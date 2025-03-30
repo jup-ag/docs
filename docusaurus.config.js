@@ -216,10 +216,10 @@ const config = {
       },
       algolia: {
         // The application ID provided by Algolia
-        appId: "JMCIA1QG7Y",
+        appId: "D6VF00EQ1A",
         // Public API key: it is safe to commit it
-        apiKey: "74d6232a420d282f4dd042bdfe519930",
-        indexName: "station-jup",
+        apiKey: "fe99e47165e1e435cb28b8bb3fdaf981",
+        indexName: "jup",
         contextualSearch: true,
         searchPagePath: false,
       },

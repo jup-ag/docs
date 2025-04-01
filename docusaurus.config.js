@@ -221,7 +221,6 @@ const config = {
         apiKey: "37fcbbea886f4051c45861b1b582dd02",
         indexName: "jup",
         contextualSearch: true,
-        searchPagePath: false,
       },
       prism: {
         theme: lightTheme,

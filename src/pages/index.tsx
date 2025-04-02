@@ -430,7 +430,7 @@ const Content = () => {
         <JupiterAPI />
         <div className="w-full max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-            Browse by tool kits
+            Browse by Tool Kits
           </h2>
           <p className="text-gray-600 text-base mb-6">
             Ready-to-use components and libraries to accelerate your development

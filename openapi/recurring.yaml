@@ -481,19 +481,23 @@ components:
         - outputMint
         - inDeposited
         - inWithdrawn
+        - inLeft
         - inUsed
         - outReceived
         - outWithdrawn
         - orderInterval
         - incrementalUsdValue
         - supposedUsdValue
+        - estimatedUsdcValueSpent
         - rawInDeposited
         - rawInWithdrawn
+        - rawInLeft
         - rawInUsed
         - rawOutReceived
         - rawOutWithdrawn
         - rawIncrementalUsdValue
         - rawSupposedUsdValue
+        - rawEstimatedUsdcValueSpent
         - status
         - closedBy
         - openTx
@@ -510,7 +514,11 @@ components:
         createdAt:
           type: string
           format: date-time
+        estimatedUsdcValueSpent:
+          type: string
         inDeposited:
+          type: string
+        inLeft:
           type: string
         inUsed:
           type: string
@@ -537,7 +545,11 @@ components:
             enabled
         outputMint:
           type: string
+        rawEstimatedUsdcValueSpent:
+          type: string
         rawInDeposited:
+          type: string
+        rawInLeft:
           type: string
         rawInUsed:
           type: string

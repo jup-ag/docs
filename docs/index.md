@@ -70,7 +70,8 @@ We will be deploying 2 different endpoints, 1 for free usage and 1 for plans wit
 - If you are still on `api.jup.ag` without an API key, you will get a 401 response
 
 **NO action required for higher rate limit plans via Portal**
-- your usage on `api.jup.ag` remains unchanged
+- Your usage on `api.jup.ag` remains unchanged
+- You can only use `api.jup.ag` with an API Key
 :::
 
 

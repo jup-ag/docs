@@ -64,11 +64,14 @@ We will be deploying 2 different endpoints, 1 for free usage and 1 for plans wit
 :::danger ACTION REQUIRED
 **ACTION REQUIRED (only for free usage)**
 - Migrate to `lite-api.jup.ag` **BY 1 MAY 2025**
-- If you are still on `api.jup.ag` without an API key, you will get a 401 response
+- The paths remain unchanged, only domain change
 - The same rate limits still apply
+- You do not need an API Key to use the APIs for free
+- If you are still on `api.jup.ag` without an API key, you will get a 401 response
 
 **NO action required for higher rate limit plans via Portal**
-- your usage on `api.jup.ag` remains unchanged
+- Your usage on `api.jup.ag` remains unchanged
+- You can only use `api.jup.ag` with an API Key
 :::
 
 

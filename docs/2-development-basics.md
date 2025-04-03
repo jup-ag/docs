@@ -39,8 +39,8 @@ To interact with the Jupiter Swap Aggregator Program, there are a few ways to do
 | Method | Description |
 | --- | --- |
 | Swap API | Simply call the Quote API to get a quote based on Jupiter’s routing engine and call the Swap API to get a serialized transaction to send to the network. |
-| Flash Fill method | If you are building your own on-chain program, we recommend this method — an alternative method from CPI, using Versioned Transaction and [Address Lookup Tables](https://docs.solana.com/developing/lookup-tables), thus reducing the size of each account (a limitation of using CPI method). |
-| Cross Program Invocation (CPI) | https://solana.com/docs/core/cpi |
+| Flash Fill method | If you are building your own on-chain program, an alternative method from CPI, using Versioned Transaction and Address Lookup Tables, thus reducing the size of each account (used to be a limitation of using CPI method). |
+| [Cross Program Invocation (CPI)](https://solana.com/docs/core/cpi) | CPI method is now recommended. As of January 2025, Jupiter Swap via CPI is recommended for most users. [The `Loosen CPI restriction` feature has been deployed on Solana, you can read more here](https://github.com/solana-labs/solana/issues/26641). |
 
 ## Building Transactions
 
@@ -62,7 +62,7 @@ There are a few key points to note when sending transactions to the Solana netwo
 2. Priority fee
 3. Compute units
 4. Transaction broadcasting methods
-5. Slippage (100% slippage will always work but also mean you can possibly get the worst outcome, so we need to find the balance between success optimizations and best output price)
+5. Slippage (100% slippage will probably always work but also mean you can possibly get the worst outcome, so we need to find the balance between success optimizations and best output price)
 
 ## More about these factors?
 

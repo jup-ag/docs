@@ -1,1 +1,1 @@
-export const DOCS_URL = "https://station.jup.ag/docs";
+export const DOCS_URL = "https://dev.jup.ag/docs";

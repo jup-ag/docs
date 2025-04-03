@@ -20,20 +20,6 @@
     color: black;
 }
 
-.navbar__brand:hover {
-    color: black;
-}
-
-.navbar__item.navbar__link {
-    margin-right: 16px;
-}
-
-.navbar__item.navbar__link.navbar__link--active {
-    margin-right: 16px;
-    font-weight: 00;
-    color: black !important;
-}
-
 /* Hide the title on mobile */
 @media (max-width: 768px) {
     .mobile-hidden {
@@ -71,11 +57,18 @@
     /* These styles are what was breaking dark mode */
     @media  (prefers-color-scheme: light) {
         .navbar__item.navbar__link {
-            @apply text-sm font-semibold text-[#304256]/40 hover:text-[#304256] hover:no-underline;
+            color: #1c1e21;
+            font-size: 0.95rem;
+            font-weight: 500;
+            &:hover {
+              color: rgb(0, 180, 90);
+              font-weight: 500;
+              text-decoration: none;
+            }
             }
 
         .navbar__item.navbar__link.navbar__link--active {
-            @apply text-[#304256];
+            color: rgb(0, 180, 90);
             }
 
         .navbar__title {
@@ -105,14 +98,6 @@
     position: relative;
 }
 
-.navbar__item.dropdown .navbar__link:not([href]) {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    font-weight: 600;
-    color: rgb(48 66 86 / 0.4);
-    position: relative;
-}
-
 .dropdown--hoverable .dropdown__menu {
     opacity: 0;
     pointer-events: none;
@@ -135,7 +120,7 @@
 .dropdown__link {
     display: block;
     padding: 0.75rem 2rem;
-    color: rgb(69, 69, 69);
+    color: #1c1e21;
     text-decoration: none;
     height: 48px;
     line-height: 24px;
@@ -145,20 +130,17 @@
 }
 
 .dropdown__link:hover {
-    color: black;
-    font-weight: 900;
+    color: rgb(0, 180, 90);
     background: none;
 }
 
 .dropdown__link--active:hover {
-    color: black;
-    font-weight: 900;
+    color: rgb(0, 180, 90);
     background-color: ghostwhite;
 }
 
 .dropdown__link.dropdown__link--active {
-    color: black;
-    font-weight: 900;
+    color: rgb(0, 180, 90);
     background-color: ghostwhite;
 }
 
@@ -167,20 +149,21 @@
     align-items: center;
     font-size: 0.875rem;
     line-height: 1.25rem;
-    font-weight: 600;
-    color: rgb(48 66 86 / 0.4);
+    font-weight: 500;
+    color: #1c1e21;
     position: relative;
 }
 
 .navbar__link-wrapper .navbar__link {
-    color: rgb(48 66 86 / 0.4);
-    font-weight: 600;
+    color: #1c1e21;
+    font-weight: 500;
     padding-right: 1.5rem; /* Make room for dropdown trigger */
 }
 
-.navbar__link:hover, .navbar__link--active {
-    color: black !important;
-    font-weight: 900 !important;
+.navbar__link-wrapper .navbar__link--active {
+    color: rgb(0, 180, 90);
+    font-weight: 500;
+    padding-right: 1.5rem; /* Make room for dropdown trigger */
 }
 
 .dropdown__trigger {

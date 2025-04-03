@@ -1,18 +1,105 @@
 ---
 sidebar_position: 1
-sidebar_label: "⚠️ New API Usage"
+sidebar_label: "Get Started"
 description: "Introduction to Jupiter APIs"
-title: "New API Usage"
+title: "Welcome!"
 ---
 
 <head>
-    <title>API Usage</title>
+    <title>Get Started</title>
     <meta name="twitter:card" content="summary" />
 </head>
 
-Since beginning of 2025, Jupiter have introduced new hostnames and the usage of our APIs through API keys to facilitate better infrastructure and developer support.
+Welcome to Jupiter Developer Documentation! You'll find detailed API guides, schemas, and powerful tool kits built by the team and DevRel Working Group to help you build with Jupiter.
+
+:::tip Breaking Changes
+Refer to the [What's New?](#whats-new) section for the latest API updates and breaking changes.
+:::
+
+## Get Started
+
+**For new developers or new to blockchain development**: We recommend you to start with the [Environment Setup](/docs/environment-setup) and [Development Basics](/docs/development-basics) guides.
+
+**For existing developers**: Please refer to the [What's New?](#whats-new) section for the latest API updates and breaking changes.
+
+**For routing integrations**: Please refer to the [DEX Integration](/docs/dex-integration) guide to complete the prerequisites before we look into integrating.
+
+**Quick Links** to APIs and Tool Kits:
+
+- [Ultra API](/docs/ultra-api/)
+- [Swap API](/docs/swap-api/get-quote)
+- [Trigger API](/docs/trigger-api/create-order)
+- [Recurring API](/docs/recurring-api/create-order)
+- [Token API](/docs/token-api/)
+- [Price API](/docs/price-api/)
+- [Swap Terminal](/docs/tool-kits/swap-terminal)
+- [Unified Wallet Kit](/docs/tool-kits/unified-wallet-kit)
+
+
+**Reach out to us** on [Discord](https://discord.gg/jup) for developer support
+
+- If you have any feedback.
+- If you have technical questions.
+- If you need API Portal support.
+- Refer to these channels to receive updates: [Telegram channel](https://t.me/jup_dev) or [Discord channel](https://discord.com/channels/897540204506775583/1115543693005430854)
+
 
 ## What's New?
+
+:::caution API Gateway: Improvements
+*Last updated: March 2025*
+
+**Improved API Gateway!**
+
+For those that have been using the new hostnames at `api.jup.ag/**`, we have made improvements to the infrastructure
+- Reduced latency in responses and much more consistent now
+- Infrastructure costs reduction (will help us look into reducing costs of the plans with higher rate limits)
+
+**Dual endpoint moving forward.**
+
+We will be deploying 2 different endpoints, 1 for free usage and 1 for plans with higher rate limits via https://portal.jup.ag/
+- `api.jup.ag` will serve only pro/paid users
+- `lite-api.jup.ag` will be the endpoint to provide free usage
+
+:::danger ACTION REQUIRED
+**ACTION REQUIRED (only for free usage)**
+- Migrate to `lite-api.jup.ag` **BY 1 MAY 2025**
+- The paths remain unchanged, only domain change
+- The same rate limits still apply
+- You do not need an API Key to use the APIs for free
+- If you are still on `api.jup.ag` without an API key, you will get a 401 response
+
+**NO action required for higher rate limit plans via Portal**
+- Your usage on `api.jup.ag` remains unchanged
+- You can only use `api.jup.ag` with an API Key
+:::
+
+
+:::caution Trigger API: New Hostname and Breaking Changes
+*Last updated: March 2025*
+
+- The `/limit/v2` path will be deprecated soon, please update your API calls to use the `/trigger/v1` path immediately.
+- `/execute` endpoint is introduced.
+- `/createOrder` endpoint now includes an additional `requestId` parameter to be used with the `/execute` endpoint.
+- `/cancelOrder` endpoint only builds the transaction for 1 order, while `/cancelOrders` endpoint builds the transaction for multiple orders.
+- The `tx` field in the responses are now `transaction` or `transactions`.
+- `/getTriggerOrders` endpoint is introduces a new format to get either active or historical orders (based on the query parameters).
+- [Please refer to the documentation for usage](/docs/trigger-api/create-order).
+
+<details>
+    <summary>
+        Hostname Changes
+    </summary>
+#### Trigger
+
+| Old Hostnames                               | New Hostnames                                 |
+| ------------------------------------------- | --------------------------------------------- |
+| `https://api.jup.ag/limit/v2/createOrder`   | `https://api.jup.ag/trigger/v1/createOrder`   |
+| `https://api.jup.ag/limit/v2/executeOrder`  | `https://api.jup.ag/trigger/v1/executeOrder`  |
+| `https://api.jup.ag/limit/v2/cancelOrder`   | `https://api.jup.ag/trigger/v1/cancelOrder`<br />`https://api.jup.ag/trigger/v1/cancelOrders` |
+| `https://api.jup.ag/limit/v2/openOrders`<br />`https://api.jup.ag/limit/v2/orderHistory`    | `https://api.jup.ag/trigger/v1/getTriggerOrders` |
+</details>
+:::
 
 :::caution API Gateway: New Hostnames and API Keys
 *Last updated: January 2025*
@@ -20,6 +107,8 @@ Since beginning of 2025, Jupiter have introduced new hostnames and the usage of 
 - API will now be served through new hostnames.
 - API will now be served through API keys.
 - API Keys will be distributed via https://portal.jup.ag (Refer to [API Setup](/docs/api-setup) to get started).
+- Old hostnames will be slowly phased out.
+- Old hostnames during this period will have reduced rate limits to facilitate migration to the new API.
 
 | Service Types          | Description                                              |
 | ---------------------- | -------------------------------------------------------- |
@@ -54,42 +143,3 @@ Since beginning of 2025, Jupiter have introduced new hostnames and the usage of 
 | `https://tokens.jup.ag/tokens_with_markets` | `https://api.jup.ag/tokens/v1/mints/tradable` |
 </details>
 :::
-
-:::caution Trigger API: New Hostname and Breaking Changes
-*Last updated: March 2025*
-
-- The `/limit/v2` path will be deprecated soon, please update your API calls to use the `/trigger/v1` path immediately.
-- `/execute` endpoint is introduced.
-- `/createOrder` endpoint now includes an additional `requestId` parameter to be used with the `/execute` endpoint.
-- `/cancelOrder` endpoint only builds the transaction for 1 order, while `/cancelOrders` endpoint builds the transaction for multiple orders.
-- The `tx` field in the responses are now `transaction` or `transactions`.
-- `/getTriggerOrders` endpoint is introduces a new format to get either active or historical orders (based on the query parameters).
-- [Please refer to the documentation for usage](/docs/trigger-api/create-order).
-
-<details>
-    <summary>
-        Hostname Changes
-    </summary>
-#### Trigger
-
-| Old Hostnames                               | New Hostnames                                 |
-| ------------------------------------------- | --------------------------------------------- |
-| `https://api.jup.ag/limit/v2/createOrder`   | `https://api.jup.ag/trigger/v1/createOrder`   |
-| `https://api.jup.ag/limit/v2/executeOrder`  | `https://api.jup.ag/trigger/v1/executeOrder`  |
-| `https://api.jup.ag/limit/v2/cancelOrder`   | `https://api.jup.ag/trigger/v1/cancelOrder`<br />`https://api.jup.ag/trigger/v1/cancelOrders` |
-| `https://api.jup.ag/limit/v2/openOrders`<br />`https://api.jup.ag/limit/v2/orderHistory`    | `https://api.jup.ag/trigger/v1/getTriggerOrders` |
-</details>
-:::
-
-## What's Old?
-
-- Old hostnames will be fully deprecated in the next 6 months on **1 June 2025**.
-- Old hostnames during this period will have reduced rate limits to facilitate migration to the new API.
-
-## Help us help you
-
-Please reach out to us
-
-- If you need have increasing demand and growth in your app.
-- If you have questions or need support.
-- Join the [Telegram channel](https://t.me/jup_dev) or [Discord channel](https://discord.com/channels/897540204506775583/1115543693005430854) to subscribe to updates.

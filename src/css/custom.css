@@ -35,10 +35,6 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3); */
 }
 
-.home {
-  background-color: #131c25;
-}
-
 @layer base {
   .stats :where(*) {
     margin: 0;
@@ -78,29 +74,6 @@
   color: transparent;
 }
 
-.home .navbar {
-  position: relative;
-  box-shadow: none;
-  background-color: transparent;
-}
-
-.home .navbar__toggle {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.home .navbar__title {
-  color: white !important;
-}
-
-.home .navbar__link {
-  color: white !important;
-}
-
-.home .navbar__link:hover {
-  color: rgba(199, 242, 132, 1) !important;
-  font-weight: 600;
-}
-
 .navbar-sidebar .launch-app {
   display: none;
 }
@@ -124,13 +97,8 @@
   animation: float-y 3s ease infinite;
 }
 
-.home .navbar-sidebar {
-  background: #111726;
-  color: white;
-}
-
 .home .navbar-sidebar .menu__link {
-  color: white;
+  color: #1c1e21;
 }
 
 .home .navbar-sidebar .menu__link:hover {

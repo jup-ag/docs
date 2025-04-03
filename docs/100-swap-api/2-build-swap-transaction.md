@@ -31,7 +31,7 @@ To interact with your own Solana program, [read how to use the **Flash Fill meth
 
 In this guide, we will pick up from where [**Get Quote**](./1-get-quote.md) guide has left off.
 
-If you have not set up your environment to use the necessary libraries, the RPC connection to the network and successfully get a quote from the Quote API, please start at [get started](../1-get-started.md) or [get quote](./1-get-quote.md).
+If you have not set up your environment to use the necessary libraries, the RPC connection to the network and successfully get a quote from the Quote API, please start at [Environment Setup](/docs/environment-setup) or [get quote](./1-get-quote.md).
 
 :::tip API Reference
 To fully utilize the Swap API, check out the [Swap API or Swap Instructions Reference](/docs/api/swap-api/swap.api.mdx).

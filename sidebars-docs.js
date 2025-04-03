@@ -6,52 +6,78 @@ const apiSidebars = require('./sidebars-api');
 const sidebars = {
   docs: [
     {
-      type: 'doc',
-      id: 'index',
+      type: 'category',
+      label: 'Development',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'index',
+        },
+        {
+          type: 'doc',
+          id: 'environment-setup',
+        },
+        {
+          type: 'doc',
+          id: 'development-basics',
+        },
+        {
+          type: 'html',
+          value: '<div class="sidebar-line-break"></div>',
+        },
+      ],
     },
     {
-      type: 'doc',
-      id: 'api-setup',
+      type: 'category',
+      label: 'Portal',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'api-setup',
+        },
+        {
+          type: 'doc',
+          id: 'api-responses',
+        },
+        {
+          type: 'html',
+          value: '<div class="sidebar-line-break"></div>',
+        },
+      ],
     },
+  ],
+  misc: [
     {
-      type: 'doc',
-      id: 'api-responses',
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-    {
-      type: 'doc',
-      id: 'get-started',
-    },
-    {
-      type: 'doc',
-      id: 'development-basics',
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-    {
-      type: 'doc',
-      id: 'sdk-api-license-agreement',
-    },
-    {
-      type: 'doc',
-      id: 'terms-of-use',
-    },
-    {
-      type: 'doc',
-      id: 'privacy-policy',
-    },
-    {
-      type: 'doc',
-      id: 'support-guidelines',
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
+      type: 'category',
+      label: 'Legal & Guidelines',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'misc/sdk-api-license-agreement',
+        },
+        {
+          type: 'doc',
+          id: 'misc/terms-of-use',
+        },
+        {
+          type: 'doc',
+          id: 'misc/privacy-policy',
+        },
+        {
+          type: 'doc',
+          id: 'misc/support-guidelines',
+        },
+        {
+          type: 'html',
+          value: '<div class="sidebar-line-break"></div>',
+        },
+      ],
     },
   ],
   ultra: [
@@ -157,123 +183,6 @@ const sidebars = {
     {
       type: 'html',
       value: '<div class="sidebar-line-break"></div>',
-    },
-  ],
-  trigger: [
-    {
-      type: 'category',
-      label: 'Trigger API',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          label: 'Create Order',
-          id: 'trigger-api/create-order',
-        },
-        {
-          type: 'doc',
-          id: 'trigger-api/execute-order',
-        },
-      ],
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-    {
-      type: 'category',
-      label: 'Order Management',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          id: 'trigger-api/cancel-order',
-        },
-        {
-          type: 'doc',
-          id: 'trigger-api/get-trigger-orders',
-        },
-      ],
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-    {
-      type: 'category',
-      label: 'Debugging',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          id: 'trigger-api/best-practices',
-        },
-      ],
-    },
-  ],
-  recurring: [
-    {
-      type: 'category',
-      label: 'Recurring API',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          id: 'recurring-api/create-order',
-        },
-        {
-          type: 'doc',
-          id: 'recurring-api/execute-order',
-        },
-      ],
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-    {
-      type: 'category',
-      label: 'Order Management',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          id: 'recurring-api/cancel-order',
-        },
-        {
-          type: 'doc',
-          id: 'recurring-api/deposit-price-order',
-        },
-        {
-          type: 'doc',
-          id: 'recurring-api/withdraw-price-order',
-        },
-        {
-          type: 'doc',
-          id: 'recurring-api/get-recurring-orders',
-        },
-      ],
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-    {
-      type: 'category',
-      label: 'Debugging',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          id: 'recurring-api/best-practices',
-        },
-      ],
     },
   ],
   trigger: [

@@ -24,7 +24,7 @@ Let’s set the stage. You are selling a **jupcake!!!** to your customer and mer
 
 ### 1. Setup
 
-You will need slightly different imports and also remember to set up connection to an RPC. If you have not set up the other typical libraries or are familiar with the Swap API, please follow this [Get Started](../1-get-started.md) and [Get Quote and Swap](./1-get-quote.md) guide.
+You will need slightly different imports and also remember to set up connection to an RPC. If you have not set up the other typical libraries or are familiar with the Swap API, please follow this [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](./1-get-quote.md) guide.
 
 ```bash
 npm i @solana/spl-token
@@ -40,13 +40,13 @@ import fetch from 'cross-fetch';
 Before we start getting a quote and swap transaction, for example sake, we will need to prepare your and Alice's accounts. In production scenario, you will need to dynamically pass this in and allow users to sign in their device interfaces.
 
 Do note that you will need to have already set up:
-- A wallet in your machine to simulate yourself as the customer as the customer is the signer of the transaction (similar to how we set up in [Get Started - Set Up Your Wallet](../1-get-started.md#4-set-up-your-wallet)).
+- A wallet in your machine to simulate yourself as the customer as the customer is the signer of the transaction (similar to how we set up in [Environment Setup](/docs/environment-setup)).
 - `trackingAccount` is an additional Solana Account you can pass in to track only Jupiter transactions easily.
 
 #### Set Up Accounts
 
 ```jsx
-const customerAccount = new Wallet(...); // Follow the method in #get-started
+const customerAccount = new Wallet(...);
 
 console.log("customerAccount:", customerAccount.publicKey.toBase58());
 
@@ -86,7 +86,7 @@ By getting a quote first, the customer can know upfront the specific amount of i
 :::warning Limitations of `ExactOut`
 Currently, there are some limitations as `ExactOut` is not widely supported across all DEXes.
 - Supported DEXes are only Orca Whirlpool, Raydium CLMM, and Raydium CPMM.
-- NOT ALL token pairs may not be available.
+- NOT ALL token pairs may be available.
 :::
 
 ```jsx

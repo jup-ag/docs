@@ -142,9 +142,13 @@ paths:
                           - string
                           - 'null'
                       otherAmount:
-                        type: number
+                        type:
+                          - number
+                          - 'null'
                       simulatedIncurredSlippageBps:
-                        type: number
+                        type:
+                          - number
+                          - 'null'
                       slippageBps:
                         type: number
                       categoryName:

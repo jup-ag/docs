@@ -16,10 +16,10 @@ const sidebars = {
       items: [
         {
           type: "category",
-          label: "Ultra API",
+          label: "Ultra API Schema",
           link: {
             type: "generated-index",
-            title: "Ultra API",
+            title: "Ultra API Schema",
             slug: "/api/ultra-api",
           },
           items: [
@@ -39,10 +39,10 @@ const sidebars = {
         },
         {
           type: "category", 
-          label: "Swap API",
+          label: "Swap API Schema",
           link: {
             type: "generated-index",
-            title: "Swap API",
+            title: "Swap API Schema",
             slug: "/api/swap-api",
           },
           items: [
@@ -66,10 +66,10 @@ const sidebars = {
         },
         {
           type: "category", 
-          label: "Trigger API",
+          label: "Trigger API Schema",
           link: {
             type: "generated-index",
-            title: "Trigger API",
+            title: "Trigger API Schema",
             slug: "/api/trigger-api",
           },
           items: [
@@ -97,10 +97,10 @@ const sidebars = {
         },
         {
           type: "category",
-          label: "Recurring API",
+          label: "Recurring API Schema",
           link: {
             type: "generated-index",
-            title: "Recurring API",
+            title: "Recurring API Schema",
             slug: "/api/recurring-api",
           },
           items: [
@@ -132,10 +132,10 @@ const sidebars = {
         },
         {
           type: "category",
-          label: "Token API",
+          label: "Token API Schema",
           link: {
             type: "generated-index",
-            title: "Token API",
+            title: "Token API Schema",
             slug: "/api/token-api",
           },
           items: [
@@ -167,10 +167,10 @@ const sidebars = {
         },
         {
           type: "category",
-          label: "Price API",
+          label: "Price API Schema",
           link: {
             type: "generated-index",
-            title: "Price API",
+            title: "Price API Schema",
             slug: "/api/price-api",
           },
           items: [

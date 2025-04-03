@@ -53,7 +53,7 @@ By default, there are **zero** protocol fees on Jupiter Swap. Integrators have t
 
 ### 1. Set up
 
-You will need to complete the prerequisites and understanding of [Get Started](../1-get-started.md) and [Get Quote and Swap](1-get-quote.md) guide as this is reliant on the Swap API.
+You will need to complete the prerequisites and understanding of [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](1-get-quote.md) guide as this is reliant on the Swap API.
 
 **Obtain `referralAccount` and `referralTokenAccount`**
 
@@ -158,7 +158,7 @@ console.log(swapResponse);
 
 ### 1. Set up
 
-You will need to complete the prerequisites and understanding of [Get Started](../1-get-started.md) and [Get Quote and Swap](1-get-quote.md) guide as this is reliant on the Swap API.
+You will need to complete the prerequisites and understanding of [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](1-get-quote.md) guide as this is reliant on the Swap API.
 
 ### 2. Set your fee in Quote
 

@@ -17,7 +17,7 @@ The Ultra API is built on top of the Swap API, with additional features to suppo
 - Request for token balances of an account.
 - Execute swap order seamlessly in a single API call.
 - We handle the complexities of RPC connections, transaction landing, slippage protection and more.
-- Provide world class customer support to your users, please refer to the [Support Guidelines](/docs/support-guidelines) for more information.
+- Provide world class customer support to your users, please refer to the [Support Guidelines](/docs/misc/support-guidelines) for more information.
 
 ## How to swap with Ultra API
 

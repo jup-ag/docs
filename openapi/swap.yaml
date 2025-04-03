@@ -496,7 +496,7 @@ components:
     SwapModeParameter:
       name: swapMode
       description: |
-        - ExactOut is for supporting use cases where you need an exact output amount, like https://station.jup.ag/docs/swap-api/payments-through-swap
+        - ExactOut is for supporting use cases where you need an exact output amount, like using [Swap API as a payment service](/docs/swap-api/payments-through-swap)
         - In the case of `ExactIn`, the slippage is on the output token
         - In the case of `ExactOut`, the slippage is on the input token
         - Not all AMMs support `ExactOut`

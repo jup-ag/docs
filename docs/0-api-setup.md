@@ -1,8 +1,8 @@
 ---
 sidebar_position: 2
-sidebar_label: "⚠️ New API Setup"
+sidebar_label: "API Key Setup"
 description: "Guide to setting up API Keys to access Jupiter APIs."
-title: "New API Setup"
+title: "API Key Setup"
 ---
 
 <head>

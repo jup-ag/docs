@@ -1,9 +1,5 @@
 # SDK & API License Agreement
 
-<!---
-*Last updated: January 17, 2025*
--->
-
 **IMPORTANT:** This Jupiter API & SDK License Agreement ("Agreement") is a legally binding contract between you, as Licensee ("You", "Your" or "Licensee") and Block Raccoon S.A., an entity incorporated in Panama ("Jupiter," "we" or "our") and applies to your use of the Jupiter API or SDK, as defined herein, available through https://portal.jup.ag (collectively the "Service"). The Service includes an Application Programming Interface ("API") and a Software Development Kit (“SDK”), which is further discussed and defined below. If you do not agree to be bound by the terms and conditions of this Agreement, please do not proceed with the use of Service, the API, or the SDK.
 
 This Agreement becomes effective as of the date you first access, download, copy or otherwise use the API or SDK ("Effective Date"). This Agreement shall continue until terminated either by us or by you. Even after termination of this Agreement, certain provisions will survive, as discussed herein. This Agreement also incorporates Jupiter`s Terms of Service link and Privacy Policy link which terms shall also govern your use of the Service. In the event of any conflict between this Agreement and the Terms of Service or Privacy Policy, the provisions of this Agreement shall prevail.
@@ -14,23 +10,23 @@ The API and SDK are protected by copyright laws and international copyright trea
 
 **1. Definitions​**
 
-1.1 **"Application Programming Interfaces"** or **"API"** or **“Jupiter API”** means the back-end smart routing algorithm which facilitates the user’s efficient swapping of digital assets at a variety of third party trading venues, which may include object code, software libraries, software tools, sample source code, published specifications and Documentation. Jupiter API shall include any future, updated or otherwise modified version(s) thereof furnished by Jupiter (in its sole discretion) to Licensee.
+1.1 **"Application Programming Interfaces"** or **"API"** or **"Jupiter API"** means the back-end smart routing algorithm which facilitates the user's efficient swapping of digital assets at a variety of third party trading venues, which may include object code, software libraries, software tools, sample source code, published specifications and Documentation. Jupiter API shall include any future, updated or otherwise modified version(s) thereof furnished by Jupiter (in its sole discretion) to Licensee.
 
-1.2 **"Software Development Kit"** or **“SDK”** or **“Jupiter SDK”** means the ancillary tools and resources that allow the user to utilise or integrate the API. Jupiter SDK shall include any future, updated or otherwise modified version(s) thereof furnished by Jupiter (in its sole discretion) to Licensee.
+1.2 **"Software Development Kit"** or **"SDK"** or **"Jupiter SDK"** means the ancillary tools and resources that allow the user to utilise or integrate the API. Jupiter SDK shall include any future, updated or otherwise modified version(s) thereof furnished by Jupiter (in its sole discretion) to Licensee.
 
 1.3 **"Documentation"** includes, but is not limited to programmer guides, manuals, materials, and information appropriate or necessary for use in connection with the API.
 
 **2. Grant of License​**
 
-2.1 Subject to the terms of this Agreement, Jupiter hereby grants Licensee a limited, non-exclusive, fee-bearing, non-transferable, non-sublicensable licence to use the API or SDK during the term of this Agreement solely for the purpose of Licensee's internal development efforts to develop products or services integrating the API and/or SDK in any manner (the **Licensee’s Product**).
+2.1 Subject to the terms of this Agreement, Jupiter hereby grants Licensee a limited, non-exclusive, fee-bearing, non-transferable, non-sublicensable licence to use the API or SDK during the term of this Agreement solely for the purpose of Licensee's internal development efforts to develop products or services integrating the API and/or SDK in any manner, including without limitation for any informational, comparison, or testing purpose (the **Licensee's Product**).
 
 2.2 Licensee shall have no right to distribute, license (whether or not through multiple tiers) or otherwise transfer the API or SDK to any third party.
 
 2.3 In case of potential other API or SDK use that is not prescribed by this Agreement, please write to info@jup.ag to seek written consent.
 
-2.4 Representations. Both Parties to this Agreement are duly organized and validly existing in good standing with all requisite power and authority to enter into this Agreement and conduct its business as is now being conducted. Neither Party is identified on, or engages in any transactions with anyone else listed on, any sanctions list maintained by the U.S. Department of the Treasury’s Office of Foreign Asset Control (“OFAC”) and have shared with each other a copy of their Articles of Incorporation and Significant Shareholder list.
+2.4 Representations. Both Parties to this Agreement are duly organized and validly existing in good standing with all requisite power and authority to enter into this Agreement and conduct its business as is now being conducted. Neither Party is identified on, or engages in any transactions with anyone else listed on, any sanctions list maintained by the U.S. Department of the Treasury's Office of Foreign Asset Control ("OFAC") and have shared with each other a copy of their Articles of Incorporation and Significant Shareholder list.
 
-2.5 By providing access to the API and the SDK, Jupiter is solely providing a back-end technical service to the Licensee which allows the Licensee to provide swap-related services to end users of the Licensee’s products or services. Jupiter is not a party to any agreement for swap-related services between the Licensee, its end users, any counterparty or trading venue where swaps are performed, nor any trustee, custodian, bailee, manager, administrator or service provider in respect of any digital asset or otherwise.
+2.5 By providing access to the API and the SDK, Jupiter is solely providing a back-end technical service to the Licensee which allows the Licensee to provide swap-related services to end users of the Licensee's products or services. Jupiter is not a party to any agreement for swap-related services between the Licensee, its end users, any counterparty or trading venue where swaps are performed, nor any trustee, custodian, bailee, manager, administrator or service provider in respect of any digital asset or otherwise.
 
 2.6 Independent Contractor Relationship. The relationship between the Parties is that of independent contractors. Nothing in this Agreement shall be construed to create anything like the relationship of an employer and employee, joint venture, partnership, or joint association.
 
@@ -64,9 +60,9 @@ k. make any representations, warranties or commitments (i) regarding the API or 
 
 l. take any action that would subject the API or SDK to any third-party terms, including without limitation any open source software licence terms.
 
-3.3 Without prejudice of the generality of the foregoing, where the Licensee’s Product is competitive with the API or the Service, Jupiter shall have the right to access the Licensee’s Product, request the Licensee for information regarding the Licensee’s Product, and Jupiter shall be granted a non-exclusive, royalty-free, non-transferable, non-sublicensable licence to use the Licensee’s Product for any purpose.
+3.3 Without prejudice of the generality of the foregoing, where the Licensee's Product is competitive (whether wholly or partially) with the API or the Service, Jupiter shall have the right to access the Licensee's Product and/or request the Licensee for information regarding the Licensee's Product. Jupiter shall be granted a non-exclusive, royalty-free, non-transferable, non-sublicensable licence to use the Licensee's Product (including without limitation any application programming interface, software development kit, logos, brand information, technical information or data or information in connection with any aspect of the Licensee's Product) for any purpose.
 
-3.4 Third Party Software. Licensee acknowledges that effective utilization of the API and SDK may require the use of a development tool, compiler and other software and technology of third parties (“Third Party Software”). Licensee is solely responsible for procuring such Third-Party Software and technology and the necessary licenses for the use thereof. Jupiter makes no representation or warranty concerning Third Party Software and shall have no obligation or liability with respect to Third Party Software.
+3.4 Third Party Software. Licensee acknowledges that effective utilization of the API and SDK may require the use of a development tool, compiler and other software and technology of third parties ("Third Party Software"). Licensee is solely responsible for procuring such Third-Party Software and technology and the necessary licenses for the use thereof. Jupiter makes no representation or warranty concerning Third Party Software and shall have no obligation or liability with respect to Third Party Software.
 
 3.5 No right is granted to Licensee to sublicense its rights hereunder. All rights not expressly granted are reserved by Jupiter and, except as expressly set forth herein, no license is granted by Jupiter under this Agreement directly, by implication, estoppel or otherwise, under any patent, copyright, trade secret or trademark or other intellectual property rights of Jupiter. Nothing herein shall be deemed to authorize Licensee to use Jupiter`s trademarks or trade names in Licensee's advertising, marketing, promotional, sales or related materials. Jupiter reserves all rights not otherwise expressly granted in this Agreement.
 
@@ -82,7 +78,7 @@ l. take any action that would subject the API or SDK to any third-party terms, i
 
 4.3 The Licensee acknowledges that the license granted under this Agreement does not provide Licensee with title or ownership to the API or SDK, but only a right of limited use under the terms and conditions of this Agreement.
 
-4.4 The Parties acknowledge that Jupiter does not store, send, or receive digital assets. Digital assets exist only by virtue of the ownership record maintained on the relevant blockchain network. Any creation or transfer of title that might occur in respect of any digital asset occurs on the relevant blockchain network (on the relevant contractual terms applicable to such creation and/or transfer) and is performed by the Licensee’s Product, and Jupiter does not have any role or responsibility in such transactions. Jupiter cannot guarantee that the Licensee’s Product, or any party can effect the transfer of such title or right to any digital asset. Accordingly, Jupiter cannot provide any guarantee, warranty or assurance regarding the authenticity, uniqueness, originality, quality, marketability, legality or value of any digital assets utilised in connection with the API and the Services.
+4.4 The Parties acknowledge that Jupiter does not store, send, or receive digital assets. Digital assets exist only by virtue of the ownership record maintained on the relevant blockchain network. Any creation or transfer of title that might occur in respect of any digital asset occurs on the relevant blockchain network (on the relevant contractual terms applicable to such creation and/or transfer) and is performed by the Licensee's Product, and Jupiter does not have any role or responsibility in such transactions. Jupiter cannot guarantee that the Licensee's Product, or any party can effect the transfer of such title or right to any digital asset. Accordingly, Jupiter cannot provide any guarantee, warranty or assurance regarding the authenticity, uniqueness, originality, quality, marketability, legality or value of any digital assets utilised in connection with the API and the Services.
 
 **5. No Obligation to Support​**
 
@@ -96,13 +92,13 @@ l. take any action that would subject the API or SDK to any third-party terms, i
 
 **6. Fees & Payment​**
 
-6.1 Jupiter shall charge a subscription fee for usage of the Jupiter API and/or SDK. This may be a fixed fee, infrastructure fee and/or a variable fee based on revenue earned by the Licensee in respect of the Licensee’s Product.
+6.1 Jupiter shall charge a subscription fee for usage of the Jupiter API and/or SDK. This may be a fixed fee, infrastructure fee and/or a variable fee based on revenue earned by the Licensee in respect of the Licensee's Product.
 
 6.2 The details of the level of fees charged shall be notified to you via the API portal at https://portal.jup.ag. By accessing, downloading, copying or otherwise using the API or SDK, you shall be deemed to have consented to said fees.
 
 6.3 The Fees may be reviewed by Jupiter at any time commencing from three (3) months after the Effective Date. Any updated fees shall be notified to you via the API portal and your continued usage of the API or SDK shall be deemed consent to such updated fees.
 
-**7. Licensee’s Obligations**
+**7. Licensee's Obligations**
 
 7.1 The Licensee agrees to report to Jupiter any errors or difficulties discovered related to the API or SDK, and the characteristic conditions and symptoms of such errors and difficulties.
 
@@ -126,7 +122,7 @@ l. take any action that would subject the API or SDK to any third-party terms, i
 
 8.3 Jupiter may disclose and publicise the existence of the business relationship between Jupiter and you on its website and in promotional and marketing materials without requiring any further consent from you.
 
-8.4 You shall ensure that the Licensee’s Product shall prominently display to end users of such product or service the message “Powered by Jupiter”.
+8.4 You shall ensure that the Licensee's Product shall prominently display to end users of such product or service the message "Powered by Jupiter".
 
 **9. No Warranty​**
 
@@ -144,7 +140,7 @@ You agree to indemnify and hold harmless Jupiter and its contributors, subsidiar
 
 **12. Disclaimers**
 
-12.1 UNLESS SEPARATELY STATED IN A WRITTEN EXPRESS LIMITED WARRANTY, THE API AND SDK PROVIDED BY JUPITER IS PROVIDED “AS IS” AND ON AN “AS AVAILABLE” BASIS, WITHOUT WARRANTIES OF ANY KIND FROM JUPITER, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT POSSIBLE PURSUANT TO APPLICABLE LAW, JUPITER DISCLAIMS ALL WARRANTIES EXPRESS, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, SATISFACTORY QUALITY OR WORKMANSHIP LIKE EFFORT, FITNESS FOR A PARTICULAR PURPOSE, RELIABILITY OR AVAILABILITY, ACCURACY, LACK OF VIRUSES, QUIET ENJOYMENT, NON- INFRINGEMENT OF THIRD-PARTY RIGHTS OR OTHER VIOLATIONS OF RIGHTS. SOME JURISDICTIONS DO NOT ALLOW EXCLUSIONS OR LIMITATIONS OF IMPLIED WARRANTIES, SO THE ABOVE EXCLUSIONS OR LIMITATIONS MAY NOT APPLY TO YOU. NO ADVICE OR INFORMATION, WHETHER ORAL OR WRITTEN, OBTAINED BY YOU FROM JUPITER OR ITS AFFILIATES SHALL BE DEEMED TO ALTER THIS DISCLAIMER BY JUPITER OF WARRANTY REGARDING THE API OR SDK OR THE AGREEMENT, OR TO CREATE ANY WARRANTY OF ANY SORT FROM JUPITER.
+12.1 UNLESS SEPARATELY STATED IN A WRITTEN EXPRESS LIMITED WARRANTY, THE API AND SDK PROVIDED BY JUPITER IS PROVIDED "AS IS" AND ON AN "AS AVAILABLE" BASIS, WITHOUT WARRANTIES OF ANY KIND FROM JUPITER, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT POSSIBLE PURSUANT TO APPLICABLE LAW, JUPITER DISCLAIMS ALL WARRANTIES EXPRESS, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, SATISFACTORY QUALITY OR WORKMANSHIP LIKE EFFORT, FITNESS FOR A PARTICULAR PURPOSE, RELIABILITY OR AVAILABILITY, ACCURACY, LACK OF VIRUSES, QUIET ENJOYMENT, NON- INFRINGEMENT OF THIRD-PARTY RIGHTS OR OTHER VIOLATIONS OF RIGHTS. SOME JURISDICTIONS DO NOT ALLOW EXCLUSIONS OR LIMITATIONS OF IMPLIED WARRANTIES, SO THE ABOVE EXCLUSIONS OR LIMITATIONS MAY NOT APPLY TO YOU. NO ADVICE OR INFORMATION, WHETHER ORAL OR WRITTEN, OBTAINED BY YOU FROM JUPITER OR ITS AFFILIATES SHALL BE DEEMED TO ALTER THIS DISCLAIMER BY JUPITER OF WARRANTY REGARDING THE API OR SDK OR THE AGREEMENT, OR TO CREATE ANY WARRANTY OF ANY SORT FROM JUPITER.
 
 12.2 NEITHER JUPITER NOR THE API PROVIDES ANY DIGITAL ASSET EXCHANGE OR PORTFOLIO/FUND MANAGEMENT SERVICE. WHERE THE LICENSEE OR ANY END USER OF THE LICENSEE'S PRODUCT MAKES THE DECISION TO TRANSACT UTILISING THE API OR THE SERVICE, THEN SUCH DECISIONS AND TRANSACTIONS AND ANY CONSEQUENCES FLOWING THEREFROM ARE SUCH TRANSACTING PARTY'S SOLE RESPONSIBILITY.
 
@@ -162,7 +158,7 @@ You agree to indemnify and hold harmless Jupiter and its contributors, subsidiar
 
 13.2 This Agreement will terminate automatically if you fail to comply with any of the terms and conditions of this Agreement and you will be liable to Jupiter and its suppliers for damages or losses caused by your non-compliance. The waiver by Jupiter of a specific breach or default shall not constitute the waiver of any subsequent breach or default.
 
-13.3 Either party shall have the right to terminate the Agreement, immediately or upon thirty (30) days written notice to legal@jup.ag.
+13.3 Either party shall have the right to terminate the Agreement (for any reason), by written notice to the other party and refunding a pro-rata portion of any unutilised fee paid (in the case of termination by Jupiter). For the purpose of the Licensee's service of notice, it may contact legal@jup.ag.
 
 13.4 Upon termination of this Agreement, Licensee will immediately cease using the API and the SDK, and Licensee agrees to destroy all adaptations or copies of the API, SDK, and Documentation or return them to Jupiter upon the termination of this License.
 
@@ -176,7 +172,7 @@ You agree to indemnify and hold harmless Jupiter and its contributors, subsidiar
 
 14.2 Licensee and Jupiter agree to notify each other in writing of any dispute within thirty (30) days of when it arises. Notice to Jupiter shall be sent to legal@jup.ag.
 
-14.3 The Licensee and Jupiter shall cooperate in good faith to resolve any dispute, controversy or claim arising out of, relating to, or in connection with this Agreement, including with respect to the formation, applicability, breach, termination, validity or enforceability thereof (a “Dispute”) shall be settled in accordance with the laws of Panama. The parties undertake to carry out any award without delay and waive their right to any form of recourse insofar as such waiver can validly be made. Judgment upon the award may be entered by any court having jurisdiction thereof or having jurisdiction over the relevant party or its assets. Jupiter and the Licensee will each pay their respective attorneys’ fees and expenses. Any dispute arising out of or related to this Agreement is personal to the Licensee and Jupiter and will not be brought as a class arbitration, class action, or any other type of representative proceeding. There will be no class arbitration or arbitration in which a person attempts to resolve a dispute as a representative of another person or group of persons. Further, a dispute cannot be brought as a class or other type of representative action, whether within or outside of arbitration, or on behalf of any other person or group of persons.
+14.3 The Licensee and Jupiter shall cooperate in good faith to resolve any dispute, controversy or claim arising out of, relating to, or in connection with this Agreement, including with respect to the formation, applicability, breach, termination, validity or enforceability thereof (a "Dispute") shall be settled in accordance with the laws of Panama. The parties undertake to carry out any award without delay and waive their right to any form of recourse insofar as such waiver can validly be made. Judgment upon the award may be entered by any court having jurisdiction thereof or having jurisdiction over the relevant party or its assets. Jupiter and the Licensee will each pay their respective attorneys' fees and expenses. Any dispute arising out of or related to this Agreement is personal to the Licensee and Jupiter and will not be brought as a class arbitration, class action, or any other type of representative proceeding. There will be no class arbitration or arbitration in which a person attempts to resolve a dispute as a representative of another person or group of persons. Further, a dispute cannot be brought as a class or other type of representative action, whether within or outside of arbitration, or on behalf of any other person or group of persons.
 
 14.4 Any dispute between the parties will be governed by this Agreement and the laws of Panama, without giving effect to any conflict of laws principles that may provide for the application of the law of another jurisdiction. Whether the dispute is heard in arbitration or in court, Licensee and Jupiter will not commence against the other a class action, class arbitration or representative action or proceeding.
 

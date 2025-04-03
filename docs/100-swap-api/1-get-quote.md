@@ -157,7 +157,6 @@ Notes:
 
 | DEX | Max | Min |
 | --- | --- | --- |
-| Jupiter Perps |  |  |
 | Meteora DLMM | 47 | 19 |
 | Meteora | 45 | 18 |
 | Moonshot | 37 | 15 |

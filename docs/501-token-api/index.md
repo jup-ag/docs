@@ -138,9 +138,6 @@ A list of useful tags are:
 | **verified** | A list of verified tokens, consisting of community-verified tokens via [catdetlist.jup.ag](https://catdetlist.jup.ag) and the previous standard of Jupiter Strict. |
 | **lst** | A list of liquid staked tokens, maintained with Sanctum. |
 | **token-2022** | A list of all token-2022 tokens. |
-| **moonshot** | A list of tokens minted via Moonshot. |
-| **pump** | A list of tokens minted via Pump.fun. |
-
 
 You can pass in multiple tags using a comma separated list, refer to the API Reference for more details.
 :::

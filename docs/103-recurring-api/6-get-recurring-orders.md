@@ -21,7 +21,7 @@ This is a GET request to `/getRecurringOrders` endpoint. The response is paginat
 
 :::note
 - orderStatus can be either `active` or `history`
-- recurringType can be either `time` or `price`
+- recurringType can be either `time` or `price` or `all`
 - includeFailedTx can be either `true` or `false`
 :::
 
@@ -35,6 +35,8 @@ You can optionally pass in the input and output token mint addresses to filter t
 
 :::note
 Please take note, depending on the `recurringType`, the response will be different.
+
+You can use `recurringType=all` to get all orders from both `time` and `price`.
 :::
 
 ```jsx

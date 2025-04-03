@@ -48,8 +48,8 @@ const createOrderResponse = await (
         body: JSON.stringify({
             inputMint: inputMint.toString(),
             outputMint: outputMint.toString(),
-            maker: "5dMXLJ8GYQxcHe2fjpttVkEpRrxcajRXZqJHCiCbWS4H",
-            payer: "5dMXLJ8GYQxcHe2fjpttVkEpRrxcajRXZqJHCiCbWS4H",
+            maker: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
+            payer: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
             params: {
                 makingAmount: "1000000",
                 takingAmount: "300000",

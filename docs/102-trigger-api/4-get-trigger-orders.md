@@ -34,7 +34,7 @@ You can optionally pass in the input and output token mint addresses to filter t
 ```jsx
 const openOrdersResponse = await (
     await fetch(
-        'https://api.jup.ag/trigger/v1/getTriggerOrders?user=devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4&orderStatus=active'
+        'https://api.jup.ag/trigger/v1/getTriggerOrders?user=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3&orderStatus=active'
     )
 ).json();
 ```
@@ -45,7 +45,7 @@ const openOrdersResponse = await (
 {
   "orders": [
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "3kmsJAquwE5in9dcn4hZN1mj7NqGnqXHACG5pa1H7dPZ",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
@@ -67,7 +67,7 @@ const openOrdersResponse = await (
       "trades": []
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "3YvKGGE9nsT5mHM9BB6LyvDjWwjowHxbWDTtJE5cknn7",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
@@ -89,7 +89,7 @@ const openOrdersResponse = await (
       "trades": []
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "7K9TjUq5nRzivHYV6XZ8D7fDvF5cJvPQGR24w6Ezsr2s",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
@@ -113,7 +113,7 @@ const openOrdersResponse = await (
   ],
   "totalPages": 1,
   "page": 1,
-  "user": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+  "user": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
   "orderStatus": "active"
 }
 ```
@@ -136,7 +136,7 @@ const orderHistoryResponse = await (
 {
   "orders": [
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "99uWTWukow8k7dqcpbYoHxTAWGvn1YkT1VMmnEeTjuDr",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
@@ -176,7 +176,7 @@ const orderHistoryResponse = await (
       ]
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "HxYetV9XeMfJn62rX34WUohF7ALxa51kfdZXAtfGF3Z4",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
@@ -198,7 +198,7 @@ const orderHistoryResponse = await (
       "trades": []
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "2BwoyZyWr1kkf5VJ2QQttMqnxSFECZLT6Ym7VhPYKDwy",
       "inputMint": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
       "outputMint": "So11111111111111111111111111111111111111112",
@@ -238,7 +238,7 @@ const orderHistoryResponse = await (
       ]
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "HcrU69DdNU6zKRSkurSC4G7QhMECxTLwT73qJhaZcTjv",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
@@ -278,7 +278,7 @@ const orderHistoryResponse = await (
       ]
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "6xFuxx9JHZfGc8AqofDxrY16TH9Hpts38fP7RPd9K4wt",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
@@ -318,7 +318,7 @@ const orderHistoryResponse = await (
       ]
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "DMB7DrtWMw8Hn29BvNNdu1ZZhEny93NNRfmnqxD3stBn",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
@@ -358,7 +358,7 @@ const orderHistoryResponse = await (
       ]
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "Gn69cRioGPrQeiuDq9XkUZdmgtWM8496Yzi2tgy9m193",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
@@ -398,7 +398,7 @@ const orderHistoryResponse = await (
       ]
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "5ifZY5yYuuy4F16JoqA4fVfTPSmvxZKUKazxU9xq6BFN",
       "inputMint": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
       "outputMint": "So11111111111111111111111111111111111111112",
@@ -438,7 +438,7 @@ const orderHistoryResponse = await (
       ]
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "6WMr67hvCQ1cDZ11q7wyvuRXwRkAnpcE9ANbtwvdXxJX",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
@@ -478,7 +478,7 @@ const orderHistoryResponse = await (
       ]
     },
     {
-      "userPubkey": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+      "userPubkey": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
       "orderKey": "BwFmvmU9qnrjz4Q3Zu9Z2vabBj3FWawutrt85yCw3Kgs",
       "inputMint": "So11111111111111111111111111111111111111112",
       "outputMint": "HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC",
@@ -520,7 +520,7 @@ const orderHistoryResponse = await (
   ],
   "totalPages": 43,
   "page": 1,
-  "user": "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4",
+  "user": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
   "orderStatus": "history"
 }
 ```

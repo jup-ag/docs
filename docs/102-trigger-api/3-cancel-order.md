@@ -39,7 +39,7 @@ const cancelOrderResponse = await (
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            maker: "5dMXLJ8GYQxcHe2fjpttVkEpRrxcajRXZqJHCiCbWS4H",
+            maker: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
             computeUnitPrice: "auto",
             order: "3g2jF8txqXPp6GUStwtXMrWydeYWxU4qoBA8UDLoTnK7",
         })
@@ -89,7 +89,7 @@ const cancelOrdersResponse = await (
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            maker: "5dMXLJ8GYQxcHe2fjpttVkEpRrxcajRXZqJHCiCbWS4H",
+            maker: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
             computeUnitPrice: "auto",
             orders: [
                 "6fe8ByaiFHisjnYnH5qdpyiNtkn89mMBQUemRkVmKhro",

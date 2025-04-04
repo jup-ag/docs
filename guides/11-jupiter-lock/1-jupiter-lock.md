@@ -48,7 +48,7 @@ Video credits: [Aremia Vincenzo](https://twitter.com/Arimiyahu1)
 1. Navigate to https://lock.jup.ag/.
 2. Click `+ Create Token Lock` button.
 3. Click `Connect Wallet` button. Note that you can only lock the tokens you have in your connected wallet.
-4. Search for the token you wish to lock via contract address or ticker.
+4. Search for the token you wish to lock via contract address or ticker. Token2022 tokens are currently not supported.
 5. Fill in the required details:
    1. Lock Title. Name this lock e.g. Team Tokens.
    2. Lock Amount. You can see the amount of token within your wallet.

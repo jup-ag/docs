@@ -1,7 +1,6 @@
 export const navbarConfigs = {
   "/docs": [
-    {
-      to: "/docs/",
+    { to: "/docs/",
       label: "APIs",
       position: "left",
       items: [
@@ -23,17 +22,9 @@ export const navbarConfigs = {
       ],
     },
     { to: "/docs/dex-integration", label: "DEX Integration", position: "left" },
-    {
-      to: "/docs/tool-kits/swap-terminal",
-      label: "Tool Kits",
-      position: "left",
-    },
+    { to: "/docs/tool-kits/swap-terminal", label: "Tool Kits", position: "left" },
     { to: "/docs/api", label: "API Reference", position: "left" },
-    {
-      to: "/docs/misc/sdk-api-license-agreement",
-      label: "Misc",
-      position: "left",
-    },
+    { to: "/docs/misc/sdk-api-license-agreement", label: "Misc", position: "left" },
   ],
   "/search": [
     {
@@ -59,17 +50,9 @@ export const navbarConfigs = {
       ],
     },
     { to: "/docs/dex-integration", label: "DEX Integration", position: "left" },
-    {
-      to: "/docs/tool-kits/swap-terminal",
-      label: "Tool Kits",
-      position: "left",
-    },
+    { to: "/docs/tool-kits/swap-terminal", label: "Tool Kits", position: "left" },
     { to: "/docs/api", label: "API Reference", position: "left" },
-    {
-      to: "/docs/misc/sdk-api-license-agreement",
-      label: "Misc",
-      position: "left",
-    },
+    { to: "/docs/misc/sdk-api-license-agreement", label: "Misc", position: "left" },
   ],
   "/": [
     {
@@ -95,17 +78,9 @@ export const navbarConfigs = {
       ],
     },
     { to: "/docs/dex-integration", label: "DEX Integration", position: "left" },
-    {
-      to: "/docs/tool-kits/swap-terminal",
-      label: "Tool Kits",
-      position: "left",
-    },
+    { to: "/docs/tool-kits/swap-terminal", label: "Tool Kits", position: "left" },
     { to: "/docs/api", label: "API Reference", position: "left" },
-    {
-      to: "/docs/misc/sdk-api-license-agreement",
-      label: "Misc",
-      position: "left",
-    },
+    { to: "/docs/misc/sdk-api-license-agreement", label: "Misc", position: "left" },
   ],
   "/ecosystem": [
     {
@@ -131,17 +106,9 @@ export const navbarConfigs = {
       ],
     },
     { to: "/docs/dex-integration", label: "DEX Integration", position: "left" },
-    {
-      to: "/docs/tool-kits/swap-terminal",
-      label: "Tool Kits",
-      position: "left",
-    },
+    { to: "/docs/tool-kits/swap-terminal", label: "Tool Kits", position: "left" },
     { to: "/docs/api", label: "API Reference", position: "left" },
-    {
-      to: "/docs/misc/sdk-api-license-agreement",
-      label: "Misc",
-      position: "left",
-    },
+    { to: "/docs/misc/sdk-api-license-agreement", label: "Misc", position: "left" },
   ],
 };
 

@@ -126,6 +126,12 @@ Now, you are able to get a quote and use our Swap API to build the swap transact
 
 If you prefer to compose with instructions instead of the provided transaction that is returned from the `/swap` endpoint (like the above example). You can post to `/swap-instructions` instead, it takes the same parameters as the `/swap` endpoint but returns you the instructions rather than the serialized transaction.
 
+:::note
+In some cases, you may add more accounts to the transaction, which may exceed the transaction size limits. To work around this, you can use the `maxAccounts` parameter in `/quote` endpoint to limit the number of accounts in the transaction.
+
+[Refer to the GET /quote's `maxAccounts` guide for more details.](/docs/swap-api/get-quote#max-accounts)
+:::
+
 <details>
     <summary>
         <div>
@@ -231,7 +237,7 @@ As of January 2025, Jupiter Swap via CPI is recommended for most users.
 
 With Jupiter's complex routing, best prices comes at a cost. It often means more compute resources and accounts are required as it would route across multiple DEXes in one transaction.
 
-Solana transactions are limited to 1232 bytes, Jupiter is using Address Lookup Tables (ALTs) to include more accounts in one transaction. However, the CPI method cannot use ALTs, which means when you add more accounts to a Jupiter Swap transaction, it will likely fail if it exceeds the transaction size limits.
+Solana transactions are limited to 1232 bytes, Jupiter is using [Address Lookup Tables (ALTs)](https://docs.solana.com/developing/lookup-tables) to include more accounts in one transaction. However, the CPI method cannot use ALTs, which means when you add more accounts to a Jupiter Swap transaction, it will likely fail if it exceeds the transaction size limits.
 
 **Flash Fill allows the use of Versioned Transaction and ALTs**, hence, reducing the total accounts used for a Jupiter Swap transaction.
 :::

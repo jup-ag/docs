@@ -34,3 +34,7 @@ Or contact Jupiter through [Twitter](https://twitter.com/JupiterExchange) or [Di
 _(JUP Token, JLP Token, JupSOL Token Logos)_
 
 <DownloadBox fileName="jupiter-token-logo.zip" />
+
+### Figma Collection
+
+https://www.figma.com/community/file/1443380475971307698/jupiter-exchange

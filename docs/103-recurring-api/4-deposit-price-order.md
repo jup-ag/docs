@@ -12,7 +12,9 @@ title: "Deposit Price Order"
 The root URL of the Recurring API's deposit to a price-based order endpoint is as such.
 
 ```
-https://api.jup.ag/recurring/v1/priceDeposit
+For paid tiers with API Keys, use `https://api.jup.ag/recurring/v1/priceDeposit`
+
+For free tier, use `https://lite-api.jup.ag/recurring/v1/priceDeposit`
 ```
 
 :::info
@@ -33,7 +35,7 @@ If you want to deposit funds into a price-based order, you need to do these step
 
 ```jsx
 const priceDepositResponse = await (
-    await fetch('https://api.jup.ag/recurring/v1/priceDeposit', {
+    await fetch('https://lite-api.jup.ag/recurring/v1/priceDeposit', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

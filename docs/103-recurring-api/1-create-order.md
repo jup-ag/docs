@@ -11,7 +11,9 @@ title: "Create Order"
 The root URL of the Recurring API's create order endpoint is as such.
 
 ```
-https://api.jup.ag/recurring/v1/createOrder
+For paid tiers with API Keys, use `https://api.jup.ag/recurring/v1/createOrder`
+
+For free tier, use `https://lite-api.jup.ag/recurring/v1/createOrder`
 ```
 
 ## Create Order
@@ -46,7 +48,7 @@ e.g. 10 orders * 86_400 seconds = 864_000 seconds = 10 days
 
 ```jsx
 const createOrderResponse = await (
-    await fetch('https://api.jup.ag/recurring/v1/createOrder', {
+    await fetch('https://lite-api.jup.ag/recurring/v1/createOrder', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -86,7 +88,7 @@ Some notes to help you understand the parameters.
 
 ```jsx
 const createOrderResponse = await (
-    await fetch('https://api.jup.ag/recurring/v1/createOrder', {
+    await fetch('https://lite-api.jup.ag/recurring/v1/createOrder', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

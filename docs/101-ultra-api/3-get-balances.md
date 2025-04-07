@@ -12,7 +12,9 @@ title: "Get Balances"
 The root URL of the Ultra API's order endpoint is as such.
 
 ```
-https://api.jup.ag/ultra/v1/balances
+For paid tiers with API Keys, use `https://api.jup.ag/ultra/v1/balances`
+
+For free tier, use `https://lite-api.jup.ag/ultra/v1/balances`
 ```
 
 :::tip API Reference
@@ -25,7 +27,7 @@ The Ultra API supports a simple endpoint to get the token balances of an account
 
 ```jsx
 const balancesResponse = await (
-  await fetch(`https://api.jup.ag/ultra/v1/balances/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`)
+  await fetch(`https://lite-api.jup.ag/ultra/v1/balances/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`)
 ).json();
 
 console.log(JSON.stringify(balancesResponse, null, 2));

@@ -12,7 +12,9 @@ title: "Get Recurring Orders"
 The root URL of the Recurring API's get recurring orders endpoint is as such.
 
 ```
-https://api.jup.ag/recurring/v1/getRecurringOrders
+For paid tiers with API Keys, use `https://api.jup.ag/recurring/v1/getRecurringOrders`
+
+For free tier, use `https://lite-api.jup.ag/recurring/v1/getRecurringOrders`
 ```
 
 This is a GET request to `/getRecurringOrders` endpoint. The response is paginated for every 10 orders and you can view different pages using the `page` parameter.
@@ -40,7 +42,7 @@ Please take note, depending on the `recurringType`, the response will be differe
 ```jsx
 const openOrdersResponse = await (
     await fetch(
-        'https://api.jup.ag/recurring/v1/getRecurringOrders?user=replaceWithPublicKey&orderStatus=active&recurringType=time'
+        'https://lite-api.jup.ag/recurring/v1/getRecurringOrders?user=replaceWithPublicKey&orderStatus=active&recurringType=time'
     )
 ).json();
 ```
@@ -114,7 +116,7 @@ To get the order history, you can pass in the `orderStatus` parameter as `histor
 ```jsx
 const orderHistoryResponse = await (
     await fetch(
-        'https://api.jup.ag/recurring/v1/getRecurringOrders?user=replaceWithPublicKey&orderStatus=history&recurringType=price'
+        'https://lite-api.jup.ag/recurring/v1/getRecurringOrders?user=replaceWithPublicKey&orderStatus=history&recurringType=price'
     )
 ).json();
 ```

@@ -27,7 +27,9 @@ In this guide, we will be going through a few examples of what Token API endpoin
 The root URL of the Token API is as such.
 
 ```
-https://api.jup.ag/tokens/v1
+For paid tiers with API Keys, use `https://api.jup.ag/tokens/v1`
+
+For free tier, use `https://lite-api.jup.ag/tokens/v1`
 ```
 
 ---
@@ -42,7 +44,7 @@ In the response, you can see that we have identified the `tags`, [`freeze_author
 
 ```jsx
 const tokenInfoResponse = await (
-    await fetch('https://api.jup.ag/tokens/v1/token/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN')
+    await fetch('https://lite-api.jup.ag/tokens/v1/token/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN')
 ).json();
 
 console.log(tokenInfoResponse);
@@ -76,7 +78,7 @@ Using this endpoint, you can get a list of token mints that belong to a market/p
 
 ```jsx
 const marketTokensResponse = await (
-    await fetch('https://api.jup.ag/tokens/v1/market/BVRbyLjjfSBcoyiYFuxbgKYnWuiFaF9CSXEa5vdSZ9Hh/mints')
+    await fetch('https://lite-api.jup.ag/tokens/v1/market/BVRbyLjjfSBcoyiYFuxbgKYnWuiFaF9CSXEa5vdSZ9Hh/mints')
 ).json();
 
 console.log(marketTokensResponse);
@@ -102,7 +104,7 @@ Using this endpoint, you can get a list of all token mints that are tradable on 
 
 ```jsx
 const allTradableResponse = await (
-    await fetch('https://api.jup.ag/tokens/v1/mints/tradable')
+    await fetch('https://lite-api.jup.ag/tokens/v1/mints/tradable')
 ).json();
 
 console.log(allTradableResponse);
@@ -147,7 +149,7 @@ You can pass in multiple tags using a comma separated list, refer to the API Ref
 
 ```jsx
 const lstTaggedResponse = await (
-    await fetch('https://api.jup.ag/tokens/v1/tagged/lst')
+    await fetch('https://lite-api.jup.ag/tokens/v1/tagged/lst')
 ).json();
 
 console.log(lstTaggedResponse);
@@ -195,7 +197,7 @@ Refer to the [API Reference](/docs/api/token-api/new.api.mdx) for more informati
 
 ```jsx
 const newTokensReponse = await (
-    await fetch('https://api.jup.ag/tokens/v1/new')
+    await fetch('https://lite-api.jup.ag/tokens/v1/new')
 ).json();
 
 console.log(newTokensReponse);
@@ -248,7 +250,7 @@ To index your own tokens, you can use RPC API like [Helius DAS](https://docs.hel
 
 ```jsx
 const allResponse = await (
-    await fetch('https://api.jup.ag/tokens/v1/all')
+    await fetch('https://lite-api.jup.ag/tokens/v1/all')
 ).json();
 
 console.log(allResponse);

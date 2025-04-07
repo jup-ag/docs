@@ -12,7 +12,9 @@ title: "Withdraw Price Order"
 The root URL of the Recurring API's withdraw from price order endpoint is as such.
 
 ```
-https://api.jup.ag/recurring/v1/priceWithdraw
+For paid tiers with API Keys, use `https://api.jup.ag/recurring/v1/priceWithdraw`
+
+For free tier, use `https://lite-api.jup.ag/recurring/v1/priceWithdraw`
 ```
 
 :::info
@@ -37,7 +39,7 @@ If you do not pass in `amount`, the transaction will be built to withdraw the fu
 
 ```jsx
 const priceWithdrawResponse = await (
-    await fetch('https://api.jup.ag/recurring/v1/priceWithdraw', {
+    await fetch('https://lite-api.jup.ag/recurring/v1/priceWithdraw', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

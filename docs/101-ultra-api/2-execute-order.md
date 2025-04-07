@@ -12,7 +12,9 @@ title: "Execute Order"
 The root URL of the Ultra API's order endpoint is as such.
 
 ```
-https://api.jup.ag/ultra/v1/execute
+For paid tiers with API Keys, use `https://api.jup.ag/ultra/v1/execute`
+
+For free tier, use `https://lite-api.jup.ag/ultra/v1/execute`
 ```
 
 :::tip API Reference
@@ -54,7 +56,7 @@ Both required parameters are found in the [order response](/docs/ultra-api/get-o
 
 ```jsx
 const executeResponse = await (
-    await fetch('https://api.jup.ag/ultra/v1/execute', {
+    await fetch('https://lite-api.jup.ag/ultra/v1/execute', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

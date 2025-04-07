@@ -22,7 +22,9 @@ When updating to the new path, please refer to the documentation as there are so
 The root URL of the Trigger API's create order endpoint is as such.
 
 ```
-https://api.jup.ag/trigger/v1/createOrder
+For paid tiers with API Keys, use `https://api.jup.ag/trigger/v1/createOrder`
+
+For free tier, use `https://lite-api.jup.ag/trigger/v1/createOrder`
 ```
 
 ## Create Order

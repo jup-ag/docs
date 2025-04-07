@@ -12,7 +12,9 @@ title: "Get Order"
 The root URL of the Ultra API's order endpoint is as such.
 
 ```
-https://api.jup.ag/ultra/v1/order
+For paid tiers with API Keys, use `https://api.jup.ag/ultra/v1/order`
+
+For free tier, use `https://lite-api.jup.ag/ultra/v1/order`
 ```
 
 :::tip API Reference
@@ -32,7 +34,7 @@ To get a swap order, you need to pass in the required parameters such as:
 ```jsx
 const orderResponse = await (
     await fetch(
-        'https://api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&taker=3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc'
+        'https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&taker=3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc'
     )
   ).json();
 

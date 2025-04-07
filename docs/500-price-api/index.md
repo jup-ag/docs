@@ -22,7 +22,9 @@ In this guide, we will be going through the simple price responses and the extra
 The root URL of the Price API is as such.
 
 ```
-https://api.jup.ag/price/v2
+For paid tiers with API Keys, use `https://api.jup.ag/price/v2`
+
+For free tier, use `https://lite-api.jup.ag/price/v2`
 ```
 
 ## Get Price (Only Price)
@@ -35,7 +37,7 @@ Notice the `ids` parameter with the public key or token address of a token mint,
 
 ```jsx
 const priceResponse = await fetch(
-    'https://api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112'
+    'https://lite-api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112'
 );
 
 const priceData = await priceResponse.json();
@@ -49,7 +51,7 @@ console.log(priceData);
 console.log(JSON.stringify(priceData, null, 2));
 
 const priceResponseWithVsToken = await fetch(
-    'https://api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112&vsToken=So11111111111111111111111111111111111111112'
+    'https://lite-api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112&vsToken=So11111111111111111111111111111111111111112'
 );
 
 const priceDataWithVsToken = await priceResponseWithVsToken.json();
@@ -103,7 +105,7 @@ To get extra help information such as confidence level or depth, you will need t
 
 ```jsx
 const priceResponseShowExtraInfo = await fetch(
-    'https://api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112&showExtraInfo=true'
+    'https://lite-api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112&showExtraInfo=true'
 );
 
 const priceDataShowExtraInfo = await priceResponseShowExtraInfo.json();

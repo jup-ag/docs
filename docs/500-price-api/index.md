@@ -19,13 +19,13 @@ The prices are derived **from Jupiter Swap**, which is an aggregate of most mark
 
 In this guide, we will be going through the simple price responses and the extra help information.
 
-The root URL of the Price API is as such.
 
-```
-For paid tiers with API Keys, use `https://api.jup.ag/price/v2`
 
-For free tier, use `https://lite-api.jup.ag/price/v2`
-```
+:::note
+Base URL: `https://lite-api.jup.ag/price/v2`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 ## Get Price (Only Price)
 

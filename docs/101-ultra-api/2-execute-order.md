@@ -9,13 +9,13 @@ title: "Execute Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Ultra API's order endpoint is as such.
 
-```
-For paid tiers with API Keys, use `https://api.jup.ag/ultra/v1/execute`
 
-For free tier, use `https://lite-api.jup.ag/ultra/v1/execute`
-```
+:::note
+Base URL: `https://lite-api.jup.ag/ultra/v1/execute`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 :::tip API Reference
 To fully utilize the Ultra API, check out the [Ultra API Reference](/docs/api/ultra-api/execute.api.mdx).

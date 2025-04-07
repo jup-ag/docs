@@ -19,13 +19,13 @@ When updating to the new path, please refer to the documentation as there are so
 - `/getTriggerOrders` endpoint is introduced to get either active or historical orders (based on the query parameters) in a new format.
 :::
 
-The root URL of the Trigger API's create order endpoint is as such.
 
-```
-For paid tiers with API Keys, use `https://api.jup.ag/trigger/v1/createOrder`
 
-For free tier, use `https://lite-api.jup.ag/trigger/v1/createOrder`
-```
+:::note
+Base URL: `https://lite-api.jup.ag/trigger/v1/createOrder`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 ## Create Order
 

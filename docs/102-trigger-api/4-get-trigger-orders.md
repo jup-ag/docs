@@ -9,13 +9,13 @@ title: "Get Trigger Orders"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Trigger API's get trigger orders endpoint is as such.
 
-```
-For paid tiers with API Keys, use `https://api.jup.ag/trigger/v1/getTriggerOrders`
 
-For free tier, use `https://lite-api.jup.ag/trigger/v1/getTriggerOrders`
-```
+:::note
+Base URL: `https://lite-api.jup.ag/trigger/v1/getTriggerOrders`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 This is a GET request to `/getTriggerOrders` endpoint.
 

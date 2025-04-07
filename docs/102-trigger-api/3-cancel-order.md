@@ -9,13 +9,13 @@ title: "Cancel Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Trigger API's cancel order endpoint is as such.
 
-```
-For paid tiers with API Keys, use `https://api.jup.ag/trigger/v1/cancelOrder`
 
-For free tier, use `https://lite-api.jup.ag/trigger/v1/cancelOrder`
-```
+:::note
+Base URL: `https://lite-api.jup.ag/trigger/v1/cancelOrder`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 If you want to cancel order(s), you need to do these steps:
 

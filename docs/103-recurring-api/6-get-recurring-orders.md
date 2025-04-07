@@ -9,13 +9,13 @@ title: "Get Recurring Orders"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Recurring API's get recurring orders endpoint is as such.
 
-```
-For paid tiers with API Keys, use `https://api.jup.ag/recurring/v1/getRecurringOrders`
 
-For free tier, use `https://lite-api.jup.ag/recurring/v1/getRecurringOrders`
-```
+:::note
+Base URL: `https://lite-api.jup.ag/recurring/v1/getRecurringOrders`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 This is a GET request to `/getRecurringOrders` endpoint. The response is paginated for every 10 orders and you can view different pages using the `page` parameter.
 

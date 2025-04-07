@@ -8,13 +8,13 @@ title: "Create Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Recurring API's create order endpoint is as such.
 
-```
-For paid tiers with API Keys, use `https://api.jup.ag/recurring/v1/createOrder`
 
-For free tier, use `https://lite-api.jup.ag/recurring/v1/createOrder`
-```
+:::note
+Base URL: `https://lite-api.jup.ag/recurring/v1/createOrder`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 ## Create Order
 

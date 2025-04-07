@@ -9,13 +9,13 @@ title: "Deposit Price Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Recurring API's deposit to a price-based order endpoint is as such.
 
-```
-For paid tiers with API Keys, use `https://api.jup.ag/recurring/v1/priceDeposit`
 
-For free tier, use `https://lite-api.jup.ag/recurring/v1/priceDeposit`
-```
+:::note
+Base URL: `https://lite-api.jup.ag/recurring/v1/priceDeposit`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 :::info
 As the price-based order is opened indefinitely until the user closes them, the user can deposit more funds into the order to continue executing.

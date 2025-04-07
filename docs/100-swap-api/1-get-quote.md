@@ -30,13 +30,13 @@ To fully utilize the Quote API, check out the [Quote API Reference](/docs/api/sw
 
 ## Quote API
 
-The root URL of the Quote API is as such.
 
-```
-For paid tiers with API Keys, use `https://api.jup.ag/swap/v1/quote`
 
-For free tier, use `https://lite-api.jup.ag/swap/v1/quote`
-```
+:::note
+Base URL: `https://lite-jup.ag/swap/v1/quote`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 The most common trading pair on Solana is SOL and USDC, to get a quote for this specific token pair, you need to pass in the required parameters such as:
 

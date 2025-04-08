@@ -65,7 +65,7 @@ const priceDepositResponse = await (
 ```json
 {
   "code": 400,
-  "message": "Failed to deserialize account data: failed to fill whole buffer",
+  "error": "Failed to deserialize account data: failed to fill whole buffer",
   "status": "Bad Request"
 }
 ```

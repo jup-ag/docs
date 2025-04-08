@@ -112,16 +112,69 @@ Now, you are able to get a quote, next steps is to submit a transaction to execu
 
 ### Legacy Transactions
 
-All Jupiter swaps are using Versioned Transactions and Address Lookup Tables. However, not all wallets support Versioned Transactions yet, so if you detect a wallet that does not support versioned transactions, you will need to set the `asLegacyTransaction` parameter to `true`.
+All Jupiter swaps are using Versioned Transactions and [Address Lookup Tables](https://docs.solana.com/developing/lookup-tables). However, not all wallets support Versioned Transactions yet, so if you detect a wallet that does not support versioned transactions, you will need to set the `asLegacyTransaction` parameter to `true`.
 
 ### Adding Fees
 
 By using the Quote API in your app, you can add a fee to charge your users. You can refer to the `platformFeeBps` parameter and to add it to your quote and in conjuction, add `feeAccount` (it can be any valid token account) to your swap request.
 
-### Direct Routes and Max Accounts
+### Direct Routes
 
-These 2 parameters can be useful for those who are building your own programs or apps. `onlyDirectRoutes` essentially restricts the routing to only go through 1 market; whereas `maxAccounts` can provide you with flexibility to utilize other accounts in your transaction.
+In some cases, you may want to restrict the routing to only go through 1 market. You can use the `onlyDirectRoutes` parameter to achieve this. This will ensure routing will only go through 1 market.
+
+:::note
+- If there are no direct routes, there will be no quote.
+- If there is only 1 market but it is illiquid, it will still return the route with the illiquid market.
+:::
 
 :::warning unfavorable trades
-Please be aware that using these 2 parameters can often yield unfavorable trades or outcomes.
+Please be aware that using `onlyDirectRoutes` can often yield unfavorable trades or outcomes.
+:::
+
+### Max Accounts
+
+In some cases, you may want to add more accounts to the transaction for specific use cases, but it might exceed the transaction size limit. You can use the `maxAccounts` parameter to limit the number of accounts in the transaction.
+
+:::note
+- We recommend setting `maxAccounts` to 64
+- Keep `maxAccounts` as large as possible
+- `maxAccounts` is only an estimation and the actual number of accounts may vary
+- Example: If `maxAccounts` is set to 46, the computed routes may drop DEXes/AMMs like Meteora DLMM that require more than 46 accounts.
+:::
+
+<details>
+    <summary>
+        <div>
+            <div>
+                <b>List of DEXes and their required accounts</b>
+            </div>
+        </div>
+    </summary>
+
+Notes:
+- Values in the table are only estimations and the actual number of accounts may vary.
+- Min accounts occur when we already create the necessary [ALTs](https://docs.solana.com/developing/lookup-tables) for a specific pool resulting in less accounts needed in routing.
+  - Only applies to simple routing pools which are pools that are instantly routed (most AMMs) and they only subject to our market crawler to check for liquidity on the 14th day.
+- Sanctum and Sanctum Infinity are unique, and their accounts are dynamic.
+
+| DEX | Max | Min |
+| --- | --- | --- |
+| Meteora DLMM | 47 | 19 |
+| Meteora | 45 | 18 |
+| Moonshot | 37 | 15 |
+| Obric | 30 | 12 |
+| Orca Whirlpool | 30 | 12 |
+| Pumpfun AMM | 42 | 17 |
+| Pumpfun Bonding Curve | 40 | 16 |
+| Raydium | 45 | 18 |
+| Raydium CLMM | 45 | 19 |
+| Raydium CPMM | 37 | 14 |
+| Sanctum | 80 | 80 |
+| Sanctum Infinity | 80 | 80 |
+| Solfi | 22 | 9 |
+
+</details>
+
+:::warning unfavorable trades
+Please be aware that the misuse of `maxAccounts` can yield unfavorable trades or outcomes.
 :::

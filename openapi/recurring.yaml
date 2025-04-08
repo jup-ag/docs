@@ -209,6 +209,28 @@ paths:
           description: Internal server error
 components:
   schemas:
+    AllRecurringResponse:
+      oneOf:
+        - allOf:
+            - $ref: '#/components/schemas/TimeRecurringResponse'
+            - type: object
+              required:
+                - recurringType
+              properties:
+                recurringType:
+                  type: string
+                  enum:
+                    - time
+        - allOf:
+            - $ref: '#/components/schemas/PriceRecurringResponse'
+            - type: object
+              required:
+                - recurringType
+              properties:
+                recurringType:
+                  type: string
+                  enum:
+                    - price
     CloseRecurring:
       type: object
       required:
@@ -245,7 +267,7 @@ components:
         user:
           type: string
       example:
-        user: "devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4"
+        user: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
         inputMint: "So11111111111111111111111111111111111111112"
         outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         params:
@@ -311,6 +333,10 @@ components:
       properties:
         includeFailedTx:
           type: boolean
+        mint:
+          type:
+            - string
+            - 'null'
         orderStatus:
           $ref: '#/components/schemas/OrderState'
         page:
@@ -330,11 +356,23 @@ components:
             - user
             - orderStatus
             - time
+            - totalPages
+            - page
           properties:
             orderStatus:
               $ref: '#/components/schemas/OrderState'
+            page:
+              type: integer
+              format: int64
+              minimum: 0
             time:
-              $ref: '#/components/schemas/PaginatedTimeData'
+              type: array
+              items:
+                $ref: '#/components/schemas/TimeRecurringResponse'
+            totalPages:
+              type: integer
+              format: int64
+              minimum: 0
             user:
               type: string
         - type: object
@@ -342,11 +380,47 @@ components:
             - user
             - orderStatus
             - price
+            - totalPages
+            - page
           properties:
             orderStatus:
               $ref: '#/components/schemas/OrderState'
+            page:
+              type: integer
+              format: int64
+              minimum: 0
             price:
-              $ref: '#/components/schemas/PaginatedPriceData'
+              type: array
+              items:
+                $ref: '#/components/schemas/PriceRecurringResponse'
+            totalPages:
+              type: integer
+              format: int64
+              minimum: 0
+            user:
+              type: string
+        - type: object
+          required:
+            - user
+            - orderStatus
+            - all
+            - totalPages
+            - page
+          properties:
+            all:
+              type: array
+              items:
+                $ref: '#/components/schemas/AllRecurringResponse'
+            orderStatus:
+              $ref: '#/components/schemas/OrderState'
+            page:
+              type: integer
+              format: int64
+              minimum: 0
+            totalPages:
+              type: integer
+              format: int64
+              minimum: 0
             user:
               type: string
     OpenIxArgsWithoutIdx:
@@ -592,6 +666,7 @@ components:
       enum:
         - time
         - price
+        - all
     RecurringResponse:
       type: object
       required:
@@ -635,16 +710,14 @@ components:
           description: In unix seconds
         maxPrice:
           type:
-            - integer
+            - number
             - 'null'
-          format: int64
-          minimum: 0
+          format: double
         minPrice:
           type:
-            - integer
+            - number
             - 'null'
-          format: int64
-          minimum: 0
+          format: double
         numberOfOrders:
           type: integer
           format: int64

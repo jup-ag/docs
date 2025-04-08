@@ -54,7 +54,7 @@ paths:
                 - maker
               title: cancelOrdersRequestBody
               example:
-                maker: devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4
+                maker: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
                 orders:
                   - 6fe8ByaiFHisjnYnH5qdpyiNtkn89mMBQUemRkVmKhro
                   - 9jwzPKHxcrSozdrTYzPnTqy7psRvNGxaYUAiiyxwZKjj
@@ -210,8 +210,8 @@ paths:
                 - params
               title: createOrdersRequestBody
               example:
-                maker: devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4
-                payer: devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4
+                maker: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
+                payer: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
                 inputMint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
                 outputMint: So11111111111111111111111111111111111111112
                 params:
@@ -330,7 +330,7 @@ paths:
                 - maker
                 - order
               example:
-                maker: devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4
+                maker: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
                 order: 6fe8ByaiFHisjnYnH5qdpyiNtkn89mMBQUemRkVmKhro
                 computeUnitPrice: auto
       responses:
@@ -536,7 +536,7 @@ paths:
       parameters:
         - schema:
             type: string
-            example: devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4
+            example: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
           required: true
           name: user
           in: query
@@ -725,10 +725,10 @@ paths:
                   - totalPages
                   - page
                 example:
-                  user: devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4
+                  user: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
                   orderStatus: history
                   orders:
-                    - userPubkey: devjnEpxbJUhJ39FSsFz7YPerr5bdxN8VWUXvfbFUK4
+                    - userPubkey: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
                       orderKey: 99uWTWukow8k7dqcpbYoHxTAWGvn1YkT1VMmnEeTjuDr
                       inputMint: So11111111111111111111111111111111111111112
                       outputMint: HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC

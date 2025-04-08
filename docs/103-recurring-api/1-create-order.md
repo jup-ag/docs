@@ -136,7 +136,7 @@ Do note that both time-based and price-based orders will return the same respons
 ```json
 {
   "code": 400,
-  "message": "Order is valued at 2.99 USDC, minimum is 100.00 USDC",
+  "error": "Order is valued at 2.99 USDC, minimum is 100.00 USDC",
   "status": "Bad Request"
 }
 ```

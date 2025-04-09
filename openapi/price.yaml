@@ -13,7 +13,7 @@ servers:
   - url: https://api.jup.ag/price/v2
 
 paths:
-  /:
+  "":
     get:
       summary: price
       description: |

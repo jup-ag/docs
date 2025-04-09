@@ -32,6 +32,7 @@ This is a POST request to `/createOrder` endpoint, where you pass in the necessa
 :::tip Optional Parameters
 Do note that there are a few optional parameters that you can use, such as:
 
+- Adding slippage to the order. This is useful if you or your users want to execute the order with higher slippage which might yield better chances of being filled.
 - Setting an expiry date on the order.
 - Adding fees through our referral program, please ensure that your `feeAccount` has the necessary `referralTokenAccount`s of the output mint of the limit order for it to work, you can learn more about creating them dynamically in the [Add Fees To Swap](../100-swap-api/4-add-fees-to-swap.md) guide.
 :::
@@ -53,6 +54,7 @@ const createOrderResponse = await (
             params: {
                 makingAmount: "1000000",
                 takingAmount: "300000",
+                // slippageBps: "", // Optional, by nature, trigger orders execute with 0 slippage
                 // expiredAt: "", // In unix seconds (e.g. Date.now()/1_000) or optional
                 // feeBps: "", // Requires referral account or optional
             },

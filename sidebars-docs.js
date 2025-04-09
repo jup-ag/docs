@@ -50,6 +50,28 @@ const sidebars = {
       ],
     },
   ],
+  routing: [
+    {
+      type: 'doc',
+      id: 'routing-integrations/index',
+    },
+    {
+      type: 'category',
+      label: 'Routing Integrations',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'routing-integrations/dex',
+        },
+        {
+          type: 'doc',
+          id: 'routing-integrations/rfq',
+        },
+      ],
+    },
+  ],
   misc: [
     {
       type: 'category',

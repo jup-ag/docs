@@ -21,7 +21,7 @@ export const navbarConfigs = {
         { to: "/docs/perp-api/", label: "Perp API", position: "left" },
       ],
     },
-    { to: "/docs/dex-integration", label: "DEX Integration", position: "left" },
+    { to: "/docs/routing-integrations", label: "Routing Integrations", position: "left" },
     { to: "/docs/tool-kits/swap-terminal", label: "Tool Kits", position: "left" },
     { to: "/docs/api", label: "API Reference", position: "left" },
     { to: "/docs/misc/sdk-api-license-agreement", label: "Misc", position: "left" },

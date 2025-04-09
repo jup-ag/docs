@@ -1,5 +1,5 @@
 ---
-sidebar_label: "DEX Integration"
+sidebar_label: "Decentalized Exchanges"
 description: "Integrate your DEX into Jupiter."
 title: "DEX Integration"
 ---
@@ -8,8 +8,6 @@ title: "DEX Integration"
     <title>DEX Integration</title>
     <meta name="twitter:card" content="summary" />
 </head>
-
-## Overview
 
 Jupiter is one of the most widely integrated protocols, so a lot of work is involved in minimizing issues on new integrations and making each integration valuable to our users and partners.
 

@@ -10,10 +10,13 @@ info:
     | [Send Swap Transaction](/docs/swap-api/send-swap-transaction) |
 
 servers:
-  - url: https://api.jup.ag
+  - url: https://lite-api.jup.ag/swap/v1
+    description: Free tier API endpoint with rate limits
+  - url: https://api.jup.ag/swap/v1
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
-  /swap/v1/quote:
+  /quote:
     get:
       tags:
         - Swap
@@ -45,7 +48,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuoteResponse'
-  /swap/v1/swap:
+  /swap:
     post:
       tags:
         - Swap
@@ -69,7 +72,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwapResponse'
-  /swap/v1/swap-instructions:
+  /swap-instructions:
     post:
       tags:
         - Swap
@@ -93,7 +96,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwapInstructionsResponse'
-  /swap/v1/program-id-to-label:
+  /program-id-to-label:
     get:
       tags:
         - Swap
@@ -513,7 +516,7 @@ components:
         - Multiple DEXes can be pass in by comma separating them
         - For example: `dexes=Raydium,Orca+V2,Meteora+DLMM`
         - If a DEX is indicated, the route will **only use** that DEX
-        - [Full list of DEXes here](https://api.jup.ag/swap/v1/program-id-to-label)
+        - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label)
       in: query
       schema:
         type: array
@@ -525,7 +528,7 @@ components:
         - Multiple DEXes can be pass in by comma separating them
         - For example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
         - If a DEX is indicated, the route will **not use** that DEX
-        - [Full list of DEXes here](https://api.jup.ag/swap/v1/program-id-to-label)
+        - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label)
       in: query
       schema:
         type: array

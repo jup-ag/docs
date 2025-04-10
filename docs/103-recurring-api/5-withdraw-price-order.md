@@ -9,11 +9,13 @@ title: "Withdraw Price Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Recurring API's withdraw from price order endpoint is as such.
 
-```
-https://api.jup.ag/recurring/v1/priceWithdraw
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/recurring/v1/priceWithdraw`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 :::info
 This will not close the order. To close the order, you need to use the [`/cancelOrder` endpoint](/docs/recurring-api/cancel-order).
@@ -37,7 +39,7 @@ If you do not pass in `amount`, the transaction will be built to withdraw the fu
 
 ```jsx
 const priceWithdrawResponse = await (
-    await fetch('https://api.jup.ag/recurring/v1/priceWithdraw', {
+    await fetch('https://lite-api.jup.ag/recurring/v1/priceWithdraw', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

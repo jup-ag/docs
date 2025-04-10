@@ -181,6 +181,11 @@ paths:
                       description: Amount of output mint to receive
                     expiredAt:
                       type: string
+                    slippageBps:
+                      type: string
+                      description: |
+                        Amount of slippage the order can be executed with
+                      default: 0
                     feeBps:
                       type: string
                       description: |
@@ -624,6 +629,8 @@ paths:
                           type: string
                         rawRemainingTakingAmount:
                           type: string
+                        slippageBps:
+                          type: string
                         expiredAt:
                           type: string
                           nullable: true
@@ -705,6 +712,7 @@ paths:
                         - rawTakingAmount
                         - rawRemainingMakingAmount
                         - rawRemainingTakingAmount
+                        - slippageBps
                         - expiredAt
                         - createdAt
                         - updatedAt
@@ -740,6 +748,7 @@ paths:
                       rawTakingAmount: '32071840924'
                       rawRemainingMakingAmount: '0'
                       rawRemainingTakingAmount: '0'
+                      slippageBps: '0'
                       expiredAt: null
                       createdAt: '2025-03-17T08:07:25Z'
                       updatedAt: '2025-03-17T08:09:37Z'

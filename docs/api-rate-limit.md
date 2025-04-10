@@ -21,34 +21,30 @@ In this section, you can find the rate limiting details for the Jupiter API. The
 
 Using the API Keys generated from the same account will share the same rate limit.
 
-## Token Bucket Configuration
+## Token Configuration
 
-These are the token bucket configurations for each tier. Based on the tier, the token bucket will have different refill rates and refill delays.
+These are the token configurations for each tier. Based on the tier, the amount of tokens allocated per periodare different.
 
-For example, in Pro II, the token bucket will  start with 500 tokens and only refill 50 tokens every 1 second, with a capacity of 500 tokens at any given time, hence it is an estimate of 3,000 requests per minute.
+For example, in Pro II, you will be allocated 500 tokens every 10 seconds, which is approximately 3,000 requests per minute.
 
-| Tier | Request Per Minute | Initial Tokens | Capacity | Refill Rate | Refill Delay |
-|------|--------------------|----------------|----------|-------------|--------------|
-| Free | 60 | 60 | 60 | 60 | 1 minute |
-| Pro I | 600 | 100 | 100 | 100 | 10 seconds |
-| Pro II | 3000 | 500 | 500 | 50 | 1 second |
-| Pro III | 6000 | 1000 | 100 | 100 | 1 second |
-| Pro IV | 30000 | 5000 | 500 | 500 | 1 second |
+| Tier | Request Per Minute | Tokens Allocated | Per Period |
+|------|--------------------|------------------|------------|
+| Free | 60 | 60 | 1 minute |
+| Pro I | 600 | 100 | 10 seconds |
+| Pro II | 3,000 | 500 | 10 seconds |
+| Pro III | 6,000 | 1,000 | 10 seconds |
+| Pro IV | 30,000 | 5,000 | 10 seconds |
 
-**Different Buckets**
+**Buckets**
 
 Each account has two separate token buckets and they share the same rules as stated in the table above.
 1. The Default bucket is shared for all APIs except the Price API.
 2. The Price API bucket is dedicated to the Price API and is separate from the Default bucket.
 
-When you make an API request, a token is consumed from the appropriate bucket. If there are no tokens available, you'll receive a 429 (Too Many Requests) response.
-
-**Token Refill**
-
-The token buckets refill gradually over time at the rates specified above, up to their maximum capacity. This allows for bursts of activity while maintaining a sustainable average request rate.
+When you make an API request, a token is consumed from the appropriate bucket. If there are no tokens available in the bucket, you'll receive a 429 (Too Many Requests) response.
 
 :::note
-For Pro I, you can see that it refills more tokens at once but has a longer refill delay, this will allow for more bursts of requests but at a slower rate.
+The free tier does not have a dedicated Price API bucket, all requests will be consumed from the same Default bucket.
 :::
 
 ## Managing Rate Limits

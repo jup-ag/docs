@@ -13,7 +13,10 @@ info:
     | [Get Recurring Orders](/docs/recurring-api/get-recurring-orders) |
 
 servers:
+  - url: https://lite-api.jup.ag/recurring/v1
+    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/recurring/v1
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
   /cancelOrder:

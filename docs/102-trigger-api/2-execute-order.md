@@ -9,11 +9,13 @@ title: "Execute Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Trigger API's execute endpoint is as such.
 
-```
-https://api.jup.ag/trigger/v1/execute
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/trigger/v1/execute`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 After getting the order transaction, you can sign and send to the network yourself or use the Trigger API's `/execute` endpoint to do it for you.
 
@@ -43,7 +45,7 @@ By making a post request to the `/execute` endpoint, Jupiter executes the order 
 
 ```jsx
 const executeResponse = await (
-    await fetch('https://api.jup.ag/trigger/v1/execute', {
+    await fetch('https://lite-api.jup.ag/trigger/v1/execute', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

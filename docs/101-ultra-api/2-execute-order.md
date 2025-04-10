@@ -9,11 +9,13 @@ title: "Execute Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Ultra API's order endpoint is as such.
 
-```
-https://api.jup.ag/ultra/v1/execute
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/ultra/v1/execute`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 :::tip API Reference
 To fully utilize the Ultra API, check out the [Ultra API Reference](/docs/api/ultra-api/execute.api.mdx).
@@ -54,7 +56,7 @@ Both required parameters are found in the [order response](/docs/ultra-api/get-o
 
 ```jsx
 const executeResponse = await (
-    await fetch('https://api.jup.ag/ultra/v1/execute', {
+    await fetch('https://lite-api.jup.ag/ultra/v1/execute', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

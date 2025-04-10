@@ -9,11 +9,13 @@ title: "Get Balances"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Ultra API's order endpoint is as such.
 
-```
-https://api.jup.ag/ultra/v1/balances
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/ultra/v1/balances`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 :::tip API Reference
 To fully utilize the Ultra API, check out the [Ultra API Reference](/docs/api/ultra-api/balances.api.mdx).
@@ -25,7 +27,7 @@ The Ultra API supports a simple endpoint to get the token balances of an account
 
 ```jsx
 const balancesResponse = await (
-  await fetch(`https://api.jup.ag/ultra/v1/balances/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`)
+  await fetch(`https://lite-api.jup.ag/ultra/v1/balances/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`)
 ).json();
 
 console.log(JSON.stringify(balancesResponse, null, 2));

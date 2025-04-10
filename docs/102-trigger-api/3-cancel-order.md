@@ -9,11 +9,13 @@ title: "Cancel Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Trigger API's cancel order endpoint is as such.
 
-```
-https://api.jup.ag/trigger/v1/cancelOrder
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/trigger/v1/cancelOrder`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 If you want to cancel order(s), you need to do these steps:
 
@@ -33,7 +35,7 @@ To cancel multiple orders, you can use the [`/cancelOrders` endpoint](#cancel-or
 
 ```jsx
 const cancelOrderResponse = await (
-    await fetch('https://api.jup.ag/trigger/v1/cancelOrder', {
+    await fetch('https://lite-api.jup.ag/trigger/v1/cancelOrder', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -83,7 +85,7 @@ If using `/execute` endpoint, you should pass in the same `requestId` for the di
 
 ```jsx
 const cancelOrdersResponse = await (
-    await fetch('https://api.jup.ag/trigger/v1/cancelOrders', {
+    await fetch('https://lite-api.jup.ag/trigger/v1/cancelOrders', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

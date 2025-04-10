@@ -9,11 +9,13 @@ title: "Get Recurring Orders"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Recurring API's get recurring orders endpoint is as such.
 
-```
-https://api.jup.ag/recurring/v1/getRecurringOrders
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/recurring/v1/getRecurringOrders`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 This is a GET request to `/getRecurringOrders` endpoint. The response is paginated for every 10 orders and you can view different pages using the `page` parameter.
 
@@ -42,7 +44,7 @@ You can use `recurringType=all` to get all orders from both `time` and `price`.
 ```jsx
 const openOrdersResponse = await (
     await fetch(
-        'https://api.jup.ag/recurring/v1/getRecurringOrders?user=replaceWithPublicKey&orderStatus=active&recurringType=time'
+        'https://lite-api.jup.ag/recurring/v1/getRecurringOrders?user=replaceWithPublicKey&orderStatus=active&recurringType=time'
     )
 ).json();
 ```
@@ -116,7 +118,7 @@ To get the order history, you can pass in the `orderStatus` parameter as `histor
 ```jsx
 const orderHistoryResponse = await (
     await fetch(
-        'https://api.jup.ag/recurring/v1/getRecurringOrders?user=replaceWithPublicKey&orderStatus=history&recurringType=price'
+        'https://lite-api.jup.ag/recurring/v1/getRecurringOrders?user=replaceWithPublicKey&orderStatus=history&recurringType=price'
     )
 ).json();
 ```

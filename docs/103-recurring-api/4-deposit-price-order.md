@@ -9,11 +9,13 @@ title: "Deposit Price Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Recurring API's deposit to a price-based order endpoint is as such.
 
-```
-https://api.jup.ag/recurring/v1/priceDeposit
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/recurring/v1/priceDeposit`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 :::info
 As the price-based order is opened indefinitely until the user closes them, the user can deposit more funds into the order to continue executing.
@@ -33,7 +35,7 @@ If you want to deposit funds into a price-based order, you need to do these step
 
 ```jsx
 const priceDepositResponse = await (
-    await fetch('https://api.jup.ag/recurring/v1/priceDeposit', {
+    await fetch('https://lite-api.jup.ag/recurring/v1/priceDeposit', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

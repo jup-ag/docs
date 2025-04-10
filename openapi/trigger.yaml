@@ -13,7 +13,10 @@ info:
     | [Get Trigger Orders](/docs/trigger-api/get-trigger-orders) |
 
 servers:
-  - url: 'https://api.jup.ag/trigger/v1'
+  - url: 'https://lite-api.jup.ag/trigger/v1'
+    description: Free tier API endpoint with rate limits
+  - url: https://api.jup.ag/trigger/v1
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 components:
   schemas: {}

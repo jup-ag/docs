@@ -134,7 +134,7 @@ We are using [Triton’s `getRecentPrioritizationFees`](https://docs.triton.one/
 
 ```jsx
 const swapResponse = await (
-  await fetch('https://api.jup.ag/swap/v1', {
+  await fetch('https://lite-api.jup.ag/swap/v1', {
       method: 'POST',
       headers: {
       'Content-Type': 'application/json'
@@ -164,7 +164,7 @@ When `true`, it allows the transaction to utilize a dynamic compute unit rather
 
 ```jsx
 const swapTransaction = await (
-  await fetch('https://api.jup.ag/swap/v1', {
+  await fetch('https://lite-api.jup.ag/swap/v1', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -194,7 +194,7 @@ To understand Dynamic Slippage better, you can reference this repository to unde
 
 ```jsx
 const swapTransaction = await (
-  await fetch('https://api.jup.ag/swap/v1', {
+  await fetch('https://lite-api.jup.ag/swap/v1', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -246,7 +246,7 @@ Additionally, Jito enables bundling transactions to ensure they execute together
 
 ```jsx
 const swapTransaction = await (
-  await fetch('https://api.jup.ag/swap/v1', {
+  await fetch('https://lite-api.jup.ag/swap/v1', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

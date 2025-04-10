@@ -9,11 +9,13 @@ title: "Get Trigger Orders"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Trigger API's get trigger orders endpoint is as such.
 
-```
-https://api.jup.ag/trigger/v1/getTriggerOrders
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/trigger/v1/getTriggerOrders`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 This is a GET request to `/getTriggerOrders` endpoint.
 
@@ -34,7 +36,7 @@ You can optionally pass in the input and output token mint addresses to filter t
 ```jsx
 const openOrdersResponse = await (
     await fetch(
-        'https://api.jup.ag/trigger/v1/getTriggerOrders?user=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3&orderStatus=active'
+        'https://lite-api.jup.ag/trigger/v1/getTriggerOrders?user=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3&orderStatus=active'
     )
 ).json();
 ```
@@ -125,7 +127,7 @@ To get the order history, you can pass in the `orderStatus` parameter as `histor
 ```jsx
 const orderHistoryResponse = await (
     await fetch(
-        'https://api.jup.ag/trigger/v1/getTriggerOrders?user=ErJKdNoarixqGGQTHbBtvHtg2nkcCqcKtYjGbVKUxY7D&orderStatus=history'
+        'https://lite-api.jup.ag/trigger/v1/getTriggerOrders?user=ErJKdNoarixqGGQTHbBtvHtg2nkcCqcKtYjGbVKUxY7D&orderStatus=history'
     )
 ).json();
 ```

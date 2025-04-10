@@ -94,10 +94,10 @@ We will be deploying 2 different endpoints, 1 for free usage and 1 for plans wit
 
 | Old Hostnames                               | New Hostnames                                 |
 | ------------------------------------------- | --------------------------------------------- |
-| `https://api.jup.ag/limit/v2/createOrder`   | `https://api.jup.ag/trigger/v1/createOrder`   |
-| `https://api.jup.ag/limit/v2/executeOrder`  | `https://api.jup.ag/trigger/v1/executeOrder`  |
-| `https://api.jup.ag/limit/v2/cancelOrder`   | `https://api.jup.ag/trigger/v1/cancelOrder`<br />`https://api.jup.ag/trigger/v1/cancelOrders` |
-| `https://api.jup.ag/limit/v2/openOrders`<br />`https://api.jup.ag/limit/v2/orderHistory`    | `https://api.jup.ag/trigger/v1/getTriggerOrders` |
+| `https://api.jup.ag/limit/v2/createOrder`   | `https://lite-api.jup.ag/trigger/v1/createOrder`   |
+| `https://api.jup.ag/limit/v2/executeOrder`  | `https://lite-api.jup.ag/trigger/v1/executeOrder`  |
+| `https://api.jup.ag/limit/v2/cancelOrder`   | `https://lite-api.jup.ag/trigger/v1/cancelOrder`<br />`https://lite-api.jup.ag/trigger/v1/cancelOrders` |
+| `https://api.jup.ag/limit/v2/openOrders`<br />`https://api.jup.ag/limit/v2/orderHistory`    | `https://lite-api.jup.ag/trigger/v1/getTriggerOrders` |
 </details>
 :::
 
@@ -123,23 +123,23 @@ We will be deploying 2 different endpoints, 1 for free usage and 1 for plans wit
 
 | Old Hostnames                                     | New Hostnames                                    |
 | ------------------------------------------------- | ------------------------------------------------ |
-| `https://quote-api.jup.ag/v6/quote`               | `https://api.jup.ag/swap/v1/quote`               |
-| `https://quote-api.jup.ag/v6/swap`                | `https://api.jup.ag/swap/v1/swap`                |
-| `https://quote-api.jup.ag/v6/swap-instructions`   | `https://api.jup.ag/swap/v1/swap-instructions`   |
-| `https://quote-api.jup.ag/v6/program-id-to-label` | `https://api.jup.ag/swap/v1/program-id-to-label` |
+| `https://quote-api.jup.ag/v6/quote`               | `https://lite-api.jup.ag/swap/v1/quote`               |
+| `https://quote-api.jup.ag/v6/swap`                | `https://lite-api.jup.ag/swap/v1/swap`                |
+| `https://quote-api.jup.ag/v6/swap-instructions`   | `https://lite-api.jup.ag/swap/v1/swap-instructions`   |
+| `https://quote-api.jup.ag/v6/program-id-to-label` | `https://lite-api.jup.ag/swap/v1/program-id-to-label` |
 
 #### Price
 
 | Old Hostnames             | New Hostnames                 |
 | ------------------------- | ----------------------------- |
-| `https://price.jup.ag/v6` | `https://api.jup.ag/price/v2` |
+| `https://price.jup.ag/v6` | `https://lite-api.jup.ag/price/v2` |
 
 #### Token
 
 | Old Hostnames                               | New Hostnames                                 |
 | ------------------------------------------- | --------------------------------------------- |
-| `https://tokens.jup.ag/token/:mint`         | `https://api.jup.ag/tokens/v1/token/:mint`    |
-| `https://tokens.jup.ag/tokens?tags=:tags`   | `https://api.jup.ag/tokens/v1/tagged/:tag`    |
-| `https://tokens.jup.ag/tokens_with_markets` | `https://api.jup.ag/tokens/v1/mints/tradable` |
+| `https://tokens.jup.ag/token/:mint`         | `https://lite-api.jup.ag/tokens/v1/token/:mint`    |
+| `https://tokens.jup.ag/tokens?tags=:tags`   | `https://lite-api.jup.ag/tokens/v1/tagged/:tag`    |
+| `https://tokens.jup.ag/tokens_with_markets` | `https://lite-api.jup.ag/tokens/v1/mints/tradable` |
 </details>
 :::

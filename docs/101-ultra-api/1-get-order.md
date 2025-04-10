@@ -9,11 +9,13 @@ title: "Get Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Ultra API's order endpoint is as such.
 
-```
-https://api.jup.ag/ultra/v1/order
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/ultra/v1/order`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 :::tip API Reference
 To fully utilize the Ultra API, check out the [Ultra API Reference](/docs/api/ultra-api/order.api.mdx).
@@ -32,7 +34,7 @@ To get a swap order, you need to pass in the required parameters such as:
 ```jsx
 const orderResponse = await (
     await fetch(
-        'https://api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&taker=3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc'
+        'https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&taker=3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc'
     )
   ).json();
 

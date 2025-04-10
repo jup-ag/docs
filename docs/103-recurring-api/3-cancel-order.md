@@ -9,11 +9,13 @@ title: "Cancel Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Recurring API's execute endpoint is as such.
 
-```
-https://api.jup.ag/recurring/v1/cancelOrder
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/recurring/v1/cancelOrder`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 ## Cancel Order
 
@@ -33,7 +35,7 @@ The `/cancelOrder` endpoint only supports 1 cancellation per transaction.
 
 ```jsx
 const cancelOrderResponse = await (
-    await fetch('https://api.jup.ag/recurring/v1/cancelOrder', {
+    await fetch('https://lite-api.jup.ag/recurring/v1/cancelOrder', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

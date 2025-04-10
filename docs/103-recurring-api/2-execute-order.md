@@ -9,11 +9,13 @@ title: "Execute Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The root URL of the Recurring API's execute endpoint is as such.
 
-```
-https://api.jup.ag/recurring/v1/execute
-```
+
+:::note
+Base URL: `https://lite-api.jup.ag/recurring/v1/execute`
+
+For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+:::
 
 After getting the order transaction, you can sign and send to the network yourself or use the Recurring API's `/execute` endpoint to do it for you.
 
@@ -49,7 +51,7 @@ The order id is returned in the [`createOrder` response](/docs/recurring-api/cre
 
 ```jsx
 const executeResponse = await (
-    await fetch('https://api.jup.ag/recurring/v1/execute', {
+    await fetch('https://lite-api.jup.ag/recurring/v1/execute', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

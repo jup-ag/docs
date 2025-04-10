@@ -22,7 +22,9 @@ headers: {
 ```
 
 :::info Free Plan
-Do note that you **do not** need an API Key to use the free plan. Simply just call the endpoints without the API Key.
+Do note that you **do not** need an API Key to use the free plan.
+
+Simply just call the endpoints without an API Key at the `lite-api.jup.ag` hostname.
 :::
 
 ## 1. Open Portal

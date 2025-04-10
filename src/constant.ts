@@ -4,6 +4,7 @@ export const navbarConfigs = {
       label: "APIs",
       position: "left",
       items: [
+        { to: "/docs/", label: "Get Started", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/get-quote", label: "Swap API", position: "left" },
         { to: "/docs/trigger-api/create-order", label: "Trigger API", position: "left" },
@@ -32,6 +33,7 @@ export const navbarConfigs = {
       label: "APIs",
       position: "left",
       items: [
+        { to: "/docs/", label: "Get Started", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/get-quote", label: "Swap API", position: "left" },
         { to: "/docs/trigger-api/create-order", label: "Trigger API", position: "left" },
@@ -59,6 +61,7 @@ export const navbarConfigs = {
       label: "APIs",
       position: "left",
       items: [
+        { to: "/docs/", label: "Get Started", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/get-quote", label: "Swap API", position: "left" },
         { to: "/docs/trigger-api/create-order", label: "Trigger API", position: "left" },
@@ -86,6 +89,7 @@ export const navbarConfigs = {
       label: "APIs",
       position: "left",
       items: [
+        { to: "/docs/", label: "Get Started", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/get-quote", label: "Swap API", position: "left" },
         { to: "/docs/trigger-api/create-order", label: "Trigger API", position: "left" },

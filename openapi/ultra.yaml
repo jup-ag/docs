@@ -9,7 +9,10 @@ info:
     | [Execute Order](/docs/ultra-api/execute-order) |
 
 servers:
+  - url: https://lite-api.jup.ag/ultra/v1
+    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/ultra/v1
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
   /order:

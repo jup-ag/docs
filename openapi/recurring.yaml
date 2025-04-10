@@ -13,7 +13,10 @@ info:
     | [Get Recurring Orders](/docs/recurring-api/get-recurring-orders) |
 
 servers:
+  - url: https://lite-api.jup.ag/recurring/v1
+    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/recurring/v1
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
   /cancelOrder:
@@ -134,6 +137,12 @@ paths:
               - 'null'
             format: int64
             minimum: 0
+        - name: mint
+          in: path
+          schema:
+            type:
+              - string
+              - 'null'
         - name: includeFailedTx
           in: path
           required: true
@@ -508,44 +517,6 @@ components:
       enum:
         - active
         - history
-    PaginatedPriceData:
-      type: object
-      required:
-        - orders
-        - totalPages
-        - page
-      properties:
-        orders:
-          type: array
-          items:
-            $ref: '#/components/schemas/PriceRecurringResponse'
-        page:
-          type: integer
-          format: int64
-          minimum: 0
-        totalPages:
-          type: integer
-          format: int64
-          minimum: 0
-    PaginatedTimeData:
-      type: object
-      required:
-        - orders
-        - totalPages
-        - page
-      properties:
-        orders:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeRecurringResponse'
-        page:
-          type: integer
-          format: int64
-          minimum: 0
-        totalPages:
-          type: integer
-          format: int64
-          minimum: 0
     PriceRecurringResponse:
       type: object
       required:

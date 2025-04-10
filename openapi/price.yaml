@@ -16,7 +16,7 @@ servers:
     description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
-  /:
+  "":
     get:
       summary: price
       description: |

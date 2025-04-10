@@ -22,7 +22,7 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 
 **For existing developers**: Please refer to the [What's New?](#whats-new) section for the latest API updates and breaking changes.
 
-**For routing integrations**: Please refer to the [DEX Integration](/docs/routing-integrations/dex) guide to complete the prerequisites before we look into integrating.
+**For routing integrations**: Please refer to the [DEX Integration](/docs/routing/dex-integration) and [RFQ Integration](/docs/routing/rfq-integration) guides to complete the prerequisites before we look into integrating.
 
 **Quick Links** to APIs and Tool Kits:
 

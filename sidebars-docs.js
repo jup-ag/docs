@@ -53,7 +53,11 @@ const sidebars = {
   routing: [
     {
       type: 'doc',
-      id: 'routing-integrations/index',
+      id: 'routing/index',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
     },
     {
       type: 'category',
@@ -63,11 +67,11 @@ const sidebars = {
       items: [
         {
           type: 'doc',
-          id: 'routing-integrations/dex',
+          id: 'routing/dex-integration',
         },
         {
           type: 'doc',
-          id: 'routing-integrations/rfq',
+          id: 'routing/rfq-integration',
         },
       ],
     },

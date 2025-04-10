@@ -33,6 +33,17 @@ function CustomNavbarContent() {
     const currentPathStripped = stripToTwoSegments(location.pathname);
     const itemPathStripped = stripToTwoSegments(itemPath);
 
+    // Special case for routing section
+    if (itemPath === '/docs/routing') {
+      // Only active when exactly at /docs/routing/ or /docs/routing
+      return location.pathname === '/docs/routing/' || location.pathname === '/docs/routing';
+    }
+
+    // For routing subsections, ensure they're only active when exactly matched
+    if (itemPath.startsWith('/docs/routing/')) {
+      return location.pathname.startsWith(itemPath);
+    }
+
     // Special case for API Reference
     if (itemPath === '/docs/api') {
       // Check if the path is exactly /docs/api or starts with /docs/api/

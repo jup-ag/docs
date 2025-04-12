@@ -24,6 +24,13 @@ The integration requirements are subjected to change and please provide suggesti
 - Complete end-to-end integration tests
 - When ready, you will be onboarded to Edge before going live on production
 
+:::note
+[Please reach out to us in Discord](https://discord.gg/jup)
+- If you are interested to participate in Jupiter Z
+- If you need any help or clarification regarding the integration.
+- To begin onboarding to Edge.
+:::
+
 ### Example Integration
 
 To facilitate the integration, we provide an [integration SDK in this repository](https://github.com/jup-ag/rfq-webhook-toolkit).

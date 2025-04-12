@@ -71,12 +71,20 @@ const JupiterExplore = () => {
               routing engine, refer to the routing integration guides.
             </p>
           </div>
-          <a
-            href="/docs/dex-integration"
-            className="mt-6 bg-[#66A2E8] !text-white font-semibold py-2 px-3 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
-          >
-            DEX Integration
-          </a>
+          <div className="mt-6 flex gap-3">
+            <a
+              href="/docs/routing/dex-integration"
+              className="flex-1 bg-[#66A2E8] !text-white font-semibold py-2 px-1 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
+            >
+              DEX Integration
+            </a>
+            <a
+              href="/docs/routing/rfq-integration"
+              className="flex-1 bg-[#66A2E8] !text-white font-semibold py-2 px-1 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
+            >
+              RFQ Integration
+            </a>
+          </div>
         </div>
         <div className="bg-white shadow-md p-6 rounded-2xl flex flex-col h-full">
           <div className="flex-1">

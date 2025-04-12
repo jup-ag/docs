@@ -12,17 +12,82 @@ title: "RFQ Integration"
 This section will cover the integration of your RFQ service into Jupiter's routing system.
 
 :::caution
-The integration requirements are subjected to change and we are open to suggestions or feedbacks on ways to improve the integration.
+The integration requirements are subjected to change and please provide suggestions or feedbacks on ways to improve the integration process.
 :::
 
-## Integration Steps
+<img src="/dev/rfq-flow.png" alt="RFQ Flow" width="700" />
 
-- Host a service that adheres to our [RFQ API schema](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/openapi)
+## Integration Prerequisites
+
+- Host a service that adheres to our RFQ API schema
 - Provide a webhook for Jupiter to send quotes and swap transactions
-- Complete end-to-end [integration tests](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/tests)
-- Onboard to Edge before going live on Production
+- Complete end-to-end integration tests
+- When ready, you will be onboarded to Edge before going live on production
+
+### Example Integration
+
+To facilitate the integration, we provide an [integration SDK in this repository](https://github.com/jup-ag/rfq-webhook-toolkit).
+
+- [**Sample server**](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/server-example/): Implements the webhook API in Rust.
+- [**API Schema**](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/openapi): OpenAPI schema for the RFQ API.
+- [**Integration tests**](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/tests/): Verify the implementation of the webhook.
+- [**Troubleshooting**](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/tests/README.md#troubleshooting): Common issues that arise during integration.
+
+---
+
+### RFQ API Schema
+
+To facilitate the integration into Jupiter's RFQ module, you will need to provide a webhook for us to register the quotation and swap endpoints with the corresponding request and response format.
+
+| Endpoint | Method | URL | Description |
+|----------|--------|-----|-------------|
+| Base URL | - | `https://your-api-endpoint.com/jupiter/rfq` | Example URL that we will register into our API |
+| Quote | POST | `https://your-api-endpoint.com/jupiter/rfq/quote` | Called to request quotes |
+| Swap | POST | `https://your-api-endpoint.com/jupiter/rfq/swap` | Called to execute swaps |
+| Tokens | GET | `https://your-api-endpoint.com/jupiter/rfq/tokens` | Called periodically to fetch supported tokens (see [below](#advertising-supported-tokens)) |
+
+:::note API Key
+If you require an API key to access your endpoints, please provide it to us during the registration process. The API Key will be passed to the webhook as a header `X-API-KEY`.
+:::
+
+---
+
+### Response Codes
+
+Market Makers should return appropriate HTTP status codes along with error messages.
+
+| Status Code | Description |
+|--------------|-------------|
+| `200 OK` | The request was successful, and the webhook will return a quote |
+| `404 Not Found` | The webhook will not return a quote for this request (e.g. the pair or the size are not supported) |
+| `400 Bad Request` | The request sent to the webhook is malformed (e.g. missing an expected parameter) |
+| `401 Unauthorized` | Authorization failed. For example the `X-API-KEY` is missing or incorrect |
+| `50x Server Errors` | The webhook is offline or unable to respond. If the status persist, the webhook will be temporarily suspended and will not receive requests |
+
+:::note Timeouts
+A webhook must adhere to the [fullfillment and response time requirements](#fulfillment-requirements). When sending the quote request, the RFQ system includes the following headers:
+
+| Header | Description |
+|--------|-------------|
+| `x-request-start` | The millisecond timestamp indicating when the request was sent |
+| `x-request-timeout` | The millisecond timeout for the request (currently set to 250 ms) |
+:::
 
 ## Integration Notes
+
+### Order Engine
+
+The RFQ functionality depends on the mainnet deployment of the [Order Engine Program](https://solscan.io/account/61DFfeTKM7trxYcPQCM78bJ794ddZprZpAwAnLiwTpYH) for order fulfillment.
+
+- **Source Code**: The program's source is located in the [programs/order-engine](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/programs/order-engine) directory.
+- **IDL**: The Interface Definition Language (IDL) file is available [here](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/idls).
+
+---
+
+### Non-standard payload
+The transaction data includes, beside the instruction data for the order-engine, 3 additional bytes that are appended to the instruction data. These bytes are not processed by the program and are only information and to be consumed by an off-chain consumer. The first 2 bytes contains the fee amount in basis points (u16) and the third byte (u8) is a bit mask where the least significant bit indicates if the swap is exact-in (0) or exact-out (1).
+
+---
 
 ### Fulfillment Requirements
 
@@ -31,7 +96,9 @@ To ensure market makers stay competitive and responsive, we enforce a minimum be
 - **Fulfillment**: Market makers are expected to comply and fulfill **95%** of the quotes provided within a 1-hour window. If this is not met, the market maker will be turned off.
 - **Response Time**: A webhook must respond within **250 ms** of receiving a quote request. If it fails to do so, the RFQ system will proceed with the available quotes at the time.
 
+:::caution
 To resume operations, we will need to manually re-enable your webhook, please reach out to us if this happens.
+:::
 
 :::danger need clarification
 are we penalizing the market maker if they consistently take more than 250ms to respond?
@@ -65,7 +132,7 @@ Jupiter RFQ allows MMs a way to provide liquidity, adjust their quotes without b
 
 **Dynamic Fee**
 
-The dynamic fee amount is forwarded to webhooks in the quote request parameters and it is contained in the message that both taker and maker sign ** **(see the payload section above)** **. In manual mode, the fee is a flat 2pbs.
+The dynamic fee amount is forwarded to webhooks in the quote request parameters and it is contained in the message that both taker and maker sign ([see the payload section above](#non-standard-payload)). In manual mode, the fee is a flat 2pbs.
 
 **Fee Calculation**
 
@@ -78,7 +145,7 @@ Webhooks do not need to account for fees when quoting, the fee is applied direct
 :::note
 The fee is not automatically transferred and will be accounted for asynchronously on a regular basis.
 
-We are looking into a way to automatically account for and transfer the fees. As this will be required when third party integrators of the Ultra API are taking fees.
+This is subject to change in the future.
 :::
 
 ---

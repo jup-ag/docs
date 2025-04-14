@@ -16,7 +16,7 @@ Jupiter provides developer tools and resources to help you integrate with Jupite
 When integrating with Jupiter, you can use the following assets to help you brand and market your product: [Jupiter Brand Assets](https://github.com/jup-ag/docs/tree/main/static/files).
 
 :::caution Labelling Routing Provider
-Do note that, if you are integrating with Jupiter Ultra or Swap API, you are to label the routing provider as **"Metis"**, and not "Jupiter".
+Do note that, if you are using our routing engine (such as getting quotes from the Swap API), you are to label the routing provider as **"Metis"**, and not "Jupiter".
 :::
 
 ## Developer Support

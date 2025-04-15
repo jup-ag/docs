@@ -1,6 +1,6 @@
 ---
-sidebar_label: "Jupiter Metis"
-description: "Integrate your DEX into Jupiter."
+sidebar_label: "Jupiter Metis v1"
+description: "Integrate your DEX into Jupiter Metis v1 Routing Engine."
 title: "DEX Integration"
 ---
 
@@ -12,6 +12,8 @@ title: "DEX Integration"
 Jupiter is one of the most widely integrated protocols, so a lot of work is involved in minimizing issues on new integrations and making each integration valuable to our users and partners.
 
 Our top priority is securing the best prices and the best token selection for our users, so we will focus on DEXes that will bring the most benefits to them.
+
+In this section, we will walk you through the process of integrating your DEX into the Jupiter Metis v1 Routing Engine that powers the Swap API.
 
 :::warning We do not charge fees for integration.
 :::

@@ -15,9 +15,9 @@ Jupiter products utilizes the Swap infrastructure which is built on top of a rob
 If you are an exchange or market maker and want to participate in our routing system, please refer to our [DEX Integration](/docs/routing/dex-integration) and [RFQ Integration](/docs/routing/rfq-integration) guides.
 :::
 
-## Jupiter Metis Routing Engine
+## Jupiter Metis v1 Routing Engine
 
-The Metis Routing Engine integrates with most decentralized exchanges on Solana, and to access the quotes, you can request the Swap API. You can find a complete list of supported DEXes via the [/swap/v1/program-id-to-label](https://lite-api.jup.ag/swap/v1/program-id-to-label) endpoint.
+The Jupiter Metis v1 Routing Engine integrates with most decentralized exchanges on Solana, and to access the quotes, you can request the Swap API. You can find a complete list of supported DEXes via the [/swap/v1/program-id-to-label](https://lite-api.jup.ag/swap/v1/program-id-to-label) endpoint.
 
 Our routing infrastructure consists of several key components:
 

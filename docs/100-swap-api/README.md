@@ -9,16 +9,17 @@ title: "About Swap API"
     <meta name="twitter:card" content="summary" />
 </head>
 
-The Jupiter Swap API enables you to tap into Jupiter’s Metis Routing Engine, which aggregates across all liquidity available within the DEXes of Solana's DeFi ecosystem, allowing you to swap seamlessly from any token to any token.
+The Jupiter Swap API enables you to tap into the Jupiter Metis v1 Routing Engine, which aggregates across all liquidity available within the DEXes of Solana's DeFi ecosystem, allowing you to swap seamlessly from any token to any token.
 
 ## Features
 
 | Feature | Description |
 | --- | --- |
+| **Robust routing engine** | The Jupiter Metis v1 Routing Engine is a robust and battle-tested routing engine that has been in production for over 2 years with multiple DEXes integrated and trillions of dollars in volume. |
+| **Best on-chain price** | Trades can split across multiple different on-chain tokens and AMMs to ensure the best possible on-chain price. |
+| **Swap any token** | Swap from any token to another token. |
 | **Zero platform fees** | Swaps made via the Swap API do not incur any trading fees, both for you and your users. |
 | **Custom integrator fees** | Integrators can choose to charge their own custom fees. |
-| **Swap any token** | Swap from any token to another token. |
-| **Best on-chain price** | Trades can split across multiple different on-chain tokens and AMMs to ensure the best possible on-chain price. |
 | **Slippage protection** | Routes are intentionally chosen to decrease the likelihood of trade failures due to price slippage. |
 | **Fine-grained control** | Allows for full control of how your transaction is crafted and broadcasted. |
 

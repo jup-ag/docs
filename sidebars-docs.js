@@ -75,7 +75,7 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'misc/support-guidelines',
+          id: 'misc/integrator-guidelines',
         },
         {
           type: 'html',

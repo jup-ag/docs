@@ -1,15 +1,23 @@
 ---
-sidebar_label: "Support Guidelines"
-description: "Support guidelines for Jupiter Integrations."
-title: "Support Guidelines"
+sidebar_label: "Integrator Guidelines"
+description: "Guidelines for integrations with Jupiter."
+title: "Integrator Guidelines"
 ---
 
 <head>
-    <title>Support Guidelines</title>
+    <title>Integrator Guidelines</title>
     <meta name="twitter:card" content="summary" />
 </head>
 
-Jupiter provides developer tools and resources to help you integrate with Jupiter. The following guidelines indicates where we provide support for you and/or your customers.
+Jupiter provides developer tools and resources to help you integrate with Jupiter. The following section provides the guidelines when integrating with Jupiter.
+
+## Branding and Marketing
+
+When integrating with Jupiter, you can use the following assets to help you brand and market your product: [Jupiter Brand Assets](https://github.com/jup-ag/docs/tree/main/static/files).
+
+:::caution Labelling Routing Provider
+Do note that, if you are using our routing engine (such as getting quotes from the Swap API), you are to label the routing provider as **"Metis"**, and not "Jupiter".
+:::
 
 ## Developer Support
 

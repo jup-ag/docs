@@ -1,5 +1,5 @@
 ---
-sidebar_label: "Decentalized Exchanges"
+sidebar_label: "Jupiter Metis"
 description: "Integrate your DEX into Jupiter."
 title: "DEX Integration"
 ---

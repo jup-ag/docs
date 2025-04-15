@@ -13,7 +13,7 @@ const sidebars = {
       items: [
         {
           type: 'doc',
-          id: 'index',
+          id: 'README',
         },
         {
           type: 'doc',
@@ -57,7 +57,7 @@ const sidebars = {
   routing: [
     {
       type: 'doc',
-      id: 'routing/index',
+      id: 'routing/README',
     },
     {
       type: 'html',
@@ -113,7 +113,7 @@ const sidebars = {
   ultra: [
     {
       type: 'doc',
-      id: 'ultra-api/index',
+      id: 'ultra-api/README',
     },
     {
       type: 'html',
@@ -147,7 +147,7 @@ const sidebars = {
   swap: [
     {
       type: 'doc',
-      id: 'swap-api/index',
+      id: 'swap-api/README',
     },
     {
       type: 'html',
@@ -230,7 +230,7 @@ const sidebars = {
   trigger: [
     {
       type: 'doc',
-      id: 'trigger-api/index',
+      id: 'trigger-api/README',
     },
     {
       type: 'html',
@@ -293,7 +293,7 @@ const sidebars = {
   recurring: [
     {
       type: 'doc',
-      id: 'recurring-api/index',
+      id: 'recurring-api/README',
     },
     {
       type: 'html',
@@ -363,7 +363,7 @@ const sidebars = {
   perp: [
     {
       type: 'doc',
-      id: 'perp-api/index',
+      id: 'perp-api/README',
     },
     {
       type: 'html',
@@ -401,7 +401,7 @@ const sidebars = {
   toolkit: [
     {
       type: 'doc',
-      id: 'tool-kits/index',
+      id: 'tool-kits/README',
     },
     {
       type: 'html',

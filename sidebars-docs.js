@@ -84,6 +84,10 @@ const sidebars = {
     {
       type: 'category',
       label: 'Legal & Guidelines',
+      link: {
+        type: 'generated-index',
+        slug: '/misc',
+      },
       collapsible: false,
       collapsed: false,
       items: [
@@ -102,25 +106,25 @@ const sidebars = {
         {
           type: 'doc',
           id: 'misc/support-guidelines',
-        },
-        {
-          type: 'html',
-          value: '<div class="sidebar-line-break"></div>',
-        },
+        }
       ],
     },
   ],
   ultra: [
+    {
+      type: 'doc',
+      id: 'ultra-api/index',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
     {
       type: 'category',
       label: 'Ultra API',
       collapsible: false,
       collapsed: false,
       items: [
-        {
-          type: 'doc',
-          id: 'ultra-api/index',
-        },
         {
           type: 'doc',
           id: 'ultra-api/get-order',
@@ -141,6 +145,14 @@ const sidebars = {
     },
   ],
   swap: [
+    {
+      type: 'doc',
+      id: 'swap-api/index',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
     {
       type: 'category',
       label: 'Swap API',
@@ -217,6 +229,14 @@ const sidebars = {
   ],
   trigger: [
     {
+      type: 'doc',
+      id: 'trigger-api/index',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
       type: 'category',
       label: 'Trigger API',
       collapsible: false,
@@ -271,6 +291,14 @@ const sidebars = {
     },
   ],
   recurring: [
+    {
+      type: 'doc',
+      id: 'recurring-api/index',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
     {
       type: 'category',
       label: 'Recurring API',
@@ -334,16 +362,8 @@ const sidebars = {
   ],
   perp: [
     {
-      type: 'category',
-      label: 'Perp API',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          id: 'perp-api/index',
-        },
-      ],
+      type: 'doc',
+      id: 'perp-api/index',
     },
     {
       type: 'html',
@@ -379,6 +399,14 @@ const sidebars = {
     },
   ],
   toolkit: [
+    {
+      type: 'doc',
+      id: 'tool-kits/index',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
     {
       type: 'category',
       label: 'Jupiter Tool Kits',

@@ -53,6 +53,6 @@ If the above sounds like too much work, then Ultra API will be the better choice
 3. [**Send Swap Transaction**](/docs/swap-api/send-swap-transaction): Sign and send the swap transaction to the network via your preferred RPC or other methods.
 
 **Other Guides**
-- [**Adding Fees to Swap API**](/docs/swap-api/adding-fees-to-swap-api): Add custom integratorfees to the swap transaction.
+- [**Adding Fees to Swap API**](/docs/swap-api/add-fees-to-swap): Add custom integratorfees to the swap transaction.
 - [**Using Swap API as a payment method**](/docs/swap-api/payments-through-swap): Use Swap API as a payment method for your users.
 - [**Using Swap Terminal**](/docs/tool-kits/swap-terminal): Lite version of Jupiter that provides end-to-end swap with just a few lines of code.

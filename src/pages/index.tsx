@@ -17,13 +17,13 @@ const JupiterExplore = () => {
               <a href="/docs/ultra-api/" className="underline text-gray-800">
                 Ultra
               </a>
-              , <a href="/docs/swap-api/get-quote" className="underline text-gray-800">
+              , <a href="/docs/swap-api/" className="underline text-gray-800">
                 Swap
               </a>
-              , <a href="/docs/trigger-api/create-order" className="underline text-gray-800">
+              , <a href="/docs/trigger-api/" className="underline text-gray-800">
                 Trigger
               </a>
-              , <a href="/docs/recurring-api/create-order" className="underline text-gray-800">
+              , <a href="/docs/recurring-api/" className="underline text-gray-800">
                 Recurring
               </a>
               , and more.
@@ -55,7 +55,7 @@ const JupiterExplore = () => {
             </p>
           </div>
           <a
-            href="/docs/tool-kits/swap-terminal"
+            href="/docs/tool-kits/"
             className="mt-6 bg-[#66A2E8] !text-white font-semibold py-2 px-3 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
           >
             Explore Tool Kits
@@ -67,8 +67,8 @@ const JupiterExplore = () => {
               Get Routed
             </h2>
             <p className="text-gray-600 text-sm text-left py-1">
-              If you are a DEX or AMM, and have an interest to be part of our
-              routing engine, refer to the routing integration guides.
+              If you are a decentralized exchange or market maker and have an interest to be part of our
+              routing engines, refer to the routing integration guides.
             </p>
           </div>
           <div className="mt-6 flex gap-3">
@@ -349,7 +349,7 @@ const JupiterFooter = () => {
                 </svg>
               </a>
               <a
-                href="https://jupiverse.zendesk.com/hc/en-us"
+                href="https://support.jup.ag/hc/en-us"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
@@ -369,22 +369,28 @@ const JupiterFooter = () => {
             {/* Legal Links */}
             <div className="flex flex-wrap justify-center gap-4 text-sm text-center">
               <a
-                href="/docs/sdk-api-license-agreement"
+                href="/docs/misc/sdk-api-license-agreement"
                 className="text-gray-700 hover:text-primary transition-colors hover:underline text-xs"
               >
                 SDK & API License
               </a>
               <a
-                href="/docs/terms-of-use"
+                href="/docs/misc/terms-of-use"
                 className="text-gray-700 hover:text-primary transition-colors hover:underline text-xs"
               >
                 Terms of Use
               </a>
               <a
-                href="/docs/privacy-policy"
+                href="/docs/misc/privacy-policy"
                 className="text-gray-700 hover:text-primary transition-colors hover:underline text-xs"
               >
                 Privacy Policy
+              </a>
+              <a
+                href="/docs/misc/integrator-guidelines"
+                className="text-gray-700 hover:text-primary transition-colors hover:underline text-xs"
+              >
+                Integrator Guidelines
               </a>
             </div>
 

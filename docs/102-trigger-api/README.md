@@ -8,6 +8,7 @@ title: "About Trigger API"
     <title>Trigger API</title>
     <meta name="twitter:card" content="summary" />
 </head>
+
 The Jupiter Trigger API enables you to create limit orders on Solana, allowing users to set target prices for token swaps that execute automatically when market conditions are met.
 
 The Trigger API is ideal for:

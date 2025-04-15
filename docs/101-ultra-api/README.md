@@ -44,7 +44,7 @@ If you have a highly custom need like what is described above, then Swap API may
 
 If the above sounds like too much work, then Ultra API will be the better choice.
 
-## How to swap with Ultra API
+## Getting Started with Ultra API
 
 1. [**Get Order**](/docs/ultra-api/get-order): Request for a swap transaction then sign it.
 2. [**Execute Order**](/docs/ultra-api/execute-order): Execute the swap transaction and get the execution status.

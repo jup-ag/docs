@@ -8,3 +8,38 @@ title: "About Trigger API"
     <title>Trigger API</title>
     <meta name="twitter:card" content="summary" />
 </head>
+The Jupiter Trigger API enables you to create limit orders on Solana, allowing users to set target prices for token swaps that execute automatically when market conditions are met.
+
+The Trigger API is ideal for:
+- DeFi applications that want to offer users more advanced trading options
+- Wallets looking to expand their trading features
+- Automated systems that need to execute at specific price points
+
+## Features
+
+| Feature | Description |
+| --- | --- |
+| **Custom integrator fees** | Integrators can choose to charge their own custom fees (on top of Jupiter's fees). |
+| **Any token pair** | Create trigger orders between any token pairs supported on Jupiter's Metis Routing Engine. |
+| **Best execution** | Orders are executed through Jupiter's Metis Routing Engine to get the best possible price across all DEXes. |
+| **Price monitoring** | Our infrastructure continuously monitors prices to execute trigger orders as soon as conditions are met. |
+| **Order expiry** | Trigger orders can be set to expire after a certain period of time. |
+| **Slippage addition** | Add slippage to the target price, ideal for users who want to prioritize success rate over price. |
+
+## Getting Started with Trigger API
+
+1. [**Create Order**](/docs/trigger-api/create-order): Create a new trigger order with your desired parameters.
+2. [**Execute Order**](/docs/trigger-api/execute-order): Execute a trigger order.
+3. [**Cancel Order**](/docs/trigger-api/cancel-order): Cancel an existing trigger order.
+4. [**Get Trigger Orders**](/docs/trigger-api/get-trigger-orders): Retrieve active/historical trigger orders for a specific wallet address
+5. [**Best Practices**](/docs/trigger-api/best-practices): Best practices for using Trigger API.
+
+## FAQ
+
+**What is the fee for using Trigger API?**
+
+Trigger API takes 0.03% for stable pairs and 0.1% for every other pairs.
+
+**Can integrators take fees using Trigger API?**
+
+Yes, integrators can take fees on top of Jupiter's fees.

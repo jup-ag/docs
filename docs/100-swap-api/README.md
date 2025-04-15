@@ -44,7 +44,7 @@ If you have a highly custom need like what is described above, then Swap API may
 
 If the above sounds like too much work, then Ultra API will be the better choice.
 
-## How to swap with Swap API
+## Getting Started with Swap API
 
 1. [**Get Quote**](/docs/swap-api/get-quote): Request for a quote which consists of the route plan, and other params such as integrator fee, slippage, etc.
 2. [**Build Swap Transaction**](/docs/swap-api/build-swap-transaction): Post the quote to build a swap transaction.

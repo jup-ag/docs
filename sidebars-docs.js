@@ -143,6 +143,22 @@ const sidebars = {
       type: 'html',
       value: '<div class="sidebar-line-break"></div>',
     },
+    {
+      type: 'category',
+      label: 'Ultra API Guides',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'ultra-api/add-fees-to-ultra',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
   ],
   swap: [
     {

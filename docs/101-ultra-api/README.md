@@ -51,6 +51,9 @@ If the above sounds like too much work, then Ultra API will be the better choice
 
 - [**Get Balances**](/docs/ultra-api/get-balances): Additionally, you can request for token balances of an account from `/ultra/v1/balances`.
 
+**Other Guides**
+- [**Add Fees To Ultra**](/docs/ultra-api/add-fees-to-ultra): Add custom integrator fees to your Ultra transaction, on top of Jupiter's fees.
+
 ## FAQ
 
 **What is the fee for using Ultra API?**
@@ -69,4 +72,4 @@ Portal API Keys are not supported for Ultra API.
 
 **Can integrators take fees using Ultra API?**
 
-Currently no, we are working on it.
+Yes, you can add fees to Ultra API, on top of Jupiter's fees. Please refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for more information.

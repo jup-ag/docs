@@ -11,21 +11,21 @@ export const API_CARDS = [
     {
       title: "Swap API",
       links: [
-        { text: "Docs", href: "/docs/swap-api/get-quote" },
+        { text: "Docs", href: "/docs/swap-api/" },
         { text: "Schemas", href: "/docs/api/swap-api/" },
       ],
     },
     {
       title: "Trigger API",
       links: [
-        { text: "Docs", href: "/docs/trigger-api/create-order" },
+        { text: "Docs", href: "/docs/trigger-api/" },
         { text: "Schemas", href: "/docs/api/trigger-api/" },
       ],
     },
     {
       title: "Recurring API",
       links: [
-        { text: "Docs", href: "/docs/recurring-api/create-order" },
+        { text: "Docs", href: "/docs/recurring-api/" },
         { text: "Schemas", href: "/docs/api/recurring-api/" },
       ],
     },

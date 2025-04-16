@@ -27,9 +27,9 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 **Quick Links** to APIs and Tool Kits:
 
 - [Ultra API](/docs/ultra-api/)
-- [Swap API](/docs/swap-api/get-quote)
-- [Trigger API](/docs/trigger-api/create-order)
-- [Recurring API](/docs/recurring-api/create-order)
+- [Swap API](/docs/swap-api/)
+- [Trigger API](/docs/trigger-api/)
+- [Recurring API](/docs/recurring-api/)
 - [Token API](/docs/token-api/)
 - [Price API](/docs/price-api/)
 - [Swap Terminal](/docs/tool-kits/swap-terminal)

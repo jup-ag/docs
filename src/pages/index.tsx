@@ -1,8 +1,6 @@
 import React from "react";
 import Layout from "@theme/Layout";
-import { cn } from "../utils";
-import SearchBar from "@theme/SearchBar";
-import { API_CARDS, TOOL_KIT_CARDS, DRWG_CARDS } from "../constant";
+import { API_CARDS, TOOL_KIT_CARDS, DRWG_CARDS } from "../utils/homeCards";
 
 const JupiterExplore = () => {
   return (
@@ -73,12 +71,20 @@ const JupiterExplore = () => {
               routing engine, refer to the routing integration guides.
             </p>
           </div>
-          <a
-            href="/docs/dex-integration"
-            className="mt-6 bg-[#66A2E8] !text-white font-semibold py-2 px-3 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
-          >
-            DEX Integration
-          </a>
+          <div className="mt-6 flex gap-3">
+            <a
+              href="/docs/routing/dex-integration"
+              className="flex-1 bg-[#66A2E8] !text-white font-semibold py-2 px-1 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
+            >
+              DEX Integration
+            </a>
+            <a
+              href="/docs/routing/rfq-integration"
+              className="flex-1 bg-[#66A2E8] !text-white font-semibold py-2 px-1 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
+            >
+              RFQ Integration
+            </a>
+          </div>
         </div>
         <div className="bg-white shadow-md p-6 rounded-2xl flex flex-col h-full">
           <div className="flex-1">
@@ -404,10 +410,13 @@ const Content = () => {
         <div className="bg-gray-100 w-full flex flex-col justify-center items-center text-center py-10 md:py-20 px-4">
           <div className="relative">
             <div
-              className={cn(
-                "font-bold max-md:max-w-full text-5xl xl:text-6xl leading-[1] py-2",
-                "bg-gradient-to-r from-[#00BEF0] via-[#8DE3A3] to-[#C7F284] text-transparent bg-clip-text"
-              )}
+              className={`
+                font-bold max-md:max-w-full 
+                text-5xl xl:text-6xl 
+                leading-[1] py-2
+                bg-gradient-to-r from-[#00BEF0] via-[#8DE3A3] to-[#C7F284] 
+                text-transparent bg-clip-text
+              `}
             >
               Jupiter Developer Docs
               <span className="inline-block ml-2 bg-[#66A2E8] text-white text-[10px] px-1.5 py-0.5 rounded-md transform align-top relative top-4 md:top-2">

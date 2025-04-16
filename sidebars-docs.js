@@ -54,6 +54,32 @@ const sidebars = {
       ],
     },
   ],
+  routing: [
+    {
+      type: 'doc',
+      id: 'routing/index',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Routing Integrations',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'routing/dex-integration',
+        },
+        {
+          type: 'doc',
+          id: 'routing/rfq-integration',
+        },
+      ],
+    },
+  ],
   misc: [
     {
       type: 'category',

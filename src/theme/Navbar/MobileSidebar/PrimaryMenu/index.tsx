@@ -1,24 +1,14 @@
 import React from 'react';
 import { useLocation } from '@docusaurus/router';
-import { useThemeConfig } from '@docusaurus/theme-common';
-import { navbarConfigs } from '../../../../constant';
 import clsx from 'clsx';
-
-// Import the isPathActive function from the parent component
-import { isPathActive } from '../index';
+import { useNavigation } from '../../../../utils/navigation';
 
 export default function NavbarMobileSidebarPrimaryMenu(): JSX.Element {
   const location = useLocation();
   
-  // Determine which navbar config to use based on the current path
-  const navbarItems = Object.keys(navbarConfigs).reduce((acc, path) => {
-    if (path === '/' && location.pathname === '/') {
-      return navbarConfigs[path];
-    } else if (location.pathname.startsWith(path) && path !== '/') {
-      return navbarConfigs[path];
-    }
-    return acc;
-  }, []);
+  // Use the same navigation hook as the main navbar
+  const { useNavbarItems, isNavItemActive, isDropdownItemActive } = useNavigation(location.pathname);
+  const navbarItems = useNavbarItems();
 
   return (
     <div className="menu">
@@ -32,9 +22,7 @@ export default function NavbarMobileSidebarPrimaryMenu(): JSX.Element {
                     href={item.to}
                     className={clsx(
                       'menu__link',
-                      (isPathActive(item.to, location, navbarItems) || 
-                       item.items?.some(subItem => isPathActive(subItem.to, location, navbarItems))) && 
-                      'menu__link--active'
+                      isNavItemActive(item) && 'menu__link--active'
                     )}
                   >
                     {item.label}
@@ -45,7 +33,7 @@ export default function NavbarMobileSidebarPrimaryMenu(): JSX.Element {
                         <a
                           className={clsx(
                             'menu__link',
-                            isPathActive(subItem.to, location, navbarItems) && 'menu__link--active'
+                            isDropdownItemActive(subItem.to) && 'menu__link--active'
                           )}
                           href={subItem.to}
                         >
@@ -63,7 +51,7 @@ export default function NavbarMobileSidebarPrimaryMenu(): JSX.Element {
                 <a
                   className={clsx(
                     'menu__link',
-                    isPathActive(item.to, location, navbarItems) && 'menu__link--active'
+                    isNavItemActive(item) && 'menu__link--active'
                   )}
                   href={item.to}
                 >

@@ -30,7 +30,7 @@ To get a swap order, you need to pass in the required parameters such as:
 - `amount`: The amount of input token to swap
 - `taker`: The user's wallet address
   - Note: If the `taker` is not provided, there will still be an Order Response with no `transaction` field.
-- `referralAccount`: The referral account address - created via the [Referral Program](https://github.com/TeamRaccoons/referral)
+- `referralAccount`: The referral account address - refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for the step by step process.
 - `referralFee`: The referral fee in basis points (bps)
 
 ```jsx
@@ -42,12 +42,6 @@ const orderResponse = await (
 
 console.log(JSON.stringify(orderResponse, null, 2));
 ```
-
-:::tip Add Fees To Ultra
-Refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for more information on how to add fees to your Ultra transaction.
-
-There are a few pointers to note in the guide.
-:::
 
 ## Order Response
 

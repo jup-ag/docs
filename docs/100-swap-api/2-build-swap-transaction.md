@@ -42,7 +42,7 @@ To fully utilize the Swap API, check out the [Swap API or Swap Instructions Refe
 
 
 :::note
-Base URL: `https://lite-jup.ag/swap/v1/swap`
+Base URL: `https://lite-api.jup.ag/swap/v1/swap`
 
 For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
 :::

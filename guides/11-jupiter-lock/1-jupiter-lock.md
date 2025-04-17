@@ -9,8 +9,6 @@ description: "Jupiter Lock is an open-sourced, audited, and free ecosystem tool 
     <meta name="twitter:card" content="summary" />
 </head>
 
-import DownloadBox from '/src/components/DownloadBox';
-
 Jupiter Lock (https://lock.jup.ag/) is an [open-sourced](https://github.com/jup-ag/jup-lock), audited and free way to lock and distribute tokens over-time. Lock will be free for all project teams to lock tokens, implement cliff, and vest non-circulating supply in a clear and transparent manner.
 
 ### Jupiter Lock Specifications
@@ -24,8 +22,6 @@ Program code is available here: https://github.com/jup-ag/jup-lock
 Mainnet Deployment: `LocpQgucEQHbqNABEYvBvwoxCPsSbG91A1QaQhQQqjn`
 
 The **IDL** for the Jupiter Lock program can be found on [Solscan](https://solscan.io/account/LocpQgucEQHbqNABEYvBvwoxCPsSbG91A1QaQhQQqjn#anchorProgramIdl), or available here: 
-
-<DownloadBox fileName="locker.json" /> &nbsp;
 
 :::info Jupiter Lock is in Beta
 Feel free to submit PRs, suggestions, or reach out to us! If you need help with Jupiter Lock or have any feedback on how to improve, let us know on Discord or [Telegram](https://t.me/xianxlb).

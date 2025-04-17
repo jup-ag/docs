@@ -64,7 +64,7 @@ The payment is currently done on a monthly basis.
 - 7 days before the plan expires, you will see a banner in the dashboard.
 - You can renew your plan latest 14 days after the plan expires before your API Key is disabled.
 - The plan will be renewed for the same plan as the previous plan.
-- If you have any issues with the payment, [please open a ticket](https://jupiverse.zendesk.com/hc/en-us/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer_support).
+- If you have any issues with the payment, [please open a ticket](https://support.jup.ag/hc/en-us/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer_support).
 :::
 
 :::note other payment methods

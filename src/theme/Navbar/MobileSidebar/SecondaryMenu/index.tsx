@@ -2,19 +2,7 @@ import React from 'react';
 import { useNavbarSecondaryMenu } from '@docusaurus/theme-common/internal';
 import { useLocation } from '@docusaurus/router';
 import Translate from '@docusaurus/Translate';
-import { navbarConfigs } from '../../../../constant';
-
-function hasPrimaryMenuItems(locationPath: string) {
-  const items = Object.keys(navbarConfigs).reduce((acc, path) => {
-    if (path === '/' && locationPath === '/') {
-      return navbarConfigs[path];
-    } else if (locationPath.startsWith(path) && path !== '/') {
-      return navbarConfigs[path];
-    }
-    return acc;
-  }, []);
-  return items.length > 0;
-}
+import { useNavigation } from '../../../../utils/navigation';
 
 function SecondaryMenuBackButton({ onClick }: { onClick: () => void }) {
   return (
@@ -36,7 +24,11 @@ function SecondaryMenuBackButton({ onClick }: { onClick: () => void }) {
 export default function NavbarMobileSidebarSecondaryMenu(): JSX.Element | null {
   const location = useLocation();
   const secondaryMenu = useNavbarSecondaryMenu();
-  const primaryMenuExists = hasPrimaryMenuItems(location.pathname);
+  
+  // Use the navigation hook to check if we have primary menu items
+  const { useNavbarItems } = useNavigation(location.pathname);
+  const navbarItems = useNavbarItems();
+  const primaryMenuExists = navbarItems.length > 0;
 
   return (
     <>

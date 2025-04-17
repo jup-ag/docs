@@ -16,7 +16,7 @@ Jupiter provides developer tools and resources to help you integrate with Jupite
 When integrating with Jupiter, you can use the following assets to help you brand and market your product: [Jupiter Brand Assets](https://github.com/jup-ag/docs/tree/main/static/files).
 
 :::caution Labelling Routing Provider
-Do note that, if you are using our routing engine (such as getting quotes from the Swap API), you are to label the routing provider as **"Metis"**, and not "Jupiter".
+Do note that, if you are using our routing engine (such as getting quotes from the Swap API), you are to label the routing provider as **"Jupiter Metis v1"**, and not "Jupiter".
 :::
 
 ## Developer Support
@@ -24,7 +24,7 @@ Do note that, if you are using our routing engine (such as getting quotes from t
 There are currently 2 ways to get technical support:
 
 1. [Public Developer Support Channel in Discord](https://discord.com/channels/897540204506775583/910250162402779146)
-2. [Portal Enquiry](https://jupiverse.zendesk.com/hc/en-us/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer_support)
+2. [Portal Enquiry](https://support.jup.ag/hc/en-us/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer_support)
 
 :::warning
 Please use the Discord channel for your technical questions, as it is a public channel, more people can help you and it promotes discovery/discussion.

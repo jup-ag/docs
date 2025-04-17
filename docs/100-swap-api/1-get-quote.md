@@ -33,7 +33,7 @@ To fully utilize the Quote API, check out the [Quote API Reference](/docs/api/sw
 
 
 :::note
-Base URL: `https://lite-jup.ag/swap/v1/quote`
+Base URL: `https://lite-api.jup.ag/swap/v1/quote`
 
 For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
 :::

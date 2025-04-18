@@ -35,6 +35,10 @@ const sidebars = {
               type: 'doc',
               id: 'api/ultra-api/balances',
             },
+            {
+              type: 'doc',
+              id: 'api/ultra-api/shield',
+            },
           ],
         },
         {

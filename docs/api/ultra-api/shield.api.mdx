@@ -1,0 +1,76 @@
+---
+id: shield
+title: "shield"
+description: "Request for token information and warnings of mints"
+sidebar_label: "shield"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVE1vEzEQ/SuWT62UZFMEl70VVKoKJEqhpyQHZ3eSdeO1jT2bttrmvzPjTegmaSWEkCCHje35evP8xq0sIRZBe9TOylzewI8GIoqFCwLdCqzQlta1YrtQthT3Klhtl1G4hai1xTi1U5vnuXUIUzsUN7AAjhWTW4NBifPrK1G6YnaS0TdmDR8OldfZEnAYKw2mPE3lahegXy1lnVo5kAGidzZClHkr34zH/LcP+1tTFBDjojFi50xxhbMIFtldeW90kfJmd5FjWhmLCmrFK3z0QFnc/A4KpEAfnIeAuqu46/jYc5N+A/n2JUzvVUlgEp1/DwuE4ELPLWIgaJJBcC0doJT5ZOs269C9ewndFcEJVhkRIazpwrqIf4iTLF4FVQPhohSTVmrGSfyFR0pvyULbpDjaHuHYFejnx9DA4KDvD66uFTXNtRBKYTSpfSdlli3Jck/ztJKb2UASsMpRUkkO3K7CijZZp2BGlHjskDfBkK1C9DHPMqMRWPGju8aP1LIbgWx9Jg+xfQwAghgMaWjAlt4RKnGvsRKMlsDWmtrfDA5L/E72a6XL17JXelmRoVeEqZiDaCJxlFyUTXGf4DHRwRQl+jUa5v9ro4tVRBWYHCaiK3o2Go/GR1CexGdtV+Jpap/EcDjsFpNLYv5LKCG8/FY4Np1ufS8eoGgI7Cv+0Jl7MawM7yLWKul4K6dft7eHr32egv/zQdxqHuEBM2+UTt0lRbRbYU52rdFVVdQ2n7TtXEW4DWaz4eNusliupY5qbnhiFsrEw5Hps3Fysx2uU/FHg/QK9BWJ6nm218o07JN0tlZBMzgCOiPPChTdaELdBZ3Tw++xF3X0au0N7+XFd3qEfgLz4G3A
+sidebar_class_name: "get api-method"
+info_path: docs/api/ultra-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"shield"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/shield"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for token information and warnings of mints
+
+:::note
+- Refer to [Ultra API doc](/docs/ultra-api/get-shield) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"in":"query","name":"mints","schema":{"type":"string"},"required":true,"description":"Comma separated list of mints to get information for"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","properties":{"warnings":{"type":"object"}}}}}},"400":{"description":"Bad request","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

@@ -137,6 +137,10 @@ const sidebars = {
           type: 'doc',
           id: 'ultra-api/get-balances',
         },
+        {
+          type: 'doc',
+          id: 'ultra-api/get-shield',
+        },
       ],
     },
     {

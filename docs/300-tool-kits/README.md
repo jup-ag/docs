@@ -34,5 +34,5 @@ We welcome contributions from the anyone! Here's how you can help:
 
 1. Submit pull requests to our repositories.
 2. Submit issues to our repositories.
-3. If you're a vibe coder or non-technical, join our [Discord](https://discord.gg/jup) to discussany ideas you have.
+3. If you're a vibe coder or non-technical, join our [Discord](https://discord.gg/jup) to discuss any ideas you have.
 4. Help us by spreading the word about the tool kits.

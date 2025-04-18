@@ -42,16 +42,16 @@ By default, there are **zero** protocol fees on Jupiter Swap. Integrators have t
         </div>
     </summary>
 
-### Important Notes
+**Important Notes**
 - The Jupiter Swap project account for the Referral Program is `45ruCyfdRkWpRNGEqWzjCiXRHkZs8WXCLQ67Pnpye7Hp`.
 - The `referralTokenAccount` can either be:
     - **Input mint or the output mint** on the swap for ExactIn.
     - **Input mint ONLY** on the swap for ExactOut.
 - You can use the [Dashboard](https://referral.jup.ag/dashboard), [SDK](https://github.com/TeamRaccoons/referral/blob/main/example/src/createReferralAccount.ts) or [API](https://referral.jup.ag/api) to set up the `referralAccount` and `referralTokenAccount` in this guide.
 
-## Let’s Get Started
+**Let’s Get Started**
 
-### 1. Set up
+**1. Set up**
 
 You will need to complete the prerequisites and understanding of [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](1-get-quote.md) guide as this is reliant on the Swap API.
 
@@ -72,7 +72,7 @@ const referralAccount = new Publickey('ReplaceWithPubkey');
 const mintAccount = new Publickey('So11111111111111111111111111111111111111112');
 ```
 
-### 2. Set your referral fee in Quote
+**2. Set your referral fee in Quote**
 
 Setting your referral fee is simple, just add `platformFeeBps` parameter to the `/quote` endpoint.
 
@@ -88,7 +88,7 @@ const quoteResponse = await (
 console.log(JSON.stringify(quoteResponse, null, 2));
 ```
 
-### 3. Set your referral token account in Swap
+**3. Set your referral token account in Swap**
 
 In order to refer and receive fees from all types of tokens, you will need to have already initialize `referralTokenAccount`s (owned by your `referralAccount`) for the mint in the swap. By calling the Swap API with the parameter `feeAccount`, which is the `referralTokenAccount`, you will receive the serialized swap transaction that will set a fee to be taken from the referred and sent to that token account.
 
@@ -199,3 +199,30 @@ const swapResponse = await (
 ### 4. Sign and send transaction
 
 Finally, the user can sign the transaction and it can be submitted to the network to be executed. You can refer to the [Send Swap Transaction](3-send-swap-transaction.md) guide to complete this step.
+
+### Create Token Account
+
+To create a token account, you can use the following code or refer to [Solana Cookbook](https://solana.com/developers/cookbook/tokens/create-token-account).
+
+- The code creates the transaction to create the token account and handles the transaction siging and sending.
+- If the token account already exists, it will not create and might throw an error such as `Provided owner is not allowed`.
+
+```ts
+import { createAssociatedTokenAccount } from "@solana/spl-token";
+
+const mintPubkey = new PublicKey(
+    "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+);
+
+let ata = await createAssociatedTokenAccount(
+    connection, // connection
+    wallet, // fee payer
+    mintPubkey, // mint
+    wallet.publicKey, // owner of the token account
+    // confirmOptions, // if you need to skip simulation and send the transaction immediately
+    // programId, // if you need to use a different token program id such as token-2022
+    // associatedTokenProgramId,
+    // allowOwnerOffCurve, // if you need to allow the owner to be off curve
+);
+console.log(`ATA: ${ata.toBase58()}`);
+```

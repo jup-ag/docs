@@ -25,7 +25,7 @@ The integration requirements are subjected to change and please provide suggesti
 - When ready, you will be onboarded to Edge before going live on production
 
 :::note
-[Please reach out to us in Discord](https://discord.gg/jup)
+Please reach out to us in [Discord](https://discord.gg/jup) in the [Developer Support channel](https://discord.com/channels/897540204506775583/910250162402779146)
 - If you are interested to participate in Jupiter Z
 - If you need any help or clarification regarding the integration.
 - To begin onboarding to Edge.

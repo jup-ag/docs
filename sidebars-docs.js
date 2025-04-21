@@ -431,6 +431,30 @@ const sidebars = {
       type: 'html',
       value: '<div class="sidebar-line-break"></div>',
     },
+    {
+      type: 'category',
+      label: 'Jupiter Terminal',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'tool-kits/terminal-introduction',
+        },
+        {
+          type: 'doc',
+          id: 'tool-kits/terminal-getting-started',
+        },
+        {
+          type: 'doc',
+          id: 'tool-kits/terminal-customization',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
   ],
   ...apiSidebars,
 };

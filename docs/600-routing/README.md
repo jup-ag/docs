@@ -13,9 +13,25 @@ title: "About Routing"
 If you are an exchange or market maker and want to participate in our routing system, please refer to our [DEX Integration](/docs/routing/dex-integration) and [RFQ Integration](/docs/routing/rfq-integration) guides.
 :::
 
-## Jupiter Metis v1 Routing Engine
+## Juno Liquidity Engine
 
-Since its inception in 2023, Jupiter's proprietary DEX aggregation engine, Metis v1, has become a cornerstone of Solana blockchain's DeFi ecosystem. Metis v1 functions as a sophisticated aggregation layer for on-chain liquidity, with one single objective - to algorithmically determine the most efficient trade route for any given token pair, considering factors like price, slippage, and transaction fees across multiple DEXes and AMMs. This ensures users receive the best possible execution price available on-chain at the moment that they wish to trade.
+Juno is Jupiter's latest liquidity engine, it is built with the combined learnings from Metis and JupiterZ, with one single objective - to ensure the best possible execution price and success rate across all engines and liquidity sources. Juno employs a sophisticated self-learning mechanism to maintain high availability of competitive routes while automatically sidelining underperforming or potentially problematic quotes. Juno will be incrementally introducing new third-party liquidity sources and a continual effort to improve Metis and JupiterZ routing capabilities.
+
+|  |  |
+| --- | --- |
+| **Multi-liquidity sources** | Integrates third-party liquidity sources and Jupiter's proprietary routing engines to ensure best possible rates.<br /><br />Currently, Juno consists of Metis, JupiterZ, Hashflow, DFlow and more in the pipeline. |
+| **Self-learning** | Automatically detects and sidelines underperforming or problematic sources, while continuously learning to provide competitive quotes. |
+| **Continuous optimizations** | By integrating external liquidity sources directly, Juno creates a competitive environment that drives continuous improvement across all routing engines. This approach ensures users consistently receive optimal execution rates while providing valuable performance data to enhance both Metis and JupiterZ routing capabilities. |
+
+Juno is directly powering the Ultra Swap on Jupiter frontend (jup.ag) and is also accessible via [**Ultra API**](/docs/ultra-api): The Jupiter Ultra API is the *only* API you ever need to experience or build the best trading experience on Solana - Jupiter handles all the complexities such as RPCs, slippage, broadcast method and landing rates, all while accessing the best liquidity available through Juno.
+
+## Jupiter Metis Routing Engine
+
+Since its inception in 2023, Jupiter's proprietary DEX aggregation engine, Metis v1, has become a cornerstone of Solana blockchain's DeFi ecosystem. Metis functions as a sophisticated aggregation layer for on-chain liquidity, with one single objective - to algorithmically determine the most efficient trade route for any given token pair, considering factors like price, slippage, and quoted-to-executed price across multiple DEXes and AMMs. This ensures users receive the best possible execution price available on-chain at the moment that they wish to trade.
+
+As of 2025, we've deployed Metis v1.5 which has experimented with modified algorithms to enable more granular splits and allows for a larger set of tokens to act as intermediate tokens in a route. From our analysis so far, this translates to 4.6x less spread between quoted and executed price. This is a continued effort to experiment with better configurations and algorithms to improve Metis.
+
+[Read more about Metis's history, learnings and future plans](https://x.com/sssionggg/status/1912378618711535889).
 
 |  |  |
 | --- | --- |
@@ -26,9 +42,11 @@ Since its inception in 2023, Jupiter's proprietary DEX aggregation engine, Metis
 
 The engine integrates with most DEXes on Solana and is accessible via the Swap API. You can find a complete list of supported DEXes via the [/swap/v1/program-id-to-label](https://lite-api.jup.ag/swap/v1/program-id-to-label) endpoint.
 
+**Metis v1**
+
 Metis v1's impact extends far beyond simple facilitation of on-chain trades. It is the de-facto liquidity engine on Solana, playing an instrumental role in onboarding millions of users to the network and facilitating trillions of dollars in cumulative trading volume. Its stability and general-purpose design have made it a reliable foundation for countless developers and protocols building on Solana.
 
-Currently, Metis v1 powers the **Swap API**: A robust interface designed for developers and applications requiring programmatic access to Solana's liquidity. It currently has tens of thousands of requests per second, with demonstrated capacity to handle peak loads reaching hundreds of thousands of requests per second.
+Currently, Metis v1 powers the [**Swap API**](/docs/swap-api): A robust interface designed for developers and applications requiring programmatic access to Solana's liquidity. It currently has tens of thousands of requests per second, with demonstrated capacity to handle peak loads reaching hundreds of thousands of requests per second.
 
 ## Jupiter Z (RFQ) Routing Engine
 

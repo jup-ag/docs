@@ -15,7 +15,7 @@ The Jupiter Ultra API is the *only* API you ever need to experience or build the
 
 | Feature | Description |
 | --- | --- |
-| **Best price** | Aggregates across multiple liquidity sources, both on-chain and off-chain, for the best possible price.<br/>Including Jupiter's Metis Routing Engine, Jupiter Z (RFQ), and others. |
+| **Best liquidity engine** | Aggregates across multiple liquidity sources, both Jupiter's proprietary routing engines and third-party liquidity sources, for the best possible price.<br/><br />Including Jupiter's Metis Routing Engine, Jupiter Z (RFQ), and others. |
 | **Blazing fast** | 95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine. |
 | **MEV-protected** | The lowest incidence of MEV attacks across all existing applications, by far. |
 | **Real-Time Slippage Estimator** | Intelligently derives the best possible slippage to use at the time of execution, balancing between trade success and price protection. |

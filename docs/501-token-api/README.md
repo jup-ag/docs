@@ -242,12 +242,12 @@ This endpoint does not support `limit` or `offset`.
 :::
 
 :::tip
-To index your own tokens, you can use RPC API like [Helius DAS](https://docs.helius.dev/compression-and-das-api/digital-asset-standard-das-api) to do it yourself.
+To index your own tokens, you can use RPC APIs such as the [Metaplex Digital Asset Standard (DAS)](https://developers.metaplex.com/das-api). Major RPC providers like [Helius](https://docs.helius.dev/compression-and-das-api/digital-asset-standard-das-api) and [Triton One](https://docs.triton.one/digital-assets-api/introduction) offer access to this API.
 :::
 
 ```jsx
 const allResponse = await (
-    await fetch('https://lite-api.jup.ag/tokens/v1/all')
+  await fetch("https://lite-api.jup.ag/tokens/v1/all")
 ).json();
 
 console.log(allResponse);

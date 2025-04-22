@@ -14,7 +14,7 @@ The API and SDK are protected by copyright laws and international copyright trea
 
 1.2 **"Software Development Kit"** or **"SDK"** or **"Jupiter SDK"** means the ancillary tools and resources that allow the user to utilise or integrate the API. Jupiter SDK shall include any future, updated or otherwise modified version(s) thereof furnished by Jupiter (in its sole discretion) to Licensee.
 
-1.3 **"Documentation"** includes, but is not limited to programmer guides, manuals, materials, and information appropriate or necessary for use in connection with the API.
+1.3 **"Documentation"** includes, but is not limited to programmer guides, manuals, materials, and information appropriate or necessary for use in connection with the API, and in particular shall include the Integrator Guidelines available at https://dev.jup.ag/docs/misc/integrator-guidelines.
 
 **2. Grant of License​**
 
@@ -22,13 +22,15 @@ The API and SDK are protected by copyright laws and international copyright trea
 
 2.2 Licensee shall have no right to distribute, license (whether or not through multiple tiers) or otherwise transfer the API or SDK to any third party.
 
-2.3 In case of potential other API or SDK use that is not prescribed by this Agreement, please write to info@jup.ag to seek written consent.
+2.3 Notwithstanding any of the provisions herein, where the Licensee uses the API or SDK (including without limitation for any informational, comparison, or testing purpose), it shall be required to strictly label/name/characterise the API and any output of the API as “Jupiter Metis v1" and not utilise any other label, name or characteristic, in particular where the same is visible to end users of the Licensee’s Product. The Licensee accepts that it is misleading and unethical to label/name/characterise the API and any output of the API as “Jupiter” or otherwise suggest it is the same product as the service available at https://jup.ag/.
 
-2.4 Representations. Both Parties to this Agreement are duly organized and validly existing in good standing with all requisite power and authority to enter into this Agreement and conduct its business as is now being conducted. Neither Party is identified on, or engages in any transactions with anyone else listed on, any sanctions list maintained by the U.S. Department of the Treasury's Office of Foreign Asset Control ("OFAC") and have shared with each other a copy of their Articles of Incorporation and Significant Shareholder list.
+2.4 In case of potential other API or SDK use that is not prescribed by this Agreement, please write to info@jup.ag to seek written consent.
 
-2.5 By providing access to the API and the SDK, Jupiter is solely providing a back-end technical service to the Licensee which allows the Licensee to provide swap-related services to end users of the Licensee's products or services. Jupiter is not a party to any agreement for swap-related services between the Licensee, its end users, any counterparty or trading venue where swaps are performed, nor any trustee, custodian, bailee, manager, administrator or service provider in respect of any digital asset or otherwise.
+2.5 Representations. Both Parties to this Agreement are duly organized and validly existing in good standing with all requisite power and authority to enter into this Agreement and conduct its business as is now being conducted. The Licensee is not identified on, or engages in any transactions with any party listed on, any sanctions list maintained by the U.S. Department of the Treasury’s Office of Foreign Asset Control (“OFAC”).
 
-2.6 Independent Contractor Relationship. The relationship between the Parties is that of independent contractors. Nothing in this Agreement shall be construed to create anything like the relationship of an employer and employee, joint venture, partnership, or joint association.
+2.6 By providing access to the API and the SDK, Jupiter is solely providing a back-end technical service to the Licensee which allows the Licensee to provide swap-related services to end users of the Licensee's products or services. Jupiter is not a party to any agreement for swap-related services between the Licensee, its end users, any counterparty or trading venue where swaps are performed, nor any trustee, custodian, bailee, manager, administrator or service provider in respect of any digital asset or otherwise.
+
+2.7 Independent Contractor Relationship. The relationship between the Parties is that of independent contractors. Nothing in this Agreement shall be construed to create anything like the relationship of an employer and employee, joint venture, partnership, or joint association.
 
 **3. Other Rights and Limitations​**
 
@@ -104,7 +106,7 @@ l. take any action that would subject the API or SDK to any third-party terms, i
 
 7.2 The Licensee shall perform such sanity testing, cybersecurity testing or other technical checks in respect of the API or SDK as may be reasonably requested by Licensor from time to time.
 
-7.3 The Licensee shall ensure that the offering/provision of the Licensee's Product complies with all applicable laws and regulations, including without limitation all consumer protection, Know Your Customer (KYC) or Anti-money Laundering (AML) due diligence laws, sanctions, anti-money laundering or terrorist financing laws, securities laws, payment provider laws, or virtual assets regulations. Without prejudice to the generality of the foregoing, the Licensee shall obtain and maintain in force (or as applicable procure the obtaining and maintenance in force of) all necessary licenses, permissions, authorisations, consents and permits which may be necessary or desirable for the offering/provision of the Licensee's Product.
+7.3 The Licensee shall ensure that the offering/provision of the Licensee's Product complies with all applicable laws and regulations, including without limitation all consumer protection, Know Your Customer (KYC) or Anti-money Laundering (AML) due diligence laws, sanctions, anti-money laundering or terrorist financing laws, securities laws, payment provider laws, or virtual assets regulations. Without prejudice to the generality of the foregoing, the Licensee shall obtain and maintain in force (or as applicable procure the obtaining and maintenance in force of) all necessary licenses, permissions, authorisations, consents and permits which may be necessary or desirable for the offering/provision of the Licensee's Product and (b) perform transaction screening and monitoring of all digital wallets interacting with the Client’s Product, including blocking of sanctioned, blacklisted, prohibited, restricted, flagged, illicit, suspicious or crime-associated digital wallets, in accordance with prevailing best market practice. The Licensee shall be solely responsible for any failure to comply with the foregoing.
 
 7.4 The Licensee acknowledges and agrees that all reporting, information gathering and other obligations under applicable Know Your Customer (KYC) or Anti-money Laundering (AML) due diligence laws, sanctions, anti-money laundering or terrorist financing laws, securities laws, payment provider laws, or virtual assets regulations with respect to the Licensee's end-users are the responsibility of the Licensee; and Jupiter shall not be responsible or have any liability for any of the foregoing. The Licensee agrees to provide such information to Jupiter if reasonably requested by Jupiter.
 

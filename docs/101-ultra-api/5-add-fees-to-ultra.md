@@ -15,11 +15,11 @@ In this guide, we will be walking through the steps to create the necessary acco
 
 | Note | Description |
 | --- | --- |
-| **Additional required accounts** | It is required to have a valid **referral account** and **referral token accounts** for the specific token mints. These accounts are initalized with the [Referral Program](https://github.com/TeamRaccoons/referral) under the ["Jupiter Ultra" Referral Project](https://solscan.io/account/DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc). |
+| **Additional required accounts** | It is required to have a valid **referral account** and **referral token accounts** for the specific token mints. These accounts are initalized with the Referral Program under the ["Jupiter Ultra" Referral Project](https://solscan.io/account/DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc). |
 | **Fee mint** | In the `/order` response, you will see the `feeMint` field which is the token mint we will collect the fees in for that particular order.<br /><br />Since Jupiter will always dictate which token mint to collect the fees in, you must ensure that you have the valid referral token account created for the specific fee mint. If it is not initialized, the order will still return and can be executed without your fees. This is to ensure success rates and the best experience with Jupiter Ultra. |
 | **Jupiter fees** | By default, Jupiter Ultra incurs a 0.05% or 0.1% fee based on token mint. When you add a referral fee, Jupiter will take a flat 20% of your integrator fees, for example, if you plan to take 100bps, Jupiter will take 20bps from it. |
 | **Integrator fees** | You can configure `referralFee` to be between 50bps to 255bps. The `/order` response will show the total fee in `feeBps` field which should be exactly what you specified in `referralFee`.<br /><br />Do note that, the referral token account has to be created before calling `/order` because during the request, we will check if the token account is initialized before applying your referral fee (if it is not applied, we will only apply our default fees). |
-| **Limitations** | Currently, we do not support fees for Token2022 tokens. |
+| **Limitations** | <li>Currently, we do not support fees for Token2022 tokens.</li><li>Setting up the referral accounts and token accounts can only be done via the SDK (the scripts provided in this guide), and not via the Referral Dashboard.</li> |
 
 ## Step-by-step
 
@@ -47,13 +47,10 @@ const provider = new ReferralProvider(connection);
 const projectPubKey = new PublicKey('DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc');
 
 async function initReferralAccount() {
-  const referralAccountKeypair = Keypair.generate(); // generate a new referral account
-
   const transaction = await provider.initializeReferralAccountWithName({
     payerPubKey: wallet.publicKey,
     partnerPubKey: wallet.publicKey,
     projectPubKey: projectPubKey,
-    referralAccountPubKey: referralAccountKeypair.publicKey,
     name: "insert-name-here",
   });
 
@@ -193,13 +190,10 @@ const provider = new ReferralProvider(connection);
 const projectPubKey = new PublicKey('DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc'); // Jupiter Ultra Referral Project
 
 async function initReferralAccount() {
-  const referralAccountKeypair = Keypair.generate(); // generate a new referral account
-
   const transaction = await provider.initializeReferralAccountWithName({
     payerPubKey: wallet.publicKey,
     partnerPubKey: wallet.publicKey,
     projectPubKey: projectPubKey,
-    referralAccountPubKey: referralAccountKeypair.publicKey,
     name: "insert-name-here",
   });
 

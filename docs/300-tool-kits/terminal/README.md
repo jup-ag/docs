@@ -6,40 +6,43 @@ title: "Introduction to Terminal"
 
 # Introduction to Jupiter Terminal
 
-Jupiter Terminal is a lightweight, plug-and-play version of Jupiter that allows you to seamlessly integrate end-to-end swap functionality into your dApp with minimal effort. With just a few lines of code, you can embed a fully functional swap interface directly into your website.
+Jupiter Terminal is a lightweight, plug-and-play version of Jupiter that allows you to seamlessly integrate end-to-end swap functionality into your application with minimal effort - with just a few lines of code, you can embed a fully functional swap interface directly into your website while providing the same powerful Ultra Mode swap experience found on https://jup.ag.
 
-## What is Jupiter Terminal?
-
-Jupiter Terminal is an open-source solution that provides the same powerful swap experience found on jup.ag, but in a format that can be easily integrated into any website or application. It offers:
-
-- **Seamless Integration**: Embed Jupiter's swap functionality directly into your dApp without redirects
-- **Multiple Display Options**: Choose between integrated, widget, or modal display modes
-- **Customizable Interface**: Configure the terminal to match your application's needs
-- **Advanced Features**: Access to Ultra Mode with real-time slippage estimation, dynamic priority fees, and optimized transaction handling
+- **Seamless Integration**: Embed Jupiter's swap functionality directly into your application without redirects.
+- **Multiple Display Options**: Choose between integrated, widget, or modal display modes.
+- **Customizable Interface**: Configure the terminal to match your application's needs.
+- **Ultra Mode**: Access to [Ultra Mode](/docs/ultra-api/) without any RPCs or complex configurations.
 
 ## Key Features
 
-### Ultra Mode Innovations
+### Ultra Mode Features
 
-- **Real-time Slippage Estimation (RTSE)**: Leverages real-time swap data from actual users, historical trends, and heuristics to determine optimal slippage for each trade
-- **Dynamic Priority Fees**: Estimates optimal transaction fees by analyzing network activity, swap size, and interactions with high-traffic accounts
-- **Optimized Transaction Landing**: Fires transactions across multiple providers simultaneously, increasing the likelihood of successful execution
-- **Jupiter Shield** (coming soon): Enhanced security features to safeguard swaps from potential risks in token selection
+All of these features are available on Terminal via Ultra Mode, without having to integrate any APIs, RPCs, or complex configurations.
+
+| Feature | Description |
+| --- | --- |
+| **Best liquidity engine** | Aggregates across multiple liquidity sources, both Jupiter's proprietary routing engines and third-party liquidity sources, for the best possible price.<br/><br />Including Jupiter's Metis Routing Engine, Jupiter Z (RFQ), and others. |
+| **Blazing fast** | 95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine. |
+| **MEV-protected** | The lowest incidence of MEV attacks across all existing applications, by far. |
+| **Shielded** | Enhanced security feature via Shield API to provide critical token information during token selection, to help provide an informed trading decision. |
+| **Real-Time Slippage Estimator** | Intelligently derives the best possible slippage to use at the time of execution, balancing between trade success and price protection. |
+| **One-stop shop** | Retrieve the user's balances, get a quote, execute the trade, and get the results of the trade, all within Ultra API without touching a single RPC or any other external API. |
+| **World class support** | We handle the complexities of RPC connections, transaction landing, slippage protection and more. |
 
 ### Display Flexibility
 
 Jupiter Terminal offers three display modes to suit different use cases:
 
-1. **Integrated Mode**: Embeds the terminal directly into a specified container in your application
-2. **Widget Mode**: Creates a floating widget that can be positioned in different corners of the screen
-3. **Modal Mode**: Displays the terminal as a modal dialog that can be triggered by user actions
+1. **Integrated Mode**: Embeds the terminal directly into a specified container in your application.
+2. **Widget Mode**: Creates a floating widget that can be positioned in different corners of the screen.
+3. **Modal Mode**: Displays the terminal as a modal dialog that can be triggered by user actions.
 
 ### Customization Options
 
-- Configure initial tokens and amounts
-- Lock input or output tokens for specific use cases
-- Restrict token selection to a predefined list
-- Style the terminal to match your application's design
-- Set up event handlers for swap success and error scenarios
+- Configure initial tokens and amounts.
+- Lock input or output tokens for specific use cases.
+- Restrict token selection to a predefined list.
+- Style the terminal to match your application's design.
+- Set up event handlers for swap success and error scenarios.
 
-By integrating Jupiter Terminal into your dApp, you can provide users with a seamless, efficient swap experience while staying at the forefront of Solana DeFi innovation.
+By integrating Jupiter Terminal into your application, you can seamlessly integrate a fully functional swap interface into your application with minimal effort, while staying at the forefront of Solana DeFi innovation.

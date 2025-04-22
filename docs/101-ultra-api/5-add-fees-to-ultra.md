@@ -61,10 +61,10 @@ async function initReferralAccount() {
   if (!referralAccount) {
     const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
     console.log('signature:', `https://solscan.io/tx/${signature}`);
-    console.log('created referralAccountPubkey:', transaction.referralAccountPubKey);
+    console.log('created referralAccountPubkey:', transaction.referralAccountPubKey.toBase58());
   } else {
     console.log(
-      `referralAccount ${transaction.referralAccountPubKey} already exists`,
+      `referralAccount ${transaction.referralAccountPubKey.toBase58()} already exists`,
     );
   }
 }
@@ -111,7 +111,7 @@ async function claimAllTokens() {
 
 // initReferralAccount(); // you should only run this once
 // initReferralTokenAccount();
-claimAllTokens();
+// claimAllTokens();
 ```
 </details>
 
@@ -204,10 +204,10 @@ async function initReferralAccount() {
   if (!referralAccount) {
     const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
     console.log('signature:', `https://solscan.io/tx/${signature}`);
-    console.log('created referralAccountPubkey:', transaction.referralAccountPubKey);
+    console.log('created referralAccountPubkey:', transaction.referralAccountPubKey.toBase58());
   } else {
     console.log(
-      `referralAccount ${transaction.referralAccountPubKey} already exists`,
+      `referralAccount ${transaction.referralAccountPubKey.toBase58()} already exists`,
     );
   }
 }

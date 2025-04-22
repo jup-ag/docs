@@ -409,21 +409,21 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Jupiter Tool Kits',
+      label: 'Jupiter Terminal',
       collapsible: false,
       collapsed: false,
       items: [
         {
           type: 'doc',
-          id: 'tool-kits/swap-terminal',
+          id: 'tool-kits/terminal/README',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal-walkthrough',
+          id: 'tool-kits/terminal/getting-started',
         },
         {
           type: 'doc',
-          id: 'tool-kits/unified-wallet-kit',
+          id: 'tool-kits/terminal/customization',
         },
       ],
     },
@@ -433,21 +433,13 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Jupiter Terminal',
+      label: 'Jupiter Wallet Kit',
       collapsible: false,
       collapsed: false,
       items: [
         {
           type: 'doc',
-          id: 'tool-kits/terminal-introduction',
-        },
-        {
-          type: 'doc',
-          id: 'tool-kits/terminal-getting-started',
-        },
-        {
-          type: 'doc',
-          id: 'tool-kits/terminal-customization',
+          id: 'tool-kits/wallet-kit/README',
         },
       ],
     },

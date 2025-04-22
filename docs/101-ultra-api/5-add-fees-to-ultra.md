@@ -55,16 +55,16 @@ async function initReferralAccount() {
   });
 
   const referralAccount = await connection.getAccountInfo(
-    referralAccountKeypair.publicKey,
+    transaction.referralAccountPubKey,
   );
 
   if (!referralAccount) {
     const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
     console.log('signature:', `https://solscan.io/tx/${signature}`);
-    console.log('created referralAccountPubkey:', referralAccountKeypair.publicKey.toBase58());
+    console.log('created referralAccountPubkey:', transaction.referralAccountPubKey);
   } else {
     console.log(
-      `referralAccount ${referralAccountKeypair.publicKey.toBase58()} already exists`,
+      `referralAccount ${transaction.referralAccountPubKey} already exists`,
     );
   }
 }
@@ -198,16 +198,16 @@ async function initReferralAccount() {
   });
 
   const referralAccount = await connection.getAccountInfo(
-    referralAccountKeypair.publicKey,
+    transaction.referralAccountPubKey,
   );
 
   if (!referralAccount) {
     const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
     console.log('signature:', `https://solscan.io/tx/${signature}`);
-    console.log('created referralAccountPubkey:', referralAccountKeypair.publicKey.toBase58());
+    console.log('created referralAccountPubkey:', transaction.referralAccountPubKey);
   } else {
     console.log(
-      `referralAccount ${referralAccountKeypair.publicKey.toBase58()} already exists`,
+      `referralAccount ${transaction.referralAccountPubKey} already exists`,
     );
   }
 }

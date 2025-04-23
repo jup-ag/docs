@@ -6,7 +6,7 @@ title: "Introduction to Terminal"
 
 # Introduction to Jupiter Terminal
 
-Jupiter Terminal is a lightweight, plug-and-play version of Jupiter that allows you to seamlessly integrate end-to-end swap functionality into your application with minimal effort - with just a few lines of code, you can embed a fully functional swap interface directly into your website while providing the same powerful Ultra Mode swap experience found on https://jup.ag.
+Jupiter Terminal is an open-source, lightweight, plug-and-play version of Jupiter that allows you to seamlessly integrate end-to-end swap functionality into your application with minimal effort - with just a few lines of code, you can embed a fully functional swap interface directly into your website while providing the same powerful Ultra Mode swap experience found on https://jup.ag.
 
 - **Seamless Integration**: Embed Jupiter's swap functionality directly into your application without redirects.
 - **Multiple Display Options**: Choose between integrated, widget, or modal display modes.

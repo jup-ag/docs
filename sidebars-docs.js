@@ -425,6 +425,14 @@ const sidebars = {
           type: 'doc',
           id: 'tool-kits/terminal/customization',
         },
+        {
+          type: 'doc',
+          id: 'tool-kits/terminal/react-app-example',
+        },
+        {
+          type: 'doc',
+          id: 'tool-kits/terminal/nextjs-app-example',
+        },
       ],
     },
     {

@@ -419,11 +419,11 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/getting-started',
+          id: 'tool-kits/terminal/customization',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/customization',
+          id: 'tool-kits/terminal/nextjs-app-example',
         },
         {
           type: 'doc',
@@ -431,7 +431,11 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/nextjs-app-example',
+          id: 'tool-kits/terminal/html-app-example',
+        },
+        {
+          type: 'doc',
+          id: 'tool-kits/terminal/faq',
         },
       ],
     },

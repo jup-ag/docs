@@ -4,7 +4,14 @@ description: "Learn how to customize Jupiter Terminal's appearance and behavior.
 title: "Customizing Terminal"
 ---
 
-# Customizing Jupiter Terminal
+<head>
+    <title>Customizing Terminal</title>
+    <meta name="twitter:card" content="summary" />
+</head>
+
+Try out the [Terminal Playground](https://terminal.jup.ag/playground) to experience the full swap features and see the different customization options with code snippets.
+
+For the full customization options, you can refer to the [repository](https://github.com/jup-ag/terminal/blob/main/src/types/index.d.ts).
 
 ## Display Modes
 
@@ -18,17 +25,13 @@ The integrated mode embeds the terminal directly into your application's layout.
 {
   displayMode: "integrated",
   integratedTargetId: string, // Required: ID of the container element
-  formProps: {
-    initialAmount?: string,    // Pre-fill the swap amount
-    fixedAmount?: boolean,     // Lock the amount (useful for payments)
-    initialInputMint?: string, // Pre-select input token
-    fixedInputMint?: boolean,  // Lock input token selection
-    initialOutputMint?: string,// Pre-select output token
-    fixedOutputMint?: boolean  // Lock output token selection
+  containerStyles?: {
+    width?: string,
+    height?: string,
+    borderRadius?: string,
+    overflow?: string
   },
-  strictTokenList: boolean,    // Restrict to predefined token list
-  containerStyles: React.CSSProperties, // Custom CSS styles
-  containerClassName: string   // Custom CSS classes
+  containerClassName?: string
 }
 ```
 
@@ -39,19 +42,10 @@ The widget mode creates a floating terminal that can be positioned in different 
 ```typescript
 {
   displayMode: "widget",
-  widgetStyle: {
+  widgetStyle?: {
     position?: "top-left" | "top-right" | "bottom-left" | "bottom-right",
     size?: "sm" | "default"
   },
-  formProps: {
-    initialAmount?: string,
-    fixedAmount?: boolean,
-    initialInputMint?: string,
-    fixedInputMint?: boolean,
-    initialOutputMint?: string,
-    fixedOutputMint?: boolean
-  },
-  strictTokenList: boolean
 }
 ```
 
@@ -62,58 +56,50 @@ The modal mode displays the terminal in a popup overlay. This is useful when you
 ```typescript
 {
   displayMode: "modal",
-  formProps: {
-    initialAmount?: string,
-    fixedAmount?: boolean,
-    initialInputMint?: string,
-    fixedInputMint?: boolean,
-    initialOutputMint?: string,
-    fixedOutputMint?: boolean
-  },
-  strictTokenList: boolean
 }
 ```
 
-## Form Configuration
+## Form Props Configuration
 
-The `formProps` object allows you to customize the initial state and behavior of the swap form:
+The `formProps` object allows you to customize the initial state and behavior of the swap form! This can be useful for use cases like fixed token swaps for memecoin communities or fixed amount payments.
 
-- `initialAmount`: Pre-fill the swap amount (e.g., "1.5")
-- `fixedAmount`: When true, users cannot modify the amount (useful for fixed-price payments)
-- `initialInputMint`: Pre-select the input token by its mint address
-- `fixedInputMint`: Lock the input token selection
-- `initialOutputMint`: Pre-select the output token by its mint address
-- `fixedOutputMint`: Lock the output token selection
+```typescript
+{
+  displayMode: "modal",
+  formProps?: {
+    initialAmount?: string, // Pre-fill the swap amount (e.g. "100")
+    fixedAmount?: boolean, // When true, users cannot change the swap amount
+    initialInputMint?: string, // Pre-select the input token by its mint address
+    fixedInputMint?: boolean, // When true, users cannot change the input token
+    initialOutputMint?: string, // Pre-select the output token by its mint address
+    fixedOutputMint?: boolean, // When true, users cannot change the output token
+  }
+}
+```
+
+## Wallet Integration
+
+Jupiter Terminal supports third-party wallet integration through the `enableWalletPassthrough` prop. This allows your application to pass through an existing wallet provider's connection in your application to Terminal. If you do not have an existing wallet provider, Terminal will provide a wallet adapter and connection - powered by [Unified Wallet Kit](/docs/tool-kits/wallet-kit/).
+
+```typescript
+{
+  // When true, wallet connection are handled by your dApp,
+  // and use `syncProps()` to syncronise wallet state with Terminal.
+  enableWalletPassthrough?: boolean,
+  
+  // When enableWalletPassthrough is true, this allows Terminal 
+  // to callback your app's wallet connection flow
+  onRequestConnectWallet?: () => void | Promise<void>;
+}
+```
 
 ## Token List Management
 
-- `strictTokenList`: When true, restricts token selection to a predefined list
-- Use this to ensure users only swap between approved tokens
-
-## Styling Options
-
-### Integrated Mode Styling
+The Jupiter Token API is an open, collaborative and dynamic token list to make trading on Solana more transparent and safer for all. It is default to true to ensure that only validated tokens are shown.
 
 ```typescript
 {
-  containerStyles: {
-    width: "100%",
-    height: "500px",
-    borderRadius: "8px",
-    overflow: "hidden"
-  },
-  containerClassName: "custom-terminal-class"
-}
-```
-
-### Widget Mode Styling
-
-```typescript
-{
-  widgetStyle: {
-    position: "bottom-right", // Position in viewport
-    size: "default"          // Size of the widget
-  }
+  strictTokenList?: boolean,
 }
 ```
 
@@ -134,66 +120,7 @@ Jupiter Terminal provides event handlers to track swap operations:
 }
 ```
 
-## Advanced Configuration
-
-### RPC Endpoint Configuration
-
-```typescript
-{
-  endpoint: "https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY";
-}
-```
-
-### Token List Customization
-
-```typescript
-{
-  tokenList: {
-    // Custom token list configuration
-  }
-}
-```
-
-## Best Practices for Customization
-
-1. **Responsive Design**
-
-   - Use percentage-based widths for container styles
-   - Test on different screen sizes
-   - Consider mobile-first design
-
-2. **User Experience**
-
-   - Position widgets in easily accessible locations
-   - Use modal mode for secondary swap functionality
-   - Consider fixed token pairs for specific use cases
-
-3. **Performance**
-
-   - Use appropriate RPC endpoints
-   - Implement proper error handling
-   - Monitor swap success rates
-
-4. **Security**
-   - Use environment variables for sensitive data
-   - Implement proper error boundaries
-   - Validate user inputs
-
-## Common Issues and Solutions
-
-### 1. Integrated Mode: Search Form Collapses Terminal
-
-- Ensure you establish a fixed height for the terminal container under `containerStyles`
-
-```typescript
-{
-  containerStyles: {
-    height: "500px",
-  },
-}
-```
-
-## Example Implementations
+## Examples
 
 ### Fixed Token Pair Swap
 

@@ -4,45 +4,48 @@ description: "An overview of Jupiter Swap Terminal and its core features."
 title: "Introduction to Terminal"
 ---
 
-# Introduction to Jupiter Terminal
+```insert hero or video here```
 
 Jupiter Terminal is an open-source, lightweight, plug-and-play version of Jupiter that allows you to seamlessly integrate end-to-end swap functionality into your application with minimal effort - with just a few lines of code, you can embed a fully functional swap interface directly into your website while providing the same powerful Ultra Mode swap experience found on https://jup.ag.
 
-- **Seamless Integration**: Embed Jupiter's swap functionality directly into your application without redirects.
-- **Multiple Display Options**: Choose between integrated, widget, or modal display modes.
-- **Customizable Interface**: Configure the terminal to match your application's needs.
-- **Ultra Mode**: Access to [Ultra Mode](/docs/ultra-api/) without any RPCs or complex configurations.
+:::info Terminal Playground
+Try out the [Terminal Playground](https://terminal.jup.ag/playground) to experience the full swap features and see the different customization options with code snippets.
+
+To view the open-source code, visit the [GitHub repository](https://github.com/jup-ag/terminal).
+:::
+
+:::info Quick Start
+To quick start your integration, check out the [Next.js](/docs/tool-kits/terminal/nextjs-app-example), [React](/docs/tool-kits/terminal/react-app-example) or [HTML](/docs/tool-kits/terminal/html-app-example) app examples.
+:::
 
 ## Key Features
 
-### Ultra Mode Features
+- **Seamless Integration**: Embed Jupiter's swap functionality directly into your application without redirects.
+- **Multiple Display Options**: Choose between integrated, widget, or modal display modes.
+- **Customizable Options**: Configure the terminal to match your application's needs.
+- **RPC-less**: Integrate Terminal without any RPCs, Ultra handles transaction sending, wallet balances and token information.
+- **Ultra Mode**: Access to all features of Ultra Mode, read more about it in the [Ultra API docs](/docs/ultra-api/).
 
-All of these features are available on Terminal via Ultra Mode, without having to integrate any APIs, RPCs, or complex configurations.
+## Getting Started
 
-| Feature | Description |
-| --- | --- |
-| **Best liquidity engine** | Aggregates across multiple liquidity sources, both Jupiter's proprietary routing engines and third-party liquidity sources, for the best possible price.<br/><br />Including Jupiter's Metis Routing Engine, Jupiter Z (RFQ), and others. |
-| **Blazing fast** | 95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine. |
-| **MEV-protected** | The lowest incidence of MEV attacks across all existing applications, by far. |
-| **Shielded** | Enhanced security feature via Shield API to provide critical token information during token selection, to help provide an informed trading decision. |
-| **Real-Time Slippage Estimator** | Intelligently derives the best possible slippage to use at the time of execution, balancing between trade success and price protection. |
-| **One-stop shop** | Retrieve the user's balances, get a quote, execute the trade, and get the results of the trade, all within Ultra API without touching a single RPC or any other external API. |
-| **World class support** | We handle the complexities of RPC connections, transaction landing, slippage protection and more. |
+When integrating Terminal, there are a few integration methods to think about, and choose the one that best fits your application's architecture and requirements.
 
-### Display Flexibility
+### Integration Methods
 
-Jupiter Terminal offers three display modes to suit different use cases:
+- **Using Window Object** - Simplest way to add and initialize Terminal.
+- [**Using NPM Package**](https://www.npmjs.com/package/@jup-ag/terminal) - Install via `npm install @jup-ag/terminal` and initialize as a module (will require you to maintain its dependencies).
 
-1. **Integrated Mode**: Embeds the terminal directly into a specified container in your application.
-2. **Widget Mode**: Creates a floating widget that can be positioned in different corners of the screen.
-3. **Modal Mode**: Displays the terminal as a modal dialog that can be triggered by user actions.
+### Wallet Integration
 
-### Customization Options
+- **Wallet Standard Support**: For applications without existing wallet provider, Terminal will provide a wallet adapter and connection - powered by [Unified Wallet Kit](/docs/tool-kits/wallet-kit/).
+- **Passthrough Wallet**: For applications with existing wallet provider(s), set `enableWalletPassthrough=true` with context, and Terminal will allow the application to pass through the existing wallet provider's connection to Terminal.
 
-- Configure initial tokens and amounts.
-- Lock input or output tokens for specific use cases.
-- Restrict token selection to a predefined list.
-- Style the terminal to match your application's design.
-- Set up event handlers for swap success and error scenarios.
+### Quick Start Guides
+
+In the next sections, we'll walk you through the steps to integrate Jupiter Terminal into different types of web applications from scratch.
+
+- [Next.js](/docs/tool-kits/terminal/nextjs-app-example)
+- [React](/docs/tool-kits/terminal/react-app-example)
+- [HTML](/docs/tool-kits/terminal/html-app-example)
 
 By integrating Jupiter Terminal into your application, you can seamlessly integrate a fully functional swap interface into your application with minimal effort, while staying at the forefront of Solana DeFi innovation.

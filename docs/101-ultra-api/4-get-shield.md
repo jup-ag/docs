@@ -27,7 +27,7 @@ This is useful when integrating with Jupiter Ultra or any other APIs, allowing y
 
 ```jsx
 const shieldResponse = await (
-  await fetch(`https://lite-api.jup.ag/ultra/v1/shield?mints=So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`)
+  await fetch(`https://lite-api.jup.ag/ultra/v1/shield?mints=So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v,DocTwz3QhCgKy1CJJMruEAFEG5xTGoC43vPMkC41pump`)
 ).json();
 ```
 
@@ -40,14 +40,33 @@ The shield response will return a list of token information and warnings of mint
 ```json
 {
   "warnings": {
-    "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": [
+    "DocTwz3QhCgKy1CJJMruEAFEG5xTGoC43vPMkC41pump": [
       {
-        "type": "HAS_MINT_AUTHORITY",
-        "message": "This token has a mint authority"
+        "type": "NOT_VERIFIED",
+        "message": "This token is not verified, make sure the mint address is correct before trading",
+        "severity": "info"
       },
       {
+        "type": "LOW_ORGANIC_ACTIVITY",
+        "message": "This token has low organic activity",
+        "severity": "info"
+      },
+      {
+        "type": "NEW_LISTING",
+        "message": "This token is newly listed",
+        "severity": "info"
+      }
+    ],
+    "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": [
+      {
         "type": "HAS_FREEZE_AUTHORITY",
-        "message": "This token has a freeze authority"
+        "message": "The authority's owner has the ability to freeze your token account, preventing you from further trading",
+        "severity": "warning"
+      },
+      {
+        "type": "HAS_MINT_AUTHORITY",
+        "message": "The authority's owner has the ability to mint more tokens",
+        "severity": "info"
       }
     ],
     "So11111111111111111111111111111111111111112": []

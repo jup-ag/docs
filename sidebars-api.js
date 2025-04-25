@@ -39,6 +39,10 @@ const sidebars = {
               type: 'doc',
               id: 'api/ultra-api/shield',
             },
+            {
+              type: 'doc',
+              id: 'api/ultra-api/routers',
+            },
           ],
         },
         {

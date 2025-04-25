@@ -406,7 +406,7 @@ paths:
       summary: shield
       description: |
         Request for token information and warnings of mints
-        
+          
         :::note
         - Refer to [Ultra API doc](/docs/ultra-api/get-shield) for more information
         :::
@@ -420,6 +420,20 @@ paths:
                 properties:
                   warnings:
                     type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          message:
+                            type: string
+                        required:
+                          - type
+                          - message
+                required:
+                  - warnings
         '400':
           description: Bad request
           content:
@@ -449,3 +463,32 @@ paths:
               type: string
             required: true
             description: "Comma separated list of mints to get information for"
+  /order/routers:
+    get:
+      summary: routers
+      description: |
+        Request for the list of routers available in the routing engine of Ultra, which is [Juno](/docs/routing#juno-liquidity-engine)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                      enum:
+                        - Metis
+                        - JupiterZ
+                        - Hashflow
+                        - DFlow
+                    icon:
+                      type: string
+                  required:
+                    - id
+                    - name

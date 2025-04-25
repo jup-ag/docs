@@ -56,9 +56,11 @@ If the above sounds like too much work, then Ultra API will be the better choice
 
 ## FAQ
 
-**What is the fee for using Ultra API?**
+**Are there any fees for using Ultra API?**
 
-Ultra API takes 0.1% (or 0.05% depending on the tokens) of the swap amount as a fee.
+When users swap using Ultra, Ultra takes 0.1% (or 0.05% depending on the tokens) of the swap amount as a fee.
+
+If you are an integrator, you can add custom integrator fees via Ultra API. Jupiter will take 20% of the integrator fees. Please refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for more information.
 
 **What is the rate limit for Ultra API?**
 

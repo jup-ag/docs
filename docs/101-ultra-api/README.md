@@ -56,11 +56,10 @@ If the above sounds like too much work, then Ultra API will be the better choice
 
 ## FAQ
 
-**Are there any fees for using Ultra API?**
+**Can I add custom integrator fees to Ultra API?**
 
-When users swap using Ultra, Ultra takes 0.1% (or 0.05% depending on the tokens) of the swap amount as a fee.
-
-If you are an integrator, you can add custom integrator fees via Ultra API. Jupiter will take 20% of the integrator fees. Please refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for more information.
+- **Integrator without custom fees**: Do note that when your users swap using Ultra, we take 0.1% (or 0.05% depending on the tokens) of the swap amount as a fee.
+- **Integrator with custom fees**: If you are an integrator, you can add custom integrator fees via Ultra API and Jupiter will take 20% of the integrator fees. Please refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for more information.
 
 **What is the rate limit for Ultra API?**
 
@@ -71,7 +70,3 @@ Currently, there is no way to increase the rate limit for Ultra API.
 
 Portal API Keys are not supported for Ultra API.
 :::
-
-**Can integrators take fees using Ultra API?**
-
-Yes, you can add fees to Ultra API, on top of Jupiter's fees. Please refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for more information.

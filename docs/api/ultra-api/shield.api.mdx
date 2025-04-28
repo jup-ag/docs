@@ -5,7 +5,7 @@ description: "Request for token information and warnings of mints"
 sidebar_label: "shield"
 hide_title: true
 hide_table_of_contents: true
-api: eJzNVE1vEzEQ/SuWT62UZFMEl70VVKoKJEqhpyQHZ3eSdeO1jT2bttrmvzPjTegmaSWEkCCHje35evP8xq0sIRZBe9TOylzewI8GIoqFCwLdCqzQlta1YrtQthT3Klhtl1G4hai1xTi1U5vnuXUIUzsUN7AAjhWTW4NBifPrK1G6YnaS0TdmDR8OldfZEnAYKw2mPE3lahegXy1lnVo5kAGidzZClHkr34zH/LcP+1tTFBDjojFi50xxhbMIFtldeW90kfJmd5FjWhmLCmrFK3z0QFnc/A4KpEAfnIeAuqu46/jYc5N+A/n2JUzvVUlgEp1/DwuE4ELPLWIgaJJBcC0doJT5ZOs269C9ewndFcEJVhkRIazpwrqIf4iTLF4FVQPhohSTVmrGSfyFR0pvyULbpDjaHuHYFejnx9DA4KDvD66uFTXNtRBKYTSpfSdlli3Jck/ztJKb2UASsMpRUkkO3K7CijZZp2BGlHjskDfBkK1C9DHPMqMRWPGju8aP1LIbgWx9Jg+xfQwAghgMaWjAlt4RKnGvsRKMlsDWmtrfDA5L/E72a6XL17JXelmRoVeEqZiDaCJxlFyUTXGf4DHRwRQl+jUa5v9ro4tVRBWYHCaiK3o2Go/GR1CexGdtV+Jpap/EcDjsFpNLYv5LKCG8/FY4Np1ufS8eoGgI7Cv+0Jl7MawM7yLWKul4K6dft7eHr32egv/zQdxqHuEBM2+UTt0lRbRbYU52rdFVVdQ2n7TtXEW4DWaz4eNusliupY5qbnhiFsrEw5Hps3Fysx2uU/FHg/QK9BWJ6nm218o07JN0tlZBMzgCOiPPChTdaELdBZ3Tw++xF3X0au0N7+XFd3qEfgLz4G3A
+api: eJzNVU1v2zAM/SuCTi2QxOmwXXLbhq4oNmBdt56SHBibidXYkirJaQvX/32k7DQfdbFhGLBdWtt8JB+f+JRaZuhTp2xQRsuJvMa7Cn0QS+NEMGvUQml6LoHjAnQm7sFppVdemKUolQ5+poWY6clkok3AmR6Ka1wiZ4vpTREciPdXlyIz6fwkob8+qfjjEKxKVhiGPldYZKexYWkc7veLVWdaDqRDb4326OWklm/GY/53SPx7labo/bIqxBZMeanRAXVgOFhbqDTWTW4959TSpzmWwE/h0SJVMYtbTAMlWmcsuqDajtuZ+5CQZYqLQnF1kNPhwDl4JJgKWPbm256sZ5QPjvrKZiBLGg5WfbGG5bmrlMNMTqZtdIefN80x4nmaLva2T88PkAnXLsPf0xGdM+7XI7Swjt27PnaXRMeR5MKj29CytRn/kCdFLDgokXhRiWktFfMk/RyfvqYIvUa/0OsLHrtz3tUPrsLB0dwfTVkCDc29AmaiUOTVrRHZcmSpA8fSk2zmvA4hN1RUEoDHhZDTS9K6jxlFHVvmlSsolodg/SRJCtpcduvotrIjWLX2TTZn8pjbJ4coSEEXDY86s4ZYiXsVcsFsiWypaPxmcNzid6pfgcpeq56rVU6BvSYsxQJF5UmjCAEd8z7jY5SDJYryq1Cw/t8qla59AMfisBBt07PReDR+QeVJfFF6LZ5m+kkMh8P2YXpByn91Gbr+e85w6LTDnj9gWhHZV/DYhvdyeDOs8aGEuMfdOj2f3gG/eueC//U677Y+4ENIbAEqzhd3ou5Wc7odjg4rp8H5S10vwOONK5qGP7fe4oXNlIdFwZ5ZQuGPTbOvx8l1Z69T8UdWeoX6mtZq5+4NFBVj4qZtwCkmR0TnhMwR6Ewj6zbpPf1s2bCX9eLeOrDvxfkPuoZ+AinQr/w=
 sidebar_class_name: "get api-method"
 info_path: docs/api/ultra-api/quickstart
 custom_edit_url: null
@@ -37,7 +37,7 @@ import Heading from "@theme/Heading";
 
 
 Request for token information and warnings of mints
-
+  
 :::note
 - Refer to [Ultra API doc](/docs/ultra-api/get-shield) for more information
 :::
@@ -67,7 +67,7 @@ Request for token information and warnings of mints
 <StatusCodes
   id={undefined}
   label={undefined}
-  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","properties":{"warnings":{"type":"object"}}}}}},"400":{"description":"Bad request","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}}}}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","properties":{"warnings":{"type":"object","additionalProperties":{"type":"array","items":{"type":"object","properties":{"type":{"type":"string"},"message":{"type":"string"}},"required":["type","message"]}}}},"required":["warnings"]}}}},"400":{"description":"Bad request","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}}}}
 >
   
 </StatusCodes>

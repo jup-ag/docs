@@ -35,6 +35,7 @@ export default function Navbar(): JSX.Element {
                   <div className="navbar__link-wrapper">
                     <a
                       href={item.to}
+                      target={item.to?.startsWith('http') ? '_blank' : undefined}
                       className={clsx(
                         'navbar__link',
                         isNavItemActive(item) && 'navbar__link--active'
@@ -53,6 +54,7 @@ export default function Navbar(): JSX.Element {
                             isDropdownItemActive(subItem.to) && 'dropdown__link--active'
                           )}
                           href={subItem.to}
+                          target={subItem.to?.startsWith('http') ? '_blank' : undefined}
                         >
                           {subItem.label}
                         </a>
@@ -73,6 +75,7 @@ export default function Navbar(): JSX.Element {
                   isNavItemActive(item) && 'navbar__link--active'
                 )}
                 href={item.to}
+                target={item.to?.startsWith('http') ? '_blank' : undefined}
               >
                 {item.label}
               </a>

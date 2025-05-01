@@ -36,7 +36,7 @@ Do note that there are a few optional parameters that you can use, such as:
 
 - Adding slippage to the order. This is useful if you or your users want to execute the order with higher slippage which might yield better chances of being filled.
 - Setting an expiry date on the order.
-- Adding fees through our referral program, please ensure that your `feeAccount` has the necessary `referralTokenAccount`s of the output mint of the limit order for it to work, you can learn more about creating them dynamically in the [Add Fees To Swap](../100-swap-api/4-add-fees-to-swap.md) guide.
+- Adding fees through our referral program, please ensure that your `feeAccount` has the necessary `referralTokenAccount`s of the output mint of the limit order for it to work, you can learn more about creating them dynamically in the [Add Fees To Swap](../100-swap-api/4-add-fees-to-swap.md) guide. (Note that the fees are transferred only after the trigger order has been executed.)
 :::
 
 #### Create a POST request to the `/createOrder` endpoint.

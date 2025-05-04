@@ -1,8 +1,6 @@
 import React from "react";
 import Layout from "@theme/Layout";
-import { cn } from "../utils";
-import SearchBar from "@theme/SearchBar";
-import { API_CARDS, TOOL_KIT_CARDS, DRWG_CARDS } from "../constant";
+import { API_CARDS, TOOL_KIT_CARDS, DRWG_CARDS } from "../utils/homeCards";
 
 const JupiterExplore = () => {
   return (
@@ -19,13 +17,13 @@ const JupiterExplore = () => {
               <a href="/docs/ultra-api/" className="underline text-gray-800">
                 Ultra
               </a>
-              , <a href="/docs/swap-api/get-quote" className="underline text-gray-800">
+              , <a href="/docs/swap-api/" className="underline text-gray-800">
                 Swap
               </a>
-              , <a href="/docs/trigger-api/create-order" className="underline text-gray-800">
+              , <a href="/docs/trigger-api/" className="underline text-gray-800">
                 Trigger
               </a>
-              , <a href="/docs/recurring-api/create-order" className="underline text-gray-800">
+              , <a href="/docs/recurring-api/" className="underline text-gray-800">
                 Recurring
               </a>
               , and more.
@@ -57,7 +55,7 @@ const JupiterExplore = () => {
             </p>
           </div>
           <a
-            href="/docs/tool-kits/swap-terminal"
+            href="/docs/tool-kits/"
             className="mt-6 bg-[#66A2E8] !text-white font-semibold py-2 px-3 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
           >
             Explore Tool Kits
@@ -69,16 +67,24 @@ const JupiterExplore = () => {
               Get Routed
             </h2>
             <p className="text-gray-600 text-sm text-left py-1">
-              If you are a DEX or AMM, and have an interest to be part of our
-              routing engine, refer to the routing integration guides.
+              If you are a decentralized exchange or market maker and have an interest to be part of our
+              routing engines, refer to the routing integration guides.
             </p>
           </div>
-          <a
-            href="/docs/dex-integration"
-            className="mt-6 bg-[#66A2E8] !text-white font-semibold py-2 px-3 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
-          >
-            DEX Integration
-          </a>
+          <div className="mt-6 flex gap-3">
+            <a
+              href="/docs/routing/dex-integration"
+              className="flex-1 bg-[#66A2E8] !text-white font-semibold py-2 px-1 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
+            >
+              DEX Integration
+            </a>
+            <a
+              href="/docs/routing/rfq-integration"
+              className="flex-1 bg-[#66A2E8] !text-white font-semibold py-2 px-1 rounded-lg text-center hover:bg-[#66A2E8]/90 transition-colors !no-underline text-sm"
+            >
+              RFQ Integration
+            </a>
+          </div>
         </div>
         <div className="bg-white shadow-md p-6 rounded-2xl flex flex-col h-full">
           <div className="flex-1">
@@ -282,12 +288,12 @@ const JupiterFooter = () => {
                 href="https://discord.gg/jup"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
                 aria-label="Discord"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -298,12 +304,12 @@ const JupiterFooter = () => {
                 href="https://github.com/jup-ag"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
                 aria-label="GitHub"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -314,12 +320,12 @@ const JupiterFooter = () => {
                 href="https://t.me/jup_dev"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
                 aria-label="Telegram"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -330,12 +336,12 @@ const JupiterFooter = () => {
                 href="https://x.com/JupiterExchange"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
                 aria-label="X (Twitter)"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -343,19 +349,35 @@ const JupiterFooter = () => {
                 </svg>
               </a>
               <a
-                href="https://jupiverse.zendesk.com/hc/en-us"
+                href="https://support.jup.ag/hc/en-us"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
-                aria-label="Guides"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                aria-label="Help Center"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
-                  <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                </svg>
+              </a>
+              <a
+                href="https://status.jup.ag"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                aria-label="Status"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
                 </svg>
               </a>
             </div>
@@ -363,22 +385,28 @@ const JupiterFooter = () => {
             {/* Legal Links */}
             <div className="flex flex-wrap justify-center gap-4 text-sm text-center">
               <a
-                href="/docs/sdk-api-license-agreement"
+                href="/docs/misc/sdk-api-license-agreement"
                 className="text-gray-700 hover:text-primary transition-colors hover:underline text-xs"
               >
                 SDK & API License
               </a>
               <a
-                href="/docs/terms-of-use"
+                href="/docs/misc/terms-of-use"
                 className="text-gray-700 hover:text-primary transition-colors hover:underline text-xs"
               >
                 Terms of Use
               </a>
               <a
-                href="/docs/privacy-policy"
+                href="/docs/misc/privacy-policy"
                 className="text-gray-700 hover:text-primary transition-colors hover:underline text-xs"
               >
                 Privacy Policy
+              </a>
+              <a
+                href="/docs/misc/integrator-guidelines"
+                className="text-gray-700 hover:text-primary transition-colors hover:underline text-xs"
+              >
+                Integrator Guidelines
               </a>
             </div>
 
@@ -404,10 +432,13 @@ const Content = () => {
         <div className="bg-gray-100 w-full flex flex-col justify-center items-center text-center py-10 md:py-20 px-4">
           <div className="relative">
             <div
-              className={cn(
-                "font-bold max-md:max-w-full text-5xl xl:text-6xl leading-[1] py-2",
-                "bg-gradient-to-r from-[#00BEF0] via-[#8DE3A3] to-[#C7F284] text-transparent bg-clip-text"
-              )}
+              className={`
+                font-bold max-md:max-w-full 
+                text-5xl xl:text-6xl 
+                leading-[1] py-2
+                bg-gradient-to-r from-[#00BEF0] via-[#8DE3A3] to-[#C7F284] 
+                text-transparent bg-clip-text
+              `}
             >
               Jupiter Developer Docs
               <span className="inline-block ml-2 bg-[#66A2E8] text-white text-[10px] px-1.5 py-0.5 rounded-md transform align-top relative top-4 md:top-2">

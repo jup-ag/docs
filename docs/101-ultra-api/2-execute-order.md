@@ -9,8 +9,6 @@ title: "Execute Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-
-
 :::note
 Base URL: `https://lite-api.jup.ag/ultra/v1/execute`
 

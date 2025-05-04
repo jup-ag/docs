@@ -16,7 +16,11 @@ The Jupiter UI at https://jup.ag/ contains multiple safeguards, warnings and def
 If you need clarification or support, please reach out to us in [Discord](https://discord.gg/jup).
 :::
 
-The Quote API enables you to tap into the Jupiter routing engine, which accesses the deep liquidity available within the DEXes of Solana's DeFi ecosystem. In this guide, we will walkthrough how you can get a quote for a specific token pair and other related parameters.
+:::warning Routing Engine
+The quotes from Swap API are from the Jupiter Metis v1 Routing Engine.
+:::
+
+The Quote API enables you to tap into the Jupiter Metis v1 Routing Engine, which accesses the deep liquidity available within the DEXes of Solana's DeFi ecosystem. In this guide, we will walkthrough how you can get a quote for a specific token pair and other related parameters.
 
 ## Let’s Get Started
 
@@ -30,10 +34,8 @@ To fully utilize the Quote API, check out the [Quote API Reference](/docs/api/sw
 
 ## Quote API
 
-
-
 :::note
-Base URL: `https://lite-jup.ag/swap/v1/quote`
+Base URL: `https://lite-api.jup.ag/swap/v1/quote`
 
 For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
 :::

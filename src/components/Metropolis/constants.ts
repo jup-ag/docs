@@ -1,1 +1,0 @@
-export const DOCS_URL = "https://dev.jup.ag/docs";

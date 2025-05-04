@@ -134,7 +134,7 @@ We are using [Triton’s `getRecentPrioritizationFees`](https://docs.triton.one/
 
 ```jsx
 const swapResponse = await (
-  await fetch('https://lite-api.jup.ag/swap/v1', {
+  await fetch('https://lite-api.jup.ag/swap/v1/swap', {
       method: 'POST',
       headers: {
       'Content-Type': 'application/json'
@@ -164,7 +164,7 @@ When `true`, it allows the transaction to utilize a dynamic compute unit rather
 
 ```jsx
 const swapTransaction = await (
-  await fetch('https://lite-api.jup.ag/swap/v1', {
+  await fetch('https://lite-api.jup.ag/swap/v1/swap', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -182,19 +182,27 @@ const swapTransaction = await (
 
 Apart from the static `slippageBps` parameter, Jupiter has iterated on different designs to estimate slippage better.
 
-You can pass in `dynamicSlippage=true` to Swap API where our backend will estimate a slippage value to be used for the specific quote and transaction for you.
+You can pass in `dynamicSlippage=true` to Swap API where our backend will estimate a slippage value by simulating the swap transaction closer to execution and calculate an optimal value based on the token category, historical swap's slippage data and other heuristics.
 
-Our backend will simulate slippage closer to execution and calculate an optimal value based on the token category, historical swap's slippage data and other heuristics.
+:::info
+The Dynamic Slippage implementation on the Swap API is different from the Real Time Slippage Estimator (RTSE) on the Ultra API.
 
-:::note
-To understand Dynamic Slippage better, you can reference this repository to understand some of the configs used.
+To use RTSE, you will need to use the Ultra API.
+:::
 
-[Dynamic Slippage Config](https://github.com/jup-ag/dynamic-slippage-config)
+:::warning
+To use Dynamic Slippage, you will need to pass in `dynamicSlippage=true` to both the `/swap/v1/quote` and `/swap/v1/swap` endpoints.
 :::
 
 ```jsx
+const quoteResponse = await (
+  await fetch(
+    'https://lite-api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&slippageBps=50&restrictIntermediateTokens=true&dynamicSlippage=true'
+  )
+).json();
+
 const swapTransaction = await (
-  await fetch('https://lite-api.jup.ag/swap/v1', {
+  await fetch('https://lite-api.jup.ag/swap/v1/swap', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -246,7 +254,7 @@ Additionally, Jito enables bundling transactions to ensure they execute together
 
 ```jsx
 const swapTransaction = await (
-  await fetch('https://lite-api.jup.ag/swap/v1', {
+  await fetch('https://lite-api.jup.ag/swap/v1/swap', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

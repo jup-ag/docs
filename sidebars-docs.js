@@ -13,7 +13,7 @@ const sidebars = {
       items: [
         {
           type: 'doc',
-          id: 'index',
+          id: 'README',
         },
         {
           type: 'doc',
@@ -54,10 +54,40 @@ const sidebars = {
       ],
     },
   ],
+  routing: [
+    {
+      type: 'doc',
+      id: 'routing/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Routing Integrations',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'routing/dex-integration',
+        },
+        {
+          type: 'doc',
+          id: 'routing/rfq-integration',
+        },
+      ],
+    },
+  ],
   misc: [
     {
       type: 'category',
       label: 'Legal & Guidelines',
+      link: {
+        type: 'generated-index',
+        slug: '/misc',
+      },
       collapsible: false,
       collapsed: false,
       items: [
@@ -75,26 +105,26 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'misc/support-guidelines',
-        },
-        {
-          type: 'html',
-          value: '<div class="sidebar-line-break"></div>',
+          id: 'misc/integrator-guidelines',
         },
       ],
     },
   ],
   ultra: [
     {
+      type: 'doc',
+      id: 'ultra-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
       type: 'category',
       label: 'Ultra API',
       collapsible: false,
       collapsed: false,
       items: [
-        {
-          type: 'doc',
-          id: 'ultra-api/index',
-        },
         {
           type: 'doc',
           id: 'ultra-api/get-order',
@@ -107,6 +137,26 @@ const sidebars = {
           type: 'doc',
           id: 'ultra-api/get-balances',
         },
+        {
+          type: 'doc',
+          id: 'ultra-api/get-shield',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Ultra API Guides',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'ultra-api/add-fees-to-ultra',
+        },
       ],
     },
     {
@@ -115,6 +165,14 @@ const sidebars = {
     },
   ],
   swap: [
+    {
+      type: 'doc',
+      id: 'swap-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
     {
       type: 'category',
       label: 'Swap API',
@@ -191,6 +249,14 @@ const sidebars = {
   ],
   trigger: [
     {
+      type: 'doc',
+      id: 'trigger-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
       type: 'category',
       label: 'Trigger API',
       collapsible: false,
@@ -245,6 +311,14 @@ const sidebars = {
     },
   ],
   recurring: [
+    {
+      type: 'doc',
+      id: 'recurring-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
     {
       type: 'category',
       label: 'Recurring API',
@@ -308,16 +382,8 @@ const sidebars = {
   ],
   perp: [
     {
-      type: 'category',
-      label: 'Perp API',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          id: 'perp-api/index',
-        },
-      ],
+      type: 'doc',
+      id: 'perp-api/README',
     },
     {
       type: 'html',
@@ -353,6 +419,14 @@ const sidebars = {
     },
   ],
   toolkit: [
+    {
+      type: 'doc',
+      id: 'tool-kits/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
     {
       type: 'category',
       label: 'Jupiter Tool Kits',

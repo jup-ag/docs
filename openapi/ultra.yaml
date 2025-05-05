@@ -86,8 +86,8 @@ paths:
                       required:
                         - swapInfo
                         - percent
-                  contextSlot:
-                    type: number
+                  feeMint:
+                    type: string
                   feeBps:
                     type: number
                   prioritizationType:
@@ -103,6 +103,7 @@ paths:
                     enum:
                       - aggregator
                       - rfq
+                      - hashflow
                   transaction:
                     description: "Unsigned base-64 encoded transaction to be signed and used in `/execute`"
                     type:
@@ -125,8 +126,6 @@ paths:
                     type: string
                   expireAt:
                     type: string
-                  lastValidBlockHeight:
-                    type: number
                   platformFee:
                     type: object
                     properties:
@@ -224,9 +223,20 @@ paths:
           required: true
         - in: query
           name: taker
-          description: "The account address of the user"
           schema:
             type: string
+          required: false
+        - in: query
+          name: referralAccount
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: referralFee
+          schema:
+            type: number
+            minimum: 50
+            maximum: 255
           required: false
   /execute:
     post:
@@ -259,6 +269,10 @@ paths:
                     type: string
                   code:
                     type: number
+                  totalInputAmount:
+                    type: string
+                  totalOutputAmount:
+                    type: string
                   inputAmountResult:
                     type: string
                   outputAmountResult:
@@ -328,62 +342,153 @@ paths:
                 - signedTransaction
                 - requestId
   /balances/:address:
-      get:
-        summary: balances
-        description: |
-          Request for token balances of an account
-          
-          :::note
-          - Refer to [Ultra API doc](/docs/ultra-api/get-balances) for more information
-          :::
-        responses:
-          '200':
-            description: Successful response
-            content:
-              application/json:
-                schema:
-                  type: object
-                  additionalProperties:
-                    type: object
-                    properties:
-                      amount:
-                        type: string
-                      uiAmount:
-                        type: number
-                      slot:
-                        type: number
-                      isFrozen:
-                        type: boolean
-                    required:
-                      - amount
-                      - uiAmount
-                      - slot
-                      - isFrozen
-          '400':
-            description: Bad request
-            content:
-              application/json:
-                schema:
+    get:
+      summary: balances
+      description: |
+        Request for token balances of an account
+        
+        :::note
+        - Refer to [Ultra API doc](/docs/ultra-api/get-balances) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
                   type: object
                   properties:
-                    error:
+                    amount:
                       type: string
+                    uiAmount:
+                      type: number
+                    slot:
+                      type: number
+                    isFrozen:
+                      type: boolean
                   required:
-                    - error
-          '500':
-            description: Internal server error
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: string
-                  required:
-                    - error
-        parameters:
+                    - amount
+                    - uiAmount
+                    - slot
+                    - isFrozen
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+      parameters:
           - schema:
               type: string
             in: path
             name: address
             required: true
+  /shield:
+    get:
+      summary: shield
+      description: |
+        Request for token information and warnings of mints
+          
+        :::note
+        - Refer to [Ultra API doc](/docs/ultra-api/get-shield) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  warnings:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          message:
+                            type: string
+                        required:
+                          - type
+                          - message
+                required:
+                  - warnings
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+      parameters:
+          - in: query
+            name: mints
+            schema:
+              type: string
+            required: true
+            description: "Comma separated list of mints to get information for"
+  /order/routers:
+    get:
+      summary: routers
+      description: |
+        Request for the list of routers available in the routing engine of Ultra, which is [Juno](/docs/routing#juno-liquidity-engine)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                      enum:
+                        - Metis
+                        - JupiterZ
+                        - Hashflow
+                        - DFlow
+                    icon:
+                      type: string
+                  required:
+                    - id
+                    - name

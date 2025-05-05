@@ -288,12 +288,12 @@ const JupiterFooter = () => {
                 href="https://discord.gg/jup"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
                 aria-label="Discord"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -304,12 +304,12 @@ const JupiterFooter = () => {
                 href="https://github.com/jup-ag"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
                 aria-label="GitHub"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -320,12 +320,12 @@ const JupiterFooter = () => {
                 href="https://t.me/jup_dev"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
                 aria-label="Telegram"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -336,12 +336,12 @@ const JupiterFooter = () => {
                 href="https://x.com/JupiterExchange"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
                 aria-label="X (Twitter)"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
@@ -352,16 +352,32 @@ const JupiterFooter = () => {
                 href="https://support.jup.ag/hc/en-us"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
-                aria-label="Guides"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                aria-label="Help Center"
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
-                  <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                </svg>
+              </a>
+              <a
+                href="https://status.jup.ag"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-700 hover:text-primary hover:bg-gray-300 transition-all transform hover:scale-110"
+                aria-label="Status"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
                 </svg>
               </a>
             </div>

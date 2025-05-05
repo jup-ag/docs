@@ -17,6 +17,7 @@ export const navbarConfigs = {
     { to: "/docs/routing/", label: "Routing Integration", position: "left" },
     { to: "/docs/tool-kits/", label: "Tool Kits", position: "left" },
     { to: "/docs/api", label: "API Reference", position: "left" },
+    { to: "https://status.jup.ag", label: "Status", position: "left" },
     { to: "/docs/misc/", label: "Misc", position: "left" },
   ],
   "/search": [
@@ -37,6 +38,7 @@ export const navbarConfigs = {
     { to: "/docs/routing/", label: "Routing Integration", position: "left" },
     { to: "/docs/tool-kits/", label: "Tool Kits", position: "left" },
     { to: "/docs/api", label: "API Reference", position: "left" },
+    { to: "https://status.jup.ag", label: "Status", position: "left" },
     { to: "/docs/misc/", label: "Misc", position: "left" },
   ],
   "/": [
@@ -57,6 +59,7 @@ export const navbarConfigs = {
     { to: "/docs/routing/", label: "Routing Integration", position: "left" },
     { to: "/docs/tool-kits/", label: "Tool Kits", position: "left" },
     { to: "/docs/api", label: "API Reference", position: "left" },
+    { to: "https://status.jup.ag", label: "Status", position: "left" },
     { to: "/docs/misc/", label: "Misc", position: "left" },
   ],
   "/ecosystem": [
@@ -77,6 +80,7 @@ export const navbarConfigs = {
     { to: "/docs/routing/", label: "Routing Integration", position: "left" },
     { to: "/docs/tool-kits/", label: "Tool Kits", position: "left" },
     { to: "/docs/api", label: "API Reference", position: "left" },
+    { to: "https://status.jup.ag", label: "Status", position: "left" },
     { to: "/docs/misc/", label: "Misc", position: "left" },
   ],
 };

@@ -419,10 +419,6 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/customization',
-        },
-        {
-          type: 'doc',
           id: 'tool-kits/terminal/nextjs-app-example',
         },
         {
@@ -432,6 +428,10 @@ const sidebars = {
         {
           type: 'doc',
           id: 'tool-kits/terminal/html-app-example',
+        },
+        {
+          type: 'doc',
+          id: 'tool-kits/terminal/customization',
         },
         {
           type: 'doc',

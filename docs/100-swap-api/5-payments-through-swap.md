@@ -13,7 +13,7 @@ The Jupiter Swap API can be utilized such that you, a merchant can allow your cu
 
 ## Use Case
 
-Let’s set the stage. You are selling a **jupcake!!!** to your customer and merchant might only accept in 1 USDC, but Alice only has 1 SOL for various reasons. Well, you’re at the right place! By using the Swap API, merchant can let customer pay in SOL while merchant still receive USDC in order to complete the payment for a jupcake.
+Let’s set the stage. You are selling a **jupcake!!!** to your customer and merchant might only accept in 1 USDC, but your customer only has 1 SOL. Well, you’re at the right place! By using the Swap API, merchant can let customer pay in SOL while merchant still receive USDC in order to complete the payment for a jupcake.
 
 - Customer has 1,000,000 SOL.
 - Merchant sells 1 jupcake for 1 USDC.
@@ -33,31 +33,30 @@ npm i @solana/spl-token
 ```jsx
 import { PublicKey, Connection, Keypair, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { Wallet } from '@coral-xyz/anchor';
-import fetch from 'cross-fetch';
 ```
 
-Before we start getting a quote and swap transaction, for example sake, we will need to prepare your and Alice's accounts. In production scenario, you will need to dynamically pass this in and allow users to sign in their device interfaces.
+Before we start getting a quote and swap transaction, for example sake, we will need to prepare both merchant and customer accounts. In production scenario, you will need to dynamically pass this in and allow users to sign in their device interfaces.
 
+:::note
 Do note that you will need to have already set up:
-- A wallet in your machine to simulate yourself as the customer as the customer is the signer of the transaction (similar to how we set up in [Environment Setup](/docs/environment-setup)).
+- **A wallet in your machine to simulate yourself as the customer as the customer is the signer of the transaction** (similar to how we set up in [Environment Setup](/docs/environment-setup)).
 - `trackingAccount` is an additional Solana Account you can pass in to track only Jupiter transactions easily.
+:::
 
 #### Set Up Accounts
 
 ```jsx
-const customerAccount = new Wallet(...);
-
-console.log("customerAccount:", customerAccount.publicKey.toBase58());
+const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+const customerWallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
 
 const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'); // Your preferred token payment
-
+const customerAccount = customerWallet.publicKey;
 const merchantAccount = new PublicKey('ReplaceWithMerchantPubkey');
-// const trackingAccount = new PublicKey('ReplaceWithPubkey');
+// const trackingAccount = new PublicKey('ReplaceWithPubkey'); // If required
 
-console.log("USDC_MINT:", USDC_MINT.toBase58());
-console.log("merchantAccount:", merchantAccount.toBase58());
-// console.log("trackingAccount:", trackingAccount.toBase58());
+console.log("USDC_MINT:", USDC_MINT.publicKey);
+console.log("merchantAccount:", merchantAccount.publicKey);
+// console.log("trackingAccount:", trackingAccount.publicKey);
 ```
 
 #### Set Up `destinationTokenAccount`
@@ -74,7 +73,7 @@ const merchantUSDCTokenAccount = await getAssociatedTokenAddress(
 	  ASSOCIATED_TOKEN_PROGRAM_ID
 );
 
-console.log("merchantUSDCTokenAccount:", merchantUSDCTokenAccount.toBase58());
+console.log("merchantUSDCTokenAccount:", merchantUSDCTokenAccount.publicKey);
 ```
 
 ### 2. Set `swapMode` to `ExactOut` in Quote
@@ -128,14 +127,12 @@ const swapResponse = await (
         },
         body: JSON.stringify({
             quoteResponse,
-            userPublicKey: customerAccount.publicKey.toBase58(),
-            destinationTokenAccount: merchantUSDCTokenAccount.toBase58(),
-            // trackingAccount: trackingAccount.toBase58(),
+            userPublicKey: customerAccount.publicKey,
+            destinationTokenAccount: merchantUSDCTokenAccount.publicKey,
+            // trackingAccount: trackingAccount.publicKey,
         })
     })
 ).json();
-
-console.log(swapResponse);
 ```
 
 ### 4. Prepare Transaction
@@ -145,11 +142,8 @@ We have walked through the steps here and explained some of the code, you can re
 ```jsx
 const transactionBase64 = swapResponse.swapTransaction
 const transaction = VersionedTransaction.deserialize(Buffer.from(transactionBase64, 'base64'));
-
 transaction.feePayer = customerAccount.publicKey;
-
-transaction.sign([customerAccount.payer]);
-
+transaction.sign([customerWallet]);
 const transactionBinary = transaction.serialize();
 ```
 

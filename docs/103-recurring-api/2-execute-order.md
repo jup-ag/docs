@@ -33,7 +33,7 @@ const transactionBase64 = createOrderResponse.transaction
 const transaction = VersionedTransaction.deserialize(Buffer.from(transactionBase64, 'base64'));
 
 // Sign the transaction
-transaction.sign([wallet.payer]);
+transaction.sign([wallet]);
 
 // Serialize the transaction to base64 format
 const signedTransaction = Buffer.from(transaction.serialize()).toString('base64');
@@ -98,7 +98,7 @@ If you want to handle the transaction, you can sign and send the transaction to 
 const transactionBase64 = createOrderResponse.transaction
 const transaction = VersionedTransaction.deserialize(Buffer.from(transactionBase64, 'base64'));
 
-transaction.sign([wallet.payer]);
+transaction.sign([wallet]);
 
 const transactionBinary = transaction.serialize();
 

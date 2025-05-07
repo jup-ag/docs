@@ -68,7 +68,7 @@ await fetch('https://lite-api.jup.ag/swap/v1/swap', {
     },
     body: JSON.stringify({
     quoteResponse,
-    userPublicKey: wallet.publicKey.toString(),
+    userPublicKey: wallet.publicKey,
     
     // ADDITIONAL PARAMETERS TO OPTIMIZE FOR TRANSACTION LANDING
     // See next guide to optimize for transaction landing
@@ -152,7 +152,7 @@ const instructions = await (
     },
     body: JSON.stringify({
         quoteResponse,
-        userPublicKey: wallet.publicKey.toString(),
+        userPublicKey: wallet.publicKey,
     })
     })
 ).json();

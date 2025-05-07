@@ -54,7 +54,7 @@ const createOrderResponse = await (
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            user: wallet.publicKey.toBase58(),
+            user: wallet.publicKey,
             inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
             outputMint: "So11111111111111111111111111111111111111112",
             params: {
@@ -94,7 +94,7 @@ const createOrderResponse = await (
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            user: wallet.publicKey.toBase58(),
+            user: wallet.publicKey,
             inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
             outputMint: "So11111111111111111111111111111111111111112",
             params: {

@@ -260,8 +260,10 @@ components:
           type: string
         wrapAndUnwrapSol:
           description: |
-            - To automatically wrap/unwrap SOL in the transaction
-            - If false, it will use wSOL token account
+            - To automatically wrap/unwrap SOL in the transaction, as WSOL is an SPL token while native SOL is not
+            - When true, it will strictly use SOL amount to wrap it to swap, and each time after you swap, it will unwrap all WSOL back to SOL
+            - When false, it will strictly use WSOL amount to swap, and each time after you swap, it will not unwrap the WSOL back to SOL
+            - To set this parameter to false, you need to have the WSOL token account initialized
             - Parameter will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close
           type: boolean
           default: true
@@ -426,7 +428,7 @@ components:
           $ref: '#/components/schemas/Instruction'
         cleanupInstruction:
           description: |
-            - To unwrap the SOL if `wrapAndUnwrapSol = true`.
+            - To wrap and unwrap the SOL.
           $ref: '#/components/schemas/Instruction'
         addressLookupTableAddresses:
           description: |

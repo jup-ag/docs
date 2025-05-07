@@ -502,7 +502,7 @@ components:
         - ExactOut is for supporting use cases where you need an exact output amount, like using [Swap API as a payment service](/docs/swap-api/payments-through-swap)
         - In the case of `ExactIn`, the slippage is on the output token
         - In the case of `ExactOut`, the slippage is on the input token
-        - Not all AMMs support `ExactOut`
+        - Not all AMMs support `ExactOut`: Currently only Orca Whirlpool, Raydium CLMM, Raydium CPMM
       in: query
       schema:
         type: string

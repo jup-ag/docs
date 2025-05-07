@@ -90,12 +90,6 @@ paths:
                     type: string
                   feeBps:
                     type: number
-                  prioritizationType:
-                    type: string
-                    enum:
-                      - None
-                      - ComputeBudget
-                      - Jito
                   prioritizationFeeLamports:
                     type: number
                   swapType:
@@ -175,7 +169,6 @@ paths:
                   - priceImpactPct
                   - routePlan
                   - feeBps
-                  - prioritizationType
                   - prioritizationFeeLamports
                   - swapType
                   - transaction

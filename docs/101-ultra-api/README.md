@@ -19,6 +19,7 @@ The Jupiter Ultra API is the *only* API you ever need to experience or build the
 | **Blazing fast** | 95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine. |
 | **MEV-protected** | The lowest incidence of MEV attacks across all existing applications, by far. |
 | **Real-Time Slippage Estimator** | Intelligently derives the best possible slippage to use at the time of execution, balancing between trade success and price protection. |
+| **Gasless Support** | Enables gasless transactions for users with certain tokens and trade sizes, you can identify this via the secondary signer in the transaction. |
 | **One-stop shop** | Retrieve the user's balances, get a quote, execute the trade, and get the results of the trade, all within Ultra API without touching a single RPC or any other external API. |
 | **World class support** | We handle the complexities of RPC connections, transaction landing, slippage protection and more. |
 

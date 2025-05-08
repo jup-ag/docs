@@ -48,7 +48,7 @@ const transactionBase64 = swapResponse.swapTransaction
 const transaction = VersionedTransaction.deserialize(Buffer.from(transactionBase64, 'base64'));
 console.log(transaction);
 
-transaction.sign([wallet.payer]);
+transaction.sign([wallet]);
 
 const transactionBinary = transaction.serialize();
 console.log(transactionBinary);
@@ -141,7 +141,7 @@ const swapResponse = await (
       },
       body: JSON.stringify({
           quoteResponse,
-          userPublicKey: wallet.publicKey.toBase58(),
+          userPublicKey: wallet.publicKey,
           prioritizationFeeLamports: {
               priorityLevelWithMaxLamports: {
                   maxLamports: 10000000,
@@ -171,7 +171,7 @@ const swapTransaction = await (
     },
     body: JSON.stringify({
       quoteResponse,
-      userPublicKey: wallet.publicKey.toBase58(),
+      userPublicKey: wallet.publicKey,
       dynamicComputeUnitLimit: true
     })
   })
@@ -209,7 +209,7 @@ const swapTransaction = await (
     },
     body: JSON.stringify({
       quoteResponse,
-      userPublicKey: wallet.publicKey.toBase58(),
+      userPublicKey: wallet.publicKey,
       dynamicSlippage: true,
     })
   })
@@ -261,7 +261,7 @@ const swapTransaction = await (
     },
     body: JSON.stringify({
       quoteResponse,
-      userPublicKey: wallet.publicKey.toBase58(),
+      userPublicKey: wallet.publicKey,
       prioritizationFeeLamports: {
         jitoTipLamports: 1000000 // note that this is FIXED LAMPORTS not a max cap
       }

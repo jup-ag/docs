@@ -418,6 +418,32 @@ const sidebars = {
       value: '<div class="sidebar-line-break"></div>',
     },
   ],
+  token: [
+    {
+      type: 'doc',
+      id: 'token-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Expanding the Token API',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'token-api/token-tag-standard',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
   toolkit: [
     {
       type: 'doc',

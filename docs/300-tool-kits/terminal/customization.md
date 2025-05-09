@@ -13,6 +13,93 @@ Try out the [Terminal Playground](https://terminal.jup.ag/playground) to experie
 
 For the full customization options, you can refer to the [repository](https://github.com/jup-ag/terminal/blob/main/src/types/index.d.ts).
 
+If you are using TypeScript, you can use the type declaration file to get the full type definitions for the Terminal.
+
+<details>
+  <summary>
+    Full TypeScript Declaration
+  </summary>
+
+```typescript
+declare global {
+    interface Window {
+        Jupiter: JupiterTerminal;
+    }
+}
+
+export type WidgetPosition = 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right';
+export type WidgetSize = 'sm' | 'default';
+export type SwapMode = "ExactInOrOut" | "ExactIn" | "ExactOut";
+export type DEFAULT_EXPLORER = 'Solana Explorer' | 'Solscan' | 'Solana Beach' | 'SolanaFM';
+
+export interface FormProps {
+    swapMode?: SwapMode;
+    initialAmount?: string;
+    fixedAmount?: boolean;
+    initialInputMint?: string;
+    fixedInputMint?: boolean;
+    initialOutputMint?: string;
+    fixedOutputMint?: boolean;
+}
+
+export interface IInit {
+    localStoragePrefix?: string;
+    formProps?: FormProps;
+    defaultExplorer?: DEFAULT_EXPLORER;
+    autoConnect?: boolean;
+    displayMode?: 'modal' | 'integrated' | 'widget';
+    integratedTargetId?: string;
+    widgetStyle?: {
+        position?: WidgetPosition;
+        size?: WidgetSize;
+    };
+    containerStyles?: CSSProperties;
+    containerClassName?: string;
+    enableWalletPassthrough?: boolean;
+    passthroughWalletContextState?: WalletContextState;
+    onRequestConnectWallet?: () => void | Promise<void>;
+    onSwapError?: ({
+        error,
+        quoteResponseMeta,
+    }: {
+        error?: TransactionError;
+        quoteResponseMeta: QuoteResponse | null;
+    }) => void;
+    onSuccess?: ({
+        txid,
+        swapResult,
+        quoteResponseMeta,
+    }: {
+        txid: string;
+        swapResult: SwapResult;
+        quoteResponseMeta: QuoteResponse | null;
+    }) => void;
+    onFormUpdate?: (form: IForm) => void;
+    onScreenUpdate?: (screen: IScreen) => void;
+}
+
+export interface JupiterTerminal {
+    _instance: JSX.Element | null;
+    init: (props: IInit) => void;
+    resume: () => void;
+    close: () => void;
+    root: Root | null;
+    enableWalletPassthrough: boolean;
+    onRequestConnectWallet: IInit['onRequestConnectWallet'];
+    store: ReturnType<typeof createStore>;
+    syncProps: (props: { passthroughWalletContextState?: IInit['passthroughWalletContextState'] }) => void;
+    onSwapError: IInit['onSwapError'];
+    onSuccess: IInit['onSuccess'];
+    onFormUpdate: IInit['onFormUpdate'];
+    onScreenUpdate: IInit['onScreenUpdate'];
+    localStoragePrefix: string;
+}
+
+export { };
+```
+
+</details>
+
 ## Display Modes
 
 Jupiter Terminal offers three distinct display modes to suit different use cases:

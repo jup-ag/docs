@@ -1,5 +1,5 @@
 ---
-sidebar_label: "Token API"
+sidebar_label: "Using Token API"
 description: "Use the Jupiter Token API for all tokens tradable or tagged via Jupiter."
 title: "Token API"
 ---
@@ -9,22 +9,19 @@ title: "Token API"
     <meta name="twitter:card" content="summary" />
 </head>
 
-Token API aims to provide accessibility to all Solana tokens that are tradable on Jupiter. The Token API is built with a tagging system which consists of tokens from [Jupiter's community verification system](https://www.jupresear.ch/t/get-your-token-a-community-tag-beta/18963), LSTs and also the ability to support partner token tags.
+Token API aims to provide accessibility to all Solana tokens that are tradable on Jupiter. The Token API is built with a tagging system which consists of tokens from [Jupiter's verification system](https://x.com/9yointern/status/1907425355071197347), LSTs and also the ability to support partner token tags.
 
 Through the Token API, you can query by tags, mints, markets to get a list of tokens and also to get more on the token information.
 
-:::info Token API Links and Resources
-- [Background and History](https://www.jupresear.ch/t/ecosystem-master-token-list/19786)
-- [Token API and Standard](https://www.jupresear.ch/t/introducing-the-ecosystem-token-api-and-standard/20601)
-- [How to get your token verified](https://www.jupresear.ch/t/get-your-token-a-community-tag-beta/18963)
+:::info More About Token API
+- [Background and History of the Ecosystem Token List](https://www.jupresear.ch/t/ecosystem-master-token-list/19786)
+- [Introducing a new token verification method](https://x.com/9yointern/status/1907425355071197347) at https://verify.jup.ag
 - [API Reference](/docs/api/token-api/quickstart.info.mdx)
 :::
 
 ## Let's Get Started
 
 In this guide, we will be going through a few examples of what Token API endpoints you can call to get the information you need.
-
-
 
 :::note
 Base URL: `https://lite-api.jup.ag/tokens/v1`

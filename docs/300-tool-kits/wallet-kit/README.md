@@ -1,5 +1,5 @@
 ---
-sidebar_label: "Unified Wallet Kit"
+sidebar_label: "Getting Started"
 description: An open source, streamlined Unified Wallet Kit adapter designed to simplify development on Solana.
 title: Unified Wallet Kit
 ---

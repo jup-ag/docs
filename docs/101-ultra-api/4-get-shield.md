@@ -29,7 +29,7 @@ This is useful when integrating with Jupiter Ultra or any other APIs, allowing y
 
 ```jsx
 const shieldResponse = await (
-  await fetch(`https://lite-api.jup.ag/ultra/v1/shield?mints=So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v,DocTwz3QhCgKy1CJJMruEAFEG5xTGoC43vPMkC41pump`)
+  await fetch(`https://lite-api.jup.ag/ultra/v1/shield?mints=So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v,DocTwz3QhCgKy1CJJMruEAFEG51pump`)
 ).json();
 ```
 
@@ -42,7 +42,7 @@ The shield response will return a list of token information and warnings of mint
 ```json
 {
   "warnings": {
-    "DocTwz3QhCgKy1CJJMruEAFEG5xTGoC43vPMkC41pump": [
+    "DocTwz3QhCgKy1CJJMruEAFEG5xTGsdfgfdgoC43vPMkC41pump": [
       {
         "type": "NOT_VERIFIED",
         "message": "This token is not verified, make sure the mint address is correct before trading",

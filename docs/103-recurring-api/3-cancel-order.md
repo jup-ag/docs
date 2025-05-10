@@ -42,7 +42,7 @@ const cancelOrderResponse = await (
         },
         body: JSON.stringify({
             order: "4DWzP4TdTsuwvYMaMWrRqzya4UTFKFoVjfUWNWh8zhzd",
-            user: wallet.publicKey.toBase58(),
+            user: wallet.publicKey,
             recurringType: "time",
         }),
     })

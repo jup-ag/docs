@@ -46,7 +46,7 @@ const priceWithdrawResponse = await (
         },
         body: JSON.stringify({
             order: "EpTsCUnKComCd8FDNZn3kVrQBQo2uEn5rRzYk9ocqFPH",
-            user: wallet.publicKey.toBase58(),
+            user: wallet.publicKey,
             inputOrOutput: "In", // either "In" or "Out" mint, note that price-based orders auto withdraws the output tokens to the user's wallet every time the order is executed
             amount: 1000000
         }),

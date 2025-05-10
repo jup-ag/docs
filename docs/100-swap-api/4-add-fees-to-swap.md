@@ -150,8 +150,6 @@ const swapResponse = await (
         })
     })
 ).json();
-
-console.log(swapResponse);
 ```
 
 </details>
@@ -172,8 +170,6 @@ const quoteResponse = await (
         'https://lite-api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000&slippageBps=50&restrictIntermediateTokens=true&platformFeeBps=20'
     )
   ).json();
-  
-console.log(JSON.stringify(quoteResponse, null, 2));
 ```
 
 ### 3. Set your feeAccount in Swap
@@ -189,7 +185,7 @@ const swapResponse = await (
         },
         body: JSON.stringify({
             quoteResponse,
-            userPublicKey: wallet.publicKey.toBase58(), // Pass in actual referred user in production
+            userPublicKey: wallet.publicKey, // Pass in actual referred user in production
             feeAccount: feeAccount,
         })
     })

@@ -25,16 +25,7 @@ As Solana grows and more DEXes are built, we have to be more cautious in the DEX
 - **Traction**: We look at the traction of the DEX to ensure it has market demand and is well-used.
 - **Team and backers**: This is a good indicator of the quality of the DEX if they are backed by or built by reputable or verifiable entities.
 
-## Integration Guidelines
-
-### Markets API
-- This API should track all markets/pools that is listed or delisted, this will allow us to automatically track new markets as you add them to your DEX.
-
-### Rust SDK
-- [Your SDK should implement the following interface](#).
-- We are soon migrating to a Rust SDK and so are asking all integrated DEXes to create a Rust SDK version or give access to the code for us to include.
-
-## AMM Interface
+### AMM Interface
 
 To facilitate integration of your DEX into the Jupiter Core Engine:
 - Provide a DEX SDK that works with the [Jupiter AMM Interface](https://docs.rs/crate/jupiter-amm-interface).

@@ -12,7 +12,9 @@ title: "Execute Order"
 :::note
 Base URL: `https://lite-api.jup.ag/ultra/v1/execute`
 
-For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+For higher rate limits, please reach out to us in [Discord](https://discord.gg/jup).
+
+Portal API keys currently do not apply for Ultra API.
 :::
 
 :::tip API Reference
@@ -33,7 +35,7 @@ const transactionBase64 = orderResponse.transaction
 const transaction = VersionedTransaction.deserialize(Buffer.from(transactionBase64, 'base64'));
 
 // Sign the transaction
-transaction.sign([wallet.payer]);
+transaction.sign([wallet]);
 
 // Serialize the transaction to base64 format
 const signedTransaction = Buffer.from(transaction.serialize()).toString('base64');

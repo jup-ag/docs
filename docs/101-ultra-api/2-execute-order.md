@@ -25,6 +25,48 @@ To fully utilize the Ultra API, check out the [Ultra API Reference](/docs/api/ul
 
 Using the Solana `web3.js` **v1** library, you can sign the transaction as follows:
 
+<details>
+<summary>Set up imports and wallet for signing</summary>
+
+```bash
+npm install @solana/web3.js@1 # Using v1 of web3.js instead of v2
+npm install bs58
+npm install dotenv # if required for wallet setup
+```
+
+:::note
+- You can paste in your private key for testing purposes but this is not recommended for production applications.
+- If you want to store your private key in the project directly, you can do it via a `.env` file.
+:::
+
+To set up a development wallet via `.env` file, you can use the following script.
+
+```jsx
+// index.js
+import { Keypair } from '@solana/web3.js';
+import dotenv from 'dotenv';
+require('dotenv').config();
+
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ''));
+```
+
+```bash
+# .env
+PRIVATE_KEY=""
+```
+
+To set up a development wallet via a wallet generated via [Solana CLI](https://solana.com/docs/intro/installation#solana-cli-basics), you can use the following script.
+
+```jsx
+import { Keypair } from '@solana/web3.js';
+import fs from 'fs';
+
+const privateKeyArray = JSON.parse(fs.readFileSync('/Path/To/.config/solana/id.json', 'utf8').trim());
+const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
+```
+
+</details>
+
 ```jsx
 // ... GET /order's response
 

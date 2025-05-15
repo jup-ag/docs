@@ -231,6 +231,17 @@ paths:
             minimum: 50
             maximum: 255
           required: false
+        - in: query
+          name: excludeRouters
+          schema:
+            type: string
+            enum:
+              - metis
+              - jupiterz
+              - hashflow
+              - dflow
+              - pyth
+          required: false
   /execute:
     post:
       summary: execute

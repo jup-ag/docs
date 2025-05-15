@@ -13,7 +13,7 @@ displayed_sidebar: docs
 In this section, you can find the list of responses that can be returned by the Jupiter API.
 
 :::info Program Errors
-For more information on error codes from programs, see the [Swap API - Program Errors](/docs/swap-api/program-errors).
+For more information on error codes from programs, see the [Swap API - Common Errors](/docs/swap-api/common-errors).
 :::
 
 | Common Codes | Description | Debug |

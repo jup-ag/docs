@@ -20,8 +20,8 @@ Jupiter Tool Kits are a collection of developer tools and SDKs that help you int
 
 ## Jupiter Tool Kits
 
-- [**Swap Terminal**](/docs/tool-kits/swap-terminal): A ready-to-use swap interface that can be embedded into any website.
-- [**Unified Wallet Kit**](/docs/tool-kits/unified-wallet-kit): A wallet interface that can be embedded into any website.
+- [**Swap Terminal**](/docs/tool-kits/terminal/): A ready-to-use swap interface that can be embedded into any website.
+- [**Unified Wallet Kit**](/docs/tool-kits/wallet-kit/): A wallet interface that can be embedded into any website.
 
 ## Community Contributions
 

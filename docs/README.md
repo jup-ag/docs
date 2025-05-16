@@ -32,8 +32,8 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 - [Recurring API](/docs/recurring-api/)
 - [Token API](/docs/token-api/)
 - [Price API](/docs/price-api/)
-- [Swap Terminal](/docs/tool-kits/swap-terminal)
-- [Unified Wallet Kit](/docs/tool-kits/unified-wallet-kit)
+- [Swap Terminal](/docs/tool-kits/terminal/)
+- [Unified Wallet Kit](/docs/tool-kits/wallet-kit/)
 
 
 **Reach out to us** on [Discord](https://discord.gg/jup) for developer support

@@ -26,7 +26,9 @@ To fully utilize the Ultra API, check out the [Ultra API Reference](/docs/api/ul
 Using the Solana `web3.js` **v1** library, you can sign the transaction as follows:
 
 <details>
-<summary>Set up imports and wallet for signing</summary>
+  <summary>
+    Set up imports and wallet for signing
+  </summary>
 
 ```bash
 npm install @solana/web3.js@1 # Using v1 of web3.js instead of v2

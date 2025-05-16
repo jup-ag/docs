@@ -137,6 +137,26 @@ const sidebars = {
           type: 'doc',
           id: 'ultra-api/get-balances',
         },
+        {
+          type: 'doc',
+          id: 'ultra-api/get-shield',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Ultra API Guides',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'ultra-api/add-fees-to-ultra',
+        },
       ],
     },
     {
@@ -214,7 +234,7 @@ const sidebars = {
       items: [
         {
           type: 'doc',
-          id: 'swap-api/program-errors',
+          id: 'swap-api/common-errors',
         },
         {
           type: 'doc',
@@ -390,6 +410,32 @@ const sidebars = {
         {
           type: 'doc',
           id: 'perp-api/custody-account',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
+  token: [
+    {
+      type: 'doc',
+      id: 'token-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Expanding the Token API',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'token-api/token-tag-standard',
         },
       ],
     },

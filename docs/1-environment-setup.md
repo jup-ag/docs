@@ -18,11 +18,8 @@ In the documentation, we are using the Solana `web3.js` library to set up connec
 **JavaScript Libraries**
 
 - `@solana/web3.js`
-- `@coral-xyz/anchor`
 - `@solana/spl-token`
 - `@jup-ag/referral-sdk`
-- `bs58`
-- `cross-fetch`
 
 ## Useful Scripts
 
@@ -48,11 +45,10 @@ To set up a development wallet via `.env` file, you can use the following script
 ```jsx
 // index.js
 import { Keypair } from '@solana/web3.js';
-import { Wallet } from '@coral-xyz/anchor';
 import dotenv from 'dotenv';
 require('dotenv').config();
 
-const wallet = new Wallet(Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || '')));
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || '')));
 ```
 
 ```
@@ -64,9 +60,8 @@ To set up a development wallet via a wallet generated via [Solana CLI](https://s
 
 ```jsx
 import { Keypair } from '@solana/web3.js';
-import { Wallet } from '@coral-xyz/anchor';
 import fs from 'fs';
 
-const privateKeyArray = JSON.parse(fs.readFileSync('../.config/solana/id.json', 'utf8').trim());
-const wallet = new Wallet(Keypair.fromSecretKey(new Uint8Array(privateKeyArray)));
+const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
 ```

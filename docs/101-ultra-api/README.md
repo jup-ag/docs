@@ -20,6 +20,7 @@ The Jupiter Ultra API is the *only* API you ever need to experience or build the
 | **MEV-protected** | The lowest incidence of MEV attacks across all existing applications, by far. |
 | **Shielded** | Enhanced security feature via Shield API to provide critical token information during token selection, to help provide an informed trading decision. |
 | **Real-Time Slippage Estimator** | Intelligently derives the best possible slippage to use at the time of execution, balancing between trade success and price protection. |
+| **Gasless Support** | Enables gasless transactions for users with certain tokens and trade sizes, you can identify this via the secondary signer in the transaction. |
 | **One-stop shop** | Retrieve the user's balances, get a quote, execute the trade, and get the results of the trade, all within Ultra API without touching a single RPC or any other external API. |
 | **World class support** | We handle the complexities of RPC connections, transaction landing, slippage protection and more. | |
 
@@ -52,11 +53,15 @@ If the above sounds like too much work, then Ultra API will be the better choice
 
 - [**Get Balances**](/docs/ultra-api/get-balances): Additionally, you can request for token balances of an account from `/ultra/v1/balances`.
 
+**Other Guides**
+- [**Add Fees To Ultra**](/docs/ultra-api/add-fees-to-ultra): Add custom integrator fees to your Ultra transaction, on top of Jupiter's fees.
+
 ## FAQ
 
-**What is the fee for using Ultra API?**
+**Can I add custom integrator fees to Ultra API?**
 
-Ultra API takes 0.1% (or 0.05% depending on the tokens) of the swap amount as a fee.
+- **Integrator without custom fees**: Do note that when your users swap using Ultra, we take 0.1% (or 0.05% depending on the tokens) of the swap amount as a fee.
+- **Integrator with custom fees**: If you are an integrator, you can add custom integrator fees via Ultra API and Jupiter will take 20% of the integrator fees. Please refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for more information.
 
 **What is the rate limit for Ultra API?**
 
@@ -67,7 +72,3 @@ Currently, there is no way to increase the rate limit for Ultra API.
 
 Portal API Keys are not supported for Ultra API.
 :::
-
-**Can integrators take fees using Ultra API?**
-
-Currently no, we are working on it.

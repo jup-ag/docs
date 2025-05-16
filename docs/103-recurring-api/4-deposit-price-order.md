@@ -42,7 +42,7 @@ const priceDepositResponse = await (
         },
         body: JSON.stringify({
             order: "EpTsCUnKComCd8FDNZn3kVrQBQo2uEn5rRzYk9ocqFPH",
-            user: wallet.publicKey.toBase58(),
+            user: wallet.publicKey,
             amount: 1000000
         }),
     })

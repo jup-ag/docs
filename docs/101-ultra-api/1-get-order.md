@@ -9,12 +9,12 @@ title: "Get Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-
-
 :::note
 Base URL: `https://lite-api.jup.ag/ultra/v1/order`
 
-For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+For higher rate limits, please reach out to us in [Discord](https://discord.gg/jup).
+
+Portal API keys currently do not apply for Ultra API.
 :::
 
 :::tip API Reference
@@ -30,11 +30,13 @@ To get a swap order, you need to pass in the required parameters such as:
 - `amount`: The amount of input token to swap
 - `taker`: The user's wallet address
   - Note: If the `taker` is not provided, there will still be an Order Response with no `transaction` field.
+- `referralAccount`: The referral account address - refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for the step by step process.
+- `referralFee`: The referral fee in basis points (bps)
 
 ```jsx
 const orderResponse = await (
     await fetch(
-        'https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&taker=3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc'
+        'https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&taker=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3'
     )
   ).json();
 
@@ -56,24 +58,23 @@ Now, you are able to get a swap order, next steps is to make a post request to t
 ```json
 {
   "swapType": "aggregator",
-  "environment": "production",
-  "requestId": "668e8b71-a5ab-424e-83d6-51c9239e8bb5",
+  "requestId": "f087e8d8-fca6-4af6-a4ff-2d962fa95489",
   "inAmount": "100000000",
-  "outAmount": "12698391",
-  "otherAmountThreshold": "12577697",
+  "outAmount": "12550645",
+  "otherAmountThreshold": "12425139",
   "swapMode": "ExactIn",
   "slippageBps": 100,
-  "priceImpactPct": "0.0000261921556639999999999997",
+  "priceImpactPct": "0",
   "routePlan": [
     {
       "swapInfo": {
-        "ammKey": "HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR",
-        "label": "Meteora DLMM",
+        "ammKey": "AHhiY6GAKfBkvseQDQbBC7qp3fTRNpyZccuEdYSdPFEf",
+        "label": "SolFi",
         "inputMint": "So11111111111111111111111111111111111111112",
         "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
         "inAmount": "100000000",
-        "outAmount": "12704744",
-        "feeAmount": "30003",
+        "outAmount": "12550645",
+        "feeAmount": "0",
         "feeMint": "So11111111111111111111111111111111111111112"
       },
       "percent": 100
@@ -81,26 +82,25 @@ Now, you are able to get a swap order, next steps is to make a post request to t
   ],
   "inputMint": "So11111111111111111111111111111111111111112",
   "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-  "feeBps": 5,
-  "taker": "3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc",
+  "feeBps": 0,
+  "taker": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
   "gasless": false,
-  "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAHDiVoTeB3jAGy1WcoJlYcZ1tvgdU0Aj6FlsjeUYBxRhGxHxf2IsqBZDc4TJCX0VVjBoDXZbW1kEsA6W7yfwIKt0c0yO+iiUVv7jZVSBDvh2kWWXekzYuRuKoLLfe0bYTKH0yv2bL0ozt8+tDaxIBCyDPmUdeiHiB+F3j79RbUrMBTZhX4Vq3GhdgfMEaJ2gWhCEHo53uZ5+KEQR/PV5YuzQbJfK6aXbCSNOqlVWxR07NAyRtSnrznUlEs5AUgIpB9pOGnzAThMjD7choVuWHDjdTxOb0dsRN3czgZ42ifRt1HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACMlyWPTiSJ8bs9ECkUjg2DC1oTmdr/EIQEjnvY2+n4Wawfg/25zlUN6V1VjNx5VGHM9DdKxojsE6mEACIKeNoGAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAAC0P/on9df2SnTAmx8pWHneSwmrNt/J3VFLMhqns4zl6AR51VvyMcBu7nTFbs5oFQf9sbLeo/SOUQKxzaJWvBOPBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKnPysPFxScORV16vbzghryUvk+VkoZUUM+RCAjwwCR3xwcKAAUCwFwVAAoACQPQyQAAAAAAAAcCAAQMAgAAAPD+FAYAAAAADAUEABUNBwmT8Xtk9ISudv0IBgACABMHDQEBDB4NAAQCDBMDCwwUERQPEAQCFRMOFAANDRIUBgEFDAkj5RfLl3rjrSoBAAAAJmQAAQDh9QUAAAAAF8PBAAAAAABLAAUNAwQAAAEJAXMwdFGIqEvFUBDTRIWStB1ygQ6vc5NqdjVNwLc0VV1HBM7S09cE1NHWcA==",
+  "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAICwrsAhWzTDt8lE+KOND7l5F1l+AGosYESC5zchQ4ZfpWT2oNgWTjN0T1WlxqLRVMemOUFGyMhmsSKBlEsNmgHvWaNCoAnvG0/Sp0KxhDwMgeIge1NzW+fIbfreNBVIJfRwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjJclj04kifG7PRApFI4NgwtaE5na/xCEBI572Nvp+FmsH4P9uc5VDeldVYzceVRhzPQ3SsaI7BOphAAiCnjaBgMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAAtD/6J/XX9kp0wJsfKVh53ksJqzbfyd1RSzIap7OM5ejG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQR51VvyMcBu7nTFbs5oFQf9sbLeo/SOUQKxzaJWvBOPBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKmKsHMLXQw2qLEyz0OzhbbleC1ZXTY4NGK6N8QWPXRWPwcGAAUCwFwVAAYACQMt3AYAAAAAAAMCAAIMAgAAAPD+FAYAAAAACQUCAA4KAwmT8Xtk9ISudvwEBgABAAgDCgEBCRMKAAIBCQgJBwkPAAwNCwIBChAFJOUXy5d6460qAQAAAD0AZAABAOH1BQAAAAD1gb8AAAAAADMAAAoDAgAAAQkByzeZPtf3ya4VjS880xYauu0yJzlCh6lntUFWKcU6tHoDDQsOAwcPEA==",
   "prioritizationType": "ComputeBudget",
-  "prioritizationFeeLamports": 72329,
-  "lastValidBlockHeight": 301856775,
+  "prioritizationFeeLamports": 629413,
   "dynamicSlippageReport": {
-    "slippageBps": 75,
+    "slippageBps": 51,
     "otherAmount": null,
     "simulatedIncurredSlippageBps": null,
     "amplificationRatio": null,
     "categoryName": "solana",
     "heuristicMaxSlippageBps": 100,
-    "rtseSlippageBps": 75,
-    "failedTxnEstSlippage": 55,
-    "priceMovementEstSlippage": 75,
-    "emaEstSlippage": 0
+    "rtseSlippageBps": 51,
+    "failedTxnEstSlippage": 0,
+    "emaEstSlippage": 51,
+    "useIncurredSlippageForQuoting": null
   },
-  "totalTime": 549
+  "totalTime": 701
 }
 ```
 

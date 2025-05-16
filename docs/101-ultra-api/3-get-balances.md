@@ -9,12 +9,12 @@ title: "Get Balances"
     <meta name="twitter:card" content="summary" />
 </head>
 
-
-
 :::note
 Base URL: `https://lite-api.jup.ag/ultra/v1/balances`
 
-For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+For higher rate limits, please reach out to us in [Discord](https://discord.gg/jup).
+
+Portal API keys currently do not apply for Ultra API.
 :::
 
 :::tip API Reference

@@ -24,6 +24,7 @@ export default function NavbarMobileSidebarPrimaryMenu(): JSX.Element {
                       'menu__link',
                       isNavItemActive(item) && 'menu__link--active'
                     )}
+                    target={item.to?.startsWith('http') ? '_blank' : undefined}
                   >
                     {item.label}
                   </a>
@@ -36,6 +37,7 @@ export default function NavbarMobileSidebarPrimaryMenu(): JSX.Element {
                             isDropdownItemActive(subItem.to) && 'menu__link--active'
                           )}
                           href={subItem.to}
+                          target={subItem.to?.startsWith('http') ? '_blank' : undefined}
                         >
                           {subItem.label}
                         </a>
@@ -54,6 +56,7 @@ export default function NavbarMobileSidebarPrimaryMenu(): JSX.Element {
                     isNavItemActive(item) && 'menu__link--active'
                   )}
                   href={item.to}
+                  target={item.to?.startsWith('http') ? '_blank' : undefined}
                 >
                   {item.label}
                 </a>

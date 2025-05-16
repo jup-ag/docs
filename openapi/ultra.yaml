@@ -231,6 +231,18 @@ paths:
             minimum: 50
             maximum: 255
           required: false
+        - in: query
+          name: excludeRouters
+          schema:
+            type: string
+            enum:
+              - metis
+              - jupiterz
+              - hashflow
+              - dflow
+              - pyth
+              - okx
+          required: false
   /execute:
     post:
       summary: execute
@@ -476,10 +488,12 @@ paths:
                     name:
                       type: string
                       enum:
-                        - Metis
+                        - Metis v1.6
                         - JupiterZ
                         - Hashflow
                         - DFlow
+                        - Pyth Express Relay
+                        - OKX DEX Router
                     icon:
                       type: string
                   required:

@@ -14,7 +14,12 @@ title: "FAQ"
 - For feature requests, please open an issue on the [GitHub repository](https://github.com/jup-ag/terminal/issues) and tag us on Discord.
 - For support, please join the [Discord server](https://discord.gg/jup) and get help in the developer channels.
 
-**2. Integrated Mode: Token Search Modal Collapses Terminal**
+**2. How do I add fees to Terminal?**
+
+- **Creating Referral Account and Token Accounts**: You can create via [scripts](/docs/ultra-api/add-fees-to-ultra) or [Referral Dashboard](https://referral.jup.ag).
+- **Adding to FormProps**: You can set the referral account and fee in the [`formProps` interface](/docs/tool-kits/terminal/customization#form-props-configuration) when you initialize the Terminal.
+
+**3. Integrated Mode: Token Search Modal Collapses Terminal**
 
 - Ensure you establish a fixed height for the terminal container under `containerStyles`
 

@@ -40,6 +40,11 @@ When integrating Terminal, there are a few integration methods to think about, a
 - **Wallet Standard Support**: For applications without existing wallet provider, Terminal will provide a wallet adapter and connection - powered by [Unified Wallet Kit](/docs/tool-kits/wallet-kit/).
 - **Passthrough Wallet**: For applications with existing wallet provider(s), set `enableWalletPassthrough=true` with context, and Terminal will allow the application to pass through the existing wallet provider's connection to Terminal.
 
+### Adding Fees to Terminal
+
+- **Referral Account**: You can create a referral account via [scripts](/docs/ultra-api/add-fees-to-ultra) or [Referral Dashboard](https://referral.jup.ag).
+- **Referral Fee**: You can set the referral fee and account in the `formProps` interface when you initialize the Terminal.
+
 ### Quick Start Guides
 
 In the next sections, we'll walk you through the steps to integrate Jupiter Terminal into different types of web applications from scratch.

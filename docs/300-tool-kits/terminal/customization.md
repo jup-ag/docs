@@ -34,12 +34,14 @@ export type DEFAULT_EXPLORER = 'Solana Explorer' | 'Solscan' | 'Solana Beach' | 
 
 export interface FormProps {
     swapMode?: SwapMode;
-    initialAmount?: string;
     fixedAmount?: boolean;
-    initialInputMint?: string;
     fixedInputMint?: boolean;
-    initialOutputMint?: string;
     fixedOutputMint?: boolean;
+    initialAmount?: string;
+    initialInputMint?: string;
+    initialOutputMint?: string;
+    referralAccount?: string;
+    referralFee?: number;
 }
 
 export interface IInit {
@@ -155,11 +157,15 @@ The `formProps` object allows you to customize the initial state and behavior of
   displayMode: "modal",
   formProps?: {
     initialAmount?: string, // Pre-fill the swap amount (e.g. "100")
-    fixedAmount?: boolean, // When true, users cannot change the swap amount
     initialInputMint?: string, // Pre-select the input token by its mint address
-    fixedInputMint?: boolean, // When true, users cannot change the input token
     initialOutputMint?: string, // Pre-select the output token by its mint address
+
+    fixedAmount?: boolean, // When true, users cannot change the swap amount
+    fixedInputMint?: boolean, // When true, users cannot change the input token
     fixedOutputMint?: boolean, // When true, users cannot change the output token
+
+    referralAccount?: string, // Set the referral account for the swap
+    referralFee?: number, // Set the referral fee for the swap
   }
 }
 ```

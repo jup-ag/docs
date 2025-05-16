@@ -4,7 +4,7 @@ description: "An overview of Jupiter Swap Terminal and its core features."
 title: "Introduction to Terminal"
 ---
 
-```insert hero or video here```
+![Jupiter Terminal Hero](/static/terminal/demo/terminal.png)
 
 Jupiter Terminal is an open-source, lightweight, plug-and-play version of Jupiter that allows you to seamlessly integrate end-to-end swap functionality into your application with minimal effort - with just a few lines of code, you can embed a fully functional swap interface directly into your website while providing the same powerful Ultra Mode swap experience found on https://jup.ag.
 

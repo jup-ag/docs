@@ -234,7 +234,7 @@ const sidebars = {
       items: [
         {
           type: 'doc',
-          id: 'swap-api/program-errors',
+          id: 'swap-api/common-errors',
         },
         {
           type: 'doc',

@@ -60,11 +60,12 @@ export type DEFAULT_EXPLORER = 'Solana Explorer' | 'Solscan' | 'Solana Beach' | 
 export interface FormProps {
     swapMode?: SwapMode;
     initialAmount?: string;
-    fixedAmount?: boolean;
     initialInputMint?: string;
-    fixedInputMint?: boolean;
     initialOutputMint?: string;
-    fixedOutputMint?: boolean;
+    fixedAmount?: boolean;
+    fixedMint?: string;
+    referralAccount?: string;
+    referralFee?: number;
 }
 
 export interface IInit {

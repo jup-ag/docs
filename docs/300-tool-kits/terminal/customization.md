@@ -155,6 +155,8 @@ The `formProps` object allows you to customize the initial state and behavior of
 {
   displayMode: "modal",
   formProps?: {
+    swapMode?: SwapMode, // Set the swap mode to "ExactIn", "ExactOut", or default to "ExactInOrOut"
+
     initialAmount?: string, // Pre-fill the swap amount (e.g. "100")
     initialInputMint?: string, // Pre-select the input token by its mint address
     initialOutputMint?: string, // Pre-select the output token by its mint address
@@ -184,16 +186,6 @@ Jupiter Terminal supports third-party wallet integration through the `enableWall
 }
 ```
 
-## Token List Management
-
-The Jupiter Token API is an open, collaborative and dynamic token list to make trading on Solana more transparent and safer for all. It is default to true to ensure that only validated tokens are shown.
-
-```typescript
-{
-  strictTokenList?: boolean,
-}
-```
-
 ## Event Handling
 
 Jupiter Terminal provides event handlers to track swap operations:
@@ -213,7 +205,7 @@ Jupiter Terminal provides event handlers to track swap operations:
 
 ## Examples
 
-### Fixed Token Pair Swap
+### Fixed SOL Swap
 
 ```typescript
 window.Jupiter.init({
@@ -221,9 +213,8 @@ window.Jupiter.init({
   integratedTargetId: "swap-container",
   formProps: {
     initialInputMint: "So11111111111111111111111111111111111111112", // SOL
-    fixedInputMint: true,
     initialOutputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
-    fixedOutputMint: true,
+    fixedMint: "So11111111111111111111111111111111111111112",
   },
 });
 ```
@@ -234,10 +225,11 @@ window.Jupiter.init({
 window.Jupiter.init({
   displayMode: "modal",
   formProps: {
+    swapMode: "ExactOut",
     initialAmount: "10",
     fixedAmount: true,
     initialOutputMint: "YOUR_TOKEN_MINT",
-    fixedOutputMint: true,
+    fixedMint: "YOUR_TOKEN_MINT",
   },
 });
 ```

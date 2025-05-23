@@ -132,7 +132,7 @@ Your dApp already has a `<WalletProvider />`.
 window.Jupiter.init({ enableWalletPassthrough: true });
 ```
 
-Then, syncronise wallet state between your dApp and Jupiter Terminal with `syncProps()`
+Then, synchronise wallet state between your dApp and Jupiter Terminal with `syncProps()`
 
 ```tsx
 import { useWallet } from '@solana/wallet-adapter-react'; // Or @jup-ag/wallet-adapter;

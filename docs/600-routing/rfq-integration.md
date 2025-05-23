@@ -72,7 +72,7 @@ Market Makers should return appropriate HTTP status codes along with error messa
 | `50x Server Errors` | The webhook is offline or unable to respond. If the status persist, the webhook will be temporarily suspended and will not receive requests. |
 
 :::note Timeouts
-A webhook must adhere to the [fullfillment and response time requirements](#fulfillment-requirements). When sending the quote request, the RFQ system includes the following headers:
+A webhook must adhere to the [fulfillment and response time requirements](#fulfillment-requirements). When sending the quote request, the RFQ system includes the following headers:
 
 | Header | Description |
 |--------|-------------|

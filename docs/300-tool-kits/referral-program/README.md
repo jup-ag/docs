@@ -1,6 +1,6 @@
 ---
 sidebar_label: "Introduction"
-description: An open source Solana referral program used by Jupiter Programs (or any other programs) to enable developers to earn fees from their users.
+description: An open source Solana referral program used by Jupiter Programs (or any other programs) to enable developers to earn fees.
 title: Introduction to Referral Program
 ---
 
@@ -9,7 +9,7 @@ title: Introduction to Referral Program
     <meta name="twitter:card" content="summary" />
 </head>
 
-The Referral Program is an open-source program used by Jupiter Programs (or any other programs) to enable developers to earn fees from their users.
+The Referral Program is an open-source program used by Jupiter Programs (or any other programs) to enable developers to earn fees.
 
 :::info Referral Program Source Code
 [Open Source Repository](https://github.com/TeamRaccoons/referral): To understand and make use of the referral program better.
@@ -17,7 +17,7 @@ The Referral Program is an open-source program used by Jupiter Programs (or any 
 
 ## Jupiter API Integrators
 
-The Jupiter Programs use the Referral Program to allow developers to earn fees from their users when integrating with Jupiter. Below are some resources to help you quickly get started. There are a different ways to setup such as via the Jupiter Referral Dashboard or using the provided scripts.
+The Jupiter Programs use the Referral Program to allow developers to earn fees when integrating with Jupiter. Below are some resources to help you quickly get started. There are a different ways to setup such as via the Jupiter Referral Dashboard or using the provided scripts.
 
 - [Jupiter Referral Dashboard](https://referral.jup.ag/): To view and manage your referral accounts used with Jupiter APIs.
 - [Add Fees to Ultra API](https://dev.jup.ag/docs/ultra-api/add-fees-to-ultra): To add fees to your Ultra API integration.

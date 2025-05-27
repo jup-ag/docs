@@ -10,9 +10,11 @@ title: "Add Fees To Swap"
 </head>
 
 :::info
-As of January 2025, you no longer need to use the Referral Program to set up a `referralAccount` and `referralTokenAccount` to collect fees from the swaps you provide to the end users.
+As of January 2025, when integrating the Swap API, you no longer need to use the Referral Program to set up a `referralAccount` and `referralTokenAccount` to collect fees from the swaps you provide to the end users.
 
 Simply, just pass in any valid token account as the `feeAccount` parameter in the Swap API.
+
+However, do note that **it is still applicable to the Trigger API**.
 :::
 
 :::note
@@ -37,7 +39,7 @@ By default, there are **zero** protocol fees on Jupiter Swap. Integrators have t
     <summary>
         <div>
             <div>
-                <b>Via Referral Program (No longer required for Swap API)</b>
+                <b>Via Referral Program (Required only for Trigger API)</b>
             </div>
         </div>
     </summary>

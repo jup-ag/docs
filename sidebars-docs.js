@@ -505,6 +505,22 @@ const sidebars = {
       type: 'html',
       value: '<div class="sidebar-line-break"></div>',
     },
+    {
+      type: 'category',
+      label: 'Jupiter Referral Program',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'tool-kits/referral-program/README',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
   ],
   ...apiSidebars,
 };

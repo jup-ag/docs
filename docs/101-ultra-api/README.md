@@ -15,7 +15,7 @@ The Jupiter Ultra API is the *only* API you ever need to experience or build the
 
 ### Juno Liquidity Engine
 
-Ultra utilizes the latest Juno Liquidity Engine which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines both Metis and Jupiter Z (RFQ), and third-party liquidity sources, for the best possible price. It also includes self-learning capabilities (to detect and sideline low-quality liquidity sources) which creates a competitive environment for all liquidity sources to continously optimize their performance and price.
+Ultra utilizes the latest [Juno Liquidity Engine](/docs/routing) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines both Metis and Jupiter Z (RFQ), and third-party liquidity sources, for the best possible price. It also includes self-learning capabilities (to detect and sideline low-quality liquidity sources) which creates a competitive environment for all liquidity sources to continously optimize their performance and price.
 
 ### Transaction Sending
 
@@ -24,15 +24,7 @@ Over the years of experiment and development, we have optimized and continues to
 :::info
 95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine.
 
-#### Transaction Landing Latency
-
-- The `/execute` has an average latency of
-    - Metis: Average P50 1 second.
-    - RFQ: Average P50 2 seconds.
-
-#### Transaction Success Rates
-
-- The `/execute` has a success rate of 95%.
+For more information on latencies, [refer to the Developer Experience section](#developer-experience).
 :::
 
 ### MEV Protection
@@ -42,32 +34,38 @@ According to both our internal monitoring system and external resources such as 
 ### Real Time Slippage Estimator
 
 Building on top of our previous versions of slippage estimation/optimization engines, we have developed a new Real Time Slippage Estimator (RTSE) - only available via Ultra API - that is able to intelligently estimate the best possible slippage to use at the time of execution, balancing between trade success and price protection. RTSE uses a variety of heuristics, algorithms and monitoring to ensure the best user experience: 
-- Heuristics: Token categories, historical and real-time slippage data, and more.
-- Algorithms: Exponential Moving Average (EMA) on slippage data, and more.
-- Monitoring: Real-time monitoring of failure rates to ensure reactiveness to increase slippage when necessary.
+- **Heuristics**: Token categories, historical and real-time slippage data, and more.
+- **Algorithms**: Exponential Moving Average (EMA) on slippage data, and more.
+- **Monitoring**: Real-time monitoring of failure rates to ensure reactiveness to increase slippage when necessary.
 
-### Gasless Support
+### Gasless
 
-Enables gasless transactions for users with certain tokens and trade sizes, you can identify this via the secondary signer in the transaction.
+Ultra provides different gasless mechanisms for different scenarios.
+- **Gasless via Jupiter Z (RFQ)**: All swaps routed via Jupiter Z are gasless, as the market maker is the fee payer for the transaction.
+- **Gasless via Gasless Support**: Depending on the tokens and trade sizes of your swap, Ultra will automatically determine if it can provide gasless support to your swap by helping you pay for the transaction fee of your swap - you can identify this via the secondary signer in the transaction.
+
+### Latency
+
+95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine.
+
+| Endpoint | Description | Latency |
+| --- | --- | --- |
+| `/order` | Aggregating across multiple liquidity sources and selecting the best price. | P50 100ms |
+| `/execute` | Broadcasting your transaction to the network on your behalf and polling for the status and result of the transaction. | Metis: P50 1s<br/><br/>Jupiter Z: P50 2s |
+| `/balances` | Retrieve the user's balances. | P50 100ms |
+| `/shield` | Enhanced security feature via Shield API to provide critical token information, to help provide an informed trading decision. | P50 115ms |
 
 ### Developer Experience
 
-Ultra API is a holistic solution for developers to build all types of applications, without having to worry about the complexities of the underlying infrastructure - such as RPC connections, transaction landing, slippage protection and more.
+Ultra API is a holistic solution for developers to build all types of applications, without having to worry about the complexities of the underlying infrastructure:
 
-:::info Ultra API Endpoints
-Ultra API is a RPC-less API, you do not need to provide a RPC endpoint to use Ultra API.
+- **RPC-less**: You do not need to provide a RPC endpoint to send transactions, get token information, or get user balances.
+- **Holistic Coverage**: Ultra API covers all the necessary features for you to build your application, including the abovementioned features and useful information such as user wallet balances, token information, and more.
+- **Integrator Fees**: Ultra API allows you to add custom integrator fees to your transactions, on top of Jupiter's fees. Refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for more information.
+- **Developer Support**: Get the [best developer support in our Discord](https://discord.gg/jup), the DevRel Working Group is here to help you with any issues you may face when using Ultra API.
+- **World Class Support**: Ultra is the best trading experience in crypto, it handles all the complexities such as slippage protection and transaction landing, and if you ever face any issues or need help when using Ultra, our support team is here to assist you 24/7. Read more about [Ultra customer support](/docs/misc/integrator-guidelines#customer-support).
 
-| Endpoint | Description |
-| --- | --- |
-| `/order` | Get a quote for a swap via Juno Liquidity Engine. |
-| `/execute` | Execute the trade with our proprietary transaction sending engine, with high success rates, low latency, and MEV-protected. |
-| `/balances` | Retrieve the user's balances. |
-| `/shield` | Enhanced security feature via Shield API to provide critical token information, to help provide an informed trading decision. |
-:::
-
-### World Class Support
-
-Ultra is the best trading experience in crypto, it handles all the complexities such as slippage protection and transaction landing, and if you ever face any issues or need help when using Ultra, our support team is here to assist you 24/7. Read more about [Ultra customer support](/docs/misc/integrator-guidelines#customer-support).
+---
 
 ## What About Swap API?
 

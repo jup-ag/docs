@@ -182,16 +182,21 @@ const swapTransaction = await (
 
 Apart from the static `slippageBps` parameter, Jupiter has iterated on different designs to estimate slippage better.
 
-You can pass in `dynamicSlippage=true` to Swap API where our backend will estimate a slippage value by simulating the swap transaction closer to execution and calculate an optimal value based on the token category, historical swap's slippage data and other heuristics.
+By using Dynamic Slippage, during swap transaction building, we will simulate the transaction and estimate a slippage value, which we then factor in the token categories heuristics to get the final slippage value.
 
-:::info
-The Dynamic Slippage implementation on the Swap API is different from the Real Time Slippage Estimator (RTSE) on the Ultra API.
+:::info Dynamic Slippage vs Real Time Slippage Estimator (RTSE)
+RTSE is very different from Dynamic Slippage and has provided a much better user experience and results. RTSE is able to intelligently estimate the best possible slippage to use at the time of execution, balancing between trade success and price protection. RTSE uses a variety of heuristics, algorithms and monitoring to ensure the best user experience: 
+- **Heuristics**: Token categories, historical and real-time slippage data, and more.
+- **Algorithms**: Exponential Moving Average (EMA) on slippage data, and more.
+- **Monitoring**: Real-time monitoring of failure rates to ensure reactiveness to increase slippage when necessary.
 
-To use RTSE, you will need to use the Ultra API.
+Refer to [Ultra API](/docs/ultra-api#real-time-slippage-estimator) for more information on RTSE.
 :::
 
 :::warning
 To use Dynamic Slippage, you will need to pass in `dynamicSlippage=true` to both the `/swap/v1/quote` and `/swap/v1/swap` endpoints.
+
+Do note that we have discontinued development on Dynamic Slippage.
 :::
 
 ```jsx

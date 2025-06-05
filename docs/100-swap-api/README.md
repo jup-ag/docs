@@ -39,7 +39,7 @@ If you have a highly custom need like what is described above, then Swap API may
 
 - **Upkeep of RPCs**: To retrieve wallet balances, broadcast and retrieve transactions, etc.
 - **Deciding transaction fee**: Including, but not limited to, priority fee, Jito fee, etc.
-- **Deciding slippage**: The optimal slippage to use to balance between trade success and price protection.
+- **Deciding slippage**: The optimal slippage to use to balance between trade success and price protection, do note that [RTSE is only available via Ultra API](/docs/ultra-api#real-time-slippage-estimator).
 - **Broadcasting the transaction**: Ultra uses a proprietary transaction sending engine which dramatically improves landing rate and speed.
 - **Parsing the swap results**: Polling and parsing the resulting transaction from the RPC, including handling for success and error cases.
 

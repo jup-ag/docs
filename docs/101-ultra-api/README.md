@@ -33,10 +33,17 @@ According to both our internal monitoring system and external resources such as 
 
 ### Real Time Slippage Estimator
 
-Building on top of our previous versions of slippage estimation/optimization engines, we have developed a new Real Time Slippage Estimator (RTSE) - only available via Ultra API - that is able to intelligently estimate the best possible slippage to use at the time of execution, balancing between trade success and price protection. RTSE uses a variety of heuristics, algorithms and monitoring to ensure the best user experience: 
+Building on top of our previous versions of slippage estimation/optimization engines, we have developed a new Real Time Slippage Estimator (RTSE), that is able to intelligently estimate the best possible slippage to use at the time of execution, balancing between trade success and price protection. RTSE uses a variety of heuristics, algorithms and monitoring to ensure the best user experience: 
 - **Heuristics**: Token categories, historical and real-time slippage data, and more.
 - **Algorithms**: Exponential Moving Average (EMA) on slippage data, and more.
 - **Monitoring**: Real-time monitoring of failure rates to ensure reactiveness to increase slippage when necessary.
+
+:::info RTSE vs Dynamic Slippage
+| API | Ultra API | Swap API |
+| --- | --- | --- |
+| Types | Real Time Slippage Estimator (RTSE) | Dynamic Slippage |
+| Description | Comprehensive data, heuristics and algorithms, and real-time reactiveness to increase slippage when necessary. | Only uses transaction simulations, though shares token categories heuristics. (Do note that we have discontinued development on Dynamic Slippage.) |
+:::
 
 ### Gasless
 

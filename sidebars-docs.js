@@ -217,7 +217,7 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'tool-kits/swap-terminal',
+          id: 'tool-kits/terminal/README',
           label: 'Integrate Swap Terminal',
         },
       ],

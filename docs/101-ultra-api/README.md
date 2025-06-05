@@ -13,6 +13,17 @@ The Jupiter Ultra API is the *only* API you ever need to experience or build the
 
 ## Features
 
+Ultra API is a holistic solution for developers to build all types of applications, without having to worry about the complexities of the underlying infrastructure:
+
+| Feature | Description |
+| --- | --- |
+| **Best Trading Experience** | Ultra is the best trading experience in crypto, it handles all the complexities and headaches such as slippage protection, transaction landing and more. |
+| **RPC-less** | You do not need to provide a RPC endpoint to send transactions, get token information, or get user balances - we handle everything for you. |
+| **Holistic Coverage** | Ultra API covers all the necessary features for you to build your application, including the features mentioned below and useful information such as user wallet balances, token information, and more. |
+| **Integrator Fees** | Ultra API allows you to add custom integrator fees to your transactions, on top of Jupiter's fees. Refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for more information. |
+| **Developer Support** | Get the [best developer support in our Discord](https://discord.gg/jup), the DevRel Working Group is here to help you with any issues you may face when using Ultra API. |
+| **World Class Support** | Ultra is the best trading experience in crypto, it handles all the complexities such as slippage protection and transaction landing, and if you ever face any issues or need help when using Ultra, our support team is here to assist you 24/7. Read more about [Ultra customer support](/docs/misc/integrator-guidelines#customer-support). |
+
 ### Juno Liquidity Engine
 
 Ultra utilizes the latest [Juno Liquidity Engine](/docs/routing) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines both Metis and Jupiter Z (RFQ), and third-party liquidity sources, for the best possible price. It also includes self-learning capabilities (to detect and sideline low-quality liquidity sources) which creates a competitive environment for all liquidity sources to continously optimize their performance and price.
@@ -61,16 +72,6 @@ Ultra provides different gasless mechanisms for different scenarios.
 | `/execute` | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Metis: 1.5s<br/>JupiterZ: 5s |
 | `/balances` | Retrieving the user's balances. | 200ms |
 | `/shield` | Enhanced token security feature to provide critical token information. | 400ms |
-
-### Developer Experience
-
-Ultra API is a holistic solution for developers to build all types of applications, without having to worry about the complexities of the underlying infrastructure:
-
-- **RPC-less**: You do not need to provide a RPC endpoint to send transactions, get token information, or get user balances.
-- **Holistic Coverage**: Ultra API covers all the necessary features for you to build your application, including the abovementioned features and useful information such as user wallet balances, token information, and more.
-- **Integrator Fees**: Ultra API allows you to add custom integrator fees to your transactions, on top of Jupiter's fees. Refer to the [Add Fees To Ultra](/docs/ultra-api/add-fees-to-ultra) guide for more information.
-- **Developer Support**: Get the [best developer support in our Discord](https://discord.gg/jup), the DevRel Working Group is here to help you with any issues you may face when using Ultra API.
-- **World Class Support**: Ultra is the best trading experience in crypto, it handles all the complexities such as slippage protection and transaction landing, and if you ever face any issues or need help when using Ultra, our support team is here to assist you 24/7. Read more about [Ultra customer support](/docs/misc/integrator-guidelines#customer-support).
 
 ---
 

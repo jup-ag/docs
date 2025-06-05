@@ -1,11 +1,11 @@
 ---
 sidebar_label: "Introduction"
 description: An open source Solana referral program used by Jupiter Programs (or any other programs) to enable developers to earn fees.
-title: Introduction to Referral Program
+title: Referral Program
 ---
 
 <head>
-    <title>Introduction to Referral Program</title>
+    <title>Referral Program</title>
     <meta name="twitter:card" content="summary" />
 </head>
 

@@ -23,7 +23,7 @@ To fully utilize the Ultra API, check out the [Ultra API Reference](/docs/api/ul
 
 ## Get Shield
 
-The Ultra API supports a simple endpoint to get the token information and warnings of mints, you just need to pass in the required parameter of the mints.
+The Ultra API provides an endpoint to retrieve token information and associated warnings for the specified mint addresses. To use this endpoint, provide one or more mint addresses for the required query parameter named mints.
 
 This is useful when integrating with Jupiter Ultra or any other APIs, allowing you or your user to be informed of any potential malicious mints before conducting your transaction.
 

@@ -48,12 +48,12 @@ Ultra provides different gasless mechanisms for different scenarios.
 
 95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine.
 
-| Endpoint | Description | Latency |
+| Endpoint | Description | Latency (P90 Average) |
 | --- | --- | --- |
-| `/order` | Aggregating across multiple liquidity sources and selecting the best price. | P50 100ms |
-| `/execute` | Broadcasting your transaction to the network on your behalf and polling for the status and result of the transaction. | Metis: P50 1s<br/><br/>Jupiter Z: P50 2s |
-| `/balances` | Retrieve the user's balances. | P50 100ms |
-| `/shield` | Enhanced security feature via Shield API to provide critical token information, to help provide an informed trading decision. | P50 115ms |
+| `/order` | Aggregating across multiple liquidity sources and selecting the best price. | 500ms |
+| `/execute` | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Metis: 1.5s<br/>JupiterZ: 5s |
+| `/balances` | Retrieving the user's balances. | 200ms |
+| `/shield` | Enhanced token security feature to provide critical token information. | 400ms |
 
 ### Developer Experience
 

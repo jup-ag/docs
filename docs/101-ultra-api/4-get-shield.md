@@ -35,7 +35,11 @@ const shieldResponse = await (
 
 ## Shield Response
 
-The shield response will return a list of token information and warnings of mints.
+The shield response will return a list of token information and warnings of the mints passed in.
+
+Do note that this is subject to changes, and we will be adding more warnings and improving the accuracy of the warnings over time.
+
+For the full list of potential warnings, refer to the [Shield API Reference](/docs/api/ultra-api/shield).
 
 **Successful example response:**
 

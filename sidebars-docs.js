@@ -213,7 +213,7 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'swap-api/requote-and-adjust',
+          id: 'swap-api/requote-with-lower-max-accounts',
         },
         {
           type: 'doc',

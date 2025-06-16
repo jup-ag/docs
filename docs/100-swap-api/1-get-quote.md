@@ -137,12 +137,15 @@ Please be aware that using `onlyDirectRoutes` can often yield unfavorable trades
 
 In some cases, you may want to add more accounts to the transaction for specific use cases, but it might exceed the transaction size limit. You can use the `maxAccounts` parameter to limit the number of accounts in the transaction.
 
+:::tip
+- Refer to the [Requote with Lower Max Accounts](/docs/swap-api/requote-with-lower-max-accounts) guide for more information on how to requote and adjust the swap when using `maxAccounts`.
+:::
+
 :::note
 - `maxAccounts` is only an estimation and the actual number of accounts may vary.
 - We recommend setting `maxAccounts` to 64
 - Keep `maxAccounts` as large as possible, only reduce `maxAccounts` if you exceed the transaction size limit.
 - If `maxAccounts` is set too low, example to 30, the computed routes may drop DEXes/AMMs like Meteora DLMM that require more than 30 accounts.
-- Refer to the [Requote and Adjust](/docs/swap-api/requote-and-adjust) guide for more information on how to requote and adjust the swap.
 
 <br/>
 **Jupiter has 2 types of routing instructions** and if you plan to limit `maxAccounts`, you will need to account for if the market is routable with [ALTs](https://docs.solana.com/developing/lookup-tables) or not:

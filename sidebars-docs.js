@@ -429,6 +429,22 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Versions',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'token-api/v2',
+        },
+        {
+          type: 'doc',
+          id: 'token-api/v1',
+        },
+      ],
+    },
+    {
+      type: 'category',
       label: 'Expanding the Token API',
       collapsible: false,
       collapsed: false,

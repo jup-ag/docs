@@ -1,0 +1,189 @@
+openapi: 3.0.3
+info:
+  title: Quickstart
+  version: 2.0.0
+  description: |
+    | Link |
+    | --- |
+    | [V2](/docs/token-api/v2) |
+
+servers:
+  - url: https://lite-api.jup.ag/tokens/v2
+    description: Free tier API endpoint with rate limits
+  - url: https://api.jup.ag/tokens/v2
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+
+paths:
+  /:
+    get:
+      summary: query by mints or tag
+      description: |
+        Returns token information based on query parameters.
+        
+        :::note
+        - Refer to [Token API doc](/docs/token-api/v2) for more information.
+        :::
+      parameters:
+      - name: mints
+        in: query
+        description: The token's mint address
+        required: false
+        schema:
+          type: string
+        example: So11111111111111111111111111111111111111112
+      - name: tag
+        in: query
+        description: A specified tag
+        required: false
+        schema:
+          type: string
+          enum:
+            - lst
+            - verified
+      responses:
+        '200':
+          description: Returns metadata about tokens
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MintInformation"
+
+components:
+  schemas:
+    MintInformation:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The token's mint address
+        name:
+          type: string
+        symbol:
+          type: string
+        icon:
+          type: string
+          nullable: true
+        decimals:
+          type: number
+        twitter:
+          type: string
+          nullable: true
+        telegram:
+          type: string
+          nullable: true
+        website:
+          type: string
+          nullable: true
+        dev:
+          type: string
+          nullable: true
+          description: The token's developer address
+        circSupply:
+          type: number
+          nullable: true
+        totalSupply:
+          type: number
+          nullable: true
+        tokenProgram:
+          type: string
+          description: The token program address
+        launchpad:
+          type: string
+          nullable: true
+        partnerConfig:
+          type: string
+          nullable: true
+        graduatedPool:
+          type: string
+          nullable: true
+        graduatedAt:
+          type: string
+          nullable: true
+        holderCount:
+          type: number
+          nullable: true
+        fdv:
+          type: number
+          nullable: true
+        mcap:
+          type: number
+          nullable: true
+        usdPrice:
+          type: number
+          nullable: true
+        priceBlockId:
+          type: number
+          nullable: true
+        liquidity:
+          type: number
+          nullable: true
+        stats5m:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+        stats1h:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+        stats6h:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+        stats24h:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+        audit:
+          type: object
+          nullable: true
+          properties:
+            isSus:
+              type: boolean
+              nullable: true
+            mintAuthorityDisabled:
+              type: boolean
+              nullable: true
+            freezeAuthorityDisabled:
+              type: boolean
+              nullable: true
+            topHoldersPercentage:
+              type: number
+              nullable: true
+            devBalancePercentage:
+              type: number
+              nullable: true
+            devMigrations:
+              type: number
+              nullable: true
+        organicScore:
+          type: number
+        organicScoreLabel:
+          type: string
+          enum: [high, medium, low]
+        ctLikes:
+          type: number
+          nullable: true
+        smartCtLikes:
+          type: number
+          nullable: true
+        isVerified:
+          type: boolean
+          nullable: true
+        cexes:
+          type: array
+          items:
+            type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+    SwapStats:
+      type: object
+      properties:
+        volume:
+          type: number
+        priceChange:
+          type: number
+        trades:
+          type: number

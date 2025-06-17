@@ -148,28 +148,54 @@ const sidebars = {
           },
           items: [
             {
-              type: 'doc',
-              id: 'api/token-api/token-information',
+              type: "category",
+              label: "V2",
+              link: {
+                type: "generated-index",
+                title: "V2",
+                slug: "/api/token-api/v2",
+              },
+              items: [
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v2/query-by-mints-or-tag',
+                },
+              ],
             },
             {
-              type: 'doc',
-              id: 'api/token-api/mints-in-market',
-            },
-            {
-              type: 'doc',
-              id: 'api/token-api/tradable',
-            },
-            {
-              type: 'doc',
-              id: 'api/token-api/tagged',
-            },
-            {
-              type: 'doc',
-              id: 'api/token-api/new',
-            },
-            {
-              type: 'doc',
-              id: 'api/token-api/all',
+              type: "category",
+              label: "V1 (Deprecated)",
+              link: {
+                type: "generated-index",
+                title: "V1",
+                slug: "/api/token-api/v1",
+              },
+              items: [
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/token-information',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/mints-in-market',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/tradable',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/tagged',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/new',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/all',
+                },
+              ],
             },
           ],
         },

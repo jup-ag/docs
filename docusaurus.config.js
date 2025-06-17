@@ -152,7 +152,7 @@ const config = {
             outputDir: "docs/api/recurring-api",
           },
           token: {
-            specPath: "openapi/token.yaml",
+            specPath: "openapi/token.v1.yaml",
             outputDir: "docs/api/token-api/v1",
           },
           token_v2: {

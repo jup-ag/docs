@@ -1,0 +1,76 @@
+---
+id: price
+title: "price"
+description: "Returns prices of specified tokens."
+sidebar_label: "price"
+hide_title: true
+hide_table_of_contents: true
+api: eJyNVNtO4zAQ/RXLTyD1RgFplTeWm9Be1KVoV1rKgxtPmmkT2/XYQGn59x0nQqK0K5GHxs5czpmZM11LDZR7dAGtkZm8hRC9IeE85kDCFoIc5FggaBHsAgz1JmZisiwzNsDEdMUtFODZJu5HKUacjW6EtvnDQZ9/qd8k6iqHh6KwXtTWg0DDx1olyF6Ta2JkRzrlVQ0BPMnsfi0NX5gQamIbJm7LCH7Fl23G57aulSBI4QESEaeIGEPUsQroKuAQD8uIHrTMgo/QkZSXUCuZrWVYuQRDwaOZydeOhGdVp6BMju3RJ59h53I0v/qj9elZLJbj8RJ+DJc/j55fVlPlzr9cnzxdXl8v/j6t7i7C0aN8fUiMyFlDQInEcDBIr+3CxjHnEVARK/HmzJXk1gQwIbkr5yrMmzb255Ri1ruF2ekc8sCBSmtMrqoaeevAB2yxt0Hv0owF+zIkkxOKxAJWaQQf87mtLNPK5osb/Q4YmecMfGqpZgXVqqL91ki6Uc47q4n1lI0d2eqEvxSV5fdr+3Tkyb6GfVVapEEDhZT3dJ/PDeN67gELxj+ybsF7yyzYnaVXWi5AzqApT4WSL3xqPVtRRl/xxzIER1m/X2FopN2bR9dTs1br/cfjHY1eeWBlIuOl7QCjneUGiCcMpWhUW2GNgZj1R4jPZB8p1P/LXuKsZMM7kLQhUxCReKMbF2WauG+waoSZlrMZBYZmC35FzBcUlE9dSY1oQY97g95gh8pGfEezEJuJ2Yhut9se7n8f7/wbcB2Hb9ahOLgA54GlDPpwj+uwceUp/QMpvpWw
+sidebar_class_name: "get api-method"
+info_path: docs/api/price-api/v3/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"price"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={""}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Returns prices of specified tokens.
+
+:::note
+- Refer to [Price API doc](/docs/price-api) for more information.
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"ids","in":"query","description":"Comma separate to pass in multiple","required":true,"schema":{"type":"string"},"example":"So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","additionalProperties":{"description":"Token addresses as keys","type":"object","properties":{"blockId":{"type":"integer"},"decimals":{"type":"integer"},"usdPrice":{"type":"number","format":"float"}}}}}}},"400":{"description":"Bad request"},"500":{"description":"Internal server error"}}}
+>
+  
+</StatusCodes>
+
+
+      

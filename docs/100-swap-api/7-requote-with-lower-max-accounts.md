@@ -231,7 +231,7 @@ while (transactionTooLarge && counter < MAX_ACCOUNTS) {
         
     } catch (error) {
         console.error('Error in attempt:', error);
-        counter++;
+        counter += 2; // Incrementing by 1 account each time will be time consuming, you can use a higher counter
         transactionTooLarge = true;
     }
 }

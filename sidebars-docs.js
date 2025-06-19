@@ -79,6 +79,86 @@ const sidebars = {
         },
       ],
     },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'JupiterZ (RFQ) Toolkit',
+      collapsible: true,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'routing/JupiterZ/intro',
+        },
+        {
+          type: 'category',
+          label: 'API Reference',
+          collapsible: true,
+          collapsed: false,
+          items: [
+            {
+              type: 'doc',
+              id: 'routing/JupiterZ/api/overview',
+            },
+            {
+              type: 'doc',
+              id: 'routing/JupiterZ/api/tokens',
+            },
+            {
+              type: 'doc',
+              id: 'routing/JupiterZ/api/quote',
+            },
+            {
+              type: 'doc',
+              id: 'routing/JupiterZ/api/swap',
+            },
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Integration Guide',
+          collapsible: true,
+          collapsed: false,
+          items: [
+            {
+              type: 'doc',
+              id: 'routing/JupiterZ/integration/overview',
+            },
+            {
+              type: 'doc',
+              id: 'routing/JupiterZ/integration/webhook-implementation',
+            },
+            {
+              type: 'doc',
+              id: 'routing/JupiterZ/integration/deployment',
+            },
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Testing & Troubleshooting',
+          collapsible: true,
+          collapsed: false,
+          items: [
+            {
+              type: 'doc',
+              id: 'routing/JupiterZ/testing/overview',
+            },
+            {
+              type: 'doc',
+              id: 'routing/JupiterZ/testing/troubleshooting',
+            },
+          ],
+        },
+        {
+          type: 'doc',
+          id: 'routing/JupiterZ/faq',
+        },
+      ],
+    },
   ],
   misc: [
     {

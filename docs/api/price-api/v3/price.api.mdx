@@ -5,7 +5,7 @@ description: "Returns prices of specified tokens."
 sidebar_label: "price"
 hide_title: true
 hide_table_of_contents: true
-api: eJyNVNtO4zAQ/RXLTyD1RgFplTeWm9Be1KVoV1rKgxtPmmkT2/XYQGn59x0nQqK0K5GHxs5czpmZM11LDZR7dAGtkZm8hRC9IeE85kDCFoIc5FggaBHsAgz1JmZisiwzNsDEdMUtFODZJu5HKUacjW6EtvnDQZ9/qd8k6iqHh6KwXtTWg0DDx1olyF6Ta2JkRzrlVQ0BPMnsfi0NX5gQamIbJm7LCH7Fl23G57aulSBI4QESEaeIGEPUsQroKuAQD8uIHrTMgo/QkZSXUCuZrWVYuQRDwaOZydeOhGdVp6BMju3RJ59h53I0v/qj9elZLJbj8RJ+DJc/j55fVlPlzr9cnzxdXl8v/j6t7i7C0aN8fUiMyFlDQInEcDBIr+3CxjHnEVARK/HmzJXk1gQwIbkr5yrMmzb255Ri1ruF2ekc8sCBSmtMrqoaeevAB2yxt0Hv0owF+zIkkxOKxAJWaQQf87mtLNPK5osb/Q4YmecMfGqpZgXVqqL91ki6Uc47q4n1lI0d2eqEvxSV5fdr+3Tkyb6GfVVapEEDhZT3dJ/PDeN67gELxj+ybsF7yyzYnaVXWi5AzqApT4WSL3xqPVtRRl/xxzIER1m/X2FopN2bR9dTs1br/cfjHY1eeWBlIuOl7QCjneUGiCcMpWhUW2GNgZj1R4jPZB8p1P/LXuKsZMM7kLQhUxCReKMbF2WauG+waoSZlrMZBYZmC35FzBcUlE9dSY1oQY97g95gh8pGfEezEJuJ2Yhut9se7n8f7/wbcB2Hb9ahOLgA54GlDPpwj+uwceUp/QMpvpWw
+api: eJyNVNtOGzEQ/RXLT0XKjQBStW+Um1AvSglqpRIenPUkO8mu7XhsIA38e8deIRGSSuxD4s2cmXNmfCYbqYFKjy6gNbKQNxCiNyScxxJI2JkgByXOELQIdgmGehMzMUVRGBtgYrriBmbgOSbuRilHnI6uhbbl/ac+f1I/F+oqhwdiZr1orAeBho+NSpS9XGtiZEc65VUDATzJ4m4jDb+wINTEMUzaVhH8ml+2FZ/ZplGCIKUHSEKcImIO0cQ6oKuBUzysInrQsgg+QkdSWUGjZLGRYe0SDQWPZi5fOhKeVJOSCjm2hx98hp2L0eLyt9Ynp3G2Go9X8H24+nH49Hc9Ve7s89Xx48XV1fLP4/r2PBw+yJf7pIicNQSURAwHg/S13dg4lnwFNIu1eAVzJ6U1AUxIcOVcjWUeY39BKWez25idLqAMnKi0xgRV9chbBz5gy71NepvuWDCWKVmcUCSWsE5X8L6e26oyrW25vNZviJF1zsGnkWp2UKNq2h+NpLNz3kRNbKZtMNvnrFJmDsPjag+kfTryeN8Ivygt0tUDhVTsZB/mmpV4ngpbyD+wk8F7m+p2JJuxstySnENuWAUWIPnUIlubRl/zj1UIjop+v8aQzd5bRNdT89b9/YejHddeemCvIvOlfQGjneWRiEcMlcg+rrHBQKz6PcVHqo8U6v9Vr3BeceANSdqZKYhIvOMZokzO+wrrbNW0rnnyGPJe/IxYLikon6aSBtGSHvUGvcGOlGfxDc1SPE/Ms+h2u+3h7tfRzv8D93HwGh2KT+fgPLC5QR/sgQ4zlG/pH1qim/k=
 sidebar_class_name: "get api-method"
 info_path: docs/api/price-api/v3/quickstart
 custom_edit_url: null
@@ -67,7 +67,7 @@ Returns prices of specified tokens.
 <StatusCodes
   id={undefined}
   label={undefined}
-  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","additionalProperties":{"description":"Token addresses as keys","type":"object","properties":{"blockId":{"type":"integer"},"decimals":{"type":"integer"},"usdPrice":{"type":"number","format":"float"}}}}}}},"400":{"description":"Bad request"},"500":{"description":"Internal server error"}}}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","additionalProperties":{"description":"Token addresses as keys","type":"object","properties":{"blockId":{"type":"integer"},"decimals":{"type":"integer"},"usdPrice":{"type":"number"},"priceChange24h":{"type":"number"}}}}}}},"400":{"description":"Bad request"},"500":{"description":"Internal server error"}}}
 >
   
 </StatusCodes>

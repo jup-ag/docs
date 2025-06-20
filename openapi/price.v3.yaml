@@ -49,7 +49,8 @@ paths:
                       type: integer
                     usdPrice:
                       type: number
-                      format: float
+                    priceChange24h:
+                      type: number
         '400':
           description: Bad request
         '500':

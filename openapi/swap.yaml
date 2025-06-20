@@ -254,9 +254,14 @@ components:
       type: object
       required:
         - userPublicKey
+        - payer
         - quoteResponse
       properties:
         userPublicKey:
+          type: string
+        payer:
+          description: |
+            - Allow a custom payer to pay for the transaction
           type: string
         wrapAndUnwrapSol:
           description: |

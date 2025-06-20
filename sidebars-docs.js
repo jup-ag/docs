@@ -141,6 +141,10 @@ const sidebars = {
           type: 'doc',
           id: 'ultra-api/get-shield',
         },
+        {
+          type: 'doc',
+          id: 'ultra-api/search-token',
+        },
       ],
     },
     {

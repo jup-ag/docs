@@ -1,0 +1,76 @@
+---
+id: search
+title: "search"
+description: "Request a search by token's symbol, name or mint address"
+sidebar_label: "search"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVV0tTIzcQ/iuquQSqMIat3Rx8A7LZUGETB+/mYjjImrZHWCNp9TA4xv893TMGj22ZDEkq2b3AWOrHp373IsvBCydtkEZnvewavkTwgXHmgTtRsNGcBTMF/Z1nfl6OjDpimpfAjGOl1EiY5w68v9GM3eher6dNgBvdYdcwBoesbPhZBcfZWf+S5UbcHnTxr+9GOuxwK7u1nk6l5JCNSa5xwKTGz5ITrErujc6OMtRkjfbgs94ie3NyQv828Q+iEAhnHBV7IkY+YXQAHYicW6ukqOR27zzxLDIvCig5fYW5BZRiRncgAjJaZyy4IGuNMm/Q+OCkniDNJoBPBTwbrGmgbHmUkeF2JeBFbdnklRQ1xm2tOirFRwrPgouwJBhCllz5BrGO5QgcSQn3MgT8bCMogIKJ42Ur4nsYeRkSr0oinP013Uv2RAGgyCFNowrpxCCiV+e7L0+9zgSuXkWPuvvO7LPIHrTM1ixNpIpHLQrLk1G0o9hyFzS4C6PHctKKA/XlkQfI+yYVTC9xnIVW9IVROUGKOrQy3jiftaIrBbetCKPP+04KaEVsifJcGTG9zFsxKPklylyGdpHhAw/+XRUU2yH8chmZGRXLxBOeIF8UXE/S91g0c0ilON3JQAiywT23A8KWPYE8Lb4BkN9/CyDfvP3KUfKI8ZvqZNuQtzqbH8SmmhFWEOA6mavY1M5iKIzDRPlBerrM27GOHcAf8DeZg7E/VeXH98EJ7OY8ZbN02znnimsBr2f8KLFEUm1P+GCHg5xi3IRrKQYCZ5ikR5sEV3wEyUINSJ/1hlkhJwX+LCGXeIAFytxnt9TzwpWcpuIiVaZKbCQXr2CQ/ndwcizbOkbAw4Zk7hyfIyGOBaXffd0y5Vs++YcSos3397F6ksQToukEicnYTKCPGNGX63ET7+j2bWq8POc5zpXViPzvjZXgnEmMZgSCdElHnhiuyG5rdO9S6C4RjtNc4ezuZjgl1Rz/I856jMGpF3GhiCEWGsKJ9nPk33oefv65g2Pt77X81Iw4qOho2VgtLejLIya4ZiOgBWawWlx+WS0u5HB2Vg9m7ECYsuQdD4Q0wKYUVuKiIq2Cw2x5S4mIpQtBZBOozMMDtoNstcLQCyq71y+NDlM7K0KwvtftKoxlWneO76I95pN6/+nOTncmyB+xRjK0uKs2JtC5NYQW5/eCVfiULGVV67dVtJHe5zLfJ52KDV40lJAt0ILRQ16ToEWJ72eYV+agHa1y1yqRfotSTLFPOjIOGaJWenp8cnyyA+WRXUk9ZY83+pF1Op36Y/gBAvvVYZXfXRTR5h1DV4cr2vcPICKC3UMP9XWDp+q4xoeSV3G/Cr9n723gW6yz5itfilfJEuAhdK3isnpmFRqLVYQOn954SyM8li48WSxG3MNnp5ZLOq5zkOI2f+7KY9wmt3OtaZaD61VWHrL/JAP3PHWK0bguIjOuItFUATrjTtZtYkhtswCcplz1yprpTAiwocG1Ux43sv7D+09Y7f4E7wr82w==
+sidebar_class_name: "get api-method"
+info_path: docs/api/ultra-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"search"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/search"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request a search by token's symbol, name or mint address
+  
+:::note
+- Refer to [Ultra API doc](/docs/ultra-api/search-token) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"in":"query","name":"query","schema":{"type":"string"},"required":true,"description":"String to search for, can be by Symbol, Name or Mint Address (comma-separate to search for multiple)"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","properties":{"id":{"type":"string","description":"The token's mint address"},"name":{"type":"string"},"symbol":{"type":"string"},"icon":{"type":"string","nullable":true},"decimals":{"type":"number"},"twitter":{"type":"string","nullable":true},"telegram":{"type":"string","nullable":true},"website":{"type":"string","nullable":true},"dev":{"type":"string","nullable":true,"description":"The token's developer address"},"circSupply":{"type":"number","nullable":true},"totalSupply":{"type":"number","nullable":true},"tokenProgram":{"type":"string","description":"The token program address"},"launchpad":{"type":"string","nullable":true},"partnerConfig":{"type":"string","nullable":true},"graduatedPool":{"type":"string","nullable":true},"graduatedAt":{"type":"string","nullable":true},"holderCount":{"type":"number","nullable":true},"fdv":{"type":"number","nullable":true},"mcap":{"type":"number","nullable":true},"usdPrice":{"type":"number","nullable":true},"priceBlockId":{"type":"number","nullable":true},"liquidity":{"type":"number","nullable":true},"stats5m":{"nullable":true,"type":"object","properties":{"volume":{"type":"number"},"priceChange":{"type":"number"},"trades":{"type":"number"}},"title":"SwapStats"},"stats1h":{"nullable":true,"type":"object","properties":{"volume":{"type":"number"},"priceChange":{"type":"number"},"trades":{"type":"number"}},"title":"SwapStats"},"stats6h":{"nullable":true,"type":"object","properties":{"volume":{"type":"number"},"priceChange":{"type":"number"},"trades":{"type":"number"}},"title":"SwapStats"},"stats24h":{"nullable":true,"type":"object","properties":{"volume":{"type":"number"},"priceChange":{"type":"number"},"trades":{"type":"number"}},"title":"SwapStats"},"audit":{"type":"object","nullable":true,"properties":{"isSus":{"type":"boolean","nullable":true},"mintAuthorityDisabled":{"type":"boolean","nullable":true},"freezeAuthorityDisabled":{"type":"boolean","nullable":true},"topHoldersPercentage":{"type":"number","nullable":true},"devBalancePercentage":{"type":"number","nullable":true},"devMigrations":{"type":"number","nullable":true}}},"organicScore":{"type":"number"},"organicScoreLabel":{"type":"string","enum":["high","medium","low"]},"ctLikes":{"type":"number","nullable":true},"smartCtLikes":{"type":"number","nullable":true},"isVerified":{"type":"boolean","nullable":true},"cexes":{"type":"array","items":{"type":"string"},"nullable":true},"tags":{"type":"array","items":{"type":"string"},"nullable":true},"updatedAt":{"type":"string","format":"date-time"}},"title":"MintInformation"}}}},"400":{"description":"Bad request","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

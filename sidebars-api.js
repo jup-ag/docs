@@ -41,6 +41,10 @@ const sidebars = {
             },
             {
               type: 'doc',
+              id: 'api/ultra-api/search',
+            },
+            {
+              type: 'doc',
               id: 'api/ultra-api/routers',
             },
           ],

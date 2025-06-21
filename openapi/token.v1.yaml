@@ -22,6 +22,7 @@ paths:
   /token/{mint_address}:
     get:
       summary: token information
+      deprecated: true
       description: |
         Returns the specified mint address's token information and metadata.
         
@@ -46,6 +47,7 @@ paths:
   /market/{market_address}/mints:
     get:
       summary: mints in market
+      deprecated: true
       description: |
         Returns the mints involved in a market.
         
@@ -72,6 +74,7 @@ paths:
   /mints/tradable:
     get:
       summary: tradable
+      deprecated: true
       description: |
         Returns a list of all mints tradable via Jupiter routing.
         
@@ -90,6 +93,7 @@ paths:
   /tagged/{tag}:
     get:
       summary: tagged
+      deprecated: true
       description: |
         Returns a list of mints with specified tag(s) along with their metadata.
         
@@ -115,6 +119,7 @@ paths:
   /new:
     get:
       summary: new
+      deprecated: true
       description: |
         Returns new tokens with metadata, created at timestamp and markets.
         
@@ -156,6 +161,7 @@ paths:
   /all:
     get:
       summary: all
+      deprecated: true
       description: |
         Returns all tokens with all metadata.
         

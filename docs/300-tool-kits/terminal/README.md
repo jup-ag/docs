@@ -1,5 +1,4 @@
 ---
-sidebar_label: "Introduction"
 description: "An overview of Jupiter Swap Terminal and its core features."
 title: "Introduction to Terminal"
 ---

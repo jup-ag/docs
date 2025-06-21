@@ -231,6 +231,18 @@ paths:
             minimum: 50
             maximum: 255
           required: false
+        - in: query
+          name: excludeRouters
+          schema:
+            type: string
+            enum:
+              - metis
+              - jupiterz
+              - hashflow
+              - dflow
+              - pyth
+              - okx
+          required: false
   /execute:
     post:
       summary: execute
@@ -414,17 +426,46 @@ paths:
                   warnings:
                     type: object
                     additionalProperties:
+                      description: "Token mint address as key"
                       type: array
                       items:
                         type: object
                         properties:
                           type:
                             type: string
+                            enum:
+                              - NOT_VERIFIED
+                              - LOW_LIQUIDITY
+                              - NOT_SELLABLE
+                              - LOW_ORGANIC_ACTIVITY
+                              - HAS_MINT_AUTHORITY
+                              - HAS_FREEZE_AUTHORITY
+                              - HAS_PERMANENT_DELEGATE
+                              - NEW_LISTING
+                              - VERY_LOW_TRADING_ACTIVITY
+                              - HIGH_SUPPLY_CONCENTRATION
+                              - NON_TRANSFERABLE
+                              - MUTABLE_TRANSFER_FEES
+                              - SUSPICIOUS_DEV_ACTIVITY
+                              - SUSPICIOUS_TOP_HOLDER_ACTIVITY
+                              - HIGH_SINGLE_OWNERSHIP
+                              - "{}%_TRANSFER_FEES"
+                            description: "Type of warning for the token"
                           message:
                             type: string
-                        required:
-                          - type
-                          - message
+                            description: "Human-readable warning message"
+                          severity:
+                            type: string
+                            enum:
+                              - info
+                              - warning
+                              - critical
+                            description: "Severity level of the warning"
+                          source:
+                            type: string
+                            enum:
+                              - RugCheck
+                            description: "Optional external source of the warning"
                 required:
                   - warnings
         '400':
@@ -476,10 +517,12 @@ paths:
                     name:
                       type: string
                       enum:
-                        - Metis
+                        - Metis v1.6
                         - JupiterZ
                         - Hashflow
                         - DFlow
+                        - Pyth Express Relay
+                        - OKX DEX Router
                     icon:
                       type: string
                   required:

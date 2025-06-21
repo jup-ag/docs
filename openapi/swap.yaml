@@ -170,11 +170,11 @@ components:
           type: string
           description: |
             - Calculated output amount from routing engine
-            - Exlcuding slippage or platform fees
+            - The value includes platform fees and DEX fees, excluding slippage
         otherAmountThreshold:
           type: string
           description: |
-            - Calculated minimum output amount after accounting for `slippageBps` and `platformFeeBps`
+            - Calculated minimum output amount after accounting for `slippageBps` on the `outAmount` value
             - Not used by `/swap` endpoint to build transaction
         swapMode:
           $ref: '#/components/schemas/SwapMode'
@@ -257,6 +257,10 @@ components:
         - quoteResponse
       properties:
         userPublicKey:
+          type: string
+        payer:
+          description: |
+            - Allow a custom payer to pay for the transaction
           type: string
         wrapAndUnwrapSol:
           description: |

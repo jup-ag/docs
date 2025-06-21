@@ -23,26 +23,30 @@ To fully utilize the Ultra API, check out the [Ultra API Reference](/docs/api/ul
 
 ## Get Shield
 
-The Ultra API supports a simple endpoint to get the token information and warnings of mints, you just need to pass in the required parameter of the mints.
+The Ultra API provides an endpoint to retrieve token information and associated warnings for the specified mint addresses. To use this endpoint, provide one or more mint addresses for the required query parameter named mints.
 
 This is useful when integrating with Jupiter Ultra or any other APIs, allowing you or your user to be informed of any potential malicious mints before conducting your transaction.
 
 ```jsx
 const shieldResponse = await (
-  await fetch(`https://lite-api.jup.ag/ultra/v1/shield?mints=So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v,DocTwz3QhCgKy1CJJMruEAFEG5xTGoC43vPMkC41pump`)
+  await fetch(`https://lite-api.jup.ag/ultra/v1/shield?mints=So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v,someTokenAddressForEducationalPurposes`)
 ).json();
 ```
 
 ## Shield Response
 
-The shield response will return a list of token information and warnings of mints.
+The shield response will return a list of token information and warnings of the mints passed in.
+
+Do note that this is subject to changes, and we will be adding more warnings and improving the accuracy of the warnings over time.
+
+For the full list of potential warnings, refer to the [Shield API Reference](/docs/api/ultra-api/shield).
 
 **Successful example response:**
 
 ```json
 {
   "warnings": {
-    "DocTwz3QhCgKy1CJJMruEAFEG5xTGoC43vPMkC41pump": [
+    "someTokenAddressForEducationalPurposes": [
       {
         "type": "NOT_VERIFIED",
         "message": "This token is not verified, make sure the mint address is correct before trading",

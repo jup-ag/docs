@@ -217,7 +217,7 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'tool-kits/swap-terminal',
+          id: 'tool-kits/terminal/README',
           label: 'Integrate Swap Terminal',
         },
       ],
@@ -234,7 +234,7 @@ const sidebars = {
       items: [
         {
           type: 'doc',
-          id: 'swap-api/program-errors',
+          id: 'swap-api/common-errors',
         },
         {
           type: 'doc',
@@ -455,21 +455,65 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Jupiter Tool Kits',
+      label: 'Jupiter Terminal',
       collapsible: false,
       collapsed: false,
       items: [
         {
           type: 'doc',
-          id: 'tool-kits/swap-terminal',
+          id: 'tool-kits/terminal/README',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal-walkthrough',
+          id: 'tool-kits/terminal/nextjs-app-example',
         },
         {
           type: 'doc',
-          id: 'tool-kits/unified-wallet-kit',
+          id: 'tool-kits/terminal/react-app-example',
+        },
+        {
+          type: 'doc',
+          id: 'tool-kits/terminal/html-app-example',
+        },
+        {
+          type: 'doc',
+          id: 'tool-kits/terminal/customization',
+        },
+        {
+          type: 'doc',
+          id: 'tool-kits/terminal/faq',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Jupiter Wallet Kit',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'tool-kits/wallet-kit/README',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Jupiter Referral Program',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'tool-kits/referral-program/README',
         },
       ],
     },

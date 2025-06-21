@@ -1,0 +1,69 @@
+---
+id: recent
+title: "recent"
+description: "Returns a list of mints recently created/minted"
+sidebar_label: "recent"
+hide_title: true
+hide_table_of_contents: true
+api: eJztWE1z2zYQ/SsYXNrORJaiSXrQzU6/PE1aN3J9kX2AwJUIGwQQfMhRZf337pKyLUuUA7mHTjK62BTwdvdh8RYkdsELCNIrF5U1fMA/QkzeBCaYViEyO2GVMjEwDxJM1HMmPYgIRZeGobg0HfZeVSqyaNnrXm+FVgYNgrMmwKW5NIPBwNgIBP4IE/AEHp3bGzDs+OyUFVZefd/Fv6EbabAjnOrO+j+wifWssh7QHz5WgjjW3i4Nf8XvIwQ+WPB+r0f/ni5mmKSEECZJP9BBO2mRuYkEF85pJWu/3etANgseZAmVoKc4d4BehPdijnYqQhXWxu34GmTECeetAx9Vw0QVa5gQvTJTxDwldl4Cq5f6XagzxkRRIMPAl6+4ERVse8CJMK/GVrdOKdlw34xqktZirHEs+gRLoiFVJfT6MkyqxuDJS7xVMeJjjqMIGqZeVFngWxgHzF4mw9mXcc/lEx2Apg1ZT6pUXg4T7vZ8e+Vtq7NR6L3wGPvM210Z2cGWucZknakWycjSiVYVbQV2wkcD/p01EzXNssB4RaIKPrNtYnrO4jhm4UurC6KUTMxK3qSYZeEqKVwWMIXizCsJWWBHyBNt5c1pkWWg1aekChXzlBGiiOFtLYpNCT9/jNS83pXCTPPWscp6vsHDOvawmVmdqn1YjdP8orbJSxZovQccnf/pp8IouWeM/a1w5iTNW47NduwQg2SDz7G+wGfDV+SRzh5Gf0DMNqDzTEX6yYe3wg1Jwfxeyq/Lg5QPUv4mpPzjQcoHKX8bUu6/OWj5oOWvXssT5UPcuJc8iHdT3F++ddO9r+lWtN1clkRDJNTnC6KFYVpf6Bg5gzCttxa83h+nWFqPhfCTCjRZ5JlOPMA/8ELjaN1vdcGGM/DUuxGZBYX35xOhhZGwv+EHhZdFuuVmqQBtbCO1obS+JcgG4L0YQ+uVFRDPByNeqmmJPysoFA7gAWRv+RW1R8IFeDVRubmT8BnWV7CrA/Sos+30i+l/9JBcsfvS3bTDcIQwnajwkFmvqg8outPHnhlpnabftDXJTkTBPHxKEOILmmM73i3gvW1pJBEJiqU8bcVoBbtq2L1tY3eKdLwRmgXwM/CssfgfeVJJA1YkjvMp1B5FxLcv7zYtUk4vAKKK/kcLnjwqlpcxujDodjXuP3U3j66TOxLTpt0ZurP+Vo/oF6x9hix93SEFUzhLfcJbFUuGJQZMU9eVTs3NGFnuz4QqdrmnKsKJtSjUrx0DSwGKBiKaxu3vMOfLK1Q1Sq1O4kp+fyUlb/DDxFM2KBVN0P5R76i3ReWOvVfmht1dmjvW6XSah9FFv70ljLNULc6GWIl6q5t+KX/I/hPvi0ehfE2t7ZUaI3yOXaeFqtdcb/NiJbfR/YKv6MMMSxdHFouxCPC318slDWNJ+zmO4+NMeNUcLiM6D0ug74Fanze4hQN+LCW4erOETvV5tVlTtM0Puv/153MskX8BASp9+w==
+sidebar_class_name: "get api-method"
+info_path: docs/api/token-api/v2/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"recent"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/recent"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Returns a list of mints recently created/minted
+- Limit to 100 mints in response
+
+:::note
+- Refer to [Token API doc](/docs/token-api/v2) for more information
+:::
+
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string","description":"The token's mint address"},"name":{"type":"string"},"symbol":{"type":"string"},"icon":{"type":"string","nullable":true},"decimals":{"type":"number"},"twitter":{"type":"string","nullable":true},"telegram":{"type":"string","nullable":true},"website":{"type":"string","nullable":true},"dev":{"type":"string","nullable":true,"description":"The token's developer address"},"circSupply":{"type":"number","nullable":true},"totalSupply":{"type":"number","nullable":true},"tokenProgram":{"type":"string","description":"The token program address"},"launchpad":{"type":"string","nullable":true},"partnerConfig":{"type":"string","nullable":true},"graduatedPool":{"type":"string","nullable":true},"graduatedAt":{"type":"string","nullable":true},"holderCount":{"type":"number","nullable":true},"fdv":{"type":"number","nullable":true},"mcap":{"type":"number","nullable":true},"usdPrice":{"type":"number","nullable":true},"priceBlockId":{"type":"number","nullable":true},"liquidity":{"type":"number","nullable":true},"stats5m":{"nullable":true,"type":"object","properties":{"priceChange":{"type":"number","nullable":true},"holderChange":{"type":"number","nullable":true},"liquidityChange":{"type":"number","nullable":true},"volumeChange":{"type":"number","nullable":true},"buyVolume":{"type":"number","nullable":true},"sellVolume":{"type":"number","nullable":true},"buyOrganicVolume":{"type":"number","nullable":true},"sellOrganicVolume":{"type":"number","nullable":true},"numBuys":{"type":"number","nullable":true},"numSells":{"type":"number","nullable":true},"numTraders":{"type":"number","nullable":true},"numOrganicBuyers":{"type":"number","nullable":true},"numNetBuyers":{"type":"number","nullable":true}},"title":"SwapStats"},"stats1h":{"nullable":true,"type":"object","properties":{"priceChange":{"type":"number","nullable":true},"holderChange":{"type":"number","nullable":true},"liquidityChange":{"type":"number","nullable":true},"volumeChange":{"type":"number","nullable":true},"buyVolume":{"type":"number","nullable":true},"sellVolume":{"type":"number","nullable":true},"buyOrganicVolume":{"type":"number","nullable":true},"sellOrganicVolume":{"type":"number","nullable":true},"numBuys":{"type":"number","nullable":true},"numSells":{"type":"number","nullable":true},"numTraders":{"type":"number","nullable":true},"numOrganicBuyers":{"type":"number","nullable":true},"numNetBuyers":{"type":"number","nullable":true}},"title":"SwapStats"},"stats6h":{"nullable":true,"type":"object","properties":{"priceChange":{"type":"number","nullable":true},"holderChange":{"type":"number","nullable":true},"liquidityChange":{"type":"number","nullable":true},"volumeChange":{"type":"number","nullable":true},"buyVolume":{"type":"number","nullable":true},"sellVolume":{"type":"number","nullable":true},"buyOrganicVolume":{"type":"number","nullable":true},"sellOrganicVolume":{"type":"number","nullable":true},"numBuys":{"type":"number","nullable":true},"numSells":{"type":"number","nullable":true},"numTraders":{"type":"number","nullable":true},"numOrganicBuyers":{"type":"number","nullable":true},"numNetBuyers":{"type":"number","nullable":true}},"title":"SwapStats"},"stats24h":{"nullable":true,"type":"object","properties":{"priceChange":{"type":"number","nullable":true},"holderChange":{"type":"number","nullable":true},"liquidityChange":{"type":"number","nullable":true},"volumeChange":{"type":"number","nullable":true},"buyVolume":{"type":"number","nullable":true},"sellVolume":{"type":"number","nullable":true},"buyOrganicVolume":{"type":"number","nullable":true},"sellOrganicVolume":{"type":"number","nullable":true},"numBuys":{"type":"number","nullable":true},"numSells":{"type":"number","nullable":true},"numTraders":{"type":"number","nullable":true},"numOrganicBuyers":{"type":"number","nullable":true},"numNetBuyers":{"type":"number","nullable":true}},"title":"SwapStats"},"firstPool":{"type":"object","nullable":true,"properties":{"id":{"type":"string"},"createdAt":{"type":"string"}}},"audit":{"type":"object","nullable":true,"properties":{"isSus":{"type":"boolean","nullable":true},"mintAuthorityDisabled":{"type":"boolean","nullable":true},"freezeAuthorityDisabled":{"type":"boolean","nullable":true},"topHoldersPercentage":{"type":"number","nullable":true},"devBalancePercentage":{"type":"number","nullable":true},"devMigrations":{"type":"number","nullable":true}}},"organicScore":{"type":"number"},"organicScoreLabel":{"type":"string","enum":["high","medium","low"]},"isVerified":{"type":"boolean","nullable":true},"cexes":{"type":"array","items":{"type":"string"},"nullable":true},"tags":{"type":"array","items":{"type":"string"},"nullable":true},"updatedAt":{"type":"string","format":"date-time"}},"title":"MintInformation"}}}}},"400":{"description":"Bad request","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

@@ -158,7 +158,19 @@ const sidebars = {
               items: [
                 {
                   type: 'doc',
-                  id: 'api/token-api/v2/query-by-mints-or-tag',
+                  id: 'api/token-api/v2/search',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v2/tag',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v2/category',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v2/recent',
                 },
               ],
             },

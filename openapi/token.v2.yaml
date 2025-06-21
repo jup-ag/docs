@@ -14,39 +14,206 @@ servers:
     description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
-  /:
+  /search:
     get:
-      summary: query by mints or tag
+      summary: search
       description: |
-        Returns token information based on query parameters.
-        
+        Request a search by token's symbol, name or mint address
+          
         :::note
-        - Refer to [Token API doc](/docs/token-api/v2) for more information.
+        - Refer to [Token API doc](/docs/token-api/v2) for more information
         :::
       parameters:
-      - name: mints
-        in: query
-        description: The token's mint address
-        required: false
-        schema:
-          type: string
-        example: So11111111111111111111111111111111111111112
-      - name: tag
-        in: query
-        description: A specified tag
-        required: false
-        schema:
-          type: string
-          enum:
-            - lst
-            - verified
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: true
+          description: |
+            - Search for a token and its information by its symbol, name or mint address
+            - Comma-separate to search for multiple
+            - Limit to 100 mint addresses in query
       responses:
         '200':
-          description: Returns metadata about tokens
+          description: Successful response
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/MintInformation"
+                type: array
+                items:
+                  $ref: "#/components/schemas/MintInformation"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+  /tag:
+    get:
+      summary: tag
+      description: |
+        Request a list of mints by a specific tag
+
+        :::note
+        - Refer to [Token API doc](/docs/token-api/v2) for more information
+        :::
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+            enum:
+              - lst
+              - verified
+          required: true
+          description: |
+            - Request for a list of mints by a specific tag
+            - Only 1 tag at a time
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MintInformation"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+  /{category}/{interval}:
+    get:
+      summary: category
+      description: |
+          Returns a list of mints for the given category and interval
+          - Limit to 100 mints in response
+
+          :::note
+          - Refer to [Token API doc](/docs/token-api/v2) for more information
+          :::
+      parameters:
+        - in: path
+          name: category
+          required: true
+          schema:
+            type: string
+            enum: [toporganicscore, toptraded, toptrending]
+          description: Category of the top tokens
+        - in: path
+          name: interval
+          required: true
+          schema:
+            type: string
+            enum: [5m, 1h, 6h, 24h]
+          description: Time interval
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MintInformation'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+  /recent:
+    get:
+      summary: recent
+      description: |
+        Returns a list of mints recently created/minted
+        - Limit to 100 mints in response
+
+        :::note
+        - Refer to [Token API doc](/docs/token-api/v2) for more information
+        :::
+
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MintInformation'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
 
 components:
   schemas:
@@ -129,6 +296,14 @@ components:
         stats24h:
           $ref: "#/components/schemas/SwapStats"
           nullable: true
+        firstPool:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            createdAt:
+              type: string
         audit:
           type: object
           nullable: true
@@ -156,12 +331,6 @@ components:
         organicScoreLabel:
           type: string
           enum: [high, medium, low]
-        ctLikes:
-          type: number
-          nullable: true
-        smartCtLikes:
-          type: number
-          nullable: true
         isVerified:
           type: boolean
           nullable: true
@@ -181,9 +350,42 @@ components:
     SwapStats:
       type: object
       properties:
-        volume:
-          type: number
         priceChange:
           type: number
-        trades:
+          nullable: true
+        holderChange:
           type: number
+          nullable: true
+        liquidityChange:
+          type: number
+          nullable: true
+        volumeChange:
+          type: number
+          nullable: true
+        buyVolume:
+          type: number
+          nullable: true
+        sellVolume:
+          type: number
+          nullable: true
+        buyOrganicVolume:
+          type: number
+          nullable: true
+        sellOrganicVolume:
+          type: number
+          nullable: true
+        numBuys:
+          type: number
+          nullable: true
+        numSells:
+          type: number
+          nullable: true
+        numTraders:
+          type: number
+          nullable: true
+        numOrganicBuyers:
+          type: number
+          nullable: true
+        numNetBuyers:
+          type: number
+          nullable: true

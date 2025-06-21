@@ -1,7 +1,7 @@
 ---
-sidebar_label: "Introduction"
+sidebar_label: "Integrate Swap Terminal"
 description: "An overview of Jupiter Swap Terminal and its core features."
-title: "Introduction to Terminal"
+title: "Integrate Swap Terminal"
 ---
 
 ![Jupiter Terminal Hero](/terminal/demo/terminal.png)

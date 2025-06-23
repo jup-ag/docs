@@ -346,7 +346,7 @@ paths:
               required:
                 - signedTransaction
                 - requestId
-  /balances/:address:
+  /balances/{address}:
     get:
       summary: balances
       description: |

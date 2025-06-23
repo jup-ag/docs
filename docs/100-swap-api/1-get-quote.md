@@ -137,11 +137,20 @@ Please be aware that using `onlyDirectRoutes` can often yield unfavorable trades
 
 In some cases, you may want to add more accounts to the transaction for specific use cases, but it might exceed the transaction size limit. You can use the `maxAccounts` parameter to limit the number of accounts in the transaction.
 
+:::tip
+- Refer to the [Requote with Lower Max Accounts](/docs/swap-api/requote-with-lower-max-accounts) guide for more information on how to requote and adjust the swap when using `maxAccounts`.
+:::
+
 :::note
+- `maxAccounts` is only an estimation and the actual number of accounts may vary.
 - We recommend setting `maxAccounts` to 64
-- Keep `maxAccounts` as large as possible
-- `maxAccounts` is only an estimation and the actual number of accounts may vary
-- Example: If `maxAccounts` is set to 46, the computed routes may drop DEXes/AMMs like Meteora DLMM that require more than 46 accounts.
+- Keep `maxAccounts` as large as possible, only reduce `maxAccounts` if you exceed the transaction size limit.
+- If `maxAccounts` is set too low, example to 30, the computed routes may drop DEXes/AMMs like Meteora DLMM that require more than 30 accounts.
+
+<br/>
+**Jupiter has 2 types of routing instructions** and if you plan to limit `maxAccounts`, you will need to account for if the market is routable with [ALTs](https://docs.solana.com/developing/lookup-tables) or not:
+- **`Routing Instruction`** (Simple Routing): The market is still new, and we do not have ALTs set up for the market, hence the number of accounts required is higher as there are more accounts required.
+- **`Shared Accounts Routing Instruction`**: The market has sufficient liquidity (and has been live for a while), and we have [ALTs](https://docs.solana.com/developing/lookup-tables) set up for the market to be used in the routing instruction, hence the number of accounts required is lower as there are less accounts required.
 :::
 
 <details>
@@ -155,8 +164,7 @@ In some cases, you may want to add more accounts to the transaction for specific
 
 Notes:
 - Values in the table are only estimations and the actual number of accounts may vary.
-- Min accounts occur when we already create the necessary [ALTs](https://docs.solana.com/developing/lookup-tables) for a specific pool resulting in less accounts needed in routing.
-  - Only applies to simple routing pools which are pools that are instantly routed (most AMMs) and they only subject to our market crawler to check for liquidity on the 14th day.
+- Min accounts are needed when we have already created the necessary [ALTs](https://docs.solana.com/developing/lookup-tables) for a specific pool resulting in less accounts needed in a Shared Accounts Routing context.
 - Sanctum and Sanctum Infinity are unique, and their accounts are dynamic.
 
 | DEX | Max | Min |

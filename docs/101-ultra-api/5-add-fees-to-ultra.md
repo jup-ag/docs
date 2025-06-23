@@ -15,6 +15,7 @@ In this guide, we will be walking through the steps to create the necessary acco
 
 | Note | Description |
 | --- | --- |
+| **Referral Dashboard UI** | Use the [Referral Dashboard](https://referral.jup.ag/) to create referral accounts through a user-friendly interface. This is the recommended approach for most users before proceeding with the SDK setup below. |
 | **Additional required accounts** | It is required to have a valid **referral account** and **referral token accounts** for the specific token mints. These accounts are initalized with the Referral Program under the ["Jupiter Ultra" Referral Project](https://solscan.io/account/DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc). |
 | **Fee mint** | In the `/order` response, you will see the `feeMint` field which is the token mint we will collect the fees in for that particular order.<br /><br />Since Jupiter will always dictate which token mint to collect the fees in, you must ensure that you have the valid referral token account created for the specific fee mint. If it is not initialized, the order will still return and can be executed without your fees. This is to ensure success rates and the best experience with Jupiter Ultra. |
 | **Jupiter fees** | By default, Jupiter Ultra incurs a 0.05% or 0.1% fee based on token mint. When you add a referral fee, Jupiter will take a flat 20% of your integrator fees, for example, if you plan to take 100bps, Jupiter will take 20bps from it. |

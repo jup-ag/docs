@@ -572,7 +572,10 @@ paths:
           schema:
             type: string
           required: true
-          description: "String to search for, can be by Symbol, Name or Mint Address (comma-separate to search for multiple)"
+          description: |
+            - Search for a token and its information by its symbol, name or mint address
+            - Comma-separate to search for multiple
+            - Limit to 100 mint addresses in query
 
 components:
   schemas:
@@ -655,6 +658,14 @@ components:
         stats24h:
           $ref: "#/components/schemas/SwapStats"
           nullable: true
+        firstPool:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            createdAt:
+              type: string
         audit:
           type: object
           nullable: true
@@ -682,12 +693,6 @@ components:
         organicScoreLabel:
           type: string
           enum: [high, medium, low]
-        ctLikes:
-          type: number
-          nullable: true
-        smartCtLikes:
-          type: number
-          nullable: true
         isVerified:
           type: boolean
           nullable: true
@@ -707,9 +712,42 @@ components:
     SwapStats:
       type: object
       properties:
-        volume:
-          type: number
         priceChange:
           type: number
-        trades:
+          nullable: true
+        holderChange:
           type: number
+          nullable: true
+        liquidityChange:
+          type: number
+          nullable: true
+        volumeChange:
+          type: number
+          nullable: true
+        buyVolume:
+          type: number
+          nullable: true
+        sellVolume:
+          type: number
+          nullable: true
+        buyOrganicVolume:
+          type: number
+          nullable: true
+        sellOrganicVolume:
+          type: number
+          nullable: true
+        numBuys:
+          type: number
+          nullable: true
+        numSells:
+          type: number
+          nullable: true
+        numTraders:
+          type: number
+          nullable: true
+        numOrganicBuyers:
+          type: number
+          nullable: true
+        numNetBuyers:
+          type: number
+          nullable: true

@@ -10,14 +10,12 @@ displayed_sidebar: docs
     <meta name="twitter:card" content="summary" />
 </head>
 
-:::note
-## API Usage
-
-### Hostnames
+:::note API Usage
+**Hostnames**
 - For paid tiers with API Keys, use `api.jup.ag`
 - For free tier, use `lite-api.jup.ag` (NO API Key required)
 
-### API Key
+**API Key**
 Simply add the API Key in the `x-api-key` field in the Headers.
 
 ```js

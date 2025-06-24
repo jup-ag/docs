@@ -14,8 +14,8 @@ servers:
     description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/swap/v1
     description: Paid tier API endpoint with higher rate limits to be used with an API Key
-  - url: https://preprod.jup.ag/swap/v1
-    description: This is a staging endpoint for internal tests
+  - url: https://preprod-quote-api.jup.ag/
+    description: This is a staging endpoint for tests
 
 paths:
   /quote:

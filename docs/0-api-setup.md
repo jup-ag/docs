@@ -12,7 +12,15 @@ title: "API Key Setup"
 
 Get started by setting up an account on the dashboard to generate API Keys and managing payments via Helio.
 
-Then, to use the API Key in our APIs, simply add the key to the header.
+:::note
+## API Usage
+
+### Hostnames
+- For paid tiers with API Keys, use `api.jup.ag`
+- For free tier, use `lite-api.jup.ag` (NO API Key required)
+
+### API Key
+Simply add the API Key in the `x-api-key` field in the Headers.
 
 ```js
 headers: {
@@ -20,11 +28,6 @@ headers: {
     'x-api-key': '' // enter api key here
 },
 ```
-
-:::info Free Plan
-Do note that you **do not** need an API Key to use the free plan.
-
-Simply just call the endpoints without an API Key at the `lite-api.jup.ag` hostname.
 :::
 
 ## 1. Open Portal

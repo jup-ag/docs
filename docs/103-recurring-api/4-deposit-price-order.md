@@ -12,9 +12,12 @@ title: "Deposit Price Order"
 
 
 :::note
-Base URL: `https://lite-api.jup.ag/recurring/v1/priceDeposit`
+Lite URL: `https://lite-api.jup.ag/swap/v1/recurring/v1/priceDeposit`
+Pro URL: `https://api.jup.ag/recurring/v1/priceDeposit`
 
-For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+To upgrade to Pro or understand our rate limiting, please refer to this section.
+- [API Key Setup](/docs/api-setup)
+- [API Rate Limit](/docs/api-rate-limit)
 :::
 
 :::info

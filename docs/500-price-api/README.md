@@ -22,9 +22,12 @@ In this guide, we will be going through the simple price responses and the extra
 
 
 :::note
-Base URL: `https://lite-api.jup.ag/price/v2`
+Lite URL: `https://lite-api.jup.ag/swap/v1/price/v2`
+Pro URL: `https://api.jup.ag/price/v2`
 
-For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+To upgrade to Pro or understand our rate limiting, please refer to this section.
+- [API Key Setup](/docs/api-setup)
+- [API Rate Limit](/docs/api-rate-limit)
 :::
 
 ## Get Price (Only Price)

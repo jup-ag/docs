@@ -42,9 +42,12 @@ To fully utilize the Swap API, check out the [Swap API or Swap Instructions Refe
 
 
 :::note
-Base URL: `https://lite-api.jup.ag/swap/v1/swap`
+Lite URL: `https://lite-api.jup.ag/swap/v1/swap/v1/swap`
+Pro URL: `https://api.jup.ag/swap/v1/swap`
 
-For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+To upgrade to Pro or understand our rate limiting, please refer to this section.
+- [API Key Setup](/docs/api-setup)
+- [API Rate Limit](/docs/api-rate-limit)
 :::
 
 From the previous guide on getting a quote, now using the quote response and your wallet, you can receive a **serialized swap transaction** that needs to be prepared and signed before sending to the network.

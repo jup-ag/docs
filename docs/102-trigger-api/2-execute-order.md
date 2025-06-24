@@ -12,8 +12,8 @@ title: "Execute Order"
 
 
 :::note
-Lite URL: `https://lite-api.jup.ag/swap/v1/trigger/v1/execute`
-Pro URL: `https://api.jup.ag/trigger/v1/execute`
+- Lite URL: `https://lite-api.jup.ag/swap/v1/trigger/v1/execute`
+- Pro URL: `https://api.jup.ag/trigger/v1/execute`
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.
 - [API Key Setup](/docs/api-setup)

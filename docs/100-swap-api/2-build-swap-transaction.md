@@ -42,8 +42,8 @@ To fully utilize the Swap API, check out the [Swap API or Swap Instructions Refe
 
 
 :::note
-Lite URL: `https://lite-api.jup.ag/swap/v1/swap/v1/swap`
-Pro URL: `https://api.jup.ag/swap/v1/swap`
+- Lite URL: `https://lite-api.jup.ag/swap/v1/swap/v1/swap`
+- Pro URL: `https://api.jup.ag/swap/v1/swap`
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.
 - [API Key Setup](/docs/api-setup)

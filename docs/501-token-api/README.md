@@ -24,8 +24,8 @@ Through the Token API, you can query by tags, mints, markets to get a list of to
 In this guide, we will be going through a few examples of what Token API endpoints you can call to get the information you need.
 
 :::note
-Lite URL: `https://lite-api.jup.ag/swap/v1/tokens/v1`
-Pro URL: `https://api.jup.ag/tokens/v1`
+- Lite URL: `https://lite-api.jup.ag/swap/v1/tokens/v1`
+- Pro URL: `https://api.jup.ag/tokens/v1`
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.
 - [API Key Setup](/docs/api-setup)

@@ -12,8 +12,8 @@ title: "Get Trigger Orders"
 
 
 :::note
-Lite URL: `https://lite-api.jup.ag/swap/v1/trigger/v1/getTriggerOrders`
-Pro URL: `https://api.jup.ag/trigger/v1/getTriggerOrders`
+- Lite URL: `https://lite-api.jup.ag/swap/v1/trigger/v1/getTriggerOrders`
+- Pro URL: `https://api.jup.ag/trigger/v1/getTriggerOrders`
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.
 - [API Key Setup](/docs/api-setup)

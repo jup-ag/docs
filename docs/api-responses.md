@@ -10,6 +10,8 @@ displayed_sidebar: docs
     <meta name="twitter:card" content="summary" />
 </head>
 
+In this section, you can find the list of responses that can be returned by the Jupiter API.
+
 :::note API Usage
 **Hostnames**
 - For paid tiers with API Keys, use `api.jup.ag`
@@ -25,8 +27,6 @@ headers: {
 },
 ```
 :::
-
-In this section, you can find the list of responses that can be returned by the Jupiter API.
 
 :::info Program Errors
 For more information on error codes from programs, see the [Swap API - Common Errors](/docs/swap-api/common-errors).

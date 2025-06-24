@@ -224,12 +224,9 @@ components:
         percent:
           type: integer
           format: uint8
-        bps:
-          type: integer
-          format: uint16
       required:
         - swapInfo
-        - bps
+        - percent
 
     SwapInfo:
       type: object

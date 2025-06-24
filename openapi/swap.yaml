@@ -163,16 +163,19 @@ components:
         inputMint:
           type: string
         inAmount:
-          type: string
+          type: integer
+          format: uint64
         outputMint:
           type: string
         outAmount:
-          type: string
+          type: integer
+          format: uint64
           description: |
             - Calculated output amount from routing engine
             - The value includes platform fees and DEX fees, excluding slippage
         otherAmountThreshold:
-          type: string
+          type: integer
+          format: uint64
           description: |
             - Calculated minimum output amount after accounting for `slippageBps` on the `outAmount` value
             - Not used by `/swap` endpoint to build transaction
@@ -181,17 +184,19 @@ components:
           required: true
         slippageBps:
           type: integer
-          format: int32
+          format: uint16
+          minimum: 0
         platformFee:
           $ref: '#/components/schemas/PlatformFee'
         priceImpactPct:
-          type: string
+          type: number
         routePlan:
           type: array
           items:
             $ref: '#/components/schemas/RoutePlanStep'
         contextSlot:
-          type: number
+          type: integer
+          format: uint64
         timeTaken:
           type: number
 
@@ -205,10 +210,11 @@ components:
       type: object
       properties:
         amount:
-          type: string
+          type: integer
+          format: uint64
         feeBps:
           type: integer
-          format: int32
+          format: uint16
 
     RoutePlanStep:
       type: object
@@ -217,10 +223,13 @@ components:
           $ref: '#/components/schemas/SwapInfo'
         percent:
           type: integer
-          format: int32
+          format: uint8
+        bps:
+          type: integer
+          format: uint16
       required:
         - swapInfo
-        - percent
+        - bps
 
     SwapInfo:
       type: object
@@ -242,11 +251,14 @@ components:
         outputMint:
           type: string
         inAmount:
-          type: string
+          type: integer
+          format: uint64
         outAmount:
-          type: string
+          type: integer
+          format: uint64
         feeAmount:
-          type: string
+          type: integer
+          format: uint64
         feeMint:
           type: string
 
@@ -312,8 +324,10 @@ components:
                   description: |
                     - Maximum lamports to cap the priority fee estimation, to prevent overpaying
                   type: integer
+                  format: uint64
             jitoTipLamports:
               type: integer
+              format: uint64
               description: |
                 - Exact amount of tip to use in a tip instruction
                 - Refer to Jito docs on how to estimate the tip amount based on percentiles
@@ -357,11 +371,13 @@ components:
             - `computeUnitLimit (1400000) * computeUnitPriceMicroLamports`
             - We recommend using `prioritizationFeeLamports` and `dynamicComputeUnitLimit` instead of passing in your own compute unit price
           type: integer
+          format: uint64
         blockhashSlotsToExpiry:
           description: |
             - Pass in the number of slots we want the transaction to be valid for
             - Example: If you pass in 10 slots, the transaction will be valid for ~400ms * 10 = approximately 4 seconds before it expires
           type: integer
+          format: uint8
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponse'
       example:
@@ -400,8 +416,10 @@ components:
           type: string
         lastValidBlockHeight:
           type: integer
+          format: uint64
         prioritizationFeeLamports:
           type: integer
+          format: uint64
       required:
         - swapTransaction
         - lastValidBlockHeight
@@ -498,11 +516,13 @@ components:
       required: true
       schema:
         type: integer
+        format: uint64
     SlippageParameter:
       name: slippageBps
       in: query
       schema:
         type: integer
+        format: uint16
     SwapModeParameter:
       name: swapMode
       description: |
@@ -575,6 +595,7 @@ components:
       in: query
       schema:
         type: integer
+        format: uint64 # usize
         default: 64
     PlatformFeeBpsParameter:
       name: platformFeeBps
@@ -584,6 +605,7 @@ components:
       in: query
       schema:
         type: integer
+        format: uint16
     DynamicSlippage:
       name: dynamicSlippage
       description: |

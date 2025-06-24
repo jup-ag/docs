@@ -12,9 +12,12 @@ title: "Cancel Order"
 
 
 :::note
-Base URL: `https://lite-api.jup.ag/trigger/v1/cancelOrder`
+- Lite URL: `https://lite-api.jup.ag/trigger/v1/cancelOrder`
+- Pro URL: `https://api.jup.ag/trigger/v1/cancelOrder`
 
-For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+To upgrade to Pro or understand our rate limiting, please refer to this section.
+- [API Key Setup](/docs/api-setup)
+- [API Rate Limit](/docs/api-rate-limit)
 :::
 
 If you want to cancel order(s), you need to do these steps:

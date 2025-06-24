@@ -12,9 +12,9 @@ title: "Get Order"
 :::note
 Base URL: `https://lite-api.jup.ag/ultra/v1/order`
 
-For higher rate limits, please reach out to us in [Discord](https://discord.gg/jup).
+We are exploring a Dynamic Rate Limit system for Ultra, hence Portal API keys currently do not apply for Ultra API.
 
-Portal API keys currently do not apply for Ultra API.
+If you require higher rate limits, please reach out to us in [Discord](https://discord.gg/jup).
 :::
 
 :::tip API Reference

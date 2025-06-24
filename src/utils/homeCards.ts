@@ -57,8 +57,7 @@ export const API_CARDS = [
       title: "Unified Wallet Kit",
       links: [
         { text: "Playground", href: "https://unified.jup.ag/" },
-        { text: "Docs", href: "/docs/tool-kits/wallet-kit"
-        },
+        { text: "Docs", href: "/docs/tool-kits/wallet-kit" },
       ],
     },
     {

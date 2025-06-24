@@ -22,7 +22,7 @@ In this guide, we will be going through the simple price responses and the extra
 
 
 :::note
-- Lite URL: `https://lite-api.jup.ag/swap/v1/price/v2`
+- Lite URL: `https://lite-api.jup.ag/price/v2`
 - Pro URL: `https://api.jup.ag/price/v2`
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.

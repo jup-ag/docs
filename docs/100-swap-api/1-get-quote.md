@@ -35,7 +35,7 @@ To fully utilize the Quote API, check out the [Quote API Reference](/docs/api/sw
 ## Quote API
 
 :::note
-- Lite URL: `https://lite-api.jup.ag/swap/v1/swap/v1/quote`
+- Lite URL: `https://lite-api.jup.ag/quote`
 - Pro URL: `https://api.jup.ag/swap/v1/quote`
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.

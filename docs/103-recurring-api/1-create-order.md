@@ -11,7 +11,7 @@ title: "Create Order"
 
 
 :::note
-- Lite URL: `https://lite-api.jup.ag/swap/v1/recurring/v1/createOrder`
+- Lite URL: `https://lite-api.jup.ag/recurring/v1/createOrder`
 - Pro URL: `https://api.jup.ag/recurring/v1/createOrder`
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.

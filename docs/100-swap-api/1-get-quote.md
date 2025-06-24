@@ -137,21 +137,56 @@ Please be aware that using `onlyDirectRoutes` can often yield unfavorable trades
 
 In some cases, you may want to add more accounts to the transaction for specific use cases, but it might exceed the transaction size limit. You can use the `maxAccounts` parameter to limit the number of accounts in the transaction.
 
+:::warning unfavorable trades
+Please be aware that the misuse of `maxAccounts` can yield unfavorable trades or outcomes.
+:::
+
 :::tip
 - Refer to the [Requote with Lower Max Accounts](/docs/swap-api/requote-with-lower-max-accounts) guide for more information on how to requote and adjust the swap when using `maxAccounts`.
 :::
 
 :::note
-- `maxAccounts` is only an estimation and the actual number of accounts may vary.
+- `maxAccounts` is an estimation and the actual number of accounts may vary.
+- `maxAccounts` only applies to the number of accounts for the swap instruction (and not any of the setup, cleanup or other instructions).
 - We recommend setting `maxAccounts` to 64
 - Keep `maxAccounts` as large as possible, only reduce `maxAccounts` if you exceed the transaction size limit.
-- If `maxAccounts` is set too low, example to 30, the computed routes may drop DEXes/AMMs like Meteora DLMM that require more than 30 accounts.
+- If `maxAccounts` is set too low, example to 30, the computed route may drop DEXes/AMMs like Meteora DLMM that require more than 30 accounts.
 
 <br/>
-**Jupiter has 2 types of routing instructions** and if you plan to limit `maxAccounts`, you will need to account for if the market is routable with [ALTs](https://docs.solana.com/developing/lookup-tables) or not:
+**Jupiter has 2 types of routing instructions**, if you plan to limit `maxAccounts`, you will need to account for if the market is routable with [ALTs](https://docs.solana.com/developing/lookup-tables) or not:
 - **`Routing Instruction`** (Simple Routing): The market is still new, and we do not have ALTs set up for the market, hence the number of accounts required is higher as there are more accounts required.
 - **`Shared Accounts Routing Instruction`**: The market has sufficient liquidity (and has been live for a while), and we have [ALTs](https://docs.solana.com/developing/lookup-tables) set up for the market to be used in the routing instruction, hence the number of accounts required is lower as there are less accounts required.
 :::
+
+<details>
+    <summary>
+        <div>
+            <div>
+                <b>Counting the accounts using an example transaction</b>
+            </div>
+        </div>
+    </summary>
+
+[In this transaction](https://solscan.io/tx/2xpiniSn5z61hE6gB6EUaeRZCqeg8rLBEbiSnAjSD28tjVTSpBogSLfrMRaJiDzuqDyZ8v49Z7WL2TKvGQVwYbB7):
+
+<img src="/dev/max_accounts_stabble.png" alt="Max Accounts Stabble Example" style={{ width: "50%" }} />
+<img src="/dev/max_accounts_lifinity_v2.png" alt="Max Accounts Lifinity V2 Example" style={{ width: "50%" }} />
+<img src="/dev/max_accounts_shared_accounts_route.png" alt="Max Accounts Shared Accounts Route Example" style={{ width: "50%" }} />
+
+- You can see that there are a total of 2 inner swaps where the number of accounts respectively are
+  - Stabble Stable Swap: 12
+  - Lifinity Swap V2: 13
+  - Total: 25
+-  The `maxAccounts` parameter is to control this value - to limit the total number of accounts in the inner swaps.
+- It doesn’t take into the consideration of a few things:
+  - Each of the inner swap's program address, so 2 in this case.
+  - Top level routing instruction accounts where in this case Shared Accounts Route is 13 and Route is 9.
+  - There are also other accounts that are required to set up, clean up, etc which are not counted in the `maxAccounts` parameter
+
+
+
+</details>
+
 
 <details>
     <summary>
@@ -184,7 +219,3 @@ Notes:
 | Solfi | 22 | 9 |
 
 </details>
-
-:::warning unfavorable trades
-Please be aware that the misuse of `maxAccounts` can yield unfavorable trades or outcomes.
-:::

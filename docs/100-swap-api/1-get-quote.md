@@ -147,7 +147,7 @@ Please be aware that the misuse of `maxAccounts` can yield unfavorable trades or
 
 :::note
 - `maxAccounts` is an estimation and the actual number of accounts may vary.
-- `maxAccounts` only applies to the number of accounts for the swap instruction (and not any of the setup, cleanup or other instructions).
+- `maxAccounts` only applies to the total number of accounts of the inner swaps in the swap instruction and not any of the setup, cleanup or other instructions (see the example below).
 - We recommend setting `maxAccounts` to 64
 - Keep `maxAccounts` as large as possible, only reduce `maxAccounts` if you exceed the transaction size limit.
 - If `maxAccounts` is set too low, example to 30, the computed route may drop DEXes/AMMs like Meteora DLMM that require more than 30 accounts.

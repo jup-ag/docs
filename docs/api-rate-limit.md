@@ -12,10 +12,23 @@ displayed_sidebar: docs
 
 In this section, you can find the rate limiting details for the Jupiter API. The Jupiter API uses a token bucket rate limiting system that is applied on a per-account basis.
 
-## API Hostnames
+:::note API Usage
+**Hostnames**
 
 - For paid tiers with API Keys, use `api.jup.ag`
-- For free tier, use `lite-api.jup.ag`
+- For free tier, use `lite-api.jup.ag` (NO API Key required)
+
+**API Key**
+
+Simply add the API Key in the `x-api-key` field in the Headers.
+
+```js
+headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': '' // enter api key here
+},
+```
+:::
 
 ## Per Account Setup
 

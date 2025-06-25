@@ -28,9 +28,10 @@ The Ultra API provides an endpoint to search tokens in the background for you an
 This is useful in most user applications, as users need to choose which tokens they want to swap. This also provides a seamless developer experience as integrating this allows us to handle and abstract the token search mechanism, allowing you to focus on other user features.
 
 :::tip Search 
-- Search for a token and its information by its symbol, name or mint address
-- Comma-separate to search for multiple
-- Limit to 100 mint addresses in query
+- Search for a token and its information by its **symbol, name or mint address**.
+- Comma-separate to search for multiple.
+- Limit to 100 mint addresses in query.
+- Default to 20 mints in response when searching via symbol or name.
 :::
 
 ```jsx
@@ -48,7 +49,9 @@ The search response will return an array of mints, along with their information.
 - Organic Score, Holder count, Market cap, etc can be useful to help make a better trading decision
 - And much more!
 
-Do note that the response is subject to changes as we continue to improve. For the full schema, refer to the [Ultra Search API Reference](/docs/api/ultra-api/search).
+Do note that the response is subject to changes as we continue to improve.
+
+Refer to [Ultra API Reference](/docs/api/ultra-api/search) for full schema.
 :::
 
 **Successful example response:**

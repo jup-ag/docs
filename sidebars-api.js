@@ -152,7 +152,7 @@ const sidebars = {
               label: "V2 (Beta)",
               link: {
                 type: "generated-index",
-                title: "V2 (Beta)",
+                title: "Token API V2 (Beta)",
                 slug: "/api/token-api/v2",
               },
               items: [

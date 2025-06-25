@@ -543,7 +543,9 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/MintInformation"
+                type: array
+                items:
+                  "$ref": "#/components/schemas/MintInformation"
         '400':
           description: Bad request
           content:

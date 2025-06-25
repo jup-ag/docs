@@ -35,7 +35,7 @@ const shieldResponse = await (
 
 ## Shield Response
 
-The shield response will return a list of token information and warnings of the mints passed in.
+The shield response will return a list of objects, containing the token information and warnings of the mints passed in.
 
 Do note that this is subject to changes, and we will be adding more warnings and improving the accuracy of the warnings over time.
 

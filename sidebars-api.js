@@ -187,7 +187,7 @@ const sidebars = {
               label: "V3 (Beta)",
               link: {
                 type: "generated-index",
-                title: "Price API V3",
+                title: "Price API V3 (Beta)",
                 slug: "/api/price-api/v3",
               },
               items: [

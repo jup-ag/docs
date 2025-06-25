@@ -149,10 +149,10 @@ const sidebars = {
           items: [
             {
               type: "category",
-              label: "V2",
+              label: "V2 (Beta)",
               link: {
                 type: "generated-index",
-                title: "V2",
+                title: "V2 (Beta)",
                 slug: "/api/token-api/v2",
               },
               items: [

@@ -31,8 +31,9 @@ paths:
           required: true
           description: |
             - Search for a token and its information by its symbol, name or mint address
-            - Comma-separate to search for multiple
+            - Comma-separate to ONLY search for multiple mint addresses
             - Limit to 100 mint addresses in query
+            - Default to 20 mints in response when searching via symbol or name
       responses:
         '200':
           description: Successful response
@@ -68,7 +69,8 @@ paths:
     get:
       summary: tag
       description: |
-        Request a list of mints by a specific tag
+        Request an array of mints and their information by a tag
+        - Note that this will return the entire array of existing mints that belongs to the tag.
 
         :::note
         - Refer to [Token API doc](/docs/token-api/v2) for more information
@@ -82,9 +84,6 @@ paths:
               - lst
               - verified
           required: true
-          description: |
-            - Request for a list of mints by a specific tag
-            - Only 1 tag at a time
       responses:
         '200':
           description: Successful response
@@ -120,8 +119,7 @@ paths:
     get:
       summary: category
       description: |
-          Returns a list of mints for the given category and interval
-          - Limit to 100 mints in response
+          Returns an array of mints and their information for the given category and interval
 
           :::note
           - Refer to [Token API doc](/docs/token-api/v2) for more information
@@ -133,14 +131,27 @@ paths:
           schema:
             type: string
             enum: [toporganicscore, toptraded, toptrending]
-          description: Category of the top tokens
+          description: | 
+            - Top tokens in different trading categories
+            - The result filters out generic top tokens like SOL, USDC, etc
+            - Default to 50 mints in response
         - in: path
           name: interval
           required: true
           schema:
             type: string
             enum: [5m, 1h, 6h, 24h]
-          description: Time interval
+          description: |
+            - Query by time interval for more accuracy
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          required: false
+          description: |
+            - Maximum number of results to return (default 50, max 100)
       responses:
         '200':
           description: Successful response
@@ -176,8 +187,8 @@ paths:
     get:
       summary: recent
       description: |
-        Returns a list of mints recently created/minted
-        - Limit to 100 mints in response
+        Returns an array of mints that recently had their **first created pool**
+        - Default to 30 mints in response
 
         :::note
         - Refer to [Token API doc](/docs/token-api/v2) for more information

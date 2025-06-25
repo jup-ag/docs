@@ -12,9 +12,12 @@ title: "Execute Order"
 
 
 :::note
-Base URL: `https://lite-api.jup.ag/trigger/v1/execute`
+- Lite URL: `https://lite-api.jup.ag/trigger/v1/execute`
+- Pro URL: `https://api.jup.ag/trigger/v1/execute`
 
-For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+To upgrade to Pro or understand our rate limiting, please refer to this section.
+- [API Key Setup](/docs/api-setup)
+- [API Rate Limit](/docs/api-rate-limit)
 :::
 
 After getting the order transaction, you can sign and send to the network yourself or use the Trigger API's `/execute` endpoint to do it for you.

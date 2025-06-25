@@ -12,6 +12,24 @@ displayed_sidebar: docs
 
 In this section, you can find the list of responses that can be returned by the Jupiter API.
 
+:::note API Usage
+**Hostnames**
+
+- For paid tiers with API Keys, use `api.jup.ag`
+- For free tier, use `lite-api.jup.ag` (NO API Key required)
+
+**API Key**
+
+Simply add the API Key in the `x-api-key` field in the Headers.
+
+```js
+headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': '' // enter api key here
+},
+```
+:::
+
 :::info Program Errors
 For more information on error codes from programs, see the [Swap API - Common Errors](/docs/swap-api/common-errors).
 :::

@@ -12,9 +12,12 @@ title: "Withdraw Price Order"
 
 
 :::note
-Base URL: `https://lite-api.jup.ag/recurring/v1/priceWithdraw`
+- Lite URL: `https://lite-api.jup.ag/recurring/v1/priceWithdraw`
+- Pro URL: `https://api.jup.ag/recurring/v1/priceWithdraw`
 
-For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+To upgrade to Pro or understand our rate limiting, please refer to this section.
+- [API Key Setup](/docs/api-setup)
+- [API Rate Limit](/docs/api-rate-limit)
 :::
 
 :::info

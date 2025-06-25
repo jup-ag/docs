@@ -11,9 +11,12 @@ title: "Create Order"
 
 
 :::note
-Base URL: `https://lite-api.jup.ag/recurring/v1/createOrder`
+- Lite URL: `https://lite-api.jup.ag/recurring/v1/createOrder`
+- Pro URL: `https://api.jup.ag/recurring/v1/createOrder`
 
-For higher rate limits, [refer to the API Key Setup doc](/docs/api-setup).
+To upgrade to Pro or understand our rate limiting, please refer to this section.
+- [API Key Setup](/docs/api-setup)
+- [API Rate Limit](/docs/api-rate-limit)
 :::
 
 ## Create Order

@@ -213,6 +213,10 @@ const sidebars = {
         },
         {
           type: 'doc',
+          id: 'swap-api/requote-with-lower-max-accounts',
+        },
+        {
+          type: 'doc',
           id: 'swap-api/solana-unity-sdk',
         },
         {
@@ -478,6 +482,7 @@ const sidebars = {
         {
           type: 'doc',
           id: 'tool-kits/terminal/README',
+          label: 'Introduction',
         },
         {
           type: 'doc',

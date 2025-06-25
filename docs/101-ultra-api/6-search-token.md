@@ -27,17 +27,17 @@ The Ultra API provides an endpoint to search tokens in the background for you an
 
 This is useful in most user applications, as users need to choose which tokens they want to swap. This also provides a seamless developer experience as integrating this allows us to handle and abstract the token search mechanism, allowing you to focus on other user features.
 
-```jsx
-const searchResponse = await (
-  await fetch(`https://lite-api.jup.ag/ultra/v1/search?query=So11111111111111111111111111111111111111112`)
-).json();
-```
-
 :::tip Search 
 - Search for a token and its information by its symbol, name or mint address
 - Comma-separate to search for multiple
 - Limit to 100 mint addresses in query
 :::
+
+```jsx
+const searchResponse = await (
+  await fetch(`https://lite-api.jup.ag/ultra/v1/search?query=So11111111111111111111111111111111111111112`)
+).json();
+```
 
 ## Search Response
 

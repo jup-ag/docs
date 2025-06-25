@@ -184,7 +184,7 @@ const sidebars = {
           items: [
             {
               type: "category",
-              label: "V3",
+              label: "V3 (Beta)",
               link: {
                 type: "generated-index",
                 title: "Price API V3",

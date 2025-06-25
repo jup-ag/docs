@@ -35,7 +35,7 @@ Over the years of experiment and development, we have optimized and continues to
 :::info
 95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine.
 
-For more information on latencies, [refer to the Developer Experience section](#developer-experience).
+For more information on latencies, [refer to the latency section](#latency).
 :::
 
 ### MEV Protection

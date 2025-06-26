@@ -10,7 +10,7 @@ title: "Execute Order"
 </head>
 
 :::note
-Base URL: `https://lite-api.jup.ag/ultra/v1/order`
+Base URL: `https://lite-api.jup.ag/ultra/v1/execute`
 
 We are exploring a Dynamic Rate Limit system for Ultra, hence Portal API keys currently do not apply for Ultra API.
 

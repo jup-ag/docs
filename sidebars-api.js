@@ -183,7 +183,7 @@ const sidebars = {
               label: "V1 (Deprecated)",
               link: {
                 type: "generated-index",
-                title: "V1",
+                title: "Token API V1 (Deprecated)",
                 slug: "/api/token-api/v1",
               },
               items: [

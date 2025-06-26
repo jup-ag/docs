@@ -152,12 +152,20 @@ const config = {
             outputDir: "docs/api/recurring-api",
           },
           token: {
-            specPath: "openapi/token.yaml",
-            outputDir: "docs/api/token-api",
+            specPath: "openapi/token.v1.yaml",
+            outputDir: "docs/api/token-api/v1",
           },
-          price: {
-            specPath: "openapi/price.yaml",
-            outputDir: "docs/api/price-api",
+          token_v2: {
+            specPath: "openapi/token.v2.yaml",
+            outputDir: "docs/api/token-api/v2",
+          },
+          price_v3: {
+            specPath: "openapi/price.v3.yaml",
+            outputDir: "docs/api/price-api/v3",
+          },
+          price_v2: {
+            specPath: "openapi/price.v2.yaml",
+            outputDir: "docs/api/price-api/v2",
           },
         },
       },

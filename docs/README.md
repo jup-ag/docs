@@ -46,6 +46,16 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 
 ## What's New?
 
+:::caution Deprecation of Price API V2 and Token API V1
+*Last updated: June 2025*
+
+Price API V2 and Token API V1 will be deprecated on 1 August 2025.
+
+Please migrate to Price API V3 and Token API V2 respectively.
+
+(add links above)
+:::
+
 :::caution API Gateway: Improvements
 *Last updated: March 2025*
 

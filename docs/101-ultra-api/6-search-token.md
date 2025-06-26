@@ -1,6 +1,6 @@
 ---
 sidebar_label: "Search Token"
-description: "Request for token information and warnings of mints."
+description: "Search tokens and their information by mint, name or symbol."
 title: "Search Token"
 ---
 

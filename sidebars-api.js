@@ -187,8 +187,34 @@ const sidebars = {
           },
           items: [
             {
-              type: 'doc',
-              id: 'api/price-api/price',
+              type: "category",
+              label: "V3 (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Price API V3 (Beta)",
+                slug: "/api/price-api/v3",
+              },
+              items: [
+                {
+                  type: 'doc',
+                  id: 'api/price-api/v3/price',
+                },
+              ],
+            },
+            {
+              type: "category",
+              label: "V2 (Deprecated)",
+              link: {
+                type: "generated-index",
+                title: "Price API V2 (Deprecated)",
+                slug: "/api/price-api/v2",
+              },
+              items: [
+                {
+                  type: 'doc',
+                  id: 'api/price-api/v2/price',
+                },
+              ],
             },
           ],
         },

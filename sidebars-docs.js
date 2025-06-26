@@ -426,6 +426,36 @@ const sidebars = {
       value: '<div class="sidebar-line-break"></div>',
     },
   ],
+  price: [
+    {
+      type: 'doc',
+      id: 'price-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Versions',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'price-api/v3',
+        },
+        {
+          type: 'doc',
+          id: 'price-api/v2',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
   token: [
     {
       type: 'doc',

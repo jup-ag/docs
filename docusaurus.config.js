@@ -159,9 +159,13 @@ const config = {
             specPath: "openapi/token.v2.yaml",
             outputDir: "docs/api/token-api/v2",
           },
-          price: {
-            specPath: "openapi/price.yaml",
-            outputDir: "docs/api/price-api",
+          price_v3: {
+            specPath: "openapi/price.v3.yaml",
+            outputDir: "docs/api/price-api/v3",
+          },
+          price_v2: {
+            specPath: "openapi/price.v2.yaml",
+            outputDir: "docs/api/price-api/v2",
           },
         },
       },

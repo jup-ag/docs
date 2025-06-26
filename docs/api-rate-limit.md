@@ -36,7 +36,7 @@ Using the API Keys generated from the same account will share the same rate limi
 
 ## Token Configuration
 
-These are the token configurations for each tier. Based on the tier, the amount of tokens allocated per periodare different.
+These are the token configurations for each tier. Based on the tier, the amount of tokens allocated per period are different.
 
 For example, in Pro II, you will be allocated 500 tokens every 10 seconds, which is approximately 3,000 requests per minute.
 

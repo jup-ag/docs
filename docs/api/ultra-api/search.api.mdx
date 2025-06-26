@@ -1,0 +1,76 @@
+---
+id: search
+title: "search"
+description: "Request a search by token's symbol, name or mint address"
+sidebar_label: "search"
+hide_title: true
+hide_table_of_contents: true
+api: eJztWU1z2zYQ/SsYXhrPRJbsSXrQzXbS1NOkcS0nF8kHCFyJsEGAwYdkVfZ/7y4hS7REOZR7aJvqklDAW+zD4u2SWM+TFJywsvDS6KSbXMK3AM4zzhxwKzI2nDFvbkH/5Jib5UOjXjPNc2DGslxqBKapBecGmrGB7na72ngY6Ba7hBFYNGX9L8pbzk4uzllqxPWrNv7r2oEGW7yQ7einVTo5YCNa11hgUuNjzolWue5AJ68T9FQY7cAl3Xly3OnQf0/594IQSGcUFHsEo50w2oP2BOdFoaQo123fOLKZJ05kkHN68rMCcBVuLZ+hnfSQu8q4Gd6A8DhRWFOA9TIykWkF47yVeoyYp8SuMlgGshq45OF1QgHdXAEnYsRrp6SI3Ne96qAUHyoc8zbAA9EQMuequg0d8iFYWsVPpff42GQhDwrGlueNwFMYOoxeQ4aT7+OeiycuAIoOpBpUIa3oBTzt2ebO63ZnPFc74dH3hTXbIrKFLSuiSZWp4kGLrOC1KtpwXHDrNdgzo0dy3MgC/aWBe0gvTJ2YnrM48Y3wmVEpUQraNwreKJ00wuWCF42AwaUXVgpoBC4IeaqMuD1PGxko+S3IVPpmynCee/e2FMW6hJ8vIyWvs4zrcbN9LKLe3GC5jx1sJkaFfBdWwzD7Wto0CxYotQMcF/9sx1xLsaOP3a1w5jTMaspmPbaHThqDrzC/wDaGL8gjnR2Mfgff2IDqmfT0M+lNedEjBSePUj7K9lLeS/mHkPLPeynvpfxjSPn4zV7Ley3/57U8ktb5tXvJUrzr4v7+rZvufRa23VweiAYPqM8XeHO9UN3oEDkD17W3FrzenwSfGYuJ8E46mkybmY4swJ/wQmNvil/LhHUXYAVozxsmFN6fT7niWsDuhp8kXhbplttIBWhjotR6wtgaJ2uAj3wItVdWQHzS7SeZHGf4M4dU4gAWIDNNrqk94r6ClSPZNHYC7qC6g20doJXONsPPx39zhVCk2y/dsR2GI4RpeYlFpppVn1B056ueGWmdpt/UNclOecpsbPS9oDm25d0C1pqaRhKRIF/S0lH0F7DryO5tHbtzpGM1V8yBnYBl0eIf5BmbLjwHX9a6PhYD4onxs3TAsXu3/LnBY3Xgq/XrOlot1ostV+qB8kW7iOuUSe+q7VBqydLQ8+3YFjszec5bDoi7p/bTY0u37LEG5WWhylbtR5lLT/NHnc6TVYD8snJjhHsHI45mhDyOwHL+sc/KphkSjj5ww2wi+YIjsSOWA5TlNSUrljcMQjKG8ni4x0+ZZNEIpgiW5x4jHSymf5J5X7huu60wmahpfHgTikM+jl3k9uRoo9/2C9ZRhiduy74z6LQwtK+p9Bkro6Foz/QGWnfRZPULLtNtq1NBwomKE4rXEFhwkEYI16XdbzArw0FHW8plkcl/BClu8RvPUnAoENHp0WHnsLNB5R5PT9+y+4G+Z61WKz70P4Bnny2+CTbb7RjzlqGpgwX2/R2IgGS34CFOV2xIyYVxPudl3i3kvzy9J/zmq6z9l/9pYZGsHu58u1BcltsspTFfKLT/uMdr+jDG0okj8/mQO/hi1cMDDccaQLpNl2/uEVduPderYXl1uagKB+x/UQG2hPoWs2FVRCdcBcKUCTLhVsb3ZJ9e7RnQp20Z5Wh0IgQUvmK18Xp4UnU+vL/Cav8XXHd1+A==
+sidebar_class_name: "get api-method"
+info_path: docs/api/ultra-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"search"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/search"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request a search by token's symbol, name or mint address
+  
+:::note
+- Refer to [Ultra API doc](/docs/ultra-api/search-token) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"in":"query","name":"query","schema":{"type":"string"},"required":true,"description":"- Search for a token and its information by its symbol, name or mint address\n- Comma-separate to search for multiple\n- Limit to 100 mint addresses in query\n- Default to 20 mints in response when searching via symbol or name\n"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string","description":"The token's mint address"},"name":{"type":"string"},"symbol":{"type":"string"},"icon":{"type":"string","nullable":true},"decimals":{"type":"number"},"twitter":{"type":"string","nullable":true},"telegram":{"type":"string","nullable":true},"website":{"type":"string","nullable":true},"dev":{"type":"string","nullable":true,"description":"The token's developer address"},"circSupply":{"type":"number","nullable":true},"totalSupply":{"type":"number","nullable":true},"tokenProgram":{"type":"string","description":"The token program address"},"launchpad":{"type":"string","nullable":true},"partnerConfig":{"type":"string","nullable":true},"graduatedPool":{"type":"string","nullable":true},"graduatedAt":{"type":"string","nullable":true},"holderCount":{"type":"number","nullable":true},"fdv":{"type":"number","nullable":true},"mcap":{"type":"number","nullable":true},"usdPrice":{"type":"number","nullable":true},"priceBlockId":{"type":"number","nullable":true},"liquidity":{"type":"number","nullable":true},"stats5m":{"nullable":true,"type":"object","properties":{"priceChange":{"type":"number","nullable":true},"holderChange":{"type":"number","nullable":true},"liquidityChange":{"type":"number","nullable":true},"volumeChange":{"type":"number","nullable":true},"buyVolume":{"type":"number","nullable":true},"sellVolume":{"type":"number","nullable":true},"buyOrganicVolume":{"type":"number","nullable":true},"sellOrganicVolume":{"type":"number","nullable":true},"numBuys":{"type":"number","nullable":true},"numSells":{"type":"number","nullable":true},"numTraders":{"type":"number","nullable":true},"numOrganicBuyers":{"type":"number","nullable":true},"numNetBuyers":{"type":"number","nullable":true}},"title":"SwapStats"},"stats1h":{"nullable":true,"type":"object","properties":{"priceChange":{"type":"number","nullable":true},"holderChange":{"type":"number","nullable":true},"liquidityChange":{"type":"number","nullable":true},"volumeChange":{"type":"number","nullable":true},"buyVolume":{"type":"number","nullable":true},"sellVolume":{"type":"number","nullable":true},"buyOrganicVolume":{"type":"number","nullable":true},"sellOrganicVolume":{"type":"number","nullable":true},"numBuys":{"type":"number","nullable":true},"numSells":{"type":"number","nullable":true},"numTraders":{"type":"number","nullable":true},"numOrganicBuyers":{"type":"number","nullable":true},"numNetBuyers":{"type":"number","nullable":true}},"title":"SwapStats"},"stats6h":{"nullable":true,"type":"object","properties":{"priceChange":{"type":"number","nullable":true},"holderChange":{"type":"number","nullable":true},"liquidityChange":{"type":"number","nullable":true},"volumeChange":{"type":"number","nullable":true},"buyVolume":{"type":"number","nullable":true},"sellVolume":{"type":"number","nullable":true},"buyOrganicVolume":{"type":"number","nullable":true},"sellOrganicVolume":{"type":"number","nullable":true},"numBuys":{"type":"number","nullable":true},"numSells":{"type":"number","nullable":true},"numTraders":{"type":"number","nullable":true},"numOrganicBuyers":{"type":"number","nullable":true},"numNetBuyers":{"type":"number","nullable":true}},"title":"SwapStats"},"stats24h":{"nullable":true,"type":"object","properties":{"priceChange":{"type":"number","nullable":true},"holderChange":{"type":"number","nullable":true},"liquidityChange":{"type":"number","nullable":true},"volumeChange":{"type":"number","nullable":true},"buyVolume":{"type":"number","nullable":true},"sellVolume":{"type":"number","nullable":true},"buyOrganicVolume":{"type":"number","nullable":true},"sellOrganicVolume":{"type":"number","nullable":true},"numBuys":{"type":"number","nullable":true},"numSells":{"type":"number","nullable":true},"numTraders":{"type":"number","nullable":true},"numOrganicBuyers":{"type":"number","nullable":true},"numNetBuyers":{"type":"number","nullable":true}},"title":"SwapStats"},"firstPool":{"type":"object","nullable":true,"properties":{"id":{"type":"string"},"createdAt":{"type":"string"}}},"audit":{"type":"object","nullable":true,"properties":{"isSus":{"type":"boolean","nullable":true},"mintAuthorityDisabled":{"type":"boolean","nullable":true},"freezeAuthorityDisabled":{"type":"boolean","nullable":true},"topHoldersPercentage":{"type":"number","nullable":true},"devBalancePercentage":{"type":"number","nullable":true},"devMigrations":{"type":"number","nullable":true}}},"organicScore":{"type":"number"},"organicScoreLabel":{"type":"string","enum":["high","medium","low"]},"isVerified":{"type":"boolean","nullable":true},"cexes":{"type":"array","items":{"type":"string"},"nullable":true},"tags":{"type":"array","items":{"type":"string"},"nullable":true},"updatedAt":{"type":"string","format":"date-time"}},"title":"MintInformation"}}}}},"400":{"description":"Bad request","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

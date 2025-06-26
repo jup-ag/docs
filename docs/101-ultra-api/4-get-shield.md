@@ -10,7 +10,7 @@ title: "Get Shield"
 </head>
 
 :::note
-Base URL: `https://lite-api.jup.ag/ultra/v1/order`
+Base URL: `https://lite-api.jup.ag/ultra/v1/shield`
 
 We are exploring a Dynamic Rate Limit system for Ultra, hence Portal API keys currently do not apply for Ultra API.
 
@@ -35,7 +35,7 @@ const shieldResponse = await (
 
 ## Shield Response
 
-The shield response will return a list of token information and warnings of the mints passed in.
+The shield response will return a list of objects, containing the token information and warnings of the mints passed in.
 
 Do note that this is subject to changes, and we will be adding more warnings and improving the accuracy of the warnings over time.
 

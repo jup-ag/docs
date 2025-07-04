@@ -21,7 +21,7 @@ Welcome to Jupiter Developer Documentation! You'll find detailed API guides, sch
 - [Token API](https://dev.jup.ag/docs/token-api/)
 - [Price API](https://dev.jup.ag/docs/price-api/)
 - [Swap Terminal](https://dev.jup.ag/docs/tool-kits/swap-terminal)
-- [Unified Wallet Kit](https://dev.jup.ag/docs/tool-kits/unified-wallet-kit)
+- [Unified Wallet Kit](https://dev.jup.ag/docs/tool-kits/wallet-kit/)
 
 
 **Reach out to us** on [Discord](https://discord.gg/jup) for developer support

@@ -44,3 +44,18 @@ Trigger API takes 0.03% for stable pairs and 0.1% for every other pairs.
 **Can integrators take fees using Trigger API?**
 
 Yes, integrators can take fees on top of Jupiter's fees.
+
+**How do jup.ag UI modes translate to the Trigger API?**
+
+When using trigger orders on the jup.ag frontend, you'll see two execution modes:
+
+| jup.ag UI Mode | API Implementation | Description |
+| --- | --- | --- |
+| **Exact** | `slippageBps: 0` (default) | Orders execute with 0 slippage for precise price execution |
+| **Ultra** | `slippageBps: <custom_value>` | Orders execute with custom slippage for higher success rates |
+
+:::info API Implementation Notes
+- **Exact mode**: By default, trigger orders execute with 0 slippage (you can omit the `slippageBps` parameter)
+- Set your own slippage tolerance via the `slippageBps` parameter in the create order request
+- Higher slippage increases the likelihood of order execution but may result in less favorable prices
+:::

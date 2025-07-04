@@ -34,7 +34,7 @@ This is a POST request to `/createOrder` endpoint, where you pass in the necessa
 :::tip Optional Parameters
 Do note that there are a few optional parameters that you can use, such as:
 
-- Adding slippage to the order. This is useful if you or your users want to execute the order with higher slippage which might yield better chances of being filled.
+- Adding slippage to the order: This corresponds to the "Ultra" mode on jup.ag frontend. Higher slippage increases execution success rate but may result in less favorable prices. Omitting this parameter (or setting it to 0) corresponds to "Exact" mode. [Learn more about UI modes vs API implementation](/docs/trigger-api#faq).
 - Setting an expiry date on the order.
 - Adding fees through our referral program, please ensure that your `feeAccount` has the necessary `referralTokenAccount`s of the output mint of the limit order for it to work, you can learn more about creating them dynamically in the [Add Fees To Swap](../100-swap-api/4-add-fees-to-swap.md) guide. (Note that the fees are transferred only after the trigger order has been executed.)
 :::

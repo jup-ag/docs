@@ -41,6 +41,10 @@ const sidebars = {
             },
             {
               type: 'doc',
+              id: 'api/ultra-api/search',
+            },
+            {
+              type: 'doc',
               id: 'api/ultra-api/routers',
             },
           ],
@@ -148,28 +152,66 @@ const sidebars = {
           },
           items: [
             {
-              type: 'doc',
-              id: 'api/token-api/token-information',
+              type: "category",
+              label: "V2 (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Token API V2 (Beta)",
+                slug: "/api/token-api/v2",
+              },
+              items: [
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v2/search',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v2/tag',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v2/category',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v2/recent',
+                },
+              ],
             },
             {
-              type: 'doc',
-              id: 'api/token-api/mints-in-market',
-            },
-            {
-              type: 'doc',
-              id: 'api/token-api/tradable',
-            },
-            {
-              type: 'doc',
-              id: 'api/token-api/tagged',
-            },
-            {
-              type: 'doc',
-              id: 'api/token-api/new',
-            },
-            {
-              type: 'doc',
-              id: 'api/token-api/all',
+              type: "category",
+              label: "V1 (Deprecated)",
+              link: {
+                type: "generated-index",
+                title: "Token API V1 (Deprecated)",
+                slug: "/api/token-api/v1",
+              },
+              items: [
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/token-information',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/mints-in-market',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/tradable',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/tagged',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/new',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/token-api/v1/all',
+                },
+              ],
             },
           ],
         },
@@ -183,8 +225,34 @@ const sidebars = {
           },
           items: [
             {
-              type: 'doc',
-              id: 'api/price-api/price',
+              type: "category",
+              label: "V3 (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Price API V3 (Beta)",
+                slug: "/api/price-api/v3",
+              },
+              items: [
+                {
+                  type: 'doc',
+                  id: 'api/price-api/v3/price',
+                },
+              ],
+            },
+            {
+              type: "category",
+              label: "V2 (Deprecated)",
+              link: {
+                type: "generated-index",
+                title: "Price API V2 (Deprecated)",
+                slug: "/api/price-api/v2",
+              },
+              items: [
+                {
+                  type: 'doc',
+                  id: 'api/price-api/v2/price',
+                },
+              ],
             },
           ],
         },

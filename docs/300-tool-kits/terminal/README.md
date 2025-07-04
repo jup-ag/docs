@@ -1,5 +1,4 @@
 ---
-sidebar_label: "Integrate Swap Terminal"
 description: "An overview of Jupiter Swap Terminal and its core features."
 title: "Integrate Swap Terminal"
 ---

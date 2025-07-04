@@ -141,6 +141,10 @@ const sidebars = {
           type: 'doc',
           id: 'ultra-api/get-shield',
         },
+        {
+          type: 'doc',
+          id: 'ultra-api/search-token',
+        },
       ],
     },
     {
@@ -210,6 +214,10 @@ const sidebars = {
         {
           type: 'doc',
           id: 'swap-api/payments-through-swap',
+        },
+        {
+          type: 'doc',
+          id: 'swap-api/requote-with-lower-max-accounts',
         },
         {
           type: 'doc',
@@ -418,6 +426,36 @@ const sidebars = {
       value: '<div class="sidebar-line-break"></div>',
     },
   ],
+  price: [
+    {
+      type: 'doc',
+      id: 'price-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Versions',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'price-api/v3',
+        },
+        {
+          type: 'doc',
+          id: 'price-api/v2',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
   token: [
     {
       type: 'doc',
@@ -426,6 +464,22 @@ const sidebars = {
     {
       type: 'html',
       value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Versions',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'token-api/v2',
+        },
+        {
+          type: 'doc',
+          id: 'token-api/v1',
+        },
+      ],
     },
     {
       type: 'category',
@@ -462,6 +516,7 @@ const sidebars = {
         {
           type: 'doc',
           id: 'tool-kits/terminal/README',
+          label: 'Introduction',
         },
         {
           type: 'doc',

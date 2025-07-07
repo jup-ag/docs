@@ -136,7 +136,7 @@ paths:
                   errorMessage:
                     type: string
                     description: |
-                      This field will be present if `taker` is defined and `transaction` is the empty string
+                      - This field will be present if `taker` is defined and `transaction` is the empty string
                   dynamicSlippageReport:
                     type: object
                     properties:

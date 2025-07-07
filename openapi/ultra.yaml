@@ -99,14 +99,17 @@ paths:
                       - rfq
                       - hashflow
                   transaction:
-                    description: "Unsigned base-64 encoded transaction to be signed and used in `/execute`"
+                    description: |
+                      - Unsigned base-64 encoded transaction to be signed and used in `/execute`
+                      - If `taker` is null, this field will be null. Else, it will either be a valid base64 encoded transaction or the empty string
                     type:
                       - string
                       - 'null'
                   gasless:
                     type: boolean
                   requestId:
-                    description: "Required to make a request to `/execute`"
+                    description: |
+                      Required to make a request to `/execute`
                     type: string
                   totalTime:
                     type: number
@@ -130,6 +133,10 @@ paths:
                     required:
                       - amount
                       - feeBps
+                  errorMessage:
+                    type: string
+                    description: |
+                      This field will be present if `taker` is defined and `transaction` is the empty string
                   dynamicSlippageReport:
                     type: object
                     properties:
@@ -339,10 +346,12 @@ paths:
               properties:
                 signedTransaction:
                   type: string
-                  description: "The signed transaction to execute"
+                  description: |
+                    The signed transaction to execute
                 requestId:
                   type: string
-                  description: "Found in response of `/order`"
+                  description: |
+                    Found in response of `/order`
               required:
                 - signedTransaction
                 - requestId
@@ -426,7 +435,8 @@ paths:
                   warnings:
                     type: object
                     additionalProperties:
-                      description: "Token mint address as key"
+                      description: |
+                        Token mint address as key
                       type: array
                       items:
                         type: object
@@ -450,22 +460,26 @@ paths:
                               - SUSPICIOUS_TOP_HOLDER_ACTIVITY
                               - HIGH_SINGLE_OWNERSHIP
                               - "{}%_TRANSFER_FEES"
-                            description: "Type of warning for the token"
+                            description: |
+                              Type of warning for the token
                           message:
                             type: string
-                            description: "Human-readable warning message"
+                            description: |
+                              Human-readable warning message
                           severity:
                             type: string
                             enum:
                               - info
                               - warning
                               - critical
-                            description: "Severity level of the warning"
+                            description: |
+                              Severity level of the warning
                           source:
                             type: string
                             enum:
                               - RugCheck
-                            description: "Optional external source of the warning"
+                            description: |
+                              Optional external source of the warning
                 required:
                   - warnings
         '400':
@@ -496,7 +510,8 @@ paths:
             schema:
               type: string
             required: true
-            description: "Comma separated list of mints to get information for"
+            description: |
+              Comma separated list of mints to get information for
   /order/routers:
     get:
       summary: routers

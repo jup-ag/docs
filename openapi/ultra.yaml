@@ -109,7 +109,7 @@ paths:
                     type: boolean
                   requestId:
                     description: |
-                      Required to make a request to `/execute`
+                      - Required to make a request to `/execute`
                     type: string
                   totalTime:
                     type: number
@@ -347,11 +347,11 @@ paths:
                 signedTransaction:
                   type: string
                   description: |
-                    The signed transaction to execute
+                    - The signed transaction to execute
                 requestId:
                   type: string
                   description: |
-                    Found in response of `/order`
+                    - Found in response of `/order`
               required:
                 - signedTransaction
                 - requestId
@@ -436,7 +436,7 @@ paths:
                     type: object
                     additionalProperties:
                       description: |
-                        Token mint address as key
+                        - Token mint address as key
                       type: array
                       items:
                         type: object
@@ -461,11 +461,11 @@ paths:
                               - HIGH_SINGLE_OWNERSHIP
                               - "{}%_TRANSFER_FEES"
                             description: |
-                              Type of warning for the token
+                              - Type of warning for the token
                           message:
                             type: string
                             description: |
-                              Human-readable warning message
+                              - Human-readable warning message
                           severity:
                             type: string
                             enum:
@@ -473,13 +473,13 @@ paths:
                               - warning
                               - critical
                             description: |
-                              Severity level of the warning
+                              - Severity level of the warning
                           source:
                             type: string
                             enum:
                               - RugCheck
                             description: |
-                              Optional external source of the warning
+                              - Optional external source of the warning
                 required:
                   - warnings
         '400':
@@ -511,7 +511,7 @@ paths:
               type: string
             required: true
             description: |
-              Comma separated list of mints to get information for
+              - Comma separated list of mints to get information for
   /order/routers:
     get:
       summary: routers

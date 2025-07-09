@@ -13,14 +13,11 @@ displayed_sidebar: docs
 In this section, you can find the list of responses that can be returned by the Jupiter API.
 
 :::note API Usage
-**Hostnames**
-
-- For paid tiers with API Keys, use `api.jup.ag`
-- For free tier, use `lite-api.jup.ag` (NO API Key required)
-
-**API Key**
-
-Simply add the API Key in the `x-api-key` field in the Headers.
+| Type | API Key | Rate Limit | Cost | URL |
+| --- | --- | --- | --- | --- |
+| Lite | No | Fixed at 60 RPM | Free | `lite-api.jup.ag` |
+| Dynamic | Yes | Scales with swap volume | [Ultra Swap Fees](/docs/ultra-api/add-fees-to-ultra) | `api.jup.ag/ultra` |
+| Pro | Yes | Tier-based | [Dependent on tier](/docs/api-rate-limit#token-configuration) | `api.jup.ag` |
 
 ```js
 headers: {

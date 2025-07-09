@@ -254,7 +254,7 @@ paths:
           name: excludeDexes
           description: |
             - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label), for example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
-            - **Important**: This only works on Metis router, if you want to exclude a DEX completely, you will need to exclude other routers as well
+            - **Important**: This only excludes DEXes on the Metis router, does not apply to other routers
             - For example:
               - **Exclude** Raydium: `excludeRouters=<all-except-Metis>` and `excludeDexes=Raydium`
               - **Only include** Meteora DLMM: `excludeRouters=<all-except-Metis>` and `excludeDexes=<all-except-MeteoraDLMM>`

@@ -203,6 +203,35 @@ Jupiter Terminal provides event handlers to track swap operations:
 }
 ```
 
+## Branding
+
+Jupiter Terminal supports branding through the `branding` prop. This allows you to customize the Terminal's logo and name to include your own branding.
+
+```typescript
+{
+  branding?: {
+    logoUri?: string;
+    name?: string;
+  };
+}
+```
+
+## Color Theme
+
+Jupiter Terminal supports a simplified way to customize the color theme. This allows you to match the appearance of the Terminal to your brand.
+
+```css
+/* In your global CSS file */
+:root {
+  --jupiter-terminal-primary: 199, 242, 132;
+  --jupiter-terminal-background: 0, 0, 0;
+  --jupiter-terminal-primaryText: 232, 249, 255;
+  --jupiter-terminal-warning: 251, 191, 36;
+  --jupiter-terminal-interactive: 33, 42, 54;
+  --jupiter-terminal-module: 16, 23, 31;
+}
+```
+
 ## Examples
 
 ### Fixed SOL Swap

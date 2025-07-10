@@ -102,10 +102,6 @@ To ensure market makers stay competitive and responsive, we enforce a minimum be
 To resume operations, we will need to manually re-enable your webhook, please reach out to us if this happens.
 :::
 
-:::danger need clarification
-are we penalizing the market maker if they consistently take more than 250ms to respond?
-:::
-
 ---
 
 ### Expiry

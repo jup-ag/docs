@@ -10,17 +10,14 @@ displayed_sidebar: docs
     <meta name="twitter:card" content="summary" />
 </head>
 
-In this section, you can find the rate limiting details for the Jupiter API. The Jupiter API uses a token bucket rate limiting system that is applied on a per-account basis.
+In this section, you can find the rate limiting details for the Jupiter API.
 
 :::note API Usage
-**Hostnames**
-
-- For paid tiers with API Keys, use `api.jup.ag`
-- For free tier, use `lite-api.jup.ag` (NO API Key required)
-
-**API Key**
-
-Simply add the API Key in the `x-api-key` field in the Headers.
+| Type | API Key | Rate Limit | Cost | URL |
+| --- | --- | --- | --- | --- |
+| Lite | No | Fixed at 60 RPM | Free | `lite-api.jup.ag` |
+| Dynamic | Yes | Scales with swap volume | [Ultra Swap Fees](/docs/ultra-api/add-fees-to-ultra) | `api.jup.ag/ultra` |
+| Pro | Yes | Tier-based | [Dependent on tier](/docs/api-rate-limit#token-configuration) | `api.jup.ag` |
 
 ```js
 headers: {
@@ -30,9 +27,15 @@ headers: {
 ```
 :::
 
-## Per Account Setup
+## Rate Limit Configuration
 
-Using the API Keys generated from the same account will share the same rate limit.
+| Note | Description |
+| --- | --- |
+| Dynamic Rate Limit only applies to Ultra API. | Lite Rate Limit is default and free for all using `lite-api.jup.ag`.<br/>Pro Rate Limit requires additional payment depending on the tier. |
+| API keys are universal and can be used with any of our APIs. | You can use the same API Key for Ultra API (Dynamic Rate Limit) and all other APIs (Lite/Pro Rate Limit). |
+| Rate limits apply on a per account basis, not to individual API keys. | Your API Key 1 and API Key 2 share the same rate limit. |
+
+![API Key](/dev/universal_api_key.png)
 
 ## Token Configuration
 

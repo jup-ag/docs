@@ -51,7 +51,7 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 
 [**Price API upgrades to V3**](/docs/price-api/v3) to support more reliable and timely pricing data - derived by the last swap price (across all transactions) and a set of heuristics to ensure the accuracy of the price and eliminate any outliers.
 
-[**Token API upgrades to V2**](/docs/token-api/v2) to support an easier and reliable usage with new data addition such as organic score, more trading categories like toporganicscore, and more.
+[**Token API upgrades to V2**](/docs/token-api/v2) to support an easier and reliable usage with new data addition such as [Organic Score](/docs/token-api/organic-score), more trading categories like toporganicscore, and more.
 
 :::danger ACTION REQUIRED
 - If you are using **Price API V2** and **Token API V1**

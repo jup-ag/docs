@@ -46,7 +46,7 @@ The search response will return an array of mints, along with their information.
 
 :::tip Useful Mint Information
 - Token Metadata like name, symbol, icon to display token information to users
-- Organic Score, Holder count, Market cap, etc can be useful to help make a better trading decision
+- [Organic Score](/docs/token-api/organic-score), Holder count, Market cap, etc can be useful to help make a better trading decision
 - And much more!
 
 Do note that the response is subject to changes as we continue to improve.

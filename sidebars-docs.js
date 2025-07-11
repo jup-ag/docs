@@ -483,10 +483,14 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Expanding the Token API',
+      label: 'Expanding on Token API',
       collapsible: false,
       collapsed: false,
       items: [
+        {
+          type: 'doc',
+          id: 'token-api/organic-score',
+        },
         {
           type: 'doc',
           id: 'token-api/token-tag-standard',

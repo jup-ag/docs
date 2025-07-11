@@ -180,9 +180,26 @@ const swapTransaction = await (
 
 ### How Jupiter Estimates Slippage?
 
-Apart from the static `slippageBps` parameter, Jupiter has iterated on different designs to estimate slippage better.
+Slippage is an unavoidable aspect of trading on decentralized exchanges (DEXes).
 
-By using Dynamic Slippage, during swap transaction building, we will simulate the transaction and estimate a slippage value, which we then factor in the token categories heuristics to get the final slippage value.
+#### About Slippage
+
+- **Token Pair:** The same fixed slippage setting can have very different effects depending on the tokens involved. For example, swapping between two stablecoins is much less volatile than swapping between two meme coins.
+- **Timing:** The time between when you receive a quote and when you actually send the swap transaction matters. Any delay can result in the price moving outside your slippage threshold.
+- **Transaction Landing:** How efficiently your transaction lands on-chain also affects slippage. Poorly optimized transactions may experience more slippage.
+
+:::tip Use Ultra API!
+- If you use the Swap API:
+  - You are limited to fixed and dynamic slippage settings.
+  - You are responsible for handling slippage and optimizing transaction landing yourself.
+- [Alternatively, consider using the Ultra API](/docs/ultra-api):
+  - All of these optimizations are handled for you - without any RPC from you.
+  - Additional routing is available to RFQ (Request for Quote) systems like Jupiterz where slippage is not an issue because the market maker fills your order exactly as quoted.
+:::
+
+#### Dynamic Slippage
+
+Apart from the fixed slippage setting, you can use Dynamic Slippage: During swap transaction building, we will simulate the transaction and estimate a slippage value, which we then factor in the token categories heuristics to get the final slippage value.
 
 :::info Dynamic Slippage vs Real Time Slippage Estimator (RTSE)
 RTSE is very different from Dynamic Slippage and has provided a much better user experience and results. RTSE is able to intelligently estimate the best possible slippage to use at the time of execution, balancing between trade success and price protection. RTSE uses a variety of heuristics, algorithms and monitoring to ensure the best user experience: 
@@ -190,7 +207,7 @@ RTSE is very different from Dynamic Slippage and has provided a much better user
 - **Algorithms**: Exponential Moving Average (EMA) on slippage data, and more.
 - **Monitoring**: Real-time monitoring of failure rates to ensure reactiveness to increase slippage when necessary.
 
-Refer to [Ultra API](/docs/ultra-api#real-time-slippage-estimator) for more information on RTSE.
+[Refer to Ultra API for more information on RTSE](/docs/ultra-api#real-time-slippage-estimator).
 :::
 
 :::warning

@@ -27,7 +27,7 @@ A historical breakdown of the evolutions of the Token API and verification syste
 - [Solana Token Registry](https://github.com/solana-labs/token-list) was deprecated in 2022.
 - [Ecosystem Token List V1: Github](https://github.com/jup-ag/token-list): Maintained via Github with 4.8k Pull Requests verified manually.
 - [Ecosystem Token List V2: Catdet List](https://catdetlist.jup.ag): Maintained by Catdets and community with simple metrics to aid review.
-- [Ecosystem Token List V3: Verify](https://verify.jup.ag): Using a variety of trading, social metrics and organic score to aid verification.
+- [Ecosystem Token List V3: Verify](https://verify.jup.ag): Using a variety of trading, social metrics and [Organic Score](/docs/token-api/organic-score) to aid verification.
 
 :::info More reading materials
 - [Introducing a new token verification method](https://x.com/9yointern/status/1907425355071197347) at https://verify.jup.ag

@@ -23,7 +23,7 @@ paths:
         Returns the specified mint address's token information and metadata.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-token-information) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1#get-token-information) for more information.
         :::
       parameters:
       - name: address
@@ -48,7 +48,7 @@ paths:
         Returns the mints involved in a market.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-tokens-in-market) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1#get-tokens-in-market) for more information.
         :::
       parameters:
       - name: address
@@ -75,7 +75,7 @@ paths:
         Returns a list of all mints tradable via Jupiter routing.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-all-tradable-tokens) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1#get-all-tradable-tokens) for more information.
         :::
       responses:
         '200':
@@ -94,7 +94,7 @@ paths:
         Returns a list of mints with specified tag(s) along with their metadata.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-tagged-tokens) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1#get-tagged-tokens) for more information.
         :::
       parameters:
       - name: tag_list
@@ -120,7 +120,7 @@ paths:
         Returns new tokens with metadata, created at timestamp and markets.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-new-tokens) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1#get-new-tokens) for more information.
         :::
       parameters:
       - name: limit
@@ -162,7 +162,7 @@ paths:
         Returns all tokens with all metadata.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-all-tokens) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1#get-all-tokens) for more information.
         :::
       responses:
         '200':

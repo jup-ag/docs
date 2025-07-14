@@ -13,11 +13,13 @@ title: "API Key Setup"
 Get started by setting up an account on the dashboard to generate API Keys and managing payments via Helio.
 
 :::note API Usage
-| Type | API Key | Rate Limit | Cost | URL |
-| --- | --- | --- | --- | --- |
-| Lite | No | Fixed at 60 RPM | Free | `lite-api.jup.ag` |
-| Dynamic | Yes | Scales with swap volume | [Ultra Swap Fees](/docs/ultra-api/add-fees-to-ultra) | `api.jup.ag/ultra` |
-| Pro | Yes | Tier-based | [Dependent on tier](/docs/api-rate-limit#token-configuration) | `api.jup.ag` |
+Refer to [API Rate Limit](/docs/api-rate-limit) for more detailed information.
+
+| API Tier | Rate Limit Model | API Key | Base URL |
+| --- | --- | --- | --- |
+| **Lite** | Fixed (Free Tier) | No | `https://lite-api.jup.ag/**` |
+| **Pro** | Fixed (Tiered) | Yes | `https://api.jup.ag/**` |
+| **Ultra** | Dynamic | Yes | `https://api.jup.ag/ultra/**` |
 
 ```js
 headers: {

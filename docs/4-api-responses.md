@@ -12,21 +12,6 @@ displayed_sidebar: docs
 
 In this section, you can find the list of responses that can be returned by the Jupiter API.
 
-:::note API Usage
-| Type | API Key | Rate Limit | Cost | URL |
-| --- | --- | --- | --- | --- |
-| Lite | No | Fixed at 60 RPM | Free | `lite-api.jup.ag` |
-| Dynamic | Yes | Scales with swap volume | [Ultra Swap Fees](/docs/ultra-api/add-fees-to-ultra) | `api.jup.ag/ultra` |
-| Pro | Yes | Tier-based | [Dependent on tier](/docs/api-rate-limit#token-configuration) | `api.jup.ag` |
-
-```js
-headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': '' // enter api key here
-},
-```
-:::
-
 :::info Program Errors
 For more information on error codes from programs, see the [Swap API - Common Errors](/docs/swap-api/common-errors).
 :::

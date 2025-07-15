@@ -388,74 +388,6 @@ const sidebars = {
       ],
     },
   ],
-  perp: [
-    {
-      type: 'doc',
-      id: 'perp-api/README',
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-    {
-      type: 'category',
-      label: 'Perp Program',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          id: 'perp-api/position-account',
-        },
-        {
-          type: 'doc',
-          id: 'perp-api/position-request-account',
-        },
-        {
-          type: 'doc',
-          id: 'perp-api/pool-account',
-        },
-        {
-          type: 'doc',
-          id: 'perp-api/custody-account',
-        },
-      ],
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-  ],
-  price: [
-    {
-      type: 'doc',
-      id: 'price-api/README',
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-    {
-      type: 'category',
-      label: 'Versions',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          id: 'price-api/v3',
-        },
-        {
-          type: 'doc',
-          id: 'price-api/v2',
-        },
-      ],
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-  ],
   token: [
     {
       type: 'doc',
@@ -494,6 +426,104 @@ const sidebars = {
         {
           type: 'doc',
           id: 'token-api/token-tag-standard',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
+  price: [
+    {
+      type: 'doc',
+      id: 'price-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Versions',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'price-api/v3',
+        },
+        {
+          type: 'doc',
+          id: 'price-api/v2',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
+  lend: [
+    {
+      type: 'doc',
+      id: 'lend-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Lend API',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'lend-api/get-order',
+        },
+        {
+          type: 'doc',
+          id: 'lend-api/execute-order',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
+  perp: [
+    {
+      type: 'doc',
+      id: 'perp-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Perp Program',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'perp-api/position-account',
+        },
+        {
+          type: 'doc',
+          id: 'perp-api/position-request-account',
+        },
+        {
+          type: 'doc',
+          id: 'perp-api/pool-account',
+        },
+        {
+          type: 'doc',
+          id: 'perp-api/custody-account',
         },
       ],
     },

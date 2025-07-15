@@ -1,0 +1,36 @@
+openapi: 3.0.3
+info:
+  title: Quickstart
+  version: 1.0.0
+  description: |
+    | Link |
+    | --- |
+    | [Get Quote](/docs/swap-api/get-quote) |
+    | [Build Swap Transaction](/docs/swap-api/build-swap-transaction) |
+    | [Send Swap Transaction](/docs/swap-api/send-swap-transaction) |
+
+servers:
+  - url: https://lite-api.jup.ag/lend/v1
+    description: Free tier API endpoint with rate limits
+  - url: https://api.jup.ag/lend/v1
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+
+paths:
+  /program-id-to-label:
+    get:
+      tags:
+        - Swap
+      summary: program-id-to-label
+      description: |
+        Returns a hash, which key is the program id and value is the label.
+        This is used to help map error from transaction by identifying the fault program id.
+        This can be used in conjunction with the `excludeDexes` or `dexes` parameter.
+      responses:
+        '200':
+          description: Default response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string

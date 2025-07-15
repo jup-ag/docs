@@ -256,6 +256,21 @@ const sidebars = {
             },
           ],
         },
+        {
+          type: "category",
+          label: "Lend API Schema",
+          link: {
+            type: "generated-index",
+            title: "Lend API Schema",
+            slug: "/api/lend-api",
+          },
+          items: [
+            {
+              type: 'doc',
+              id: 'api/lend-api/program-id-to-label',
+            },
+          ],
+        },
       ],
     },
   ],

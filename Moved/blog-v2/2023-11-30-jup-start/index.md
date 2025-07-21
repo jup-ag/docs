@@ -82,7 +82,7 @@ Launchpad and Atlas are 2 funding-related initiatives to be launched next year. 
 
 # Community-Driven Approach
 
-As with all our key initiaitives, we are committed to doing these in conjuction with the community and doing it in a way that greatly enhances the trust of users in the Solana ecosystem.
+As with all our key initiaitives, we are committed to doing these in conjunction with the community and doing it in a way that greatly enhances the trust of users in the Solana ecosystem.
 
 If you fall into any of the following categories:
 

@@ -10,11 +10,16 @@ title: "Get Shield"
 </head>
 
 :::note
-Base URL: `https://lite-api.jup.ag/ultra/v1/shield`
+Lite URL: `https://lite-api.jup.ag/ultra/v1/shield`
+Dynamic URL: `https://api.jup.ag/ultra/v1/shield`
 
-We are exploring a Dynamic Rate Limit system for Ultra, hence Portal API keys currently do not apply for Ultra API.
+Dynamic Rate Limits are now applied to Ultra API.
 
-If you require higher rate limits, please reach out to us in [Discord](https://discord.gg/jup).
+- No Pro plans or payment needed.
+- Simply generate the free/standard API Key via [Portal](https://portal.jup.ag)
+- Rate limits scale together with your swap volume.
+
+[Read more about Ultra API Dynamic Rate Limit](/docs/api-rate-limit).
 :::
 
 :::tip API Reference

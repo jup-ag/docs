@@ -13,14 +13,13 @@ title: "API Key Setup"
 Get started by setting up an account on the dashboard to generate API Keys and managing payments via Helio.
 
 :::note API Usage
-**Hostnames**
+Refer to [API Rate Limit](/docs/api-rate-limit) for more detailed information.
 
-- For paid tiers with API Keys, use `api.jup.ag`
-- For free tier, use `lite-api.jup.ag` (NO API Key required)
-
-**API Key**
-
-Simply add the API Key in the `x-api-key` field in the Headers.
+| API Tier | Rate Limit Model | API Key | Base URL |
+| --- | --- | --- | --- |
+| **Lite** | Fixed (Free Tier) | No | `https://lite-api.jup.ag/**` |
+| **Pro** | Fixed (Tiered) | Yes | `https://api.jup.ag/**` |
+| **Ultra** | Dynamic | Yes | `https://api.jup.ag/ultra/**` |
 
 ```js
 headers: {

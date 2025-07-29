@@ -2,12 +2,6 @@ openapi: 3.0.3
 info:
   title: Quickstart
   version: 1.0.0
-  description: |
-    | Link |
-    | --- |
-    | [Get Quote](/docs/swap-api/get-quote) |
-    | [Build Swap Transaction](/docs/swap-api/build-swap-transaction) |
-    | [Send Swap Transaction](/docs/swap-api/send-swap-transaction) |
 
 servers:
   - url: https://lite-api.jup.ag/lend/v1
@@ -16,21 +10,193 @@ servers:
     description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
-  /program-id-to-label:
-    get:
-      tags:
-        - Swap
-      summary: program-id-to-label
+  /earning/deposit:
+    post:
+      summary: earning-deposit
       description: |
-        Returns a hash, which key is the program id and value is the label.
-        This is used to help map error from transaction by identifying the fault program id.
-        This can be used in conjunction with the `excludeDexes` or `dexes` parameter.
+        Request for a base64-encoded unsigned earning deposit transaction based on parameters
+        
+        :::note
+        Refer to [Lend API doc](/docs/lend-api) for more information
+        :::
+      parameters:
+        - name: cluster
+          in: query
+          description: "Solana cluster"
+          required: false # what is the default?
+          schema:
+            type: string
+            enum:
+              - mainnet
+              - devnet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnRequestBody'
       responses:
         '200':
-          description: Default response
+          description: Successful response
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties:
-                  type: string
+                $ref: '#/components/schemas/TransactionResponse'
+
+  /earning/deposit-instruction:
+    post:
+      summary: earning-deposit-instruction
+      description: |
+        Request for the instruction of a earning deposit transaction based on parameters
+        
+        :::note
+        Refer to [Lend API doc](/docs/lend-api) for more information
+        :::
+      parameters:
+        - name: cluster
+          in: query
+          description: "Solana cluster"
+          required: false # what is the default?
+          schema:
+            type: string
+            enum:
+              - mainnet
+              - devnet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstructionResponse'
+
+  /earning/withdraw:
+    post:
+      summary: earning-withdraw
+      description: |
+        Request for a base64-encoded unsigned earning withdraw transaction based on parameters
+        
+        :::note
+        Refer to [Lend API doc](/docs/lend-api) for more information
+        :::
+      parameters:
+        - name: cluster
+          in: query
+          description: "Solana cluster"
+          required: false # what is the default?
+          schema:
+            type: string
+            enum:
+              - mainnet
+              - devnet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+
+  /earning/withdraw-instruction:
+    post:
+      summary: earning-withdraw-instruction
+      description: |
+        Request for the instruction of a earning deposit transaction based on parameters
+        
+        :::note
+        Refer to [Lend API doc](/docs/lend-api) for more information
+        :::
+      parameters:
+        - name: cluster
+          in: query
+          description: "Solana cluster"
+          required: false # what is the default?
+          schema:
+            type: string
+            enum:
+              - mainnet
+              - devnet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstructionResponse'
+
+
+
+components:
+  schemas:
+    EarnRequestBody:
+      type: object
+      required:
+        - asset
+        - signer
+        - amount
+      properties:
+        asset:
+          type: string
+        signer:
+          type: string
+        amount:
+          type: string
+
+    TransactionResponse:
+      type: object
+      required:
+        - transaction
+      properties:
+        transaction:
+          type: string
+
+    InstructionResponse:
+      type: object
+      required:
+        - programId
+        - accounts
+        - data
+      properties:
+        programId:
+          type: string
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountMeta'
+        data:
+          type: string
+
+    AccountMeta:
+      type: object
+      required:
+        - pubkey
+        - isSigner
+        - isWritable
+      properties:
+        pubkey:
+          type: string
+        isSigner:
+          type: boolean
+        isWritable:
+          type: boolean
+
+
+

@@ -1,0 +1,76 @@
+---
+id: earning-deposit
+title: "earning-deposit"
+description: "Request for a base64-encoded unsigned earning deposit transaction based on parameters"
+sidebar_label: "earning-deposit"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVVMFu2zAM/RVBpw1o4nQYdvCtHTpg2IB1aXdKcmBsJlZrS5okpy0M//tI2andui122GU5OLZIkXx8j2xkjj5zygZltEzlEn/X6IPYGSdAbMHjp48z1JnJMRe19mqv6QXBaaX3IkdrvAoiONAeMo4R7+SCXiw4qDCg82u91mmaahNwrZe4QyeCEavvqHNxdvlV5CbbvEvo6ZOSzmZg1ftYQWUcCqXptQIOHsOstTyRQ3CZrhqp6YOqz8ra0xnZFYMhKO6BPp5CvDIlaBCDryPMymEu0x2UHk+kzwqsQKaNDA+W4/rgCC65oq4rSigrUFpjiLEP/LJp200Xibp3bvIHvj0EDq6muJnRAXVgE1hbqiyCSm4819VM05rtDWbhSYUrCd7HxJEKLh8qU1NQSm+dseiCQh9TRMcJiPbx6kumPtjURLagQslHF8T+coS0bdnq0FujfZf7w2LBf88aX2cZer+rS3F0lv+oKSMBThsxNr4J7HpwXB4LbDt0pLXCUCpJgg9Rf6Ggr6SfhKSfBOYF3eEoy9qV5FSEYH2aJKUKyNqe39R2Dvuo9eRwOhHoF4coqHgXh4OcrFE6iDsVCuEgoChVpYInup5n+Ivgl6Dy14IXal+QYZSD53SLouaRji6g471vSLRTo5mlkRQu7qGy3MpH9Q2jcxTdcHLU2kh+POuRo56Rn7XKbn0Ax53ltnYgTueL+YL9mY0KIq39CugJmQ2EPMHfDHr7b3ZdL9iA9yGxJW0eRh6Jb3odro6wI9wOOLFTsFbJ2DRc6C9Xti0fd2uR9ZkrD9tytPle7dVkab5Y1C3JYryFD1DW7BW1cgCnOBtl3pBvgZCzHqiM7trnLtnsmiMPdydLgWXf3TijfWLDm76b0ehe/ri6Judtv50r4plOHdzxMqEn1XkiTQQf90Y8ayQB39ewZ98uJv/+ABr4hCo=
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"earning-deposit"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earning/deposit"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for a base64-encoded unsigned earning deposit transaction based on parameters
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"cluster","in":"query","description":"Solana cluster","required":false,"schema":{"type":"string","enum":["mainnet","devnet"]}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"title":"EarnRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["transaction"],"properties":{"transaction":{"type":"string"}},"title":"TransactionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

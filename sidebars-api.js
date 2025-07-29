@@ -267,7 +267,19 @@ const sidebars = {
           items: [
             {
               type: 'doc',
-              id: 'api/lend-api/program-id-to-label',
+              id: 'api/lend-api/earning-deposit',
+            },
+            {
+              type: 'doc',
+              id: 'api/lend-api/earning-deposit-instruction',
+            },
+            {
+              type: 'doc',
+              id: 'api/lend-api/earning-withdraw',
+            },
+            {
+              type: 'doc',
+              id: 'api/lend-api/earning-withdraw-instruction',
             },
           ],
         },

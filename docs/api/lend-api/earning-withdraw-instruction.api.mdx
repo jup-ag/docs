@@ -1,0 +1,76 @@
+---
+id: earning-withdraw-instruction
+title: "earning-withdraw-instruction"
+description: "Request for the instruction of a earning deposit transaction based on parameters"
+sidebar_label: "earning-withdraw-instruction"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVVU1z0zAQ/SsanWAmiVOOvhWmzHSAoaRlOCQ5bOxNrNaWjCSndDz+7+zKdu3WaeHAhRwcW/v2e9+qlim6xKrSK6NlLFf4s0Lnxd5Y4TMUSjtvq4SlwuwFCASrlT6IFEvjlBfegnbQAnbgMBX0UoKFAj1at9EbHcexNh43eoV7JLNGrD+jTsX51aVITbJ9E9HTRTmdzaFUb4Pzwlj2Tq8FsPFgZqPlTA7GZbyupaYPCjzJK0dnJFecB2VhH+jjaXbXJgcNYsBaSldZTGW8h9zhTLokwwJkXEv/ULJdSp/SJSjqqiCHsgClNfpg+8gv26bZtpaocO9N+sDag2EqH9lNjPaoPYugLHOVhKSiW8dx1VO3ZneLiX8S4VqCc8GxUwcdwofCVGSU3JfWlGi9QhdcBOAkieZR9ZSoMzYVkcwrn/PRBXV/Ncq0aVhq0ZVGu9b3u+WS/54VvkoSdG5f5aIHy39UFMr8QANxmXI9koRzcNwc8DAtzAA+WYFefRCCtcBzpDwW7o+hVLs7DGh33bdIuR9WedhR+abRtPhToTxaGIQ7Y3IE3UofjZ6Qj/p13mb0BakYfB6q8mqHLwfCr/pONW2biXSZoUQlMd8HIvqMvqJuJUT3ymephfv5aGnwtKI99mStbE4amfeli6Mop6oy4xe3VbmAQ9gA0fFsQtuPFlFQ0WxYGQQqjdJesD9hwaPIVaGobc3suYe/MH4FKn3JeKYOGQlGPnh77VBUvOgCBHTQ+0R95DXAszsiyMUvKMq2Sx0nh4XSU3E46Rk4ngPagKFhXXu+VSq5cx4sN4DL2iZxtlgulozn1hQQ6NMtxq478xe686QY9UDJ/+Em6KbY4y8flTntZa5AGIC6G851nz6hTxaAWpbxNBOyrjnq7zZvGj5ubxAe2lQ5ptpwSbxYs8n9cjLCwPnRhXWEvGJUGKAjWNUSe70lbIaQ8pBQGK3ah9bZ/IYtD7qT/clcaDVoB2DpX8VuR+S++np9Q+Bdd5EVJmUdqhsvO3pSnDNpQvJhiYWzWlLihwoOjG1t8u83d9Xr1Q==
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"earning-withdraw-instruction"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earning/withdraw-instruction"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the instruction of a earning deposit transaction based on parameters
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"cluster","in":"query","description":"Solana cluster","required":false,"schema":{"type":"string","enum":["mainnet","devnet"]}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"title":"EarnRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["programId","accounts","data"],"properties":{"programId":{"type":"string"},"accounts":{"type":"array","items":{"type":"object","required":["pubkey","isSigner","isWritable"],"properties":{"pubkey":{"type":"string"},"isSigner":{"type":"boolean"},"isWritable":{"type":"boolean"}},"title":"AccountMeta"}},"data":{"type":"string"}},"title":"InstructionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

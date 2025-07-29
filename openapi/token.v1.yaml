@@ -5,12 +5,8 @@ info:
   description: |
     | Link |
     | --- |
-    | [Get Token Information](/docs/token-api#get-token-information) |
-    | [Get Mints in Market](/docs/token-api#get-tokens-in-market) |
-    | [Get Tradable Mints](/docs/token-api#get-all-tradable-tokens) |
-    | [Get Tokens by Tag](/docs/token-api#get-tagged-tokens) |
-    | [Get New Tokens](/docs/token-api#get-new-tokens) |
-    | [Get All Tokens](/docs/token-api#get-all-tokens) |
+    | [V2](/docs/token-api/v2) |
+    | [V1 Deprecated](/docs/token-api/v1) |
 
 servers:
   - url: https://lite-api.jup.ag/tokens/v1
@@ -27,7 +23,7 @@ paths:
         Returns the specified mint address's token information and metadata.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-token-information) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1) for more information.
         :::
       parameters:
       - name: address
@@ -52,7 +48,7 @@ paths:
         Returns the mints involved in a market.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-tokens-in-market) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1) for more information.
         :::
       parameters:
       - name: address
@@ -79,7 +75,7 @@ paths:
         Returns a list of all mints tradable via Jupiter routing.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-all-tradable-tokens) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1) for more information.
         :::
       responses:
         '200':
@@ -98,7 +94,7 @@ paths:
         Returns a list of mints with specified tag(s) along with their metadata.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-tagged-tokens) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1) for more information.
         :::
       parameters:
       - name: tag_list
@@ -124,7 +120,7 @@ paths:
         Returns new tokens with metadata, created at timestamp and markets.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-new-tokens) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1) for more information.
         :::
       parameters:
       - name: limit
@@ -166,7 +162,7 @@ paths:
         Returns all tokens with all metadata.
         
         :::note
-        - Refer to [Token API doc](/docs/token-api#get-all-tokens) for more information.
+        - Refer to [Token API doc](/docs/token-api/v1) for more information.
         :::
       responses:
         '200':

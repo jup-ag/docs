@@ -92,7 +92,7 @@ In both cases, both [@OvolsNFT](https://twitter.com/OvolsNFT) and [@Jupiterexcha
 
 So that should be a nice early bonus to the DAO. The team will keep this first, and transfer to the DAO after it forms.
 
-Moving forward, the Jupiter DAO will approve new projects to be on the launchpad. It has to be throughly responsible for making sure the projects are worthy of being promoted to all Jupiter users, and then doing what they can to make the project as successful as possible.
+Moving forward, the Jupiter DAO will approve new projects to be on the launchpad. It has to be thoroughly responsible for making sure the projects are worthy of being promoted to all Jupiter users, and then doing what they can to make the project as successful as possible.
 
 There will be no bullshit like insider arrangements, secret profit sharing and token gating. The above arrangement is a pure, simple and mutually beneficial approach to token launches.
 

@@ -41,7 +41,7 @@ Each `Pool` account contains the following data:
 | Field | Description |
 | --- | --- |
 | `maxAumUsd`               | **Type:** `u128`<br /><br />The max AUM for the JLP pool. This acts as a max cap / ceiling as the JLP will not accept deposits when the cap is hit. |
-| `tokenWeightageBufferBps` | **Type:** `u128`<br /><br />The token weightage buffer (in basis points) to calculate the token's maximum or minimum current weightage based on the target weightage.<br /><br />Currently, `tokenWeightageBufferBps` is set to `2000` which means the the current weightage cannot be lower or higher than + / - 20% of the token's target weightage.<br /><br />For example, if SOL's target weightage for the JLP pool is 50%, the current weightage cannot be less than 40% or exceed 60%. The pool will not allow deposits or withdrawals if the action causes the token to exceed its target weightage. |
+| `tokenWeightageBufferBps` | **Type:** `u128`<br /><br />The token weightage buffer (in basis points) to calculate the token's maximum or minimum current weightage based on the target weightage.<br /><br />Currently, `tokenWeightageBufferBps` is set to `2000` which means the current weightage cannot be lower or higher than + / - 20% of the token's target weightage.<br /><br />For example, if SOL's target weightage for the JLP pool is 50%, the current weightage cannot be less than 40% or exceed 60%. The pool will not allow deposits or withdrawals if the action causes the token to exceed its target weightage. |
 | `maxPositionUsd`          | **Type:** `u64`<br /><br />Sets the maximum position size. The current `maxPositionUsd` value is `2_500_000_000_000` which means a position's max size is $2,500,000. |
 
 ### `Fees`

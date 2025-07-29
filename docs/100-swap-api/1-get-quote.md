@@ -121,7 +121,7 @@ All Jupiter swaps are using Versioned Transactions and [Address Lookup Tables](h
 
 ### Adding Fees
 
-By using the Quote API in your app, you can add a fee to charge your users. You can refer to the `platformFeeBps` parameter and to add it to your quote and in conjuction, add `feeAccount` (it can be any valid token account) to your swap request.
+By using the Quote API in your app, you can add a fee to charge your users. You can refer to the `platformFeeBps` parameter and to add it to your quote and in conjunction, add `feeAccount` (it can be any valid token account) to your swap request.
 
 ### Direct Routes
 

@@ -481,11 +481,11 @@ const sidebars = {
       items: [
         {
           type: 'doc',
-          id: 'lend-api/get-order',
+          id: 'lend-api/earn',
         },
         {
           type: 'doc',
-          id: 'lend-api/execute-order',
+          id: 'lend-api/borrow',
         },
       ],
     },

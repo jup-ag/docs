@@ -77,6 +77,33 @@ const sidebars = {
           ],
         },
         {
+          type: "category",
+          label: "Lend API Schema",
+          link: {
+            type: "generated-index",
+            title: "Lend API Schema",
+            slug: "/api/lend-api",
+          },
+          items: [
+            {
+              type: 'doc',
+              id: 'api/lend-api/earning-deposit',
+            },
+            {
+              type: 'doc',
+              id: 'api/lend-api/earning-deposit-instruction',
+            },
+            {
+              type: 'doc',
+              id: 'api/lend-api/earning-withdraw',
+            },
+            {
+              type: 'doc',
+              id: 'api/lend-api/earning-withdraw-instruction',
+            },
+          ],
+        },
+        {
           type: "category", 
           label: "Trigger API Schema",
           link: {
@@ -253,33 +280,6 @@ const sidebars = {
                   id: 'api/price-api/v2/price',
                 },
               ],
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "Lend API Schema",
-          link: {
-            type: "generated-index",
-            title: "Lend API Schema",
-            slug: "/api/lend-api",
-          },
-          items: [
-            {
-              type: 'doc',
-              id: 'api/lend-api/earning-deposit',
-            },
-            {
-              type: 'doc',
-              id: 'api/lend-api/earning-deposit-instruction',
-            },
-            {
-              type: 'doc',
-              id: 'api/lend-api/earning-withdraw',
-            },
-            {
-              type: 'doc',
-              id: 'api/lend-api/earning-withdraw-instruction',
             },
           ],
         },

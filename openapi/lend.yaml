@@ -10,25 +10,15 @@ servers:
     description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
-  /earning/deposit:
+  /earn/deposit:
     post:
-      summary: earning-deposit
+      summary: earn-deposit
       description: |
-        Request for a base64-encoded unsigned earning deposit transaction based on parameters
+        Request for a base64-encoded unsigned earn deposit transaction based on parameters
         
         :::note
         Refer to [Lend API doc](/docs/lend-api) for more information
         :::
-      parameters:
-        - name: cluster
-          in: query
-          description: "Solana cluster"
-          required: false # what is the default?
-          schema:
-            type: string
-            enum:
-              - mainnet
-              - devnet
       requestBody:
         required: true
         content:
@@ -43,25 +33,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/TransactionResponse'
 
-  /earning/deposit-instruction:
+  /earn/deposit-instruction:
     post:
-      summary: earning-deposit-instruction
+      summary: earn-deposit-instruction
       description: |
-        Request for the instruction of a earning deposit transaction based on parameters
+        Request for the instruction of an earn deposit transaction based on parameters
         
         :::note
         Refer to [Lend API doc](/docs/lend-api) for more information
         :::
-      parameters:
-        - name: cluster
-          in: query
-          description: "Solana cluster"
-          required: false # what is the default?
-          schema:
-            type: string
-            enum:
-              - mainnet
-              - devnet
       requestBody:
         required: true
         content:
@@ -76,25 +56,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/InstructionResponse'
 
-  /earning/withdraw:
+  /earn/withdraw:
     post:
-      summary: earning-withdraw
+      summary: earn-withdraw
       description: |
-        Request for a base64-encoded unsigned earning withdraw transaction based on parameters
+        Request for a base64-encoded unsigned earn withdraw transaction based on parameters
         
         :::note
         Refer to [Lend API doc](/docs/lend-api) for more information
         :::
-      parameters:
-        - name: cluster
-          in: query
-          description: "Solana cluster"
-          required: false # what is the default?
-          schema:
-            type: string
-            enum:
-              - mainnet
-              - devnet
       requestBody:
         required: true
         content:
@@ -109,25 +79,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/TransactionResponse'
 
-  /earning/withdraw-instruction:
+  /earn/withdraw-instruction:
     post:
-      summary: earning-withdraw-instruction
+      summary: earn-withdraw-instruction
       description: |
-        Request for the instruction of a earning deposit transaction based on parameters
+        Request for the instruction of an earn withdraw transaction based on parameters
         
         :::note
         Refer to [Lend API doc](/docs/lend-api) for more information
         :::
-      parameters:
-        - name: cluster
-          in: query
-          description: "Solana cluster"
-          required: false # what is the default?
-          schema:
-            type: string
-            enum:
-              - mainnet
-              - devnet
       requestBody:
         required: true
         content:
@@ -142,6 +102,138 @@ paths:
               schema:
                 $ref: '#/components/schemas/InstructionResponse'
 
+  /earn/stats:
+    get: 
+      summary: earn-stats
+      description: |
+        Request for the stats of all tokens
+
+        :::note
+        Refer to [Lend API doc](/docs/lend-api) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - totalDeposits
+                  - totalWithdraws
+                  - totalAssets
+                  - earnings
+                properties:
+                  totalDeposits:
+                    type: string
+                  totalWithdraws:
+                    type: string
+                  totalAssets:
+                    type: string
+                  earnings:
+                    type: string
+
+  /earn/tokens:
+    get:
+      summary: earn-tokens
+      description: |
+        Request for the tokens available to be deposited and their information
+
+        :::note
+        Refer to [Lend API doc](/docs/lend-api) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokensResponse'
+
+  /earn/positions:
+    get: 
+      summary: earn-user-positions
+      description: |
+        Request for the position data of one or multiple users
+
+        :::note
+        Refer to [Lend API doc](/docs/lend-api) for more information
+        :::
+      parameters:
+        - name: users
+          in: query
+          description: "User wallet address"
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPositionsResponse'
+
+  /earn/rewards:
+    get: 
+      summary: earn-user-rewards
+      description: |
+        Request for the rewards of one or multiple positions of a user
+
+        :::note
+        Refer to [Lend API doc](/docs/lend-api) for more information
+        :::
+      parameters:
+        - name: user
+          in: query
+          description: "User wallet address"
+          required: true
+          schema:
+            type: string
+        - name: positions
+          in: query
+          description: "User token position"
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRewardsResponse'
+
+  /earn/transactions:
+    get: 
+      summary: earn-user-transactions
+      description: |
+        Request for the transactions made by a user
+
+        :::note
+        Refer to [Lend API doc](/docs/lend-api) for more information
+        :::
+      parameters:
+        - name: user
+          in: query
+          description: "User wallet address"
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: "Pagination (e.g. `?page=10`)"
+          required: false
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTransactionsResponse'
 
 
 components:
@@ -198,5 +290,274 @@ components:
         isWritable:
           type: boolean
 
+    TokensResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/TokenInfo'
 
+    UserPositionsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserPosition'
 
+    UserRewardsResponse:
+      type: object
+      required:
+        - totalDeposits
+        - totalWithdraws
+        - totalBalance
+        - totalAssets
+        - earnings
+      properties:
+        totalDeposits: 
+          type: string
+        totalWithdraws:
+          type: string
+        totalBalance: 
+          type: string
+        totalAssets:
+          type: string
+        earnings:
+          type: string
+
+    UserPosition:
+      type: object
+      required:
+        - token
+        - ownerAddress
+        - shares
+        - underlyingAssets
+        - underlyingBalance
+        - allowance
+      properties:
+        token:
+          $ref: '#/components/schemas/TokenInfo'
+        ownerAddress:
+          type: string
+        shares:
+          type: string
+        underlyingAssets:
+          type: string
+        underlyingBalance:
+          type: string
+        allowance:
+          type: string
+
+    TokenInfo:
+      type: object
+      required:
+        - id
+        - address
+        - name
+        - symbol
+        - decimals
+        - assetAddress
+        - asset
+        - totalAssets
+        - totalSupply
+        - convertToShares
+        - convertToAssets
+        - rewardsRate
+        - supplyRate
+        - totalRate
+        - rebalanceDifference
+        - liquiditySupplyData
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the token
+        address:
+          type: string
+          description: Address of the token
+        name:
+          type: string
+        symbol:
+          type: string
+        decimals:
+          type: integer
+        assetAddress:
+          type: string
+          description: Address of the underlying asset
+        asset:
+          $ref: '#/components/schemas/AssetInfo'
+        totalAssets:
+          type: string
+        totalSupply:
+          type: string
+        convertToShares:
+          type: string
+        convertToAssets:
+          type: string
+        rewardsRate:
+          type: string
+        supplyRate:
+          type: string
+        totalRate:
+          type: string
+        rebalanceDifference:
+          type: string
+        liquiditySupplyData:
+          $ref: '#/components/schemas/LiquiditySupplyData'
+
+    AssetInfo:
+      type: object
+      required:
+        - address
+        - chain_id
+        - name
+        - symbol
+        - decimals
+        - logo_url
+        - price
+        - coingecko_id
+      properties:
+        address:
+          type: string
+        chain_id:
+          type: string
+        name:
+          type: string
+        symbol:
+          type: string
+        decimals:
+          type: integer
+        logo_url:
+          type: string
+          format: uri
+        price:
+          type: string
+        coingecko_id:
+          type: string
+
+    LiquiditySupplyData:
+      type: object
+      required:
+        - modeWithInterest
+        - supply
+        - withdrawalLimit
+        - lastUpdateTimestamp
+        - expandPercent
+        - expandDuration
+        - baseWithdrawalLimit
+        - withdrawableUntilLimit
+        - withdrawable
+      properties:
+        modeWithInterest:
+          type: boolean
+          # description: Whether the mode includes interest
+        supply:
+          type: string
+          # description: Current supply
+        withdrawalLimit:
+          type: string
+          # description: Withdrawal limit
+        lastUpdateTimestamp:
+          type: string
+          # description: Last update timestamp
+        expandPercent:
+          type: string
+          # description: Expand percentage
+        expandDuration:
+          type: string
+          # description: Expand duration
+        baseWithdrawalLimit:
+          type: string
+          # description: Base withdrawal limit
+        withdrawableUntilLimit:
+          type: string
+          # description: Withdrawable amount until limit
+        withdrawable:
+          type: string
+          # description: Currently withdrawable amount
+
+    UserTransactionsResponse:
+      type: object
+      required:
+        - meta
+        - data
+      properties:
+        meta:
+          type: object
+          required:
+            - total
+            - perPage
+            - currentPage
+            - lastPage
+            - firstPage
+            - firstPageUrl
+            - lastPageUrl
+            - nextPageUrl
+            - previousPageUrl
+          properties:
+            total:
+              type: integer
+            perPage:
+              type: integer
+            currentPage:
+              type: integer
+            lastPage:
+              type: integer
+            firstPage:
+              type: integer
+            firstPageUrl:
+              type: string
+            lastPageUrl:
+              type: string
+            nextPageUrl:
+              type: string
+              nullable: true
+            previousPageUrl:
+              type: string
+              nullable: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionData'
+
+    TransactionData:
+      type: object
+      required:
+        - id
+        - type
+        - signature
+        - slot
+        - from
+        - to
+        - ftoken
+        - asset
+        - assetAmount
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          description: Unique transaction identifier
+        type:
+          type: string
+          description: Type of transaction (e.g., deposit, withdraw)
+        signature:
+          type: string
+        slot:
+          type: integer
+        from:
+          type: string
+          description: Source address
+        to:
+          type: string
+          description: Destination address
+        ftoken:
+          type: string
+          description: FToken address
+        asset:
+          type: string
+          description: Asset address (e.g. WSOL token address)
+        assetAmount:
+          type: string
+          description: Asset amount in atomic value (before applying decimals)
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        

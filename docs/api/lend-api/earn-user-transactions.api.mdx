@@ -1,0 +1,76 @@
+---
+id: earn-user-transactions
+title: "earn-user-transactions"
+description: "Request for the transactions made by a user"
+sidebar_label: "earn-user-transactions"
+hide_title: true
+hide_table_of_contents: true
+api: eJzFVktv2zgQ/iuETjHgWE6PBoqFgXQXxRbYNEmxBydAx9JIYiKRLEklaxj67ztDyZZcqXFuvdik5psH572PUnSJlcZLraJVdIs/anReZNoKX6DwFpSDhKlOVJCi2O4EiNqhfVAParVaKe3xQd1ihsShxeYLqlSsbz6LVCePFzH9urikb5dg5CzIrbRFIRUdK2DBQcyDiuaRAQsVerQuWm32kaIL2cTKiCjZPrLO7uhyavU3QohXKEv0AtLUonOEsfQWaTGNVt7WOI9cUmAF0Wof+Z1hwc5bqfKoaeZHXQZyfFvXDeRSBbvFBS7yhfj+BzN9vFp+n50ozaB0U1ql8pjTi5rmkeHOkGvRMeDDcsl/p/ru6iSh92R1KQ5gUpNokqI8w8GYUibBovjJMc9+rFRvnzDxJ/ZtInI18PuA/sgWY7VB62VrTCCeEeC1h5LjhvamdVxSW0t2dbcS3OGYSTs+f7PlANXeFP43uBmLL1LX7vBlZGZrwoR3e6smiUNDJwFH2yep/XPeJrPN44Q7ffMUfeiFEZ3IdVnCtsQ2tZuxn87zUNa3ke+hYC1wwkuPlTsXe5nShwCgHJc5lURtw7nUDM2srhig+ez1M3J9g3PoD//rSteKb4lF8Jiu+VybtDuPIk0Kx74edQIlqWyHbUvIlOIsM9lGpuUfe+dUzD1Rhc5O5IRqn4sUjXbSz8Wr9EVq4XXGYnsPTEUz+GQ6UdhNZ82507VN8NjamuDXs1zX1MgPrWrA2kXjLPuf94wbcrbhO8u4ZtiBr2uS/97980X4ocDZUWKXCO+VG9A0PwR4XclEvEBJEb/YYsZzhbvhjrgpTomsqAUHPX2KTWhpBxF94dS79JIGQTPMxHeycFSk5/qK7vu0ueYSa4ZEHlYDgLs9dPWmCThqvIWmXI/yUCsGfEGXGMGqeDiOudbQvhyGZc1VHxXeG7eK45JqmCfu4qk2C8jDBI5frsZBtkjVQrURRjaBjKbsDLktLL1NlLKSnqP/s4Z3CL8Bmf5KeCHzgggDHbw9bJFXi7SFgAp8f+Mu4lHJG0OIRefHr7VMnp0Hy15iN7RKrxbLxTK0f+18BSHRu+HOLrzkbeLyJz+emL3vh+tvXoe6rPM0C2JTAi0lnJdtd2/TYhPexNDhg8hZBT2eyfv9FhxPhKbhz+1Kw+mSSsfDoN9TfumDi9uu68/E9J41aeYzRe24uoUSpWtIo/drPrNqvaG3W+N6vY98sbKdf5tHAhZI4bPBFy3PmvYs4wdco8WKpRyr869P91Sx/wPgC+H2
+sidebar_class_name: "get api-method"
+info_path: docs/api/lend-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"earn-user-transactions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/earn/transactions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the transactions made by a user
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"user","in":"query","description":"User wallet address","required":true,"schema":{"type":"string"}},{"name":"page","in":"query","description":"Pagination (e.g. `?page=10`)","required":false,"schema":{"type":"integer"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["meta","data"],"properties":{"meta":{"type":"object","required":["total","perPage","currentPage","lastPage","firstPage","firstPageUrl","lastPageUrl","nextPageUrl","previousPageUrl"],"properties":{"total":{"type":"integer"},"perPage":{"type":"integer"},"currentPage":{"type":"integer"},"lastPage":{"type":"integer"},"firstPage":{"type":"integer"},"firstPageUrl":{"type":"string"},"lastPageUrl":{"type":"string"},"nextPageUrl":{"type":"string","nullable":true},"previousPageUrl":{"type":"string","nullable":true}}},"data":{"type":"array","items":{"type":"object","required":["id","type","signature","slot","from","to","ftoken","asset","assetAmount","createdAt","updatedAt"],"properties":{"id":{"type":"integer","description":"Unique transaction identifier"},"type":{"type":"string","description":"Type of transaction (e.g., deposit, withdraw)"},"signature":{"type":"string"},"slot":{"type":"integer"},"from":{"type":"string","description":"Source address"},"to":{"type":"string","description":"Destination address"},"ftoken":{"type":"string","description":"FToken address"},"asset":{"type":"string","description":"Asset address (e.g. WSOL token address)"},"assetAmount":{"type":"string","description":"Asset amount in atomic value (before applying decimals)"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}},"title":"TransactionData"}}},"title":"UserTransactionsResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

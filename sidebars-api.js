@@ -86,21 +86,63 @@ const sidebars = {
           },
           items: [
             {
-              type: 'doc',
-              id: 'api/lend-api/earning-deposit',
+              type: "category",
+              label: "Earn (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Earn (Beta)",
+                slug: "/api/lend-api/earn",
+              },
+              items: [
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-deposit',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-deposit-instruction',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-withdraw',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-withdraw-instruction',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-stats',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-tokens',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-user-positions',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-user-rewards',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-user-transactions',
+                },
+              ],
             },
-            {
-              type: 'doc',
-              id: 'api/lend-api/earning-deposit-instruction',
-            },
-            {
-              type: 'doc',
-              id: 'api/lend-api/earning-withdraw',
-            },
-            {
-              type: 'doc',
-              id: 'api/lend-api/earning-withdraw-instruction',
-            },
+            // {
+            //   type: "category",
+            //   label: "Borrow (Soon!)",
+            //   link: {
+            //     type: "generated-index",
+            //     title: "Borrow (Soon!)",
+            //     slug: "/api/lend-api/borrow",
+            //   },
+            //   items: [
+            //   ],
+            // },
           ],
         },
         {

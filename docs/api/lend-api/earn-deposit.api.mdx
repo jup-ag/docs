@@ -1,11 +1,11 @@
 ---
-id: earning-withdraw
-title: "earning-withdraw"
-description: "Request for a base64-encoded unsigned earning withdraw transaction based on parameters"
-sidebar_label: "earning-withdraw"
+id: earn-deposit
+title: "earn-deposit"
+description: "Request for a base64-encoded unsigned earn deposit transaction based on parameters"
+sidebar_label: "earn-deposit"
 hide_title: true
 hide_table_of_contents: true
-api: eJzVVMFu2zAM/RVBpw1o4nQYdvCtHTpg2IB1aXdKcmBsJlZrS5okpy0M//tI2a7dpi122GU5OLZIkXx8j2xkjj5zygZltEzlEn/X6IPYGSdAbMHjp48z1JnJMRe19mqv6QXBaaX34k6FIndwJ4ID7SHjIPFSLujFgoMKAzq/1mudpqk2Add6iTt0Ihix+o46F2eXX0Vuss27hJ4+KelsBla9jyVUxqFQml4r4OAxzFrLEzkGl+mqkZo+qPysrD2dkV0xGsLiHujjKcYrU4IGMfo6Aq0c5jLdQenxRPqswApk2sjwYDmuD47wkivquqKEsgKlNYYY+8Avm7bddJGofecmf+DbY+DgaoqbGR1QBzaBtaXKIqjkxnNdzXFas73BLDypcCXB+5g4csHlQ2VqCkrprTMWXVDoY4roeASifbz6kqkPdmwiW1Ch5KMLon85Qdq2bHXordG+y/1hseC/Z42vswy939WlGJzlP2rKRIDHjZga3wR2PTouhwLbDh1prTCUSlrjQ9RfKOgr6UchGUaBiUF3GHRZu5K8ihCsT5OkVAFZ3POb2s5hH8WeHE6PFPrFIQqq3sXpICdrlA5x3ISDgKJUlQqe+Hqe4S+CX4LKXwteqH1BhkkOHtQtippnOrqAjve+IfFOnWaaJlq4uIfKci8f5TfOzqC68WQQ20R/POyRpJ6Sn7XKbn0Ax03ntnYgTueL+YL9mY4KIq/9DugZmU0YedKAZlTc/7Pues0GvA+JLWn5MPZIfdNLcTUAJ+9H6ERQwXola9Nwpb9c2bZ83K1GlmiuPGzLyfZ7tVtHi/PFqm5JGdNNfICyZq8olwM4xdko84Z8C4ScJUFldNc+d8lm1xx5vHu0GFj53Y0z2ik2vOm7mYzv5Y+ra3Le9hu6IqbptJMJP6nOE2ki+Lg74lkjCfi+hj37djH59wdi5IZk
+api: eJzVVE1v2zAM/SuCThuQxOkw7OBbN3TAsAHL0u6U5MDYbKzWljSJ7geM/PeRstM461bssMtycGiSIvX4Ht3pEmMRjCfjrM71En+0GEldu6BAbSHiu7dTtIUrsVStjWZn2UAIVpXoXTSkKICNUEiBdKBUbHgI0CBhiGu7tnmeW0e4tku8xqDIqdUXtKU6X3xSpSs2rzJ+xqxm3xS8eZ3aNy6gMpbNBqR4KrO2eqJDf8n3rnzUeZdeTcBS5xRanOjCWUJLEgLva1Ok49lNFISdjkWFDYhFjx4Zs9veYEFD3b7QSkOMKL6EOLABjWu56GaifXAeAxmMqUVKPFaLFIzd6f3T0d+FhmLPQxwjQ7W4LnjIyxHS/V6iAaN3Nva938zn8ndK4WVbFBjjdVurQ7L+R0MZUf18EOPgi8CujonLwwX3PTqWTOW4lWZpSXMPVPFbJoLLBsEJKRjuWFp8pU63oeaMisjHPMtqQygSmt20fga7JKns7ozPnA7pY0BUfPOQNMhJ3hlL6t5QpQIQqto0hiJz9WuHvyi+AFP+qXhldhUHRj1kHbaoWtmclAI2nfuMzDlPWSga6eDiARovc3yS3mHGR8UdPQehjbQnK5UIGuj41priNhIEmayMtQdxNpvP5pIvVDSQOLW80xwSNqZHNk7Ad0el/R8fk0GnhA+U+RqMFcyJ8m6Q3yoBTkB7yExKJfrkSNfJLb+Her8XN+MN/E1asXkHwcBWJrzacMUKoRRqWLG3TGyuP/Rjml5Jf0mvW7nHs+UUBfYnznmvPb2Yuxmt0OLr5RUnb4evZMNTZ2+Ae1lqfuaaDZdoS/ubfJ2uwe5a2EluX1N+PwHMkiU7
 sidebar_class_name: "post api-method"
 info_path: docs/api/lend-api/quickstart
 custom_edit_url: null
@@ -22,13 +22,13 @@ import Heading from "@theme/Heading";
 <Heading
   as={"h1"}
   className={"openapi__heading"}
-  children={"earning-withdraw"}
+  children={"earn-deposit"}
 >
 </Heading>
 
 <MethodEndpoint
   method={"post"}
-  path={"/earning/withdraw"}
+  path={"/earn/deposit"}
   context={"endpoint"}
 >
   
@@ -36,7 +36,7 @@ import Heading from "@theme/Heading";
 
 
 
-Request for a base64-encoded unsigned earning withdraw transaction based on parameters
+Request for a base64-encoded unsigned earn deposit transaction based on parameters
 
 :::note
 Refer to [Lend API doc](/docs/lend-api) for more information
@@ -52,7 +52,7 @@ Refer to [Lend API doc](/docs/lend-api) for more information
 </Heading>
 
 <ParamsDetails
-  parameters={[{"name":"cluster","in":"query","description":"Solana cluster","required":false,"schema":{"type":"string","enum":["mainnet","devnet"]}}]}
+  parameters={undefined}
 >
   
 </ParamsDetails>

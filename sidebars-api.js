@@ -116,7 +116,7 @@ const sidebars = {
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-tokens',
+                  id: 'api/lend-api/earn-vaults',
                 },
                 {
                   type: 'doc',
@@ -124,7 +124,7 @@ const sidebars = {
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-user-rewards',
+                  id: 'api/lend-api/earn-user-earnings',
                 },
                 {
                   type: 'doc',

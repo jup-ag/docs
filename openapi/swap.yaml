@@ -165,19 +165,16 @@ components:
         inputMint:
           type: string
         inAmount:
-          type: integer
-          format: uint64
+          type: string
         outputMint:
           type: string
         outAmount:
-          type: integer
-          format: uint64
+          type: string
           description: |
             - Calculated output amount from routing engine
             - The value includes platform fees and DEX fees, excluding slippage
         otherAmountThreshold:
-          type: integer
-          format: uint64
+          type: string
           description: |
             - Calculated minimum output amount after accounting for `slippageBps` on the `outAmount` value
             - Not used by `/swap` endpoint to build transaction
@@ -212,8 +209,7 @@ components:
       type: object
       properties:
         amount:
-          type: integer
-          format: uint64
+          type: string
         feeBps:
           type: integer
           format: uint16
@@ -226,6 +222,9 @@ components:
         percent:
           type: integer
           format: uint8
+        bps:
+          type: integer
+          format: uint16
       required:
         - swapInfo
         - percent
@@ -250,14 +249,11 @@ components:
         outputMint:
           type: string
         inAmount:
-          type: integer
-          format: uint64
+          type: string
         outAmount:
-          type: integer
-          format: uint64
+          type: string
         feeAmount:
-          type: integer
-          format: uint64
+          type: string
         feeMint:
           type: string
 

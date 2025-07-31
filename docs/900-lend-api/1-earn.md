@@ -317,14 +317,21 @@ try {
 
 ---
 
-## Tokens
+## Vaults
 
-Jupiter Lend provides Earnings for individual tokens, meaning SOL and USDC will be deposited in isolation. To get all tokens available and their information such as supply, rates and liquidity information.
+Jupiter Lend provides Earnings for individual vaults, meaning SOL and USDC will be deposited in isolation. To get all vaults information such as the underlying token, supply, rates and liquidity information.
+
+:::tip
+Useful user interface information found in `/earn/vaults` endpoint:
+
+1. Token APR: `earningsRate`
+2. Total value deposited: `totalAssets`
+:::
 
 ```jsx
-const tokens = await (
+const vaults = await (
     await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/tokens'
+        'https://lite-api.jup.ag/lend/v1/earn/vaults'
     )
 ).json();
 ```
@@ -347,6 +354,13 @@ const userPositions = await (
 
 Below are the endpoints to aid user to better manage their positions with data of each existing positions, position earnings, and transaction history.
 
+:::tip
+Useful user interface information found in the endpoints below:
+
+1. Deposited amount: `underlyingAssets` in `/earn/positions` or `totalDeposits` in `/earn/earnings`
+2. Earnings amount: `earnings` in `/earn/earnings`
+:::
+
 ### Positions
 
 Given a user, you are able to get their existing position data such as shares, underlying assets, balance and allowance.
@@ -359,14 +373,14 @@ const userPositions = await (
 ).json();
 ```
 
-### Position Rewards
+### Earnings
 
-Given a user, you are able to get the rewards of a specific position, for example, the yield earned for USDC token position.
+Given a user, you are able to get the earnings of a specific position, for example, the yield earned for USDC token position.
 
 ```jsx
 const userPositionEarnings = await (
     await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/positions/rewards?user={user1}&positions={position1},{position2}'
+        'https://lite-api.jup.ag/lend/v1/earn/earnings?user={user1}&positions={position1},{position2}'
     )
 ).json();
 ```

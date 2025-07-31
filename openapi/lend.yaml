@@ -106,7 +106,7 @@ paths:
     get: 
       summary: earn-stats
       description: |
-        Request for the stats of all tokens
+        Request for the stats of all vaults combined
 
         :::note
         Refer to [Lend API doc](/docs/lend-api) for more information
@@ -133,11 +133,11 @@ paths:
                   earnings:
                     type: string
 
-  /earn/tokens:
+  /earn/vaults:
     get:
-      summary: earn-tokens
+      summary: earn-vaults
       description: |
-        Request for the tokens available to be deposited and their information
+        Request for the vaults available to be deposited and their information
 
         :::note
         Refer to [Lend API doc](/docs/lend-api) for more information
@@ -148,7 +148,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokensResponse'
+                $ref: '#/components/schemas/VaultsResponse'
 
   /earn/positions:
     get: 
@@ -174,11 +174,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserPositionsResponse'
 
-  /earn/rewards:
+  /earn/earnings:
     get: 
-      summary: earn-user-rewards
+      summary: earn-user-earnings
       description: |
-        Request for the rewards of one or multiple positions of a user
+        Request for the earnings of one or multiple positions of a user
 
         :::note
         Refer to [Lend API doc](/docs/lend-api) for more information
@@ -192,7 +192,7 @@ paths:
             type: string
         - name: positions
           in: query
-          description: "User token position"
+          description: "User vault position"
           required: true
           schema:
             type: string
@@ -202,7 +202,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserRewardsResponse'
+                $ref: '#/components/schemas/UserEarningsResponse'
 
   /earn/transactions:
     get: 
@@ -290,17 +290,17 @@ components:
         isWritable:
           type: boolean
 
-    TokensResponse:
+    VaultsResponse:
       type: array
       items:
-        $ref: '#/components/schemas/TokenInfo'
+        $ref: '#/components/schemas/VaultInfo'
 
     UserPositionsResponse:
       type: array
       items:
         $ref: '#/components/schemas/UserPosition'
 
-    UserRewardsResponse:
+    UserEarningsResponse:
       type: object
       required:
         - totalDeposits
@@ -323,15 +323,15 @@ components:
     UserPosition:
       type: object
       required:
-        - token
+        - vault
         - ownerAddress
         - shares
         - underlyingAssets
         - underlyingBalance
         - allowance
       properties:
-        token:
-          $ref: '#/components/schemas/TokenInfo'
+        vault:
+          $ref: '#/components/schemas/VaultInfo'
         ownerAddress:
           type: string
         shares:
@@ -343,7 +343,7 @@ components:
         allowance:
           type: string
 
-    TokenInfo:
+    VaultInfo:
       type: object
       required:
         - id
@@ -357,7 +357,7 @@ components:
         - totalSupply
         - convertToShares
         - convertToAssets
-        - rewardsRate
+        - earningsRate
         - supplyRate
         - totalRate
         - rebalanceDifference
@@ -365,10 +365,10 @@ components:
       properties:
         id:
           type: integer
-          description: Unique identifier for the token
+          description: Unique identifier for the vault
         address:
           type: string
-          description: Address of the token
+          description: Address of the vault
         name:
           type: string
         symbol:
@@ -388,8 +388,9 @@ components:
           type: string
         convertToAssets:
           type: string
-        rewardsRate:
+        earningsRate:
           type: string
+          description: APR of the vault
         supplyRate:
           type: string
         totalRate:

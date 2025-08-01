@@ -383,7 +383,7 @@ const userPositions = await (
 
 ## User Data
 
-Below are the endpoints to aid user to better manage their positions with data of each existing positions, earnings, and transaction history.
+Below are the endpoints to aid user to better manage their positions with data of each existing positions, earnings, etc.
 
 ### Positions
 
@@ -405,18 +405,6 @@ Given a user, you are able to get the rewards of a specific position, for exampl
 const userRwards = await (
     await fetch (
         'https://lite-api.jup.ag/lend/v1/earn/rewards?user={user1}&positions={position1},{position2}'
-    )
-).json();
-```
-
-### Transactions
-
-Given a user, you are able to get the transactions made on the Jupiter Lending Program
-
-```jsx
-const userTransactions = await (
-    await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/transactions?user={user1}'
     )
 ).json();
 ```

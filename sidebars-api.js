@@ -142,10 +142,6 @@ const sidebars = {
                   type: 'doc',
                   id: 'api/lend-api/earn-user-rewards',
                 },
-                {
-                  type: 'doc',
-                  id: 'api/lend-api/earn-user-transactions',
-                },
               ],
             },
             // {

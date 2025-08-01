@@ -397,14 +397,14 @@ const userPositions = await (
 ).json();
 ```
 
-### Earnings
+### Rewards
 
-Given a user, you are able to get the earnings of a specific position, for example, the yield earned for USDC token position.
+Given a user, you are able to get the rewards of a specific position, for example, the yield earned for USDC token position.
 
 ```jsx
-const userPositionEarnings = await (
+const userRwards = await (
     await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/earnings?user={user1}&positions={position1},{position2}'
+        'https://lite-api.jup.ag/lend/v1/earn/rewards?user={user1}&positions={position1},{position2}'
     )
 ).json();
 ```

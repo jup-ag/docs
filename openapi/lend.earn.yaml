@@ -194,37 +194,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/InstructionResponse'
 
-  /earn/stats:
-    get: 
-      summary: stats
-      description: |
-        Request for the stats of all tokens combined
-
-        :::note
-        Refer to [Lend API doc](/docs/lend-api) for more information
-        :::
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - totalDeposits
-                  - totalWithdraws
-                  - totalAssets
-                  - earnings
-                properties:
-                  totalDeposits:
-                    type: string
-                  totalWithdraws:
-                    type: string
-                  totalAssets:
-                    type: string
-                  earnings:
-                    type: string
-
   /earn/tokens:
     get:
       summary: tokens

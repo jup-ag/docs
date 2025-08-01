@@ -367,20 +367,6 @@ const vaults = await (
 ).json();
 ```
 
-## Stats
-
-To get an overview of the statistics of Earn.
-
-```jsx
-const userPositions = await (
-    await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/stats'
-    )
-).json();
-```
-
----
-
 ## User Data
 
 Below are the endpoints to aid user to better manage their positions with data of each existing positions, earnings, etc.

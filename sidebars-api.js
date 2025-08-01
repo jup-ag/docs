@@ -128,10 +128,6 @@ const sidebars = {
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn/stats',
-                },
-                {
-                  type: 'doc',
                   id: 'api/lend-api/earn/tokens',
                 },
                 {

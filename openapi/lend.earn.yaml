@@ -223,10 +223,12 @@ paths:
       parameters:
         - name: users
           in: query
-          description: "User wallet address"
+          description: |
+            User wallet addresses (comma separated)
           required: true
           schema:
             type: string
+          example: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf,jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
       responses:
         '200':
           description: Successful response
@@ -247,16 +249,20 @@ paths:
       parameters:
         - name: user
           in: query
-          description: "User wallet address"
+          description: |
+            User wallet address
           required: true
           schema:
             type: string
+          example: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf"
         - name: positions
           in: query
-          description: "User token position"
+          description: |
+            User token positions (comma-separated)
           required: true
           schema:
             type: string
+          example: "9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D,2uQsyo1fXXQkDtcpXnLofWy88PxcvnfH2L8FPSE62FVU"
       responses:
         '200':
           description: Successful response
@@ -281,6 +287,10 @@ components:
           type: string
         amount:
           type: string
+      example:
+        asset: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        signer: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf"
+        amount: "1000000"
 
     EarnSharesRequestBody:
       type: object
@@ -295,6 +305,10 @@ components:
           type: string
         shares:
           type: string
+      example:
+        asset: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        signer: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf"
+        shares: "1000000"
 
     TransactionResponse:
       type: object
@@ -347,12 +361,18 @@ components:
     UserEarningsResponse:
       type: object
       required:
+        - address
+        - ownerAddress
         - totalDeposits
         - totalWithdraws
         - totalBalance
         - totalAssets
         - earnings
       properties:
+        address:
+          type: string
+        ownerAddress:
+          type: string
         totalDeposits: 
           type: string
         totalWithdraws:

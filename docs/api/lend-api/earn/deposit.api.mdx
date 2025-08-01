@@ -5,7 +5,7 @@ description: "Request for a base64-encoded unsigned earn deposit transaction to 
 sidebar_label: "deposit"
 hide_title: true
 hide_table_of_contents: true
-api: eJzVVE1v00AQ/SurPYHUxClCHHwrqEgIJEoaTkkOE3sSb2vvLrvjtJWV/87M2mlcChUHLuTgrGfeztd7406XGItgPBlnda7n+KPFSGrrggK1gYjv3k7QFq7EUrU2mp3lA0KwqkTvoiFFAWyEQgIoco9miBEpruzK5nluHeHKznGLQTDLL2hLdXH1SZWuWL/K+Bmzmm0T8OZ1St64gMpYPjYgoVOYldVnOvQlvnflg8679GoCljqn0OKZLpwltCQu8L42Rbqe3UTpr9OxqLABOdGDR+7YbW6woCFuH2ipU/FsS/0GPkDjWg66PtM+OI+BDMaUIgFP0SIFY3f68Hj1d64h2HMX+8hQLaZLHvFFws1H/R4OggkYvbOxr+DNbCZ/T2m8bosCY9y2tTqC9T8azYju5+MYO19sb3ECzo8FHvruGqTKcSrNOpLkHqjit0xElw3qEmow7DFw1mWn21AzoiLyMc+y2hCKkKY3rZ/CLgkr25/znadD+hgQFVcekhIZ5J2xpO4MVSoAoapNYygyY79m+IvgV2DKPwWvzK5ixyiHLMUGVRt5uRIEbLr3GZlznrJQNNLB5T00Xub4KMDjjE+6O1mOchspUBYrETTQ8a01xW0kCDJZGWvfxPl0Np0JXqhoIHFqoZEbJyKe9N2dRPY/fEsGgRLeU+ZrMFaaTVx3g+6WWgpMbfYNMxuVCJM9XSdNfQ/14SBm7jbwJ2nJxz0EAxsZ7XLNESuEUjhhqd4yo7n+0A9pspD8Aq9bqePZVor0+hsXvNCeXsSuR7tz9fV6weDN8JFseOZsDXAn28zPXPPBJdLS4iZbp2uwuxZ2gu1jyu8nSRckmA==
+api: eJzVVEtz0zAQ/isanWCmrZtSGPAtLWnKq4QkTKFpDoq9iZXYkirJedST/86unDYpLQwHDuCDLWvf+327FU/BJVYaL7XiMe/CTQnOs7G2TLCRcPDqeB9UolNIWamcnCg8gLCKpWC0k555K5QTCTlgXt9fC+fAu2t1reI4VtrDterCGCzpDD6CSlmz846lOhk+i/Dtohzv9oWRz0PwQltgUuGxEOQ6uLlWfI/bOsUTna54XIVfaSHlsbcl7PFEKw/Kk0gYk8skmEdTR/VV3CUZFIJOfmUAK9ajKSR+47d2NOAhebwL9Vo8iEKX6HS4x43VBqyX4EKIoLj15ryVasLX96ZPiTbOHotQBktRmBx2fPNWZ3p2maYvm+X4pte7gU9HNxeN5e1qJMzp6/bxotVuz64Wq/5b35hvc475+ffRsj27mLcW86vGcff2/Xnn5E32Ir0cf5suF81WNlvdvu+eLxvZyXhbYswbh+GhTL30lAtvIeDNIO/udH+9powtOKOVq/txhHb4eUiqXpkk4Ny4zNmdMv9LQO2Q7zE4u8Inm31XXn+r2L1LcF1XV4DPNIbiyGoKboTP8C+iEYg2XKemg52DxaiDipc2R43Me+PiKMqlB6L1wbQ0B2ISaB7NG2jzsElnFoBh5jbMBSoZLZVnC+kzZoUHlstCeoeo/BzhD5x3hEx/5TyTkwwFOzFoREfASoejHlSECnYfADHHLhNEOzxo/VOUpZ0R0N5g+6WUycx5YQkmwqjuSOPg8CDoE66FCARRoiCLLaoPmlhtGfs/rMkN2z0sfWRyIRUVG4hTbUg84JRgKLMuGKHNiOUoqSoq6qvN12u6xmotbtsBHufCSjGi1g6G6DEDkRJ0yPsZ0iPmp3WT9vsUn9TzkvJ4NOLE49qiidvB+N/qDncGsfO510fl0Wb/F9hzvLViQasB3zHHgw6ghS0Q7iqeCzUpxYR0a5/0/AA35mtN
 sidebar_class_name: "post api-method"
 info_path: docs/api/lend-api/earn/quickstart
 custom_edit_url: null
@@ -59,7 +59,7 @@ Refer to [Lend API doc](/docs/lend-api) for more information
 
 <RequestSchema
   title={"Body"}
-  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"title":"EarnAmountRequestBody"}}}}}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"example":{"asset":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","signer":"HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf","amount":"1000000"},"title":"EarnAmountRequestBody"}}}}}
 >
   
 </RequestSchema>

@@ -1,11 +1,11 @@
 ---
 id: earn-withdraw
 title: "earn-withdraw"
-description: "Request for a base64-encoded unsigned earn withdraw transaction based on parameters"
+description: "Request for a base64-encoded unsigned earn withdraw transaction to withdraw assets"
 sidebar_label: "earn-withdraw"
 hide_title: true
 hide_table_of_contents: true
-api: eJzVVEtv00AQ/iurPYHUxClCHHwrqEgIJEIaTkkOE3sSb2vvLrvjtJWV/87MOg+XQsWBCzk443nPfN+40yXGIhhPxlmd6xn+aDGS2rigQK0h4ru3I7SFK7FUrY1ma1lACFbdG6rKAPeKAtgIhWRIEaViwUOABglDXNqlzfPcOsKlneEGgyKnFl/Qlupq+kmVrli9yvgZs5p1I/DmdarfuIDKWBYbkOQpzdLqCx36Lt+78lHnXXo1AUudU2jxQhfOEloSE3hfmyKFZ7dRRux0LCpsQCR69MhDu/UtFnTI2ydaaIgRRZdGDixA41pOurrQPjiPgQzGVCI5nrNFCsZu9f4U+jvTIdlzE9vIUC2qa97ybDDpfi/WgNE7G/vabyYT+XuK4U1bFBjjpq3V0Vn/o6UMoH6+iKHxxcHmZ8fZscF9Px1TpnJcSnsXpbgHqvgtE8ZlR8YJKhh2zC3uqdNtqNmlIvIxz7LaEAqHxretH8M2cSrbXXLM0y19DIiKWw+JhOzknbGUWK0CEKraNIYig/Vrhb9IPgVT/il5ZbYVGwY15B7WqFo5neQCNsV9Rgad1ywYDYhw/QCNl0WeuHdc8plyZ82RaQPyyU0lhA54fGtNcRcJgmxc1toPcTmejCfiL1g0kEC1fNRsEjhGAzieTN+dufaffE8OVCV8oMzXYKxMnUDvDgxcpJHZ9TQ041IJR9nUddLm91Dv96LmiQN/lxYs7iAYWMuSFytOWSGUgg6T9o6xzfWHflGjuTQg7nUrjTw7UCFhH3HFt+3pRd/V4IymX2/m7Lw+fCkb3jtre9DkmWsWXAIu3XDSdboGu21hK759Tvn9BPMaJ3U=
+api: eJzVVE1v00AQ/SurPYHUxClCHHwrqEgIJEIaTkkOE3sSb2vvLrvjtJWV/87MOh8uhYoDF3Jw1jNv5+u9cadLjEUwnoyzOtcz/NFiJLVxQYFaQ8R3b0doC1diqVobzdbyASFYdW+oKgPcKwpgIxQSQZE72yFGpLi0S5vnuXWESzvDDQYBLb6gLdXV9JMqXbF6lfEzZjXbRuDN65S+cQGVsXxsQGKnMEurL3Toi3zvykedd+nVBCx1TqHFC104S2hJXOB9bYp0PbuN0mGnY1FhA3KiR4/cs1vfYkGHuH2ghU7Fsy11HPgAjWs56OpC++A8BjIYU4oEPEeLFIzd6v3p6u9ch2DPXewjQ7WYrnnIVwk3G/S73wsmYPTOxr6CN5OJ/D0l8qYtCoxx09bqCNb/aDQDvp+PY+h8sb35GTg7Frjvu2uQKseptHdRknugit8ykV12lJdwg2GHgdMuOt2GmiEVkY95ltWGUJQ0vm39GLZJWdnuku88ndLHgKi49JCkyCDvjKUkYRWAUNWmMRSZsl8z/EXwKZjyT8Ers63YMcghW7FG1UberwQBm+59RiadxywcDYRw/QCNl0GeFHgc8ll4Z8tRbwMJymYlhg58fGtNcRcJgkxcxto3cTmejCeCFy4aSKRaaOSG0DEa0PGk++6stf/jo3JQKuEDZb4GY6XpxHl3EOAidczQU89MSyUSZVfXSV/fQ73fi5kbDvxxWvBxB8HAWma8WHHICqEUclizd0xtrj/0cxrNpQCB160U8mw/RYP9jStebU8vYleDLZp+vZkzeH34XDY8drb2nMkz13xwibe0wsnW6RrstoWtYPuY8vsJb5MpiQ==
 sidebar_class_name: "post api-method"
 info_path: docs/api/lend-api/quickstart
 custom_edit_url: null
@@ -36,7 +36,7 @@ import Heading from "@theme/Heading";
 
 
 
-Request for a base64-encoded unsigned earn withdraw transaction based on parameters
+Request for a base64-encoded unsigned earn withdraw transaction to withdraw assets
 
 :::note
 Refer to [Lend API doc](/docs/lend-api) for more information
@@ -59,7 +59,7 @@ Refer to [Lend API doc](/docs/lend-api) for more information
 
 <RequestSchema
   title={"Body"}
-  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"title":"EarnRequestBody"}}}}}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"title":"EarnAmountRequestBody"}}}}}
 >
   
 </RequestSchema>

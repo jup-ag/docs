@@ -1,0 +1,68 @@
+---
+id: liquidity
+title: "liquidity"
+description: "Request for liquidity data on all tokens"
+sidebar_label: "liquidity"
+hide_title: true
+hide_table_of_contents: true
+api: eJzFVktv2kAQ/ivWnlqpBdKjb6n6EGoqpaQ5QRQt9oA3rHed3TEJRf7vnVljYmBpq1x6SZZ5zzcvb0UOPnOqQmWNSMUEHmvwmCysS7R6rFWucJPkEmViTSK1TtCuwPiZmZk0TY1FmJkJLMARI5legcmTy+txktvs7s2Q/vqhJtp7Wam3wWhpHSTK0LOU7DOYmRnxTjjwlTUevEi34sNoxP8Og7upswy8X9Q66YRJL7MGwSCLy6rSKgt2hw+edbbCZwWUkl+4qYCsSOfkhvQUQul7dDt/gAxDIJS3g1ykUyHznFx5dlNIZe5VTk8jS3bsN+XcanrkkKlSapbSdmnva8fUyqmsjU+ZJWQr2yqjRalvaoqUg/DhMaYMyA1+cQB74kQ+dfQeDaGz8dE6Z5/o1zw8jmy0xEMbHS3YcLAGU/NrERS09HiDVJ38FpVWvwKKRC/l8yFB7Qyyne82By3uOFlbgUPVVq9D7QVcj45QEE0PxxgzIBtj7LCOsfbovzA5xCU45u4LcqJKiYcmPDDWFi0ad7+MMYF+YaMpnJb6vFi/cH+SwriRfoPE+JGWOS/2t1h6bRVjd40W4y3OOI43Y0zyqD1jIqcN+8plEHhEageIl+Jp67f6p71GEJRsw3eT36Im7pqdwWhrs4tXBlsfDG1wcRJsHUWuNz1Hke053GIKNdPGPXQ/cbzNOW6L/QH7qjsxY7oIIsaYdIu+aYJmCVhYSlAsgTOuJBb0Y7i/Vbwqwa3BUYJTypAnXxSIlU+HJIXAp2jwUFcDuQynabi+CCu8f2h4IBICyYVbRkIVDT8mTwqLhCGh01gq9BTwsYd/MH4tVX7OeKGWBTF6PvisziGpPeStiDRB7xtsRHPHzU3AcYV2wP2oVbbyKB2jwzC0Ti8Go8EoLDjrsZSh3O2yFX3oDiLdvpzW//ldsOs9hGccVpqOB6ex2+ht+ae9HAiSwvKimortdi493DrdNEymBBxt5ik919IpOWe8pjx/Bcicupr7ZUWwpuKSvjOqAKDUdZi84w8Lhn7fil8//6T2/A2wwkAh
+sidebar_class_name: "get api-method"
+info_path: docs/api/lend-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"liquidity"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/liquidity"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for liquidity data on all tokens
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","required":["address","chain_id","name","symbol","decimals","logo_url","price","coingecko_id","totalSupply","supplyInterestFree","supplyRawInterest","supplyRate","totalBorrow","borrowInterestFree","borrowRawInterest","borrowRate","revenue","fee","lastStoredUtilization","maxUtilization","interestRateModel"],"properties":{"address":{"type":"string"},"chain_id":{"type":"string"},"name":{"type":"string"},"symbol":{"type":"string"},"decimals":{"type":"integer"},"logo_url":{"type":"string","format":"string"},"price":{"type":"string"},"coingecko_id":{"type":"string"},"totalSupply":{"type":"string"},"supplyInterestFree":{"type":"string"},"supplyRawInterest":{"type":"string"},"supplyRate":{"type":"string"},"totalBorrow":{"type":"string"},"borrowInterestFree":{"type":"string"},"borrowRawInterest":{"type":"string"},"borrowRate":{"type":"string"},"revenue":{"type":"string"},"fee":{"type":"string"},"lastStoredUtilization":{"type":"string"},"maxUtilization":{"type":"string"},"interestRateModel":{"type":"array","items":{"type":"object","required":["type","rate","data"],"properties":{"type":{"type":"string","enum":["supply","borrow"]},"rate":{"type":"string"},"data":{"type":"array","items":{"type":"object","required":["utilization","rate"],"properties":{"utilization":{"type":"integer"},"rate":{"type":"integer"}},"title":"InterestRateData"}}},"title":"InterestRateModel"}}},"title":"LiquidityInfo"},"title":"LiquidityResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

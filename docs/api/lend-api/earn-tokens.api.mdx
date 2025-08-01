@@ -1,0 +1,68 @@
+---
+id: earn-tokens
+title: "earn-tokens"
+description: "Request for the tokens available to be deposited and their information"
+sidebar_label: "earn-tokens"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVktPGzEQ/isrn1opsNBjbki0FSoHykM9BFRN1kPWxGsb2wtEUf57Z7xhsyEm9FQ1kRJ73vN5xuOlkBgqr1xU1oixuMTHFkMs7q0vYo1FtHM0oYAnUBqmmgnFFAuJzgYVURZgJAsqXyhDSg2woVv6jsdjYyPemku8R896k3Mk4ZOLs0La6u5TSb+h1EQ7AKc+J5eN9bhtiMzcGjESHoOzJmAQ46X4cnTEf9uhX7VVhSHct7p4FSa9ypqIJrI4OKdVleyWD4F1liJUNTbAq7hwSFbAe1iQHiXXhAHdTh+wiimQx1Z5lGI8EUoSAaQkf4FWBhp2GRbN1GpaSKxUA5pZEALGk14ybek/2gj6hDfhdXfVUpiLLvIn9PHaXtVAakNKr+HxGbwMlxCT46S63iRj67XHKWgwFZ6qezoMpBVRtaJMpIqLzuUpRBB3I+G8deRFdVBTihsQFGE5Qy9Wm6w3zBC9MjPmJRxyjDUyOVaPVd7bEL6cegfoB8e1OamqBmV+p+Pbc2jazuzv1jPVeVV15UQOsZpbVt4Bax8ovct/g1gf+47qSHTtRZTWK5btkssGPUx3V4AkooqaSakkz6hzWW1Y1jmzw0LPu90u/b0ye/wM2yOL7qZh3g3zXW6uqXJyuTb7oFAbK/GXivUZnSflH/vepsUz0aWHZ9DnqlHM0hDijZMU57VqSBoaR1R8cXQ3X6Cv+Pp73Z+2Pl2ARJhCSE62jfXm6bK/MVFlGbuVvxPxJsOptRrBbPDOovQ2rSySmURzctupvy/Rg5ETycGzN/BtwD4S3d9N55maGfKveSz33TYkhsvX2bfiz0g0GGtLVSVmaeI4iDVtSgRvym66c3Whp2aik5wsRbo0RB2jC+Oy1DQIeT4fPrTuEGZpXpdPx+miHE7fbx7pcaBo0vOAJyFHV0csOOWCUMZCMyyB4n3r4S+MX4CS7xmv1awmxsDH+o3SBnqeJBEwSe8HLsSKKpffFwn+NW4/W1XNqZo848MwdE6PD48Oj9L1aENsIFVJd08LBu+gB28r1uXmxfH/PqbWhRfxJZZO01ziNNfDoiuQScoxPSNSlgRbbbmtJ2K55Na48Xq1YjKl6KmlJ7R8Aq+62p7ckcEaQdIw4pqaE/Q0I+iB5hLIoNv02Hr7IuPj6Qv2+9drKuI/beS6gg==
+sidebar_class_name: "get api-method"
+info_path: docs/api/lend-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"earn-tokens"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/earn/tokens"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the tokens available to be deposited and their information
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","required":["id","address","name","symbol","decimals","assetAddress","asset","totalAssets","totalSupply","convertToShares","convertToAssets","rewardsRate","supplyRate","totalRate","rebalanceDifference","liquiditySupplyData"],"properties":{"id":{"type":"integer"},"address":{"type":"string"},"name":{"type":"string"},"symbol":{"type":"string"},"decimals":{"type":"integer"},"assetAddress":{"type":"string"},"asset":{"type":"object","required":["address","chain_id","name","symbol","decimals","logo_url","price","coingecko_id"],"properties":{"address":{"type":"string"},"chain_id":{"type":"string"},"name":{"type":"string"},"symbol":{"type":"string"},"decimals":{"type":"integer"},"logo_url":{"type":"string","format":"uri"},"price":{"type":"string"},"coingecko_id":{"type":"string"}},"title":"AssetInfo"},"totalAssets":{"type":"string"},"totalSupply":{"type":"string"},"convertToShares":{"type":"string"},"convertToAssets":{"type":"string"},"rewardsRate":{"type":"string"},"supplyRate":{"type":"string"},"totalRate":{"type":"string"},"rebalanceDifference":{"type":"string"},"liquiditySupplyData":{"type":"object","required":["modeWithInterest","supply","withdrawalLimit","lastUpdateTimestamp","expandPercent","expandDuration","baseWithdrawalLimit","withdrawableUntilLimit","withdrawable"],"properties":{"modeWithInterest":{"type":"boolean"},"supply":{"type":"string"},"withdrawalLimit":{"type":"string"},"lastUpdateTimestamp":{"type":"string"},"expandPercent":{"type":"string"},"expandDuration":{"type":"string"},"baseWithdrawalLimit":{"type":"string"},"withdrawableUntilLimit":{"type":"string"},"withdrawable":{"type":"string"}},"title":"LiquiditySupplyData"}},"title":"TokenInfo"},"title":"TokensResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

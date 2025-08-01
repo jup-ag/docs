@@ -148,12 +148,17 @@ try {
 
 </details>
 
-## Deposit
+## Deposit and Withdraw
 
-1. User chooses the vault (with a specific mint, e.g. USDC).
-2. User chooses the amount and deposits the specific mint.
-3. User sign and then the transaction is sent to the network.
-4. The mint authority mints vault tokens to the user.
+Using the Deposit or Withdraw endpoint, the user can do so based on the `amount` of assets to be deposited/withdrawn.
+
+:::note Usage steps
+1. User chooses the token.
+2. User chooses the amount of assets to deposit or withdraw in the specific token mint.
+3. Post request to get the transaction.
+4. User sign and send the transaction to the network.
+4. The mint authority mints/burns the vault tokens to/from the user.
+:::
 
 ```jsx
 const depositTransactionResponse = await (
@@ -172,20 +177,6 @@ const depositTransactionResponse = await (
     )
 );
 ```
-
-## Withdraw
-
-1. User chooses the vault (with existing assets deposited).
-2. User chooses the amount and withdraws.
-3. User sign and then the transaction is sent to the network.
-4. The token program burns the vault tokens from the user.
-
-:::note
-When withdrawing assets from a vault, you will need to check for the correct amount of assets left in the vault using the position endpoints.
-
-In cases where rounding of assets had occurred, users may face insufficient funds error if not handled proper. For example, user deposited 1 USDC but rounded to 0.99999 USDC, so they can't withdraw 1 USDC.
-:::
-
 ```jsx
 const withdrawTransactionResponse = await (
     await (
@@ -204,6 +195,53 @@ const withdrawTransactionResponse = await (
 );
 ```
 
+## Mint and Redeem
+
+Using the Mint or Redeem endpoint, the user can do so based on the number `shares` to be minted/redeemed.
+
+:::note Usage steps
+1. User chooses the token.
+2. User chooses the number of shares to deposit or withdraw in the specific token mint.
+3. Post request to get the transaction.
+4. User sign and send the transaction to the network.
+4. The mint authority mints/burns the vault tokens to/from the user.
+:::
+
+```jsx
+const mintTransactionResponse = await (
+    await (
+        await fetch('https://lite-api.jup.ag/lend/v1/earn/mint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                asset: mint,
+                signer: wallet.publicKey,
+                shares: '100000',
+            })
+        })
+    )
+);
+```
+```jsx
+const redeemTransactionResponse = await (
+    await (
+        await fetch('https://lite-api.jup.ag/lend/v1/earn/redeem', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                asset: mint,
+                signer: wallet.publicKey,
+                shares: '100000',
+            })
+        })
+    )
+);
+```
+
 ---
 
 ## Build Your Own Transaction
@@ -212,21 +250,21 @@ The Lend API provides 2 ways to interface with the Earn functions in the Jupiter
 
 ### Transaction
 
-To use the Transaction method, simply request to `/earn/deposit` or `/earn/withdraw` directly, as shown in the examples above. The API will respond with an unsigned base64 transaction for the signer to sign, then sent to the network for execution.
+To use the Transaction method, simply request to the endpoints without `-instructions` suffix directly, as shown in the examples above. The API will respond with an unsigned base64 transaction for the signer to sign, then sent to the network for execution.
 
 ### Instruction
 
-In some use cases, you'd prefer to utilize the instructions instead of the serialized transaction, so you can utilize with CPI or compose with other instructions. You can make a post request to `/earn/deposit-instruction` and `/earn/withdraw-instruction` instead.
+In some use cases, you'd prefer to utilize the instructions instead of the serialized transaction, so you can utilize with CPI or compose with other instructions. You can make a post request to `-instructions`endpoints instead.
 
 <details>
     <summary>
         <div>
             <div>
-                <b>Build instructions to transaction code snippet</b>
+                <b>Building with Instuctions Code Snippet</b>
             </div>
         </div>
     </summary>
-Example code snippet of using either `/deposit-instruction` or `/withdraw-instruction` and building a transaction with the instructions.
+Example code snippet of using `/deposit-instructions` endpoint and building a transaction with the instructions.
 
 ```jsx
 import { Connection, Keypair, PublicKey, TransactionMessage, TransactionInstruction, VersionedTransaction } from '@solana/web3.js';
@@ -238,7 +276,7 @@ const connection = new Connection('insert-your-own-rpc');
 
 const depositIx = await (
     await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/deposit-instruction', {
+        'https://lite-api.jup.ag/lend/v1/earn/deposit-instructions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -317,28 +355,21 @@ try {
 
 ---
 
-## Vaults
+## Tokens
 
-Jupiter Lend provides Earnings for individual vaults, meaning SOL and USDC will be deposited in isolation. To get all vaults information such as the underlying token, supply, rates and liquidity information.
-
-:::tip
-Useful user interface information found in `/earn/vaults` endpoint:
-
-1. Token APR: `earningsRate`
-2. Total value deposited: `totalAssets`
-:::
+Jupiter Lend provides Earnings for individual tokens, meaning SOL and USDC will be deposited in isolation. To get all token information such as the underlying token, supply, rates and liquidity information.
 
 ```jsx
 const vaults = await (
     await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/vaults'
+        'https://lite-api.jup.ag/lend/v1/earn/tokens'
     )
 ).json();
 ```
 
 ## Stats
 
-To get a quick overview of the Earn stats.
+To get an overview of the statistics of Earn.
 
 ```jsx
 const userPositions = await (
@@ -352,14 +383,7 @@ const userPositions = await (
 
 ## User Data
 
-Below are the endpoints to aid user to better manage their positions with data of each existing positions, position earnings, and transaction history.
-
-:::tip
-Useful user interface information found in the endpoints below:
-
-1. Deposited amount: `underlyingAssets` in `/earn/positions` or `totalDeposits` in `/earn/earnings`
-2. Earnings amount: `earnings` in `/earn/earnings`
-:::
+Below are the endpoints to aid user to better manage their positions with data of each existing positions, earnings, and transaction history.
 
 ### Positions
 

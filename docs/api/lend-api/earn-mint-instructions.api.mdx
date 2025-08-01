@@ -1,0 +1,76 @@
+---
+id: earn-mint-instructions
+title: "earn-mint-instructions"
+description: "Request for the instruction of an earn mint transaction to mint shares"
+sidebar_label: "earn-mint-instructions"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVU1z0zAQ/SsanWAmiVOOvhWmzHSAoSRlOCQ5bOxNrNaWhCT3Yzz+7+xK+XDbUDhwIAdH3n1aad/TkztZoi+cskEZLXM5w58t+iA2xolQoVDaB9cWnBVmI0ALBKdFo3QQwYH2kHLBpJivwKFf6qXO81ybgEs9ww06Biw+oy7F+dWlKE2xepPR02c1xcZg1du4ZGMcr0nDBrhuLLPUciRd2th7Uz7KvIuvymEpc9oejmRhdEAdOAXW1qqI07Mbz1110hcVNsCj8GiR+jTrGyzCrm4qtJDgPXLMq61GRwNoTEtFVyNpnbHogkIfl4jAYzXiSOmt7A9TT6YiNSdSlAsq1By6IHLnETcb9Nv3jKGgNdqnEu+mU/57Kt68LQr0ftPWYg+W/4ga6n/roLksmZWiYFo8DUsI8JKeI/gUD4fpxyQ4B49UTgVs/B+30q5vMaL9fC+U8j+cCrAmEl/uJuFPbeVQ4ZhcG1Mj6JQ9FD2RH6h2njr6gkQGxyMrr+p8ebTVbK9Un2RuMFSGGpXWeG7dQqjoLWPfZeyx8cCTrIFHd4eOWl10snU1YasQrM+zrCY+2VuTm9ZOYBu9lt2dsW5Pzs1HhyiILhfNSSBr2Mv3KlTCQUBRq0aRYP3o+Qp/UfwKVPm74pXaVpQYrMH3xBpF67FMELpxeN4nUrAnafnUDqxx8QCNTfrsPLln+2jFQWTnwOEJoLsmSrUT5lurilsfwDH1TGtq4mwynUwZz6I0EI2joeEZrMv4lC5PaOiONvx/79jdeQ34EDJbg4ouiIJ3u2O4iO0S9GXDJE7FJ5YwXbcGj99d3fccpm4d+W9BwztwKhlqsaLaFULJEtHJjRaVHxJJ42veCcPrNt4Pz+8tPolpBnkPbXgVuxqY6urr/JrA691npDElz3Fwz5cMPXNJA2NTS/yd4Vgna9DbFraMTTX59wvWDYXx
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"earn-mint-instructions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/mint-instructions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the instruction of an earn mint transaction to mint shares
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"shares":{"type":"string"}},"title":"EarnSharesRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["programId","accounts","data"],"properties":{"programId":{"type":"string"},"accounts":{"type":"array","items":{"type":"object","required":["pubkey","isSigner","isWritable"],"properties":{"pubkey":{"type":"string"},"isSigner":{"type":"boolean"},"isWritable":{"type":"boolean"}},"title":"AccountMeta"}},"data":{"type":"string"}},"title":"InstructionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

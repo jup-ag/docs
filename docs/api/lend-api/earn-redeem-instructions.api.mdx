@@ -1,0 +1,76 @@
+---
+id: earn-redeem-instructions
+title: "earn-redeem-instructions"
+description: "Request for the instruction of an earn redeem transaction to redeem shares"
+sidebar_label: "earn-redeem-instructions"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVU1z0zAQ/SsanWAmiVOOvhWmzHSAoSRlOCQ5bOxNrNaWhCT3Yzz+7+xK+XDbUDhwIAdH3n1aad/TkztZoi+cskEZLXM5w58t+iA2xolQoVDaB9cWnBVmI0ALBKeFwxKxEcGB9pCyweyjvgKHfqmXOs9zbQIu9Qw36Biy+Iy6FOdXl6I0xepNRk+f1RQbg1Vv47KNcbwuDRvgyrHMUsuRdGlz7035KPMuvipaU+a0RRzJwuiAOnAKrK1VEadnN54766QvKmyAR+HRIvVq1jdYhF3dVGghwXvkmFdbjY4G0JiWiq5G0jpj0QWFPi4RgcdqxJPSW9kfpp5MRWpOpCgXVKg5dEEEzyNuNui37xlDQWu0TyXeTaf891TAeVsU6P2mrcUeLP8RNdT/1kFzWTIrRcG0eBqWEOAlPUfwKR4O049JcA4eqZwK2Pg/bqVd32JE+/leKOV/OBVgTSS+3E3Cn9rKocIxuTamRtApeyh6Ij9Q7Tx19AWJDI5HVl7V+fJordleqT7J3GCoDDUqrfHcuoVQ0VvG3suSy8YDZ7IKHt0dOmp20cnW1YSuQrA+z7KaGGV3TW5aO4FtdFt2d8bKPTk5Hx2iIMJctCeBrFE6iHsVKuEgoKhVo0iyfvR8hb8ofgWq/F3xSm0rSgzW4JtijaL1WCYI3Ts87xNp2JO4fG4H5rh4gMYmhXau3PN9NOMgsvPg8AzQbRPF2knzrVXFrQ/gmHymNTVxNplOpoxnWRqI1tHQ8AxWZnxamSdEdEcr/t937e7cBnwIma1BRTdE2bvdcVzEpqMxX7ZNIlV8dgnVdWvw+N3Vfc9h6tmRExc0vAOnkrUWK6peIZQsFZ3gaFb5IVE1vua9MLxu403x/AbjE5lmkAvRhlexq4G9rr7Orwm83n1QGlPyHAf33BU9c0kDY1NL/MXhWCdr0NsWtoxNNfn3Cxwsiwc=
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"earn-redeem-instructions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/redeem-instructions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the instruction of an earn redeem transaction to redeem shares
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"shares":{"type":"string"}},"title":"EarnSharesRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["programId","accounts","data"],"properties":{"programId":{"type":"string"},"accounts":{"type":"array","items":{"type":"object","required":["pubkey","isSigner","isWritable"],"properties":{"pubkey":{"type":"string"},"isSigner":{"type":"boolean"},"isWritable":{"type":"boolean"}},"title":"AccountMeta"}},"data":{"type":"string"}},"title":"InstructionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

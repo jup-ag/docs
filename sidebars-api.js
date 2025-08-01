@@ -100,15 +100,31 @@ const sidebars = {
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-deposit-instruction',
-                },
-                {
-                  type: 'doc',
                   id: 'api/lend-api/earn-withdraw',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-withdraw-instruction',
+                  id: 'api/lend-api/earn-mint',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-redeem',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-deposit-instructions',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-withdraw-instructions',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-mint-instructions',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn-redeem-instructions',
                 },
                 {
                   type: 'doc',
@@ -116,7 +132,7 @@ const sidebars = {
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-vaults',
+                  id: 'api/lend-api/earn-tokens',
                 },
                 {
                   type: 'doc',

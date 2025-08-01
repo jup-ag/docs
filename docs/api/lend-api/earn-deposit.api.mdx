@@ -1,11 +1,11 @@
 ---
 id: earn-deposit
 title: "earn-deposit"
-description: "Request for a base64-encoded unsigned earn deposit transaction based on parameters"
+description: "Request for a base64-encoded unsigned earn deposit transaction to deposit assets"
 sidebar_label: "earn-deposit"
 hide_title: true
 hide_table_of_contents: true
-api: eJzVVE1v2zAM/SuCThuQxOkw7OBbN3TAsAHL0u6U5MDYbKzWljSJ7geM/PeRstM461bssMtycGiSIvX4Ht3pEmMRjCfjrM71En+0GEldu6BAbSHiu7dTtIUrsVStjWZn2UAIVpXoXTSkKICNUEiBdKBUbHgI0CBhiGu7tnmeW0e4tku8xqDIqdUXtKU6X3xSpSs2rzJ+xqxm3xS8eZ3aNy6gMpbNBqR4KrO2eqJDf8n3rnzUeZdeTcBS5xRanOjCWUJLEgLva1Ok49lNFISdjkWFDYhFjx4Zs9veYEFD3b7QSkOMKL6EOLABjWu56GaifXAeAxmMqUVKPFaLFIzd6f3T0d+FhmLPQxwjQ7W4LnjIyxHS/V6iAaN3Nva938zn8ndK4WVbFBjjdVurQ7L+R0MZUf18EOPgi8CujonLwwX3PTqWTOW4lWZpSXMPVPFbJoLLBsEJKRjuWFp8pU63oeaMisjHPMtqQygSmt20fga7JKns7ozPnA7pY0BUfPOQNMhJ3hlL6t5QpQIQqto0hiJz9WuHvyi+AFP+qXhldhUHRj1kHbaoWtmclAI2nfuMzDlPWSga6eDiARovc3yS3mHGR8UdPQehjbQnK5UIGuj41priNhIEmayMtQdxNpvP5pIvVDSQOLW80xwSNqZHNk7Ad0el/R8fk0GnhA+U+RqMFcyJ8m6Q3yoBTkB7yExKJfrkSNfJLb+Her8XN+MN/E1asXkHwcBWJrzacMUKoRRqWLG3TGyuP/Rjml5Jf0mvW7nHs+UUBfYnznmvPb2Yuxmt0OLr5RUnb4evZMNTZ2+Ae1lqfuaaDZdoS/ubfJ2uwe5a2EluX1N+PwHMkiU7
+api: eJzVVE1v2zAM/SuCThuQxOkw7OBbN3TAsAHr0u6U5MDYbKzUljSJ7geM/PeRspO461bssMtycGTqidTje3SnS4xFMJ6MszrXC/zRYiR144ICtYGI795O0RauxFK1Npqt5QVCsKpE76IhRQFshEISKHLHMMSIFFd2ZfM8t45wZRd4g0Ewyy9oS3V++UmVrli/yvgZs5pjU/DmdSreuIDKWF42IKlTmpXVEx36K7535aPOu/RqApY6p9DiRBfOElqSLfC+NkU6nu2i8Ot0LCpsQFb06JEZu80OCxry9omWOl2eY4lv4AU0ruWk64n2wXkMZDCmEgl4yhYpGLvV++PR320NyZ5v8R4ZqiV0wS0+T7jFiO9+L5iA0Tsb+xu8mc/l76mMV21RYIw3ba0OYP2PWjOS+3k7xpsv0rs+AReHC+57dg1S5biUZh9JcQ9U8VsmpssGd4k0GO4wcNVlp9tQM6Ii8jHPstoQipFmu9bPYJuMld2d8ZmnTfoYEBXfPCQnMsg7Y0ndG6pUAEJVm8ZQZMV+rfAXyS/BlH9KXpltxRujGjIUG1Rt5OFKELDp3GdkzbnLItHIBxcP0Hjp49GAhx6ffHeKHOw2cqAMVhJokONba4rbSBCks9LWnsTZbD6bC16kaCBpaqGRE6LG9KTGE/LdyWn/wwdlcCnhA2W+BmOFcRK8G8y3THQTzZ4wS1KJO3mn64TU91Dv9xJmtoG/S0te3kEwsJH+LtecsUIoRRj26y3LmusPfZOm11Jf4HUr93g2muK//sQ5T7WnF7Hr0QBdfr26ZvBm+FI23HOOBriXkeZnrnnhkmhpelOs0zXYbQtbwfY55fcTNpkmaw==
 sidebar_class_name: "post api-method"
 info_path: docs/api/lend-api/quickstart
 custom_edit_url: null
@@ -36,7 +36,7 @@ import Heading from "@theme/Heading";
 
 
 
-Request for a base64-encoded unsigned earn deposit transaction based on parameters
+Request for a base64-encoded unsigned earn deposit transaction to deposit assets
 
 :::note
 Refer to [Lend API doc](/docs/lend-api) for more information
@@ -59,7 +59,7 @@ Refer to [Lend API doc](/docs/lend-api) for more information
 
 <RequestSchema
   title={"Body"}
-  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"title":"EarnRequestBody"}}}}}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"title":"EarnAmountRequestBody"}}}}}
 >
   
 </RequestSchema>

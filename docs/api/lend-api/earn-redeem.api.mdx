@@ -1,0 +1,76 @@
+---
+id: earn-redeem
+title: "earn-redeem"
+description: "Request for a base64-encoded unsigned earn redeem transaction to redeem shares"
+sidebar_label: "earn-redeem"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVE1v2zAM/SuCThvQxOkw7OBbO3TAsAHrku6U5MDYbKzWljSJTlsY+e8j5Xw4a1fssMNycGTykRT5Ht3pEmMRjCfjrM71FH+2GEnduqBArSDih/cjtIUrsVStjWZt+YAQrApYIjaKAtgIhcQrcntrrCBgXNiFzfPcOsKFneItBoHMv6It1cX1Z1W6Yvkm42fMaraNwJu3qXTjAipj+diAZE5pFlaf6dBf8NKVTzrv0qvhmjqn0OKZLpwltCQu8L42RQrP7qJ01+lYVNiAnOjJI/frVndY0C5vn2iuIUYUW+o28AEa13LS5Zn2wXkMZDCmEgl4zBYpGLvW20Poi640mhdc7CNDtZiueMCzhJsO+t1uBcNG72zsU7ybTOTvlMRZWxQY421bqz1Y/6PRDNh+Po6h89X2bo7A6f6C2767BqlyXEp7F6W4B6r4LRPJZb24hBkMGwxcdN7pNtQMqIh8zLOsNoSio/Fd68ewTrrKNuccczqjTwFR8cVDEiKDvDOW1IOhSgUgVLVpDEUm7PcKf5H8Gkz5p+SVWVfsGNSQnVihaiNvVoKATXFfkCnnIQtDAxlcPULjZYwH/e1HfJTdwLJT20CAsleJnx0b31tT3EeCIPOWsfZNnI8n44nghYkGEqUWGokQMkYHMk567446+/8/JjuFEj5S5mswVtpNbHc74c1Tr2kJUrdMRyXCZEfXSUc/Qr3diplbDfxJmvNxA8HASmY7X3LCCqEUUlir90xprj/2ExrdSHmB161c49lWivb6iAteaE+vYpeD3bn+Nrth8Gr3kWx44GwN8CCN8DPXfHCJsbS4ydbpGuy6hbVg+5zy+wVz+yJ9
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"earn-redeem"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/redeem"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for a base64-encoded unsigned earn redeem transaction to redeem shares
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"shares":{"type":"string"}},"title":"EarnSharesRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["transaction"],"properties":{"transaction":{"type":"string"}},"title":"TransactionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

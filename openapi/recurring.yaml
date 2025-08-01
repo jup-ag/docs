@@ -136,7 +136,7 @@ paths:
               - integer
               - 'null'
             format: int64
-            minimum: 0
+            minimum: 1
         - name: mint
           in: path
           schema:
@@ -350,7 +350,7 @@ components:
             - integer
             - 'null'
           format: int64
-          minimum: 0
+          minimum: 1
         recurringType:
           $ref: '#/components/schemas/RecurringOrderType'
         user:
@@ -370,7 +370,7 @@ components:
             page:
               type: integer
               format: int64
-              minimum: 0
+              minimum: 1
             time:
               type: array
               items:
@@ -378,7 +378,7 @@ components:
             totalPages:
               type: integer
               format: int64
-              minimum: 0
+              minimum: 1
             user:
               type: string
         - type: object
@@ -394,7 +394,7 @@ components:
             page:
               type: integer
               format: int64
-              minimum: 0
+              minimum: 1
             price:
               type: array
               items:
@@ -402,7 +402,7 @@ components:
             totalPages:
               type: integer
               format: int64
-              minimum: 0
+              minimum: 1
             user:
               type: string
         - type: object
@@ -422,11 +422,11 @@ components:
             page:
               type: integer
               format: int64
-              minimum: 0
+              minimum: 1
             totalPages:
               type: integer
               format: int64
-              minimum: 0
+              minimum: 1
             user:
               type: string
     OpenIxArgsWithoutIdx:

@@ -132,11 +132,11 @@ const sidebars = {
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn/user-positions',
+                  id: 'api/lend-api/earn/positions',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn/user-earnings',
+                  id: 'api/lend-api/earn/earnings',
                 },
               ],
             },

@@ -213,7 +213,7 @@ paths:
 
   /earn/positions:
     get: 
-      summary: user-positions
+      summary: positions
       description: |
         Request for the position data of one or multiple users
 
@@ -237,7 +237,7 @@ paths:
 
   /earn/earnings:
     get: 
-      summary: user-earnings
+      summary: earnings
       description: |
         Request for the earnings of one or multiple positions of a user
 

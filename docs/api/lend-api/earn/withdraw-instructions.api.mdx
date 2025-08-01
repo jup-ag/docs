@@ -1,0 +1,76 @@
+---
+id: withdraw-instructions
+title: "withdraw-instructions"
+description: "Request for the instruction of an earn withdraw transaction to withdraw assets"
+sidebar_label: "withdraw-instructions"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVU1v2zAM/SuCThuQxumOvnVDCxTbsC7tsEOSA2MzsVpb0iS5HzD830dKSe22abfDDsvBkckniuTjkztZoi+cskEZLXM5x18t+iA2xolQoVDaB9cW7BVmI0ALBKfFnQpV6eBOBAfaQ/IHM9jBewx+qZc6z3NtAi71HDfoGLT4groUJxfnojTF6l1GT5/VZDsCq97Hoxvj+GxaNsCxY5illhPpUoIfTfkg8y6+KoelzClNnMjC6IA6sAusrVURt2fXnqvrpC8qbIBX4cEi1WvW11iEXdwUaCFj8mTzaqvR0QIa01LQ1URaZyy6oNDHIyJwiEa9Unor+8eth1y7YC9d5Asq1Gw6pSafRNx8VG/fM8aht0b7lMGH2Yz/npJ42RYFer9pa7EHy3/UGqp/66A5L7krRcEZelqWEOBlewbwwT7stw9OcA4eKJwK2Pg/ptKubzCi/eWeKOV/OhVgTU18mU3CH0rlMcLgXBtTI+jkfQx6wD9i7SRV9BWpGWyPXXmT5/NBXvM9U32iucFQGSpUWuO5dAuhoreM9ZftdXY00ifz4NHdoqNyF51sXU34KgTr8yyrqaesr+l1a6ewjXrLbo+Zuyezc+YQBbXMRYESyBqlQxS2cBBQ1KpRRFo/eX7CXwS/AFW+FrxS24ocozP4rlijaD2WCUK3D+/7TCz2RC9P7kgep/fQ2MTRTpf7jg9yHCx7FY6ngO6bSNeOnO+tKm58AMft57amIo6ns+mM8UxMA1E8Ghre8RotT7rQDUr8/6/b3egGvA+ZrUFFQUTeu91ELiSnSNDDxRNPFQ8w4bpuDR5/uLrv2UyVO5Ljgpa34FTS12JF8SuEktmiIY6KlZ9Sw46uOBuG1228Lp5fYzyUaQdJEW14E7saaezi2+UVgde7r0pjSt5DxfCdQ89c0sLYVBJ/dtjWyRr0toUtY1NM/v0GrgqQQA==
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"withdraw-instructions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/withdraw-instructions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the instruction of an earn withdraw transaction to withdraw assets
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"title":"EarnAmountRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["programId","accounts","data"],"properties":{"programId":{"type":"string"},"accounts":{"type":"array","items":{"type":"object","required":["pubkey","isSigner","isWritable"],"properties":{"pubkey":{"type":"string"},"isSigner":{"type":"boolean"},"isWritable":{"type":"boolean"}},"title":"AccountMeta"}},"data":{"type":"string"}},"title":"InstructionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

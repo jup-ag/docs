@@ -77,6 +77,83 @@ const sidebars = {
           ],
         },
         {
+          type: "category",
+          label: "Lend API Schema",
+          link: {
+            type: "generated-index",
+            title: "Lend API Schema",
+            slug: "/api/lend-api",
+          },
+          items: [
+            {
+              type: "category",
+              label: "Earn (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Earn (Beta)",
+                slug: "/api/lend-api/earn",
+              },
+              items: [
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/deposit',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/withdraw',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/mint',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/redeem',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/deposit-instructions',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/withdraw-instructions',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/mint-instructions',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/redeem-instructions',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/tokens',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/positions',
+                },
+                {
+                  type: 'doc',
+                  id: 'api/lend-api/earn/earnings',
+                },
+              ],
+            },
+            // {
+            //   type: "category",
+            //   label: "Borrow (Soon!)",
+            //   link: {
+            //     type: "generated-index",
+            //     title: "Borrow (Soon!)",
+            //     slug: "/api/lend-api/borrow",
+            //   },
+            //   items: [
+            //   ],
+            // },
+          ],
+        },
+        {
           type: "category", 
           label: "Trigger API Schema",
           link: {

@@ -1,0 +1,76 @@
+---
+id: withdraw
+title: "withdraw"
+description: "Request for a base64-encoded unsigned earn withdraw transaction to withdraw assets"
+sidebar_label: "withdraw"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVVE2P0zAQ/SuWTyC1TRchDrktaJEQSJRuObU9TJPZxt3ENvZkPxT1vzPjtNsshRUHLvSQOjPP8/XepNMlxiIYT8ZZnes5/mgxkrpxQYHaQMR3b8doC1diqVobzdbyASFYdW+oKgPcKwpgIxQSQZE72SFGpLiyK5vnuXWEKzvHGwwCWn5BW6rL2SdVumL9KuNnzGq2jcGb1yl94wIqY/nYgMROYVZWj3Toi3zvykedd+nVBCx1TqHFkS6cJbQkLvC+NkW6nu2idNjpWFTYgJzo0SP37DY7LOgQtw+01Kl4tqWOAx+gcS0HXY+0D85jIIMxpUjAU7RIwdit3j9d/Z3rEOzcxT4yVIvpiod8mXDzQb/7vWACRu9s7Ct4M53K33Mir9uiwBhv2lodwfofjWbA9/k4hs4X21ucgPNjgfu+uwapcpxKexcluQeq+C0T2WVHeQk3GO4wcNplp9tQM6Qi8jHPstoQipImu9ZPYJuUld1d8J3nU/oYEBWXHpIUGeSdsZQkrAIQqto0hiJT9muGvwg+A1P+KXhlthU7BjlkKzao2sj7lSBg073PyKTzmIWjgRCuHqDxMsgnBR6HfBLeyXLU20CCslmJoQMf31pT3EaCIBOXsfZNXEymk6nghYsGEqkWGrkxYOJZ491JZv/H9+QgUsIHynwNxkq/ie7uoL2llhIZ+tQzM1KJOtnVddLX91Dv92LmhgN/l5Z8vINgYCPjXa45ZIVQCi8s11tmNdcf+jmNF1KAwOtWCjlbTZFff+OSt9rTi9j1YIFmX68XDN4cvpQNj52tPWfyzDUfXOItbW+ydboGu21hK9g+pvx+AnQXJ7Y=
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"withdraw"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/withdraw"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for a base64-encoded unsigned earn withdraw transaction to withdraw assets
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"title":"EarnAmountRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["transaction"],"properties":{"transaction":{"type":"string"}},"title":"TransactionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

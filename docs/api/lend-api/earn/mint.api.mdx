@@ -1,0 +1,76 @@
+---
+id: mint
+title: "mint"
+description: "Request for a base64-encoded unsigned earn mint transaction to mint shares"
+sidebar_label: "mint"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVE1v2zAM/SuCThvQxOkw7OBbN3TAsAHL0uyU5MDYTKzWljSJ7geM/PeRstO461bssMNycGTykRT5Ht3pEmMRjCfjrM71An+0GEntXFCgthDx3dsJ2sKVWKrWRrO3fEAIVjXGkqIANkIh0Ypcb4sVBIxru7Z5nltHuLYL3GEQwOoL2lJdzD+p0hWbVxk/Y1azbQLevE5lGxdQGcvHBiRvSrO2+kyH/nLvXfmg8y69moClzim0eKYLZwktiQu8r02RwrPrKJ11OhYVNiAnevDIvbrtNRY05O0TrTTEiGJLnQY5pG705kz74DwGMvwmJRLwlC1SMHavD4+hv3X1yZ672EeGajFd8nCvEm4x6vdwEAwbvbOxT/FmNpO/pwRetUWBMe7aWh3B+h+NZsT183GMnS+2tzwBF8cLHvruGqTKcSntXZTiHqjit0zklom0hA4Mtxi45KrTbajZXRH5mGdZbQhFRdPr1k9hn1SV3Z5zzNMJfQyIiq8dkgwZ5J2o9s5QpQIQqto0hiLT9WuFv0g+B1P+KXll9hU7RjVkI7ao2sg7lSBgU9xnZMJ5xMLPSASX99B4GeKj+o4DPoluZBm0NpKfbFViZ+DiW2uKm0gQZLIy1r6J8+lsOhO88NBAItRCIxEDC0+a7k7y+r+/H4MoCe8p8zUYKz0mirtBaystV2No6pMZqESJbO466eV7qA8HMXOTgb9BKz7eQjCwlXGuNpyuQiiFB5bnDbOY6w/9bCZLKS7wupVLPFtDkVsfccEb7OlF7Ga0LPOvV0sGb4evYsOjZmuAO1lffuaaDy5xlTY12Tpdg923sBdsn1N+PwHevBuG
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"mint"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/mint"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for a base64-encoded unsigned earn mint transaction to mint shares
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","shares"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"shares":{"type":"string"}},"title":"EarnSharesRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["transaction"],"properties":{"transaction":{"type":"string"}},"title":"TransactionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

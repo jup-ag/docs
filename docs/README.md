@@ -32,6 +32,7 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 - [Recurring API](/docs/recurring-api/)
 - [Token API](/docs/token-api/)
 - [Price API](/docs/price-api/)
+- [Lend API](/docs/lend-api/) **NEW!**
 - [Swap Terminal](/docs/tool-kits/terminal/)
 - [Unified Wallet Kit](/docs/tool-kits/wallet-kit/)
 

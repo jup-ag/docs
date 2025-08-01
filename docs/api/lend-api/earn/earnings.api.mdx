@@ -1,0 +1,76 @@
+---
+id: earnings
+title: "earnings"
+description: "Request for the earnings of one or multiple positions of a user"
+sidebar_label: "earnings"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVMFy2jAQ/RWNTskMxaRH3+g07XTaQ0qb6QE4CHvBCrKkSmtoxsO/d1cYBwrJpD2VAyDpad/u09ttZQmxCNqjdlbmcgI/G4goli4IrECAClbbVRRuKZwFQdt1Y1B7A8K7qPlaOlSiiRBmdmbzPLcOYWYnsASK4sT0C9hSjO8+idIV86uMvmNmaO+N8vo6cdUugNCW/taKY6YwMysH0qugakAIUebTVlpaUJ5MRoeac6aMwyMtTiu5J4TYKmMAhSrLADESJlB9OkApcwwNDGQsKqiVzFuJj54DRwxUr9ztBj1XX+crCNGtwfbK/BXhnMHREw9EPn87GvHPKcm3piiokmVjxAFMJIWzCBYZrrw3ukgaZg+R77TnnG7xAAWeZDeV6FCZ95By51LT+ofGqgxq22+8U0bZAg7LcYyQ0AejSCrDB+choN7XcRr3vPAzpmchB+5nAV02l877/C49tUSNBro3vO2Qk4O+O/4MJJmwcqSUXAEmX2JFi4wDZ310emAIm4NZm2AIUiH6mGeZ0Qjs+OFD44dqlTog29ycGelDABCkXkgtQyDvtEWxJYFEUAjC6JqlZIueMrwi+J3S5XPBK72q6OCIg7t3Adza5R6ibLr3GR4lG5Y7Nina6fe10cU6ogqsEMuwJ70ZjoYjfgUyAdYqmbJrriPlThJtn0z9Hw6lzkEIvzDzRtFUoOLSW7SdMaapsj8ao6Ly+ahtFyrCfTC7HW/v5wkbptRRLQz341KZCC9ocjXpWvdaXJ50F1Nc07v1w3OjTMOQZKR/Zz4beS8wH4/SJ/o5L4JmflJhTugKVEk5siT7i2Maex6Pbp3NOY7St+jH2+/Utr8BcRZjxQ==
+sidebar_class_name: "get api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"earnings"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/earn/earnings"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the earnings of one or multiple positions of a user
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"user","in":"query","description":"User wallet address","required":true,"schema":{"type":"string"}},{"name":"positions","in":"query","description":"User token position","required":true,"schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["totalDeposits","totalWithdraws","totalBalance","totalAssets","earnings"],"properties":{"totalDeposits":{"type":"string"},"totalWithdraws":{"type":"string"},"totalBalance":{"type":"string"},"totalAssets":{"type":"string"},"earnings":{"type":"string"}},"title":"UserEarningsResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

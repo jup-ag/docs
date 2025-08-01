@@ -168,8 +168,8 @@ const config = {
             outputDir: "docs/api/price-api/v2",
           },
           lend: {
-            specPath: "openapi/lend.yaml",
-            outputDir: "docs/api/lend-api",
+            specPath: "openapi/lend.earn.yaml",
+            outputDir: "docs/api/lend-api/earn",
           }
         },
       },

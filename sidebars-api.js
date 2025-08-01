@@ -96,51 +96,51 @@ const sidebars = {
               items: [
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-deposit',
+                  id: 'api/lend-api/earn/deposit',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-withdraw',
+                  id: 'api/lend-api/earn/withdraw',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-mint',
+                  id: 'api/lend-api/earn/mint',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-redeem',
+                  id: 'api/lend-api/earn/redeem',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-deposit-instructions',
+                  id: 'api/lend-api/earn/deposit-instructions',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-withdraw-instructions',
+                  id: 'api/lend-api/earn/withdraw-instructions',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-mint-instructions',
+                  id: 'api/lend-api/earn/mint-instructions',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-redeem-instructions',
+                  id: 'api/lend-api/earn/redeem-instructions',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-stats',
+                  id: 'api/lend-api/earn/stats',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-tokens',
+                  id: 'api/lend-api/earn/tokens',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-user-positions',
+                  id: 'api/lend-api/earn/user-positions',
                 },
                 {
                   type: 'doc',
-                  id: 'api/lend-api/earn-user-rewards',
+                  id: 'api/lend-api/earn/user-earnings',
                 },
               ],
             },

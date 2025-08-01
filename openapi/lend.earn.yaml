@@ -10,22 +10,6 @@ servers:
     description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
-  /liquidity:
-    get:
-      summary: liquidity
-      description: |
-        Request for liquidity data on all tokens
-        
-        :::note
-        Refer to [Lend API doc](/docs/lend-api) for more information
-        :::
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LiquidityResponse'
   /earn/deposit:
     post:
       summary: earn-deposit
@@ -315,110 +299,6 @@ paths:
 
 components:
   schemas:
-    LiquidityResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/LiquidityInfo'
-
-    LiquidityInfo:
-      type: object
-      required:
-        - address
-        - chain_id
-        - name
-        - symbol
-        - decimals
-        - logo_url
-        - price
-        - coingecko_id
-        - totalSupply
-        - supplyInterestFree
-        - supplyRawInterest
-        - supplyRate
-        - totalBorrow
-        - borrowInterestFree
-        - borrowRawInterest
-        - borrowRate
-        - revenue
-        - fee
-        - lastStoredUtilization
-        - maxUtilization
-        - interestRateModel
-      properties:
-        address:
-          type: string
-        chain_id:
-          type: string
-        name:
-          type: string
-        symbol:
-          type: string
-        decimals:
-          type: integer
-        logo_url:
-          type: string
-          format: string
-        price:
-          type: string
-        coingecko_id:
-          type: string
-        totalSupply:
-          type: string
-        supplyInterestFree:
-          type: string
-        supplyRawInterest:
-          type: string
-        supplyRate:
-          type: string
-        totalBorrow:
-          type: string
-        borrowInterestFree:
-          type: string
-        borrowRawInterest:
-          type: string
-        borrowRate:
-          type: string
-        revenue:
-          type: string
-        fee:
-          type: string
-        lastStoredUtilization:
-          type: string
-        maxUtilization:
-          type: string
-        interestRateModel:
-          type: array
-          items:
-            $ref: '#/components/schemas/InterestRateModel'
-
-    InterestRateModel:
-      type: object
-      required:
-        - type
-        - rate
-        - data
-      properties:
-        type:
-          type: string
-          enum: [supply, borrow]
-        rate:
-          type: string
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/InterestRateData'
-
-    InterestRateData:
-      type: object
-      required:
-        - utilization
-        - rate
-      properties:
-        utilization:
-          type: integer
-        rate:
-          type: integer
-
     EarnAmountRequestBody:
       type: object
       required:

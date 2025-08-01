@@ -1,0 +1,76 @@
+---
+id: earn-user-earnings
+title: "earn-user-earnings"
+description: "Request for the earnings of one or multiple positions of a user"
+sidebar_label: "earn-user-earnings"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVMFy2jAQ/RWNTskMYNKjb+k07XTaQ0qb6QE4CHvBSmRJldakGQ//3l1hHAiQSXsqB0DS077dp7fbyhJiEbRH7azM5QR+NRBRLF0QWIEAFay2qyjcUjgLgrbrxqD2BoR3UfO1dKhEEyHM7MzmeW4dwsxOYAkUxYnpV7CluL79LEpXzC8y+o6Zob2h8voycdUugNCW/taKY6YwMysH0qugakAIUebTVlpaUJ5MRoeac6aMwxMtDiu5I4R4VMYAClWWAWIkTKD6dIBS5hgaGMhYVFArmbcSnzwHjhioXrnZDHquvs43EKJ7ANsr81eEcwZHTzwQ+fzdeMw/hyTfm6KgSpaNETswkRTOIlhkuPLe6CJpmN1HvtMec7rFPRR4kN1UokNlPkDKnUtN658aqzKox37jvTLKFrBbXscICb0ziqQyfHAeAuptHYdxjws/YjoL2XGfBXTZnDrv8zv11BI1Guje8KZDTnb6bvgzkGTCypFScgWYfIkVLTIOnPXR6YEhrHdmbYIhSIXoY55lRiOw40f3jR+pVeqAbH11ZKSPAUCQeiG1DIG80xbFIwkkgkIQRtcsJVv0kOENwW+VLs8Fr/SqooM9Du7eBXBrl1uIsuneF3iSbFju2KRop9+3RhcPEVVghViGLenVaDwa8yuQCbBWyZRdc7FyQ+7m4Z6GBym3z/b+D8dT5yWE35h5o2g+UJnpVdrOItNU44sWqUgIPmrbhYpwF8xmw9vbycLWKXVUC8OduVQmwiuaXEy6Jr4Up2feyRQf6AX7MbpWpmFIstS/Mx8Nv1eY94fqM/2cF0EzP6kwJ3QFqqQcWZLtxWsagB73bh1NPI7SN+unmx/UwH8AGhVnhA==
+sidebar_class_name: "get api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"earn-user-earnings"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/earn/earnings"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the earnings of one or multiple positions of a user
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"user","in":"query","description":"User wallet address","required":true,"schema":{"type":"string"}},{"name":"positions","in":"query","description":"User token position","required":true,"schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["totalDeposits","totalWithdraws","totalBalance","totalAssets","earnings"],"properties":{"totalDeposits":{"type":"string"},"totalWithdraws":{"type":"string"},"totalBalance":{"type":"string"},"totalAssets":{"type":"string"},"earnings":{"type":"string"}},"title":"UserEarningsResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

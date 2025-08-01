@@ -256,6 +256,25 @@ const sidebars = {
             },
           ],
         },
+        {
+          type: "category",
+          label: "Universal Send API Schema",
+          link: {
+            type: "generated-index",
+            title: "Universal Send API Schema",
+            slug: "/api/universal-send-api",
+          },
+          items: [
+            {
+              type: 'doc',
+              id: 'api/universal-send-api/craft-send',
+            },
+            {
+              type: 'doc',
+              id: 'api/universal-send-api/craft-clawback',
+            },
+          ],
+        },
       ],
     },
   ],

@@ -43,6 +43,13 @@ export const API_CARDS = [
         { text: "Schemas", href: "/docs/api/price-api/" },
       ],
     },
+    {
+      title: "Universal Send API",
+      links: [
+        { text: "Docs", href: "/docs/universal-send-api/" },
+        { text: "Schemas", href: "/docs/api/universal-send-api/" },
+      ],
+    },
   ];
   
   export const TOOL_KIT_CARDS = [

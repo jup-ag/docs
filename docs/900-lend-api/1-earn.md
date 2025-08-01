@@ -390,7 +390,7 @@ const userPositionEarnings = await (
 Given a user, you are able to get the transactions made on the Jupiter Lending Program
 
 ```jsx
-const userPositions = await (
+const userTransactions = await (
     await fetch (
         'https://lite-api.jup.ag/lend/v1/earn/transactions?user={user1}'
     )

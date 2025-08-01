@@ -12,7 +12,7 @@ servers:
 paths:
   /earn/deposit:
     post:
-      summary: earn-deposit
+      summary: deposit
       description: |
         Request for a base64-encoded unsigned earn deposit transaction to deposit assets
         
@@ -35,7 +35,7 @@ paths:
 
   /earn/deposit-instructions:
     post:
-      summary: earn-deposit-instructions
+      summary: deposit-instructions
       description: |
         Request for the instruction of an earn deposit transaction to deposit assets
         
@@ -58,7 +58,7 @@ paths:
 
   /earn/withdraw:
     post:
-      summary: earn-withdraw
+      summary: withdraw
       description: |
         Request for a base64-encoded unsigned earn withdraw transaction to withdraw assets
         
@@ -81,7 +81,7 @@ paths:
 
   /earn/withdraw-instructions:
     post:
-      summary: earn-withdraw-instructions
+      summary: withdraw-instructions
       description: |
         Request for the instruction of an earn withdraw transaction to withdraw assets
         
@@ -104,7 +104,7 @@ paths:
 
   /earn/mint:
     post:
-      summary: earn-mint
+      summary: mint
       description: |
         Request for a base64-encoded unsigned earn mint transaction to mint shares
         
@@ -127,7 +127,7 @@ paths:
 
   /earn/mint-instructions:
     post:
-      summary: earn-mint-instructions
+      summary: mint-instructions
       description: |
         Request for the instruction of an earn mint transaction to mint shares
         
@@ -150,7 +150,7 @@ paths:
 
   /earn/redeem:
     post:
-      summary: earn-redeem
+      summary: redeem
       description: |
         Request for a base64-encoded unsigned earn redeem transaction to redeem shares
         
@@ -173,7 +173,7 @@ paths:
 
   /earn/redeem-instructions:
     post:
-      summary: earn-redeem-instructions
+      summary: redeem-instructions
       description: |
         Request for the instruction of an earn redeem transaction to redeem shares
         
@@ -196,7 +196,7 @@ paths:
 
   /earn/stats:
     get: 
-      summary: earn-stats
+      summary: stats
       description: |
         Request for the stats of all tokens combined
 
@@ -227,7 +227,7 @@ paths:
 
   /earn/tokens:
     get:
-      summary: earn-tokens
+      summary: tokens
       description: |
         Request for the tokens available to be deposited and their information
 
@@ -244,7 +244,7 @@ paths:
 
   /earn/positions:
     get: 
-      summary: earn-user-positions
+      summary: user-positions
       description: |
         Request for the position data of one or multiple users
 
@@ -268,7 +268,7 @@ paths:
 
   /earn/earnings:
     get: 
-      summary: earn-user-earnings
+      summary: user-earnings
       description: |
         Request for the earnings of one or multiple positions of a user
 

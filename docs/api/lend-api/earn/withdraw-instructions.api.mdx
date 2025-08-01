@@ -1,11 +1,11 @@
 ---
-id: earn-deposit-instructions
-title: "earn-deposit-instructions"
-description: "Request for the instruction of an earn deposit transaction to deposit assets"
-sidebar_label: "earn-deposit-instructions"
+id: withdraw-instructions
+title: "withdraw-instructions"
+description: "Request for the instruction of an earn withdraw transaction to withdraw assets"
+sidebar_label: "withdraw-instructions"
 hide_title: true
 hide_table_of_contents: true
-api: eJzNVcFu2zAM/RVBpw1I4nRH37qhA4ptWJd22CHNgbGZWK0taZLcrjD87yMlJ07btNthh+XgyOQTRfLxyZ0s0RdO2aCMlrlc4M8WfRAb40SoUCjtg2sL9gqzEaAFgtOiRGu8CiI40B6SO5i9GbzH4K/1tc7zXJuA13qBG3SMWX5GXYrTi3NRmmL1JqOnz2qyTcGqt/Hgxjg+mZYNcOgY5lrLiXQpvfemfJB5F1+Vw1LmlCROZGF0QB3YBdbWqojbsxvPtXXSFxU2wKvwYJGqNesbLMIQNwVaypg82bzaanS0gMa0FHQ1kdYZiy4o9PGICByjUaeU3sp+v/WYawj23EW+oELNpjNq8WnELQ7q7XvGOPTWaJ8yeDef899jCi/bokDvN20tdmD5j1pD9W8dNOcld6UoOENPyxICPG/PCD7ah9320QnOwQOFUwEb/8dU2vUtRrS/3BGl/A+nAqypic+zSfhjqewjjM61MTWCTt590CP+A9ZOU0VfkJrB9tiVV3k+H8W12DHVJ5obDJWhQiUJiku3ECp6y1h92SCz6YE4mQaP7g4dVbvsZOtqglchWJ9nWU0tZXnNblo7g22UW3Z3wtQ9Gp2PDlFQx1zUJ4GsUTqIexUq4SCgqFWjiLN+8vSEvwh+Aap8KXilthU5Ds7gq2KNovVYJghdPbzvE5HYE7s8uAfqOPsFjU0UDbLcNXxU42jZifBwCOi6iWwN3HxrVXHrAzjuPrc1FXEym8/mjGdeGoja0dDwDqZm+gI1jzrRjWL83+/bYXYD/gqZrUFFRUTmu2Ekl7HuWOKRyomoigeYYF23Bo/fXd33bKayHclxScs7cCrpa7mi8BVCyXTRFEfFyg+pW9MrTobhdRuvi6fXGE9l2kFSRBtexa4ONHbx9fKKwOvhq9KYkvc4uOc7h565pIWxqST+7LCtkzXobQtbxqaY/PsNXNKO9Q==
+api: eJzNVU1v2zAM/SuCThuQxumOvnVDCxTbsC7tsEOSA2MzsVpb0iS5HzD830dKSe22abfDDsvBkckniuTjkztZoi+cskEZLXM5x18t+iA2xolQoVDaB9cW7BVmI0ALBKfFnQpV6eBOBAfaQ/IHM9jBewx+qZc6z3NtAi71HDfoGLT4groUJxfnojTF6l1GT5/VZDsCq97Hoxvj+GxaNsCxY5illhPpUoIfTfkg8y6+KoelzClNnMjC6IA6sAusrVURt2fXnqvrpC8qbIBX4cEi1WvW11iEXdwUaCFj8mTzaqvR0QIa01LQ1URaZyy6oNDHIyJwiEa9Unor+8eth1y7YC9d5Asq1Gw6pSafRNx8VG/fM8aht0b7lMGH2Yz/npJ42RYFer9pa7EHy3/UGqp/66A5L7krRcEZelqWEOBlewbwwT7stw9OcA4eKJwK2Pg/ptKubzCi/eWeKOV/OhVgTU18mU3CH0rlMcLgXBtTI+jkfQx6wD9i7SRV9BWpGWyPXXmT5/NBXvM9U32iucFQGSpUWuO5dAuhoreM9ZftdXY00ifz4NHdoqNyF51sXU34KgTr8yyrqaesr+l1a6ewjXrLbo+Zuyezc+YQBbXMRYESyBqlQxS2cBBQ1KpRRFo/eX7CXwS/AFW+FrxS24ocozP4rlijaD2WCUK3D+/7TCz2RC9P7kgep/fQ2MTRTpf7jg9yHCx7FY6ngO6bSNeOnO+tKm58AMft57amIo6ns+mM8UxMA1E8Ghre8RotT7rQDUr8/6/b3egGvA+ZrUFFQUTeu91ELiSnSNDDxRNPFQ8w4bpuDR5/uLrv2UyVO5Ljgpa34FTS12JF8SuEktmiIY6KlZ9Sw46uOBuG1228Lp5fYzyUaQdJEW14E7saaezi2+UVgde7r0pjSt5DxfCdQ89c0sLYVBJ/dtjWyRr0toUtY1NM/v0GrgqQQA==
 sidebar_class_name: "post api-method"
 info_path: docs/api/lend-api/earn/quickstart
 custom_edit_url: null
@@ -22,13 +22,13 @@ import Heading from "@theme/Heading";
 <Heading
   as={"h1"}
   className={"openapi__heading"}
-  children={"earn-deposit-instructions"}
+  children={"withdraw-instructions"}
 >
 </Heading>
 
 <MethodEndpoint
   method={"post"}
-  path={"/earn/deposit-instructions"}
+  path={"/earn/withdraw-instructions"}
   context={"endpoint"}
 >
   
@@ -36,7 +36,7 @@ import Heading from "@theme/Heading";
 
 
 
-Request for the instruction of an earn deposit transaction to deposit assets
+Request for the instruction of an earn withdraw transaction to withdraw assets
 
 :::note
 Refer to [Lend API doc](/docs/lend-api) for more information

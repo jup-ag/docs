@@ -502,6 +502,40 @@ const sidebars = {
       value: '<div class="sidebar-line-break"></div>',
     },
   ],
+  send: [
+    {
+      type: 'doc',
+      id: 'universal-send-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Universal Send API',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'universal-send-api/invite-code',
+        },
+        {
+          type: 'doc',
+          id: 'universal-send-api/craft-send',
+        },
+        {
+          type: 'doc',
+          id: 'universal-send-api/craft-clawback',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
   toolkit: [
     {
       type: 'doc',

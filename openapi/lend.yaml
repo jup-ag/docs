@@ -282,11 +282,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserPositionsResponse'
 
-  /earn/rewards:
+  /earn/earnings:
     get: 
-      summary: earn-user-rewards
+      summary: earn-user-earnings
       description: |
-        Request for the rewards of one or multiple positions of a user
+        Request for the earnings of one or multiple positions of a user
 
         :::note
         Refer to [Lend API doc](/docs/lend-api) for more information
@@ -310,7 +310,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserRewardsResponse'
+                $ref: '#/components/schemas/UserEarningsResponse'
 
 
 components:
@@ -438,7 +438,7 @@ components:
       required:
         - asset
         - signer
-        - amount
+        - shares
       properties:
         asset:
           type: string
@@ -495,7 +495,7 @@ components:
       items:
         $ref: '#/components/schemas/UserPosition'
 
-    UserRewardsResponse:
+    UserEarningsResponse:
       type: object
       required:
         - totalDeposits

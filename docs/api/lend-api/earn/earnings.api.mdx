@@ -5,7 +5,7 @@ description: "Request for the earnings of one or multiple positions of a user"
 sidebar_label: "earnings"
 hide_title: true
 hide_table_of_contents: true
-api: eJzNVMFy2jAQ/RWNTskMxaRH3+g07XTaQ0qb6QE4CHvBCrKkSmtoxsO/d1cYBwrJpD2VAyDpad/u09ttZQmxCNqjdlbmcgI/G4goli4IrECAClbbVRRuKZwFQdt1Y1B7A8K7qPlaOlSiiRBmdmbzPLcOYWYnsASK4sT0C9hSjO8+idIV86uMvmNmaO+N8vo6cdUugNCW/taKY6YwMysH0qugakAIUebTVlpaUJ5MRoeac6aMwyMtTiu5J4TYKmMAhSrLADESJlB9OkApcwwNDGQsKqiVzFuJj54DRwxUr9ztBj1XX+crCNGtwfbK/BXhnMHREw9EPn87GvHPKcm3piiokmVjxAFMJIWzCBYZrrw3ukgaZg+R77TnnG7xAAWeZDeV6FCZ95By51LT+ofGqgxq22+8U0bZAg7LcYyQ0AejSCrDB+choN7XcRr3vPAzpmchB+5nAV02l877/C49tUSNBro3vO2Qk4O+O/4MJJmwcqSUXAEmX2JFi4wDZ310emAIm4NZm2AIUiH6mGeZ0Qjs+OFD44dqlTog29ycGelDABCkXkgtQyDvtEWxJYFEUAjC6JqlZIueMrwi+J3S5XPBK72q6OCIg7t3Adza5R6ibLr3GR4lG5Y7Nina6fe10cU6ogqsEMuwJ70ZjoYjfgUyAdYqmbJrriPlThJtn0z9Hw6lzkEIvzDzRtFUoOLSW7SdMaapsj8ao6Ly+ahtFyrCfTC7HW/v5wkbptRRLQz341KZCC9ocjXpWvdaXJ50F1Nc07v1w3OjTMOQZKR/Zz4beS8wH4/SJ/o5L4JmflJhTugKVEk5siT7i2Maex6Pbp3NOY7St+jH2+/Utr8BcRZjxQ==
+api: eJzNVdtOIzkQ/RXLTyBlaJIdjSBvQQTYGbTqhGXILvDgdFfTTty213bnMlH+faucC8lCRmieNg+Esuty6rjqZMFz8JmTNkijeZv34Z8afGCFcSyUwEA4LfWLZ6ZgRgPD46pWQVoFzBovKSxeClZ7cE/6SbfbbW0CPOk+FIBZDHu8BZ2zTvo7y032fJTgX58oPPskrDyOtSrjgEmN/1aCcsY0T5o3uBVOVBDAed5+XHCNBuKkYngpCTMidnM09ju5Rw82FUpBYCLPHXgf8znsUDrIeTu4GhrcZyVUgrcXPMwtpfbBYcd82eAwExU2imc3fw1n1+M/Jt3p5O/m5/6PrzfpxXn5W/5QDEazaadbjuc/vvZvZs3yosDILcwtRR/AGswY9A6pR5mpKvHJAzEQID/+dfjnF91Mn4u0W5V36TDtwdX1SOZ92f02lp+/FN97l/PU3vUGaad12WjVPT83zWIw6I0vQ2YH+tYUD/Ozs3SWTXRx07o9u0rvul9aV9/v+fKZIHmLgMETitbpKX3t93dXZxnyX9SKbZyxlczoADqQu7BWySy+fDLyFLN425kZjiALexw88vXT4qmZanCdrRlMEOoSIp9b+0GGMndiuj24EEroDDZmx3uI3pu559ifdcaCC3LV4Kbge4zvQXjPYR/UQY9XmAddNsAPOqxbeXcwNs29vaRoGeLQ0FB21579zast6dPguJClQf75C4S4o6FEI6HEyTY7Die4yWZxa6fQpQzB+naSKBmAtv9kVNsT8RLVIJk032zGlQNgSL2L8oFO1kgd2BQJYrQVTMmKqKSd26/wgeSpkPmh5KV8KfFipwYp2RBI5vKVi9Ax7hvM4xqQekVG1/z1apmNfRCOGCIaVkWbJ6cnp/QKOAShEnHU12qxw9we0MXrqvwPBXo9QQFmIbFKoMxhc/EtFuvBeIyd/WerSmyfrhaLofBw79RySccrgaSByaUXQ0VbXgjl4SecHPXXgnDMDqn+uyDH+HLbn5KJUDW5xFH69dofU/GfwNn9yXjF9EyGkwQKyXlG7xJEjsCJqVVgBzXWhp2oN6JKWbabe939E7f5X+j8x2A=
 sidebar_class_name: "get api-method"
 info_path: docs/api/lend-api/earn/quickstart
 custom_edit_url: null
@@ -52,7 +52,7 @@ Refer to [Lend API doc](/docs/lend-api) for more information
 </Heading>
 
 <ParamsDetails
-  parameters={[{"name":"user","in":"query","description":"User wallet address","required":true,"schema":{"type":"string"}},{"name":"positions","in":"query","description":"User token position","required":true,"schema":{"type":"string"}}]}
+  parameters={[{"name":"user","in":"query","description":"User wallet address\n","required":true,"schema":{"type":"string"},"example":"HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf"},{"name":"positions","in":"query","description":"User token positions (comma-separated)\n","required":true,"schema":{"type":"string"},"example":"9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D,2uQsyo1fXXQkDtcpXnLofWy88PxcvnfH2L8FPSE62FVU"}]}
 >
   
 </ParamsDetails>
@@ -67,7 +67,7 @@ Refer to [Lend API doc](/docs/lend-api) for more information
 <StatusCodes
   id={undefined}
   label={undefined}
-  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["totalDeposits","totalWithdraws","totalBalance","totalAssets","earnings"],"properties":{"totalDeposits":{"type":"string"},"totalWithdraws":{"type":"string"},"totalBalance":{"type":"string"},"totalAssets":{"type":"string"},"earnings":{"type":"string"}},"title":"UserEarningsResponse"}}}}}}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["address","ownerAddress","totalDeposits","totalWithdraws","totalBalance","totalAssets","earnings"],"properties":{"address":{"type":"string"},"ownerAddress":{"type":"string"},"totalDeposits":{"type":"string"},"totalWithdraws":{"type":"string"},"totalBalance":{"type":"string"},"totalAssets":{"type":"string"},"earnings":{"type":"string"}},"title":"UserEarningsResponse"}}}}}}
 >
   
 </StatusCodes>

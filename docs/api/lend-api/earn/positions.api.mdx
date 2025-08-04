@@ -1,0 +1,76 @@
+---
+id: positions
+title: "positions"
+description: "Request for the position data of one or multiple users"
+sidebar_label: "positions"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNV21vGjkQ/iuWPyUSF5JrpVP5RpS0SZueOJKo7ZGoMrsDa/DaW9sLISj//Wa8sCzFkN6X0/EB/DL2zPN43ljyFFxiZeGl0bzD+/CjBOfZyFjmM2CFcZK2WCq8YGbEjAaGe3mpvCwUsNKBdQ/6QXc6HW08POg+jAAPGza4AZ2ybu+apSZ5PGrjt2srXPtNFPI4qMiNBSY1DnNBasI1D5q3eCGsyMHj5bwzWHKNEzQvaMNdSbaipXaBk20E9yjC5kIp8EykqQXnwLGjxOS5YA7oXg/pcVBiEa20kPKOtyW0uEsyyAXvLLlfFKTPeSv1mL+0ODyJHPHi2tW34dOH6Z+zy/ns77O3/eePV73zd9mb9Mvo6+Rp3r3Mpovnj/2rp7PsfNSaIOiyN77sTj6PZNY9d73xp8vZN+/yz8+T+yv48e7m69urmftj9Ia/PJJFrjAaLSYjfj89pZ9tfLdlkiCmUanYWhiRJEZ70J7ERVEomQQ62xNHZ5a7wIS1griTHnLXWDfDCSR+i5oB92YKRJeZa7DdilOcukzgCAelTsGqBTLVRbL99tK5UEInZCO+iZmHMQItrCnAelkhrTS8YoZM6ZJafXAJtGKRD40KbpDIXCjaEmTGxtAwxV9vvFC1iWF2WyJbi4rAGdpzZ27XqOqV+oSFubCp66MDkeJwdDUJl63GFoYV5gs5wlCACr2SiCSVflGpvMB42uUBIW5IkPikY7DkfWvUMc+sQiOysWImtlVzFdfWpC92vCL0lefavFSSCam/h+c78GjKjM330tJqYWVSeTUqhGRq6PAOWYdIqVX+N4zVtu8cbfEquVHyspJkK3BRo5twdwVQwksfclBwyWvMm3Ss6daxa5uOHle77foHZQ7oaYZHlN1NwOw1c+9uLKhicrEwe8VRc5PCF+mza3xPxO/r2MbBHNdTK7Ce3Mhc0pYSzt8XWA7hTuYojWWBU3kohE57YBPKwuv5RWlDHsaFoXBByfZl9fVDBffay+jGrufvWLxBODRGgdAbvqMs/QwrymQEaLwyNqHvl6jJiInE6Dlo+DZhr4kejqabiM809++oOq2jbasIRt18fxTtFMrDQuvSGU3BdTE9CI26od6qh+N71l1/3Ue80KfFse/KDIYGH4eyWQif4aQNwur2uiEMDQDY2bpBC8mPZ94XrtNuK+wrqMs7mZTFiRiHrq89O9tp1t5bAIZebUObiEIFpkDP6OkY9WlM0fM6tPxnDb9weU/IdN/lmRxnuNHQQR3rMPSzaSUidDj3CRahM6MuNXC9YvCvUiZTjApLFBENldKzk9OT05DmjfO5CN6+al6b1G1Zuty0b/+fBnzlUx6efLtQWE2Db1YlrvKIASeP4K0GMOQpM5SPBny5pJi+t+rlhZarZp08JZWOQhL9a4T1FA5wcdRfZelj9m+6+qjlU3zGzf+HmVAlyYSXnQkrqyQxeETJDAQGYDC1OtTFhrvwjVM7HTbdUgfNh8s7DKR/AIVgrjk=
+sidebar_class_name: "get api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"positions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/earn/positions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the position data of one or multiple users
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"users","in":"query","description":"User wallet addresses (comma separated)\n","required":true,"schema":{"type":"string"},"example":"HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf,jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","required":["token","ownerAddress","shares","underlyingAssets","underlyingBalance","allowance"],"properties":{"token":{"type":"object","required":["id","address","name","symbol","decimals","assetAddress","asset","totalAssets","totalSupply","convertToShares","convertToAssets","rewardsRate","supplyRate","totalRate","rebalanceDifference","liquiditySupplyData"],"properties":{"id":{"type":"integer"},"address":{"type":"string"},"name":{"type":"string"},"symbol":{"type":"string"},"decimals":{"type":"integer"},"assetAddress":{"type":"string"},"asset":{"type":"object","required":["address","chain_id","name","symbol","decimals","logo_url","price","coingecko_id"],"properties":{"address":{"type":"string"},"chain_id":{"type":"string"},"name":{"type":"string"},"symbol":{"type":"string"},"decimals":{"type":"integer"},"logo_url":{"type":"string","format":"uri"},"price":{"type":"string"},"coingecko_id":{"type":"string"}},"title":"AssetInfo"},"totalAssets":{"type":"string"},"totalSupply":{"type":"string"},"convertToShares":{"type":"string"},"convertToAssets":{"type":"string"},"rewardsRate":{"type":"string"},"supplyRate":{"type":"string"},"totalRate":{"type":"string"},"rebalanceDifference":{"type":"string"},"liquiditySupplyData":{"type":"object","required":["modeWithInterest","supply","withdrawalLimit","lastUpdateTimestamp","expandPercent","expandDuration","baseWithdrawalLimit","withdrawableUntilLimit","withdrawable"],"properties":{"modeWithInterest":{"type":"boolean"},"supply":{"type":"string"},"withdrawalLimit":{"type":"string"},"lastUpdateTimestamp":{"type":"string"},"expandPercent":{"type":"string"},"expandDuration":{"type":"string"},"baseWithdrawalLimit":{"type":"string"},"withdrawableUntilLimit":{"type":"string"},"withdrawable":{"type":"string"}},"title":"LiquiditySupplyData"}},"title":"TokenInfo"},"ownerAddress":{"type":"string"},"shares":{"type":"string"},"underlyingAssets":{"type":"string"},"underlyingBalance":{"type":"string"},"allowance":{"type":"string"}},"title":"UserPosition"},"title":"UserPositionsResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

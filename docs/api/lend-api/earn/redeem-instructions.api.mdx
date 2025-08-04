@@ -1,0 +1,76 @@
+---
+id: redeem-instructions
+title: "redeem-instructions"
+description: "Request for the instruction of an earn redeem transaction to redeem shares"
+sidebar_label: "redeem-instructions"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVUtz2zYQ/iscnJoZ24zSdKblzU4V22mTqpIzbiP7sCRXIiQSgAFQD3P037sLSJYcq49DD9GBAveF3f32W3aiRFdYabzUSmRiiA8tOp9MtE18hYlUztu2YG2iJwmoBMGqxGKJ2CTegnIQtV7vpK4Ci+5O3aksy5T2eKeGOEHLJuNfUZXJ+eA6KXVx/11KT5fWJDsFI1+Faxtt+V46NsCRQ5g7JU6Ejcld6HItsi68SrpTZJQinohCK4/KswqMqWUR3NOZ48o64YoKG+CTXxukWnU+w8Jv48ZAYwHOIcucnCq0fAjViPsTYaw2aL2kN74iGO6jUZ+kmorNk+tRVQz2UkU6XEFjajyILfqD2fvbsvzhvJ08jEYP+PHNw6fe6nGdg3n34+XbZf/ycv5lub752fcW+5wzcfVnvrqcf1r0l4svvbfDxw9Xg4ufqu/L28kfs9XyvF/N148fhlerXnUx2ZeYid7r8ONMvfSci+gT3KOgHx50f7PhjElotHKxoDfkR3/Px2nUFgU6N2nrZGcs/iegCI2phea6JDkUhW6Vd3QswcNLsPbGx1B5ct8rwVpYUzjpsXH/mkqbzzFYu9FubKS7tdJDTk18mU20P5bKU4S9Mte6RlBR+xT0iP4AtfNY0UekZrA8dOXo1O08rvdEH+6Q2kSYG/SVpkKF0Y5LN+Arekt5E6SR86cHe4JRcGgXaKnYcSdaW5N15b1xWZrW1FHm+tmsNWcwDdxPFz1G7tnkvLeICTXMhmVBRkZL5ZOl9FViwWNSy0YSZJuTr2/4D8EHIMu/C17JaUWKgzt4b+WYtA7LaEJbkP1+IQw3BC7P7QE5+t8Uj3mRBuS3OP/eymLuPFhGkjGKHemdvT4L9oxxA4GHChr2OI7ws4Z2e0p/21+Q7fx7XPnU1CADq8L4dNuxHgtOLxD8ZdkEdsUcIKuuy8HhZ1tvNiymmi0xekzHBVgZKTq+p+gVQslgEhMC6cW72KrTG86Fzes2bJyvNyFPdvQgNqPx/2h7f0DTwW+jGzLOt5/JRpcBRlhyVfTMBB20iSXxd5RlnahBTVuYsm2Myb+/AH6Xz80=
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"redeem-instructions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/redeem-instructions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the instruction of an earn redeem transaction to redeem shares
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","shares"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"shares":{"type":"string"}},"example":{"asset":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","signer":"HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf","shares":"1000000"},"title":"EarnSharesRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["programId","accounts","data"],"properties":{"programId":{"type":"string"},"accounts":{"type":"array","items":{"type":"object","required":["pubkey","isSigner","isWritable"],"properties":{"pubkey":{"type":"string"},"isSigner":{"type":"boolean"},"isWritable":{"type":"boolean"}},"title":"AccountMeta"}},"data":{"type":"string"}},"title":"InstructionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

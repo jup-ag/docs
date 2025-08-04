@@ -1,0 +1,76 @@
+---
+id: mint
+title: "mint"
+description: "Request for a base64-encoded unsigned earn mint transaction to mint shares"
+sidebar_label: "mint"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVEtz0zAQ/isenWCmjZtSGPAtLWlKgRKSMIUmOSj2JlZiS4ok5+XJf2dXTklKC8OBQ32w5X3vft+qZAnY2AjthJIsYh2YF2BdMFYm4MGIW3hzdgwyVgkkQSGtmEg8ADcyyIV0gTNcWh6Td+BUJbMpN2AHciCjKJLKwUB2YAyGDPqfQCZBo/0hSFQ8fBHi24YZyo65Fi992lwZCITEY84prg8zkOyImaq4c5WsWVT6X2EgYZEzBRyxWEkH0pGKa52J2LuHU0udlczGKeScTm6tAXtVoynEbhe3CtRn3Fogme/U0MF3w4ZHTBulwTiBf5TCG+6jWWeEnLDtL9cnVVWwxyrUwYrnOoOD2KzZnl7eJsnrRjGed7tz+Hw6v6mvNusR1xdvW2fLZqs1u1uue+9dfbGvOWJXP0ar1uxm0Vwu7upnnc31Vfv8XfoquR1/n66WjWY6W2+uO1ereno+3rcYsfqJf6hSJxzVwpoIddfrOwfT326pYhRqJW3V0Cn64echnbpFHIO14yIL7o3ZfwLqgHmPwTlUPjns+/Z6e8POfYHbqrscXKowFdPKUnLNXYp/IZE/JKLT5MAswGDKfskKk6E6dU7bKAwz4YA4XZsWusYnnuPhoo4+Dyd0aQACLNv4pUAjrWiHlsKlgeEOgkzkwlmE5PcM/xC8zUXyp+CpmKSoOMhB+zmCoLC44d6ES+/3ERBwHDHhc0CC5rPiK10YHuodsF8LEc+s44ZgIoyqidRrJzVvT6Dm3LND8pw8dpA+mGC55+rzvhp3DHewcqHOuJDUo+dLuSNun1FpaOr7RDhTojWKy5J6+Way7ZbE2KTB67WPxwU3go9onP0hhkuBJwQXcn2GlIjYRTWb4x4lJ/OsoCIe7TRxt/Jo4HWg3V9thweb1/7S7aHxaHfh5zhqlBq+pLsA3xHDg/JY+bX3spJlXE4KPiHbKiY9PwECGGIt
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"mint"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/mint"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for a base64-encoded unsigned earn mint transaction to mint shares
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","shares"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"shares":{"type":"string"}},"example":{"asset":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","signer":"HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf","shares":"1000000"},"title":"EarnSharesRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["transaction"],"properties":{"transaction":{"type":"string"}},"title":"TransactionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

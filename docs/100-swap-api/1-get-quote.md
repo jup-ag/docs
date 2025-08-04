@@ -9,6 +9,15 @@ title: "Get Quote"
     <meta name="twitter:card" content="summary" />
 </head>
 
+:::note
+- Lite URL: `https://lite-api.jup.ag/swap/v1quote`
+- Pro URL: `https://api.jup.ag/swap/v1/quote`
+
+To upgrade to Pro or understand our rate limiting, please refer to this section.
+- [API Key Setup](/docs/api-setup)
+- [API Rate Limit](/docs/api-rate-limit)
+:::
+
 :::warning Please use the Swap API at your own discretion.
 
 The Jupiter UI at https://jup.ag/ contains multiple safeguards, warnings and default settings to guide our users to trade safer. Jupiter is not liable for losses incurred by users on other platforms.
@@ -33,15 +42,6 @@ To fully utilize the Quote API, check out the [Quote API Reference](/docs/api/sw
 :::
 
 ## Quote API
-
-:::note
-- Lite URL: `https://lite-api.jup.ag/quote`
-- Pro URL: `https://api.jup.ag/swap/v1/quote`
-
-To upgrade to Pro or understand our rate limiting, please refer to this section.
-- [API Key Setup](/docs/api-setup)
-- [API Rate Limit](/docs/api-rate-limit)
-:::
 
 The most common trading pair on Solana is SOL and USDC, to get a quote for this specific token pair, you need to pass in the required parameters such as:
 

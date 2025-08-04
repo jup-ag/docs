@@ -28,6 +28,7 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 
 - [Ultra API](/docs/ultra-api/)
 - [Swap API](/docs/swap-api/)
+- [Lend API](/docs/lend-api/) **NEW!**
 - [Trigger API](/docs/trigger-api/)
 - [Recurring API](/docs/recurring-api/)
 - [Token API](/docs/token-api/)

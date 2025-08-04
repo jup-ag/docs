@@ -1,0 +1,76 @@
+---
+id: redeem
+title: "redeem"
+description: "Request for a base64-encoded unsigned earn redeem transaction to redeem shares"
+sidebar_label: "redeem"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVEtz2jAQ/isendqZBIc07bS+kZSQvlIKdNIGOAh7wQJbEpLMIx7+e3dlCKRJOz30EB9sWfve79stWQI2NkI7oSSLWAfmBVgXjJUJeDDiFt6cHYOMVQJJUEgrJhIPwI0MDCQAeeAMl5bHZB84tbu1KTdgB3IgoyiSysFAdmAMhlT6n0EmQaP9IUhUPHwR4tuGGd4dcy1e+tC5MhAIiceck2fvZiDZETNVgucqWbOo9L8CY7LImQKOWKykA+lIxLXOROzNw6ml6kpm4xRyTie31oD1qtEUYrf1WznqM24t0J2v1tDBV8OGR0wbpcE4gX8UwivuvVlnhJywzb3pk6LK2WMRymDFc53BgW/WbE8vb5LkdaMYz7vdOXw5nV/XV3frEdcXb1tny2arNbtdrnvvXX2xzzliVz9Hq9bsetFcLm7rZ527j1ft83fpq+Rm/GO6Wjaa6Wx997Fztaqn5+N9iRGrn/iHMnXCUS6siXB3vbxz0P3NhjLGS62krQo6RTv8PKRUt4hjsHZcZMFOmf0noA649xicQ+GTzd6V19srdnYJbqrqcnCpwlBMK0vBNXcp/oU0AGFFdeodmAUYDNovWWEyVEid0zYKw0w4IFbXpoWu8Ylnebioo83DHl0agAATN34sUEkrIV2wFC4NDHcQZCIXziIov0f4B+dtLpI/OU/FJEXBQQya0BEEhcU59ypcertPgJBjkwmhAxo0nxVjaWV4sLfQfitEPLOOGwKPMKo6Uq+d1Lw+wZpzzw/Jc7K4B/VBD8s9X5//itwy3cHKhTrjQlKlnjXllsB9Run5YfLVIqwpERwFZUkVfTfZZkPXWKrBRdvH44IbwUfU1v4QHabAE4INOT9DakTsourQcY/Ck3pWUBqPpps4XFk0cDFo91fd4cEMtr92e6g82q7+HBtOgPElFYLviOFBecT8AvB3Jcu4nBR8QrqVT3p+AX04Z0M=
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"redeem"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/redeem"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for a base64-encoded unsigned earn redeem transaction to redeem shares
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","shares"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"shares":{"type":"string"}},"example":{"asset":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","signer":"HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf","shares":"1000000"},"title":"EarnSharesRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["transaction"],"properties":{"transaction":{"type":"string"}},"title":"TransactionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

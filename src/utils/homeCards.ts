@@ -16,6 +16,13 @@ export const API_CARDS = [
       ],
     },
     {
+      title: "Lend API",
+      links: [
+        { text: "Docs", href: "/docs/lend-api/" },
+        { text: "Schemas", href: "/docs/api/lend-api/" },
+      ],
+    },
+    {
       title: "Trigger API",
       links: [
         { text: "Docs", href: "/docs/trigger-api/" },

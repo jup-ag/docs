@@ -1,0 +1,76 @@
+---
+id: withdraw-instructions
+title: "withdraw-instructions"
+description: "Request for the instruction of an earn withdraw transaction to withdraw assets"
+sidebar_label: "withdraw-instructions"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVU1z2zYQ/SscnNoZ24ySdKblTU4V20mTqJI7biP7sCRXIiQSgAFQH+bov3cXlEw5VpIeeogOFIh9u9jdh7dsRI4us9J4qZVIxAjva3Q+mmob+QIjqZy3dcbWSE8jUBGCVdFK+iK3sIq8BeWgtXvd7YNz6N2tulVJkijt8VaNcIqWQZM/UOVRf3gV5Tq7+ymmp4tL2jsFI38OR1fa8tm0rIBjhzC3SpwI2yZ4rvONSJrwKi3mIqE08URkWnlUnk1gTCmz4B7PHVfXCJcVWAGv/MYg1avTOWZ+F7cNNBEhedpzcqbQ0gIqXVPQuxNhrDZovUQXjgjALhr1SqqZ2D66HjPtgj03kQ3XUJkSD2KLwXD+9ibPf+nX0/vx+B4/vLz/2Fs/bFIwb369eL0aXFwsPq8217/73rLLORGX/6Tri8XH5WC1/Nx7PXp4dzk8/614ld9M/56vV/1Bsdg8vBtdrnvF+bQrMRG9F+HHmXrpORcxIMr7wT466P52yxlbdEYr1/bjJfnR39MrNa6zDJ2b1mW0B4v/iShiY2ahusq5gCzjDB0tc/DwnKwOfJSVvXtnBGthQ+Gkx8p9N5U6XWBAu/H+2kh3Y6WHlJr4PJsWfyyVxwidMdW6RFCt9THoEfsBa/22og9IzeD90JWjt27vcdWJfbRnatvSXKEvNBUqjHZcugFf0FvM0yDeq/70YFowDw7tEi2VO2lEbUvCF94bl8RxST1ltZ/Na3MGs6D+eNlj7p7cnbcWMaKW2TAuCGS0VD6MmciCx6iUlSTStidfnvAfgg9B5l8LXshZQYaDM3hypRjVDvMWQrOQ/d4Ti1uil2/ugTwGP5SSeZQG7ndM/1nLbOE8WOaSOWo70jt7cRbwzHIFQYkKKvb4GsdPWtp0sv7xvyQ7HXhc+9iUIIO6wiVqdtd7IjhFgh4vnkgvWA2Ea5oUHP5ly+2Wt6lyS9qe0HIJVrZindxR/AIhZ1JJEUH+4k3bsNNrzobhZR1mz5czkW9460G6RuO/ib07EOzw0/iawOnug1npnH2oGB5g9EwELbRpS+IvKu81ogQ1q2HG2DYm//4FR6TW9Q==
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"withdraw-instructions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/withdraw-instructions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the instruction of an earn withdraw transaction to withdraw assets
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","amount"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"amount":{"type":"string"}},"example":{"asset":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","signer":"HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf","amount":"1000000"},"title":"EarnAmountRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["programId","accounts","data"],"properties":{"programId":{"type":"string"},"accounts":{"type":"array","items":{"type":"object","required":["pubkey","isSigner","isWritable"],"properties":{"pubkey":{"type":"string"},"isSigner":{"type":"boolean"},"isWritable":{"type":"boolean"}},"title":"AccountMeta"}},"data":{"type":"string"}},"title":"InstructionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

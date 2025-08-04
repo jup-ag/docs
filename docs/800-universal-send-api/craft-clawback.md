@@ -157,6 +157,10 @@ const invite_pda = PublicKey.findProgramAddressSync(
 
 ## Craft Clawback
 
+:::note
+The clawback will return the full amount including leftover transaction fees and/or rent back to the sender.
+:::
+
 ```jsx
 // STEP 4: Post request for a Clawback transaction
 const craftClawbackTransaction = await (

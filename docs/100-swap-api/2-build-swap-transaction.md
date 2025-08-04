@@ -12,6 +12,15 @@ import TabItem from '@theme/TabItem';
     <meta name="twitter:card" content="summary" />
 </head>
 
+:::note
+- Lite URL: `https://lite-api.jup.ag/swap/v1/swap`
+- Pro URL: `https://api.jup.ag/swap/v1/swap`
+
+To upgrade to Pro or understand our rate limiting, please refer to this section.
+- [API Key Setup](/docs/api-setup)
+- [API Rate Limit](/docs/api-rate-limit)
+:::
+
 The Swap API is one of the ways for you to interact with the Jupiter Swap Aggregator program. Before you send a transaction to the network, you will need to build the transaction that defines the instructions to execute and accounts to read/write to. 
 
 It can be complex to handle this yourself, but good news! Most of our APIs and SDKs just handles it for you, so you get a response with the transaction to be prepared and sent to the network.
@@ -38,17 +47,6 @@ To fully utilize the Swap API, check out the [Swap API or Swap Instructions Refe
 :::
 
 ## Swap API
-
-
-
-:::note
-- Lite URL: `https://lite-api.jup.ag/swap`
-- Pro URL: `https://api.jup.ag/swap/v1/swap`
-
-To upgrade to Pro or understand our rate limiting, please refer to this section.
-- [API Key Setup](/docs/api-setup)
-- [API Rate Limit](/docs/api-rate-limit)
-:::
 
 From the previous guide on getting a quote, now using the quote response and your wallet, you can receive a **serialized swap transaction** that needs to be prepared and signed before sending to the network.
 

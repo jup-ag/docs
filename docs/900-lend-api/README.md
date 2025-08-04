@@ -15,23 +15,23 @@ The Jupiter Lend API is built on top of Jupiter Lend Program.
 
 - **What is the Jupiter `Earn` Protocol?**
     
-    The Earn Protocol is the 'Deposit and Earn' side of Jupiter Lend protocol. Supply to the Jupiter Earn protocol through this simple UX and earn yield on your supplied asset in kind.
+    The Earn Protocol is the 'Deposit and Earn' side of Jupiter Lend. Simply deposit assets to the Jupiter Earn and earn yield.
 
 - **Why is this separate from borrowing?**
     
-    Jupiter uses a unified liquidity layer where all protocols on Jupiter can source liquidity from. For depositors this means you earn the best possible rate at all times without having to migrate your funds when new protocols are launched on Jupiter. You can supply once and earn the most up to date yield from the Jupiter protocol.
+    Jupiter Lend uses a unified liquidity layer where both Earn (lending) and Borrow (vault) protocol can source liquidity from. For depositors this means you earn the best possible rate at all times without having to migrate your funds when new protocols are launched on Jupiter Lend. You can supply once and earn the most up to date yield from the Jupiter Lend protocol.
 
 - **Are there supply or withdraw limits?**
     
-    There is no limits on supplying funds to the Earn Protocol. Withdrawals from the Earn Protocol utilize an Automated Debt Ceiling. Withdrawals increase every block creating a smoothing curve for withdrawals preventing any sudden large movements.
+    There is no limits on supplying funds to the Earn Protocol. Withdrawals from Jupiter Lend utilize an Automated Debt Ceiling. Withdrawals increase every block creating a smoothing curve for withdrawals preventing any sudden large movements.
 
 - **What are the risk?**
     
-    Jupiter lend is a new and novel protocol and like all DeFi protocols contains smart contract risk, market risk and other factors which can cause a complete loss of funds.
+    Jupiter Lend is a novel protocol and like all DeFi protocols contains smart contract risk, market risk and other factors which can cause loss of user funds.
 
 - **What are the fees for the Earn Protocol?**
     
-    There are no fees to use the earn protocol on Jupiter Lend.
+    There are no fees to use the Earn Protocol on Jupiter Lend.
 
 ### About Borrow
 
@@ -45,11 +45,11 @@ The Jupiter Lend API is built on top of Jupiter Lend Program.
 
 - **What happens if I am liquidated?**
     
-    When your vault or position is liquidated, a portion of it is sold to repay your debt and return your position to a safe state. In addition to the debt repayment, a liquidation penalty is also charged.
+    When your NFT or position is liquidated, a portion of your collateral is sold to repay your debt and return your position to a safe state. In addition to selling a part of your collateral, a liquidation penalty is also charged.
 
 - **What is the Max Liquidation Threshold?**
 
-    While the Liquidation Threshold determines when a vault can be liquidated the protocol also has a 'hard' ceiling for liquidation. When a vault passes the max liquidation threshold it is liquidated automatically.
+    While the Liquidation Threshold determines when a vault can be liquidated, the protocol also has a 'hard' ceiling for liquidation. When a vault passes the max liquidation threshold it is entirely (100%) liquidated automatically.
 
 - **My vault passed the liquidation threshold but is not liquidated, will I be liquidated?**
     

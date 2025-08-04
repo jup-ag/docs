@@ -40,6 +40,7 @@ import { create_invite_code, invite_code_to_priv_key } from "./utils.js";
 import {
   Connection,
   Keypair,
+  VersionedTransaction,
 } from "@solana/web3.js";
 import fs from "fs";
 
@@ -49,15 +50,12 @@ const sender = Keypair.fromSecretKey(new Uint8Array(senderPrivateKey));
 
 // STEP 1: Create 12-character invite code
 const invite_code = await create_invite_code();
-console.log(invite_code);
 
 // STEP 2: Derive secret key (public and private key)
 const secret_key = invite_code_to_priv_key(invite_code);
-console.log(secret_key);
 
 // STEP 3: Use secret key to create Solana Keypair instance
 const recipient = Keypair.fromSecretKey(secret_key);
-console.log(recipient);
 
 // STEP 4: Post request for a Universal Send transaction
 const craftSendTransaction = await (
@@ -74,7 +72,6 @@ const craftSendTransaction = await (
         }, null, 2)
     })
 ).json();
-console.log(craftSendTransaction);
 
 // STEP 5: Use sender and receipient keypair to sign and send to network
 const transaction = VersionedTransaction.deserialize(Buffer.from(craftSendTransaction.tx, 'base64'));
@@ -166,5 +163,4 @@ const craftSendTransaction = await (
         }, null, 2)
     })
 ).json();
-console.log(craftSendTransaction);
 ```

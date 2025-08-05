@@ -559,6 +559,10 @@ const sidebars = {
           type: 'doc',
           id: 'universal-send-api/craft-clawback',
         },
+        {
+          type: 'doc',
+          id: 'universal-send-api/manage-invites',
+        },
       ],
     },
     {

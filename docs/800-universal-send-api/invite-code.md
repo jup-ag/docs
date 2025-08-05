@@ -1,11 +1,11 @@
 ---
-sidebar_label: "Invite Code"
+sidebar_label: "Invite Code (Beta)"
 description: "Use the Jupiter Universal Send API to gift, pay, or onboard anyone in seconds."
-title: "Invite Code"
+title: "Invite Code (Beta)"
 ---
 
 <head>
-    <title>Invite Code</title>
+    <title>Invite Code (Beta)</title>
     <meta name="twitter:card" content="summary" />
 </head>
 

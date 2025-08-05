@@ -350,6 +350,14 @@ const sidebars = {
               type: 'doc',
               id: 'api/universal-send-api/craft-clawback',
             },
+            {
+              type: 'doc',
+              id: 'api/universal-send-api/pending-invites',
+            },
+            {
+              type: 'doc',
+              id: 'api/universal-send-api/invite-history',
+            },
           ],
         },
       ],

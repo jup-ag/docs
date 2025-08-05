@@ -134,9 +134,10 @@ There are 2 types of market listing on Jupiter.
 
 1. **Instant routing**
     - We automatically list all new markets that are created on specific DEXes (list is below).
-    - These markets have a 25 days grace period, where the liquidity criteria is not applied.
-    - After 25 days, the liquidity criteria will apply (refer to normal routing).
-    - For bonding curves, if it does not graduate after 25 days, it will be removed from routing.
+    - These markets have a grace period, where the liquidity criteria is not applied.
+    - After the grace period has passed, the liquidity criteria will apply (refer to normal routing).
+    - For bonding curves, if it does not graduate after the grace period, it will be removed from routing.
+        - Only when the bonding curve has graduated to a new market, the graduated market will be added to routing.
 
     <details>
         <summary>

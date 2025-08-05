@@ -22,6 +22,10 @@ Universal Send API provides more opportunities for potential users to be onboard
 - Claiming needs to be done via Jupiter Mobile only.
 - You can gamify the experience post-claim once they are onboarded!
 
+## Jupiter Mobile Adapter
+
+To maximize users experience, once your users have claimed via Jupiter Mobile, they can use the app to continue their journey on your app or other use cases. This can be done via [Jupiter Mobile Adapter](/docs/tool-kits/mobile-adapter), allowing Jupiter Mobile users to simply use the app to scan a QR code to login, they can utilize their wallets on Jupiter Mobile across any platform.
+
 ## FAQ
 **How to does claim work?**
 - The invite code can be in the format of a link or a QR code.

@@ -31,7 +31,7 @@ Both of the following endpoints only returns the invites that are set up by the 
 :::
 
 :::tip
-Depending on how you have set up to allow connection of wallets, either via Jupiter Mobile QR log in, wallet extensions, or any other methods, you will need to handle the passing in of their pubkey to the API to get the necessary data.
+Depending on how you have set up to allow connection of wallets, either via [Jupiter Mobile Adapter](/docs/tool-kits/mobile-adapter) for QR code login, wallet extensions, or any other methods, you will need to handle the passing in of their pubkey to the API to get the necessary data.
 :::
 
 ## Get Pending Invites

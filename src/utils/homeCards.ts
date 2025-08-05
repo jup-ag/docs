@@ -61,6 +61,13 @@ export const API_CARDS = [
       ],
     },
     {
+      title: "Jupiter Mobile Adapter",
+      links: [
+        { text: "NPM", href: "https://www.npmjs.com/package/@jup-ag/jup-mobile-adapter" },
+        { text: "Docs", href: "/docs/tool-kits/mobile-adapter" },
+      ],
+    },
+    {
       title: "Unified Wallet Kit",
       links: [
         { text: "Playground", href: "https://unified.jup.ag/" },
@@ -71,10 +78,7 @@ export const API_CARDS = [
       title: "NPM Package",
       links: [
         { text: "NPM", href: "https://www.npmjs.com/package/@jup-ag/api" },
-        {
-          text: "Example",
-          href: "https://github.com/jup-ag/jupiter-quote-api-node/tree/main/example",
-        },
+        { text: "Example", href: "https://github.com/jup-ag/jupiter-quote-api-node/tree/main/example" },
       ],
     },
   ];

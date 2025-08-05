@@ -1,0 +1,76 @@
+---
+id: dbc-pool-submit
+title: "dbc-pool-submit"
+description: "Execute the signed transaction, and optionally upload content and header image"
+sidebar_label: "dbc-pool-submit"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVVU1z2jAQ/SsandoZjGkm7YFbSNuZTDuTNKQnyEG2F6wgS6okJ2GI/3t3ZUNMIWkOvZQDCGn19uvt04YX4HMnbZBG8zH/8gh5HYCFEpiXSw0FC05oL3IyGDChC2aisVBqzWqrjChYbnQAHeJpCaIAx2QlljDXcz0ej7UJuLyGBe4Hw2bTUBfSsLOrC1aY/PZdit8+9XE3EVa+ZwvjWGUcMKlxWQlyGKHmmg+4g181+DAxxZqPN7zzTsuqVkFa4UJK15JCBEHbPi+hiquwtoBpmuwO8tBBSQcFH894L1E8MQ8aHL8dcOuMBRck+AjQM3rG88FJvcRb+9VM2ER4+HSagM5NgbU8LCkm1GydvQHvkgzZAxYfArN1pmTOVrBuUXqF+CtO18Nd63oGsca6VkpkCkGCqwHB275eUFuPOWjbhDuZ1MKtX3PZZwhbSAUUPXoIMpA/Pq2zSobPk/Ob5zJd91reNGTtwFujfduVk9GIfvZdTus8B+8XtWJbY75XJGEt1i+SK73zbUNfpso+D3wL3jPMjFEgYiO2vHsdopLHetX2cSGX32B95LT7DPjpsZQnOIzddPy7VME54/yhHQYRj16KcsA/HovxAoNyxAMP7h550GKQeQWhNDiK3JoYvxWhxH9pkeWJxeqmPjIDT9qrGNNsw2un0KgMwfpxmioZgDRkeFfboVh2qpLefzhg5FcHqHMSIyAhAl1Ygw1hDzKUzAnUQCXRmcc0//TxJvgrIYuX4Eu5LPGg54V0MQNWe1SHaCJ0vEckaFCESAdjnbsZ+VHLfOUDKh06plK0Tk+Go+HoIJQn9l3qFXua6yeWJAktqHlU5UpEKmhREeq20Mmu0HtAPan9Px6KjpUBHkNqlZAx7djLTUeu2S5nYlWbNZa7JALi4WaToYD/dKppaBsHC6VtPMPlvXCy1cfZ7U4dIx9XNLf8vM00uaEQyFzVFMqxB4oI1l46Q02xoWd+MLbEhd2YXF1Ob9A4697BCp8Y3CXgiDt4XlKQTfMbLuXFhQ==
+sidebar_class_name: "post api-method"
+info_path: docs/api/studio-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"dbc-pool-submit"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/dbc-pool/submit"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Execute the signed transaction, and optionally upload content and header image
+
+:::note
+Refer to [Studio API doc](/docs/studio-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"content":{"multipart/form-data":{"schema":{"type":"object","required":["transaction","owner"],"properties":{"transaction":{"type":"string","description":"- Base64-encoded signed transaction\n"},"owner":{"type":"string","description":"- Owner wallet public key\n"},"content":{"type":"string","description":"- Optional content description\n","nullable":true},"headerImage":{"type":"string","format":"binary","description":"- Optional header image file\n"}},"title":"SubmitDBCTransactionRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","properties":{"success":{"type":"boolean"},"data":{"type":"object","properties":{"mint":{"type":"string"},"configKey":{"type":"string"}}}}}}}},"400":{"description":"Bad request","content":{"application/json":{"schema":{"type":"object","properties":{"errors":{"type":"object"},"error":{"type":"string"}}}}}},"500":{"description":"Internal server error"}}}
+>
+  
+</StatusCodes>
+
+
+      

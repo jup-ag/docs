@@ -50,6 +50,13 @@ export const API_CARDS = [
         { text: "Schemas", href: "/docs/api/price-api/" },
       ],
     },
+    {
+      title: "Studio API",
+      links: [
+        { text: "Docs", href: "/docs/studio-api/" },
+        { text: "Schemas", href: "/docs/api/studio-api/" },
+      ],
+    },
   ];
   
   export const TOOL_KIT_CARDS = [

@@ -331,6 +331,33 @@ const sidebars = {
                 },
               ],
             },
+          ]
+        },
+        {
+          type: "category",
+          label: "Studio API Schema",
+          link: {
+            type: "generated-index",
+            title: "Studio API Schema",
+            slug: "/api/studio-api",
+          },
+          items: [
+            {
+              type: 'doc',
+              id: 'api/studio-api/dbc-pool-create-tx',
+            },
+            {
+              type: 'doc',
+              id: 'api/studio-api/dbc-pool-submit',
+            },
+            {
+              type: 'doc',
+              id: 'api/studio-api/dbc-fee',
+            },
+            {
+              type: 'doc',
+              id: 'api/studio-api/dbc-fee-create-tx',
+            },
           ],
         },
       ],

@@ -498,6 +498,36 @@ const sidebars = {
       value: '<div class="sidebar-line-break"></div>',
     },
   ],
+  studio: [
+    {
+      type: 'doc',
+      id: 'studio-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Studio API',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'studio-api/create-dbc',
+        },
+        {
+          type: 'doc',
+          id: 'studio-api/claim-fee',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
   perp: [
     {
       type: 'doc',

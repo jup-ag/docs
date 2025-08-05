@@ -1,0 +1,77 @@
+---
+id: dbc-fee-create-tx
+title: "dbc-fee-create-tx"
+description: "Request for a base64-encoded unsigned transaction to claim creator trading fees of a Dynamic Bonding Curve pool"
+sidebar_label: "dbc-fee-create-tx"
+hide_title: true
+hide_table_of_contents: true
+api: eJztVktz2zYQ/is7PDUzpaimbg+6WU4zzfQRxXan05F8AImVCJsEGDxsKTL/e3dB2aQeST3TTE/VQYKIxWK//Xa/5TaR6AqrGq+MTibJJX4M6DwsjQUBuXD441mKujASJQTt1ErTwluhnSj4DHgDRSVUDYVF4ekYbUqlV7BEdGCW5ObNRotaFTA1Ou5cBHuP0BhTLXQKPwstKzLNjS9BKouFf/ZlHjRaV6oGyAgaa9ablIOS/c5ooRd6Mplo43GhL3GJlmOaX/kglYHz2TuQprj5JqNvl7n4NBWNehUx1sYiKE3LWjCc6Gqhk28T22ViauQmmWyTwmiP2vNSNE2limie3TpO2zZxRYm14JXfNEiJNPktAdn5IVAymcyTGPSfoqqQdzgB51JadI7+1WL9IRCG89oEuueG9q1p0HqFjv0Oz/bXOG8po3R8n8YU3rM5PER7aEJOEcMdbghau3/zC3x9nj8QnZfO7QGE3rMOdY72hOffxFrVoYaPfAxEPPdcUZGGWmm2SCbjlm7wylfs8ILrAy/Y6i3im+nFdV+RlwPi2pZPUYSN0a7L4+vxmH/2I7kKRUEwlqGCJ2O6+6twPuiVY1KHm/9IxHS/G4dNSOmQm1jQ3KF8uG077Gen4E6FhF19/xuY+1jQWmPdKTsqEsUuRTXbR9/ZCWvFhsyUx/pEPbZtj+X7Yyy/Gw8i+NJY9Ymz8iRHUX6W1tTgS+VitX5lrKcYw7Wom1iif5kAgsSFdIkiwE6wWA/7cHpcZ8e4Zix2IIoi9gR7WdJKRpLZ304i/1NML43pCdgPp4rvHUVrqRbAIcmIhe5eNq+RaKSmIX2KhdkIX9K/TOZFRnRm0T2mfk173WEKfL5Ngq3IrPS+cZMsq6iOWOBHt6EZidVO8rP7744a6q1FBIJv45RALRujCNeDokFk6SaoVK28I2k7vONF7mdCyc+5L9WqpI3BLVy5OULg4RZNhI7nfkGSMRIOpnMgbT89kXIwGXra9kS+f3wo0mNKPA/AyPxOXj8EVdw5LyyzwGnuAL0ejUfjI5iP8KvSd/C40I+QpikvuhnjfC1iBdL0YK9EY0o0pkMa91wNpuz/LyLPLyK7dvS49llDAGN2Yzludx0y59SSJQFlOXhOL1VNyZ1EBtstR/uHrdqWH1NuLb3WzGl5L6wSOdM+vyHHJU0SGtXcVvS6wKO2oyS95jDYvApRtA+VhpukO3FOs7TxX7S9GTT77P3VNRnnuxetmhimp1Y88CCl70lCCxNLJOpUfLZNKqFXQazYtvPJn78B3mjNEg==
+sidebar_class_name: "post api-method"
+info_path: docs/api/studio-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"dbc-fee-create-tx"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/dbc/fee/create-tx"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for a base64-encoded unsigned transaction to claim creator trading fees of a Dynamic Bonding Curve pool
+- Handles both direct creator ownership and proxy-based ownership.
+
+:::note
+Refer to [Studio API doc](/docs/studio-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"content":{"application/json":{"schema":{"type":"object","required":["ownerWallet","poolAddress","maxQuoteAmount"],"properties":{"ownerWallet":{"type":"string","description":"- Owner wallet public key\n"},"poolAddress":{"type":"string","description":"- Dynamic Bonding Curve pool address\n"},"maxQuoteAmount":{"type":"number","description":"- Maximum quote amount to claim\n","minimum":0}},"title":"CreateClaimFeeDBCTransactionRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["transaction"],"properties":{"transaction":{"type":"string","description":"Base64-encoded transaction ready for signing"}}}}}},"400":{"description":"Bad request","content":{"application/json":{"schema":{"type":"object","properties":{"errors":{"type":"object","additionalProperties":{"type":"array","items":{"type":"string"}}}}}}}},"403":{"description":"Not authorized to claim fees from this pool","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string","example":"You are not the owner of this pool"}}}}}},"404":{"description":"Proxy account not found for the creator","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string","example":"Proxy account not found for the creator"}}}}}},"500":{"description":"Internal server error"}}}
+>
+  
+</StatusCodes>
+
+
+      

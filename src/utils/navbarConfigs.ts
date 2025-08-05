@@ -5,6 +5,7 @@ export const navbarConfigs = {
       position: "left",
       items: [
         { to: "/docs/", label: "Get Started", position: "left" },
+        { to: "/docs/api-setup", label: "API Key", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/", label: "Swap API", position: "left" },
         { to: "/docs/lend-api/", label: "Lend API", position: "left" },
@@ -27,6 +28,7 @@ export const navbarConfigs = {
       position: "left",
       items: [
         { to: "/docs/", label: "Get Started", position: "left" },
+        { to: "/docs/api-setup", label: "API Key", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/", label: "Swap API", position: "left" },
         { to: "/docs/lend-api/", label: "Lend API", position: "left" },
@@ -49,6 +51,7 @@ export const navbarConfigs = {
       position: "left",
       items: [
         { to: "/docs/", label: "Get Started", position: "left" },
+        { to: "/docs/api-setup", label: "API Key", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/", label: "Swap API", position: "left" },
         { to: "/docs/lend-api/", label: "Lend API", position: "left" },
@@ -71,6 +74,7 @@ export const navbarConfigs = {
       position: "left",
       items: [
         { to: "/docs/", label: "Get Started", position: "left" },
+        { to: "/docs/api-setup", label: "API Key", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/", label: "Swap API", position: "left" },
         { to: "/docs/lend-api/", label: "Lend API", position: "left" },

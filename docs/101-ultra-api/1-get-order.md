@@ -10,11 +10,16 @@ title: "Get Order"
 </head>
 
 :::note
-Base URL: `https://lite-api.jup.ag/ultra/v1/order`
+Lite URL: `https://lite-api.jup.ag/ultra/v1/order`
+Dynamic URL: `https://api.jup.ag/ultra/v1/order`
 
-We are exploring a Dynamic Rate Limit system for Ultra, hence Portal API keys currently do not apply for Ultra API.
+Dynamic Rate Limits are now applied to Ultra API.
 
-If you require higher rate limits, please reach out to us in [Discord](https://discord.gg/jup).
+- No Pro plans or payment needed.
+- Simply generate the free/standard API Key via [Portal](https://portal.jup.ag)
+- Rate limits scale together with your swap volume.
+
+[Read more about Ultra API Dynamic Rate Limit](/docs/api-rate-limit).
 :::
 
 :::tip API Reference
@@ -57,50 +62,101 @@ Now, you are able to get a swap order, next steps is to make a post request to t
 
 ```json
 {
+  "mode": "ultra",
   "swapType": "aggregator",
-  "requestId": "f087e8d8-fca6-4af6-a4ff-2d962fa95489",
-  "inAmount": "100000000",
-  "outAmount": "12550645",
-  "otherAmountThreshold": "12425139",
+  "router": "metis",
+  "requestId": "5421e18f-9d12-4709-8f5a-6c79c1032203",
+  "inAmount": "1000000",
+  "outAmount": "6652914",
+  "otherAmountThreshold": "6644643",
   "swapMode": "ExactIn",
-  "slippageBps": 100,
+  "slippageBps": 15,
   "priceImpactPct": "0",
   "routePlan": [
     {
       "swapInfo": {
-        "ammKey": "AHhiY6GAKfBkvseQDQbBC7qp3fTRNpyZccuEdYSdPFEf",
-        "label": "SolFi",
-        "inputMint": "So11111111111111111111111111111111111111112",
-        "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "inAmount": "100000000",
-        "outAmount": "12550645",
+        "ammKey": "4bg8UDLXEm4T6pCyoW7iUizAz9HMoxhTAtMquSXigFZu",
+        "label": "Meteora DLMM",
+        "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "outputMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "inAmount": "90000",
+        "outAmount": "89991",
+        "feeAmount": "9",
+        "feeMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+      },
+      "percent": 9,
+      "bps": 900
+    },
+    {
+      "swapInfo": {
+        "ammKey": "5M7McNWX7yBBGrZGB6XhmHYhFwWwwB2ckrA1HEpkf3SA",
+        "label": "Perena",
+        "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "outputMint": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+        "inAmount": "50000",
+        "outAmount": "50007",
+        "feeAmount": "5",
+        "feeMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+      },
+      "percent": 5,
+      "bps": 500
+    },
+    {
+      "swapInfo": {
+        "ammKey": "6dB49iS94RnwUhQwJwjnE7mEqPedZDtU7XBZXaLBbfbt",
+        "label": "Stabble Stable Swap",
+        "inputMint": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+        "outputMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "inAmount": "50007",
+        "outAmount": "49995",
         "feeAmount": "0",
+        "feeMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+      },
+      "percent": 100,
+      "bps": 10000
+    },
+    {
+      "swapInfo": {
+        "ammKey": "BWBHrYqfcjAh5dSiRwzPnY4656cApXVXmkeDmAfwBKQG",
+        "label": "Obric V2",
+        "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "outputMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "inAmount": "860000",
+        "outAmount": "859910",
+        "feeAmount": "6",
+        "feeMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+      },
+      "percent": 86,
+      "bps": 8600
+    },
+    {
+      "swapInfo": {
+        "ammKey": "D94tFiBfJzdZmcH6GtV39iXexWyVpNfwEH3CxEbqvsvr",
+        "label": "Obric V2",
+        "inputMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "outputMint": "So11111111111111111111111111111111111111112",
+        "inAmount": "999896",
+        "outAmount": "6654624",
+        "feeAmount": "343",
         "feeMint": "So11111111111111111111111111111111111111112"
       },
-      "percent": 100
+      "percent": 100,
+      "bps": 10000
     }
   ],
-  "inputMint": "So11111111111111111111111111111111111111112",
-  "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-  "feeBps": 0,
-  "taker": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
+  "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "outputMint": "So11111111111111111111111111111111111111112",
+  "feeMint": "So11111111111111111111111111111111111111112",
+  "feeBps": 2,
+  "taker": "5dMXLJ8GYQxcHe2fjpttVkEpRrxcajRXZqJHCiCbWS4H",
   "gasless": false,
-  "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAICwrsAhWzTDt8lE+KOND7l5F1l+AGosYESC5zchQ4ZfpWT2oNgWTjN0T1WlxqLRVMemOUFGyMhmsSKBlEsNmgHvWaNCoAnvG0/Sp0KxhDwMgeIge1NzW+fIbfreNBVIJfRwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjJclj04kifG7PRApFI4NgwtaE5na/xCEBI572Nvp+FmsH4P9uc5VDeldVYzceVRhzPQ3SsaI7BOphAAiCnjaBgMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAAtD/6J/XX9kp0wJsfKVh53ksJqzbfyd1RSzIap7OM5ejG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQR51VvyMcBu7nTFbs5oFQf9sbLeo/SOUQKxzaJWvBOPBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKmKsHMLXQw2qLEyz0OzhbbleC1ZXTY4NGK6N8QWPXRWPwcGAAUCwFwVAAYACQMt3AYAAAAAAAMCAAIMAgAAAPD+FAYAAAAACQUCAA4KAwmT8Xtk9ISudvwEBgABAAgDCgEBCRMKAAIBCQgJBwkPAAwNCwIBChAFJOUXy5d6460qAQAAAD0AZAABAOH1BQAAAAD1gb8AAAAAADMAAAoDAgAAAQkByzeZPtf3ya4VjS880xYauu0yJzlCh6lntUFWKcU6tHoDDQsOAwcPEA==",
-  "prioritizationType": "ComputeBudget",
-  "prioritizationFeeLamports": 629413,
-  "dynamicSlippageReport": {
-    "slippageBps": 51,
-    "otherAmount": null,
-    "simulatedIncurredSlippageBps": null,
-    "amplificationRatio": null,
-    "categoryName": "solana",
-    "heuristicMaxSlippageBps": 100,
-    "rtseSlippageBps": 51,
-    "failedTxnEstSlippage": 0,
-    "emaEstSlippage": 51,
-    "useIncurredSlippageForQuoting": null
-  },
-  "totalTime": 701
+  "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAFCkS+3LuGTbsYdcCPVuxlVEcq9wNOnR9+PBw6SEM3ACeKd1R4MYi595YUO8ViNwpWb17+Q9DxkVcz5fWpSqjtDyi/by2TOVyTUuu9HYAIH+8AvsAiyyBVh4I4Fsd9iyTJyeC0vJINbsjyglaB0IKJCaka7Xs7bD5H1KusZLVDh/7A+PTko52VL0CIM2xtl0WkvNslD6Wawxr7yd9HYllN4LxSYdFKrMW8DuxjXahwWh9wo57jWprPC/jyLMbOSQGdegMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAA50rZbONln9MTUQAoS/d4BFuFEKjzTkmMki7ub8MF+GkEedVb8jHAbu50xW7OaBUH/bGy3qP0jlECsc2iVrwTjwbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpPSwt5ThewuTEP350DNuqyKwGVEa4lpMRw26ckG/cO10EBgAFApE/CQAGAAkDSbc4AAAAAAAIVwkkAAEOEAIPJg0IIwguGi4bHg4EDzEcLiQJCS0uHRkIMyAPHw4DISIyJAknKyQfMQMEFBMREikqKCwJJy8LBwUMCg4EFhYWJAkvFQcFGBcQBBYWMCQJJTjBIJszQdacgQAFAAAAJgkABEcAAQUAAk9kAgQ6AVYABDoAZAQFQEIPAAAAAABthWUAAAAAAA8AAgkDAgAAAQkGFvHsWcITjSSy666/XikzqLiO11a0SwY8rT5d3C+q84sDvr+7ACm/lQcqT78E33F1k+c4vMwhJygVwkcagNn59VWw1IQlBBopKBgFAAMBFxV9wMcXAhzLZucTPtF6MmZ80NPWq9GD13dumGAXjalsagR49HT7BfFveXXzwVdRxcH4wwx5hrqgGgkua/Gonv4pzAZz/LU35B3ySlkEeHl2dwQsLXV6xTf8OXe5zg55RN15dUirCc2NlTbGZ63YLmpuzcw8rqYGaGqFaW1mAWfiYdGuN3McD0TMhBYpTLog607/NBju6DG/v6eBEjRZCQSVk5fMApSW",
+  "prioritizationFeeLamports": 2252824,
+  "inUsdValue": 0.999901896351375,
+  "outUsdValue": 1.0004190022848067,
+  "priceImpact": 0.05171566683877625,
+  "swapUsdValue": 0.999901896351375,
+  "totalTime": 735
 }
 ```
 
@@ -108,45 +164,49 @@ Now, you are able to get a swap order, next steps is to make a post request to t
 
 ```json
 {
-  "inputMint": "So11111111111111111111111111111111111111112",
-  "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-  "inAmount": "100000000",
-  "outAmount": "12619939",
-  "otherAmountThreshold": "12626253",
+  "mode": "ultra",
+  "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "outputMint": "So11111111111111111111111111111111111111112",
+  "inAmount": "1000000",
+  "outAmount": "6643102",
+  "otherAmountThreshold": "6643102",
   "swapMode": "ExactIn",
   "slippageBps": 0,
   "priceImpactPct": "0",
   "routePlan": [
     {
       "swapInfo": {
-        "ammKey": "96ywtMs5KJNt2iAinr1U8KMzxjcY1FUEpgKHMYNz818g",
-        "label": "RFQ",
-        "inputMint": "So11111111111111111111111111111111111111112",
-        "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "inAmount": "100000000",
-        "outAmount": "12619939",
+        "ammKey": "CifhTfrKeMfSpTRLjJnXLXEALS37dKH3ziC8gjTLe5dD",
+        "label": "JupiterZ",
+        "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "outputMint": "So11111111111111111111111111111111111111112",
+        "inAmount": "1000000",
+        "outAmount": "6643102",
         "feeAmount": "0",
         "feeMint": "11111111111111111111111111111111"
       },
       "percent": 100
     }
   ],
-  "feeBps": 5,
-  "transaction": null,
+  "feeBps": 2,
+  "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAIABgyuHR/2vkxfzU7FGy7oIwST/eu3qKGcgDNLQXNZqjhf/ES+3LuGTbsYdcCPVuxlVEcq9wNOnR9+PBw6SEM3ACeKLG4Kt0ZV/x7L9RaG1rdUmMMOr+NV9iN2t63tTwAhJqt3VHgxiLn3lhQ7xWI3ClZvXv5D0PGRVzPl9alKqO0PKK8uUfxZ6umAKD8aFHv43B/XRa4GxCNft1fWnLOBGKhCvT1zZhVaaLZKp6kLnLekwgoP5noPGw80QSK/+q5KDAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAABpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqUpYSftyo7vpH9xbDmpX9jxaHLRbIGem7Qys02OVyKECxvp6877brTo9ZfNqq8l0MbG75MLS9uDkfKYCA0UvXWFUzz6zfmKnWYJxn4RVu8Gf4g/6x2CmlkWSbSUO82C+2wMHAAkDiQQAAAAAAAAHAAUCMa0AAAoMAQADAgoECwkICQYFI6hgt6NcCiigQEIPAAAAAACeXWUAAAAAAELqbGgAAAAAAgAAAA==",
   "gasless": true,
-  "prioritizationType": "None",
   "prioritizationFeeLamports": 0,
-  "requestId": "0abacc75-6a3c-d688-b633-ce2c14cef0fd",
+  "requestId": "9e39b39a-4e6d-2c03-3a4e-df0564d98531",
   "swapType": "rfq",
-  "quoteId": "25e8fc14-15f9-522d-8e18-5130e273b90f",
-  "maker": "96ywtMs5KJNt2iAinr1U8KMzxjcY1FUEpgKHMYNz818g",
-  "taker": null,
-  "expireAt": null,
-  "contextSlot": 0,
+  "router": "jupiterz",
+  "quoteId": "b8f818b8-4651-5d3b-ba57-1f921c6b0f62",
+  "maker": "CifhTfrKeMfSpTRLjJnXLXEALS37dKH3ziC8gjTLe5dD",
+  "taker": "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
+  "expireAt": "1751968322",
   "platformFee": {
-    "amount": "6313",
-    "feeBps": 5
+    "amount": "1328",
+    "feeBps": 2
   },
-  "totalTime": 425
+  "inUsdValue": 0.999901896351375,
+  "outUsdValue": 0.9993827964401991,
+  "priceImpact": -0.05191508417676995,
+  "swapUsdValue": 0.999901896351375,
+  "totalTime": 721
 }
 ```

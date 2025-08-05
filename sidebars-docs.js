@@ -48,6 +48,10 @@ const sidebars = {
           id: 'api-rate-limit',
         },
         {
+          type: 'doc',
+          id: 'api-faq',
+        },
+        {
           type: 'html',
           value: '<div class="sidebar-line-break"></div>',
         },

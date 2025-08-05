@@ -1,5 +1,4 @@
 ---
-sidebar_position: 2
 sidebar_label: "API Key Setup"
 description: "Guide to setting up API Keys to access Jupiter APIs."
 title: "API Key Setup"
@@ -29,78 +28,46 @@ headers: {
 ```
 :::
 
-## 1. Open Portal
+## Overview
 
-Navigate to https://portal.jup.ag
+1. Open Portal at https://portal.jup.ag/
+2. Browse and select plan
+3. Connect via email
+4. Pay via Helio (Payment is currently done on per month basis)
+5. Setup API Keys
 
-## 2. Connect via email
+## Types of Plans
 
-To enter the portal, simply connect via email account. This allows us to keep track of your account tagged to your API Keys.
-
-![Connect](../static/portal/connect.png)
-
-## 3. Browse and Select Plan
-
-To decide on a suitable plan by gauging requests required by your project size and user needs.
-
-:::info Change of plans
+:::note
 You can always change your plans later.
 
-Please reach out to the team for any plans change request as it is currently done manually.
+You can upgrade/downgrade your Pro plans on the UI any time.
 :::
 
-![Plans](../static/portal/plans.png)
+Depending on your needs, you can choose from the following plans:
 
-## 4. Payment
+| Plan | Rate Limit Model | Why choose this plan |
+| --- | --- | --- |
+| Lite | Free Tier | You are just starting out and want to test the Jupiter APIs. |
+| Pro | Fixed Tiered Rate Limits | Both small projects or large enterprises can utilize this with the tiered rate limits. Rate limits range from 1 RPS to 500 RPS plans. |
+| Ultra | Dynamic Rate Limits based on executed swap volume | [Using Ultra API comes with many benefits](/docs/ultra-api) where Jupiter will handle slippage, transaction sending, and more without the need of an RPC from you. With that, the Ultra API is governed by a Dynamic Rate Limit model that will scale with your swap executions. |
 
-Before you set up your keys, you will need to make the payment upfront via Helio.
+## Payment
 
-1. Helio payment link modal will pop-up.
-2. Enter the required details.
-3. Connect wallet to pay via Solana blockchain.
-4. Click the **Subscribe** button to proceed.
+:::note
+We are working on adding more payment methods.
+:::
 
 :::info Plan Renewal
-The payment is currently done on a monthly basis.
+The payment is currently done on a monthly basis, which means you will need to manually renew each month.
 
-- 7 days before the plan expires, you will see a banner in the dashboard.
-- You can renew your plan latest 14 days after the plan expires before your API Key is disabled.
-- The plan will be renewed for the same plan as the previous plan.
+- 7 days before the plan expires, you will see the state change in the dashboard's table and receive an automated email as a reminder to renew.
+- Upon expiry, your key will remain valid for a grace period but will be disabled (but not deleted) when it ends.
+- The plan will be renewed to the same plan as the previous.
 - If you have any issues with the payment, [please open a ticket](https://support.jup.ag/hc/en-us/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer_support).
 :::
 
-:::note other payment methods
-New payment methods is a work in progress.
-:::
-
-![Payment](../static/portal/payment.png)
-
-## 5. Processing Screen
-
-Yes, please wait while the payment gateway confirm the payment and return us a success response.
-
-![Processing](../static/portal/processing.png)
-
-## 6. Setup API Keys
-
-Click on the **"+ Generate Key"** button to generate an API Key.
-
-:::warning Generating multiple keys
-The rate limits are imposed on a **PER ACCOUNT** basis, not per API Key.
-
-If you need more requests, you can upgrade the plan, or create a completely new account and subscribe to a plan, (this means you will have 2 separate accounts, each has its own plans).
-:::
-
-![Generate](../static/portal/generate.png)
-
-## 7. Have a Question?
-
-Please reach out to us.
-
-- If you have increasing demand and growth in your app, and need additional support.
-- If you have questions or need support.
-- Join the [Telegram channel](https://t.me/jup_dev) or [Discord channel](https://discord.com/channels/897540204506775583/1115543693005430854) to subsribe to updates.
-
-## 8. Get Started!
-
-With your API Key, you can gain higher request access to `/quote`, `/swap` and other endpoints to build world class applications. Refer to the rest of the documentation to get started, we will be releasing more developer content in the future.
+The current payment method we support is via Helio.
+- Only Pro plans require payments.
+- The payment is currently done on a monthly basis.
+- The payment is done in Solana USDC only.

@@ -622,6 +622,22 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Jupiter Mobile Adapter',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'tool-kits/mobile-adapter/README',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
       label: 'Jupiter Wallet Kit',
       collapsible: false,
       collapsed: false,

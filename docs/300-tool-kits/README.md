@@ -21,6 +21,7 @@ Jupiter Tool Kits are a collection of developer tools and SDKs that help you int
 ## Jupiter Tool Kits
 
 - [**Swap Terminal**](/docs/tool-kits/terminal/): A ready-to-use swap interface that can be embedded into any website.
+- [**Jupiter Mobile Adapter**](/docs/tool-kits/mobile-adapter): A wallet interface to allow Jupiter Mobile QR code login.
 - [**Unified Wallet Kit**](/docs/tool-kits/wallet-kit/): A wallet interface that can be embedded into any website.
 
 ## Community Contributions

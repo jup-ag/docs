@@ -33,9 +33,14 @@ export function useNavigation(currentPath: string) {
       return true;
     }
 
-    // For paths starting with /docs/api-, only match with /docs/
+    // For paths starting with /docs/api-, only match with /docs/api-setup
     if (currentPath.startsWith('/docs/api-')) {
-      return navPath === '/docs/';
+      // If the nav path is /docs/api-setup and current path starts with /docs/api-, match
+      if (navPath === '/docs/api-setup' && currentPath.startsWith('/docs/api-')) {
+        return true;
+      }
+      // For /docs/api- paths, don't match with /docs/ (Get Started)
+      return false;
     }
 
     // Special case for paths directly under /docs/ that aren't covered by other nav items

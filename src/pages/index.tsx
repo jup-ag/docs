@@ -26,6 +26,9 @@ const JupiterExplore = () => {
               , <a href="/docs/recurring-api/" className="underline text-gray-800">
                 Recurring
               </a>
+              , <a href="/docs/lend-api/" className="underline text-gray-800">
+                Lend
+              </a>
               , and more.
             </p>
           </div>

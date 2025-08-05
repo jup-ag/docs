@@ -1,0 +1,76 @@
+---
+id: mint-instructions
+title: "mint-instructions"
+description: "Request for the instruction of an earn mint transaction to mint shares"
+sidebar_label: "mint-instructions"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVd9z2zYM/ld0fFrvkqhuu7tNb0nnJmnXzrPTy1YnD5AEW7QlkiEp/4jO//sA0omdxmv3sIf6QaaADyCAD4A6UaIrrDReaiUyMcS7Fp1PJtomvsJEKudtW7A20ZMEVIJgVdJI5RNvQTmIOq+jzFVg0d2oG5VlmdIeb9QQJ2gZMP4dVZmcDi6TUhe3P6X0dGlNsmMw8kW4stGW76RjA+w3uLlR4kjYGNiZLtci68KrtFiKjMLDI1Fo5VF5VoExtSyCeTpznFUnXFFhA3zya4OUp85nWPit3+hoLMA5ZJmTU4WWDyEbcXskjNUGrZf0xlcE4M4b1Uiqqdg8mh5URWfPVaTDFTSmxj3foj+Yvbsuy59P28ndaHSHH1/dfeqt7tc5mLe/nL9Z9s/P51+W66vffG+xizkTF3/nq/P5p0V/ufjSezO8f38xOPu1el1eT/6arZan/Wq+vn8/vFj1qrPJLsVM9F6GH0fqpedYRJ+oHgX9cK/6mw1HTEKjlYsJvSI7+nvaSqO2KNC5SVsnD2DxPxFFbEwtNJclyaEodKu8o2MJHp6TtQMfYuXRfKcEa2FN7qTHxn03lDafY0C70UPbSHdtpYecivg8mog/FMqjh50y17pGUFH76PSAfo+105jRR6RisDxU5WDXPVhc7oZ8+MDUJtLcoK80JSqMdpy6AV/RW8pbIOWJP97bEMyBQ7tAS6mOO9HamrCV98ZlaVpTPXnST2atOYFpmPx00WPenvTNO4uYULlsWBUEMpo3y1L6KrHgMallI4mwzdHXN/wH5wOQ5b85r+S0IsXeHby1ckxah2WE0P5juw/E4Iao5a7dG43+DzXFvEYD71uW/2xlMXceLPPIHMWK9E5engQ8M9xAmEIFDVsc4vdJObvdOP+4X45t33tc+dTUIMM0hcbptu08FhwaQZ8nTCRX3PmE6bocHH629WbDYsrW0hyP6bgAK+Ngjm/Jd4VQMok0AWHUxdtYpOMrjoThdRv2zNf7jzs6WtAMo/HfxN7uDefgj9EVgfPtx7HRJdtYWPKyomcm6KBNTIm/nizrRA1q2sKUsdEn//4BSinKtw==
+sidebar_class_name: "post api-method"
+info_path: docs/api/lend-api/earn/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"mint-instructions"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/earn/mint-instructions"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the instruction of an earn mint transaction to mint shares
+
+:::note
+Refer to [Lend API doc](/docs/lend-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["asset","signer","shares"],"properties":{"asset":{"type":"string"},"signer":{"type":"string"},"shares":{"type":"string"}},"example":{"asset":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","signer":"HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf","shares":"1000000"},"title":"EarnSharesRequestBody"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["programId","accounts","data"],"properties":{"programId":{"type":"string"},"accounts":{"type":"array","items":{"type":"object","required":["pubkey","isSigner","isWritable"],"properties":{"pubkey":{"type":"string"},"isSigner":{"type":"boolean"},"isWritable":{"type":"boolean"}},"title":"AccountMeta"}},"data":{"type":"string"}},"title":"InstructionResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

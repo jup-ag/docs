@@ -32,6 +32,8 @@ paths:
               schema:
                 type: object
                 properties:
+                  mode:
+                    type: string
                   inputMint:
                     type: string
                   outputMint:
@@ -46,8 +48,18 @@ paths:
                     type: string
                   slippageBps:
                     type: number
+                  inUsdValue: 
+                    type: number
+                  outUsdValue:
+                    type: number
+                  priceImpact:
+                    type: number
+                  swapUsdValue:
+                    type: number
                   priceImpactPct:
                     type: string
+                    description: |
+                      - Please use `priceImpact` field instead, this is still available only for backwards compatibility
                   routePlan:
                     type: array
                     items:
@@ -94,17 +106,24 @@ paths:
                     type: number
                   swapType:
                     type: string
+                    description: |
+                      - Deprecated, in favour of router
+                  router:
+                    type: string
                     enum:
                       - aggregator
-                      - rfq
+                      - jupiterz
                       - hashflow
+                      - dflow
+                      - pyth
+                      - okx                  
                   transaction:
-                    description: |
-                      - Unsigned base-64 encoded transaction to be signed and used in `/execute`
-                      - If `taker` is null, this field will be null. Else, it will either be a valid base64 encoded transaction or the empty string
                     type:
                       - string
                       - 'null'
+                    description: |
+                      - Unsigned base-64 encoded transaction to be signed and used in `/execute`
+                      - If `taker` is null, this field will be null. Else, it will either be a valid base64 encoded transaction or the empty string
                   gasless:
                     type: boolean
                   requestId:
@@ -137,47 +156,21 @@ paths:
                     type: string
                     description: |
                       - This field will be present if `taker` is defined and `transaction` is the empty string
-                  dynamicSlippageReport:
-                    type: object
-                    properties:
-                      amplificationRatio:
-                        type:
-                          - string
-                          - 'null'
-                      otherAmount:
-                        type:
-                          - number
-                          - 'null'
-                      simulatedIncurredSlippageBps:
-                        type:
-                          - number
-                          - 'null'
-                      slippageBps:
-                        type: number
-                      categoryName:
-                        type: string
-                      heuristicMaxSlippageBps:
-                        type: number
-                    required:
-                      - amplificationRatio
-                      - otherAmount
-                      - simulatedIncurredSlippageBps
-                      - slippageBps
-                      - categoryName
-                      - heuristicMaxSlippageBps
                 required:
+                  - mode
                   - inputMint
                   - outputMint
                   - inAmount
                   - outAmount
                   - otherAmountThreshold
+                  - priceImpactPct
                   - swapMode
                   - slippageBps
-                  - priceImpactPct
                   - routePlan
                   - feeBps
                   - prioritizationFeeLamports
                   - swapType
+                  - router
                   - transaction
                   - gasless
                   - requestId

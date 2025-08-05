@@ -119,6 +119,6 @@ If the above sounds like too much work, then Ultra API will be the better choice
 
 - Dynamic Rate Limits are now applied to Ultra API.
     - No Pro plans or payment needed.
-    - Simply generate the free/standard API Key via [Portal](https://portal.jup.ag)
+    - Simply generate the universal API Key via [Portal](https://portal.jup.ag)
     - Rate limits scale together with your swap volume.
     - [Read more about Ultra API Dynamic Rate Limit](/docs/api-rate-limit).

@@ -16,7 +16,7 @@ Dynamic URL: `https://api.jup.ag/ultra/v1/execute`
 Dynamic Rate Limits are now applied to Ultra API.
 
 - No Pro plans or payment needed.
-- Simply generate the free/standard API Key via [Portal](https://portal.jup.ag)
+- Simply generate the universal API Key via [Portal](https://portal.jup.ag)
 - Rate limits scale together with your swap volume.
 
 [Read more about Ultra API Dynamic Rate Limit](/docs/api-rate-limit).

@@ -117,10 +117,8 @@ If the above sounds like too much work, then Ultra API will be the better choice
 
 **What is the rate limit for Ultra API?**
 
-Currently, Ultra API has a rate limit of 60 requests per minute.
-
-:::info Increasing Rate Limits
-Currently, there is no way to increase the rate limit for Ultra API.
-
-Portal API Keys are not supported for Ultra API.
-:::
+- Dynamic Rate Limits are now applied to Ultra API.
+    - No Pro plans or payment needed.
+    - Simply generate the universal API Key via [Portal](https://portal.jup.ag)
+    - Rate limits scale together with your swap volume.
+    - [Read more about Ultra API Dynamic Rate Limit](/docs/api-rate-limit).

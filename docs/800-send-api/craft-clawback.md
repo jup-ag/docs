@@ -1,6 +1,6 @@
 ---
 sidebar_label: "Craft Clawback (Beta)"
-description: "Use the Jupiter Universal Send API to gift, pay, or onboard anyone in seconds."
+description: "Use the Jupiter Send API to gift, pay, or onboard anyone in seconds."
 title: "Craft Clawback (Beta)"
 ---
 
@@ -28,7 +28,7 @@ To upgrade to Pro or understand our rate limiting, please refer to this section.
 5. Sign with sender keypair, then send transaction and wait for confirmation.
 
 :::note
-[Please ensure that you have set up the prerequisites](/docs/universal-send-api/invite-code#overview).
+[Please ensure that you have set up the prerequisites](/docs/send-api/invite-code#overview).
 :::
 
 <details>

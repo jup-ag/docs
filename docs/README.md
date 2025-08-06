@@ -33,7 +33,7 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 - [Recurring API](/docs/recurring-api/)
 - [Token API](/docs/token-api/)
 - [Price API](/docs/price-api/)
-- [Universal Send API](/docs/universal-send-api) **NEW!**
+- [Send API](/docs/send-api) **NEW!**
 - [Jupiter Plugin](/docs/tool-kits/plugin/) **NEW!**
 - [Unified Wallet Kit](/docs/tool-kits/wallet-kit/)
 

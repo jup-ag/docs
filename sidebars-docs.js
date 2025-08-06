@@ -501,7 +501,7 @@ const sidebars = {
   send: [
     {
       type: 'doc',
-      id: 'universal-send-api/README',
+      id: 'send-api/README',
     },
     {
       type: 'html',
@@ -509,25 +509,25 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Universal Send API',
+      label: 'Send API',
       collapsible: false,
       collapsed: false,
       items: [
         {
           type: 'doc',
-          id: 'universal-send-api/invite-code',
+          id: 'send-api/invite-code',
         },
         {
           type: 'doc',
-          id: 'universal-send-api/craft-send',
+          id: 'send-api/craft-send',
         },
         {
           type: 'doc',
-          id: 'universal-send-api/craft-clawback',
+          id: 'send-api/craft-clawback',
         },
         {
           type: 'doc',
-          id: 'universal-send-api/manage-invites',
+          id: 'send-api/manage-invites',
         },
       ],
     },

@@ -51,10 +51,10 @@ export const API_CARDS = [
       ],
     },
     {
-      title: "Universal Send API",
+      title: "Send API",
       links: [
-        { text: "Docs", href: "/docs/universal-send-api/" },
-        { text: "Schemas", href: "/docs/api/universal-send-api/" },
+        { text: "Docs", href: "/docs/send-api/" },
+        { text: "Schemas", href: "/docs/api/send-api/" },
       ],
     },
     {

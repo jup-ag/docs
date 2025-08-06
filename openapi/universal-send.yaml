@@ -171,7 +171,7 @@ paths:
                 required:
                   - error
 
-  /pending-invites/{address}:
+  /pending-invites:
     get:
       summary: pending-invites
       description: |
@@ -181,9 +181,10 @@ paths:
         - Refer to [Universal Send API doc](/docs/universal-send-api) for more information
         :::
       parameters:
-        - name: address
-          in: path
-          description: Public key
+        - name: sender
+          in: query
+          description: |
+            - Pubkey of Sender
           required: true
           schema:
             type: string
@@ -217,7 +218,7 @@ paths:
                 required:
                   - error
 
-  /invite-history/{address}:
+  /invite-history:
     get:
       summary: invite-history
       description: |
@@ -228,8 +229,9 @@ paths:
         :::
       parameters:
         - name: address
-          in: path
-          description: Public key
+          in: query
+          description: |
+            - Pubkey can be sender or recipient
           required: true
           schema:
             type: string

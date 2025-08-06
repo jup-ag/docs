@@ -5,7 +5,7 @@ description: "Request for the pending invites of an address"
 sidebar_label: "pending-invites"
 hide_title: true
 hide_table_of_contents: true
-api: eJzNVk1T2zAQ/SsanWCGxLTTXnyj049h2gMN5ZQwjGJvYoEtqSs5hTH+792VHYiJC0wv7QUk79Pq7dN+pJE5+Ay1C9oamcoZ/KzBB7GyKEIBwoHJtVkLbTY6gBd2JZQRKs8RvF+YhUnT1NgACzMRM1gBnbJifmH0BtCrUpzTeXFydipym10eJPTXJ/XWOvFknSinD+N9lUWgi2hZKaYTnS+MPJJOoaog0CGZzhtpaENcexZk10zdqVDQehjPWb0sdSZu4I5MSMFphFymAWs4kj4roFIybWS4c+zRB6RgZdteMtg7azx4tr89PuZ/Q9/ndZbR/au6FFswXZJZE8AEhivn6PIYS3Lt+Uyzf6dCVEyO5K38zne7vIYsDFjPZfcMV16vDWAMPO5drmjDasavcOs0sk9V2dqwjwwh0rgKt1GiEh53CBnwgzA+i6Ht4nUFgxPdvtKdW2tWGiviRoI5tA4w6E6xIdN9iQfcx8x9NGOmPr4xUx/xmGlXgzH7rip79iNp6rJUyxK65Gl3dHsNuFf2NdCh9s8zHUWM+Izv9arLH170ZXRL+KAD7+VpfMyPKqjZthTaCHg3VjkfVC6w7zRLm9/9Rdk8lMcw7QDRjiVNO6yjDnbZUXw/RvGU6KChDtZB/yFBfj4IhaXvcg3RI3e6VCZ9c570zTlp+o7YxmaAm22/rLEkeBGC82mSlITlpju9rt1UrRMutL2++RkBBHHG2LwJ4SylkPilQyFQBRClrnTwlI1P3b/k+Uzp/E+eC70uyLBzAY+TJYjaQ95BaPrwua/U0LlL87iIavZ5+L3W2Y0PClknFqC79M30eHq8R+VefNPmRtwvzL2YTCa84PJy1odKxVftJ80ToZ86ah6T4z8doH2yBbgNiSuVjnHGd2v6bJqPBJluJywJXZAojGqapfJwgWXb8mcKljvxnJYbhbrrDpRyufa8ppxdqdLDM4IdzPq0PxSDYT1KeTszDSM2qqx5R0s+8viDoL0kaAEqzg8i01lPaFq7sHNur4w5oR5K7cunH1SVvwES9C3w
+api: eJzNVclu2zAQ/RWCpwSILbdoL7ql6IKgPaROc7KNgJbGFhOJZIeUG0PRv3dIyY5UKQt6aS+JqXkzfPM4S8VTsAlK46RWPOZz+FmCdWyjkbkMmAGVSrVlUu2kA8v0hgnFRJoiWLtUSxXHsdIOlmrC5rAB8tJsca3kDtCKnF2RPzu/vGCpTlYnEf21UXmwTixZJ8LI03BfoRHoIvpZCE8nBF8qfsaNQFGAIyceLyqu6EBcvTcgmaVnTrxxT4d+PhN2Wa7vYO+JXwV8CIiUpkRIeeywhDNukwwKweOKu70JsR1S2ryuVx5sjVYWrLe/nc38v/4tV2WSkB6bMmcHMF2SaOVAOQ8XxuQyCVlFt9b7VMM7BaLwGZDQhe181+tbSFyP9YI3D3Jj5Va1GoSzSQUdjsrAvZFBFVHoUvkYCUKgcePug1g5PJ4QEvBP4/FJSK2LlwX0PJpzIZuwWm0kFsSNBDOoDaCTjWJ9pkOJe9zHzG02Y6Y2vzFTm/GYqavBmL2rysB+xlWZ52KdQ1M8dUe314BbZV8D7Wv/PNNRxEjM8F6vuvz4oi+ja8I76fyZX4TH/CicmB9aoQ6Ad2Od80GkDNuZs9bp/i/a5tge/bIDRD1WNHW/jxrYqqH4foziBdFBRbOsgf5Dgv75wGWavvMthIjCZXSI2jE9acd0GAG4O8zLEnMCZc4ZG0dRTgg/dKe3pZmKbeTbazA3PyMAI6YYhjchjKbCYb+kyxgKByyXhXSWavDP8C9FvhQyfSpyJrcZGToX+HWyBlZaSBsIbR/v9xX23M9mvy6Chm31fS9lcmedQK+OF6C59M10Np0NqDywb1LdsYelemCTycT/8E1ltHWFCG/ZbpqhvL1A1WNJ/KcLtC0xB/cuMrmQIc/wblVbQ4tBkqRuRkp4U1WthYVrzOvaf25Wra+sVFo/BqggNyK38IwuJ/O2pk/ZEzt5lCPBupt+J/LSg8Lb7wTKZggtVgTNQIQ1QbQar3NaysZ1vAbd6qMcO+rLpx/UfL8BrLcohA==
 sidebar_class_name: "get api-method"
 info_path: docs/api/universal-send-api/quickstart
 custom_edit_url: null
@@ -28,7 +28,7 @@ import Heading from "@theme/Heading";
 
 <MethodEndpoint
   method={"get"}
-  path={"/pending-invites/{address}"}
+  path={"/pending-invites"}
   context={"endpoint"}
 >
   
@@ -52,7 +52,7 @@ Request for the pending invites of an address
 </Heading>
 
 <ParamsDetails
-  parameters={[{"name":"address","in":"path","description":"Public key","required":true,"schema":{"type":"string"}}]}
+  parameters={[{"name":"sender","in":"query","description":"- Pubkey of Sender\n","required":true,"schema":{"type":"string"}}]}
 >
   
 </ParamsDetails>

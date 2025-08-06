@@ -1,12 +1,12 @@
 ---
-sidebar_label: "Create DBC (Beta)"
-description: "Create and launch tokens on Jupiter Studio via API."
-title: "Create DBC (Beta)"
+sidebar_label: 'Create DBC (Beta)'
+description: 'Create and launch tokens on Jupiter Studio via API.'
+title: 'Create DBC (Beta)'
 ---
 
 <head>
     <title>Create DBC (Beta)</title>
-    <meta name="twitter:card" content="summary" />
+    <meta name='twitter:card' content='summary' />
 </head>
 
 :::note
@@ -19,7 +19,7 @@ To upgrade to Pro or understand our rate limiting, please refer to this section.
 :::
 
 :::tip API Reference
-To fully utilize the Lend API, check out the [Studio API Reference](/docs/api/studio-api).
+To fully utilize the Studio API, check out the [Studio API Reference](/docs/api/studio-api).
 :::
 
 ## Prerequisite
@@ -68,7 +68,7 @@ const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ''))
 
 ```bash
 # .env
-PRIVATE_KEY=""
+PRIVATE_KEY=''
 ```
 
 To set up a development wallet via a wallet generated via [Solana CLI](https://solana.com/docs/intro/installation#solana-cli-basics), you can use the following script.
@@ -110,7 +110,7 @@ On https://jup.ag/studio, you can find a few different presets to get you starte
 
 ```json
 buildCurveByMarketCapParam: {
-    quoteMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    quoteMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     initialMarketCap: 16000,
     migrationMarketCap: 69000,
     tokenQuoteDecimal: 6,
@@ -124,9 +124,9 @@ buildCurveByMarketCapParam: {
 },
 antiSniping: false,
 isLpLocked: true,
-tokenName: "",
-tokenSymbol: "",
-tokenImageContentType: "image/jpeg",
+tokenName: '',
+tokenSymbol: '',
+tokenImageContentType: 'image/jpeg',
 creator: wallet.publicKey.toBase58(),
 ```
 </details>
@@ -147,7 +147,7 @@ creator: wallet.publicKey.toBase58(),
 
 ```json
 buildCurveByMarketCapParam: {
-    quoteMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    quoteMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     initialMarketCap: 32000,
     migrationMarketCap: 240000,
     tokenQuoteDecimal: 6,
@@ -161,9 +161,9 @@ buildCurveByMarketCapParam: {
 },
 antiSniping: true,
 isLpLocked: true,
-tokenName: "",
-tokenSymbol: "",
-tokenImageContentType: "image/jpeg",
+tokenName: '',
+tokenSymbol: '',
+tokenImageContentType: 'image/jpeg',
 creator: wallet.publicKey.toBase58(),
 ```
 </details>
@@ -183,15 +183,15 @@ Just pass in the parameters you need!
 ```jsx
 const createTransaction = await (
     await fetch (
-      "https://lite-api.jup.ag/studio/v1/dbc-pool/create-tx", 
+      'https://lite-api.jup.ag/studio/v1/dbc-pool/create-tx', 
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
             buildCurveByMarketCapParam: {
-                quoteMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // or SOL or JUP
+                quoteMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // or SOL or JUP
                 initialMarketCap: 16000, // This means 16_000 USDC
                 migrationMarketCap: 69000, // This means 69_000 USDC
                 tokenQuoteDecimal: 6,
@@ -205,9 +205,9 @@ const createTransaction = await (
             },
             antiSniping: true,
             isLpLocked: true,
-            tokenName: "",
-            tokenSymbol: "",
-            tokenImageContentType: "image/jpeg",
+            tokenName: '',
+            tokenSymbol: '',
+            tokenImageContentType: 'image/jpeg',
             creator: wallet.publicKey.toBase58(),
         }, null, 2)
     })
@@ -220,11 +220,11 @@ From the response of the `create-tx` endpoint, we will need the `imagePresignedU
 
 ```jsx
 const imageResponse = await fetch(createTransaction.imagePresignedUrl, {
-    method: "PUT",
+    method: 'PUT',
     headers: {
-        "Content-Type": "image/jpeg", // Adjust based on the image type passed in previously
+        'Content-Type': 'image/jpeg', // Adjust based on the image type passed in previously
     },
-    body: fs.readFileSync("./token.jpeg"), // Assuming the image file is located in the same folder
+    body: fs.readFileSync('./token.jpeg'), // Assuming the image file is located in the same folder
 });
 ```
 
@@ -234,18 +234,18 @@ From the response of the `create-tx` endpoint, we will need the `metadataPresign
 
 ```jsx
 const metadataResponse = await fetch(createTransaction.metadataPresignedUrl, {
-    method: "PUT",
+    method: 'PUT',
     headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-        name: "",
-        symbol: "",
-        description: "",
+        name: '',
+        symbol: '',
+        description: '',
         image: createTransaction.imageUrl,
-        website: "",
-        twitter: "",
-        telegram: "",
+        website: '',
+        twitter: '',
+        telegram: '',
     }, null, 2),
 });
 ```
@@ -255,28 +255,26 @@ const metadataResponse = await fetch(createTransaction.metadataPresignedUrl, {
 After you have uploaded your token image and token metadata, you can proceed to signing and making a post request to the `submit` endpoint - this will allow Jupiter Studio to complete the transaction and submit it to the network on your behalf.
 
 :::note
-Do note that the endpoint expects the `content` to be in [`multipart/form-data` format](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API/Using_FormData_Objects).
+Do note that the endpoint expects the `requestBody`'s `content` to be in [`multipart/form-data` format](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API/Using_FormData_Objects).
 :::
 
 ```jsx
-import { VersionedTransaction } from "@solana/web3.js";
-import fs from "fs";
+import { VersionedTransaction } from '@solana/web3.js';
+import fs from 'fs';
 
-const transaction = VersionedTransaction.deserialize(Buffer.from(createTransaction.transaction, "base64"));
+const transaction = VersionedTransaction.deserialize(Buffer.from(createTransaction.transaction, 'base64'));
 transaction.sign([wallet]);
-const signedTransaction = Buffer.from(transaction.serialize()).toString("base64");
+const signedTransaction = Buffer.from(transaction.serialize()).toString('base64');
 
 const formData = new FormData();
-formData.append("transaction", signedTransaction);
-formData.append("owner", wallet.publicKey.toBase58());
-formData.append("content", "");
-formData.append("headerImage", fs.createReadStream("./header.jpeg"));
+formData.append('transaction', signedTransaction);
+formData.append('owner', wallet.publicKey.toBase58());
 
 const result = await (
     await fetch (
-      "https://lite-api.jup.ag/studio/v1/dbc-pool/submit", 
+      'https://lite-api.jup.ag/studio/v1/dbc-pool/submit', 
       {
-        method: "POST",
+        method: 'POST',
         body: formData,
     })
 ).json();

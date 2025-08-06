@@ -1,12 +1,12 @@
 ---
-sidebar_label: "Claim Fee (Beta)"
-description: "Claim creator trading fees via Jupiter Studio API."
-title: "Claim Fee (Beta)"
+sidebar_label: 'Claim Fee (Beta)'
+description: 'Claim creator trading fees via Jupiter Studio API.'
+title: 'Claim Fee (Beta)'
 ---
 
 <head>
     <title>Claim Fee (Beta)</title>
-    <meta name="twitter:card" content="summary" />
+    <meta name='twitter:card' content='summary' />
 </head>
 
 :::note
@@ -19,7 +19,7 @@ To upgrade to Pro or understand our rate limiting, please refer to this section.
 :::
 
 :::tip API Reference
-To fully utilize the Lend API, check out the [Studio API Reference](/docs/api/studio-api).
+To fully utilize the Studio API, check out the [Studio API Reference](/docs/api/studio-api).
 :::
 
 ## Prerequisite
@@ -55,7 +55,7 @@ Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters).
 :::
 
 ```jsx
-import { Connection } from "@solana/web3.js";
+import { Connection } from '@solana/web3.js';
 const connection = new Connection('https://api.mainnet-beta.solana.com');
 ```
 </details>
@@ -89,7 +89,7 @@ const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ''))
 
 ```bash
 # .env
-PRIVATE_KEY=""
+PRIVATE_KEY=''
 ```
 
 To set up a development wallet via a wallet generated via [Solana CLI](https://solana.com/docs/intro/installation#solana-cli-basics), you can use the following script.
@@ -117,7 +117,7 @@ transaction.sign([wallet]);
 const transactionBinary = transaction.serialize();
 console.log(transactionBinary);
 console.log(transactionBinary.length);
-const blockhashInfo = await connection.getLatestBlockhashAndContext({ commitment: "finalized" });
+const blockhashInfo = await connection.getLatestBlockhashAndContext({ commitment: 'finalized' });
 
 const signature = await connection.sendRawTransaction(transactionBinary, {
   maxRetries: 0,
@@ -131,7 +131,7 @@ try {
     signature,
     blockhash: blockhashInfo.value.blockhash,
     lastValidBlockHeight: blockhashInfo.value.lastValidBlockHeight,
-  }, "confirmed");
+  }, 'confirmed');
 
   if (confirmation.value.err) {
     console.error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
@@ -165,11 +165,11 @@ Using the Pool Address, you will be able to get the total and current unclaimed 
 ```jsx
 const feeResponse = await (
     await fetch (
-      "https://lite-api.jup.ag/studio/v1/dbc/fee", 
+      'https://lite-api.jup.ag/studio/v1/dbc/fee', 
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
             poolAddress: poolAddressResponse.data.dbcPoolAddress,
@@ -185,11 +185,11 @@ In order to claim fees from a Dynamic Bonding Curve pool, you will need to pass 
 ```jsx
 const claimTransaction = await (
     await fetch (
-      "https://lite-api.jup.ag/studio/v1/dbc/fee/create-tx", 
+      'https://lite-api.jup.ag/studio/v1/dbc/fee/create-tx', 
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
             ownerWallet: wallet.publicKey.toBase58(),

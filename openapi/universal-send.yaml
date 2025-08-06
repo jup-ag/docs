@@ -8,9 +8,9 @@ info:
     | --- |
 
 servers:
-  - url: https://lite-api.jup.ag/send
+  - url: https://lite-api.jup.ag/send/v1
     description: Free tier API endpoint with rate limits
-  - url: https://api.jup.ag/send
+  - url: https://api.jup.ag/send/v1
     description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:

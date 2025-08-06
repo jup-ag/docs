@@ -352,6 +352,10 @@ const sidebars = {
             },
             {
               type: 'doc',
+              id: 'api/studio-api/dbc-pool-addresses-by-mint',
+            },
+            {
+              type: 'doc',
               id: 'api/studio-api/dbc-fee',
             },
             {

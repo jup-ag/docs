@@ -1,0 +1,76 @@
+---
+id: dbc-pool-addresses-by-mint
+title: "dbc-pool-addresses-by-mint"
+description: "Request for pool addresses for a given token mint"
+sidebar_label: "dbc-pool-addresses-by-mint"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVc1v0zAU/1csnzapaco0LrkNCdAEh7IBl3YHN35tvDq2sZ2yKsv/zntO1q20Q0MaEj2kL/b7+L2vX1ouIZReuais4QW/gh8NhMiW1jNnrWZCSg8hQEhHgq3UBgyLdo3PWpk4N3NTFIWxEebmCpbg8ZLNrmMjlWUX00smbXlzkuMz5CGdZsKp0+Suth6YMijWggAkV3PDR9wJL2qI4AMvZi03+ILoKCBeKkLqRKxQ9ghYeZC8iL6BEQ9lBbXgRcvj1pFNiF6ZFe+6G1IOzhpMhu7PJhP628//uilLTHfZaPagjEFKayJgaFQXzmlVJrT5bSCb9jCmXdxCSUidtw58VH3E0Dt/orjAEoMwvBtxKeILXEhR15uzKZpd9I05zHTETaO1WGjoa0K+F+XfmmDKS7X6BNsXaA+/ET8/VtJ3QjLfj9XrlRK8tz4c09sP/l1oJVMINpg8Yj0/xDrdH3mcapzTxshXBn6spnAnakclfR7EA/S3x8p8ifC8EZoF8Bvcwj7Qv8a9az0ua2VxC/kKkjFtZ8FznLyMeCQf8slb2uEONXqY/Xo3XqNyFaMLRZ5rFYE4YnzbuLFYDayRb94cdPeDB2CI0CeiASOdRe/sp4oV8yIC06pWEXs++j3Gi9xPhZLPua/UqsKLJ1GI9xbAmgCyVxEm2dEOEfkQz6UCqpja/KVR5TpE4aleVIo+6Nl4Mp4cQLlnn5VZs/u5uWdZlpFApOFsiLVIjRwo8qHg2W6AssU2G4hzz2f7OBr/De0PwxXhLuZOC5WSTJ1rh5Ga7TJE9QElSkXKEKtcYUVIq20XIsA3r7uOjjE9j1Q2Q3EjvOrJCydPqkAyDu5S6AB/KNHJ1fClOWXPAR0OhdlSR4Vu6A3FNbFo//HqblCvAiHBp/j91QV+F1x8YnSwqTRAuxX7+P4rLt4vEb+wVg==
+sidebar_class_name: "get api-method"
+info_path: docs/api/studio-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"dbc-pool-addresses-by-mint"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/dbc-pool/address/{mint}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for pool addresses for a given token mint
+
+:::note
+Refer to [Studio API doc](/docs/studio-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"mint","in":"path","required":true,"schema":{"type":"string"}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","properties":{"success":{"type":"boolean"},"data":{"type":"object","properties":{"dammv2PoolAddress":{"type":"string","nullable":true},"dbcPoolAddress":{"type":"string","nullable":true},"configKey":{"type":"string","nullable":true}}}}}}}},"400":{"description":"Bad request","content":{"application/json":{"schema":{"type":"object","properties":{"errors":{"type":"object","description":"Validation errors"}}}}}},"404":{"description":"Pool addresses not found","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string","example":"Pool addresses not found"}}}}}},"500":{"description":"Internal server error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}}}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

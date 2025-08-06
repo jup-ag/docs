@@ -102,6 +102,73 @@ paths:
         '500':
           description: Internal server error
 
+  /dbc-pool/address/{mint}:
+    get:
+      summary: dbc-pool-addresses-by-mint
+      description: |
+        Request for pool addresses for a given token mint
+        
+        :::note
+        Refer to [Studio API doc](/docs/studio-api) for more information
+        :::
+      parameters:
+        - name: mint
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      dammv2PoolAddress:
+                        type: string
+                        nullable: true
+                      dbcPoolAddress:
+                        type: string
+                        nullable: true
+                      configKey:
+                        type: string
+                        nullable: true
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    description: Validation errors
+        '404':
+          description: Pool addresses not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Pool addresses not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
   /dbc/fee:
     post:
       summary: dbc-fee
@@ -255,7 +322,7 @@ components:
               type: number
               description: |
                 - Initial market cap in quote token units
-                - 16000 passed in = 100 USDC/SOL/JUP initial market cap
+                - 16000 passed in = 16000 USDC/SOL/JUP initial market cap
               example: 16000
             migrationMarketCap:
               type: number

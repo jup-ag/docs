@@ -188,6 +188,12 @@ paths:
           required: true
           schema:
             type: string
+        - name: page
+          in: query
+          description: |
+            - Pagination of response
+          schema:
+            type: string
       responses:
         '200':
           description: Successful response
@@ -233,6 +239,12 @@ paths:
           description: |
             - Pubkey can be sender or recipient
           required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: |
+            - Pagination of response
           schema:
             type: string
       responses:

@@ -20,7 +20,7 @@ Welcome to Jupiter Developer Documentation! You'll find detailed API guides, sch
 - [Recurring API](https://dev.jup.ag/docs/recurring-api/create-order)
 - [Token API](https://dev.jup.ag/docs/token-api/)
 - [Price API](https://dev.jup.ag/docs/price-api/)
-- [Swap Terminal](https://dev.jup.ag/docs/tool-kits/swap-terminal)
+- [Jupiter Plugin](https://dev.jup.ag/docs/tool-kits/plugin)
 - [Unified Wallet Kit](https://dev.jup.ag/docs/tool-kits/wallet-kit/)
 
 

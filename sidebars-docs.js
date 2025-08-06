@@ -229,8 +229,8 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/README',
-          label: 'Integrate Swap Terminal',
+          id: 'tool-kits/plugin/README',
+          label: 'Integrate Jupiter Plugin',
         },
       ],
     },
@@ -547,34 +547,33 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Jupiter Terminal',
+      label: 'Jupiter Plugin',
       collapsible: false,
       collapsed: false,
       items: [
         {
           type: 'doc',
-          id: 'tool-kits/terminal/README',
-          label: 'Introduction',
+          id: 'tool-kits/plugin/README',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/nextjs-app-example',
+          id: 'tool-kits/plugin/nextjs-app-example',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/react-app-example',
+          id: 'tool-kits/plugin/react-app-example',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/html-app-example',
+          id: 'tool-kits/plugin/html-app-example',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/customization',
+          id: 'tool-kits/plugin/customization',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/faq',
+          id: 'tool-kits/plugin/faq',
         },
       ],
     },

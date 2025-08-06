@@ -53,8 +53,8 @@ const JupiterExplore = () => {
               Tool Kits
             </h2>
             <p className="text-gray-600 text-sm text-left py-1">
-              For those looking for no-code solutions, we provide a customizable
-              Swap Terminal kit for you to develop faster and smoother.
+              For those looking for low-code solutions, we provide a customizable tools
+              like Jupiter Plugin for you to develop faster and smoother.
             </p>
           </div>
           <a

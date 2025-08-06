@@ -1,15 +1,15 @@
 ---
 sidebar_label: "Next.js App Example"
-description: "A step-by-step guide to integrating Jupiter Terminal into a Next.js application."
+description: "A step-by-step guide to integrating Jupiter Plugin into a Next.js application."
 title: "Next.js App Example"
 ---
 
 <head>
-    <title>Terminal Next.js App Example</title>
+    <title>Plugin Next.js App Example</title>
     <meta name="twitter:card" content="summary" />
 </head>
 
-In this guide, we'll walk you through from scratch the steps to integrate Jupiter Terminal into a Next.js application.
+In this guide, we'll walk you through from scratch the steps to integrate Jupiter Plugin into a Next.js application.
 
 ## Prerequisites
 
@@ -22,19 +22,19 @@ Before you begin, make sure you have the following installed on your system.
 Head to your preferred directory and create a new Next.js project using `create-next-app` with TypeScript template (you can use other templates or methods to start your project too):
 
 ```bash
-npx create-next-app@latest terminal-demo --typescript
-cd terminal-demo
+npx create-next-app@latest plugin-demo --typescript
+cd plugin-demo
 npm run dev
 ```
 
 ## Step 2: Add TypeScript Support
 
-Create a type declaration file `terminal.d.ts` in your project's `/src/types` folder:
+Create a type declaration file `plugin.d.ts` in your project's `/src/types` folder:
 
 ```typescript
 declare global {
   interface Window {
-    Jupiter: JupiterTerminal;
+    Jupiter: JupiterPlugin;
   }
 };
 export {};
@@ -48,7 +48,7 @@ export {};
 ```typescript
 declare global {
     interface Window {
-        Jupiter: JupiterTerminal;
+        Jupiter: JupiterPlugin;
     }
 }
 
@@ -104,7 +104,7 @@ export interface IInit {
     onScreenUpdate?: (screen: IScreen) => void;
 }
 
-export interface JupiterTerminal {
+export interface JupiterPlugin {
     _instance: JSX.Element | null;
     init: (props: IInit) => void;
     resume: () => void;
@@ -126,7 +126,7 @@ export { };
 
 </details>
 
-## Step 3: Embed the Terminal Script
+## Step 3: Embed the Plugin Script
 
 For Next.js applications, you can add the script in two ways:
 
@@ -146,7 +146,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <Script
-          src="https://terminal.jup.ag/main-v4.js"
+          src="https://plugin.jup.ag/plugin-v1.js"
           strategy="beforeInteractive"
           data-preload
           defer
@@ -171,7 +171,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Script
-        src="https://terminal.jup.ag/main-v4.js"
+        src="https://plugin.jup.ag/plugin-v1.js"
         strategy="beforeInteractive"
         data-preload
         defer
@@ -182,41 +182,41 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 }
 ```
 
-## Step 4: Initialize Terminal
+## Step 4: Initialize Plugin
 
-There are two ways to initialize Jupiter Terminal in a Next.js application:
+There are two ways to initialize Jupiter Plugin in a Next.js application:
 
 ### Method 1: Using Window Object
 
-Create a new component for the terminal at `components/terminal.tsx`:
+Create a new component for the plugin at `components/plugin.tsx`:
 
 ```typescript
 "use client";
 
 import React, { useEffect } from "react";
 
-export default function TerminalComponent() {
+export default function PluginComponent() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.Jupiter.init({
         displayMode: "widget",
-        integratedTargetId: "jupiter-terminal",
+        integratedTargetId: "jupiter-plugin",
       });
     }
   }, []);
 
   return (
     <div>
-      <h1>Jupiter Terminal Demo</h1>
+      <h1>Jupiter Plugin Demo</h1>
       <div
-        id="jupiter-terminal"
+        id="jupiter-plugin"
       />
     </div>
   );
 }
 ```
 
-### Method 2: Using @jup-ag/terminal Package
+### Method 2: Using @jup-ag/plugin Package
 
 :::warning
 Do note that using this method will require you to maintain its dependencies.
@@ -226,55 +226,55 @@ Do note that using this method will require you to maintain its dependencies.
 1. Install the package:
 
 ```bash
-npm install @jup-ag/terminal
+npm install @jup-ag/plugin
 ```
 
-2. Create a new component for the terminal at `components/terminal.tsx`:
+2. Create a new component for the plugin at `components/plugin.tsx`:
 
 ```typescript
 "use client";
 
 import React, { useEffect } from "react";
-import "@jup-ag/terminal/css";
+import "@jup-ag/plugin/css";
 
-export default function TerminalComponent() {
+export default function PluginComponent() {
   useEffect(() => {
-    import("@jup-ag/terminal").then((mod) => {
+    import("@jup-ag/plugin").then((mod) => {
       const { init } = mod;
       init({
         displayMode: "widget",
-        integratedTargetId: "jupiter-terminal",
+        integratedTargetId: "jupiter-plugin",
       });
     });
   }, []);
 
   return (
     <div>
-      <h1>Jupiter Terminal Demo</h1>
-      <div id="jupiter-terminal" />
+      <h1>Jupiter Plugin Demo</h1>
+      <div id="jupiter-plugin" />
     </div>
   );
 }
 ```
 
-## Step 5: Add the Terminal Component to Your Page
+## Step 5: Add the Plugin Component to Your Page
 
 In your `app/page.tsx` (or `pages/index.tsx` if you're using Pages Router):
 
 ```typescript
-import TerminalComponent from '@/components/terminal';
+import PluginComponent from '@/components/plugin';
 
 export default function Home() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <TerminalComponent />
+      <PluginComponent />
     </div>
   );
 }
 ```
 
-There you have it! You've successfully integrated Jupiter Terminal into your Next.js application.
+There you have it! You've successfully integrated Jupiter Plugin into your Next.js application.
 
 - Please test the swap functionality and check the transaction.
-- If you require more customizations, check out the [Terminal Playground](https://terminal.jup.ag/playground) or the [Customization](/docs/tool-kits/terminal/customization) documentation.
+- If you require more customizations, check out the [Plugin Playground](https://plugin.jup.ag) or the [Customization](/docs/tool-kits/plugin/customization) documentation.
 - If you have any questions or issues, please refer to the [FAQ](./faq.md) or contact us on [Discord](https://discord.gg/jup).

@@ -1,32 +1,32 @@
 ---
 sidebar_label: "FAQ"
-description: "Terminal FAQ"
+description: "Plugin FAQ"
 title: "FAQ"
 ---
 
 <head>
-    <title>Terminal FAQ</title>
+    <title>Plugin FAQ</title>
     <meta name="twitter:card" content="summary" />
 </head>
 
 **1. How do I feature request or get support?**
 
-- For feature requests, please open an issue on the [GitHub repository](https://github.com/jup-ag/terminal/issues) and tag us on Discord.
+- For feature requests, please open an issue on the [GitHub repository](https://github.com/jup-ag/plugin/issues) and tag us on Discord.
 - For support, please join the [Discord server](https://discord.gg/jup) and get help in the developer channels.
 
-**2. How do I add fees to Terminal?**
+**2. How do I add fees to Plugin?**
 
 - **Creating Referral Account and Token Accounts**: You can create via [scripts](/docs/ultra-api/add-fees-to-ultra) or [Referral Dashboard](https://referral.jup.ag).
-- **Adding to FormProps**: You can set the referral account and fee in the [`formProps` interface](/docs/tool-kits/terminal/customization#form-props-configuration) when you initialize the Terminal.
+- **Adding to FormProps**: You can set the referral account and fee in the [`formProps` interface](/docs/tool-kits/plugin/customization#form-props-configuration) when you initialize the Plugin.
 
-**3. Integrated Mode: Token Search Modal Collapses Terminal**
+**3. Integrated Mode: Token Search Modal Collapses Plugin**
 
-- Ensure you establish a fixed height for the terminal container under `containerStyles`
+- Ensure you establish a fixed height for the swap form container under `containerStyles`
 
 ```typescript
 {
    displayMode: "integrated",
-   integratedTargetId: "jupiter-terminal",
+   integratedTargetId: "jupiter-plugin",
    containerStyles: {
       height: "500px",
    },

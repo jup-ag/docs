@@ -172,8 +172,12 @@ const config = {
             outputDir: "docs/api/lend-api/earn",
           },
           send: {
-            specPath: "openapi/universal-send.yaml",
-            outputDir: "docs/api/universal-send-api",
+            specPath: "openapi/send.yaml",
+            outputDir: "docs/api/send-api",
+          },
+          studio: {
+            specPath: "openapi/studio.yaml",
+            outputDir: "docs/api/studio-api",
           },
         },
       },

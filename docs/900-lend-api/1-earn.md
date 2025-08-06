@@ -122,7 +122,6 @@ const blockhashInfo = await connection.getLatestBlockhashAndContext({ commitment
 const signature = await connection.sendRawTransaction(transactionBinary, {
   maxRetries: 0,
   skipPreflight: true,
-  preflightCommitment: "confirmed",
 });
 
 console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
@@ -145,7 +144,6 @@ try {
   console.log(`Examine the transaction status: https://solscan.io/tx/${signature}`);
 };
 ```
-
 </details>
 
 ## Deposit and Withdraw
@@ -323,7 +321,6 @@ const blockhashInfo = await connection.getLatestBlockhashAndContext({ commitment
 const signature = await connection.sendRawTransaction(transactionBinary, {
   maxRetries: 0,
   skipPreflight: true,
-  preflightCommitment: "confirmed",
 });
 
 console.log(`Transaction sent: https://solscan.io/tx/${signature}`);

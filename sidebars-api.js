@@ -331,32 +331,63 @@ const sidebars = {
                 },
               ],
             },
-          ],
+          ]
         },
         {
           type: "category",
-          label: "Universal Send API Schema",
+          label: "Send API Schema (Beta)",
           link: {
             type: "generated-index",
-            title: "Universal Send API Schema",
-            slug: "/api/universal-send-api",
+            title: "Send API Schema (Beta)",
+            slug: "/api/send-api",
           },
           items: [
             {
               type: 'doc',
-              id: 'api/universal-send-api/craft-send',
+              id: 'api/send-api/craft-send',
             },
             {
               type: 'doc',
-              id: 'api/universal-send-api/craft-clawback',
+              id: 'api/send-api/craft-clawback',
             },
             {
               type: 'doc',
-              id: 'api/universal-send-api/pending-invites',
+              id: 'api/send-api/pending-invites',
             },
             {
               type: 'doc',
-              id: 'api/universal-send-api/invite-history',
+              id: 'api/send-api/invite-history',
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Studio API Schema (Beta)",
+          link: {
+            type: "generated-index",
+            title: "Studio API Schema (Beta)",
+            slug: "/api/studio-api",
+          },
+          items: [
+            {
+              type: 'doc',
+              id: 'api/studio-api/dbc-pool-create-tx',
+            },
+            {
+              type: 'doc',
+              id: 'api/studio-api/dbc-pool-submit',
+            },
+            {
+              type: 'doc',
+              id: 'api/studio-api/dbc-pool-addresses-by-mint',
+            },
+            {
+              type: 'doc',
+              id: 'api/studio-api/dbc-fee',
+            },
+            {
+              type: 'doc',
+              id: 'api/studio-api/dbc-fee-create-tx',
             },
           ],
         },

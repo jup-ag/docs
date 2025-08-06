@@ -1,6 +1,6 @@
 ---
 sidebar_label: "Invite Code (Beta)"
-description: "Use the Jupiter Universal Send API to gift, pay, or onboard anyone in seconds."
+description: "Use the Jupiter Send API to gift, pay, or onboard anyone in seconds."
 title: "Invite Code (Beta)"
 ---
 
@@ -20,7 +20,7 @@ To upgrade to Pro or understand our rate limiting, please refer to this section.
 
 ## Security
 
-The Universal Send API is designed for **transaction building only** - it expects and exchanges parameters such as public keys, amounts, and mint addresses. The API **does not handle private keys or invite codes** for security reasons.
+The Send API is designed for **transaction building only** - it expects and exchanges parameters such as public keys, amounts, and mint addresses. The API **does not handle private keys or invite codes** for security reasons.
 
 **All cryptographic operations must be performed client-side:**
 - Invite code generation
@@ -45,7 +45,7 @@ The following sections provide the complete implementation steps required before
 1. Create invite code.
 2. From utils, derive the secret key - a deterministic 64-byte Solana secret key (32 bytes private + 32 bytes public key).
 3. Create Solana Keypair instance from the secret key.
-4. Post request to get Universal Send transaction.
+4. Post request to get Send transaction.
     - If `craft-clawback`, requires an additional `invitePDA` to be passed in.
 5. Sign with both sender and recipient keypair, then send transaction and wait for confirmation.
 
@@ -194,7 +194,7 @@ const secret_key = invite_code_to_priv_key(invite_code);
 // STEP 3: Use secret key to create Solana Keypair instance
 const recipient = Keypair.fromSecretKey(secret_key);
 
-// STEP 4: Post request for a Universal Send transaction
+// STEP 4: Post request for a Send transaction
 const craftSendTransaction = await (
     await fetch ('https://lite-api.jup.ag/send/v1/craft-send', {
         method: 'POST',

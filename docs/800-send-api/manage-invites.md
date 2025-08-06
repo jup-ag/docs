@@ -1,6 +1,6 @@
 ---
 sidebar_label: "Manage Invites (Beta)"
-description: "Use the Jupiter Universal Send API to manage invites."
+description: "Use the Jupiter Send API to manage invites."
 title: "Manage Invites (Beta)"
 ---
 

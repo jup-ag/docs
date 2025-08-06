@@ -18,10 +18,10 @@ paths:
     post:
       summary: craft-send
       description: |
-        Request for a base64-encoded unsigned Universal Send transaction
+        Request for a base64-encoded unsigned Send transaction
 
         :::note
-        - Refer to [Universal Send API doc](/docs/universal-send-api) for more information
+        - Refer to [Send API doc](/docs/send-api) for more information
         :::
       requestBody:
         required: true
@@ -38,7 +38,7 @@ paths:
                   type: string
                   description: |
                     - Public key address generated from the hash of the invite code
-                    - Do note that, the invite code requires to be generated client side, [refer to docs](/docs/universal-send-api)
+                    - Do note that, the invite code requires to be generated client side, [refer to docs](/docs/send-api)
                     - Please handle invite code and secret key with highest security as user funds are involved
                 sender:
                   type: string
@@ -71,7 +71,7 @@ paths:
                   tx:
                     type: string
                     description: |
-                      - Base64-encoded unsigned Universal Send transaction
+                      - Base64-encoded unsigned Send transaction
                   expiry:
                     type: string
                     description: |
@@ -108,10 +108,10 @@ paths:
     post:
       summary: craft-clawback
       description: |
-        Request for a base64-encoded unsigned Universal Send transaction
+        Request for a base64-encoded unsigned Send transaction
 
         :::note
-        - Refer to [Universal Send API doc](/docs/universal-send-api) for more information
+        - Refer to [Send API doc](/docs/send-api) for more information
         :::
       requestBody:
         required: true
@@ -127,7 +127,7 @@ paths:
                   type: string
                   description: |
                     - Program Derived Address derived by `"invite"` and the public key of the invite
-                    - Do note that, the invitePDA requires to be generated client side, [refer to docs](/docs/universal-send-api)
+                    - Do note that, the invitePDA requires to be generated client side, [refer to docs](/docs/send-api)
                     - Please handle invite code and secret key with highest security as user funds are involved
                 sender:
                   type: string
@@ -147,7 +147,7 @@ paths:
                   tx:
                     type: string
                     description: |
-                      - Base64-encoded unsigned Universal Send transaction
+                      - Base64-encoded unsigned Send transaction
         '400':
           description: Bad request body
           content:
@@ -178,7 +178,7 @@ paths:
         Request for the pending invites of an address
 
         :::note
-        - Refer to [Universal Send API doc](/docs/universal-send-api) for more information
+        - Refer to [Send API doc](/docs/send-api) for more information
         :::
       parameters:
         - name: address
@@ -233,7 +233,7 @@ paths:
         Request for the invite history of an address
 
         :::note
-        - Refer to [Universal Send API doc](/docs/universal-send-api) for more information
+        - Refer to [Send API doc](/docs/send-api) for more information
         :::
       parameters:
         - name: address

@@ -498,6 +498,74 @@ const sidebars = {
       value: '<div class="sidebar-line-break"></div>',
     },
   ],
+  send: [
+    {
+      type: 'doc',
+      id: 'send-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Send API',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'send-api/invite-code',
+        },
+        {
+          type: 'doc',
+          id: 'send-api/craft-send',
+        },
+        {
+          type: 'doc',
+          id: 'send-api/craft-clawback',
+        },
+        {
+          type: 'doc',
+          id: 'send-api/manage-invites',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
+  studio: [
+    {
+      type: 'doc',
+      id: 'studio-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Studio API',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'studio-api/create-token',
+        },
+        {
+          type: 'doc',
+          id: 'studio-api/claim-fee',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
   perp: [
     {
       type: 'doc',
@@ -528,44 +596,6 @@ const sidebars = {
         {
           type: 'doc',
           id: 'perp-api/custody-account',
-        },
-      ],
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-  ],
-  send: [
-    {
-      type: 'doc',
-      id: 'universal-send-api/README',
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-    {
-      type: 'category',
-      label: 'Universal Send API',
-      collapsible: false,
-      collapsed: false,
-      items: [
-        {
-          type: 'doc',
-          id: 'universal-send-api/invite-code',
-        },
-        {
-          type: 'doc',
-          id: 'universal-send-api/craft-send',
-        },
-        {
-          type: 'doc',
-          id: 'universal-send-api/craft-clawback',
-        },
-        {
-          type: 'doc',
-          id: 'universal-send-api/manage-invites',
         },
       ],
     },

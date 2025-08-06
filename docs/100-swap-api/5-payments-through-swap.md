@@ -156,7 +156,6 @@ Do note that more retries will cause the user to wait slightly longer, so find t
 ```jsx
 const signature = await connection.sendRawTransaction(transactionBinary, {
     maxRetries: 10,
-    preflightCommitment: "finalized",
 });
   
 const confirmation = await connection.confirmTransaction({ signature }, "finalized");

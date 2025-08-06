@@ -22,7 +22,7 @@ The Jupiter Programs use the Referral Program to allow developers to earn fees w
 - [Jupiter Referral Dashboard](https://referral.jup.ag/): To view and manage your referral accounts used with Jupiter APIs.
 - [Add Fees to Ultra API](https://dev.jup.ag/docs/ultra-api/add-fees-to-ultra): To add fees to your Ultra API integration.
 - [Add Fees to Swap and Trigger API](https://dev.jup.ag/docs/swap-api/add-fees-to-swap): To add fees to your Swap and Trigger API integration.
-- [Add Fees to Terminal](https://dev.jup.ag/docs/tool-kits/terminal#adding-fees-to-terminal): To add fees to your Terminal integration.
+- [Add Fees to Jupiter Plugin](https://dev.jup.ag/docs/tool-kits/plugin#adding-fees-to-plugin): To add fees to your Plugin integration.
 
 ## Other Program Integrators
 

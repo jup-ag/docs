@@ -34,7 +34,7 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 - [Token API](/docs/token-api/)
 - [Price API](/docs/price-api/)
 - [Universal Send API](/docs/universal-send-api) **NEW!**
-- [Swap Terminal](/docs/tool-kits/terminal/)
+- [Jupiter Plugin](/docs/tool-kits/plugin/) **NEW!**
 - [Unified Wallet Kit](/docs/tool-kits/wallet-kit/)
 
 

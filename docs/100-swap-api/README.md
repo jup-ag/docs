@@ -56,4 +56,4 @@ If the above sounds like too much work, then Ultra API will be the better choice
 **Other Guides**
 - [**Adding Fees to Swap API**](/docs/swap-api/add-fees-to-swap): Add custom integrator fees to the swap transaction.
 - [**Using Swap API as a payment method**](/docs/swap-api/payments-through-swap): Use Swap API as a payment method for your users.
-- [**Using Swap Terminal**](/docs/tool-kits/terminal): Lite version of Jupiter that provides end-to-end swap with just a few lines of code.
+- [**Using Jupiter Plugin**](/docs/tool-kits/plugin): Lite version of Jupiter that provides end-to-end swap with just a few lines of code.

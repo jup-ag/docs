@@ -1,15 +1,15 @@
 ---
 sidebar_label: "HTML App Example"
-description: "A step-by-step guide to integrating Jupiter Terminal into a HTML application."
+description: "A step-by-step guide to integrating Jupiter Plugin into a HTML application."
 title: "HTML App Example"
 ---
 
 <head>
-    <title>Terminal HTML App Example</title>
+    <title>Plugin HTML App Example</title>
     <meta name="twitter:card" content="summary" />
 </head>
 
-In this guide, we'll walk you through from scratch the steps to integrate Jupiter Terminal into a HTML application.
+In this guide, we'll walk you through from scratch the steps to integrate Jupiter Plugin into a HTML application.
 
 ## Prerequisites
 
@@ -23,14 +23,14 @@ Before you begin, make sure you have the following installed on your system.
 Head to your preferred directory and create a new folder for your project:
 
 ```bash
-mkdir terminal-demo
-cd terminal-demo
+mkdir plugin-demo
+cd plugin-demo
 touch index.html
 ```
 
-## Step 2: Add the Terminal Script
+## Step 2: Add the Plugin Script
 
-Add the Terminal script to your project:
+Add the Plugin script to your project:
 
 ```html
 <!DOCTYPE html>
@@ -38,8 +38,8 @@ Add the Terminal script to your project:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jupiter Terminal Demo</title>
-    <script src="https://terminal.jup.ag/main-v4.js" data-preload defer></script>
+    <title>Jupiter Plugin Demo</title>
+    <script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
     <style>
         .container {
             display: flex;
@@ -52,15 +52,15 @@ Add the Terminal script to your project:
 </head>
 <body>
     <div class="container">
-        <h1>Jupiter Terminal Demo</h1>
-        <div id="jupiter-terminal"></div>
+        <h1>Jupiter Plugin Demo</h1>
+        <div id="jupiter-plugin"></div>
     </div>
 
     <script>
         window.onload = function() {
             window.Jupiter.init({
                 displayMode: "widget",
-                integratedTargetId: "jupiter-terminal",
+                integratedTargetId: "jupiter-plugin",
             });
         };
     </script>
@@ -76,8 +76,8 @@ Run the project using `http-server`:
 http-server
 ```
 
-There you have it! You've successfully integrated Jupiter Terminal into your HTML application.
+There you have it! You've successfully integrated Jupiter Plugin into your HTML application.
 
 - Please test the swap functionality and check the transaction.
-- If you require more customizations, check out the [Terminal Playground](https://terminal.jup.ag/playground) or the [Customization](/docs/tool-kits/terminal/customization) documentation.
+- If you require more customizations, check out the [Plugin Playground](https://plugin.jup.ag) or the [Customization](/docs/tool-kits/plugin/customization) documentation.
 - If you have any questions or issues, please refer to the [FAQ](./faq.md) or contact us on [Discord](https://discord.gg/jup).

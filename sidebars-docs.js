@@ -229,8 +229,8 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/README',
-          label: 'Integrate Swap Terminal',
+          id: 'tool-kits/plugin/README',
+          label: 'Integrate Jupiter Plugin',
         },
       ],
     },
@@ -498,6 +498,44 @@ const sidebars = {
       value: '<div class="sidebar-line-break"></div>',
     },
   ],
+  send: [
+    {
+      type: 'doc',
+      id: 'universal-send-api/README',
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Universal Send API',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'universal-send-api/invite-code',
+        },
+        {
+          type: 'doc',
+          id: 'universal-send-api/craft-send',
+        },
+        {
+          type: 'doc',
+          id: 'universal-send-api/craft-clawback',
+        },
+        {
+          type: 'doc',
+          id: 'universal-send-api/manage-invites',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+  ],
   studio: [
     {
       type: 'doc',
@@ -577,34 +615,33 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Jupiter Terminal',
+      label: 'Jupiter Plugin',
       collapsible: false,
       collapsed: false,
       items: [
         {
           type: 'doc',
-          id: 'tool-kits/terminal/README',
-          label: 'Introduction',
+          id: 'tool-kits/plugin/README',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/nextjs-app-example',
+          id: 'tool-kits/plugin/nextjs-app-example',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/react-app-example',
+          id: 'tool-kits/plugin/react-app-example',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/html-app-example',
+          id: 'tool-kits/plugin/html-app-example',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/customization',
+          id: 'tool-kits/plugin/customization',
         },
         {
           type: 'doc',
-          id: 'tool-kits/terminal/faq',
+          id: 'tool-kits/plugin/faq',
         },
       ],
     },

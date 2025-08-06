@@ -20,13 +20,13 @@ Jupiter Tool Kits are a collection of developer tools and SDKs that help you int
 
 ## Jupiter Tool Kits
 
-- [**Swap Terminal**](/docs/tool-kits/terminal/): A ready-to-use swap interface that can be embedded into any website.
+- [**Jupiter Plugin**](/docs/tool-kits/plugin/): A ready-to-use swap interface that can be embedded into any website.
 - [**Jupiter Mobile Adapter**](/docs/tool-kits/mobile-adapter): A wallet interface to allow Jupiter Mobile QR code login.
 - [**Unified Wallet Kit**](/docs/tool-kits/wallet-kit/): A wallet interface that can be embedded into any website.
 
 ## Community Contributions
 
-- [**Jupiverse Kit**](https://jupiversekit.xyz): A ready-to-use React components for building with Swap Terminal and Unified Wallet Kit.
+- [**Jupiverse Kit**](https://jupiversekit.xyz): A ready-to-use React components for building with Jupiter Plugin and Unified Wallet Kit.
 - [**DevRel Examples**](https://github.com/Jupiter-DevRel): A wealth of scripts and examples for building with Solana and Jupiter.
 
 ## How to Contribute

@@ -28,12 +28,13 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 
 - [Ultra API](/docs/ultra-api/)
 - [Swap API](/docs/swap-api/)
+- [Lend API](/docs/lend-api/) **NEW!**
 - [Trigger API](/docs/trigger-api/)
 - [Recurring API](/docs/recurring-api/)
 - [Token API](/docs/token-api/)
 - [Price API](/docs/price-api/)
-- [Lend API](/docs/lend-api/) **NEW!**
-- [Swap Terminal](/docs/tool-kits/terminal/)
+- [Universal Send API](/docs/universal-send-api) **NEW!**
+- [Jupiter Plugin](/docs/tool-kits/plugin/) **NEW!**
 - [Unified Wallet Kit](/docs/tool-kits/wallet-kit/)
 
 

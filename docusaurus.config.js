@@ -171,6 +171,10 @@ const config = {
             specPath: "openapi/lend.earn.yaml",
             outputDir: "docs/api/lend-api/earn",
           },
+          send: {
+            specPath: "openapi/universal-send.yaml",
+            outputDir: "docs/api/universal-send-api",
+          },
           studio: {
             specPath: "openapi/studio.yaml",
             outputDir: "docs/api/studio-api",

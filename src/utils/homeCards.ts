@@ -51,6 +51,13 @@ export const API_CARDS = [
       ],
     },
     {
+      title: "Universal Send API",
+      links: [
+        { text: "Docs", href: "/docs/universal-send-api/" },
+        { text: "Schemas", href: "/docs/api/universal-send-api/" },
+      ],
+    },
+    {
       title: "Studio API",
       links: [
         { text: "Docs", href: "/docs/studio-api/" },
@@ -61,10 +68,10 @@ export const API_CARDS = [
   
   export const TOOL_KIT_CARDS = [
     {
-      title: "Swap Terminal",
+      title: "Jupiter Plugin",
       links: [
-        { text: "Playground", href: "https://terminal.jup.ag/" },
-        { text: "Docs", href: "/docs/tool-kits/swap-terminal" },
+        { text: "Playground", href: "https://plugin.jup.ag/" },
+        { text: "Docs", href: "/docs/tool-kits/plugin" },
       ],
     },
     {

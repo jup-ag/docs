@@ -1,0 +1,76 @@
+---
+id: craft-send
+title: "craft-send"
+description: "Request for a base64-encoded unsigned Universal Send transaction"
+sidebar_label: "craft-send"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVVttuIzcM/RViXrIFfEmKbR8M9CHZZIFFAySNE/TBCbD0DO1RrJGmksYXOP73kpqZOLazC2NboKgDOLJEkYeHh5LWSUY+daoMyppkkNzRXxX5ABPrAGGMnn792CWT2owyqIxXU8ODB6Pm5DxqGJLJIDg0HlNx8ch/g8HA2ECPpgt3NCEHwcJob8v57RfIbPr0oc/fvl+1q13Pq10s1U8RQmEdgTI8LLB2z84fTdJJXA30wmarZLCOP5WjLBkEV1EnSa0JZIIsYVlqlcbt/WcvWa4Tn+ZUoIzCqiTO246fKQ2N39rRKFFmrgINJWfHSwItDrCwFft+6iSlsyW5oMiLrx37rW8fnDJT3rdLdRduqzEjgxmtALPMkfcwJd6LgTmeOFtAyAly9DnYSRzXEUDKIfReWhCmeQlDZ98AmlS88D+mN65TrZgb8CqjDoxcWyOpxHcKIgFvNbEkGJLJ9G4wngFPqaMQ81mokEOuprmIiecrpwJn6aHyHGxSmcwDxtrOrZ5TxjXdvDL8Y9Q1FNU+BOx9rvzr6kJpLSxIaHYZTes6NvR4oUSykJVgZ2QA01QM/B7KpvxHoDyvAyh2FWzBeOeoK4IPY5qIsDNKVYHaR2qvetOeQBH8cAYPw8tPwPilhrxLwHGCX+vYv52cncbPydd9GQh8dt2my+krgSN9d3PdZjwmoYBLkQm2mPC2hWPj7fwm1lBkZoeVmoxCHUfFJU2w0iGK8U+BIhsF/I3RKyjR+xoKp1yiw4IC6ySqyEpG0RwWOcdvO1Tix480rS+t8XUX/nx6Kv92AQyrNGUZTCoNrXHyL50SYckTtCyVW/Eg2ID6M9E1FqV1wR+eEmx/BF8XP3D0Sj0aIEdEYE9LCKrgDmWsoq5I75tTJIooOoynzVUcZc1q01JYsbKZthQ11zHVuBhjOmuFLI0oqA5YOb55GFcUYEt5lKehsLBuduL3hfoNnTY6+fieNC4wg+Y2gbFcJ/9AF7uVJufsO6dZrditgGqzpxriL+9B/MJwnPRwbfofApSOp5Bbnk9K66NLDDn/6qcOJyFeF/GudCJT3r1OKqd5PQ+h9IN+X7N25D7pPVdlD6d92dCfnx0I4LPjajJQF98KbFTaeATIkSDXGGhVKFbSprMf4Qjnt6iybzmPt5Z7G6O5IeJ5GU3QxH2/0yrZcH8L7Xfb98jVklWu6fBFsNV6e9FtZ9pLZTtTn6yvNekk8g6KxVJBvCd/VCqdcfM6qYKwXed21jvtnR5k/ALXyszg5dG8QLfblYH4lBoWGEVj+NBlw50y7vhYb2X3/3knNsoOtAz9UqOKWUe9rBvljt6mzNXMRdY8u15LWg9ObzYyzfnKuTri4RydwrHUYPTE3nLCWEyWOr9HONinmqbuvcQWc770efqgU0W69Y5zvp3K8F3bpzedd3szvGfjcfP4LZh1nnW4kKuJvwcJD2wsW+zzOLdONJpphVOxrX3K529Mrze1
+sidebar_class_name: "post api-method"
+info_path: docs/api/universal-send-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"craft-send"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/craft-send"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for a base64-encoded unsigned Universal Send transaction
+
+:::note
+- Refer to [Universal Send API doc](/docs/universal-send-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["inviteSigner","sender","amount"],"properties":{"inviteSigner":{"type":"string","description":"- Public key address generated from the hash of the invite code\n- Do note that, the invite code requires to be generated client side, [refer to docs](/docs/universal-send-api)\n- Please handle invite code and secret key with highest security as user funds are involved\n"},"sender":{"type":"string","description":"- Public key address of the sender\n- This address will be funding the amount to be sent and the token accounts involved\n"},"amount":{"type":"string","description":"- Amount in atomic value (before decimals)\n- E.g. to send 1 USDC is equivalent of `amount='1000000'`\n- Do note that there will be additional SOL amount being used in the transaction for transaction fees and token accounts\n"},"mint":{"type":"string","description":"- Defaults to WSOL mint\n- Only pass in this parameter with other mint when required\n"}}}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["tx","expiry","totalFeeLamports"],"properties":{"tx":{"type":"string","description":"- Base64-encoded unsigned Universal Send transaction\n"},"expiry":{"type":"string","description":"- Unix timestamp of when the invite will expire\n- Expired invites will automatically clawback to sender\n"},"totalFeeLamports":{"type":"string","description":"- Amount of fees required for network's transaction fee and token accounts\n"}}}}}},"400":{"description":"Bad request body","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}},"500":{"description":"Internal error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

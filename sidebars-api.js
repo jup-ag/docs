@@ -335,10 +335,10 @@ const sidebars = {
         },
         {
           type: "category",
-          label: "Send API Schema",
+          label: "Send API Schema (Beta)",
           link: {
             type: "generated-index",
-            title: "Send API Schema",
+            title: "Send API Schema (Beta)",
             slug: "/api/send-api",
           },
           items: [
@@ -362,10 +362,10 @@ const sidebars = {
         },
         {
           type: "category",
-          label: "Studio API Schema",
+          label: "Studio API Schema (Beta)",
           link: {
             type: "generated-index",
-            title: "Studio API Schema",
+            title: "Studio API Schema (Beta)",
             slug: "/api/studio-api",
           },
           items: [

@@ -16,7 +16,7 @@ export const API_CARDS = [
       ],
     },
     {
-      title: "Lend API",
+      title: "Lend API (Beta)",
       links: [
         { text: "Docs", href: "/docs/lend-api/" },
         { text: "Schemas", href: "/docs/api/lend-api/" },
@@ -51,14 +51,14 @@ export const API_CARDS = [
       ],
     },
     {
-      title: "Send API",
+      title: "Send API (Beta)",
       links: [
         { text: "Docs", href: "/docs/send-api/" },
         { text: "Schemas", href: "/docs/api/send-api/" },
       ],
     },
     {
-      title: "Studio API",
+      title: "Studio API (Beta)",
       links: [
         { text: "Docs", href: "/docs/studio-api/" },
         { text: "Schemas", href: "/docs/api/studio-api/" },

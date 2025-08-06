@@ -10,7 +10,7 @@ title: 'Claim Fee (Beta)'
 </head>
 
 :::note
-- Lite URL: `https://lite-api.jup.ag/studio/v1`: 3 requests per 60 seconds
+- Lite URL: `https://lite-api.jup.ag/studio/v1`: 15 requests per 5 minutes
 - Pro URL: `https://api.jup.ag/studio/v1`: 3 requests per 10 seconds (for all Tiers)
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.

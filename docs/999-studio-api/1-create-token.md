@@ -10,8 +10,8 @@ title: 'Create Token (Beta)'
 </head>
 
 :::note
-- Lite URL: `https://lite-api.jup.ag/studio/v1`: 5 requests per 60 seconds
-- Pro URL: `https://api.jup.ag/studio/v1`: 5 requests per 10 seconds
+- Lite URL: `https://lite-api.jup.ag/studio/v1`: 3 requests per 60 seconds
+- Pro URL: `https://api.jup.ag/studio/v1`: 3 requests per 10 seconds (for all Tiers)
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.
 - [API Key Setup](/docs/api-setup)

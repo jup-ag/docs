@@ -553,7 +553,7 @@ const sidebars = {
       items: [
         {
           type: 'doc',
-          id: 'studio-api/create-dbc',
+          id: 'studio-api/create-token',
         },
         {
           type: 'doc',

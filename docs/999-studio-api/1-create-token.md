@@ -1,11 +1,11 @@
 ---
-sidebar_label: 'Create DBC (Beta)'
+sidebar_label: 'Create Token (Beta)'
 description: 'Create and launch tokens on Jupiter Studio via API.'
-title: 'Create DBC (Beta)'
+title: 'Create Token (Beta)'
 ---
 
 <head>
-    <title>Create DBC (Beta)</title>
+    <title>Create Token (Beta)</title>
     <meta name='twitter:card' content='summary' />
 </head>
 

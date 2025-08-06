@@ -1,0 +1,76 @@
+---
+id: invite-history
+title: "invite-history"
+description: "Request for the invite history of an address"
+sidebar_label: "invite-history"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVt9v2zYQ/lcIPrVAHCVD+6K3Ft2GYBuQpu2TbRRn6WxdIpEcSbkxHP/vvaPk2KrVzMAetjw4pO7Xx+/ueNzqEkPhyUWyRuf6Dv9uMUS1tF7FChWZNUVUFYVo/UbZpQKjoCw9hjAzM5PnubERZ2ai7nCJbGTV9IuhNfoAtfqEplTvbm9UaYv5q4x/Q9bupZPA0gk4ep3CNdZLPF42IGiS85nRF9qBhwYjG+l8utWGNwy1R8FyEuSM2294MzzPRN22iwfcqIJxL1BJSEbJ4TwW5AhNTCE8n5s8ljqPvsULHYoKG9D5VseNk2ghejIrvdtdPANwsMJ/jA4rMuk4wh3jddYETCFPQpCJuELPooYMNW2j82vxuIS2jrze7eYCtHMRxPCXqyv5Nwz6qS0K5mXZ1s/x2GVh2buJog7O1VQkUNl9EJvtKRi7uMciDpiZ6q4ahPIKwl+crw8QQTMq561DH6mDtVc7eAPvQejhz004L8rXQCuT2Oj3rgRhLSWQF/joKFEOjW2N+Cg8pkN9jY8pEzUedpxtlLIT/SIRdaxPDQ4suj1nIXbMLck3jO0nB90jPS2WAfYxcX+aMVF/vjFRf+Ix0TEHY/JjVk7kF9q0dQ2LGrs22B3xdo5yz+w5qkPuX0Y6qjHiM+XrrODPGR1rvh/U+W9Y7gebhbU1gpFLQUeKYqJvUsJF8W7ffJ2LN2O9+h5K5fsrd2HLzb9p1GFpovd2rLB2w17r1OYdxLdjEG8Yjjd8l3eq/yFASTHGyvJ3vcLkEWLFm6zrskk/pdIt4df7cdH6mnWqGF3Is6wWRZ45l/etu4RVJh2Yra9Pru7fPKJirD6NL1ZylktEfaNYKQ88EmtqKAYt82AY4Qznt0Dlz5xXtKpYcBRDZiqPrjZg2anwKBO7P3CjZSTIzExE9iX4saXiIUTwQpHQ0AW9vry6vDqB8qT+JPOgnmbmSU0mE1lI9zkbYgMpof20O+F44Gd7KIv/5xuir7KIjzFzNVA6ZUrcti+j6Y9HZGorpkEk2+0CAn7x9W4nn7tpL8VVUpC7gktyCXXAF1h5dddX9Wt17qNkFDPbDR4/a6hb0UqVeD6cF58mLwTuHz2HqHPZeOpuzOlcLkuENNSYns7mHT9IXDyyOrk3xMtzb//+62e+Br4DwjWvjA==
+sidebar_class_name: "get api-method"
+info_path: docs/api/universal-send-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"invite-history"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/invite-history"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the invite history of an address
+
+:::note
+- Refer to [Universal Send API doc](/docs/universal-send-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"address","in":"query","description":"- Pubkey can be sender or recipient\n","required":true,"schema":{"type":"string"}},{"name":"page","in":"query","description":"- Pagination of response\n","schema":{"type":"integer","minimum":1,"default":1}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["invites","hasMoreData"],"properties":{"invites":{"type":"array","items":{"type":"object","required":["invite_signer","invite_pda","sender","expiry","amount","creation_tx","deletion_tx","receiver","action","creation_time","deletion_time","mint","confirmed"],"properties":{"invite_signer":{"type":"string"},"invite_pda":{"type":"string"},"sender":{"type":"string"},"expiry":{"type":"string"},"amount":{"type":"string"},"creation_tx":{"type":"string"},"deletion_tx":{"type":"string","nullable":true},"receiver":{"type":"string","nullable":true},"action":{"type":"string","nullable":true},"creation_time":{"type":"string"},"deletion_time":{"type":"string","nullable":true},"mint":{"type":"string","nullable":true},"confirmed":{"type":"integer","nullable":true}}}},"hasMoreData":{"type":"boolean"}},"title":"InviteDataResponse"}}}},"400":{"description":"Bad request body","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}},"500":{"description":"Internal error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

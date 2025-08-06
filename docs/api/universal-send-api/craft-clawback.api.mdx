@@ -1,0 +1,76 @@
+---
+id: craft-clawback
+title: "craft-clawback"
+description: "Request for a base64-encoded unsigned Universal Send transaction"
+sidebar_label: "craft-clawback"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVVlFv2zYQ/isHPm2AFaVDtwe/JcsKFCswL2mfbAM9UWeLiURqJOXEUPLfd0fJcWJnRdAWGOoANkUev7v77rtTelVS0N600TirpuqS/ukoRFg5DwgFBvrtbUZWu5JK6Gwwa8uLT9ZsyAes4YpsCdGjDagFYsF/0+nUukgLm8ElrchDdDA/uHI2ew+l08ufcv4Oebc7zQKfZtian1MIjfMExvKywQGewRdWTZQfAj135VZN+/RoPJVqGn1HE6WdjWSjHGHb1kan6/l1kCx7FXRFDcoqblvivF1xTTqOuAPQXBm7MZFmF2e8L3GRV8uJar1ryUdDQe7vbfZgIXpj13zpObcZzLxbe2zggjznyyyUpacQoByfiy18XoyQC/UZUMitCNqu4BTghrbgVmlntGGKLxwI27yLcfLkjEOCMZkgFSgI1mTJY2RHujbMDgRT0gTmflclqcUXSiLuZjWxKKDi0OqdKxB5pGADaU8xBXprYgWVWVciJ97vvIlbwABdYGerzpYBMFV342pOnqv68Ejza7jcc4IjjSM3A4YEe2WsFmZMeLQRx1Q+4WkCJnKwdS0MybYnTWbDTg9xVx0bYeM6GyXY9BHBhNbZMKjhl9NT+Xke61WnNcPwddgZq++k0Hh3rEjeewV951/R2o85v30pzXMsYexKKKQtvyHH5xmR9+4FTQzs78kYzJZDiL++FOJ7Dsdbzm0w/R8D5JOGYuV4X7UuJEiMFT/l2uMqZrrG2wL1TRo9XkrCCL3qfM02VYxtmOZ5zfqVzjy57toTXOei/Hzz5qjc7zyxtg33ncxdNmqdsXFoURkIUJvGxMANeOjhFeAzNOV/gaf+9099jKOIh0A5mKBN9/6krXpgLQv1l/vZ/scdNm1NB5N2L+vdvHikfKLkdZFqYaJcVH93Rt+EiF5IFiKHsN+cnJ6cHiVzDx+MvYH7hb2HLMtkIZhSogaTJiw2gnpUpWc4/V5ZP84rdRRvpLuYtzWalHmSQz+Kc36YNhesEvXySd9Lap98/fAg25yz5zfznJcb9AYLqcV8yYgVYSoZq5mHNzv8faAq+yj+xbzuJI6jhhR1DjfOeKC28Yu2yycNNvvr6iMbF+P/Cg0zz7seb2Wa8vdU8cKl0qV2Tnu9qtGuO1yL7YApn38B3WE3XA==
+sidebar_class_name: "post api-method"
+info_path: docs/api/universal-send-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"craft-clawback"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/craft-clawback"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for a base64-encoded unsigned Universal Send transaction
+
+:::note
+- Refer to [Universal Send API doc](/docs/universal-send-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["invitePDA","sender"],"properties":{"invitePDA":{"type":"string","description":"- Program Derived Address derived by `\"invite\"` and the public key of the invite\n- Do note that, the invitePDA requires to be generated client side, [refer to docs](/docs/universal-send-api)\n- Please handle invite code and secret key with highest security as user funds are involved\n"},"sender":{"type":"string","description":"- Public key address of the sender\n- Since this address funded the invite, it will be the receiving address of the full amount\n"}}}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["tx"],"properties":{"tx":{"type":"string","description":"- Base64-encoded unsigned Universal Send transaction\n"}}}}}},"400":{"description":"Bad request body","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}},"500":{"description":"Internal error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

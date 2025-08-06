@@ -1,0 +1,76 @@
+---
+id: pending-invites
+title: "pending-invites"
+description: "Request for the pending invites of an address"
+sidebar_label: "pending-invites"
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVktv2zAM/iuCTi3Q1O2wXXzbsAeKbUDXrqckKBibidXakibJWYM0/32k7DTx7HYBdth6SCXz9ekjKWotc/SZUzYoo2Uqr/BHjT6IuXEiFCgs6lzphVB6qQJ6YeYCtIA8d+j9RE90mqbaBJzokbjCOZKVEeMbrZboPJTimuzF28sLkZtsepTQr0/qrXTkSToCq45jvMo4pEC0rIDhROcTLU+kBQcVBjKS6XgtNW0Ia4uC5IqhE3C3ok33QCNxWc/uccXIGQy66NHROZXDXKbB1XgifVZgBTJdy7Cy7NwHR+eWm83JUzwLC/xjMFgoHdFzQIJnjfYYQ/ZCKB1wgY5EldKqqiuZnrPHOdRloPVmM2WgjQvPhq/OzvhfN+h1nWVEw7wun+KRy8yQdx1YHawtVRZBJXeebdZ9MGZ2h1noMDOWbdbpawH+K6XnPQSQhMo6Y9EF1cDaqu28gXPA9NDnyh8W5darhY5stHubA7MWc0YLfLAqUg6VqTX7yBzGQ92Gh5iJEnc7hxlylbF+Fona11cVdiyaPWUhNMzNlasI2zMH3SLtF0sH+5C4Pc2QqD3fkKg98ZBon4Mh+T4rPfmJ1HVZwqzEpg02e7wdotwye4hql/uXkQ5qDPiM+Too+FNGh5rvN3X665b7zmZmTImg+VKQQQU2kRcx4ax4tW2+xsXroV59B7lw7RU7M/nqbxq1W5ronBkqrE231xq1aQPxzRDEC4LjNF3djeo/BMgpxlAY+i4XGD1CKGiTtFNptLufPLrldjzUriSlIgTr0yQpSYNnzOldbU9hkXALJsvz3t390SEKAuviuCIla6hGxE8VCuEgoChVpYKXPBC6EQ5wfgkqf855oRYFCfZi8Aydoag95o0KjVy2+4wryTOBZ2Rksq3Bb7XK7n0AxxwxDU3Q89Oz07MelEfxRel78TjRj2I0GvGC288aHyqIGd2Oux7JHUfrXWH8p6+GttACPoTElqDiOWPq1m0ljXuHJHYLYoJF6/UMPN64crPhz83E5/rKlef7gspyDqXHF3g5umor+1g88w4ZxEhqnefNEsqatWLtHR79xdfIC4Hbd84u6pQ3TjWX5HjK9yNCnGPERmPzlt4gNuxZ9a4K9vLUzp8+fKfO/wXKWqRa
+sidebar_class_name: "get api-method"
+info_path: docs/api/universal-send-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"pending-invites"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/pending-invites"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for the pending invites of an address
+
+:::note
+- Refer to [Universal Send API doc](/docs/universal-send-api) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"name":"address","in":"query","description":"- Pubkey of Sender\n","required":true,"schema":{"type":"string"}},{"name":"page","in":"query","description":"- Pagination of response\n","schema":{"type":"integer","minimum":1,"default":1}}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","required":["invites","hasMoreData"],"properties":{"invites":{"type":"array","items":{"type":"object","required":["invite_signer","invite_pda","sender","expiry","amount","creation_tx","deletion_tx","receiver","action","creation_time","deletion_time","mint","confirmed"],"properties":{"invite_signer":{"type":"string"},"invite_pda":{"type":"string"},"sender":{"type":"string"},"expiry":{"type":"string"},"amount":{"type":"string"},"creation_tx":{"type":"string"},"deletion_tx":{"type":"string","nullable":true},"receiver":{"type":"string","nullable":true},"action":{"type":"string","nullable":true},"creation_time":{"type":"string"},"deletion_time":{"type":"string","nullable":true},"mint":{"type":"string","nullable":true},"confirmed":{"type":"integer","nullable":true}}}},"hasMoreData":{"type":"boolean"}},"title":"InviteDataResponse"}}}},"400":{"description":"Bad request body","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}},"500":{"description":"Internal error","content":{"application/json":{"schema":{"type":"object","properties":{"error":{"type":"string"}},"required":["error"]}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

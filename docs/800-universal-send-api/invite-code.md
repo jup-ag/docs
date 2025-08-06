@@ -18,21 +18,26 @@ To upgrade to Pro or understand our rate limiting, please refer to this section.
 - [API Rate Limit](/docs/api-rate-limit)
 :::
 
-## Caution
+## Security
 
-The Universal Send API only handles transaction building - which means it only expects and exchanges of parameters/fields such as public key, amount, mint. It does not handle any private/secret key nor invite code.
+The Universal Send API is designed for **transaction building only** - it expects and exchanges parameters such as public keys, amounts, and mint addresses. The API **does not handle private keys or invite codes** for security reasons.
 
-The generation of invite code and hashing of invite code to determine the private key **is done on the CLIENT SIDE** and the following section will provide the steps before using the API.
+**All cryptographic operations must be performed client-side:**
+- Invite code generation
+- Private key derivation from invite codes  
+- Transaction signing
+
+The following sections provide the complete implementation steps required before using the API.
 
 :::danger
-Handle INVITE CODE and PRIVATE KEY with highest security.
+**CRITICAL SECURITY REQUIREMENTS**
 
-- Any potential threats of invite code or private key being exposed might lead to loss of funds.
-- Jupiter is not liable for loss of funds due to leaked invite code or private key.
-:::
+- **Never share invite codes or private keys** - treat them like passwords or seed phrases
+- **Store invite codes securely** - use encrypted storage, secure vaults, or environment variables
+- **Validate all inputs** - ensure invite codes meet expected format before processing
+- **Implement proper error handling** - avoid exposing sensitive data in logs or error messages
 
-:::note
-**insert recommendations on how to handle invite code and private key**
+**⚠️ Loss of funds:** Any exposure of invite codes or private keys may result in permanent loss of funds. Jupiter is not liable for losses due to compromised credentials.
 :::
 
 ## Overview

@@ -1,15 +1,15 @@
 ---
 sidebar_label: "React App Example"
-description: "A step-by-step guide to integrating Jupiter Terminal into a React application."
+description: "A step-by-step guide to integrating Jupiter Plugin into a React application."
 title: "React App Example"
 ---
 
 <head>
-    <title>Terminal React App Example</title>
+    <title>Plugin React App Example</title>
     <meta name="twitter:card" content="summary" />
 </head>
 
-In this guide, we'll walk you through from scratch the steps to integrate Jupiter Terminal into a React application.
+In this guide, we'll walk you through from scratch the steps to integrate Jupiter Plugin into a React application.
 
 ## Prerequisites
 
@@ -22,19 +22,19 @@ Before you begin, make sure you have the following installed on your system.
 Head to your preferred directory and create a new React project using `create-react-app` with TypeScript template (you can use other templates or methods to start your project too):
 
 ```bash
-npx create-react-app terminal-demo --template typescript
-cd terminal-demo
+npx create-react-app plugin-demo --template typescript
+cd plugin-demo
 npm start
 ```
 
 ## Step 2: Add TypeScript Support
 
-Create a type declaration file `terminal.d.ts` in your project's `/src/types` folder:
+Create a type declaration file `plugin.d.ts` in your project's `/src/types` folder:
 
 ```typescript
 declare global {
   interface Window {
-    Jupiter: JupiterTerminal;
+    Jupiter: JupiterPlugin;
   }
 };
 export {};
@@ -48,7 +48,7 @@ export {};
 ```typescript
 declare global {
     interface Window {
-        Jupiter: JupiterTerminal;
+        Jupiter: JupiterPlugin;
     }
 }
 
@@ -104,7 +104,7 @@ export interface IInit {
     onScreenUpdate?: (screen: IScreen) => void;
 }
 
-export interface JupiterTerminal {
+export interface JupiterPlugin {
     _instance: JSX.Element | null;
     init: (props: IInit) => void;
     resume: () => void;
@@ -126,48 +126,48 @@ export { };
 
 </details>
 
-## Step 3: Embed the Terminal Script
+## Step 3: Embed the Plugin Script
 
-In your `/public/index.html`, add the Jupiter Terminal script:
+In your `/public/index.html`, add the Jupiter Plugin script:
 
 ```html
 <head>
-  <script src="https://terminal.jup.ag/main-v4.js" data-preload defer></script>
+  <script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
 </head>
 ```
 
-## Step 4: Initialize Terminal
+## Step 4: Initialize Plugin
 
-There are two ways to initialize Jupiter Terminal in a React application:
+There are two ways to initialize Jupiter Plugin in a React application:
 
 ### Method 1: Using Window Object
 
-In your `/src/App.tsx`, use the following code to initialize the terminal.
+In your `/src/App.tsx`, use the following code to initialize the plugin.
 
 ```typescript
 import React, { useEffect } from 'react';
 import './App.css';
-import './types/terminal.d';
+import './types/plugin.d';
 
 export default function App() {
   useEffect(() => {
-    // Initialize terminal
+    // Initialize plugin
     window.Jupiter.init({
       displayMode: "widget",
-      integratedTargetId: "jupiter-terminal",
+      integratedTargetId: "jupiter-plugin",
     });
   }, []);
 
   return (
     <div className="App">
-      <h1>Jupiter Terminal Demo</h1>
-      <div id="jupiter-terminal" />
+      <h1>Jupiter Plugin Demo</h1>
+      <div id="jupiter-plugin" />
     </div>
   );
 }
 ```
 
-### Method 2: Using @jup-ag/terminal Package
+### Method 2: Using @jup-ag/plugin Package
 
 :::warning
 Do note that using this method will require you to maintain its dependencies.
@@ -176,39 +176,39 @@ Do note that using this method will require you to maintain its dependencies.
 1. Install the package:
 
 ```bash
-npm install @jup-ag/terminal
+npm install @jup-ag/plugin
 ```
 
-2. Initialize the terminal:
+2. Initialize the plugin:
 
 ```typescript
 import React, { useEffect } from "react";
-import "@jup-ag/terminal/css";
+import "@jup-ag/plugin/css";
 import "./App.css";
-import "./types/terminal.d";
+import "./types/plugin.d";
 
 export default function App() {
   useEffect(() => {
-    import("@jup-ag/terminal").then((mod) => {
+    import("@jup-ag/plugin").then((mod) => {
       const { init } = mod;
       init({
         displayMode: "widget",
-        integratedTargetId: "jupiter-terminal",
+        integratedTargetId: "jupiter-plugin",
       });
     });
   }, []);
 
   return (
     <div>
-      <h1>Jupiter Terminal Demo</h1>
-      <div id="jupiter-terminal" />
+      <h1>Jupiter Plugin Demo</h1>
+      <div id="jupiter-plugin" />
     </div>
   );
 }
 ```
 
-There you have it! You've successfully integrated Jupiter Terminal into your Next.js application.
+There you have it! You've successfully integrated Jupiter Plugin into your Next.js application.
 
 - Please test the swap functionality and check the transaction.
-- If you require more customizations, check out the [Terminal Playground](https://terminal.jup.ag/playground) or the [Customization](/docs/tool-kits/terminal/customization) documentation.
+- If you require more customizations, check out the [Plugin Playground](https://plugin.jup.ag) or the [Customization](/docs/tool-kits/plugin/customization) documentation.
 - If you have any questions or issues, please refer to the [FAQ](./faq.md) or contact us on [Discord](https://discord.gg/jup).

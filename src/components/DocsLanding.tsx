@@ -90,10 +90,10 @@ const SwapProductList = () => {
                 </div>
                 <div style={{ flex: '1 1 calc(33% - 10px)', display: 'flex', margin: '5px', minWidth: '300px' }}>
                     <ProductCard
-                        image={<img src="/docslanding/kit.svg" alt="Swap Terminal" style={{ width: '60px', height: '60px' }} />}
-                        title="Swap Terminal"
-                        description="Bring Swap Terminal interface directly into your app."
-                        link="/docs/tool-kits/swap-terminal"
+                        image={<img src="/docslanding/kit.svg" alt="Jupiter Plugin" style={{ width: '60px', height: '60px' }} />}
+                        title="Jupiter Plugin"
+                        description="Bring Jupiter Ultra swap interface directly into your app."
+                        link="/docs/tool-kits/plugin"
                     />
                 </div>
                 <div style={{ flex: '1 1 calc(33% - 10px)', display: 'flex', margin: '5px', minWidth: '300px' }}>

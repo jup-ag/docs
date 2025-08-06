@@ -61,12 +61,11 @@ paths:
     post:
       summary: dbc-pool-submit
       description: |
-        Execute the signed transaction
+        Execute the signed transaction, and optionally upload content and header image
         
         :::note
         Refer to [Studio API doc](/docs/studio-api) for more information
         :::
-      # , and optionally upload content and header image
       requestBody:
         content:
           multipart/form-data:
@@ -458,16 +457,15 @@ components:
           type: string
           description: |
             - Owner wallet public key
-        # content:
-        #   type: string
-        #   description: |
-        #     - Optional content description
-        #   nullable: true
-        # headerImage:
-        #   type: string
-        #   format: binary
-        #   description: |
-        #     - Optional header image file
+        content:
+          type: string
+          description: |
+            - Optional content description displayed on Studio token page
+        headerImage:
+          type: string
+          format: binary
+          description: |
+            - Optional header image file displayed on Studio token page
 
     CreateClaimFeeDBCTransactionRequestBody:
       type: object

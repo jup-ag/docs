@@ -160,7 +160,7 @@ const poolAddressResponse = await (
 
 ## Fee
 
-Using the Pool Address, you will be able to get the total and current unclaimed fees in the Dynamic Bonding Curve pool
+Using the Pool Address, you will be able to get the total and current unclaimed fees in the Dynamic Bonding Curve pool.
 
 ```jsx
 const feeResponse = await (

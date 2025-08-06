@@ -255,7 +255,8 @@ const metadataResponse = await fetch(createTransaction.metadataPresignedUrl, {
 After you have uploaded your token image and token metadata, you can proceed to signing and making a post request to the `submit` endpoint - this will allow Jupiter Studio to complete the transaction and submit it to the network on your behalf.
 
 :::note
-Do note that the endpoint expects the `requestBody`'s `content` to be in [`multipart/form-data` format](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API/Using_FormData_Objects).
+- Do note that the endpoint expects the `requestBody`'s `content` to be in [`multipart/form-data` format](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API/Using_FormData_Objects).
+- Ensure the file types and size of the image file is manageable.
 :::
 
 ```jsx
@@ -269,6 +270,15 @@ const signedTransaction = Buffer.from(transaction.serialize()).toString('base64'
 const formData = new FormData();
 formData.append('transaction', signedTransaction);
 formData.append('owner', wallet.publicKey.toBase58());
+formData.append('content', '');
+formData.append(
+    'headerImage',
+    new File(
+        [fs.readFileSync('/Path/to/header.jpeg')],
+        'header.jpeg',
+        { type: 'image/jpeg' },
+    )
+);
 
 const result = await (
     await fetch (

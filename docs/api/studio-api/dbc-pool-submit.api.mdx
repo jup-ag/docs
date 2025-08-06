@@ -1,11 +1,11 @@
 ---
 id: dbc-pool-submit
 title: "dbc-pool-submit"
-description: "Execute the signed transaction"
+description: "Execute the signed transaction, and optionally upload content and header image"
 sidebar_label: "dbc-pool-submit"
 hide_title: true
 hide_table_of_contents: true
-api: eJzFVVFv2jAQ/iuWnzaJEFZ1e+CtdJtUbVK70j1BH5zkIC6J7dmXtojmv+/OCS0MOvVh0kACE5+/++7zd8dGFhByrx1qa+RYfnmEvEEQWIIIemmgEOiVCSrngDm9x+OxsQhzcw0L8AKtmE2xKbQVZ1cXorD57buUPkMa4tNEOf1eLKwXtfUgtKFlrTowgpobOZAefjUQcGKLtRxvZG4NgkFe1k2F2imPKR9LCoWKH4e8hDqucO2AaNvsDnLsobSHQo5ncoc47dgHA17eDqTz1oFHDSEC7AS94AX02izp1L46iZioAJ9OEzC5LUibYxLJdpvsDXiXHCgeVFUBCtdklc7FCtaMQjCoseLj0yarNX6enN+8JLreEa1tOdpDcNaErq6T0Yi/9vNNmzyHEBZNJbbBxGlHb+UcMYjXk96FTpLXxd5XMnTgO4GZtRWoKMj25v4OUeuOxr5qbaS40MtvsD6y278G8vRYyRNViN5f/65U8N76cBhHJOLWaywH8uMxjhdEyhtViQD+nuzQYXB4DVhaMrN0NvJ3Ckv6lRZZnjhSNw3RGbTTHSVOs41sfEVBJaIL4zStNAJ34fCucUO17Psyvf9wYMevHqjzNTHgVgZTOEsXIh40lsIrmgqVpmSByvwzx5vgr5QuXoMv9bKkjZ0sPFkyEE2g/oohysRzbIKW2pgnSdS575Efjc5XAWlWUGKWokt6MhwNRwdUnsR3bVbiaW6eRJIkvODLY5VrFa1gVM2oW6GTZ6H3gHaG1f8Znb3LEB4xdZXSsYx4N5veLLPnGtglXRUkX8mGos3NJqOR9tNXbcuPqVE8NdmMlvfKa5WxtrNbAi1BFTzTyF8r7kN53lWe3DAFDq8apnJsZLNhukNnNCMc7oQftCHf7bPtry6nNxSc9f8MNQ1desrAEXfwsmSSbfsb0g9flA==
+api: eJzVVcFS2zAQ/RWNTu1MjClDe8gNaDvDtDNQoKeEg2xvYhFbUqU1kAn+9+7KTnCaQDn00hwSRVq93X37drWSBYTca4faGjmWXx4hbxAEliCCnhsoBHplgsrZYCSUKYSNxqqqlqJxlVWFyK1BMBhPS1AFeKFrNYepmZrxeGws0vIKZrSPVkyusSm0FSeX56Kw+e27lL5DGuJuopx+L2bWi9p6ENrQslbsMEJNjRxJD78aCHhqi6Ucr2TvnZd1U6F2ymPK15JCoeLtkJdQxxUuHVCaNruDHHso7aGQ44kcJEon9sGAl7cj6bx14FFDiAADo2e8gF6bOd3aZjMRpyrAp+METG4L4nKXUkqoXTt7A94FG4oHIh9QuCardC4WsOxQBkT8Faev4aZ0AwNR6OAqtaRA6U9fLLQLMMLForKvrsznXOV9/rqq0U6mjfLL1yIYCkbMdAVv8E8BoMaKXV43Wa3x8+nZzTOpVwOBtC1bewjOmtDV8OjwkH+2I7pu8hxCmDWVWBvLLUqVc8R2lGJ6F7ryvyysbdWEDnxgmFlbgYpUrlX6OkSt91W2q/pMz7/Bcs9p/xnJ430pn1Lr9r3071IF760Pu3YURDx6KcqR/LgvxnMKyrNMAvh7kkmHweY1YGmpcaWzMX6nsKR/aZHliSN20xCVQSfdVYppspKNr8ioRHRhnKaVRuCJc3DXuAM172dQev9hR7BfPdBU1BQBjy0whbNUEPGgsRRe0cSsNDkLlOafPt4Ef6l08RJ8qeclHQy88BTNQDSBWiSaKBPvsQhaGlk8NSPPfY/8aHS+CEhzkRwzFZ3To4PDg8OdUJ7Ed20W4mlqnkSSJLzg4jHLtYpSMKpm1DXRyYboLaDBYP4/npVelQiPmNL80THtWMtVL67JJmdWVZc10V2yAOlwtcpo3P/0VdvyNjUWTb7xhJb3ymuVcS0mt5vhGfW44L6VZ12myQ2HwOZVw6Hse85YYN2lE5opDgfmO23LWti0yeXF9Q0ZZ/2rWdODRLsMHHFHz0sOsm1/AwGE1rA=
 sidebar_class_name: "post api-method"
 info_path: docs/api/studio-api/quickstart
 custom_edit_url: null
@@ -36,7 +36,7 @@ import Heading from "@theme/Heading";
 
 
 
-Execute the signed transaction
+Execute the signed transaction, and optionally upload content and header image
 
 :::note
 Refer to [Studio API doc](/docs/studio-api) for more information
@@ -59,7 +59,7 @@ Refer to [Studio API doc](/docs/studio-api) for more information
 
 <RequestSchema
   title={"Body"}
-  body={{"content":{"multipart/form-data":{"schema":{"type":"object","required":["transaction","owner"],"properties":{"transaction":{"type":"string","description":"- Base64-encoded signed transaction\n"},"owner":{"type":"string","description":"- Owner wallet public key\n"}},"title":"SubmitDBCTransactionRequestBody"}}}}}
+  body={{"content":{"multipart/form-data":{"schema":{"type":"object","required":["transaction","owner"],"properties":{"transaction":{"type":"string","description":"- Base64-encoded signed transaction\n"},"owner":{"type":"string","description":"- Owner wallet public key\n"},"content":{"type":"string","description":"- Optional content description displayed on Studio token page\n"},"headerImage":{"type":"string","format":"binary","description":"- Optional header image file displayed on Studio token page\n"}},"title":"SubmitDBCTransactionRequestBody"}}}}}
 >
   
 </RequestSchema>

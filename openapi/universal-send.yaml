@@ -193,7 +193,9 @@ paths:
           description: |
             - Pagination of response
           schema:
-            type: string
+            type: integer
+            minimum: 1
+            default: 1
       responses:
         '200':
           description: Successful response
@@ -246,7 +248,9 @@ paths:
           description: |
             - Pagination of response
           schema:
-            type: string
+            type: integer
+            minimum: 1
+            default: 1
       responses:
         '200':
           description: Successful response

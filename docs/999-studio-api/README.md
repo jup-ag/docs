@@ -20,8 +20,8 @@ Studio is a powerful playground equipped with a suite of tools for creators. Eac
 
 **Features**
 
-- Swap Fees: 50% before AND after graduation.
-- LP: 50% of the graduated LP unlocks after 1 year.
+- LP Fees: 50% before AND after graduation.
+- LP Locking: Optional 50% of the graduated LP unlocks after 1 year.
 - Vested Tokens: 0 - 80% of token supply, with optional vesting schedule and cliff.
 - Flexible parameters: Quote mint, Market cap bonding, etc.
 - Other helpful tools: Anti-sniper suite, Lp Locking.

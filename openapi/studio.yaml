@@ -102,7 +102,7 @@ paths:
         '500':
           description: Internal server error
 
-  /dbc-pool/address/{mint}:
+  /dbc-pool/addresses/{mint}:
     get:
       summary: dbc-pool-addresses-by-mint
       description: |
@@ -350,27 +350,38 @@ components:
                   type: number
                   description: |
                     - Total locked vesting amount of tokens (0% to 80% of total supply)
-                  example: 100000000
                 cliffUnlockAmount:
                   type: number
                   description: |
                     - Amount of tokens unlocked at cliff
-                  example: 20000000
                 numberOfVestingPeriod:
                   type: number
+                  enum:
+                    - 0
+                    - 6
+                    - 12
+                    - 183
+                    - 365
                   description: |
-                    - Number of vesting periods in months
-                  example: 12
+                    - Number of vesting periods in days (183/365) or months (6/12)
                 totalVestingDuration:
                   type: number
+                  enum:
+                    - 0
+                    - 15552000
+                    - 15811200
+                    - 31536000
                   description: |
                     - Total vesting duration in seconds
-                  example: 31536000
                 cliffDurationFromMigrationTime:
                   type: number
+                  enum:
+                    - 0
+                    - 15552000
+                    - 15811200
+                    - 31536000
                   description: |
                     - Cliff duration from migration time in seconds
-                  example: 2592000
         antiSniping:
           type: boolean
           description: |
@@ -422,11 +433,11 @@ components:
         imagePresignedUrl:
           type: string
           format: uri
-          description: Presigned URL for image upload
+          description: Presigned URL for image upload via `PUT` request
         metadataPresignedUrl:
           type: string
           format: uri
-          description: Presigned URL for metadata upload
+          description: Presigned URL for metadata upload via `PUT` request
         imageUrl:
           type: string
           format: uri

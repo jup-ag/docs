@@ -27,7 +27,7 @@ To upgrade to Pro or understand our rate limiting, please refer to this section.
 Both of the following endpoints only returns the invites that are set up by the sender and not from the perspective of the recipient.
 
 - Pending invites: Invites created by the sender that are not yet expired and can be clawback/claimed.
-- Invite history: Invites created by the sender and is either claimed, clawback, or expired.
+- Invite history: Invites created by the sender and is either claimed, clawback, or expired. (You can also pass in a Recipient pubkey to get their history)
 :::
 
 :::tip
@@ -37,20 +37,9 @@ Depending on how you have set up to allow connection of wallets, either via [Jup
 ## Get Pending Invites
 
 ```jsx
-// import { Keypair } from '@solana/web3.js';
-// import fs from 'fs';
-
-// Using file system wallet
-// const privateKey = JSON.parse(fs.readFileSync('/Path/to/private/key.json', 'utf8').trim());
-// const pubkey = Keypair.fromSecretKey(new Uint8Array(privateKey)).publicKey.toBase58();
-
-// Using .env wallet
-// process.loadEnvFile('.env');
-// const pubkey = Keypair.fromSecretKey(new Uint8Array(JSON.parse(process.env.PRIVATE_KEY))).publicKey.toBase58();
-
 const pendingInvites = await (
   await fetch(
-    `https://lite-api.jup.ag/send/v1/pending-invites/${pubkey}`
+    `https://lite-api.jup.ag/send/v1/pending-invites?address=${pubkey}`
   )
 ).json();
 ```
@@ -58,20 +47,9 @@ const pendingInvites = await (
 ## Get Invite History
 
 ```jsx
-import { Keypair } from '@solana/web3.js';
-import fs from 'fs';
-
-// Using file system wallet
-// const privateKey = JSON.parse(fs.readFileSync('/Path/to/private/key.json', 'utf8').trim());
-// const pubkey = Keypair.fromSecretKey(new Uint8Array(privateKey)).publicKey.toBase58();
-
-// Using .env wallet
-// process.loadEnvFile('.env');
-// const pubkey = Keypair.fromSecretKey(new Uint8Array(JSON.parse(process.env.PRIVATE_KEY))).publicKey.toBase58();
-
 const inviteHistory = await (
   await fetch(
-    `https://lite-api.jup.ag/send/v1/invite-history/${pubkey}`
+    `https://lite-api.jup.ag/send/v1/invite-history?address=${pubkey}`
   )
 ).json();
 ```

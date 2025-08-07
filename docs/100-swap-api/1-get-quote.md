@@ -10,7 +10,7 @@ title: "Get Quote"
 </head>
 
 :::note
-- Lite URL: `https://lite-api.jup.ag/swap/v1quote`
+- Lite URL: `https://lite-api.jup.ag/swap/v1/quote`
 - Pro URL: `https://api.jup.ag/swap/v1/quote`
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.

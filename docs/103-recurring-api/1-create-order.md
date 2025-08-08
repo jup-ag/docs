@@ -24,7 +24,7 @@ To upgrade to Pro or understand our rate limiting, please refer to this section.
 This is a POST request to `/createOrder` endpoint, where you pass in the necessary parameters and our backend will create the transaction for you to sign and send to the network seamlessly.
 
 :::info
-The Recurring API supports both Time-based and Price-based strategies.
+The Recurring API supports both Time-based and Price-based (DEPRECATED) strategies.
 
 The `createOrder` endpoint is used to create both types of orders based on the parameters you pass in.
 :::
@@ -75,9 +75,13 @@ const createOrderResponse = await (
 ).json();
 ```
 
-### Price-based Order
+### Price-based Order (DEPRECATED)
 
 Pass in the **`price`** object in the `params` field.
+
+:::caution
+Price-based orders via API is deprecated.
+:::
 
 :::note
 Some notes to help you understand the parameters.

@@ -36,6 +36,10 @@ If you want to cancel order(s), you need to do these steps:
 The `/cancelOrder` endpoint only supports 1 cancellation per transaction.
 :::
 
+:::caution
+Price-based orders via API is deprecated.
+:::
+
 ```jsx
 const cancelOrderResponse = await (
     await fetch('https://lite-api.jup.ag/recurring/v1/cancelOrder', {

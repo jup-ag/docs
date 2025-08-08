@@ -26,7 +26,8 @@ paths:
         Request for a base64-encoded unsigned recurring order cancellation transaction to be used in `POST /recurring/v1/execute`
 
         :::note
-        - `recurringType` is used to denote the type of recurring order, can be `time` or `price`
+        - `recurringType` is used to denote the type of recurring order, only `time`
+        - **DEPRECATED**: `recurringType: price` based orders are deprecated
         - Refer to [Recurring API doc](/docs/recurring-api/cancel-order) for more information
         :::
       requestBody:
@@ -53,7 +54,8 @@ paths:
         Request for a base64-encoded unsigned recurring order creation transaction to be used in `POST /recurring/v1/execute`
         
         :::note
-        - Pass in the correct recurring type in the `params` field, can be `time` or `price`
+        - Pass in the correct recurring type in the `params` field, only `time`
+        - **DEPRECATED**: `params.price` based orders are deprecated
         - Refer to [Recurring API doc](/docs/recurring-api/create-order) for more information
         :::
       requestBody:
@@ -81,7 +83,7 @@ paths:
         
         :::note
         - Do note that the `requestId` is found in the response of `/createOrder` or `/cancelOrder`
-        - `recurringType` is used to denote the type of recurring order, can be `time` or `price`
+        - **DEPRECATED**: `recurringType: price` based orders are deprecated
         - Refer to [Recurring API doc](/docs/recurring-api/execute-order) for more information
         :::
       requestBody:
@@ -108,8 +110,8 @@ paths:
         Request for the active or historical orders associated to the provided account
 
         :::note
-        - `recurringType` is used to denote the type of recurring order, can be `time` or `price`
-        - Do note that each recurring type's data format is different, make sure you handle both accordingly
+        - `recurringType` is used to denote the type of recurring order, only `time`
+        - **DEPRECATED**: `recurringType: price` based orders are deprecated
         - Refer to [Recurring API doc](/docs/recurring-api/get-recurring-orders) for more information
         :::
       parameters:
@@ -162,7 +164,10 @@ paths:
   /priceDeposit:
     post:
       summary: priceDeposit
+      deprecated: true
       description: |
+        **DEPRECATED**: This endpoint is deprecated. Please use time-based recurring orders instead.
+        
         Request for a base64-encoded unsigned price-based recurring order deposit transaction to be used in `POST /recurring/v1/execute`
         
         :::note
@@ -188,7 +193,10 @@ paths:
   /priceWithdraw:
     post:
       summary: priceWithdraw
+      deprecated: true
       description: |
+        **DEPRECATED**: This endpoint is deprecated. Please use time-based recurring orders instead.
+        
         Request for a base64-encoded unsigned price-based recurring order withdrawal transaction to be used in `POST /recurring/v1/execute`
         
         :::note
@@ -237,6 +245,8 @@ components:
                   type: string
                   enum:
                     - price
+                  deprecated: true
+                  description: "DEPRECATED: Price-based recurring orders are deprecated"
     CloseRecurring:
       type: object
       required:
@@ -256,6 +266,9 @@ components:
       enum:
         - time
         - price
+      description: |
+        - Type of recurring order to close.
+        - **DEPRECATED**: The 'price' value is deprecated.
     CreateRecurring:
       type: object
       required:
@@ -283,6 +296,8 @@ components:
             interval: 86400
     DepositPriceRecurring:
       type: object
+      deprecated: true
+      description: "DEPRECATED: Price-based recurring orders are deprecated"
       required:
         - user
         - order
@@ -382,6 +397,8 @@ components:
             user:
               type: string
         - type: object
+          deprecated: true
+          description: "DEPRECATED: Price-based recurring orders are deprecated"
           required:
             - user
             - orderStatus
@@ -431,6 +448,8 @@ components:
               type: string
     OpenIxArgsWithoutIdx:
       type: object
+      deprecated: true
+      description: "DEPRECATED: Price-based recurring orders are deprecated"
       required:
         - interval
         - depositAmount
@@ -519,6 +538,8 @@ components:
         - history
     PriceRecurringResponse:
       type: object
+      deprecated: true
+      description: "DEPRECATED: Price-based recurring orders are deprecated"
       required:
         - userPubkey
         - orderKey
@@ -635,6 +656,9 @@ components:
         - time
         - price
         - all
+      description: |
+        Type of recurring order.
+        **DEPRECATED**: The 'price' value is deprecated.
     RecurringResponse:
       type: object
       required:
@@ -656,6 +680,8 @@ components:
             time:
               $ref: '#/components/schemas/TimeRecurringCreationParams'
         - type: object
+          deprecated: true
+          description: "DEPRECATED: Price-based recurring orders are deprecated"
           required:
             - price
           properties:
@@ -787,6 +813,8 @@ components:
           type: string
     WithdrawPriceRecurring:
       type: object
+      deprecated: true
+      description: "DEPRECATED: Price-based recurring orders are deprecated"
       required:
         - user
         - order
@@ -811,4 +839,3 @@ components:
       enum:
         - In
         - Out
-

@@ -9,8 +9,6 @@ title: "Withdraw Price Order"
     <meta name="twitter:card" content="summary" />
 </head>
 
-
-
 :::note
 - Lite URL: `https://lite-api.jup.ag/recurring/v1/priceWithdraw`
 - Pro URL: `https://api.jup.ag/recurring/v1/priceWithdraw`
@@ -20,8 +18,8 @@ To upgrade to Pro or understand our rate limiting, please refer to this section.
 - [API Rate Limit](/docs/api-rate-limit)
 :::
 
-:::info
-This will not close the order. To close the order, you need to use the [`/cancelOrder` endpoint](/docs/recurring-api/cancel-order).
+:::caution
+Price-based orders via API is deprecated.
 :::
 
 ## Withdraw Order

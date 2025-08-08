@@ -38,3 +38,15 @@ Apart from the strategic levers, start rallying your community with the dedicate
 - Launch post: https://x.com/jup_studio/status/1940620377602011566
 - General FAQ: https://support.jup.ag/hc/en-us/categories/21148110700060-Studio
 :::
+
+## FAQ
+
+**Why is my Studio token page showing "Token not found"?**
+- In order for us to track and store your token information, header image or token description, you **must** send your signed transaction from the `create_tx` endpoint to the `submit` endpoint.
+- This will allow us to store your token into our database and reflect it as a Studio token on our frontend.
+- If you submit the transaction on your own or some other way, the token will not have a dedicated Studio page.
+
+**What do I do with the presigned URLs?**
+- Those URLs are for you to upload your token's metadata and image to a static endpoint, which will be in the token's URI metadata onchain.
+- You are required to make a PUT request to those endpoints, [you can refer to this section on the usage](/docs/studio-api/create-token#token-metadata).
+- If you do not upload your token image and metadata to this endpoint, your token will not have any image/metadata reflected onchain.

@@ -433,11 +433,17 @@ components:
         imagePresignedUrl:
           type: string
           format: uri
-          description: Presigned URL for image upload via `PUT` request
+          description: |
+            - Presigned URL for image upload via `PUT` request
+            - This is for you to make a PUT request to upload your token image to the on-chain uri metadata
+            - [Refer to the Token Metadata section for better understanding](/docs/studio-api/create-token#token-metadata)
         metadataPresignedUrl:
           type: string
           format: uri
-          description: Presigned URL for metadata upload via `PUT` request
+          description: |
+            - Presigned URL for metadata upload via `PUT` request
+            - This is for you to make a PUT request to upload your token metadata to the on-chain uri metadata
+            - [Refer to the Token Metadata section for better understanding](/docs/studio-api/create-token#token-metadata)
         imageUrl:
           type: string
           format: uri
@@ -460,12 +466,18 @@ components:
         content:
           type: string
           description: |
-            - Optional content description displayed on Studio token page
+            - Optional content description displayed on Studio dedicated token page
+            - This is stored off-chain for our frontend to display
+            - This is NOT the on-chain token metadata
+            - The on-chain token metadata is done by making a PUT request to the presigned URL
         headerImage:
           type: string
           format: binary
           description: |
             - Optional header image file displayed on Studio token page
+            - This is stored off-chain for our frontend to display
+            - This is NOT the on-chain token metadata
+            - The on-chain token metadata is done by making a PUT request to the presigned URL
 
     CreateClaimFeeDBCTransactionRequestBody:
       type: object

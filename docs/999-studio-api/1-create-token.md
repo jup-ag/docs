@@ -214,7 +214,17 @@ const createTransaction = await (
 ).json();
 ```
 
-## Upload Image
+## Token Metadata
+
+The following 2 steps, are to upload your token image and metadata to the **static URL**, which will be the URI in the onchain metadata of your token.
+
+Example
+- URI/ Off-chain Metadata: `https://static-create.jup.ag/metadata/{mint}.json`
+- Image: `https://static-create.jup.ag/images/{mint}`
+
+You can refer to this to understand Token Metadata on Solana: https://developers.metaplex.com/token-metadata
+
+### Upload Image
 
 From the response of the `create-tx` endpoint, we will need the `imagePresignedUrl` to make a **`PUT` request** to the url provided, in order to upload the token image.
 
@@ -228,7 +238,7 @@ const imageResponse = await fetch(createTransaction.imagePresignedUrl, {
 });
 ```
 
-## Upload Metadata
+### Upload Metadata
 
 From the response of the `create-tx` endpoint, we will need the `metadataPresignedUrl` to make a **`PUT` request** to the url provided, in order to upload the token metadata.
 
@@ -257,6 +267,14 @@ After you have uploaded your token image and token metadata, you can proceed to 
 :::note
 - Do note that the endpoint expects the `requestBody`'s `content` to be in [`multipart/form-data` format](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest_API/Using_FormData_Objects).
 - Ensure the file types and size of the image file is manageable.
+:::
+
+:::note
+The `content` and `headerImage` refers to the Studio dedicated page's token description and header image of the page, they are not on-chain metadata. This is meant for you to customize the Studio dedicated page as you wish - to include lore, story or just a nice looking banner!
+
+The `content` and `headerImage` are stored off-chain for our frontend to ingest and display.
+
+[Do not confuse this with the uploading of token metadata, they are done separately.](#token-metadata)
 :::
 
 ```jsx

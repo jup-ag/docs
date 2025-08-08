@@ -20,8 +20,8 @@ To upgrade to Pro or understand our rate limiting, please refer to this section.
 - [API Rate Limit](/docs/api-rate-limit)
 :::
 
-:::info
-As the price-based order is opened indefinitely until the user closes them, the user can deposit more funds into the order to continue executing.
+:::caution
+Price-based orders via API is deprecated.
 :::
 
 ## Deposit Order

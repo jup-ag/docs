@@ -26,8 +26,12 @@ This is a GET request to `/getRecurringOrders` endpoint. The response is paginat
 
 :::note
 - orderStatus can be either `active` or `history`
-- recurringType can be either `time` or `price` or `all`
+- recurringType can be either `time` (`price` is deprecated)
 - includeFailedTx can be either `true` or `false`
+:::
+
+:::caution
+Price-based orders via API is deprecated.
 :::
 
 ## Active Orders

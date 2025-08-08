@@ -75,7 +75,7 @@ After making the post request to the `/execute` endpoint, you will receive a res
 
 ```json
 {
-  "signature": "M1uvubYaR8PtzcjeL9mCkVgmxamJK6wYqqVM7MTuX6djL79QpJD54U5hLqL3v97TiT7j7de3nYZLLKteCQYpe4x",
+  "signature": "...",
   "status": "Success",
   "order": "4DWzP4TdTsuwvYMaMWrRqzya4UTFKFoVjfUWNWh8zhzd",
   "error": null
@@ -86,7 +86,7 @@ After making the post request to the `/execute` endpoint, you will receive a res
 
 ```json
 {
-  "signature": "5jyc18T918oGUhkcqaXLfe1srCiQ1MLdi2oTLLwXHTRizu8BfzW8H4SJxTRNqDDpLFpGw7pr1umV6ZM8MdaUE46Y",
+  "signature": "...",
   "status": "Failed",
   "order": null,
   "error": "Insufficient funds for the operation requested.",

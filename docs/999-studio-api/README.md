@@ -50,3 +50,7 @@ Apart from the strategic levers, start rallying your community with the dedicate
 - Those URLs are for you to upload your token's metadata and image to a static endpoint, which will be in the token's URI metadata onchain.
 - You are required to make a PUT request to those endpoints, [you can refer to this section on the usage](/docs/studio-api/create-token#token-metadata).
 - If you do not upload your token image and metadata to this endpoint, your token will not have any image/metadata reflected onchain.
+
+**What is the rate limit of Studio API?**
+- Lite URL: `https://lite-api.jup.ag/studio/v1`: 100 requests per 5 minutes
+- Pro URL: `https://api.jup.ag/studio/v1`: 10 requests per 10 seconds (for all Tiers)

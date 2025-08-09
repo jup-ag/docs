@@ -1,22 +1,24 @@
 ---
-sidebar_label: "Earn (Beta)"
+sidebar_label: "Earn"
 description: "Use Jupiter Lend to borrow assets."
-title: "Earn (Beta)"
+title: "Earn"
 ---
 
 <head>
-    <title>Earn (Beta)</title>
+    <title>Earn</title>
     <meta name="twitter:card" content="summary" />
 </head>
 
 :::note
+
 - Lite URL: `https://lite-api.jup.ag/quote`
 - Pro URL: `https://api.jup.ag/swap/v1/quote`
 
 To upgrade to Pro or understand our rate limiting, please refer to this section.
+
 - [API Key Setup](/docs/api-setup)
 - [API Rate Limit](/docs/api-rate-limit)
-:::
+  :::
 
 :::tip API Reference
 To fully utilize the Lend API, check out the [Lend API Reference](/docs/api/lend-api).
@@ -37,6 +39,7 @@ To fully utilize the Lend API, check out the [Lend API Reference](/docs/api/lend
 npm install @solana/web3.js@1 # Using v1 of web3.js instead of v2
 npm install dotenv # If required for wallet setup
 ```
+
 </details>
 
 <details>
@@ -56,8 +59,9 @@ Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters).
 
 ```jsx
 import { Connection } from "@solana/web3.js";
-const connection = new Connection('https://api.mainnet-beta.solana.com');
+const connection = new Connection("https://api.mainnet-beta.solana.com");
 ```
+
 </details>
 
 <details>
@@ -72,19 +76,22 @@ const connection = new Connection('https://api.mainnet-beta.solana.com');
 **Set up Development Wallet**
 
 :::note
+
 - You can paste in your private key for testing purposes but this is not recommended for production applications.
 - If you want to store your private key in the project directly, you can do it via a `.env` file.
-:::
+  :::
 
 To set up a development wallet via `.env` file, you can use the following script.
 
 ```jsx
 // index.js
-import { Keypair } from '@solana/web3.js';
-import dotenv from 'dotenv';
-require('dotenv').config();
+import { Keypair } from "@solana/web3.js";
+import dotenv from "dotenv";
+require("dotenv").config();
 
-const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ''));
+const wallet = Keypair.fromSecretKey(
+  bs58.decode(process.env.PRIVATE_KEY || "")
+);
 ```
 
 ```bash
@@ -95,12 +102,15 @@ PRIVATE_KEY=""
 To set up a development wallet via a wallet generated via [Solana CLI](https://solana.com/docs/intro/installation#solana-cli-basics), you can use the following script.
 
 ```jsx
-import { Keypair } from '@solana/web3.js';
-import fs from 'fs';
+import { Keypair } from "@solana/web3.js";
+import fs from "fs";
 
-const privateKeyArray = JSON.parse(fs.readFileSync('/Path/To/.config/solana/id.json', 'utf8').trim());
+const privateKeyArray = JSON.parse(
+  fs.readFileSync("/Path/To/.config/solana/id.json", "utf8").trim()
+);
 const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
 ```
+
 </details>
 
 <details>
@@ -117,7 +127,9 @@ transaction.sign([wallet]);
 const transactionBinary = transaction.serialize();
 console.log(transactionBinary);
 console.log(transactionBinary.length);
-const blockhashInfo = await connection.getLatestBlockhashAndContext({ commitment: "finalized" });
+const blockhashInfo = await connection.getLatestBlockhashAndContext({
+  commitment: "finalized",
+});
 
 const signature = await connection.sendRawTransaction(transactionBinary, {
   maxRetries: 0,
@@ -125,25 +137,35 @@ const signature = await connection.sendRawTransaction(transactionBinary, {
 });
 
 console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
-  
+
 try {
-  const confirmation = await connection.confirmTransaction({
-    signature,
-    blockhash: blockhashInfo.value.blockhash,
-    lastValidBlockHeight: blockhashInfo.value.lastValidBlockHeight,
-  }, "confirmed");
+  const confirmation = await connection.confirmTransaction(
+    {
+      signature,
+      blockhash: blockhashInfo.value.blockhash,
+      lastValidBlockHeight: blockhashInfo.value.lastValidBlockHeight,
+    },
+    "confirmed"
+  );
 
   if (confirmation.value.err) {
-    console.error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
-    console.log(`Examine the failed transaction: https://solscan.io/tx/${signature}`);
+    console.error(
+      `Transaction failed: ${JSON.stringify(confirmation.value.err)}`
+    );
+    console.log(
+      `Examine the failed transaction: https://solscan.io/tx/${signature}`
+    );
   } else {
     console.log(`Transaction successful: https://solscan.io/tx/${signature}`);
   }
 } catch (error) {
   console.error(`Error confirming transaction: ${error}`);
-  console.log(`Examine the transaction status: https://solscan.io/tx/${signature}`);
-};
+  console.log(
+    `Examine the transaction status: https://solscan.io/tx/${signature}`
+  );
+}
 ```
+
 </details>
 
 ## Deposit and Withdraw
@@ -151,45 +173,45 @@ try {
 Using the Deposit or Withdraw endpoint, the user can do so based on the `amount` of assets to be deposited/withdrawn.
 
 :::note Usage steps
+
 1. User chooses the token.
 2. User chooses the amount of assets to deposit or withdraw in the specific token mint.
 3. Post request to get the transaction.
 4. User sign and send the transaction to the network.
-4. The mint authority mints/burns the vault tokens to/from the user.
-:::
+5. The mint authority mints/burns the vault tokens to/from the user.
+   :::
 
 ```jsx
-const depositTransactionResponse = await (
-    await (
-        await fetch('https://lite-api.jup.ag/lend/v1/earn/deposit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                asset: mint,
-                amount: '100000',
-                signer: wallet.publicKey,
-            })
-        })
-    )
+const depositTransactionResponse = await await await fetch(
+  "https://lite-api.jup.ag/lend/v1/earn/deposit",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      asset: mint,
+      amount: "100000",
+      signer: wallet.publicKey,
+    }),
+  }
 );
 ```
+
 ```jsx
-const withdrawTransactionResponse = await (
-    await (
-        await fetch('https://lite-api.jup.ag/lend/v1/earn/withdraw', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                asset: mint,
-                amount: '100000',
-                signer: wallet.publicKey,
-            })
-        })
-    )
+const withdrawTransactionResponse = await await await fetch(
+  "https://lite-api.jup.ag/lend/v1/earn/withdraw",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      asset: mint,
+      amount: "100000",
+      signer: wallet.publicKey,
+    }),
+  }
 );
 ```
 
@@ -198,45 +220,45 @@ const withdrawTransactionResponse = await (
 Using the Mint or Redeem endpoint, the user can do so based on the number `shares` to be minted/redeemed.
 
 :::note Usage steps
+
 1. User chooses the token.
 2. User chooses the number of shares to deposit or withdraw in the specific token mint.
 3. Post request to get the transaction.
 4. User sign and send the transaction to the network.
-4. The mint authority mints/burns the vault tokens to/from the user.
-:::
+5. The mint authority mints/burns the vault tokens to/from the user.
+   :::
 
 ```jsx
-const mintTransactionResponse = await (
-    await (
-        await fetch('https://lite-api.jup.ag/lend/v1/earn/mint', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                asset: mint,
-                signer: wallet.publicKey,
-                shares: '100000',
-            })
-        })
-    )
+const mintTransactionResponse = await await await fetch(
+  "https://lite-api.jup.ag/lend/v1/earn/mint",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      asset: mint,
+      signer: wallet.publicKey,
+      shares: "100000",
+    }),
+  }
 );
 ```
+
 ```jsx
-const redeemTransactionResponse = await (
-    await (
-        await fetch('https://lite-api.jup.ag/lend/v1/earn/redeem', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                asset: mint,
-                signer: wallet.publicKey,
-                shares: '100000',
-            })
-        })
-    )
+const redeemTransactionResponse = await await await fetch(
+  "https://lite-api.jup.ag/lend/v1/earn/redeem",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      asset: mint,
+      signer: wallet.publicKey,
+      shares: "100000",
+    }),
+  }
 );
 ```
 
@@ -265,50 +287,59 @@ In some use cases, you'd prefer to utilize the instructions instead of the seria
 Example code snippet of using `/deposit-instructions` endpoint and building a transaction with the instructions.
 
 ```jsx
-import { Connection, Keypair, PublicKey, TransactionMessage, TransactionInstruction, VersionedTransaction } from '@solana/web3.js';
-import fs from 'fs';
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  TransactionMessage,
+  TransactionInstruction,
+  VersionedTransaction,
+} from "@solana/web3.js";
+import fs from "fs";
 
-const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/private/key', 'utf8').trim());
+const privateKeyArray = JSON.parse(
+  fs.readFileSync("/Path/to/private/key", "utf8").trim()
+);
 const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
-const connection = new Connection('insert-your-own-rpc');
+const connection = new Connection("insert-your-own-rpc");
 
 const depositIx = await (
-    await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/deposit-instructions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                asset: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-                amount: '1000000',
-                signer: wallet.publicKey,
-            }, null, 2)
-        }
-    )
+  await fetch("https://lite-api.jup.ag/lend/v1/earn/deposit-instructions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(
+      {
+        asset: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        amount: "1000000",
+        signer: wallet.publicKey,
+      },
+      null,
+      2
+    ),
+  })
 ).json();
 
 console.log(JSON.stringify(depositIx, null, 2));
 
 const deserializeInstruction = (instruction) => {
-    return new TransactionInstruction({
+  return new TransactionInstruction({
     programId: new PublicKey(instruction.programId),
     keys: instruction.accounts.map((key) => ({
-        pubkey: new PublicKey(key.pubkey),
-        isSigner: key.isSigner,
-        isWritable: key.isWritable,
+      pubkey: new PublicKey(key.pubkey),
+      isSigner: key.isSigner,
+      isWritable: key.isWritable,
     })),
-    data: Buffer.from(instruction.data, 'base64'),
-    });
+    data: Buffer.from(instruction.data, "base64"),
+  });
 };
 
 const blockhash = (await connection.getLatestBlockhash()).blockhash;
 const messageV0 = new TransactionMessage({
-    payerKey: wallet.publicKey,
-    recentBlockhash: blockhash,
-    instructions: [
-        ...depositIx.instructions.map(deserializeInstruction)
-    ],
+  payerKey: wallet.publicKey,
+  recentBlockhash: blockhash,
+  instructions: [...depositIx.instructions.map(deserializeInstruction)],
 }).compileToV0Message();
 
 const transaction = new VersionedTransaction(messageV0);
@@ -316,7 +347,9 @@ transaction.sign([wallet]);
 const transactionBinary = transaction.serialize();
 console.log(transactionBinary);
 console.log(transactionBinary.length);
-const blockhashInfo = await connection.getLatestBlockhashAndContext({ commitment: "finalized" });
+const blockhashInfo = await connection.getLatestBlockhashAndContext({
+  commitment: "finalized",
+});
 
 const signature = await connection.sendRawTransaction(transactionBinary, {
   maxRetries: 0,
@@ -324,25 +357,35 @@ const signature = await connection.sendRawTransaction(transactionBinary, {
 });
 
 console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
-  
+
 try {
-  const confirmation = await connection.confirmTransaction({
-    signature,
-    blockhash: blockhashInfo.value.blockhash,
-    lastValidBlockHeight: blockhashInfo.value.lastValidBlockHeight,
-  }, "confirmed");
+  const confirmation = await connection.confirmTransaction(
+    {
+      signature,
+      blockhash: blockhashInfo.value.blockhash,
+      lastValidBlockHeight: blockhashInfo.value.lastValidBlockHeight,
+    },
+    "confirmed"
+  );
 
   if (confirmation.value.err) {
-    console.error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
-    console.log(`Examine the failed transaction: https://solscan.io/tx/${signature}`);
+    console.error(
+      `Transaction failed: ${JSON.stringify(confirmation.value.err)}`
+    );
+    console.log(
+      `Examine the failed transaction: https://solscan.io/tx/${signature}`
+    );
   } else {
     console.log(`Transaction successful: https://solscan.io/tx/${signature}`);
   }
 } catch (error) {
   console.error(`Error confirming transaction: ${error}`);
-  console.log(`Examine the transaction status: https://solscan.io/tx/${signature}`);
-};
+  console.log(
+    `Examine the transaction status: https://solscan.io/tx/${signature}`
+  );
+}
 ```
+
 </details>
 
 ### CPI
@@ -358,9 +401,7 @@ Jupiter Lend provides Earnings for individual tokens, meaning SOL and USDC will 
 
 ```jsx
 const vaults = await (
-    await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/tokens'
-    )
+  await fetch("https://lite-api.jup.ag/lend/v1/earn/tokens")
 ).json();
 ```
 
@@ -374,9 +415,9 @@ Given a user, you are able to get their existing position data such as shares, u
 
 ```jsx
 const userPositions = await (
-    await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/positions?users={user1},{user2}'
-    )
+  await fetch(
+    "https://lite-api.jup.ag/lend/v1/earn/positions?users={user1},{user2}"
+  )
 ).json();
 ```
 
@@ -386,8 +427,8 @@ Given a user, you are able to get the rewards of a specific position, for exampl
 
 ```jsx
 const userRwards = await (
-    await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/earnings?user={user1}&positions={position1},{position2}'
-    )
+  await fetch(
+    "https://lite-api.jup.ag/lend/v1/earn/earnings?user={user1}&positions={position1},{position2}"
+  )
 ).json();
 ```

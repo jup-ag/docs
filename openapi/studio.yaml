@@ -298,6 +298,7 @@ components:
       required:
         - buildCurveByMarketCapParam
         - antiSniping
+        - fee
         - tokenName
         - tokenSymbol
         - tokenImageContentType
@@ -388,6 +389,36 @@ components:
             - Enable anti-sniping protection
             - Apply an additional swap fee immediately after launch to discourage bots
             - Starts at 99% and decreases 1% linearly over a randomized period
+        fee:
+          type: object
+          description: |
+            - Fee configuration parameters
+            - If not provided, the default fee will be 100 basis points (1%)
+          properties:
+            totalDuration:
+              type: number
+              enum:
+                - 60
+                - 120
+                - 180
+                - 240
+                - 300
+              description: Total duration for fee schedule
+            baseFeeMode:
+              type: string
+              enum:
+                - linear
+                - exponential
+              description: Base fee mode for fee scheduler
+            feeBps:
+              type: number
+              enum:
+                - 100
+                - 200
+              description: Ending fee in basis points (100 or 200)
+              default: 100
+          required:
+            - feeBps
         isLpLocked:
           type: boolean
           description: |
@@ -454,6 +485,7 @@ components:
       required:
         - transaction
         - owner
+        - feeBps
       properties:
         transaction:
           type: string
@@ -478,6 +510,13 @@ components:
             - This is stored off-chain for our frontend to display
             - This is NOT the on-chain token metadata
             - The on-chain token metadata is done by making a PUT request to the presigned URL
+        feeBps:
+          type: number
+          enum:
+            - 100
+            - 200
+          description: Ending fee in basis points (100 or 200)
+          default: 100
 
     CreateClaimFeeDBCTransactionRequestBody:
       type: object

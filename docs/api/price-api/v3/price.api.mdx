@@ -5,7 +5,7 @@ description: "Returns prices of specified tokens."
 sidebar_label: "price"
 hide_title: true
 hide_table_of_contents: true
-api: eJyNVNtOGzEQ/RXLT0XKjQBStW+Um1AvSglqpRIenPUkO8mu7XhsIA38e8deIRGSSuxD4s2cmXNmfCYbqYFKjy6gNbKQNxCiNyScxxJI2JkgByXOELQIdgmGehMzMUVRGBtgYrriBmbgOSbuRilHnI6uhbbl/ac+f1I/F+oqhwdiZr1orAeBho+NSpS9XGtiZEc65VUDATzJ4m4jDb+wINTEMUzaVhH8ml+2FZ/ZplGCIKUHSEKcImIO0cQ6oKuBUzysInrQsgg+QkdSWUGjZLGRYe0SDQWPZi5fOhKeVJOSCjm2hx98hp2L0eLyt9Ynp3G2Go9X8H24+nH49Hc9Ve7s89Xx48XV1fLP4/r2PBw+yJf7pIicNQSURAwHg/S13dg4lnwFNIu1eAVzJ6U1AUxIcOVcjWUeY39BKWez25idLqAMnKi0xgRV9chbBz5gy71NepvuWDCWKVmcUCSWsE5X8L6e26oyrW25vNZviJF1zsGnkWp2UKNq2h+NpLNz3kRNbKZtMNvnrFJmDsPjag+kfTryeN8Ivygt0tUDhVTsZB/mmpV4ngpbyD+wk8F7m+p2JJuxstySnENuWAUWIPnUIlubRl/zj1UIjop+v8aQzd5bRNdT89b9/YejHddeemCvIvOlfQGjneWRiEcMlcg+rrHBQKz6PcVHqo8U6v9Vr3BeceANSdqZKYhIvOMZokzO+wrrbNW0rnnyGPJe/IxYLikon6aSBtGSHvUGvcGOlGfxDc1SPE/Ms+h2u+3h7tfRzv8D93HwGh2KT+fgPLC5QR/sgQ4zlG/pH1qim/k=
+api: eJyNVNtuGjEQ/RXLT4nELUCkat/S3IR6EQ1RKxXyYNYDO7BrG19IKOHfO/YqKgQqZR927Z0zc47n4i2X4HKLxqNWPOMP4INVjhmLOTimZ8wZyHGGIJnXS1CuNVETlWWZ0h4mqskeYAaWbGw8jD7sajhgUudPZ216u3YK1BQGz9lMW1ZpCwwVLSsRKVsp1kTxBjfCigo8WMez8ZYr2pAglI5sGLWtAtgNbQ4VX+uqEsxBdPcQhRjhHHGwKpQeTQnkYmEV0ILkmbcBGtzlBVSCZ1vuNybSOG9RzfmuweFFVNEp4yN98cGn27gdLu5+SXl5FWar0WgF37qr7xcvfzZTYa4/3fefb+/vl7+fN483/mLNd09RkTNaOXBRRLfTiZ/Dg41CTiVws1CyNzCdJNfKg/IRLowpMU9pbC9c9NkeH0xPF5B7chRSYoSKcmi1Aeux5j4kfYw1ZoQlShLHhGNL2MQSvI9nDqJMS50vB3KPGEnnHCwhVShLMY0pjcnfxQLmWInSnUCTNTiZOmnPqkI1rY2pna4LoebQ7RfHkCO23X7xx/+o93iedvFp8P6pKnwWksUA4HzkvzyFGZB4S4mlLrRrGgawVpNaglM/F5qI+RxSzoQnzZxWNbLu9GBL+ll4b1zWbpfo07y0FsG0xLweoPa6d9T4dxao3ZH44siBkkZTFtkz+oKlUSixQu9I9XuKj0QfCpT/i17gvCDDHkkcuymw4OiaSBChkt8X2KRujxOfioU+jdaPgPnSeWFjVmIiatJeq9PqHEl5ZV9RLdnrRL2yZrNZL8Y/e0dXDJ3j/M3aZWc3YCzQfIA8PwHtJihV6S/9NLNj
 sidebar_class_name: "get api-method"
 info_path: docs/api/price-api/v3/quickstart
 custom_edit_url: null
@@ -67,7 +67,7 @@ Returns prices of specified tokens.
 <StatusCodes
   id={undefined}
   label={undefined}
-  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","additionalProperties":{"description":"Token addresses as keys","type":"object","properties":{"blockId":{"type":"integer"},"decimals":{"type":"integer"},"usdPrice":{"type":"number"},"priceChange24h":{"type":"number"}}}}}}},"400":{"description":"Bad request"},"500":{"description":"Internal server error"}}}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","additionalProperties":{"description":"Token addresses as keys","type":"object","properties":{"blockId":{"type":"integer","nullable":true},"decimals":{"type":"integer"},"usdPrice":{"type":"number"},"priceChange24h":{"type":"number","nullable":true}},"required":["decimals","usdPrice"]}}}}},"400":{"description":"Bad request"},"500":{"description":"Internal server error"}}}
 >
   
 </StatusCodes>

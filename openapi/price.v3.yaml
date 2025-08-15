@@ -45,12 +45,17 @@ paths:
                   properties:
                     blockId:
                       type: integer
+                      nullable: true
                     decimals:
                       type: integer
                     usdPrice:
                       type: number
                     priceChange24h:
                       type: number
+                      nullable: true
+                  required:
+                    - decimals
+                    - usdPrice
         '400':
           description: Bad request
         '500':

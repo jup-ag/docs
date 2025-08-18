@@ -1,0 +1,85 @@
+---
+title: "Common Errors"
+description: "In this section, you can find the list of errors that can be returned by the Jupiter Swap API, Swap Program or from other programs like DEXes, System or Token programs."
+---
+
+## Program Errors
+
+### Jupiter Swap Program Errors
+
+<Info>
+  **JUPITER SWAP PROGRAM IDL**
+
+  You can find the full Swap Program IDL here: <a style={{wordBreak: "break-all"}} href="https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#anchorProgramIdl">https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#anchorProgramIdl</a>
+</Info>
+
+<Note>
+  **ABNORMAL ERROR RATES**
+
+  If you face high or consistent amounts of errors, please reach out to [Jupiter Discord](https://discord.gg/jup).
+</Note>
+
+| Error Code | Error Name                | Debug                                                                                                                     |
+| :--------- | :------------------------ | :------------------------------------------------------------------------------------------------------------------------- |
+| 6001       | SlippageToleranceExceeded | Try higher fixed slippage or try [`dynamicSlippage`](/swap-api/send-swap-transaction#how-jupiter-estimates-slippage) |
+| 6008       | NotEnoughAccountKeys      | Likely modified swap transaction causing missing account keys                                                             |
+| 6014       | IncorrectTokenProgramID   | Likely attempted to take platform fees on a Token2022 token (This is also 0x177e)                                         |
+| 6017       | ExactOutAmountNotMatched  | Similar to slippage                                                                                                       |
+
+### Solana Program Errors
+
+| Program                          | Link                                                                                                                                                                                   |
+| :-------------------------------- | :---------------------------------------------------------------------------------------------------------------------- |
+| Token Program                    | [https://github.com/solana-program/token/blob/main/program/src/error.rs](https://github.com/solana-program/token/blob/main/program/src/error.rs)                                       |
+| Token2022 Program                | [https://github.com/solana-program/token-2022/blob/main/program/src/error.rs](https://github.com/solana-program/token-2022/blob/main/program/src/error.rs)                             |
+| Associated Token Account Program | [https://github.com/solana-program/associated-token-account/blob/main/program/src/error.rs](https://github.com/solana-program/associated-token-account/blob/main/program/src/error.rs) |
+| Other Solana Programs            | [https://github.com/solana-program](https://github.com/solana-program)                                                                                                                 |
+
+### DEX Program Errors
+
+In the swap transaction, the DEX in routing may return errors. You can find some of their IDLs and/or error codes in an explorer. If they do not support public IDLs or open source code, you can reference the common errors below or if you need additional help, please reach out to [Jupiter Discord](https://discord.gg/jup).
+
+| Error                                                   | Description                                                                                           |
+| :------------------------------------------------------- | :----------------------------------------------------------------------------------------------------- |
+| Error related to tick array or bitmap extension account | Similar to slippage, the price or market has "moved out of range", hence the swap transaction failed. |
+
+## Routing Errors
+
+The common routing errors you may encounter are usually related to attempting to swap a token that is not tradable on Jupiter, for reasons such as lack of liquidity or the token is not supported.
+
+
+| Error | Description | Debug |
+| :--- | :--- | :--- |
+| NO\_ROUTES\_FOUND | No routes were found for the requested swap | * Check jup.ag if it's routable <br/> * [Check the liquidity of the token's markets](https://support.jup.ag/hc/en-us/articles/18453861473436-Why-is-this-token-not-tradable-on-Jupiter) |
+| COULD\_NOT\_FIND\_ANY\_ROUTE | Unable to find any valid route for the swap | * Check jup.ag if it's routable <br/> * [Check the liquidity of the token's markets](https://support.jup.ag/hc/en-us/articles/18453861473436-Why-is-this-token-not-tradable-on-Jupiter) |
+| ROUTE\_PLAN\_DOES\_NOT\_   CONSUME\_ALL\_THE\_AMOUNT | The calculated route cannot process the entire input amount, you can get more output amount by reducing your input amount | * Try reducing your input amount |
+| MARKET\_NOT\_FOUND | The specified market address was not found | * Verify the market address exists and is active |
+| TOKEN\_NOT\_TRADABLE | The specified token mint is not available for trading | * Check jup.ag if it's routable <br/> * [Check the liquidity of the token's markets](https://support.jup.ag/hc/en-us/articles/18453861473436-Why-is-this-token-not-tradable-on-Jupiter) |
+| NOT\_SUPPORTED | Generic error for unsupported operations | * Check the specific error message for details |
+| CIRCULAR\_ARBITRAGE\_   IS\_DISABLED | Attempted to swap a token for itself | * Input and output tokens must be different |
+| CANNOT\_COMPUTE\_   OTHER\_AMOUNT\_THRESHOLD | Failed to calculate the minimum output amount based on slippage | * Verify the input amount and slippage parameters are valid |
+
+## Swap Transaction Composing Errors
+
+| Error                                                   | Description                                                   | Debug                                                           |
+| :------------------------------------------------------- | :------------------------------------------------------------- | :--------------------------------------------------------------- |
+| MAX\_ACCOUNT\_GREATER\_THAN\_MAX                        | The specified number of accounts exceeds the maximum allowed  | * Reduce the number of accounts in the transaction              |
+| INVALID\_COMPUTE\_UNIT\_PRICE\_AND\_PRIORITIZATION\_FEE | Both compute unit price and prioritization fee were specified | - Use either compute unit price or prioritization fee, not both |
+| FAILED\_TO\_GET\_SWAP\_AND\_ACCOUNT\_METAS              | Failed to generate the swap transaction                       | * Check the error message for specific details                  |
+
+## Best Practices
+
+It is important to understand the error codes when your products are user facing. This will help you provide a better experience for your users, helping them make an informed decision or follow up step to help their transaction succeed.
+
+<Tip>
+  **JUP.AG AS A REFERENCE**
+
+  You can use [https://jup.ag/](https://jup.ag/) as a reference to understand how we handle errors on the UI.
+</Tip>
+
+| Error Type                   | Best Practice                                                                                         |
+| :---------------------------- | :----------------------------------------------------------------------------------------------------- |
+| Slippage exceeding threshold | Show the user the current slippage tolerance and the incurred slippage                                |
+| Insufficient funds           | Show the user the current balance of the account and the required balance                             |
+| Non Jupiter Program Errors   | Allow the user to retry with a different route and/or exclude the specific DEX from the quote request |
+| Token not tradable           | Show the user the token is not tradable and provide context on why it's not tradable                  |

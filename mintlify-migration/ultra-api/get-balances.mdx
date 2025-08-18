@@ -1,0 +1,64 @@
+---
+title: "Get Balances"
+---
+
+<Info>
+  **NOTE**
+
+  - Lite URL: `https://lite-api.jup.ag/ultra/v1/balances`
+
+  - Dynamic URL: `https://api.jup.ag/ultra/v1/balances`
+
+  Dynamic Rate Limits are now applied to Ultra API.
+
+  * No Pro plans or payment needed.
+  * Simply generate the universal API Key via [Portal](https://portal.jup.ag)
+  * Rate limits scale together with your swap volume.
+
+<CardGroup cols={1}>
+  <Card title="Read more about Ultra API Dynamic Rate Limit" href="/api-rate-limit" icon="book-open" horizontal/>
+</CardGroup>
+</Info>
+
+<Tip>
+  **API REFERENCE**
+
+  To fully utilize the Ultra API, check out the [Ultra API Reference](/api-reference/ultra-api/balances).
+</Tip>
+
+## Get Balances
+
+The Ultra API supports a simple endpoint to get the token balances of an account, you just need to pass in the required parameter of the user's wallet address.
+
+```js
+const balancesResponse = await (
+  await fetch(`https://lite-api.jup.ag/ultra/v1/balances/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`)
+).json();
+
+console.log(JSON.stringify(balancesResponse, null, 2));
+```
+
+## Balances Response
+
+The balances response will return a list of token balances for the user's wallet address.
+
+**Successful example response:**
+
+```json
+{
+  "SOL": {
+    "amount": "0",
+    "uiAmount": 0,
+    "slot": 324307186,
+    "isFrozen": false
+  }
+}
+```
+
+**Failed example response:**
+
+```json
+{
+  "error": "Invalid address"
+}
+```

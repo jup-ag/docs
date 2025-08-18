@@ -1,0 +1,76 @@
+openapi: 3.0.0
+info:
+  title: Recurring Order API
+  version: 1.0.0
+  description: |
+    | Link |
+    | --- |
+    | [Create Order](/recurring-api/create-order) |
+    | [Execute Order](/recurring-api/execute-order) |
+    | [Cancel Order](/recurring-api/cancel-order) |
+    | [Price Deposit](/recurring-api/deposit-price-order) |
+    | [Price Withdraw](/recurring-api/withdraw-price-order) |
+    | [Get Recurring Orders](/recurring-api/get-recurring-orders) |
+
+servers:
+  - url: https://lite-api.jup.ag/recurring/v1
+    description: Free tier API endpoint with rate limits
+  - url: https://api.jup.ag/recurring/v1
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+
+paths:
+  /execute:
+    post:
+      summary: execute
+      operationId: execute
+      description: |
+        Execute the signed transaction and get the execution status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteRecurring'
+        required: true
+      responses:
+        '200':
+          description: Transaction executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecuteRecurringResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+components:
+  schemas:
+    ExecuteRecurring:
+      type: object
+      required:
+        - requestId
+        - signedTransaction
+      properties:
+        requestId:
+          type: string
+        signedTransaction:
+          type: string
+    ExecuteRecurringResponse:
+      type: object
+      required:
+        - signature
+        - status
+      properties:
+        error:
+          type: string
+          nullable: true
+        order:
+          type: string
+          nullable: true
+          description: "Base-58 account which is the Recurring Order account"
+        signature:
+          type: string
+        status:
+          type: string
+          enum:
+            - Success
+            - Failed

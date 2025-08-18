@@ -111,15 +111,11 @@ const sidebars = {
           type: 'doc',
           id: 'misc/integrator-guidelines',
         },
+        {
+          type: 'doc',
+          id: 'misc/audits',
+        },
       ],
-    },
-    {
-      type: 'html',
-      value: '<div class="sidebar-line-break"></div>',
-    },
-    {
-      type: 'doc',
-      id: 'misc/audits',
     },
   ],
   ultra: [

@@ -111,14 +111,14 @@ The integrated mode embeds the swap form directly into your application's layout
 
 ```typescript
 {
-  displayMode: "integrated",
-  integratedTargetId: string, // Required: ID of the container element
+  displayMode: "integrated";
+  integratedTargetId: string; // Required: ID of the container element
   containerStyles?: {
-    width?: string,
-    height?: string,
-    borderRadius?: string,
-    overflow?: string
-  },
+    width?: string;
+    height?: string;
+    borderRadius?: string;
+    overflow?: string;
+  };
   containerClassName?: string
 }
 ```
@@ -129,11 +129,11 @@ The widget mode creates a floating swap form that can be positioned in different
 
 ```typescript
 {
-  displayMode: "widget",
+  displayMode: "widget";
   widgetStyle?: {
-    position?: "top-left" | "top-right" | "bottom-left" | "bottom-right",
-    size?: "sm" | "default"
-  },
+    position?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+    size?: "sm" | "default";
+  };
 }
 ```
 
@@ -143,7 +143,7 @@ The modal mode displays the swap form in a popup overlay. This is useful when yo
 
 ```typescript
 {
-  displayMode: "modal",
+  displayMode: "modal";
 }
 ```
 
@@ -153,19 +153,19 @@ The `formProps` object allows you to customize the initial state and behavior of
 
 ```typescript
 {
-  displayMode: "modal",
+  displayMode: "modal";
   formProps?: {
-    swapMode?: SwapMode, // Set the swap mode to "ExactIn", "ExactOut", or default to "ExactInOrOut"
+    swapMode?: SwapMode; // Set the swap mode to "ExactIn", "ExactOut", or default to "ExactInOrOut"
 
-    initialAmount?: string, // Pre-fill the swap amount (e.g. "100")
-    initialInputMint?: string, // Pre-select the input token by its mint address
-    initialOutputMint?: string, // Pre-select the output token by its mint address
+    initialAmount?: string; // Pre-fill the swap amount (e.g. "100")
+    initialInputMint?: string; // Pre-select the input token by its mint address
+    initialOutputMint?: string; // Pre-select the output token by its mint address
 
-    fixedAmount?: boolean, // When true, users cannot change the swap amount
-    fixedMint?: string, // Lock one side of the swap to a specific token by its mint address
+    fixedAmount?: boolean; // When true, users cannot change the swap amount
+    fixedMint?: string; // Lock one side of the swap to a specific token by its mint address
 
-    referralAccount?: string, // Set the referral account for the swap
-    referralFee?: number, // Set the referral fee for the swap
+    referralAccount?: string; // Set the referral account for the swap
+    referralFee?: number; // Set the referral fee for the swap
   }
 }
 ```
@@ -178,7 +178,11 @@ Jupiter Plugin supports third-party wallet integration through the `enableWallet
 {
   // When true, wallet connection are handled by your dApp,
   // and use `syncProps()` to syncronise wallet state with Plugin.
-  enableWalletPassthrough?: boolean,
+  enableWalletPassthrough?: boolean;
+
+  // Optional, if wallet state is ready, 
+  // you can pass it in here, or just use `syncProps()`
+  passthroughWalletContextState?: WalletContextState;
   
   // When enableWalletPassthrough is true, this allows Plugin 
   // to callback your app's wallet connection flow
@@ -195,7 +199,7 @@ Jupiter Plugin provides event handlers to track swap operations:
   onSuccess: ({ txid, swapResult, quoteResponseMeta }) => {
     // Handle successful swap
     console.log("Swap successful:", txid);
-  },
+  };
   onSwapError: ({ error, quoteResponseMeta }) => {
     // Handle swap errors
     console.error("Swap failed:", error);
@@ -238,13 +242,13 @@ Jupiter Plugin supports a simplified way to customize the color theme. This allo
 
 ```typescript
 window.Jupiter.init({
-  displayMode: "integrated",
-  integratedTargetId: "jupiter-plugin",
+  displayMode: "integrated";
+  integratedTargetId: "jupiter-plugin";
   formProps: {
-    initialInputMint: "So11111111111111111111111111111111111111112", // SOL
-    initialOutputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
-    fixedMint: "So11111111111111111111111111111111111111112",
-  },
+    initialInputMint: "So11111111111111111111111111111111111111112"; // SOL
+    initialOutputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC
+    fixedMint: "So11111111111111111111111111111111111111112";
+  };
 });
 ```
 
@@ -252,14 +256,14 @@ window.Jupiter.init({
 
 ```typescript
 window.Jupiter.init({
-  displayMode: "modal",
+  displayMode: "modal";
   formProps: {
-    swapMode: "ExactOut",
-    initialAmount: "10",
-    fixedAmount: true,
-    initialOutputMint: "YOUR_TOKEN_MINT",
-    fixedMint: "YOUR_TOKEN_MINT",
-  },
+    swapMode: "ExactOut";
+    initialAmount: "10";
+    fixedAmount: true;
+    initialOutputMint: "YOUR_TOKEN_MINT";
+    fixedMint: "YOUR_TOKEN_MINT";
+  };
 });
 ```
 
@@ -267,10 +271,10 @@ window.Jupiter.init({
 
 ```typescript
 window.Jupiter.init({
-  displayMode: "widget",
+  displayMode: "widget";
   widgetStyle: {
-    position: "bottom-right",
-    size: "sm",
-  },
+    position: "bottom-right";
+    size: "sm";
+  };
 });
 ```

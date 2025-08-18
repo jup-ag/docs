@@ -11,18 +11,6 @@ title: "About Lend API"
 
 The Jupiter Lend API is built on top of Jupiter Lend Program.
 
-## Program ID
-
-- LIQUIDITY_PROGRAM: `jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC`
-
-- LENDING_PROGRAM: `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9`
-
-- LRRM_PROGRAM: `jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar`
-
-- ORACLE_PROGRAM: `jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc`
-
-- VAULTS_PROGRAM: `jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi`
-
 ## About Earn
 
 - **What is the Jupiter `Earn` Protocol?**
@@ -67,3 +55,13 @@ The Jupiter Lend API is built on top of Jupiter Lend Program.
     
     **Yes your position is still at risk of being liquidated!** Once your position passes the threshold it can be liquidated, but it may not happen immediately.
     If your position is still at risk you can take the time now to unwind/reduce your risk ratio to make your position safe and prevent a liquidation event.
+
+## Program ID
+
+- LIQUIDITY_PROGRAM: `jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC`
+- LENDING_PROGRAM: `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9`
+- LRRM_PROGRAM: `jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar`
+- ORACLE_PROGRAM: `jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc`
+- VAULTS_PROGRAM: `jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi`
+- [IDL](https://github.com/jup-ag/jupiter-lend/tree/main/target/idl)
+- [Audits](/docs/misc/audits)

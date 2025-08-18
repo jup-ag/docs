@@ -111,6 +111,10 @@ const sidebars = {
           type: 'doc',
           id: 'misc/integrator-guidelines',
         },
+        {
+          type: 'doc',
+          id: 'misc/audits',
+        },
       ],
     },
   ],

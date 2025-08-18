@@ -113,6 +113,14 @@ const sidebars = {
         },
       ],
     },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'doc',
+      id: 'misc/audits',
+    },
   ],
   ultra: [
     {

@@ -63,8 +63,5 @@ The Jupiter Lend API is built on top of Jupiter Lend Program.
 - LRRM_PROGRAM: `jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar`
 - ORACLE_PROGRAM: `jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc`
 - VAULTS_PROGRAM: `jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi`
-- IDL: https://github.com/jup-ag/jupiter-lend/tree/main/target/idl
-- Audits:
-    - [Offside Labs Liquidity Report](/audits/lend-liquidity-offside.pdf)
-    - [Offside Labs Vault Report](/audits/lend-vault-offside.pdf)
-    - [Zenith Report](/audits/lend-zenith.pdf)
+- [IDL](https://github.com/jup-ag/jupiter-lend/tree/main/target/idl)
+- [Audits](/docs/misc/audits)

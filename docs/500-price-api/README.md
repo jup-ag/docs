@@ -42,3 +42,11 @@ While and also after deriving the last swap price, we also utilize a number of h
 - Holder distribution statistics
 - Trading activity indicators
 - Market value to liquidity ratios
+
+:::caution
+When using Price API, do note that you may face many tokens where price is not available or returns null.
+
+This is because, we use the aforementioned heuristics to determine the price of a token and if the price is reliable - if certain combinations of these factors indicate potential issues with price reliability or market health, the token will be flagged and not provided a price.
+
+This is to safeguard users and prevent an inaccurate price from being returned.
+:::

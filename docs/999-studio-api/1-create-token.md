@@ -297,6 +297,7 @@ const signedTransaction = Buffer.from(transaction.serialize()).toString('base64'
 const formData = new FormData();
 formData.append('transaction', signedTransaction);
 formData.append('owner', wallet.publicKey.toBase58());
+formData.append('feeBps', 100); // Pass in the same value you set in `fee.feeBps` in `/create-tx`
 formData.append('content', '');
 formData.append(
     'headerImage',

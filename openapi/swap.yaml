@@ -20,6 +20,7 @@ servers:
 paths:
   /quote:
     get:
+      operationId: QuoteGet
       tags:
         - Swap
       summary: quote
@@ -52,6 +53,7 @@ paths:
                 $ref: '#/components/schemas/QuoteResponse'
   /swap:
     post:
+      operationId: SwapPost
       tags:
         - Swap
       summary: swap
@@ -76,6 +78,7 @@ paths:
                 $ref: '#/components/schemas/SwapResponse'
   /swap-instructions:
     post:
+      operationId: SwapInstructionsPost
       tags:
         - Swap
       summary: swap-instructions
@@ -100,6 +103,7 @@ paths:
                 $ref: '#/components/schemas/SwapInstructionsResponse'
   /program-id-to-label:
     get:
+      operationId: ProgramIdToLabelGet
       tags:
         - Swap
       summary: program-id-to-label

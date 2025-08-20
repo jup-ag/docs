@@ -196,7 +196,7 @@ async function getFeeAccountAndSwapTransaction(
     // - referralAccountPubkey.toBuffer(): The buffer representation of the referral account public key
     // - mint.toBuffer(): The buffer representation of the token mint
     // - new PublicKey("REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3"): The public key of the Referral Program
-    const [feeAccount] = await PublicKey.findProgramAddressSync(
+    const [feeAccount] = PublicKey.findProgramAddressSync(
       [
         Buffer.from("referral_ata"),
         referralAccountPubkey.toBuffer(),

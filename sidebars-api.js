@@ -50,7 +50,7 @@ const sidebars = {
           ],
         },
         {
-          type: "category", 
+          type: "category",
           label: "Swap API Schema",
           link: {
             type: "generated-index",
@@ -87,10 +87,10 @@ const sidebars = {
           items: [
             {
               type: "category",
-              label: "Earn (Beta)",
+              label: "Earn",
               link: {
                 type: "generated-index",
-                title: "Earn (Beta)",
+                title: "Earn",
                 slug: "/api/lend-api/earn",
               },
               items: [
@@ -154,7 +154,7 @@ const sidebars = {
           ],
         },
         {
-          type: "category", 
+          type: "category",
           label: "Trigger API Schema",
           link: {
             type: "generated-index",

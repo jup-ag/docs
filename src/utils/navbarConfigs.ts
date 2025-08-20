@@ -1,6 +1,7 @@
 export const navbarConfigs = {
   "/docs": [
-    { to: "/docs/",
+    {
+      to: "/docs/",
       label: "APIs",
       position: "left",
       items: [
@@ -8,13 +9,21 @@ export const navbarConfigs = {
         { to: "/docs/api-setup", label: "API Key", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/", label: "Swap API", position: "left" },
-        { to: "/docs/lend-api/", label: "Lend API (Beta)", position: "left" },
+        { to: "/docs/lend-api/", label: "Lend API", position: "left" },
         { to: "/docs/trigger-api/", label: "Trigger API", position: "left" },
-        { to: "/docs/recurring-api/", label: "Recurring API", position: "left" },
+        {
+          to: "/docs/recurring-api/",
+          label: "Recurring API",
+          position: "left",
+        },
         { to: "/docs/token-api/", label: "Token API", position: "left" },
         { to: "/docs/price-api/", label: "Price API", position: "left" },
         { to: "/docs/send-api/", label: "Send API (Beta)", position: "left" },
-        { to: "/docs/studio-api/", label: "Studio API (Beta)", position: "left" },
+        {
+          to: "/docs/studio-api/",
+          label: "Studio API (Beta)",
+          position: "left",
+        },
         { to: "/docs/perp-api/", label: "Perp API", position: "left" },
       ],
     },
@@ -25,7 +34,8 @@ export const navbarConfigs = {
     { to: "/docs/misc/", label: "Misc", position: "left" },
   ],
   "/search": [
-    { to: "/docs/",
+    {
+      to: "/docs/",
       label: "APIs",
       position: "left",
       items: [
@@ -33,13 +43,21 @@ export const navbarConfigs = {
         { to: "/docs/api-setup", label: "API Key", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/", label: "Swap API", position: "left" },
-        { to: "/docs/lend-api/", label: "Lend API (Beta)", position: "left" },
+        { to: "/docs/lend-api/", label: "Lend API", position: "left" },
         { to: "/docs/trigger-api/", label: "Trigger API", position: "left" },
-        { to: "/docs/recurring-api/", label: "Recurring API", position: "left" },
+        {
+          to: "/docs/recurring-api/",
+          label: "Recurring API",
+          position: "left",
+        },
         { to: "/docs/token-api/", label: "Token API", position: "left" },
         { to: "/docs/price-api/", label: "Price API", position: "left" },
         { to: "/docs/send-api/", label: "Send API (Beta)", position: "left" },
-        { to: "/docs/studio-api/", label: "Studio API (Beta)", position: "left" },
+        {
+          to: "/docs/studio-api/",
+          label: "Studio API (Beta)",
+          position: "left",
+        },
         { to: "/docs/perp-api/", label: "Perp API", position: "left" },
       ],
     },
@@ -50,7 +68,8 @@ export const navbarConfigs = {
     { to: "/docs/misc/", label: "Misc", position: "left" },
   ],
   "/": [
-    { to: "/docs/",
+    {
+      to: "/docs/",
       label: "APIs",
       position: "left",
       items: [
@@ -58,13 +77,21 @@ export const navbarConfigs = {
         { to: "/docs/api-setup", label: "API Key", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/", label: "Swap API", position: "left" },
-        { to: "/docs/lend-api/", label: "Lend API (Beta)", position: "left" },
+        { to: "/docs/lend-api/", label: "Lend API", position: "left" },
         { to: "/docs/trigger-api/", label: "Trigger API", position: "left" },
-        { to: "/docs/recurring-api/", label: "Recurring API", position: "left" },
+        {
+          to: "/docs/recurring-api/",
+          label: "Recurring API",
+          position: "left",
+        },
         { to: "/docs/token-api/", label: "Token API", position: "left" },
         { to: "/docs/price-api/", label: "Price API", position: "left" },
         { to: "/docs/send-api/", label: "Send API (Beta)", position: "left" },
-        { to: "/docs/studio-api/", label: "Studio API (Beta)", position: "left" },
+        {
+          to: "/docs/studio-api/",
+          label: "Studio API (Beta)",
+          position: "left",
+        },
         { to: "/docs/perp-api/", label: "Perp API", position: "left" },
       ],
     },
@@ -75,7 +102,8 @@ export const navbarConfigs = {
     { to: "/docs/misc/", label: "Misc", position: "left" },
   ],
   "/ecosystem": [
-    { to: "/docs/",
+    {
+      to: "/docs/",
       label: "APIs",
       position: "left",
       items: [
@@ -83,13 +111,21 @@ export const navbarConfigs = {
         { to: "/docs/api-setup", label: "API Key", position: "left" },
         { to: "/docs/ultra-api/", label: "Ultra API", position: "left" },
         { to: "/docs/swap-api/", label: "Swap API", position: "left" },
-        { to: "/docs/lend-api/", label: "Lend API (Beta)", position: "left" },
+        { to: "/docs/lend-api/", label: "Lend API", position: "left" },
         { to: "/docs/trigger-api/", label: "Trigger API", position: "left" },
-        { to: "/docs/recurring-api/", label: "Recurring API", position: "left" },
+        {
+          to: "/docs/recurring-api/",
+          label: "Recurring API",
+          position: "left",
+        },
         { to: "/docs/token-api/", label: "Token API", position: "left" },
         { to: "/docs/price-api/", label: "Price API", position: "left" },
         { to: "/docs/send-api/", label: "Send API (Beta)", position: "left" },
-        { to: "/docs/studio-api/", label: "Studio API (Beta)", position: "left" },
+        {
+          to: "/docs/studio-api/",
+          label: "Studio API (Beta)",
+          position: "left",
+        },
         { to: "/docs/perp-api/", label: "Perp API", position: "left" },
       ],
     },

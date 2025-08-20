@@ -32,6 +32,6 @@ Jupiter's protocols are audited by reputable security firms to ensure the highes
 
 ## Jupiter Lend
 
-- [Offside Labs Liquidity Report](/audits/lend-liquidity-offside.pdf)
-- [Offside Labs Vault Report](/audits/lend-vault-offside.pdf)
-- [Zenith Report](/audits/lend-zenith.pdf)
+- [Zenith Report: June 24th, 2025 - July 31, 2025](/audits/lend-zenith.pdf)
+- [Offside Labs Liquidity report: July 10th, 2025 - July 18, 2025](/audits/lend-liquidity-offside.pdf)
+- [Offside Labs Vaults report: July 23rd, 2025 - August 4th, 2025](/audits/lend-vault-offside.pdf)

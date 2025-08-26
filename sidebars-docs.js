@@ -53,7 +53,7 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'payment-method',
+          id: 'api-payment-method',
         },
         {
           type: 'html',

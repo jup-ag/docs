@@ -55,7 +55,7 @@ Depending on your needs, you can choose from the following plans:
 ## Payment
 
 :::note
-Refer to [Payment Method](/docs/payment-method) for more details.
+Refer to [Payment Method](/docs/api-payment-method) for more details.
 :::
 
 :::info Plan Renewal

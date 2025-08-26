@@ -52,6 +52,10 @@ const sidebars = {
           id: 'api-faq',
         },
         {
+          type: 'doc',
+          id: 'payment-method',
+        },
+        {
           type: 'html',
           value: '<div class="sidebar-line-break"></div>',
         },

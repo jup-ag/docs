@@ -34,6 +34,9 @@ paths:
                 properties:
                   mode:
                     type: string
+                    description: |
+                      - Either 'manual' or 'ultra', defaults to `ultra`
+                      - Defaults to `ultra`, unless manual parameters are defined which is not the intended use of the API
                   inputMint:
                     type: string
                   outputMint:
@@ -95,15 +98,28 @@ paths:
                             - feeMint
                         percent:
                           type: number
+                        bps:
+                          type: number
                       required:
                         - swapInfo
                         - percent
+                        - bps
                   feeMint:
                     type: string
                   feeBps:
                     type: number
+                  signatureFeeLamports:
+                    type: number
+                    description: |
+                      - The number of lamports the taker has to pay as a base network fee, if a valid transaction is returned. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee.
                   prioritizationFeeLamports:
                     type: number
+                    description: |
+                      - The number of lamports the taker has to pay for higher priority landing, if a valid transaction is returned. Includes priority fees and tips for services such as Jito, if any. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee.
+                  rentFeeLamports:
+                    type: number
+                    description: |
+                      - The number of lamports the taker has to pay for rent, if a valid transaction is returned. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee. Note that this value is just an estimate.
                   swapType:
                     type: string
                     description: |
@@ -156,6 +172,7 @@ paths:
                     type: string
                     description: |
                       - This field will be present if `taker` is defined and `transaction` is the empty string
+                      - This field can still return despite having a valid order/quote, this is meant to support displaying of quote to users together with the error message
                 required:
                   - mode
                   - inputMint
@@ -168,7 +185,9 @@ paths:
                   - slippageBps
                   - routePlan
                   - feeBps
+                  - signatureFeeLamports
                   - prioritizationFeeLamports
+                  - rentFeeLamports
                   - swapType
                   - router
                   - transaction

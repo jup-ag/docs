@@ -485,7 +485,6 @@ components:
       required:
         - transaction
         - owner
-        - feeBps
       properties:
         transaction:
           type: string
@@ -510,13 +509,6 @@ components:
             - This is stored off-chain for our frontend to display
             - This is NOT the on-chain token metadata
             - The on-chain token metadata is done by making a PUT request to the presigned URL
-        feeBps:
-          type: number
-          enum:
-            - 100
-            - 200
-          description: Ending fee in basis points (100 or 200)
-          default: 100
 
     CreateClaimFeeDBCTransactionRequestBody:
       type: object

@@ -34,6 +34,9 @@ paths:
                 properties:
                   mode:
                     type: string
+                    description: |
+                      - Either 'manual' or 'ultra', defaults to `ultra`
+                      - Defaults to `ultra`, unless manual parameters are defined which is not the intended use of the API
                   inputMint:
                     type: string
                   outputMint:
@@ -95,9 +98,12 @@ paths:
                             - feeMint
                         percent:
                           type: number
+                        bps:
+                          type: number
                       required:
                         - swapInfo
                         - percent
+                        - bps
                   feeMint:
                     type: string
                   feeBps:
@@ -166,6 +172,7 @@ paths:
                     type: string
                     description: |
                       - This field will be present if `taker` is defined and `transaction` is the empty string
+                      - This field can still return despite having a valid order/quote, this is meant to support displaying of quote to users together with the error message
                 required:
                   - mode
                   - inputMint
@@ -178,7 +185,9 @@ paths:
                   - slippageBps
                   - routePlan
                   - feeBps
+                  - signatureFeeLamports
                   - prioritizationFeeLamports
+                  - rentFeeLamports
                   - swapType
                   - router
                   - transaction

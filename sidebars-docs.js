@@ -483,6 +483,22 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Architecture',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'lend-api/oracle',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
       label: 'Lend API',
       collapsible: false,
       collapsed: false,

@@ -102,8 +102,18 @@ paths:
                     type: string
                   feeBps:
                     type: number
+                  signatureFeeLamports:
+                    type: number
+                    description: |
+                      - The number of lamports the taker has to pay as a base network fee, if a valid transaction is returned. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee.
                   prioritizationFeeLamports:
                     type: number
+                    description: |
+                      - The number of lamports the taker has to pay for higher priority landing, if a valid transaction is returned. Includes priority fees and tips for services such as Jito, if any. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee.
+                  rentFeeLamports:
+                    type: number
+                    description: |
+                      - The number of lamports the taker has to pay for rent, if a valid transaction is returned. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee. Note that this value is just an estimate.
                   swapType:
                     type: string
                     description: |

@@ -168,11 +168,17 @@ paths:
                     required:
                       - amount
                       - feeBps
+                  errorCode:
+                    type: number
+                    description: |
+                      - This field will be present if `taker` is defined and `transaction` is the empty string
+                      - It is unique for each error scenarios
                   errorMessage:
                     type: string
                     description: |
                       - This field will be present if `taker` is defined and `transaction` is the empty string
-                      - This field can still return despite having a valid order/quote, this is meant to support displaying of quote to users together with the error message
+                      - This field can still return despite having a valid order/quote
+                      - This is meant for display purposes only and it is discouraged to match these error messages as they could be parameterized
                 required:
                   - mode
                   - inputMint

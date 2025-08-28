@@ -129,9 +129,7 @@ paths:
                     enum:
                       - aggregator
                       - jupiterz
-                      - hashflow
                       - dflow
-                      - pyth
                       - okx                  
                   transaction:
                     type:
@@ -263,9 +261,7 @@ paths:
             enum:
               - metis
               - jupiterz
-              - hashflow
               - dflow
-              - pyth
               - okx
           required: false
         - in: query
@@ -562,9 +558,7 @@ paths:
                       enum:
                         - Metis v1.6
                         - JupiterZ
-                        - Hashflow
                         - DFlow
-                        - Pyth Express Relay
                         - OKX DEX Router
                     icon:
                       type: string

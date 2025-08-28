@@ -179,6 +179,10 @@ paths:
                       - This field will be present if `taker` is defined and `transaction` is the empty string
                       - This field can still return despite having a valid order/quote
                       - This is meant for display purposes only and it is discouraged to match these error messages as they could be parameterized
+                    example: |
+                      - Taker has insufficient input
+                      - Top up X SOL for gas
+                      - Minimum $X for gasless
                 required:
                   - mode
                   - inputMint

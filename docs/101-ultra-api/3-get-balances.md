@@ -1,11 +1,11 @@
 ---
 sidebar_label: "Get Balances (Deprecated)"
 description: "Request for token balances of an account."
-title: "Get Balances"
+title: "Get Balances (Deprecated)"
 ---
 
 <head>
-    <title>Get Balances</title>
+    <title>Get Balances (Deprecated)</title>
     <meta name="twitter:card" content="summary" />
 </head>
 
@@ -13,7 +13,7 @@ title: "Get Balances"
 This Ultra endpoint is deprecated and will be removed in the future. Please use the [Get Holdings](/docs/ultra-api/get-holdings) endpoint instead.
 :::
 
-## Get Balances
+## Get Balances (Deprecated)
 
 The Ultra API supports a simple endpoint to get the token balances of an account, you just need to pass in the required parameter of the user's wallet address.
 

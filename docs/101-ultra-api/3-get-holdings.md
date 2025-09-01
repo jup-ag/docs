@@ -43,6 +43,7 @@ console.log(JSON.stringify(holdingsResponse, null, 2));
 The holdings response will return the following:
 - A list of token holdings for the user's wallet address.
 - Token account information for each token holding.
+- Note that the top level response outside of `tokens` is the native SOL balance.
 
 :::tip
 For tokens with more than thousands of token holdings, the response may be slow - depending on the number of token holdings, the response time may vary.

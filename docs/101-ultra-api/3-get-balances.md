@@ -10,7 +10,7 @@ title: "Get Balances (Deprecated)"
 </head>
 
 :::warning
-This Ultra endpoint is deprecated and will be removed in the future. Please use the [Get Holdings](/docs/ultra-api/get-holdings) endpoint instead.
+This Ultra endpoint is not maintained in favour of the [Get Holdings](/docs/ultra-api/get-holdings) endpoint, please use that instead.
 :::
 
 ## Get Balances (Deprecated)

@@ -50,7 +50,6 @@ const sidebars = {
             {
               type: 'doc',
               id: 'api/ultra-api/balances',
-              label: 'balances (Deprecated)'
             },
           ],
         },

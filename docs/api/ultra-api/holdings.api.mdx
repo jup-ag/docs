@@ -1,0 +1,76 @@
+---
+id: holdings
+title: "holdings"
+description: "Request for detailed token holdings of an account including token account information"
+sidebar_label: "holdings"
+hide_title: true
+hide_table_of_contents: true
+api: eJzVVk1T2zAQ/Ssan8pMg2mPuTHT0jJlCoUyPQQOG3sTC2TJ1Qc0Df7v3bXlxE5CCYceOmGCIq3ePu2+XWmZ5OgyKysvjU7GySX+DOi8mBkrcvQgFebCm3vUojAql3ruhJkJ0AKyzATthdSZCrwQzdbzhFEC497QZzwea+PxRo/EJc7QkrWYXCtvQRxfnIrcZLdvUvp2aeDJEVQynaMfdV4PGkqlsThEJtwbnbxNLLrKaIcuGS+T90dH/G94tKuQZejcLCjRGdO+zGiP2rM5VJWSWYOb3jnes0xcVmAJPPKLCgnFTO8w87SxsqZC62XrEUo+dM/OeUu0yW5I4rvxoMTV+RmdQigoK2O9S+q3SZDHmxA6lFO0f4e4PhVBS+8EzDwFlY+w4FzkmMkS1AD6qqX0Co7gRGuzr6tGAm5XuIYuzn3RSGCoKzsHLX+T4KYLUUrSEOQ5pcoxj3tcOIKhGckYoC4G8d88AQPvgCCESAysBf4pPZY7CW/kt1X1HsErcKMQIgMOz/4qaQDKWEgCvCllllp4bFPwWsEM0f6NZno+Xi0b6U6s+Y2652dqjELQW45+FNhqZyvO0olZi9IgHjtnMgke84bb8VYCX/ZAiPTHvW6FNfTJnlbneDEPX5tpbp9xj6gUUEtqOtvqPIxJ2ptbKE/z1+gtbhKnH5K65ob4M0iLBDFZqXelwJ58tnLdS8df4tg7eJ/vLRWY9Ao7SXTmdb3FaR8msZ/0UD/HbnHZtfC6ha6ACCApjBIx2dG3Y/hYGhy2CnxB+Jr2cDOIJdpn6G3AXcF+BKVw3VfoGqNrat3EKJdJTXyJS2EIJqFVjhD7GydpZ5cuI0BNiw7tQ0c8WEV2hfeVG6epovbEV+HhXagOYd7ejenDuy0ZnFgkHUiSF9+mqPPKcPd7lL4QlpInlCzbxrHpYh/0C5D5c+iFnHO19JxwTKYogqNyaUyognjfF+q/HBq+v5vMxJR+CzK7dx4sB4oD0Tp9d3h0eLRF5UmcSX0vnm70kxiNRu1g8olScG5ztLsfEYaXDqLtx1+YBSL7jD22y709TUUa50toGlTUTJfJTYbL9ZPi/31NxaLx+Mun1KRkE4NGN8so5Uk/AOOugCi7BUWKl5fLKTi8tqqueZoCYRc0T8MHsBKmnHrSey4dj6lSZtRLNiuuH8w3l7E2D8SedfjMOboXgOb7/wFU4F805PfBuhfUt2RaIJAKGqLtKvUzrHxv39ajcVD8nz5+pwb1B0bgAdk=
+sidebar_class_name: "get api-method"
+info_path: docs/api/ultra-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"holdings"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/holdings/{address}"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for detailed token holdings of an account including token account information
+
+:::note
+- Refer to [Ultra API doc](/docs/ultra-api/get-holdings) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"schema":{"type":"string"},"in":"path","name":"address","required":true,"description":"The wallet address to get holdings for"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","properties":{"amount":{"type":"string","description":"Total SOL in lamports"},"uiAmount":{"type":"number","description":"Total SOL in UI units after applying decimals"},"uiAmountString":{"type":"string","description":"Total SOL as string in UI units after applying decimals"},"tokens":{"type":"object","description":"Other token holdings organized by mint address as keys","additionalProperties":{"description":"Token mint address as key","type":"array","items":{"type":"object","properties":{"account":{"type":"string","description":"The token account address"},"amount":{"type":"string","description":"Token amount in atomic/raw units"},"uiAmount":{"type":"number","description":"Token amount in UI units after applying decimals"},"uiAmountString":{"type":"string","description":"Token amount as string in UI units after applying decimals"},"isFrozen":{"type":"boolean","description":"Whether the token account is frozen"},"isAssociatedTokenAccount":{"type":"boolean","description":"Whether this is an associated token account"},"decimals":{"type":"number","description":"Number of decimal places for the token"},"programId":{"type":"string","description":"The token program ID"}},"required":["account","amount","uiAmount","uiAmountString","isFrozen","isAssociatedTokenAccount","decimals","programId"],"title":"TokenAccount"}}}},"required":["amount","uiAmount","uiAmountString","tokens"],"title":"HoldingsResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

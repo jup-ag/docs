@@ -525,6 +525,22 @@ const sidebars = {
       type: 'html',
       value: '<div class="sidebar-line-break"></div>',
     },
+    {
+      type: 'category',
+      label: 'Guides',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'lend-api/sdk',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
   ],
   send: [
     {

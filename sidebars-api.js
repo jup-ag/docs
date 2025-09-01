@@ -37,6 +37,10 @@ const sidebars = {
             },
             {
               type: 'doc',
+              id: 'api/ultra-api/holdings-native',
+            },
+            {
+              type: 'doc',
               id: 'api/ultra-api/shield',
             },
             {

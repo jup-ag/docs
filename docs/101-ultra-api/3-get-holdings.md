@@ -44,6 +44,12 @@ The holdings response will return the following:
 - A list of token holdings for the user's wallet address.
 - Token account information for each token holding.
 
+:::tip
+For tokens with more than thousands of token holdings, the response may be slow - depending on the number of token holdings, the response time may vary.
+
+If you only need the native SOL balance, you can use `/holdings/{address}/native` to get the native SOL balance.
+:::
+
 **Successful example response:**
 
 ```json

@@ -273,8 +273,8 @@ const config = {
       announcementBar: {
         id: 'feeback-for-mintlify',
         content: 'We will be upgrading our docs soon and <a target="_blank" rel="noopener noreferrer" href="https://forms.gle/49Ps7VGqVv7QEULfA">we would love to hear your feedback before the upgrade</a>.',
-        backgroundColor: '#FFFFFF',
-        textColor: '#000000',
+        backgroundColor: '#000000',
+        textColor: '#FFFFFF',
         isCloseable: false,
       }
     }),

@@ -1,32 +1,19 @@
 ---
-sidebar_label: "Get Balances"
+sidebar_label: "Get Balances (Deprecated)"
 description: "Request for token balances of an account."
-title: "Get Balances"
+title: "Get Balances (Deprecated)"
 ---
 
 <head>
-    <title>Get Balances</title>
+    <title>Get Balances (Deprecated)</title>
     <meta name="twitter:card" content="summary" />
 </head>
 
-:::note
-Lite URL: `https://lite-api.jup.ag/ultra/v1/balances`
-Dynamic URL: `https://api.jup.ag/ultra/v1/balances`
-
-Dynamic Rate Limits are now applied to Ultra API.
-
-- No Pro plans or payment needed.
-- Simply generate the universal API Key via [Portal](https://portal.jup.ag)
-- Rate limits scale together with your swap volume.
-
-[Read more about Ultra API Dynamic Rate Limit](/docs/api-rate-limit).
+:::warning
+This Ultra endpoint is not maintained in favour of the [Get Holdings](/docs/ultra-api/get-holdings) endpoint, please use that instead.
 :::
 
-:::tip API Reference
-To fully utilize the Ultra API, check out the [Ultra API Reference](/docs/api/ultra-api/balances.api.mdx).
-:::
-
-## Get Balances
+## Get Balances (Deprecated)
 
 The Ultra API supports a simple endpoint to get the token balances of an account, you just need to pass in the required parameter of the user's wallet address.
 

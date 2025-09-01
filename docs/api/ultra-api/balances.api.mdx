@@ -1,11 +1,11 @@
 ---
 id: balances
 title: "balances"
-description: "Request for token balances of an account"
+description: "- Deprecated, use `/holdings/{address}` instead"
 sidebar_label: "balances"
 hide_title: true
 hide_table_of_contents: true
-api: eJzNVTtv2zAQ/isEpwSwLadoF20pkARBCzRNm8n2cJbOFmOKZEgqjavov/dOkhHZcYoCHVoP9pH3+vjdw7XMMWReuaiskam8xYcKQxQr60W0GzRiCRpMhkHYlQAjIMtsZeLczE2apsZGnJuxuMUVsoOY3enoQZzfXIvcZouThL5DUvHlGJxK1hjHu4inbZbSehTKkFgCg2jjzo0cSY/BWRMwyLSW76ZT/tlH+63KKE5YVVrsjMkvsyaiiWwOzmmVtXGT+8A+tQxZgSWwFLcOKYpd3mMWyRHyXLEp6BtvHfqoutyHdm5PCyUTMrAL0Suzls1IVur8UGmqcomelUHb4woVLr39iWagXFqrEYxsGqbloVIec5nOdrkHmfq4gyiLhj8j+f4Ygx8hF76r+d8wt88Iem/9EUIOwHdmiw7dh2PorgmOp3KIgP6RGqzz+Ic4SePAQ4mEi0LMjuR6qb7iJziIBSU25EMn6jBq1CCHCaKvsFmMJAUtLJ0lzQhDZcdUJrtpSereueEat3x0CCqvya6I0YU0SbSKyJM2ua/cBNbd6CWPZ+S0z+2lRxTEhG+HFU3urDJR/FCxEB4iCq1KFQM95DDFn0S/AZW/Fb1Q64IUgyS8OZYoqoB5Z0KLhv0+4VYyNbweWopV1Ezj10plmxDBM1FMRJf0bDKdTF9BeRafldmI57l5FuPxuBNmVxjFF5+jP76jLKtOe9uLJ8wqAvuGPXbqgQ9X39kQS2j7sS/+rpKHCOuXfv6v9m/f0BGfYuI0qPZZbSvUfXfOhm9Kd81NBSvo8ayu6yUEvPO6afia3ua3dE/iI3gFS64mtXCuAsvU/CvQAX/Dz8ltPzen4i2E/SWYLTcH6IpPJG6omV4msFmQaYFAJWshdNpz+j9xceD3ar3sTerVxXfaFr8AvqCEoQ==
+api: eJzVVU1P20AQ/SurPYGU4FC1F9+oCgi1UimUUxKJtT2Jl9i729k1kBr/987YTuOEIFXqoWoOyXrn6/nNvEktM3AIqQqQyThgBSO68SlqF7Q1MpZj8em3x0hUHsR9lNsi02bpo1plGYL3zb3QxgdQ2cyMxW3lnEXyFwuLIlHp6klhJlJbOhV0ogsd1jMzM3EcGxuAQ25gASiCFdO7IqASZ9dXIrPp/Ciibx9VfDlWTkdLCONEFcqk4I/b/KVFoOp0LBVjbvPOjBxJQuas8eBlXMt3kwn/7L7cbZVSHr+oCrFxprjUmgAmsLtyrtBpmzd68BxTS5/mUCo+hbUDymKTB0gDBRIbml1VcY3WAQbd1d73cztWVdqqq9b7+YDErmxGstJn+0ZTlQkgG31hDxu0v0D7E8zAmFhbgDKyaZiWH5VG7vd0U3tQqc87yDJv+DOS7w8x+FFlghOCD3/D3C4jgGjxACF74Du3eYfuwyF0VwQHqR3CAz7SgHUR/xAnWZxCVQLhohTTA7W23df8CiSZnAobiqGnXm9yWIBV28xHkpLmlp4laYShcmAso41atmLlHrd8dAgqLMgvD8H5OIpInMBKO3mo3IladtKLHk/l/mK4QABBTGArVjCZs9oE8aRDLpC2hSh0qYOnF9kv8SfZr5XO3sqe62VOhkER3hwJ8HbKOhdl2rjPsJZMDa+HlmIdCqbxW6XTlQ8KmSgmoit6ejI5mbyC8iK+aLMSLzPzIsbjcXeYXkIQXzEDPLyjLJuOe9/zZ0grAvuGP3TmQQx331kfStXOY9/8TSf3Edbbef6f13U//wGeQ+QKpVsW2smp+2GeDimIN1qg/ubEFZvrOlEe7rBoGr6mtYRruqfjo0KtEm4+TXymPZ9JKwtV+P2/vCGdRze9zI7FWwj7S2XWPEuqqPiJjiuava1gmzm55sQ4rWiG0FnP6O/HhUHcq220I+zL8++0XH4BeYOuhg==
 sidebar_class_name: "get api-method"
 info_path: docs/api/ultra-api/quickstart
 custom_edit_url: null
@@ -34,9 +34,14 @@ import Heading from "@theme/Heading";
   
 </MethodEndpoint>
 
+:::caution deprecated
 
+This endpoint has been deprecated and may be replaced or removed in future versions of the API.
 
-Request for token balances of an account
+:::
+
+- Deprecated, use `/holdings/{address}` instead
+- Supported for backward compatibility
 
 :::note
 - Refer to [Ultra API doc](/docs/ultra-api/get-balances) for more information

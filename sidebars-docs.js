@@ -147,7 +147,7 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'ultra-api/get-balances',
+          id: 'ultra-api/get-holdings',
         },
         {
           type: 'doc',
@@ -156,6 +156,10 @@ const sidebars = {
         {
           type: 'doc',
           id: 'ultra-api/search-token',
+        },
+        {
+          type: 'doc',
+          id: 'ultra-api/get-balances',
         },
       ],
     },

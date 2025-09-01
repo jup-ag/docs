@@ -52,6 +52,10 @@ const sidebars = {
           id: 'api-faq',
         },
         {
+          type: 'doc',
+          id: 'api-payment-method',
+        },
+        {
           type: 'html',
           value: '<div class="sidebar-line-break"></div>',
         },
@@ -143,7 +147,7 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'ultra-api/get-balances',
+          id: 'ultra-api/get-holdings',
         },
         {
           type: 'doc',
@@ -152,6 +156,10 @@ const sidebars = {
         {
           type: 'doc',
           id: 'ultra-api/search-token',
+        },
+        {
+          type: 'doc',
+          id: 'ultra-api/get-balances',
         },
       ],
     },

@@ -271,10 +271,10 @@ const config = {
         },
       ],
       announcementBar: {
-        id: 'zendesk-migration',
-        content: 'We have migrated our User Guides from Station to our new Support System. Please visit <a target="_blank" rel="noopener noreferrer" href="https://support.jup.ag/hc/en-us">Jupiter Helpdesk</a> for the latest guides.',
-        backgroundColor: '#FFA500',
-        textColor: '#000000',
+        id: 'feeback-for-mintlify',
+        content: 'We will be upgrading our docs soon and <a target="_blank" rel="noopener noreferrer" href="https://forms.gle/49Ps7VGqVv7QEULfA">we would love to hear your feedback before the upgrade</a>.',
+        backgroundColor: '#000000',
+        textColor: '#FFFFFF',
         isCloseable: false,
       }
     }),

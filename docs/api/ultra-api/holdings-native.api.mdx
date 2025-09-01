@@ -1,0 +1,77 @@
+---
+id: holdings-native
+title: "holdings (native)"
+description: "Request for native SOL holdings only, without other tokens"
+sidebar_label: "holdings (native)"
+hide_title: true
+hide_table_of_contents: true
+api: eJzlVU1T2zAQ/Ss7PpGZBIcefePQUqZMoQFOCQfF3sQismSkVSBj8t+7kh3yBR04N5NJZHs/3u6+t26SAl1uZU3S6CRLRvjk0RHMjAUtSC4Rbq+voDSqkHruwGi16sOzpNJ4AkMlWiCzQO0meqKzLNOGcKIHcFdKB/wVUBmLgLOZzCVqAtRFbSQfnkvUsDI+xgSNWMRUU6GEzmOMEc5ieBjfK7ICzm8uoTD5w0nKvy714eZA1DKdIw02EHsRe0wqNR8rEUqL2CY66ScWXW20Q5dkTfJtOAx/+z249XmOzs28go0x++VGE+MP5qKulcxj3PTRBZ8mcXmJlQgnWtXIUcz0EXNix9qaGi3JNqOojG+jdHaOLMNmu30Qd4aEig2RGpSoamPJJet+4uX5YQjtqynaf4e4vwSvJfFAZsRNDSWsOC8UmMtKqL3Qty2kL2AUDlqbz6VahzE8eWmxSLLxpic7tR1heegnJEkFML8jLX924x5tJrQOH+62sKJCzsvdHr8zlq4UtpShhFpQydk0+/CVKAqeuEt24ZH1eFR4ifAslEKCziWwlFm4q5mOyIGOyZrxM6rScMCE7QItQuYsSTe8TZsu1Dptg7CNQ7vcVOKtYvOSqHZZmipJGKh/+ujrUzFvtZAuz45m9MMiApPPRvVsxccKBisIQclKRmYdpvhM9Bshi4+il3IetsNOktCkKYJ3LPVoInT0+4Wr2KGg1ziqbtJ/vMwXjoQN/QqNaJOenQ5Ph0dQXuFK6gW8TvQrDAaD9jC+4Jlc2wLt+0vDhEe9zvb7C+aewX5gj+3jHZ/Aoto4qkRcAR2J3nblSTvH3iHUZrtL/oN92+mO8IXSWgkZuxaZ1nQaGL+1jM2zrQY7GTAxSm5ysGuaqXB4b9V6HW5z6+yK7/NxKawU08AalkohXTiz1ma8bg7Vu9v+k1Gn8x58WdMflNbdFHoVSCuUD1d8XDDJtxtm/cCmJQqmUoTcPj3nF09NO35Hb5q9RXLx/Y7X3l+bI7Ut
+sidebar_class_name: "get api-method"
+info_path: docs/api/ultra-api/quickstart
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"holdings (native)"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/holdings/{address}/native"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Request for native SOL holdings only, without other tokens
+
+:::note
+- This is a more efficient endpoint when you only need SOL balance
+- Refer to [Ultra API doc](/docs/ultra-api/get-holdings) for more information
+:::
+
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={[{"schema":{"type":"string"},"in":"path","name":"address","required":true,"description":"The wallet address to get native SOL balance for"}]}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful response","content":{"application/json":{"schema":{"type":"object","properties":{"amount":{"type":"string","description":"Total SOL in lamports"},"uiAmount":{"type":"number","description":"Total SOL in UI units after applying decimals"},"uiAmountString":{"type":"string","description":"Total SOL as string in UI units after applying decimals"}},"required":["amount","uiAmount","uiAmountString"],"title":"NativeHoldingsResponse"}}}}}}
+>
+  
+</StatusCodes>
+
+
+      

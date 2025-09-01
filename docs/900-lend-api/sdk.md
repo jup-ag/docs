@@ -233,7 +233,7 @@ await program.methods
     // ... all other accounts from context
 
     lendingProgram: new PublicKey(
-      "7tjE28izRUjzmxC1QNXnNwcc4N82CNYCexf3k8mw67s3"
+      "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"
     ),
   })
   .rpc();

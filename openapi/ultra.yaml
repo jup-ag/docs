@@ -464,6 +464,31 @@ paths:
             name: address
             required: true
             description: The wallet address to get holdings for
+  /holdings/{address}/native:
+    get:
+      summary: holdings (native)
+      description: |
+        Request for native SOL holdings only, without other tokens
+        
+        :::note
+        - This is a more efficient endpoint when you only need SOL balance
+        - Refer to [Ultra API doc](/docs/ultra-api/get-holdings) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeHoldingsResponse"
+      parameters:
+          - schema:
+              type: string
+            in: path
+            name: address
+            required: true
+            description: The wallet address to get native SOL balance for
+
   /shield:
     get:
       summary: shield
@@ -842,6 +867,22 @@ components:
         - uiAmount
         - uiAmountString
         - tokens
+    NativeHoldingsResponse:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Total SOL in lamports
+        uiAmount:
+          type: number
+          description: Total SOL in UI units after applying decimals
+        uiAmountString:
+          type: string
+          description: Total SOL as string in UI units after applying decimals
+      required:
+        - amount
+        - uiAmount
+        - uiAmountString
     TokenAccount:
       type: object
       properties:

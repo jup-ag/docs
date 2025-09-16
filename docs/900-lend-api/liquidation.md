@@ -67,9 +67,9 @@ const fetchLiquidationsByVaultId = await getLiquidations({
 ```
 :::
 
-### Flash borrow the debt amount
+### Flash borrow and payback
 
-By using the SDK, you can flash borrow the debt amount.
+By using the SDK, you can flashloan to borrow the debt amount and flash payback what you flash borrowed.
 
 ```typescript
 const fetchFlashBorrowIx = await getFlashBorrowIx({
@@ -80,10 +80,6 @@ const fetchFlashBorrowIx = await getFlashBorrowIx({
 });
 ```
 
-### Flash payback the borrowed amount
-
-By using the SDK, you can flash payback what you flash borrowed.
-
 ```typescript
 const fetchFlashPaybackIx = await getFlashPaybackIx({
   amount: debtAmount,
@@ -92,6 +88,10 @@ const fetchFlashPaybackIx = await getFlashPaybackIx({
   connection,
 });
 ```
+
+:::tip Flashloan Fee
+**ALL flashloans are free**!
+:::
 
 ### Get liquidation instructions
 

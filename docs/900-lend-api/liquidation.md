@@ -11,6 +11,99 @@ title: "About Liquidation"
 
 Jupiter Lend allows anyone to participate in the liquidation mechanism. In this section, we have included a minimal Typescript example to get you started.
 
+## Prerequisites
+
+The liquidation bot requires the Jupiter Lend SDK. [You can find the full example at the end of this section](#full-example).
+
+:::note
+We will be using functions from `@jup-ag/lend/borrow` and `/flashloan`.
+:::
+
+```bash
+npm install @jup-ag/lend
+```
+
+:::tip
+You will also need reliable RPC to fetch information like liquidations or swap quote and to execute the liquidation.
+:::
+
+## Breakdown
+
+The liquidation bot requires the following steps:
+1. Fetch all available liquidations
+2. Flash borrow the debt amount
+3. Get liquidation instructions
+4. Get Jupiter swap quote (collateral token -> debt token)
+5. Get Jupiter swap instructions
+6. Build all instructions together
+7. Execute the liquidation
+8. Flash payback the debt amount
+
+### Fetch liquidations
+
+By using the SDK, you can fetch for all available liquidations.
+
+```typescript
+const fetchAllLiquidations = await getAllLiquidations({
+  connection,
+  signer,
+});
+```
+
+:::tip RPC Rate Limit
+The `getAllLiquidations` function gives you the available liquidations across all vault, each request is processed in parallel, and each consumes ~10 RPC requests.
+
+If you receive **`429`** or rate limit error code from this function, it is likely due to your RPC connection getting rate limited. You should upgrade your RPC plan to avoid this issue.
+:::
+
+### Flash borrow the debt amount
+
+By using the SDK, you can flash borrow the debt amount.
+
+```typescript
+const fetchFlashBorrowIx = await getFlashBorrowIx({
+  amount: debtAmount,
+  asset: borrowToken,
+  signer,
+  connection,
+});
+```
+
+### Flash payback the borrowed amount
+
+By using the SDK, you can flash payback what you flash borrowed.
+
+```typescript
+const fetchFlashPaybackIx = await getFlashPaybackIx({
+  amount: debtAmount,
+  asset: borrowToken,
+  signer,
+  connection,
+});
+```
+
+### Get liquidation instructions
+
+By using the SDK, you can get the liquidation instructions.
+
+```typescript
+const fetchLiquidateIx = await getLiquidateIx({
+  vaultId,
+  debtAmount,
+  signer,
+  connection,
+});
+```
+
+### Get Jupiter quote and swap instructions
+
+For this step, you will need to request to the Jupiter Swap API to get the quote and swap instructions.
+
+- [You can refer to the example below to check how to fetch from the Swap API](#full-example)
+- Else, [for the full guide on Swap API, please refer to Swap API section](/docs/swap-api).
+
+## Full Example
+
 ```typescript
 import {
   getLiquidateIx,

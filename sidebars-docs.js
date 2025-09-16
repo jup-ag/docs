@@ -535,6 +535,10 @@ const sidebars = {
           type: 'doc',
           id: 'lend-api/sdk',
         },
+        {
+          type: 'doc',
+          id: 'lend-api/liquidation',
+        },
       ],
     },
     {

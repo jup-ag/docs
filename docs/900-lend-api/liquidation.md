@@ -56,6 +56,17 @@ The `getAllLiquidations` function gives you the available liquidations across al
 If you receive **`429`** or rate limit error code from this function, it is likely due to your RPC connection getting rate limited. You should upgrade your RPC plan to avoid this issue.
 :::
 
+:::tip Fetch liquidations for specific vault
+If you'd like to fetch liquidations for a specific vault, you can use the `getLiquidations` function.
+```typescript
+const fetchLiquidationsByVaultId = await getLiquidations({
+  vaultId,
+  connection,
+  signer,
+});
+```
+:::
+
 ### Flash borrow the debt amount
 
 By using the SDK, you can flash borrow the debt amount.

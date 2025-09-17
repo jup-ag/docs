@@ -1,429 +1,380 @@
 ---
 mode: "custom"
-title: "Jupiter Developer Docs"
+title: "Build with Jupiter"
 ---
 
-<div className="relative w-full flex items-center justify-center" style={{ height: '26rem', overflow: 'hidden'}}>
-<div id="background-div" className="absolute inset-0 h-full bg-[#00000000] bg-cover bg-center"></div>
+import { JupiterPluginIntegrated } from "/snippets/jupiter-plugin-integrated.jsx"
+import { JupiterPluginModalTrigger } from "/snippets/jupiter-plugin-modal-trigger.jsx"
 
-<div
-  id="background-div"
-  className="absolute inset-0 h-full bg-cover bg-center"
-></div>
+<script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
 
-<div style={{ position: 'absolute', textAlign: 'center', padding: '0 1rem' }}>
-  <div
-    className="text-5xl font-bold w-full mt-12 mb-2"
-  >
-    <span className="bg-gradient-to-r from-[#00BEF0] via-[#8DE3A3] to-[#C7F284] bg-clip-text text-transparent">Jupiter Developer Docs</span>
+<div className="relative min-h-screen text-[#181D27] dark:text-[#F9F9FB]">
+  <div className="w-full h-[525px] absolute opacity-60 overflow-hidden">
   </div>
 
-   <p className="text-lg" style={{  fontWeight: '500' , maxWidth: '40rem', margin: '0 auto', marginTop: '0.5rem'}}>
-      How can we help you today?
-    </p>
-    <div className="flex items-center justify-center" style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <button
-        type="button"
-        className="hidden w-full lg:flex items-center text-sm leading-6 py-4 pl-4 pr-4 text-gray-500 rounded-full"
-        id="home-search-entry"
-        style={{
-          marginTop: '2rem',
-          maxWidth: '40rem',
-          background: '#FFF',
-          boxShadow: '0px 1px 4px 0px rgba(8, 9, 10, 0.25), 0px 0px 0px 4px rgba(255, 255, 255, 0.20)',
-          cursor: 'pointer',
-          textAlign: 'left',
-        }}
-        onClick={()=> document.getElementById('search-bar-entry').click()}
-      >
-        <svg
-          className="h-4 w-4 ml-1.5 flex-none bg-primary hover:bg-gray-600 dark:bg-primary-dark dark:hover:bg-white/70"
-          style={{
-          marginRight: '0.5rem',
-          maskImage:
-            'url("https://mintlify.b-cdn.net/v6.5.1/solid/magnifying-glass.svg")',
-          maskRepeat: 'no-repeat',
-          maskPosition: 'center center',
-          }}
-        />
-        Search or ask...
-      </button>
+  {/* Hero Section */}
+  <div className="flex flex-col items-center justify-center pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
+    <div className="text-center max-w-6xl mx-auto pt-8 sm:pt-0">
+      <div className="text-center justify-start text-xs sm:text-base text-[#00BEF0] dark:text-[#C7F284] font-medium leading-normal">Welcome to Jupiter's Developer Documentation!</div>
+      <div className="text-center justify-start text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold leading-tight sm:leading-[60px] md:leading-[80px] lg:leading-[96px] mt-2">Build with Jupiter</div>
+
+      {/* Hero card group to display stats */}
+      <div className="mx-1 md:mx-20 grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-6 p-2 md:p-6">
+        <div className="bg-gradient-to-br from-[#C7F284]/10 to-[#00BEF0]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center hover:border-[#00BEF0]/40">
+          <div className="text-xl md:text-3xl font-bold text-[#00BEF0] dark:text-[#C7F284] mb-1 md:mb-2">#1</div>
+          <div className="text-xs md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 md:mb-2">Superapp</div>
+          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden md:block">Leading DeFi across all chains</div>
+        </div>
+        <div className="bg-gradient-to-br from-[#00BEF0]/10 to-[#C7F284]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center hover:border-[#00BEF0]/40">
+          <div className="text-xl md:text-3xl font-bold text-[#00BEF0] dark:text-[#C7F284] mb-1 md:mb-2">$50B+</div>
+          <div className="text-xs md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 md:mb-2">Volume</div>
+          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden md:block">Loved by millions of users</div>
+        </div>
+        <div className="bg-gradient-to-br from-[#C7F284]/10 to-[#00BEF0]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center hover:border-[#00BEF0]/40">
+          <div className="text-xl md:text-3xl font-bold text-[#00BEF0] dark:text-[#C7F284] mb-1 md:mb-2">500+</div>
+          <div className="text-xs md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 md:mb-2">Integrations</div>
+          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden md:block">Trusted by leading protocols</div>
+        </div>
+      </div>
+
     </div>
   </div>
-</div>
 
-<div
-  style={{marginTop: '1rem', marginBottom: '8rem', maxWidth: '70rem', marginLeft: 'auto',
-  marginRight: 'auto', paddingLeft: '1.25rem',
-  paddingRight: '1.25rem' }}
->
+  {/* Line break */}
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+  </div>
+  
+  {/* Ultra Swap Section */}
+  <div className="max-w-6xl mx-auto pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
+    <div className="flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight md:leading-10 pb-[10px]">Start with Ultra Swap</div>
+    <div className="flex justify-center text-[#535862] dark:text-[#A6A09E] text-xs sm:text-lg font-normal leading-6 sm:leading-7 pb-[40px] sm:pb-[56px] text-center">The perfect swap experience for everyone everywhere</div>
 
-<CardGroup cols={2}>
-  <Card title="Integrate APIs" icon="code">
+          {/* Desktop: Left-Right Layout, Mobile: Stacked with Modal */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        {/* Left side: Integration options and Benefits */}
+        <div className="order-2 lg:order-1 space-y-6">
 
-Develop with the most comprehensive set of APIs offering a full range of Jupiter Products like [Ultra](/docs/ultra-api/), [Swap](/docs/swap-api/), [Trigger](/docs/trigger-api/), [Recurring](/docs/recurring-api/), [Lend](/docs/lend-api/), and more.
+          <CardGroup cols={1}>
+            <Card title="Why Ultra Swap?">
+              <div className="space-y-3 mt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#00BEF0]"></div>
+                  <div className="font-normal text-sm text-gray-600 dark:text-gray-400">Does not require RPCs.</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#00BEF0]"></div>
+                  <div className="font-normal text-sm text-gray-600 dark:text-gray-400">Handles slippage & priority fee optimizations.</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#00BEF0]"></div>
+                  <div className="font-normal text-sm text-gray-600 dark:text-gray-400">Handles transaction sending & polling.</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#00BEF0]"></div>
+                  <div className="font-normal text-sm text-gray-600 dark:text-gray-400">Lowest MEV with fast execution & high success.</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#00BEF0]"></div>
+                  <div className="font-normal text-sm text-gray-600 dark:text-gray-400">Multiple liquidity sources & gasless support.</div>
+                </div>
+              </div>
+            </Card>
 
-  <Columns cols={2}>
- <Card title="Get Started" href="/docs" icon="rocket" horizontal/>
- <Card title="Setup API Key" href="/docs/api-setup" icon="key" horizontal/>
-  </Columns>
-  </Card>
-  <Card title="Tool Kits" icon="wrench">
-  For those looking for low-code solutions, we provide a customizable tools like Jupiter Plugin for you to develop faster and smoother.
-  <Card title="Explore Tool Kits" href="/docs/tool-kits" icon="box" horizontal/>
-  </Card>
-  <Card title="Get Routed" icon="route">
-  If you are a decentralized exchange or market maker and have an interest to be part of our routing engines, refer to the routing integration guides.
-   <Columns cols={2}>
- <Card title="DEX Integration" href="/docs/routing/dex-integration" icon="link" horizontal/>
- <Card title="RFQ Integration" href="/docs/routing/rfq-integration" icon="repeat" horizontal/>
-  </Columns>
-  </Card>
-    <Card title="Expansive Ecosystem" icon="airplay" >
-  Explore our ecosystem of projects and protocols that are part of our routing engine, or utilize Jupiter's developer tools to build their applications.
-<Card title="Explore Ecosystem" href="https://dev.jup.ag/ecosystem" icon="globe" horizontal/>
-  </Card>
-</CardGroup>
+            <Card title="Ultra Swap API" icon="bolt" href="/docs/ultra" horizontal>
+              Integrate Ultra Swap via API for full customization and control over the swap experience.
+            </Card>
 
-<div className="flex flex-col w-full " style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-<h2
-    className="text-gray-900 dark:text-gray-200"
-    style={{
-      fontSize: '2rem',
-      fontWeight: '700',
-    }}
-  >
-    Browse by API
+            <Card title="Plugin" icon="rocket-launch" href="/tool-kits/plugin" horizontal>
+              Easiest and most seamless way to embed the full end-to-end Ultra Swap functionality into any website.
+            </Card>
+          </CardGroup>
 
-  </h2>
-  <p
-    style={{
-      fontSize: '1rem',
-      fontWeight: '500',
-      marginTop: '4px',
-    }}
-  >
-    Most comprehensive set of endpoints to integrate Jupiter Products into your
-  applications
-  </p>
-</div>
+          {/* Mobile Plugin Demo Button */}
+          <div className="mt-4 pt-6 lg:hidden">
+            <JupiterPluginModalTrigger 
+              className="w-full px-4 py-2 text-black font-bold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              style={{
+                background: 'linear-gradient(to right, #00BEF0, #C7F284)',
+              }}
+            >
+              Try Plugin Live
+            </JupiterPluginModalTrigger>
+          </div>
+        </div>
 
-<CardGroup cols={4}>
+      {/* Right side: Plugin Demo (Desktop only) */}
+      <div className="order-1 lg:order-2 hidden lg:block my-2">
+        <div className="sticky top-8">
+          <div className="p-6 bg-gradient-to-r from-[#00BEF0] to-[#C7F284] rounded-2xl">
+            <div className="text-center mb-6">
+              <div className="text-xl font-semibold text-gray-900 mb-2">Try Jupiter Plugin Live</div>
+              <div className="text-xs text-gray-900">Experience the full swap functionality embedded directly in our docs</div>
+            </div>
+            <div className="overflow-hidden">
+              <JupiterPluginIntegrated />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<Card title="Ultra API">
-  <a
-    href="/docs/ultra-api/"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-  <a
-    href="/api/ultra-api/"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Schemas
-  </a>
-</Card>
-<Card title="Swap API">
-  <a
-    href="/docs/swap-api/"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-  <a
-    href="/api/swap-api/"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Schemas
-  </a>
-</Card>
+  {/* Line break */}
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+  </div>
 
-<Card title="Lend API (Beta)">
-  <a
-    href="/docs/lend-api/"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-  <a
-    href="/api/lend-api/"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Schemas
-  </a>
-</Card>
+  {/* Developer Products Section */}
+  <div className="max-w-6xl mx-auto pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
+    <div className="flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight md:leading-10 pb-[10px]">Developer Products</div>
+    <div className="flex justify-center text-[#535862] dark:text-[#A6A09E] text-xs sm:text-lg font-normal leading-6 sm:leading-7 pb-[40px] sm:pb-[56px] text-center">Build with Jupiter's comprehensive DeFi and tech stack</div>
 
-<Card title="Trigger API">
-  <a
-    href="/docs/trigger-api/"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-  <a
-    href="/api/trigger-api/"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Schemas
-  </a>
-</Card>
+    <CardGroup cols={2}>
+      <Card title="Core Products" icon="diamonds-4">
+        Create your own DeFi superapp with Jupiter's core products.
+        <Columns cols={2}>
+          <Card title="Ultra Swap" href="/docs/ultra" icon="bolt" horizontal/>
+          <Card title="Lend" href="/docs/lend" icon="piggy-bank" horizontal/>
+          <Card title="Perp" href="/docs/perp" icon="chart-line" horizontal/>
+          <Card title="Studio" href="/docs/studio" icon="building-columns"  horizontal/>
+          <Card title="Trigger" href="/docs/trigger" icon="bullseye"  horizontal/>
+          <Card title="Recurring" href="/docs/recurring" icon="clock-rotate-left"  horizontal/>
+        </Columns>
+      </Card>
 
-<Card title="Recurring API">
-  <a
-    href="/docs/recurring-api/"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-  <a
-    href="/api/recurring-api/"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Schemas
-  </a>
-</Card>
+      <Card title="Other Products" icon="ethernet">
+        Utilize additional products to enhance your DeFi superapp.
+        <Columns cols={2}>
+          <Card title="Tokens" href="/docs/tokens" icon="coin" horizontal/>
+          <Card title="Price" href="/docs/price" icon="dollar-sign" horizontal/>
+          <Card title="Send" href="/docs/send" icon="paper-plane" horizontal/>
+        </Columns>
+      </Card>
 
-<Card title="Token API">
-  <a
-    href="/docs/token-api/"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-  <a
-    href="/api/token-api/"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Schemas
-  </a>
-</Card>
+      <Card title="Tool Kits" icon="toolbox">
+        Supercharge your integration by using our easy-to-use tool kits.
+        <Columns cols={1}>
+          <Card title="Plugin" href="/tool-kits/plugin" icon="rocket-launch" horizontal>
+            Few lines of code to integrate full end-to-end Ultra Swap.
+          </Card>
+          <Card title="Wallet Kit" href="/tool-kits/wallet-kit" icon="wallet" horizontal>
+            Swiss army knife adapter for seamless wallet connectivity.
+          </Card>
+          <Card title="Mobile Wallet Adapter" href="/tool-kits/mobile-adapter" icon="mobile" horizontal>
+            Onboard Jupiter Mobile users to connect to your website.
+          </Card>
+          <Card title="Referral Program" href="/tool-kits/referral-program" icon="percent"  horizontal>
+            Utilize together with Ultra Swap to earn integrator fees.
+          </Card>
+        </Columns>
+      </Card>
 
-<Card title="Price API">
-  <a
-    href="/docs/price-api/"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-  <a
-    href="/api/price-api/"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Schemas
-  </a>
-</Card>
+      <Card title="Routing" icon="split">
+        Provide your liquidity capabilities into Jupiter's routing engines.
+        <Columns cols={1}>
+          <Card title="For DEXes" href="/routing/dex-integration" icon="split" horizontal>
+            Integrate your DEX into Jupiter's Metis routing engine.
+          </Card>
+          <Card title="For MMs" href="/routing/rfq-integration" icon="arrow-right" horizontal> 
+            Integrate your MM into JupiterZ (RFQ) routing engine.
+          </Card>
+        </Columns>
+      </Card>
+    </CardGroup>
+  </div>
 
-<Card title="Send API (Beta)">
-  <a
-    href="/docs/send-api/"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-  <a
-    href="/api/send-api/"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Schemas
-  </a>
-</Card>
+  {/* Line break */}
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+  </div>
 
-<Card title="Studio API (Beta)">
-  <a
-    href="/docs/studio-api/"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-  <a
-    href="/api/studio-api/"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Schemas
-  </a>
-</Card>
+  {/* Expansive Ecosystem Section */}
+  <div className="max-w-6xl mx-auto pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
+    <div className="flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight md:leading-10 pb-[10px]">Expansive Ecosystem</div>
+    <div className="flex justify-center text-[#535862] dark:text-[#A6A09E] text-xs sm:text-lg font-normal leading-6 sm:leading-7 pb-[40px] sm:pb-[56px] text-center">Explore our ecosystem of protocols utilizing Jupiter</div>
+    
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+      {/* Integrators Subsection */}
+      <div>
+        <div className="flex justify-center lg:justify-start text-sm sm:text-xl font-semibold leading-tight pb-[10px] text-[#181D27] dark:text-[#F9F9FB]">Integrators</div>
+        <div className="flex justify-center lg:justify-start text-[#535862] dark:text-[#A6A09E] text-xs sm:text-sm font-normal leading-6 pb-[30px] text-center lg:text-left">Protocols powered by Jupiter</div>
+        
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-4 justify-items-center lg:justify-items-start">
+          {[
+            { name: 'moonshot', image: '/static/logos/integrator/moonshot.png', url: 'https://moonshot.com' },
+            { name: 'metengine', image: '/static/logos/integrator/metengine.png', url: 'https://metengine.xyz' },
+            { name: 'basedbot', image: '/static/logos/integrator/basedbot.png', url: 'https://x.com/BasedTradingBot' },
+            { name: 'birdeye', image: '/static/logos/integrator/birdeye.png', url: 'https://birdeye.so' },
+            { name: 'hawksight', image: '/static/logos/integrator/hawksight.png', url: 'https://www.hawksight.co' },
+            { name: 'backpack', image: '/static/logos/integrator/backpack.png', url: 'https://backpack.app' },
+            { name: 'phantom', image: '/static/logos/integrator/phantom.svg', url: 'https://phantom.com' },
+            { name: 'solflare', image: '/static/logos/integrator/solflare.svg', url: 'https://solflare.com' },
+            { name: 'metamask', image: '/static/logos/integrator/metamask.svg', url: 'https://metamask.io' },
+            { name: 'binance', image: '/static/logos/integrator/binance.png', url: 'https://binance.com' },
+            { name: 'bybit', image: '/static/logos/integrator/bybit.jpg', url: 'https://bybit.com' },
+            { name: 'bitget', image: '/static/logos/integrator/bitget.png', url: 'https://bitget.com' },
+            { name: 'coinbase', image: '/static/logos/integrator/coinbase.png', url: 'https://coinbase.com' },
+            { name: 'cryptodotcom', image: '/static/logos/integrator/cryptodotcom.png', url: 'https://crypto.com' },
+            { name: 'gatedotio', image: '/static/logos/integrator/gatedotio.png', url: 'https://gate.io' },
+            { name: 'kraken', image: '/static/logos/integrator/kraken.png', url: 'https://kraken.com' },
+            { name: 'okx', image: '/static/logos/integrator/okx.png', url: 'https://okx.com' },
+            { name: '...', image: '', url: '' },
+          ].map((integrator, index) => (
+            integrator.url ? (
+              <a
+                key={integrator.name}
+                href={integrator.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-2xl flex justify-start items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                <div className="w-12 h-12 sm:w-16 sm:h-16 relative overflow-hidden">
+                  {integrator.image ? (
+                    <img 
+                      className="w-full h-full object-cover pointer-events-none select-none"
+                      src={integrator.image}
+                      alt={integrator.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      draggable="false"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xs sm:text-sm font-semibold text-[#00BEF0] dark:text-[#C7F284] text-center px-1">
+                        {integrator.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </a>
+            ) : (
+              <div
+                key={integrator.name}
+                className="p-2 rounded-2xl flex justify-start items-center gap-2"
+              >
+                <div className="w-12 h-12 sm:w-16 sm:h-16 relative overflow-hidden">
+                  {integrator.image ? (
+                    <img 
+                      className="w-full h-full object-cover pointer-events-none select-none"
+                      src={integrator.image}
+                      alt={integrator.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      draggable="false"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xs sm:text-sm font-semibold text-[#00BEF0] dark:text-[#C7F284] text-center px-1">
+                        {integrator.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
 
-</CardGroup>
+      {/* DEXes Subsection */}
+      <div>
+        <div className="flex justify-center lg:justify-start text-sm sm:text-xl font-semibold leading-tight pb-[10px] text-[#181D27] dark:text-[#F9F9FB]">Routing</div>
+        <div className="flex justify-center lg:justify-start text-[#535862] dark:text-[#A6A09E] text-xs sm:text-sm font-normal leading-6 pb-[30px] text-center lg:text-left">Liquidity venues integrated into Metis and JupiterZ</div>
+        
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-4 justify-items-center lg:justify-items-start">
+          {[
+            { name: 'meteora', image: '/static/logos/dex/meteora.svg', url: 'https://meteora.ag' },
+            { name: 'raydium', image: '/static/logos/dex/raydium.png', url: 'https://raydium.io' },
+            { name: 'orca', image: '/static/logos/dex/orca.png', url: 'https://orca.so' },
+            { name: 'pumpfun', image: '/static/logos/dex/pumpfun.png', url: 'https://pump.fun' },
+            { name: 'sanctum', image: '/static/logos/dex/sanctum.svg', url: 'https://sanctum.so' },
+            { name: 'stabble', image: '/static/logos/dex/stabble.png', url: 'https://stabble.org' },
+            { name: 'lifinity', image: '/static/logos/dex/lifinity.png', url: 'https://lifinity.io' },
+            { name: 'saros', image: '/static/logos/dex/saros.png', url: 'https://dex.saros.xyz' },
+            { name: 'phoenix', image: '/static/logos/dex/phoenix.svg', url: 'https://www.phoenix.trade' },
+            { name: 'pancakswap', image: '/static/logos/dex/pancakeswap.png', url: 'https://pancakeswap.finance' },
+            { name: 'byreal', image: '/static/logos/dex/byreal.png', url: 'https://x.com/byreal_io' },
+            { name: 'moonit', image: '/static/logos/dex/moonit.png', url: 'https://moon.it' },
+            { name: 'orbric', image: '/static/logos/dex/obric.jpg', url: 'https://obric.xyz' },
+            { name: 'solfi', image: '/static/logos/dex/solfi.jpg', url: 'https://x.com/SolFiAMM' },
+            { name: 'goonfi', image: '', url: '' },
+            { name: 'humidifi', image: '', url: '' },
+            { name: 'zerofi', image: '', url: '' },
+            { name: '...', image: '', url: '' },
+          ].map((dex, index) => (
+            dex.url ? (
+              <a
+                key={dex.name}
+                href={dex.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-2xl flex justify-start items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                <div className="w-12 h-12 sm:w-16 sm:h-16 relative overflow-hidden">
+                  {dex.image ? (
+                    <img 
+                      className="w-full h-full object-cover pointer-events-none select-none"
+                      src={dex.image}
+                      alt={dex.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      draggable="false"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xs sm:text-sm font-semibold text-[#00BEF0] dark:text-[#C7F284] text-center px-1">
+                        {dex.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </a>
+            ) : (
+              <div
+                key={dex.name}
+                className="p-2 rounded-2xl flex justify-start items-center gap-2"
+              >
+                <div className="w-12 h-12 sm:w-16 sm:h-16 relative overflow-hidden">
+                  {dex.image ? (
+                    <img 
+                      className="w-full h-full object-cover pointer-events-none select-none"
+                      src={dex.image}
+                      alt={dex.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      draggable="false"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xs sm:text-sm font-semibold text-[#00BEF0] dark:text-[#C7F284] text-center px-1">
+                        {dex.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div className="flex flex-col w-full " style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-<h2
-    className="text-gray-900 dark:text-gray-200"
-    style={{
-      fontSize: '2rem',
-      fontWeight: '700',
-    }}
-  >
-    Browse by Tool Kits
-  </h2>
-  <p
-    style={{
-      fontSize: '1rem',
-      fontWeight: '500',
-      marginTop: '4px',
-    }}
-  >
-  Ready-to-use components and libraries to accelerate your development
-  </p>
-</div>
+  {/* Line break */}
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+  </div>
 
-<CardGroup cols={4}>
-<Card title="Jupiter Plugin">
-  <a href="https://plugin.jup.ag/" target="_blank" rel="noopener noreferrer" className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline">Playground</a>
-  <a href="/docs/tool-kits/plugin" rel="noopener noreferrer" className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline">Docs</a>
-</Card>
+  {/* Support Section */}
+  <div className="max-w-6xl mx-auto pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
+    <div className="flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight md:leading-10 pb-[10px]">Build Together</div>
+    <div className="flex justify-center text-[#535862] dark:text-[#A6A09E] text-base sm:text-lg font-normal leading-6 sm:leading-7 pb-[40px] sm:pb-[56px] text-center">We're here to help you build with Jupiter.</div>
 
-<Card title="Jupiter Mobile Adapter">
-  <a
-    href="https://www.npmjs.com/package/@jup-ag/jup-mobile-adapter"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    NPM
-  </a>
-  <a
-    href="/docs/tool-kits/mobile-adapter"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-</Card>
+    <CardGroup cols={3}>
+      <Card title="Support" icon="people-group" href="/resources/support">
+        Get support our developer community.
+      </Card>
 
-<Card title="Unified Wallet Kit">
-  <a
-    href="https://unified.jup.ag/"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Playground
-  </a>
-  <a
-    href="/docs/tool-kits/wallet-kit"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Docs
-  </a>
-</Card>
+      <Card title="Updates" icon="triangle-exclamation" href="/updates">
+        Refer to the latest developer updates.
+      </Card>
 
-<Card title="NPM Package">
-  <a
-    href="https://www.npmjs.com/package/@jup-ag/api"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    NPM
-  </a>
-  <a
-    href="https://github.com/jup-ag/jupiter-quote-api-node/tree/main/example"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Example
-  </a>
-</Card>
-
-</CardGroup>
-
-<div className="flex flex-col w-full " style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-<h2
-    className="text-gray-900 dark:text-gray-200"
-    style={{
-      fontSize: '2rem',
-      fontWeight: '700',
-    }}
-  >
-    Developed by DevRel Working Group
-  </h2>
-  <p
-    style={{
-      fontSize: '1rem',
-      fontWeight: '500',
-      marginTop: '4px',
-    }}
-  >
-   Community-driven resources and examples to help you build with Jupiter
-  </p>
-</div>
-
-<CardGroup cols={4}>
-<Card title="Example Scripts">
-  <a href="https://github.com/Jupiter-DevRel/typescript-examples" target="_blank" rel="noopener noreferrer" className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline">Typescript</a>
-  <a href="https://github.com/Jupiter-DevRel/python-examples" target="_blank" rel="noopener noreferrer" className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline">Python</a>
-</Card>
-
-<Card title="Jupiverse Kit">
-  <a
-    href="https://www.jupiversekit.xyz/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    Playground
-  </a>
-  <a
-    href="https://github.com/dannweeeee/jupiverse-kit"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
-  >
-    GitHub
-  </a>
-</Card>
-
-</CardGroup>
-
-<div className="flex flex-col w-full " style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-<h2
-    className="text-gray-900 dark:text-gray-200"
-    style={{
-      fontSize: '2rem',
-      fontWeight: '700',
-    }}
-  >
-     We'd love to hear from you!
-  </h2>
-  <p
-    style={{
-      fontSize: '1rem',
-      fontWeight: '500',
-      marginTop: '4px',
-    }}
-  >
-  Join our community and share your feedback to help us improve
-  </p>
-</div>
-
-
-<CardGroup cols={2}>
-<Card title="Get Support" icon="discord" horizontal href="https://discord.gg/jup">
-Join our Discord Community
-</Card>
-<Card title="Feedback & Contribute" icon="github" horizontal href="https://github.com/jup-ag/space-station/issues">
-Share your suggestions on GitHub
-</Card>
-</CardGroup>
-
+      <Card title="Status" icon="signal" href="https://status.jup.ag">
+        Check the status of our services.
+      </Card>
+    </CardGroup>
+  </div>
 </div>

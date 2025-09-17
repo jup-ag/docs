@@ -1,0 +1,25 @@
+---
+title: "Recurring API"
+sidebarTitle: "Overview"
+---
+
+<CardGroup>
+  <Card title="createOrder" href="/api-reference/recurring/create-order" icon="file-lines" horizontal>
+    Request for a base64-encoded unsigned recurring order creation transaction to be used in `POST /recurring/v1/execute`
+  </Card>
+  <Card title="execute" href="/api-reference/recurring/execute" icon="file-lines" horizontal>
+    Execute the signed transaction and get the execution status
+  </Card>
+  <Card title="cancelOrder" href="/api-reference/recurring/cancel-order" icon="file-lines" horizontal>
+    Request for a base64-encoded unsigned recurring order cancellation transaction to be used in `POST /recurring/v1/execute`
+  </Card>
+  <Card title="priceDeposit" href="/api-reference/recurring/price-deposit" icon="file-lines" horizontal>
+    **DEPRECATED**: This endpoint is deprecated. Please use time-based recurring orders instead.
+  </Card>
+  <Card title="priceWithdraw" href="/api-reference/recurring/price-withdraw" icon="file-lines" horizontal>
+    **DEPRECATED**: This endpoint is deprecated. Please use time-based recurring orders instead.
+  </Card>
+  <Card title="getRecurringOrders" href="/api-reference/recurring/get-recurring-orders" icon="file-lines" horizontal>
+    Request for the active or historical orders associated to the provided account
+  </Card>
+</CardGroup>

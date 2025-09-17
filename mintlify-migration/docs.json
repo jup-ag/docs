@@ -606,7 +606,7 @@
       "destination": "/portal/responses"
     },
     {
-      "source": "/portal/rate-limit",
+      "source": "/docs/api-rate-limit",
       "destination": "/portal/rate-limit"
     },
     {
@@ -650,6 +650,38 @@
       "destination": "/api-reference/studio/:slug*"
     },
     {
+      "source": "/api/ultra-api/",
+      "destination": "/api-reference/ultra/"
+    },
+    {
+      "source": "/api/swap-api/",
+      "destination": "/api-reference/swap/"
+    },
+    {
+      "source": "/api/lend-api/",
+      "destination": "/api-reference/lend/"
+    },
+    {
+      "source": "/api/trigger-api/",
+      "destination": "/api-reference/trigger/"
+    },
+    {
+      "source": "/api/token-api/",
+      "destination": "/api-reference/tokens/"
+    },
+    {
+      "source": "/api/price-api/",
+      "destination": "/api-reference/price/"
+    },
+    {
+      "source": "/api/send-api/",
+      "destination": "/api-reference/send/"
+    },
+    {
+      "source": "/api/studio-api/",
+      "destination": "/api-reference/studio/"
+    },
+    {
       "source": "/docs/ultra-api/:slug*",
       "destination": "/docs/ultra/:slug*"
     },
@@ -684,6 +716,42 @@
     {
       "source": "/docs/studio-api/:slug*",
       "destination": "/docs/studio/:slug*"
+    },
+    {
+      "source": "/docs/ultra-api/",
+      "destination": "/docs/ultra/"
+    },
+    {
+      "source": "/docs/swap-api/",
+      "destination": "/docs/swap/"
+    },
+    {
+      "source": "/docs/lend-api/",
+      "destination": "/docs/lend/"
+    },
+    {
+      "source": "/docs/trigger-api/",
+      "destination": "/docs/trigger/"
+    },
+    {
+      "source": "/docs/recurring-api/",
+      "destination": "/docs/recurring/"
+    },
+    {
+      "source": "/docs/token-api/",
+      "destination": "/docs/tokens/"
+    },
+    {
+      "source": "/docs/price-api/",
+      "destination": "/docs/price/"
+    },
+    {
+      "source": "/docs/send-api/",
+      "destination": "/docs/send/"
+    },
+    {
+      "source": "/docs/studio-api/",
+      "destination": "/docs/studio/"
     },
     {
       "source": "/docs/routing/:slug*",

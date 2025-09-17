@@ -1,10 +1,11 @@
 ---
 title: "Development Basics"
-description: "Solana uses an account-based architecture where data are stored in accounts. However, Solana keeps Programs (also known as smart contracts on other blockchains) and Accounts distinct."
 ---
 
+Solana uses an account-based architecture where data are stored in accounts. However, Solana keeps Programs (also known as smart contracts on other blockchains) and Accounts distinct.
+
 <Tip>
-  **WHERE IS JUPITER?**
+  **Where are the Jupiter Programs deployed?**
 
   Jupiter is built on Solana MAINNET only!
 </Tip>
@@ -25,18 +26,16 @@ The Solana Web3.js and Rust client libraries serve as essential interfaces for i
 3. Interfacing with Solana Programs and Accounts
 
 <Info>
-  **LINKS**
-
   Explore the rich features and detailed documentation of these libraries in the official Solana Developer Documentation: [Web3.js](https://solana.com/docs/clients/javascript) and [Rust client](https://solana.com/docs/clients/rust)
 </Info>
 
-## Interacting with Jupiter Programs
+## Interacting with Jupiter
 
-To interact with the Jupiter Swap Aggregator Program, there are a few ways to do it:
+For example, to use the Jupiter Swap Aggregator Program, there are a few ways to do it:
 
 | Method                                                             | Description                                                                                                                                                                                                                                            |
 | :----------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Swap API                                                           | Simply call the Quote API to get a quote based on Jupiter’s routing engine and call the Swap API to get a serialized transaction to send to the network.                                                                                               |
+| [Ultra Swap API](/docs/ultra)                                      | Simply call the order endpoint to get a quote, sign then submit the transaction to the execute endpoint, we handle the rest for you, no RPCs needed!                                                                                                   |
 | Flash Fill method                                                  | If you are building your own on-chain program, an alternative method from CPI, using Versioned Transaction and Address Lookup Tables, thus reducing the size of each account (used to be a limitation of using CPI method).                            |
 | [Cross Program Invocation (CPI)](https://solana.com/docs/core/cpi) | CPI method is now recommended. As of January 2025, Jupiter Swap via CPI is recommended for most users. [The `Loosen CPI restriction` feature has been deployed on Solana, you can read more here](https://github.com/solana-labs/solana/issues/26641). |
 
@@ -44,19 +43,19 @@ To interact with the Jupiter Swap Aggregator Program, there are a few ways to do
 
 Before you send a transaction to the network, you will need to build the transaction that defines the instructions to execute and accounts to read/write to. It can be complex to handle this yourself when building with Jupiter, you can [read more about it here](https://solana.com/docs/core/transactions).
 
-However, good news! Most of our APIs and SDKs just handles it for you, so you get a response with the transaction to be prepared and sent to the network.
-
 <Tip>
-  **SWAP API TIP**
-
-  The Swap API returns you the serialized transaction which you can directly send it to your RPC endpoint to execute on Solana. Alternatively, if you plan to manipulate the instructions and build your own custom transactions, you can request from the `/swap-instructions` endpoint.
+  However, good news! The [Ultra Swap API](/docs/ultra) handles everything for you!
+  
+  1. You get an order response with the encoded transaction.
+  2. You sign the transaction and submit to execute.
+  2. We handle the transaction sending and the rest for you.
 </Tip>
 
 ## Sending Transactions
 
 Transactions on Solana can only be sent to the network through an RPC (Remote Procedure Call) endpoint. The Solana network operates with a client-server model where RPC nodes handle transactions and interact with the validators of the blockchain. We recommend using 3rd party RPC providers like [Triton](https://triton.one/) or [Helius](https://helius.dev/) for production applications.
 
-There are a few key points to note when sending transactions to the Solana network. At Jupiter, we do our best to help you optimize transaction sending and make it easier for you.
+There are a few key points to note when sending transactions to the Solana network.
 
 1. Solana transaction base fee
 2. Priority fee
@@ -64,14 +63,22 @@ There are a few key points to note when sending transactions to the Solana netwo
 4. Transaction broadcasting methods
 5. Slippage (100% slippage will probably always work but also mean you can possibly get the worst outcome, so we need to find the balance between success optimizations and best output price)
 
-## More about these factors?
+<Tip>
+  By using [Ultra Swap API](/docs/ultra), we will optimize all of these for you!
+  
+  * No additional params from you.
+  * No RPCs required from you.
+  * Simply let us handle and optimize it for you.
+</Tip>
 
-### What is Priority Fee?
+## About these factors
+
+### What is Priority Fee
 
 Transactions submitted to the blockchain are prioritized based on a fee-bidding process. The higher the priority fee, the higher your transaction will be placed in the execution queue.
 
 <Note>
-  **OVERPAYING PRIORITY FEE**
+  **Overpaying Priority Fee**
 
   It is important to note that overpaying for priority fee can be detrimental in the long run. If transactions continuously outbid each other, the overall fees required to process across the network will increase over time.
 </Note>
@@ -92,25 +99,25 @@ Transactions submitted to the blockchain are prioritized based on a fee-bidding 
 
 When querying the micro-lamport per compute unit for a particular program or account, it will contain both the Global and Local Fee markets.
 
-### What is Compute Unit?
+### What is Compute Unit
 
 Compute Unit (CU) is a standardized metric for evaluating how much "work" or "resource" is required by the transaction to execute. Different operations on Solana has varying amounts of CUs. In order to keep the blockchain efficient yet fast, each transaction, the Solana runtime has an absolute max compute unit limit of 1.4 million CU and sets a default requested max limit of 200k CU per instruction.
 
 <Tip>
-  **SET CUSTOM COMPUTE UNIT LIMIT**
+  **Set Custom Compute Unit Limit**
 
   A transaction can request a more specific and optimal compute unit limit by including a single `SetComputeUnitLimit` instruction. Either a higher or lower limit. But it may never request higher than the absolute max limit per transaction.
 </Tip>
 
 However, we must note that higher CU also means higher Priority Fee it might need to help prioritize it.
 
-### What are some transaction broadcasting methods?
+### What are some transaction broadcasting methods
 
 1. Typical RPCs
 2. RPCs with SWQoS
 3. Jito RPC
 
-### What is Slippage?
+### What is Slippage
 
 A percentage or bps threshold the user specify and if the actual executed output is less than quoted output by the percentage/bps, the transaction will fail.
 

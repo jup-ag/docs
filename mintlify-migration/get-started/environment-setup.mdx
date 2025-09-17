@@ -14,15 +14,12 @@ title: "Environment Setup"
 
 * `@solana/web3.js`
 * `@solana/spl-token`
-* `@jup-ag/referral-sdk`
 
 ## Useful Scripts
 
 **Set up RPC Connection**
 
 <Info>
-  **NOTE**
-
   Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters). However, as your application grows, we recommend you to always use your own or provision a 3rd party provider’s RPC endpoint such as [Helius](https://helius.dev/) or [Triton](https://triton.one/).
 </Info>
 
@@ -33,16 +30,18 @@ const connection = new Connection('https://api.mainnet-beta.solana.com');
 **Set up Development Wallet**
 
 <Info>
-  **NOTE**
-
-  * You can paste in your private key for testing purposes but this is not recommended for production applications.
-  * If you want to store your private key in the project directly, you can do it via a `.env` file.
+  You can paste in your private key for testing but this is not recommended for production.
+  * Either use your private key in the project directly, you can do it via a `.env` file.
+  * Or set up your private key in the [Solana CLI](https://solana.com/docs/intro/installation#create-wallet).
 </Info>
 
-To set up a development wallet via `.env` file, you can use the following script.
+<CodeGroup>
 
-```js
-// index.js
+```javascript Store private key in .env
+// In your .env file
+PRIVATE_KEY=""
+
+// In your index.js (or any file that needs the private key)
 import { Keypair } from '@solana/web3.js';
 import dotenv from 'dotenv';
 require('dotenv').config();
@@ -50,17 +49,12 @@ require('dotenv').config();
 const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || '')));
 ```
 
-```bash
-// .env
-PRIVATE_KEY=""
-```
-
-To set up a development wallet via a wallet generated via [Solana CLI](https://solana.com/docs/intro/installation#solana-cli-basics), you can use the following script.
-
-```js
+```javascript Store private key in Solana CLI
 import { Keypair } from '@solana/web3.js';
 import fs from 'fs';
 
 const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
 const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
 ```
+
+</CodeGroup>

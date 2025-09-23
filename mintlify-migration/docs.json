@@ -66,54 +66,71 @@
             ]
           },
           {
-            "item": "Ultra",
+            "item": "Ultra Swap",
             "icon": "bolt",
             "groups": [
               {
-                "group": " ",
-                "pages": ["docs/ultra/index"]
-              },
-              {
-                "group": "Ultra API",
+                "group": "About Ultra Swap",
                 "pages": [
-                  "docs/ultra/get-order",
-                  "docs/ultra/execute-order",
-                  "docs/ultra/get-balances",
-                  "docs/ultra/get-shield",
-                  "docs/ultra/search-token"
+                  "docs/ultra/index",
+                  {
+                    "group": "Features",
+                    "pages": [
+                      "docs/ultra/gasless"
+                    ]
+                  }
                 ]
               },
               {
-                "group": "Ultra API Guides",
+                "group": "Ultra Swap API",
+                "pages": [
+                  "docs/ultra/get-started",
+                  "docs/ultra/get-order",
+                  "docs/ultra/execute-order",
+                  "docs/ultra/response",
+                  {
+                    "group": "Data Endpoints",
+                    "pages": [
+                      "docs/ultra/search-token",
+                      "docs/ultra/get-holdings",
+                      "docs/ultra/get-shield"
+                    ]
+                  },
+                  "docs/ultra/rate-limit"
+                ]
+              },
+              {
+                "group": "Ultra Swap Guides",
                 "pages": [
                   "docs/ultra/add-fees-to-ultra",
                   "docs/ultra/plugin-integration"
                 ]
               },
               {
-                "group": " ",
-                "pages": ["swap/index"]
-              },
-              {
-                "group": "Swap API",
+                "group": "Legacy Swap API",
                 "pages": [
-                  "docs/swap/get-quote",
-                  "docs/swap/build-swap-transaction",
-                  "docs/swap/send-swap-transaction"
+                  {
+                    "group": "Usage",
+                    "pages": [
+                      "docs/swap/index",
+                      "docs/swap/get-quote",
+                      "docs/swap/build-swap-transaction",
+                      "docs/swap/send-swap-transaction"
+                    ]
+                  },
+                  {
+                    "group": "Guides",
+                    "pages": [
+                      "docs/swap/add-fees-to-swap",
+                      "docs/swap/payments-through-swap",
+                      "docs/swap/requote-with-lower-max-accounts"
+                    ]
+                  },
+                  {
+                    "group": "Debugging",
+                    "pages": ["docs/swap/common-errors"]
+                  }
                 ]
-              },
-              {
-                "group": "Swap API Guides",
-                "pages": [
-                  "docs/swap/add-fees-to-swap",
-                  "docs/swap/payments-through-swap",
-                  "docs/swap/requote-with-lower-max-accounts",
-                  "docs/swap/solana-unity-sdk"
-                ]
-              },
-              {
-                "group": "Debugging",
-                "pages": ["docs/swap/common-errors"]
               }
             ]
           },
@@ -156,24 +173,6 @@
                   "docs/perp/position-request-account",
                   "docs/perp/pool-account",
                   "docs/perp/custody-account"
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Studio",
-            "icon": "building-columns",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/studio/index"]
-              },
-              {
-                "group": "Studio API",
-                "tag": "BETA",
-                "pages": [
-                  "docs/studio/create-token",
-                  "docs/studio/claim-fee"
                 ]
               }
             ]
@@ -296,6 +295,24 @@
                 ]
               }
             ]
+          },
+          {
+            "item": "Studio",
+            "icon": "building-columns",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["docs/studio/index"]
+              },
+              {
+                "group": "Studio API",
+                "tag": "BETA",
+                "pages": [
+                  "docs/studio/create-token",
+                  "docs/studio/claim-fee"
+                ]
+              }
+            ]
           }
         ]
       },
@@ -310,19 +327,20 @@
             "group": "api-reference Reference",
             "pages": [
               {
-                "group": "Ultra",
+                "group": "Ultra Swap",
                 "pages": [
                   "api-reference/ultra",
                   "api-reference/ultra/order",
                   "api-reference/ultra/execute",
-                  "api-reference/ultra/balances",
+                  "api-reference/ultra/holdings",
                   "api-reference/ultra/shield",
                   "api-reference/ultra/search",
-                  "api-reference/ultra/routers"
+                  "api-reference/ultra/routers",
+                  "api-reference/ultra/balances"
                 ]
               },
               {
-                "group": "Swap",
+                "group": "Legacy Swap",
                 "pages": [
                   "api-reference/swap",
                   "api-reference/swap/quote",

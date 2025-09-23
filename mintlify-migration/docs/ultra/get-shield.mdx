@@ -2,35 +2,9 @@
 title: "Get Shield"
 ---
 
-<Info>
-  **NOTE**
+The Ultra Swap API provides an endpoint to retrieve token information and associated warnings for the specified mint addresses. To use this endpoint, provide one or more mint addresses for the required query parameter named mints.
 
-  - Lite URL: `https://lite-api.jup.ag/ultra/v1/shield`
-
-  - Dynamic URL: `https://api.jup.ag/ultra/v1/shield`
-
-  Dynamic Rate Limits are now applied to Ultra API.
-
-  * No Pro plans or payment needed.
-  * Simply generate the universal API Key via [Portal](https://portal.jup.ag)
-  * Rate limits scale together with your swap volume.
-
-<CardGroup cols={1}>
-  <Card title="Read more about Ultra API Dynamic Rate Limit" href="/portal/rate-limit" icon="book-open" horizontal/>
-</CardGroup>
-</Info>
-
-<Tip>
-  **API REFERENCE**
-
-  To fully utilize the Ultra API, check out the [Ultra API Reference](/api-reference/ultra/shield).
-</Tip>
-
-## Get Shield
-
-The Ultra API provides an endpoint to retrieve token information and associated warnings for the specified mint addresses. To use this endpoint, provide one or more mint addresses for the required query parameter named mints.
-
-This is useful when integrating with Jupiter Ultra or any other APIs, allowing you or your user to be informed of any potential malicious mints before conducting your transaction.
+This is useful when integrating with Jupiter Ultra Swap or any other APIs, allowing you or your user to be informed of any potential malicious mints before conducting your transaction.
 
 ```js
 const shieldResponse = await (
@@ -44,7 +18,7 @@ The shield response will return a list of objects, containing the token informat
 
 Do note that this is subject to changes, and we will be adding more warnings and improving the accuracy of the warnings over time.
 
-For the full list of potential warnings, refer to the [Shield API Reference](/api/ultra-api/shield).
+For the full list of potential warnings, refer to the [Shield API Reference](/api-reference/ultra/shield).
 
 **Successful example response:**
 

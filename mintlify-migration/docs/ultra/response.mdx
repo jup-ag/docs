@@ -1,0 +1,277 @@
+---
+title: "Response"
+---
+
+In this section, we will cover potential responses that can be returned from both the `/order` and `/execute` endpoints.
+
+## Order Response
+
+<Tabs>
+    <Tab title="Success" icon="face-smile">
+        <CodeGroup>
+            ```json Metis
+            {
+                "mode": "ultra",
+                "inAmount": "100000000",
+                "outAmount": "461208958",
+                "otherAmountThreshold": "460024271",
+                "swapMode": "ExactIn",
+                "slippageBps": 26,
+                "priceImpactPct": "-0.0001311599520149334",
+                "routePlan": [
+                    {
+                    "swapInfo": {
+                        "ammKey": "HTvjzsfX3yU6BUodCjZ5vZkUrAxMDTrBs3CJaq43ashR",
+                        "label": "MeteoraDLMM",
+                        "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                        "outputMint": "So11111111111111111111111111111111111111112",
+                        "inAmount": "52000000",
+                        "outAmount": "239879552",
+                        "feeAmount": "0",
+                        "feeMint": "11111111111111111111111111111111"
+                    },
+                    "percent": 52,
+                    "bps": 5200
+                    }
+                ],
+                "feeMint": "So11111111111111111111111111111111111111112",
+                "feeBps": 2,
+                "taker": "taker-address",
+                "gasless": false,
+                "signatureFeeLamports": 5000,
+                "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAEB+r/6dWfRh5QZq1pS2FU/a5CQmMX/HcgLK4+zaeSlI5cZdTk+KNaH68Jj2ISScdmgdJ/88PKxKtXPavfMK2A5TFvQBO6cleTQsKnQWYpDA5PurAceVrkoCVPKJSGBw6LARo6wTdxxXRAzu6pCAqBH8SnExvClVC1O8bT5gyQxm5oAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAAAEedVb8jHAbu50xW7OaBUH/bGy3qP0jlECsc2iVrwTjwbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpeE6XgwQiPQTdYGYpJIn7N9ynBymyDkUCCC1aA3Klx+cFBAAFAjh+AQAEAAkD75JsAAAAAAAFBQEAFAYQCZPxe2T0hK52/wUhAAIBEhQGBgURBQcWCggLCQwCAQAGFRcADQECDw4DFQYTLrtk+swxxK8UAOH1BQAAAAAbtn0bAAAAABoAAgAAAAIAAABDUBQAAlYB/8ASAAIGAwEAAAEJAym/lQcqT78E33F1k+c4vMwhJygVwkcagNn59VWw1IQlASAFEwAoAhdSojJcrqzlDmuUV2ZVdk3ihN14mZpQMxrnUJS463C7xAUxLhQVMAItL7MrMZDyYzurr+hCn5YjvrvmsR9/EdfdhYUISn5ODzRsA8vPzAHO",
+                "prioritizationFeeLamports": 696237,
+                "rentFeeLamports": 0,
+                "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "outputMint": "So11111111111111111111111111111111111111112",
+                "swapType": "aggregator",
+                "router": "metis",
+                "requestId": "019974a8-5fbb-7395-9355-9ebf8f844884",
+                "inUsdValue": 99.96761068334662,
+                "outUsdValue": 99.95449893632635,
+                "priceImpact": -0.013115995201493341,
+                "swapUsdValue": 99.96761068334662,
+                "totalTime": 359
+            }
+            ```
+
+            ```json JupiterZ (RFQ)
+            {
+                "mode": "ultra",
+                "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "outputMint": "So11111111111111111111111111111111111111112",
+                "inAmount": "100000000",
+                "outAmount": "460250418",
+                "otherAmountThreshold": "460250418",
+                "swapMode": "ExactIn",
+                "slippageBps": 0,
+                "priceImpactPct": "-0.00018881197024002837",
+                "routePlan": [
+                    {
+                    "swapInfo": {
+                        "ammKey": "CDg3bPoM21fSXEzrXWHWyJR33JHX6xaYboq5p7s4uo48",
+                        "label": "JupiterZ",
+                        "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                        "outputMint": "So11111111111111111111111111111111111111112",
+                        "inAmount": "100000000",
+                        "outAmount": "460250418",
+                        "feeAmount": "0",
+                        "feeMint": "11111111111111111111111111111111"
+                    },
+                    "percent": 100,
+                    "bps": 10000
+                    }
+                ],
+                "feeBps": 2,
+                "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAIABgymr6yEAmkOIXpp3AcyvWL/QB2KoDZDEZAXeMYvfP7cver/6dWfRh5QZq1pS2FU/a5CQmMX/HcgLK4+zaeSlI5cDiUHiMuOTEfv/7RvoyR8p3lT/6Mq87vOJ1wZbQZg8PAPZvgVNXGQR4l/GibNBPjRJtllQ2kqGDcrpjCUaFKkdTAkgVB1V0ZN+ftspt1cSBk+wVMQVrs4JNQFQwBgW9GZb0ATunJXk0LCp0FmKQwOT7qwHHla5KAlTyiUhgcOiwEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAABpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqUpYSftyo7vpH9xbDmpX9jxaHLRbIGem7Qys02OVyKECxvp6877brTo9ZfNqq8l0MbG75MLS9uDkfKYCA0UvXWGJKbAQWdHOsOJGn5YdWJhd2PXDdDG9WzYvCihrfITlwwMHAAkDDRoAAAAAAAAHAAUC4JAAAAoMAQAFAwoCCwkICQYEI6hgt6NcCiigAOH1BQAAAAAy3W4bAAAAACoW0mgAAAAAAgAAAA==",
+                "gasless": true,
+                "signatureFeeLamports": 0,
+                "prioritizationFeeLamports": 0,
+                "rentFeeLamports": 0,
+                "requestId": "ff63982b-9140-9b0e-e525-44f7246a79b2",
+                "swapType": "rfq",
+                "router": "jupiterz",
+                "quoteId": "5852f88e-525b-5400-ab97-abe5e409ebfd",
+                "maker": "CDg3bPoM21fSXEzrXWHWyJR33JHX6xaYboq5p7s4uo48",
+                "taker": "taker-address",
+                "expireAt": "1758598698",
+                "platformFee": {
+                    "amount": "92050",
+                    "feeBps": 2
+                },
+                "inUsdValue": 99.97072758461792,
+                "outUsdValue": 99.95185191457634,
+                "priceImpact": -0.018881197024002837,
+                "swapUsdValue": 99.97072758461792,
+                "totalTime": 489
+            }
+            ```
+        </CodeGroup>
+    </Tab>
+    <Tab title="Failed" icon="face-frown-slight">
+        In cases where it fails to find a quote, the response will be as follows.
+        ```json 400 Response Code
+        {
+            "error": "Failed to get quotes"
+        }
+        ```
+
+        In cases where a quote is available but the swap simulation fails, there are error codes that can be returned.
+        | `errorCode` | `errorMessage` | Description |
+        | :---------- | :------------- | :---------- |
+        | 1 | Insufficient funds | Does not have sufficient swap amount |
+        | 2 | Top up `${solAmount}` SOL for gas | Does not have sufficient SOL for gas fees |
+        | 3 | Minimum `${swapAmount}` for gasless | Does not have sufficient trade size to be applicable for Gasless Support |
+    </Tab>
+</Tabs>
+
+
+## Execute Response
+
+<Tabs>
+    <Tab title="Success" icon="face-smile">
+        Use the `signature` field to view the transaction in an explorer.
+
+        ```json
+        {
+            "status": "Success",
+            "signature": "transaction-signature",
+            "slot": "323598314",
+            "code": 0,
+            "inputAmountResult": "9995000",
+            "outputAmountResult": "1274698",
+            "swapEvents": [
+                {
+                "inputMint": "So11111111111111111111111111111111111111112",
+                "inputAmount": "9995000",
+                "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "outputAmount": "1274698"
+                }
+            ]
+        }
+        ```
+    </Tab>
+    <Tab title="Failed" icon="face-frown-slight">
+        Here are some example cases of the execute response when it fails.
+
+        ```json Ultra Endpoint Codes
+        {
+            "code": -1,
+            "error": "Order not found, it might have expired"
+        }
+        ```
+
+        ```json Aggregator Swap Type Codes
+        {
+            "status": "Failed",
+            "slot": "0",
+            "signature": "transaction-signature",
+            "code": -1005,
+            "error": "Transaction expired"
+        }
+        ```
+
+        ```json RFQ Swap Type Codes
+        {
+            "status": "Failed",
+            "slot": "0",
+            "code": -2005,
+            "error": "Internal error",
+        }
+        ```
+
+        In cases where the routes are of aggregator types like Metis and has been submitted to the network, but failed to land due to program related errors, the response will be as follows.
+
+        Only Jupiter V6 Aggregator Program Codes are parsed with description, for other DEX program codes, the error message can be `custom program error: #<code>`.
+
+        ```json Program Related Codes
+        {
+            "status": "Failed",
+            "signature": "transaction-signature",
+            "slot": "368661931",
+            "code": 6001,
+            "error": "Slippage tolerance exceeded",
+            "totalInputAmount": "1000000",
+            "totalOutputAmount": "4647512",
+            "inputAmountResult": "1000000",
+            "outputAmountResult": "4648441",
+            "swapEvents": [
+                {
+                "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "inputAmount": "50000",
+                "outputMint": "So11111111111111111111111111111111111111112",
+                "outputAmount": "232423"
+                },
+                {
+                "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "inputAmount": "950000",
+                "outputMint": "So11111111111111111111111111111111111111112",
+                "outputAmount": "4416018"
+                }
+            ]
+        }
+        ```
+    </Tab>
+</Tabs>
+
+### Ultra Endpoint Codes
+
+| Code | Description | Debugging |
+| :--- | :---------- | :-------- |
+| 0    | Success                    | -                                                                                                                            |
+| -1   | Missing cached order       | `requestId` not found in cache, likely expired or not found                                                                  |
+| -2   | Invalid signed transaction | `signedTransaction` is invalid, likely failed to sign the transaction correctly                                              |
+| -3   | Invalid message bytes      | `signedTransaction` is invalid, likely due to incorrect usage like modification of `transaction` field in the order response |
+| -4   | Missing request id         | `requestId` is not found in the request to `/execute`                                                                        |
+| -5   | Missing signed transaction | `signedTransaction` is not found in the request to `/execute`                                                                |
+
+### Aggregator Swap Type Codes
+
+| Code | Description | Debugging |
+| :--- | :---------- | :-------- |
+| -1000 | Failed to land               | Transaction failed to land on the network                                                                                          |
+| -1001 | Unknown error                | Please try again, if it persists please reach out in Discord                                                                       |
+| -1002 | Invalid transaction          | Please try again, if it persists please reach out in Discord                                                                       |
+| -1003 | Transaction not fully signed | Failed to sign the transaction correctly                                                                                           |
+| -1004 | Invalid block height         | The block height is invalid                                                                                                        |
+| -1005 | Expired                      | The submitted transaction has been attempted but has expired                                                                       |
+| -1006 | Timed out                    | The submitted transaction has been attempted but has timed out                                                                     |
+| -1007 | Gasless unsupported wallet   | The wallet is not supported for gasless                                                                                            |
+
+### RFQ Swap Type Codes
+
+| Code | Description | Debugging |
+| :--- | :---------- | :-------- |
+| -2000 | Failed to land  | Please try again, if it persists please reach out in Discord         |
+| -2001 | Unknown error   | Please try again, if it persists please reach out in Discord         |
+| -2002 | Invalid payload | Please try again, if it persists please reach out in Discord         |
+| -2003 | Quote expired   | User did not respond in time or RFQ provider did not execute in time |
+| -2004 | Swap rejected   | User or RFQ provider rejected the swap                               |
+| -2005 | Internal error  | Please try again, if it persists please reach out in Discord         |
+
+### Program Related Codes
+
+For Jupiter V6 Aggregator Program Codes, the error message will be parsed with description.
+
+<Card title="IDL" href="https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#programIdl" icon="file-lines" horizontal>
+    For the full and most up to date list of Jupiter V6 Aggregator Program Codes, you can refer to the IDL on an explorer.
+</Card>
+
+<Info>
+    If you need help identifying the other DEX program codes, please reach out in Discord.
+</Info>
+
+
+## Best Practices
+
+It is important to understand the error codes to provide a better experience for your users, helping them make an informed decision or follow up step to help their transaction succeed.
+
+<Info>
+    See [https://jup.ag/](https://jup.ag/) as a reference to understand how we handle errors on the UI.
+</Info>
+
+| Example Error | Best Practice |
+| :------------ | :------------ |
+| Slippage exceeding threshold | Show the user the current slippage tolerance and the incurred slippage                                       |
+| Insufficient funds           | Disable swap widget but still provide quote visibility                                                       |
+| Non Jupiter Program Errors   | Allow the user to retry with a new route by requoting and/or exclude the specific DEX from the quote request |

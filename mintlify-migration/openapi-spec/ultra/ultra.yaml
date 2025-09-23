@@ -122,9 +122,7 @@ paths:
                     enum:
                       - aggregator
                       - jupiterz
-                      - hashflow
                       - dflow
-                      - pyth
                       - okx                  
                   transaction:
                     type: string
@@ -159,11 +157,25 @@ paths:
                     required:
                       - amount
                       - feeBps
-                  errorMessage:
-                    type: string
+                  errorCode:
+                    type: number
+                    enum:
+                      - 1
+                      - 2
+                      - 3
                     description: |
                       - This field will be present if `taker` is defined and `transaction` is the empty string
-                      - This field can still return despite having a valid order/quote, this is meant to support displaying of quote to users together with the error message
+                      - It is unique for each error scenarios
+                  errorMessage:
+                    type: string
+                    enum:
+                      - Insufficient funds
+                      - Top up `${solAmount}` SOL for gas
+                      - Minimum `${swapAmount}` for gasless
+                    description: |
+                      - This field will be present if `taker` is defined and `transaction` is the empty string
+                      - This field can still return despite having a valid order/quote
+                      - This is meant for display purposes only and it is discouraged to match these error messages as they could be parameterized
                 required:
                   - mode
                   - inputMint
@@ -248,9 +260,7 @@ paths:
             enum:
               - metis
               - jupiterz
-              - hashflow
               - dflow
-              - pyth
               - okx
           required: false
         - in: query
@@ -366,6 +376,7 @@ paths:
   /balances/{address}:
     get:
       summary: balances
+      deprecated: true
       description: |
         Request for token balances of an account
       responses:
@@ -419,6 +430,50 @@ paths:
             in: path
             name: address
             required: true
+  /holdings/{address}:
+    get:
+      summary: holdings
+      description: |
+        Request for token balances of an account including token account information
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HoldingsResponse"
+      parameters:
+          - schema:
+              type: string
+            in: path
+            name: address
+            required: true
+            description: The wallet address to get holdings for
+  /holdings/{address}/native:
+    get:
+      summary: holdings (native)
+      description: |
+        Request for native SOL holdings only, without other tokens
+        
+        :::note
+        - This is a more efficient endpoint when you only need SOL balance
+        - Refer to [Ultra API doc](/docs/ultra-api/get-holdings) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeHoldingsResponse"
+      parameters:
+          - schema:
+              type: string
+            in: path
+            name: address
+            required: true
+            description: The wallet address to get native SOL balance for
+
   /shield:
     get:
       summary: shield
@@ -534,9 +589,7 @@ paths:
                       enum:
                         - Metis v1.6
                         - JupiterZ
-                        - Hashflow
                         - DFlow
-                        - Pyth Express Relay
                         - OKX DEX Router
                     icon:
                       type: string
@@ -765,3 +818,81 @@ components:
         numNetBuyers:
           type: number
           nullable: true
+
+    HoldingsResponse:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Total SOL in lamports
+        uiAmount:
+          type: number
+          description: Total SOL in UI units after applying decimals
+        uiAmountString:
+          type: string
+          description: Total SOL as string in UI units after applying decimals
+        tokens:
+          type: object
+          description: Other token holdings organized by mint address as keys
+          additionalProperties:
+            description: Token mint address as key
+            type: array
+            items:
+              $ref: "#/components/schemas/TokenAccount"
+      required:
+        - amount
+        - uiAmount
+        - uiAmountString
+        - tokens
+    NativeHoldingsResponse:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Total SOL in lamports
+        uiAmount:
+          type: number
+          description: Total SOL in UI units after applying decimals
+        uiAmountString:
+          type: string
+          description: Total SOL as string in UI units after applying decimals
+      required:
+        - amount
+        - uiAmount
+        - uiAmountString
+    TokenAccount:
+      type: object
+      properties:
+        account:
+          type: string
+          description: The token account address
+        amount:
+          type: string
+          description: Token amount in atomic/raw units
+        uiAmount:
+          type: number
+          description: Token amount in UI units after applying decimals
+        uiAmountString:
+          type: string
+          description: Token amount as string in UI units after applying decimals
+        isFrozen:
+          type: boolean
+          description: Whether the token account is frozen
+        isAssociatedTokenAccount:
+          type: boolean
+          description: Whether this is an associated token account
+        decimals:
+          type: number
+          description: Number of decimal places for the token
+        programId:
+          type: string
+          description: The token program ID
+      required:
+        - account
+        - amount
+        - uiAmount
+        - uiAmountString
+        - isFrozen
+        - isAssociatedTokenAccount
+        - decimals
+        - programId

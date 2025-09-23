@@ -2,107 +2,72 @@
 title: "Execute Order"
 ---
 
-<Info>
-  **NOTE**
-
-  Lite URL: `https://lite-api.jup.ag/ultra/v1/execute`
-
-  Dynamic URL: `https://api.jup.ag/ultra/v1/execute`
-
-  Dynamic Rate Limits are now applied to Ultra API.
-
-  * No Pro plans or payment needed.
-  * Simply generate the universal API Key via [Portal](https://portal.jup.ag)
-  * Rate limits scale together with your swap volume.
-
-<CardGroup cols={1}>
-  <Card title="Read more about Ultra API Dynamic Rate Limit" href="/portal/rate-limit" icon="book-open" horizontal/>
-</CardGroup>
-</Info>
-
-<Tip>
-  **API REFERENCE**
-
-  To fully utilize the Ultra API, check out the [Ultra API Reference](/api-reference/ultra/execute).
-</Tip>
+After getting the quote and transaction from the [Get Order](/docs/ultra/get-order) endpoint, you can sign and send to the network using the Ultra Swap API's `/execute` endpoint.
 
 ## Sign Transaction
 
-Using the Solana `web3.js` **v1** library, you can sign the transaction as follows:
+Using the Solana `web3.js@1` library, you can sign the transaction as follows:
 
-<Accordion title="Set up imports and wallet for signing">
-```bash
-npm install @solana/web3.js@1 # Using v1 of web3.js instead of v2
-npm install bs58
-npm install dotenv # if required for wallet setup
-```
+<Accordion title="Set up dependencies and wallet for signing">
+  **Set up dependencies for signing**
+  ```bash
+  npm install @solana/web3.js@1
+  ```
 
-<Info>
-  **NOTE**
+  **Set up Development Wallet**
+  <Info>
+    You can paste in your private key for testing but this is not recommended for production.
+    * Either use your private key in the project directly, you can do it via a `.env` file.
+    * Or set up your private key in the [Solana CLI](https://solana.com/docs/intro/installation#create-wallet).
+  </Info>
 
-  * You can paste in your private key for testing purposes but this is not recommended for production applications.
-  * If you want to store your private key in the project directly, you can do it via a `.env` file.
-</Info>
+  <CodeGroup>
+    ```javascript Store private key in .env
+    // In your .env file
+    PRIVATE_KEY=""
 
-  To set up a development wallet via `.env` file, you can use the following script.
+    // In your index.js (or any file that needs the private key)
+    import { Keypair } from '@solana/web3.js';
+    import dotenv from 'dotenv';
+    require('dotenv').config();
 
-```js
-// index.js
-import { Keypair } from '@solana/web3.js';
-import dotenv from 'dotenv';
-require('dotenv').config();
+    const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || '')));
+    ```
 
-const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ''));
-```
+    ```javascript Store private key in Solana CLI
+    import { Keypair } from '@solana/web3.js';
+    import fs from 'fs';
 
-```bash
-# .env
-PRIVATE_KEY=""
-```
-
-  To set up a development wallet via a wallet generated via [Solana CLI](https://solana.com/docs/intro/installation#solana-cli-basics), you can use the following script.
-
-```js
-import { Keypair } from '@solana/web3.js';
-import fs from 'fs';
-
-const privateKeyArray = JSON.parse(fs.readFileSync('/Path/To/.config/solana/id.json', 'utf8').trim());
-const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
-```
+    const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+    const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
+    ```
+  </CodeGroup>
 </Accordion>
 
-```js
-// ... GET /order's response
+```js Sign Transaction
+import { VersionedTransaction } from '@solana/web3.js';
+
+// ... Get Order's response
 
 // Extract the transaction from the order response
 const transactionBase64 = orderResponse.transaction
 
-// Deserialize the transaction
+// Deserialize, sign and serialize the transaction
 const transaction = VersionedTransaction.deserialize(Buffer.from(transactionBase64, 'base64'));
-
-// Sign the transaction
 transaction.sign([wallet]);
-
-// Serialize the transaction to base64 format
 const signedTransaction = Buffer.from(transaction.serialize()).toString('base64');
 ```
 
 ## Execute Order
 
-By making a post request to the `/execute` endpoint, Jupiter executes the swap transaction on behalf of you/your users. This includes handling of slippage, priority fees, transaction landing and more.
+By making a post request to the `/execute` endpoint, Jupiter executes the swap transaction on behalf of you/your users through our own proprietary transaction sending infrastructure. This already includes handling of slippage, priority fees, transaction landing and more.
 
-To make a post request to execute a swap order, you need to pass in the required parameters:
+To make a post request to execute a swap order, you need to pass in the required parameters,:
 
-* `signedTransaction`: The signed transaction
-* `requestId`: The order response's request ID
+* `signedTransaction`: The signed and serialized base64 encodedtransaction [like above](#sign-transaction)
+* `requestId`: The order response's request ID [from Get Order](/docs/ultra/get-order)
 
-<Note>
-  **`/execute` PARAMETERS**
-
-  Both required parameters are found in the [order response](/docs/ultra/get-order#order-response), do note that the `transaction` field is the base64 encoded transaction that [you need to sign](#sign-transaction) before submitting to the network.
-</Note>
-
-```js
+```js Execute Order
 const executeResponse = await (
     await fetch('https://lite-api.jup.ag/ultra/v1/execute', {
         method: 'POST',
@@ -117,11 +82,18 @@ const executeResponse = await (
 ).json();
 ```
 
-## Execute Response
+## Transaction Status Polling
 
-After making the post request to the `/execute` endpoint, you will receive a response with the status of the swap.
+After our transaction sending service has submitted your swap, we will actively poll for your transaction status as part of the `/execute` endpoint. You will receive a response with the status of the swap.
 
-```js
+<Tip>
+* You can submit with the same `signedTransaction` and `requestId` for **up to 2 minutes regardless of state**, to poll for the transaction status.
+* The transaction will not double execute since it has the same signature.
+* If connection got dropped, you can try again with the same `signedTransaction` and `requestId` to poll for the status of the swap.
+* If there is no status, the order likely expired (did not get processed onchain and failed), but reach out to us if cases like this happen.
+</Tip>
+
+```js Transaction Status Polling
 if (executeResponse.status === "Success") {
     console.log('Swap successful:', JSON.stringify(executeResponse, null, 2));
     console.log(`https://solscan.io/tx/${executeResponse.signature}`);
@@ -130,69 +102,3 @@ if (executeResponse.status === "Success") {
     console.log(`https://solscan.io/tx/${executeResponse.signature}`);
 }
 ```
-
-**Example response of successful swap:**
-
-```json
-{
-  "status": "Success",
-  "signature": "transaction signature",
-  "slot": "323598314",
-  "code": 0,
-  "inputAmountResult": "9995000",
-  "outputAmountResult": "1274698",
-  "swapEvents": [
-    {
-      "inputMint": "So11111111111111111111111111111111111111112",
-      "inputAmount": "9995000",
-      "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-      "outputAmount": "1274698"
-    }
-  ]
-}
-```
-
-**Example response of failed swap:**
-
-```json
-{
-  "status": "Failed",
-  "signature": "transaction signature",
-  "error": "custom program error: #6023",
-  "code": 4615026,
-  "slot": "323597963"
-}
-```
-
-## Response Codes
-
-The following is a list of error codes that can be returned by the `/execute` endpoint.
-
-### Ultra Endpoint Codes
-
-| Code | Description                | Debugging                                                                                                  |
-| :---- | :-------------------------- | :---------------------------------------------------------------------------------------------------------- |
-| 0    | Success                    | -                                                                                                          |
-| -1   | Missing cached order       | `requestId` not found in cache, likely expired or not found                                                |
-| -2   | Invalid signed transaction | `signedTransaction` is invalid, likely failed to sign the transaction correctly                            |
-| -3   | Invalid message bytes      | `signedTransaction` is invalid, likely due to incorrect usage of `transaction` field in the order response |
-
-### Aggregator Swap Type Codes
-
-| Code  | Description                  | Debugging                                 |
-| :---- | :--------------------------- | :---------------------------------------- |
-| -1000 | Failed to land               | Transaction failed to land on the network |
-| -1001 | Unknown error                | -                                         |
-| -1002 | Invalid transaction          | -                                         |
-| -1003 | Transaction not fully signed | -                                         |
-| -1004 | Invalid block height         | -                                         |
-
-### RFQ Swap Type Codes
-
-| Code  | Description     | Debugging                                                            |
-| :---- | :--------------- | :-------------------------------------------------------------------- |
-| -2000 | Failed to land  | -                                                                    |
-| -2001 | Unknown error   | -                                                                    |
-| -2002 | Invalid payload | -                                                                    |
-| -2003 | Quote expired   | User did not respond in time or RFQ provider did not execute in time |
-| -2004 | Swap rejected   | User or RFQ provider rejected the swap                               |

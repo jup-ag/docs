@@ -36,7 +36,6 @@ const connection = new Connection('https://api.mainnet-beta.solana.com');
 </Info>
 
 <CodeGroup>
-
 ```javascript Store private key in .env
 // In your .env file
 PRIVATE_KEY=""
@@ -56,5 +55,4 @@ import fs from 'fs';
 const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
 const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
 ```
-
 </CodeGroup>

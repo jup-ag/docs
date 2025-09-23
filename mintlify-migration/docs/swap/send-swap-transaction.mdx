@@ -6,14 +6,14 @@ description: "Transaction sending can be very simple but optimizing for transact
 <Tip>
   **IMPROVE TRANSACTION LANDING TIP**
 
-  By using Jupiter Swap API, you can enable Dynamic Slippage, Priority Fee estimation and Compute Unit estimation, all supported on our backend and served directly to you through our API.
+  By using Jupiter Legacy Swap API, you can enable Dynamic Slippage, Priority Fee estimation and Compute Unit estimation, all supported on our backend and served directly to you through our API.
 </Tip>
 
 ## Let’s Get Started
 
-In this guide, we will pick up from where [**Get Quote**](/docs/swap-api/get-quote) and [**Build Swap Transaction**](/docs/swap-api/build-swap-transaction) guide has left off.
+In this guide, we will pick up from where [**Get Quote**](/docs/swap/get-quote) and [**Build Swap Transaction**](/docs/swap/build-swap-transaction) guide has left off.
 
-If you have not set up your environment to use the necessary libraries, the RPC connection to the network and successfully get a quote from the Quote API, please start at [Environment Setup](/docs/environment-setup) or [get quote](/docs/swap-api/get-quote).
+If you have not set up your environment to use the necessary libraries, the RPC connection to the network and successfully get a quote from the Quote API, please start at [Environment Setup](/get-started/environment-setup) or [get quote](/docs/swap/get-quote).
 
 ## Prepare Transaction
 
@@ -22,20 +22,20 @@ If you have not set up your environment to use the necessary libraries, the RPC 
 
   The most important part of this step is to sign the transaction. For the sake of the guide, you will be using the file system wallet you have set up to sign and send yourself.
 
-  However, for other production scenarios such as building your own program or app on top of the Swap API, you will need the user to be the signer which is often through a third party wallet provider, so do account for it.
+  However, for other production scenarios such as building your own program or app on top of the Legacy Swap API, you will need the user to be the signer which is often through a third party wallet provider, so do account for it.
 </Note>
 
-In the previous guide, we are able to get the `swapTransaction` from the Swap API response. However, you will need to reformat it to sign and send the transaction, here are the formats to note of.
+In the previous guide, we are able to get the `swapTransaction` from the Legacy Swap API response. However, you will need to reformat it to sign and send the transaction, here are the formats to note of.
 
 | Formats                      | Description                                                                                                                          |
 | :---------------------------- | :---------------------------------------------------------------------------------------------------- |
 | Serialized Uint8array format | The correct format to send to the network.                                                                                           |
-| Serialized base64 format     | This is a text encoding of the Uint8array data, meant for transport like our Swap API or storage. You should not sign this directly. |
+| Serialized base64 format     | This is a text encoding of the Uint8array data, meant for transport like our Legacy Swap API or storage. You should not sign this directly. |
 | Deserialized format          | This is the human-readable, object-like format before serialization. This is the state you will sign the transaction.                |
 
 Here's the code to deserialize and sign, then serialize.
 
-1. `swapTransaction` from the Swap API is a serialized transaction in the **base64 format**.
+1. `swapTransaction` from the Legacy Swap API is a serialized transaction in the **base64 format**.
 2. Convert it to **Uint8array (binary buffer) format**.
 3. Deserialize it to a **VersionedTransaction** object to sign.
 4. Finally, convert it back to **Uint8array** format to send the transaction.
@@ -65,7 +65,7 @@ console.log(transactionBinary);
 
 ### Transaction Sending Options
 
-Finally, there are a 2 [transaction sending options](https://solana.com/docs/advanced/retry#an-in-depth-look-at-sendtransaction) that we should take note of. Depending on your use case, these options can make a big difference to you or your users. For example, if you are using the Swap API as a payment solution, setting higher `maxRetries` allows the transaction to have more retries as it is not as critical compared to a bot that needs to catch fast moving markets.
+Finally, there are a 2 [transaction sending options](https://solana.com/docs/advanced/retry#an-in-depth-look-at-sendtransaction) that we should take note of. Depending on your use case, these options can make a big difference to you or your users. For example, if you are using the Legacy Swap API as a payment solution, setting higher `maxRetries` allows the transaction to have more retries as it is not as critical compared to a bot that needs to catch fast moving markets.
 
 <Accordion title="Transaction Sending Options">
 
@@ -114,7 +114,7 @@ As the Solana network grew and increased in activity over the years, it has beco
 
 ### How Jupiter Estimates Priority Fee?
 
-You can pass in `prioritizationFeeLamports` to Swap API where our backend will estimate the Priority Fee for you.
+You can pass in `prioritizationFeeLamports` to Legacy Swap API where our backend will estimate the Priority Fee for you.
 
 We are using [Triton’s `getRecentPrioritizationFees`](https://docs.triton.one/chains/solana/improved-priority-fees-api) to estimate using the local fee market in writable accounts of the transaction (comparing to the global fee market), across the past 20 slots and categorizing them into different percentiles.
 
@@ -152,7 +152,7 @@ const swapResponse = await (
 
 ### How Jupiter Estimates Compute Unit Limit?
 
-You can pass in `dynamicComputeUnitLimit` to Swap API where our backend will estimate the Compute Unit Limit for you.
+You can pass in `dynamicComputeUnitLimit` to Legacy Swap API where our backend will estimate the Compute Unit Limit for you.
 
 When `true`, it allows the transaction to utilize a dynamic compute unit rather than using incorrect compute units which can be detrimental to transaction prioritization. Additionally, the amount of compute unit used and the compute unit limit requested to be used are correlated to the amount of priority fees you pay.
 
@@ -187,7 +187,7 @@ Slippage is an unavoidable aspect of trading on decentralized exchanges (DEXes).
 <Tip>
   **USE ULTRA API!**
 
-  - If you use the Swap API:
+  - If you use the Legacy Swap API:
 
     * You are limited to fixed and dynamic slippage settings.
     * You are responsible for handling slippage and optimizing transaction landing yourself.
@@ -274,7 +274,7 @@ This is the most typical method to send transactions to the network to get execu
 
 #### Broadcasting Through Jito
 
-To include Jito Tips in your Swap transaction, you can do specify in the Swap API parameters. However, please take note of these when sending your transaction to Jito and [you can find thsese information in their documentation](https://docs.jito.wtf/):
+To include Jito Tips in your Legacy Swap transaction, you can do specify in the Legacy Swap API parameters. However, please take note of these when sending your transaction to Jito and [you can find thsese information in their documentation](https://docs.jito.wtf/):
 
 * You need to submit to a Jito RPC endpoint for it to work.
 * You need to send an appropriate amount of Jito Tip to be included to be processed.

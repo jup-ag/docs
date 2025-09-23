@@ -5,9 +5,9 @@ title: "Add Fees To Swap"
 <Note>
   **INFO**
 
-  As of January 2025, when integrating the Swap API, you no longer need to use the Referral Program to set up a `referralAccount` and `referralTokenAccount` to collect fees from the swaps you provide to the end users.
+  As of January 2025, when integrating the Legacy Swap API, you no longer need to use the Referral Program to set up a `referralAccount` and `referralTokenAccount` to collect fees from the swaps you provide to the end users.
 
-  Simply, just pass in any valid token account as the `feeAccount` parameter in the Swap API.
+  Simply, just pass in any valid token account as the `feeAccount` parameter in the Legacy Swap API.
 
   However, do note that **it is still applicable to the Trigger API**.
 </Note>
@@ -49,7 +49,7 @@ By default, there are **zero** protocol fees on Jupiter Swap. Integrators have t
 
   **1. Set up**
 
-  You will need to complete the prerequisites and understanding of [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](/docs/swap-api/get-quote) guide as this is reliant on the Swap API.
+  You will need to complete the prerequisites and understanding of [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](/docs/swap-api/get-quote) guide as this is reliant on the Legacy Swap API.
 
   **Obtain `referralAccount` and `referralTokenAccount`**
 
@@ -90,7 +90,7 @@ console.log(JSON.stringify(quoteResponse, null, 2));
 
   In this code block, we will be using the SDK to try to find the `referralTokenAccount` based on our previously defined `referralAccount` and `mintAccount`.
 
-  * If the token account is found, it will proceed to the Swap API.
+  * If the token account is found, it will proceed to the Legacy Swap API.
   * If the token account is not found, it will send a transaction to the network to attempt to initialize one for the mint. **Do note that transactions may fail due to various reasons like Priority Fees.**
 
 ```js
@@ -131,7 +131,7 @@ const [feeAccount] = PublicKey.findProgramAddressSync(
 );
 ```
 
-  Using the above, we will now know the `feeAccount` to be passed in as the parameter in Swap API. You can refer to the [Build Swap Transaction](/docs/swap-api/build-swap-transaction) guide to add any parameters where necessary to help transaction sending, etc.
+  Using the above, we will now know the `feeAccount` to be passed in as the parameter in Legacy Swap API. You can refer to the [Build Swap Transaction](/docs/swap-api/build-swap-transaction) guide to add any parameters where necessary to help transaction sending, etc.
 
 ```js
   const swapResponse = await (
@@ -152,7 +152,7 @@ const [feeAccount] = PublicKey.findProgramAddressSync(
 
 ### 1. Set up
 
-You will need to complete the prerequisites and understanding of [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](/docs/swap-api/get-quote) guide as this is reliant on the Swap API.
+You will need to complete the prerequisites and understanding of [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](/docs/swap-api/get-quote) guide as this is reliant on the Legacy Swap API.
 
 ### 2. Set your fee in Quote
 

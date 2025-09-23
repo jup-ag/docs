@@ -1,43 +1,35 @@
 ---
-title: "About Swap API"
-description: "The Jupiter Swap API enables you to tap into the Jupiter Metis v1 Routing Engine, which aggregates across all liquidity available within the DEXes of Solana's DeFi ecosystem, allowing you to swap seamlessly from any token to any token."
+title: "About Legacy Swap API"
 ---
 
-## Features
+The Jupiter Legacy Swap API enables you to tap into the Jupiter Metis v1 Routing Engine, which aggregates across all liquidity available within the DEXes of Solana's DeFi ecosystem, allowing you to swap seamlessly from any token to any token.
 
-| Feature                    | Description                                                                                                                                                                                      |
-| :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Robust routing engine**  | The Jupiter Metis v1 Routing Engine is a robust and battle-tested routing engine that has been in production for over 2 years with multiple DEXes integrated and trillions of dollars in volume. |
-| **Best on-chain price**    | Trades can split across multiple different on-chain tokens and AMMs to ensure the best possible on-chain price.                                                                                  |
-| **Swap any token**         | Swap from any token to another token.                                                                                                                                                            |
-| **Zero platform fees**     | Swaps made via the Swap API do not incur any trading fees, both for you and your users.                                                                                                          |
-| **Custom integrator fees** | Integrators can choose to charge their own custom fees.                                                                                                                                          |
-| **Slippage protection**    | Routes are intentionally chosen to decrease the likelihood of trade failures due to price slippage.                                                                                              |
-| **Fine-grained control**   | Allows for full control of how your transaction is crafted and broadcasted.                                                                                                                      |
+## We recommend using Ultra Swap API
 
-## What About Ultra API?
+Ultra Swap API is the spiritual successor to Swap API, and is much simpler to use than Swap API. If you are first starting out on your Solana development journey, using Ultra Swap API is highly recommended over Swap API.
 
-Ultra API is the spiritual successor to Swap API, and is much simpler to use than Swap API. If you are first starting out on your Solana development journey, using Ultra API is highly recommended over Swap API.
+<Tip>
+For more information about Ultra Swap API, please refer to the [Ultra Swap API](/docs/ultra) documentation.
+</Tip>
 
-However, unlike Ultra API, Swap API allows developers to:
+<Info>
+**Using Legacy Swap API**
 
-* Add custom instructions.
-* Add Cross Program Invocation (CPI) calls.
-* Choose the broadcasting strategy for the signed transaction (ie. via priority fee, Jito, etc.).
-* Choose which DEXes or AMMs to route through.
-* Modify the number of accounts to use in a transaction.
+Requires your own maintenance, optimizations and dependencies.
+   * **Upkeep of RPCs**: To retrieve wallet balances, broadcast and retrieve transactions, etc.
+   * **Deciding transaction fee**: Including, but not limited to, priority fee, Jito fee, etc.
+   * **Deciding slippage**: The optimal slippage to use to balance between trade success and price protection, do note that [RTSE is only available via Ultra API](/docs/ultra#real-time-slippage-estimator).
+   * **Broadcasting the transaction**: Ultra uses a proprietary transaction sending engine which dramatically improves landing rate and speed.
+   * **Parsing the swap results**: Polling and parsing the resulting transaction from the RPC, including handling for success and error cases.
 
-If you have a highly custom need like what is described above, then Swap API may be for you. However, with Swap API, there are many more things you need to worry about that Ultra API automatically handles for:
+Though comes with other ways to use Jupiter.
+   * Add custom instructions.
+   * Use via Cross Program Invocation (CPI) calls.
+   * Choose your own transactionbroadcasting method (like Typical RPCs, Jito, etc).
+   * Modify the number of accounts to use in a transaction.
+</Info>
 
-* **Upkeep of RPCs**: To retrieve wallet balances, broadcast and retrieve transactions, etc.
-* **Deciding transaction fee**: Including, but not limited to, priority fee, Jito fee, etc.
-* **Deciding slippage**: The optimal slippage to use to balance between trade success and price protection, do note that [RTSE is only available via Ultra API](/docs/ultra#real-time-slippage-estimator).
-* **Broadcasting the transaction**: Ultra uses a proprietary transaction sending engine which dramatically improves landing rate and speed.
-* **Parsing the swap results**: Polling and parsing the resulting transaction from the RPC, including handling for success and error cases.
-
-If the above sounds like too much work, then Ultra API will be the better choice.
-
-## Getting Started with Swap API
+## Getting Started with Legacy Swap API
 
 1. [**Get Quote**](/docs/swap-api/get-quote): Request for a quote which consists of the route plan, and other params such as integrator fee, slippage, etc.
 
@@ -50,6 +42,5 @@ If the above sounds like too much work, then Ultra API will be the better choice
 
 **Other Guides**
 
-* [**Adding Fees to Swap API**](/docs/swap-api/add-fees-to-swap): Add custom integrator fees to the swap transaction.
-* [**Using Swap API as a payment method**](/docs/swap-api/payments-through-swap): Use Swap API as a payment method for your users.
-* [**Using Jupiter Plugin**](/docs/tool-kits/plugin): Lite version of Jupiter that provides end-to-end swap with just a few lines of code.
+* [**Adding Fees to Legacy Swap API**](/docs/swap-api/add-fees-to-swap): Add custom integrator fees to the swap transaction.
+* [**Using Legacy Swap API as a payment method**](/docs/swap-api/payments-through-swap): Use Legacy Swap API as a payment method for your users.

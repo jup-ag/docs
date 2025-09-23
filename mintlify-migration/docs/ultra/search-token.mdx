@@ -2,44 +2,18 @@
 title: "Search Token"
 ---
 
-<Info>
-  **NOTE**
-
-  - Lite URL: `https://lite-api.jup.ag/ultra/v1/search`
-
-  - Dynamic URL: `https://api.jup.ag/ultra/v1/search`
-
-  Dynamic Rate Limits are now applied to Ultra API.
-
-  * No Pro plans or payment needed.
-  * Simply generate the universal API Key via [Portal](https://portal.jup.ag)
-  * Rate limits scale together with your swap volume.
-
-<CardGroup cols={1}>
-  <Card title="Read more about Ultra API Dynamic Rate Limit" href="/portal/rate-limit" icon="book-open" horizontal/>
-</CardGroup>
-</Info>
-
-<Tip>
-  **API REFERENCE**
-
-  To fully utilize the Ultra API, check out the [Ultra API Reference](/api-reference/ultra/search).
-</Tip>
-
-## Search Token
-
-The Ultra API provides an endpoint to search tokens in the background for you and returns you the search results, along with the mint information.
+The Ultra Swap API provides an endpoint to search tokens in the background for you and returns you the search results, along with the mint information.
 
 This is useful in most user applications, as users need to choose which tokens they want to swap. This also provides a seamless developer experience as integrating this allows us to handle and abstract the token search mechanism, allowing you to focus on other user features.
 
-<Tip>
+<Info>
   **SEARCH**
 
   * Search for a token and its information by its **symbol, name or mint address**.
   * Comma-separate to search for multiple.
   * Limit to 100 mint addresses in query.
   * Default to 20 mints in response when searching via symbol or name.
-</Tip>
+</Info>
 
 ```js
 const searchResponse = await (
@@ -60,7 +34,7 @@ The search response will return an array of mints, along with their information.
 
   Do note that the response is subject to changes as we continue to improve.
 
-  Refer to [Ultra API Reference](/api/ultra-api/search) for full schema.
+  Refer to [Ultra API Reference](/api-reference/ultra/search) for full schema.
 </Tip>
 
 **Successful example response:**

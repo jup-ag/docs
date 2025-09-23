@@ -1,18 +1,19 @@
 ---
-title: "Add Fees To Ultra"
-description: "In this guide, we will be walking through the steps to create the necessary accounts for adding fees to your Ultra transaction."
+title: "Add Fees To Ultra Swap"
 ---
+
+In this guide, we will be walking through the steps to create the necessary accounts for adding fees to your Ultra Swap transaction.
 
 ## Important Notes
 
 | Note                             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | :------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Referral Dashboard UI**        | Use the [Referral Dashboard](https://referral.jup.ag/) to create referral accounts through a user-friendly interface. This is the recommended approach for most users before proceeding with the SDK setup below.                                                                                                                                                                                                                                                                               |
+| **Referral Dashboard UI**        | Use the [Referral Dashboard](https://referral.jup.ag/) to create referral accounts if you prefer a user-friendly interface.                                                                                                                                                                                                                                                                               |
 | **Additional required accounts** | It is required to have a valid **referral account** and **referral token accounts** for the specific token mints. These accounts are initalized with the Referral Program under the ["Jupiter Ultra" Referral Project](https://solscan.io/account/DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc).                                                                                                                                                                                                |
-| **Fee mint**                     | In the `/order` response, you will see the `feeMint` field which is the token mint we will collect the fees in for that particular order. Since Jupiter will always dictate which token mint to collect the fees in, you must ensure that you have the valid referral token account created for the specific fee mint. If it is not initialized, the order will still return and can be executed without your fees. This is to ensure success rates and the best experience with Jupiter Ultra. |
-| **Jupiter fees**                 | By default, Jupiter Ultra incurs a 0.05% or 0.1% fee based on token mint. When you add a referral fee, Jupiter will take a flat 20% of your integrator fees, for example, if you plan to take 100bps, Jupiter will take 20bps from it.                                                                                                                                                                                                                                                          |
-| **Integrator fees**              | You can configure `referralFee` to be between 50bps to 255bps. The `/order` response will show the total fee in `feeBps` field which should be exactly what you specified in `referralFee`. Do note that, the referral token account has to be created before calling `/order` because during the request, we will check if the token account is initialized before applying your referral fee (if it is not applied, we will only apply our default fees).                                     |
-| **Limitations**                  | * Currently, we do not support fees for Token2022 tokens.* Setting up the referral accounts and token accounts can only be done via the SDK (the scripts provided in this guide), and not via the Referral Dashboard.                                                                                                                                                                                                                                                                           |
+| **Fee mint**                     | In the `/order` response, you will see the `feeMint` field which is the token mint we will collect the fees in for that particular order.<br/><br/>Since Jupiter will always dictate which token mint to collect the fees in, you must ensure that you have the valid referral token account created for the specific fee mint. If it is not initialized, the order will still return and can be executed without your fees. This is to ensure success rates and the best experience with Jupiter Ultra Swap. |
+| **Jupiter fees**                 | By default, Jupiter Ultra Swap incurs a 5 to 10 bps fee based on token mint. When you add a referral fee, Jupiter will take a flat 20% of your integrator fees, for example, if you plan to take 100bps, Jupiter will take 20bps from it.                                                                                                                                                                                                                                                          |
+| **Integrator fees**              | You can configure `referralFee` to be between 50bps to 255bps. The `/order` response will show the total fee in `feeBps` field which should be exactly what you specified in `referralFee`.<br/><br/>Do note that, the referral token account has to be created before calling `/order` because during the request, we will check if the token account is initialized before applying your referral fee (if it is not applied, we will only apply our default fees).                                     |
+| **Limitations**                  | * Currently, we do not support fees for Token2022 tokens and `feeBps` may return `0`.<br/><br/>* `jupiterz` does not support integrator fees and will not be routed when referral params are passed in to get an order.                                                                                                                                                                                                                                                                         |
 
 ## Step-by-step
 
@@ -21,7 +22,7 @@ description: "In this guide, we will be walking through the steps to create the 
   Install additional dependencies.
   </Step>
   <Step>
-Create `referralTokenAccount` for each token mint.
+  Create `referralTokenAccount` for each token mint.
   </Step>
   <Step>
   Create `referralAccount`.
@@ -30,10 +31,10 @@ Create `referralTokenAccount` for each token mint.
   Create `referralTokenAccount` for each token mint.
   </Step>
   <Step>
-  Add `referralAccount` and `referralFee` to Ultra `/order` endpoint.
+  Add `referralAccount` and `referralFee` to Ultra Swap `/order` endpoint.
   </Step>
   <Step>
-  Sign and send the transaction via Ultra `/execute` endpoint.
+  Sign and send the transaction via Ultra Swap `/execute` endpoint.
   </Step>
   <Step>
   Verify transaction and fees.
@@ -127,60 +128,47 @@ async function claimAllTokens() {
 ```bash
 npm install @jup-ag/referral-sdk
 npm install @solana/web3.js@1 # Using v1 of web3.js instead of v2
-npm install bs58
-npm install dotenv # if required for wallet setup
 ```
 
 <Accordion title="RPC Connection and Wallet Setup">
+
   **Set up RPC Connection**
-
   <Info>
-  **NOTE**
-
-  Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters). However, as your application grows, we recommend you to always use your own or provision a 3rd party provider’s RPC endpoint such as [Helius](https://helius.dev/) or [Triton](https://triton.one/).
+    Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters). However, as your application grows, we recommend you to always use your own or provision a 3rd party provider’s RPC endpoint such as [Helius](https://helius.dev/) or [Triton](https://triton.one/).
   </Info>
 
-```js
-import { Connection } from "@solana/web3.js";
-
-const connection = new Connection('https://api.mainnet-beta.solana.com');
-```
+  ```bash
+  const connection = new Connection('https://api.mainnet-beta.solana.com');
+  ```
 
   **Set up Development Wallet**
+  <Info>
+    You can paste in your private key for testing but this is not recommended for production.
+    * Either use your private key in the project directly, you can do it via a `.env` file.
+    * Or set up your private key in the [Solana CLI](https://solana.com/docs/intro/installation#create-wallet).
+  </Info>
 
+  <CodeGroup>
+  ```javascript Store private key in .env
+  // In your .env file
+  PRIVATE_KEY=""
 
-<Info>
-  **NOTE**
+  // In your index.js (or any file that needs the private key)
+  import { Keypair } from '@solana/web3.js';
+  import dotenv from 'dotenv';
+  require('dotenv').config();
 
-  * You can paste in your private key for testing purposes but this is not recommended for production applications.
-  * If you want to store your private key in the project directly, you can do it via a `.env` file.
-
-</Info>
-
-To set up a development wallet via `.env` file, you can use the following script.
-
-```js
-// index.js
-import { Keypair } from '@solana/web3.js';
-import dotenv from 'dotenv';
-require('dotenv').config();
-
-const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ''));
+  const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || '')));
   ```
 
-  ```bash
-  # .envPRIVATE_KEY=""
+  ```javascript Store private key in Solana CLI
+  import { Keypair } from '@solana/web3.js';
+  import fs from 'fs';
+
+  const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+  const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
   ```
-
-  To set up a development wallet via a wallet generated via [Solana CLI](https://solana.com/docs/intro/installation#solana-cli-basics), you can use the following script.
-
-```js
-import { Keypair } from '@solana/web3.js';
-import fs from 'fs';
-
-const privateKeyArray = JSON.parse(fs.readFileSync('/Path/To/.config/solana/id.json', 'utf8').trim());
-const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
-  ```
+  </CodeGroup>
 </Accordion>
 
 ### Create `referralAccount`
@@ -263,17 +251,17 @@ async function initReferralTokenAccount() {
 }
 ```
 
-### Usage in Ultra
+### Usage in Ultra Swap
 
-* After creating the necessary accounts, you can now add the `referralAccount` and `referralFee` to the Ultra `/order` endpoint.
+* After creating the necessary accounts, you can now add the `referralAccount` and `referralFee` to the Ultra Swap `/order` endpoint.
 * From the order response, you should see the `feeMint` field, which is the token mint we will collect the fees in for that particular order.
 * From the order response, you should see the `feeBps` field, which is the total fee in bps, which should be exactly what you specified in `referralFee`.
-* Then, you can sign and send the transaction via the Ultra `/execute` endpoint.
+* Then, you can sign and send the transaction via the Ultra Swap `/execute` endpoint.
 
 <Warning>
   **DANGER**
 
-  Do note that, during your request to `/order`, we will check if the specific fee mint's referral token account is initialized. If it is not, the order will still return and can be executed without your fees. This is to ensure success rates and the best experience with Jupiter Ultra.
+  Do note that, during your request to `/order`, we will check if the specific fee mint's referral token account is initialized. If it is not, the order will still return and can be executed without your fees. This is to ensure success rates and the best experience with Jupiter Ultra Swap.
 
   Hence, please verify the transaction when testing with a new referral token account, and always create the referral token account before calling `/order`.
 </Warning>

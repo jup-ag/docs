@@ -22,10 +22,12 @@ In this section, you can find the list of errors that can be returned by the Jup
 
 | Error Code | Error Name                | Debug                                                                                                                     |
 | :--------- | :------------------------ | :------------------------------------------------------------------------------------------------------------------------- |
-| 6001       | SlippageToleranceExceeded | Try higher fixed slippage or try [`dynamicSlippage`](/docs/swap-api/send-swap-transaction#how-jupiter-estimates-slippage) |
+| 6001       | SlippageToleranceExceeded | Try higher fixed slippage or try [`dynamicSlippage`](/docs/swap/send-swap-transaction#how-jupiter-estimates-slippage) |
 | 6008       | NotEnoughAccountKeys      | Likely modified swap transaction causing missing account keys                                                             |
 | 6014       | IncorrectTokenProgramID   | Likely attempted to take platform fees on a Token2022 token (This is also 0x177e)                                         |
 | 6017       | ExactOutAmountNotMatched  | Similar to slippage                                                                                                       |
+| 6024       | InsufficientFunds         | Insufficient funds for either swap amount, transaction fees or rent fees                                                  |
+| 6025       | InvalidTokenAccount       | A token account passed in is invalid, it can be uninitialized or not expected                                             |
 
 ### Solana Program Errors
 

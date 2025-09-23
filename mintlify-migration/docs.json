@@ -36,7 +36,8 @@
             "pages": [
               "get-started/index",
               "get-started/environment-setup",
-              "get-started/development-basics"
+              "get-started/development-basics",
+              "get-started/program-id"
             ]
           },
           {
@@ -311,6 +312,16 @@
                 ]
               }
             ]
+          },
+          {
+            "item": "Lock",
+            "icon": "lock",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["docs/lock/index"]
+              }
+            ]
           }
         ]
       },
@@ -322,7 +333,7 @@
             "pages": ["api-reference/index"]
           },
           {
-            "group": "api-reference Reference",
+            "group": "API Reference",
             "pages": [
               {
                 "group": "Ultra Swap",

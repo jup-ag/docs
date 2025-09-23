@@ -5,9 +5,9 @@ info:
   description: |
     | Link |
     | --- |
-    | [Get Quote](/docs/swap-api/get-quote) |
-    | [Build Swap Transaction](/docs/swap-api/build-swap-transaction) |
-    | [Send Swap Transaction](/docs/swap-api/send-swap-transaction) |
+    | [Get Quote](/docs/swap/get-quote) |
+    | [Build Swap Transaction](/docs/swap/build-swap-transaction) |
+    | [Send Swap Transaction](/docs/swap/send-swap-transaction) |
 
 servers:
   - url: https://lite-api.jup.ag/swap/v1
@@ -279,7 +279,7 @@ components:
             - An token account that will be used to collect fees
             - The mint of the token account **can only be either the input or output mint of the swap**
             - You no longer are required to use the Referral Program
-            - See [Add Fees](/docs/swap-api/add-fees-to-swap) guide for more details
+            - See [Add Fees](/docs/swap/add-fees-to-swap) guide for more details
           type: string
         trackingAccount:
           description: |
@@ -345,7 +345,7 @@ components:
           description: |
             - When enabled, it estimates slippage and apply it in the swap transaction directly, overwriting the `slippageBps` parameter in the quote response.
             - Used together with `dynamicSlippage` in `/quote`, otherwise the slippage used will be the one in the `/quote`'s `slippageBps`
-            - [See notes for more information](/docs/swap-api/send-swap-transaction#how-jupiter-estimates-slippage)
+            - [See notes for more information](/docs/swap/send-swap-transaction#how-jupiter-estimates-slippage)
           type: boolean
           default: false
         computeUnitPriceMicroLamports:
@@ -509,7 +509,7 @@ components:
     SwapModeParameter:
       name: swapMode
       description: |
-        - ExactOut is for supporting use cases where you need an exact output amount, like using [Swap API as a payment service](/docs/swap-api/payments-through-swap)
+        - ExactOut is for supporting use cases where you need an exact output amount, like using [Swap API as a payment service](/docs/swap/payments-through-swap)
         - In the case of `ExactIn`, the slippage is on the output token
         - In the case of `ExactOut`, the slippage is on the input token
         - Not all AMMs support `ExactOut`: Currently only Orca Whirlpool, Raydium CLMM, Raydium CPMM
@@ -584,7 +584,7 @@ components:
       name: platformFeeBps
       description: |
         - Take fees in basis points
-        - Used together with `feeAccount` in /swap, see [Adding Fees](/docs/swap-api/add-fees-to-swap) guide
+        - Used together with `feeAccount` in /swap, see [Adding Fees](/docs/swap/add-fees-to-swap) guide
       in: query
       schema:
         type: integer

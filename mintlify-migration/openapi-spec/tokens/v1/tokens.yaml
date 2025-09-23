@@ -5,8 +5,8 @@ info:
   description: |
     | Link |
     | --- |
-    | [V2](/docs/token-api/v2) |
-    | [V1 Deprecated](/docs/token-api/v1) |
+    | [V2](/docs/tokens/v2) |
+    | [V1 Deprecated](/docs/tokens/v1) |
 
 servers:
   - url: https://lite-api.jup.ag/tokens/v1
@@ -31,7 +31,7 @@ paths:
         <Info>
         **NOTE**
 
-        - Refer to [Token API doc](/docs/token-api/v1) for more information.
+        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
         </Info>
       parameters:
       - name: mint_address
@@ -63,7 +63,7 @@ paths:
         <Info>
         **NOTE**
 
-        - Refer to [Token API doc](/docs/token-api/v1) for more information.
+        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
         </Info>
       parameters:
       - name: market_address
@@ -98,7 +98,7 @@ paths:
         <Info>
         **NOTE**
 
-        - Refer to [Token API doc](/docs/token-api/v1) for more information.
+        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
         </Info>
       responses:
         '200':
@@ -124,7 +124,7 @@ paths:
         <Info>
         **NOTE**
 
-        - Refer to [Token API doc](/docs/token-api/v1) for more information.
+        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
         </Info>
       parameters:
       - name: tag
@@ -158,7 +158,7 @@ paths:
         <Info>
         **NOTE**
 
-        - Refer to [Token API doc](/docs/token-api/v1) for more information.
+        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
         </Info>
       parameters:
       - name: limit
@@ -206,7 +206,7 @@ paths:
 
         <Info>
         **NOTE**
-        - Refer to [Token API doc](/docs/token-api/v1) for more information.
+        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
         </Info>
       responses:
         '200':

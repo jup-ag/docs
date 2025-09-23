@@ -1,5 +1,6 @@
 ---
 title: "Get Order"
+description: "Swap via Ultra by getting a quote from the Order endpoint."
 ---
 
 To get an Ultra Swap order, you need to pass in the required parameters such as:
@@ -10,7 +11,7 @@ To get an Ultra Swap order, you need to pass in the required parameters such as:
 | `outputMint` | The output token mint address |
 | `amount` | The amount of input token to swap, in native token units (before decimals) |
 | `taker` | The user's wallet address (**Note:** If the `taker` is not provided, there will still be an Order Response with no `transaction` field) |
-| `referralAccount` | The referral account address - refer to the [Add Fees To Ultra Swap](/docs/ultra-api/add-fees-to-ultra) guide for the step by step process |
+| `referralAccount` | The referral account address - refer to the [Add Fees To Ultra Swap](/docs/ultra/add-fees-to-ultra) guide for the step by step process |
 | `referralFee` | The referral fee in basis points (bps) |
 
 ```js Get Order

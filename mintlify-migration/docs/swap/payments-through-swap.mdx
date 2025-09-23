@@ -16,7 +16,7 @@ Let’s set the stage. You are selling a **jupcake!!!** to your customer and mer
 
 ### 1. Setup
 
-You will need slightly different imports and also remember to set up connection to an RPC. If you have not set up the other typical libraries or are familiar with the Legacy Swap API, please follow this [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](/docs/swap-api/get-quote) guide.
+You will need slightly different imports and also remember to set up connection to an RPC. If you have not set up the other typical libraries or are familiar with the Legacy Swap API, please follow this [Environment Setup](/get-started/environment-setup) and [Get Quote and Swap](/docs/swap/get-quote) guide.
 
 ```bash
 npm i @solana/spl-token
@@ -34,7 +34,7 @@ Before we start getting a quote and swap transaction, for example sake, we will 
 
   Do note that you will need to have already set up:
 
-  * **A wallet in your machine to simulate yourself as the customer as the customer is the signer of the transaction** (similar to how we set up in [Environment Setup](/docs/environment-setup)).
+  * **A wallet in your machine to simulate yourself as the customer as the customer is the signer of the transaction** (similar to how we set up in [Environment Setup](/get-started/environment-setup)).
   * `trackingAccount` is an additional Solana Account you can pass in to track only Jupiter transactions easily.
 </Info>
 
@@ -73,7 +73,7 @@ console.log("merchantUSDCTokenAccount:", merchantUSDCTokenAccount.publicKey);
 
 ### 2. Set `swapMode` to `ExactOut` in Quote
 
-Next, the merchant have to [Get Quote](/docs/swap-api/get-quote) for the customer. We are using the `ExactOut` mode because we know exactly how much output amount (1 USDC) the merchant want to receive but not sure how much input amount the customer should pay with.
+Next, the merchant have to [Get Quote](/docs/swap/get-quote) for the customer. We are using the `ExactOut` mode because we know exactly how much output amount (1 USDC) the merchant want to receive but not sure how much input amount the customer should pay with.
 
 By getting a quote first, the customer can know upfront the specific amount of input token before they approve and sign the transaction.
 
@@ -114,7 +114,7 @@ From the this quote, you should get part of the response like this, where `amoun
 
 The merchant then retrieves the serialized swap transaction, but the merchant need to specify the `destinationTokenAccount` in the parameters — this will build the swap transaction to swap but send to the [merchant's specified token account which we defined earlier](#set-up-destinationtokenaccount).
 
-The `destinationTokenAccount` should be the merchant’s token account to receive the payment in. Also do note that `customerAccount` should be accounted for. **You can refer to the [Build Swap Transaction](/docs/swap-api/build-swap-transaction) guide for other parameters to be passed in.**
+The `destinationTokenAccount` should be the merchant’s token account to receive the payment in. Also do note that `customerAccount` should be accounted for. **You can refer to the [Build Swap Transaction](/docs/swap/build-swap-transaction) guide for other parameters to be passed in.**
 
 ```js
 const swapResponse = await (
@@ -135,7 +135,7 @@ const swapResponse = await (
 
 ### 4. Prepare Transaction
 
-We have walked through the steps here and explained some of the code, you can refer to [Send Swap Transaction - Prepare Transaction](/docs/swap-api/send-swap-transaction#prepare-transaction). The main difference for payments is to ensure that the customer is the fee payer (the merchant can be generous and be the fee payer too!) and the signer.
+We have walked through the steps here and explained some of the code, you can refer to [Send Swap Transaction - Prepare Transaction](/docs/swap/send-swap-transaction#prepare-transaction). The main difference for payments is to ensure that the customer is the fee payer (the merchant can be generous and be the fee payer too!) and the signer.
 
 ```js
 const transactionBase64 = swapResponse.swapTransaction
@@ -147,7 +147,7 @@ const transactionBinary = transaction.serialize();
 
 ### 5. Send Transaction
 
-We have walked through the steps here and explained some of the code, you can refer to [Send Swap Transaction - Send Transaction](/docs/swap-api/send-swap-transaction#send-transaction). The main difference for payments is, you might want to try adjusting `maxRetries` to a higher count as it is not time sensitive and ideally this is used with tighter slippage and ensuring the `inputMint` is not too unstable.
+We have walked through the steps here and explained some of the code, you can refer to [Send Swap Transaction - Send Transaction](/docs/swap/send-swap-transaction#send-transaction). The main difference for payments is, you might want to try adjusting `maxRetries` to a higher count as it is not time sensitive and ideally this is used with tighter slippage and ensuring the `inputMint` is not too unstable.
 
 Do note that more retries will cause the user to wait slightly longer, so find the balance between the two. Read more here: [https://solana.com/docs/advanced/retry](https://solana.com/docs/advanced/retry).
 

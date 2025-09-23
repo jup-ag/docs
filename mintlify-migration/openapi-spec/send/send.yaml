@@ -34,7 +34,7 @@ paths:
                   type: string
                   description: |
                     - Public key address generated from the hash of the invite code
-                    - Do note that, the invite code requires to be generated client side, [refer to docs](/docs/send-api)
+                    - Do note that, the invite code requires to be generated client side, [refer to docs](/docs/send)
                     - Please handle invite code and secret key with highest security as user funds are involved
                 sender:
                   type: string
@@ -119,7 +119,7 @@ paths:
                   type: string
                   description: |
                     - Program Derived Address derived by `"invite"` and the public key of the invite
-                    - Do note that, the invitePDA requires to be generated client side, [refer to docs](/docs/send-api)
+                    - Do note that, the invitePDA requires to be generated client side, [refer to docs](/docs/send)
                     - Please handle invite code and secret key with highest security as user funds are involved
                 sender:
                   type: string

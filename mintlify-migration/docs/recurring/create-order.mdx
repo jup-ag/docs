@@ -92,8 +92,8 @@ Pass in the **`price`** object in the `params` field.
   Some notes to help you understand the parameters.
 
   * Price-based orders are opened indefinitely until the user closes them.
-  * Once low on funds, the order will not be closed and can continue to execute if the user deposits more into the order. Refer to the [Deposit Price Order](/docs/recurring-api/deposit-price-order) endpoint to deposit more funds into the order.
-  * Alternatively, the user can also withdraw funds from the order without closing it. Refer to the [Withdraw Price Order](/docs/recurring-api/withdraw-price-order) endpoint to withdraw funds from the order.
+  * Once low on funds, the order will not be closed and can continue to execute if the user deposits more into the order. Refer to the [Deposit Price Order](/docs/recurring/deposit-price-order) endpoint to deposit more funds into the order.
+  * Alternatively, the user can also withdraw funds from the order without closing it. Refer to the [Withdraw Price Order](/docs/recurring/withdraw-price-order) endpoint to withdraw funds from the order.
   * Do note that the price-based orders auto withdraws the output tokens to the user's wallet every time the order is executed.
   * The total time to use up all funds is not definite as the amount to be spent per cycle is variable based on the USDC value of the input token.
 </Info>

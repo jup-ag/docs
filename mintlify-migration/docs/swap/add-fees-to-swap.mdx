@@ -49,7 +49,7 @@ By default, there are **zero** protocol fees on Jupiter Swap. Integrators have t
 
   **1. Set up**
 
-  You will need to complete the prerequisites and understanding of [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](/docs/swap-api/get-quote) guide as this is reliant on the Legacy Swap API.
+  You will need to complete the prerequisites and understanding of [Environment Setup](/get-started/environment-setup) and [Get Quote and Swap](/docs/swap/get-quote) guide as this is reliant on the Legacy Swap API.
 
   **Obtain `referralAccount` and `referralTokenAccount`**
 
@@ -131,7 +131,7 @@ const [feeAccount] = PublicKey.findProgramAddressSync(
 );
 ```
 
-  Using the above, we will now know the `feeAccount` to be passed in as the parameter in Legacy Swap API. You can refer to the [Build Swap Transaction](/docs/swap-api/build-swap-transaction) guide to add any parameters where necessary to help transaction sending, etc.
+  Using the above, we will now know the `feeAccount` to be passed in as the parameter in Legacy Swap API. You can refer to the [Build Swap Transaction](/docs/swap/build-swap-transaction) guide to add any parameters where necessary to help transaction sending, etc.
 
 ```js
   const swapResponse = await (
@@ -152,7 +152,7 @@ const [feeAccount] = PublicKey.findProgramAddressSync(
 
 ### 1. Set up
 
-You will need to complete the prerequisites and understanding of [Environment Setup](/docs/environment-setup) and [Get Quote and Swap](/docs/swap-api/get-quote) guide as this is reliant on the Legacy Swap API.
+You will need to complete the prerequisites and understanding of [Environment Setup](/get-started/environment-setup) and [Get Quote and Swap](/docs/swap/get-quote) guide as this is reliant on the Legacy Swap API.
 
 ### 2. Set your fee in Quote
 
@@ -190,7 +190,7 @@ const swapResponse = await (
 
 ### 4. Sign and send transaction
 
-Finally, the user can sign the transaction and it can be submitted to the network to be executed. You can refer to the [Send Swap Transaction](/docs/swap-api/send-swap-transaction) guide to complete this step.
+Finally, the user can sign the transaction and it can be submitted to the network to be executed. You can refer to the [Send Swap Transaction](/docs/swap/send-swap-transaction) guide to complete this step.
 
 ### Create Token Account
 

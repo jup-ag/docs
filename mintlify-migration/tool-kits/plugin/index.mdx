@@ -1,6 +1,6 @@
 ---
 title: "Integrate Jupiter Plugin"
-description: "Seamlessly integrate end-to-end Ultra swap functionality into any application with just a few lines of code."
+description: "Seamlessly integrate end-to-end Ultra Swap functionality into any application with just a few lines of code."
 ---
 
 Jupiter Plugin is an open-source, lightweight, plug-and-play version of Jupiter Ultra Swap, allowing you to bring the exact jup.ag swap experience to any application.
@@ -47,7 +47,7 @@ Refer to [Customization](/tool-kits/plugin/customization) and [FAQ](/tool-kits/p
 - **Multiple Display Options**: Choose between integrated, widget, or modal display modes.
 - **Customizable Options**: Configure the swap form to match your application's needs.
 - **RPC-less**: Integrate Plugin without any RPCs, Ultra handles transaction sending, wallet balances and token information.
-- **Ultra Mode**: Access to all features of Ultra Mode, read more about it in the [Ultra API docs](/docs/ultra/).
+- **Ultra Mode**: Access to all features of Ultra Mode, read more about it in the [Ultra Swap API docs](/docs/ultra/).
 
 ## Getting Started
 
@@ -60,12 +60,12 @@ When integrating Plugin, there are a few integration methods to think about, and
 
 ### Wallet Integration
 
-- **Wallet Standard Support**: For applications without existing wallet provider, Plugin will provide a wallet adapter and connection - powered by [Unified Wallet Kit](/docs/tool-kits/wallet-kit/).
+- **Wallet Standard Support**: For applications without existing wallet provider, Plugin will provide a wallet adapter and connection - powered by [Unified Wallet Kit](/tool-kits/wallet-kit/).
 - **Passthrough Wallet**: For applications with existing wallet provider(s), set `enableWalletPassthrough=true` with context, and Plugin will allow the application to pass through the existing wallet provider's connection to Plugin.
 
 ### Adding Fees to plugin
 
-- **Referral Account**: You can create a referral account via [scripts](/docs/ultra-api/add-fees-to-ultra) or [Referral Dashboard](https://referral.jup.ag/).
+- **Referral Account**: You can create a referral account via [scripts](/docs/ultra/add-fees-to-ultra) or [Referral Dashboard](https://referral.jup.ag/).
 - **Referral Fee**: You can set the referral fee and account in the `formProps` interface when you initialize the Plugin.
 
 ### Quick Start Guides

@@ -5,8 +5,8 @@ info:
   description: |
     | Link |
     | --- |
-    | [Get Order](/docs/ultra-api/get-order) |
-    | [Execute Order](/docs/ultra-api/execute-order) |
+    | [Get Order](/docs/ultra/get-order) |
+    | [Execute Order](/docs/ultra/execute-order) |
 
 servers:
   - url: https://lite-api.jup.ag/ultra/v1
@@ -457,7 +457,7 @@ paths:
         
         :::note
         - This is a more efficient endpoint when you only need SOL balance
-        - Refer to [Ultra API doc](/docs/ultra-api/get-holdings) for more information
+        - Refer to [Ultra API doc](/docs/ultra/get-holdings) for more information
         :::
       responses:
         '200':

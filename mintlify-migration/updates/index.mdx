@@ -14,21 +14,21 @@ We’re sunsetting several legacy endpoints over the next few weeks by gradually
 * Old Quote API V6: `http://quote-api.jup.ag/v6/`
 * Old Tokens API: `http://tokens.jup.ag`
 * Old Price API: `http://price.jup.ag`
-* Token V1: `http://lite-api.jup.ag/tokens/v1`
+* Tokens V1: `http://lite-api.jup.ag/tokens/v1`
 * Price V2: `http://lite-api.jup.ag/price/v2`
 </Danger>
 </Update>
 
 <Update label="June 2025" description="">
-**DEPRECATION OF PRICE API V2 AND TOKEN API V1**
+**DEPRECATION OF PRICE API V2 AND TOKENS API V1**
 
-[**Price API upgrades to V3**](/docs/price-api/v3) to support more reliable and timely pricing data - derived by the last swap price (across all transactions) and a set of heuristics to ensure the accuracy of the price and eliminate any outliers.
+[**Price API upgrades to V3**](/docs/price/v3) to support more reliable and timely pricing data - derived by the last swap price (across all transactions) and a set of heuristics to ensure the accuracy of the price and eliminate any outliers.
 
-[**Token API upgrades to V2**](/docs/token-api/v2) to support an easier and reliable usage with new data addition such as [Organic Score](/docs/token-api/organic-score), more trading categories like toporganicscore, and more.
+[**Tokens API upgrades to V2**](/docs/tokens/v2) to support an easier and reliable usage with new data addition such as [Organic Score](/docs/tokens/organic-score), more trading categories like toporganicscore, and more.
 
 <Danger>
 **Action Required**
-* If you are using **Price API V2** and **Token API V1**
+* If you are using **Price API V2** and **Tokens API V1**
 * Please migrate to their new versions respectively
 * The older versions will be deprecated by 30 September 2025
 </Danger>
@@ -76,7 +76,7 @@ We will be deploying 2 different endpoints, 1 for free usage and 1 for plans wit
 * `/cancelOrder` endpoint only builds the transaction for 1 order, while `/cancelOrders` endpoint builds the transaction for multiple orders.
 * The `tx` field in the responses are now `transaction` or `transactions`.
 * `/getTriggerOrders` endpoint is introduces a new format to get either active or historical orders (based on the query parameters).
-* [Please refer to the documentation for usage](/docs/trigger-api/create-order).
+* [Please refer to the documentation for usage](/docs/trigger/create-order).
 
 <Accordion title="Path Changes">
 | Old Paths | New Paths |

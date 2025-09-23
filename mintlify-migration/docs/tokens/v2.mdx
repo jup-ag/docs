@@ -1,7 +1,7 @@
 ---
-title: "Token API V2 (Beta)"
+title: "Tokens API V2 (Beta)"
 sidebarTitle: "V2 (Beta)"
-description: "The Token API V2 provides different endpoints to query for mint information in specific searches, tags or categories."
+description: "The Tokens API V2 provides different endpoints to query for mint information in specific searches, tags or categories."
 ---
 
 <Info>
@@ -22,17 +22,17 @@ description: "The Token API V2 provides different endpoints to query for mint in
   **USEFUL MINT INFORMATION**
 
   * Token Metadata like name, symbol, icon to display token information to users
-  * [Organic Score](/docs/token-api/organic-score), Holder count, Market cap, etc can be useful to help make a better trading decision
+  * [Organic Score](/docs/tokens/organic-score), Holder count, Market cap, etc can be useful to help make a better trading decision
   * And much more!
 
   Do note that the response is subject to changes as we continue to improve.
 
-  Refer to [Example Response](#example-response) or [Token API V2 Reference](/api/token-api/v2) for full schema.
+  Refer to [Example Response](#example-response) or [Tokens API V2 Reference](/api-reference/tokens/v2) for full schema.
 </Tip>
 
 ## Query by Mint
 
-The Token API V2 provides an endpoint to search tokens in the background for you and returns you the search results, along with the mint information.
+The Tokens API V2 provides an endpoint to search tokens in the background for you and returns you the search results, along with the mint information.
 
 This is useful in most user applications, as users need to choose which tokens they want to swap. This also provides a seamless developer experience as integrating this allows us to handle and abstract the token search mechanism, allowing you to focus on other user features.
 
@@ -53,7 +53,7 @@ const searchResponse = await (
 
 ## Query by Tag
 
-The Token API V2 provides an endpoint to query by tags. This is useful to help users distinguish between verified vs non-verified or specific groups of tokens like liquid-staked tokens (LSTs).
+The Tokens API V2 provides an endpoint to query by tags. This is useful to help users distinguish between verified vs non-verified or specific groups of tokens like liquid-staked tokens (LSTs).
 
 <Tip>
   **TAGS**
@@ -70,7 +70,7 @@ const tagResponse = await (
 
 ## Get Category
 
-The Token API V2 provides an endpoint to get mints and their mint information by categories. These categories are useful for identifying tokens in specific trading scenarios, providing users with more information to trade with.
+The Tokens API V2 provides an endpoint to get mints and their mint information by categories. These categories are useful for identifying tokens in specific trading scenarios, providing users with more information to trade with.
 
 <Tip>
   **CATEGORY**
@@ -89,7 +89,7 @@ const categoryResponse = await (
 
 ## Get Recent
 
-The Token API V2 provides an endpoint to get mints and their mint information by their recency. This is helpful to display to users a list of tokens that just had their first pool created, providing more information to trade with.
+The Tokens API V2 provides an endpoint to get mints and their mint information by their recency. This is helpful to display to users a list of tokens that just had their first pool created, providing more information to trade with.
 
 <Tip>
   **RECENT**

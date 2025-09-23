@@ -36,9 +36,9 @@ It can be complex to handle this yourself, but good news! Most of our APIs and S
 
 ## Let’s Get Started
 
-In this guide, we will pick up from where [**Get Quote**](/docs/swap-api/get-quote) guide has left off.
+In this guide, we will pick up from where [**Get Quote**](/docs/swap/get-quote) guide has left off.
 
-If you have not set up your environment to use the necessary libraries, the RPC connection to the network and successfully get a quote from the Quote API, please start at [Environment Setup](/docs/environment-setup) or [get quote](/docs/swap-api/get-quote).
+If you have not set up your environment to use the necessary libraries, the RPC connection to the network and successfully get a quote from the Quote API, please start at [Environment Setup](/get-started/environment-setup) or [get quote](/docs/swap/get-quote).
 
 <Tip>
   **API REFERENCE**
@@ -59,7 +59,7 @@ Using the root URL and parameters to pass in, it is as simple as the example cod
 
   This code block includes additional parameters that our Legacy Swap API supports, such as estimating compute units, priority fees and slippage, to optimize for transaction landing.
 
-  To understand how these parameters help, the next step, [Send Swap Transaction guide](/docs/swap-api/send-swap-transaction) will discuss them.
+  To understand how these parameters help, the next step, [Send Swap Transaction guide](/docs/swap/send-swap-transaction) will discuss them.
 </Tip>
 
 ```js
@@ -135,7 +135,7 @@ If you prefer to compose with instructions instead of the provided transaction t
 
   In some cases, you may add more accounts to the transaction, which may exceed the transaction size limits. To work around this, you can use the `maxAccounts` parameter in `/quote` endpoint to limit the number of accounts in the transaction.
 
-  [Refer to the GET /quote's `maxAccounts` guide for more details.](/docs/swap-api/get-quote#max-accounts)
+  [Refer to the GET /quote's `maxAccounts` guide for more details.](/docs/swap/get-quote#max-accounts)
 </Info>
 
 <Accordion title="/swap-instructions code snippet">

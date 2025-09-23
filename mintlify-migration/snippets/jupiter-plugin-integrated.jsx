@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-
 export const JupiterPluginIntegrated = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);

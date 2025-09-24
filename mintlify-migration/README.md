@@ -1,16 +1,21 @@
-# Mintlify Starter Kit
+# Jupiter Developer Documentation
 
-Use the starter kit to get your docs deployed and ready to customize.
+Welcome to Jupiter Developer Documentation! You'll find detailed API guides, schemas, and powerful tool kits built by the team and DevRel Working Group to help you build with Jupiter.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## Contributing
+To contribute to our documentation, please follow the steps below.
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+1. Fork the repository
+2. Create a new branch
+3. Make your changes
+4. Submit a pull request
+5. Wait for review
+6. Merge your changes
+7. Celebrate!
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+### Support
+
+If you need help, [reach out to our developer community in Discord](https://discord.gg/jup).
 
 ## Development
 
@@ -28,11 +33,11 @@ mint dev
 
 View your local preview at `http://localhost:3000`.
 
-## Publishing changes
+Use the following command to check for broken links in pages:
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
-
-## Need help?
+```
+mint broken-links
+```
 
 ### Troubleshooting
 
@@ -40,5 +45,6 @@ Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/sett
 - If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
 
 ### Resources
+
 - [Mintlify documentation](https://mintlify.com/docs)
 - [Mintlify community](https://mintlify.com/community)

@@ -36,7 +36,7 @@
             "pages": [
               "get-started/index",
               "get-started/environment-setup",
-              "get-started/development-basics",
+              "get-started/development-basics"
             ]
           },
           {
@@ -738,6 +738,10 @@
       "destination": "/docs/lend/:slug*"
     },
     {
+      "source": "/docs/perp-api/:slug*",
+      "destination": "/docs/perps/:slug*"
+    },
+    {
       "source": "/docs/trigger-api/:slug*",
       "destination": "/docs/trigger/:slug*"
     },
@@ -772,6 +776,10 @@
     {
       "source": "/docs/lend-api/",
       "destination": "/docs/lend/"
+    },
+    {
+      "source": "/docs/perp-api/",
+      "destination": "/docs/perps/"
     },
     {
       "source": "/docs/trigger-api/",

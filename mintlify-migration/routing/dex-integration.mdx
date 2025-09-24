@@ -1,10 +1,9 @@
 ---
-title: "DEX Integration"
-description: "Jupiter is one of the most widely integrated protocols, so a lot of work is involved in minimizing issues on new integrations and making each integration valuable to our users and partners. Our top priority is ensuring security and providing the best prices and the best token selection for our users, so we will focus on DEXes that will bring the most benefits to them."
-sidebarTitle: "Jupiter Metis v1"
+title: "Integrate DEX into Metis"
+description: "Walkthrough on how to integrate your DEX into Metis"
 ---
 
-In this section, we will walk you through the process of integrating your DEX into the Jupiter Metis v1 Routing Engine that powers the Swap API.
+upiter is one of the most widely integrated protocols, so a lot of work is involved in minimizing issues on new integrations and making each integration valuable to our users and partners. Our top priority is ensuring security and providing the best prices and the best token selection for our users, so we will focus on DEXes that will bring the most benefits to them.
 
 <Warning >
 **WE DO NOT CHARGE FEES FOR INTEGRATION.**
@@ -117,62 +116,3 @@ To facilitate integration of your DEX into the Jupiter Core Engine:
 }
   ```
 </Accordion>
-
-***
-
-## Market Listing
-
-This section explains how markets are listed and maintained on Jupiter. It covers the different types of routing (instant and normal), the criteria for a market to be included in routing, and the liquidity requirements that must be met for a market to remain routable. Understanding these rules is essential for DEX teams to ensure their markets are eligible for and remain in the Jupiter Metis routing engine.
-
-### Routing Type
-
-There are 2 types of market listing on Jupiter.
-
-1. **Instant routing**
-
-   * We automatically list all new markets that are created on specific DEXes (list is below).
-   * These markets have a grace period, where the liquidity criteria is not applied.
-   * After the grace period has passed, the liquidity criteria will apply (refer to normal routing).
-   * For bonding curves, if it does not graduate after the grace period, it will be removed from routing.
-     * Only when the bonding curve has graduated to a new market, the graduated market will be added to routing.
-
-   <Accordion title="List of DEXes that are eligible for Instant Routing">
-     - Meteora Dynamic Bonding Curve
-     - Meteora Dynamic AMM
-     - Meteora DAMM V2
-     - Meteora DLMM
-     - Raydium
-     - Raydium CLMM
-     - Raydium CPMM
-     - Raydium Launchlab
-     - Pump.fun AMM
-     - Pump.fun
-     - Fluxbeam
-     - Whirlpool
-     - Moonshot
-     - Virtuals
-     - Boop.fun
-   </Accordion>
-
-2. **Normal routing**
-
-   * This is the default for all markets.
-   * Every 30 minutes, we will check the liquidity of the market.
-   * If the liquidity is not enough, we will remove the market from routing.
-
-### Market Liquidity Requirements
-
-The market must fit one of the following criteria for it to be routable:
-
-1. **Less than 30\% price difference on \$500**
-
-Using a benchmark position size of \$500, a user should encounter less than 30% price difference after buying \$500 worth and then selling back on the same market.
-
-Price Difference = (\$500 - Final USD value) / \$500 If the price difference is more than 30%, it means that there is insufficient liquidity in the market for the benchmark position size of \$500.
-
-2. **Less than 20\% price impact on market**
-
-If the above (sell back \$500 worth) fails, we will compare the price per token received from buying \$1000 worth vs the price per token received from buying \$500 worth to calculate price impact.
-
-If the price impact is more than 20\%, it means that the market is illiquid.
-

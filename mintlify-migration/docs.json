@@ -490,20 +490,25 @@
             "group": "Jupiter Plugin",
             "pages": [
               "tool-kits/plugin/index",
-              "tool-kits/plugin/nextjs-app-example",
-              "tool-kits/plugin/react-app-example",
-              "tool-kits/plugin/html-app-example",
+              {
+                "group": "Walkthrough",
+                "pages": [
+                "tool-kits/plugin/nextjs-app-example",
+                "tool-kits/plugin/react-app-example",
+                "tool-kits/plugin/html-app-example"
+                ]
+              },
               "tool-kits/plugin/customization",
               "tool-kits/plugin/faq"
             ]
           },
           {
-            "group": "Jupiter Mobile Adapter",
-            "pages": ["tool-kits/mobile-adapter"]
-          },
-          {
             "group": "Jupiter Wallet Kit",
-            "pages": ["tool-kits/wallet-kit"]
+            "pages": [
+              "tool-kits/wallet-kit/index",
+              "tool-kits/wallet-kit/walkthrough",
+              "tool-kits/wallet-kit/jupiter-mobile"
+            ]
           },
           {
             "group": "Jupiter Referral Program",

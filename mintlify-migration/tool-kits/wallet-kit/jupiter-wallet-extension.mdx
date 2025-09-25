@@ -1,0 +1,168 @@
+---
+title: "Jupiter Wallet Extension"
+description: "Using the Jupiter Wallet Kit, we can pass in the Jupiter Wallet Extension as a wallet in your app."
+---
+
+## Prerequisites
+
+Before you begin, make sure you have the following installed on your system. This is what we will be using in this example.
+
+**Node.js and npm**: Download and install from [nodejs.org](https://nodejs.org)
+
+## Step 1: Create a new project
+
+Head to your preferred directory and create a new project using `create-next-app` with TypeScript template (you can use other templates or methods to start your project too):
+
+```bash
+npx create-next-app@latest wallet-kit-demo --typescript
+cd wallet-kit-demo
+npm run dev
+```
+
+## Step 2: Install dependency
+
+```bash
+npm i @jup-ag/wallet-adapter
+```
+
+<Card title="Download Jupiter Wallet Extension" href="" icon="wallet" horizontal/>
+
+## Step 3: Add notification functionality
+
+In `/src/components`, create a new file `WalletNotification.tsx` with the following content:
+
+In this example, we will use a simple browser notification system to handle the wallet connection events.
+
+```typescript expandable
+"use client";
+
+interface IWalletNotification {
+  publicKey?: string;
+  shortAddress?: string;
+  walletName?: string;
+  metadata?: {
+    name: string;
+    url: string;
+    icon: string;
+    supportedTransactionVersions?: any;
+  };
+}
+
+// Simple notification component - you can replace this with your preferred notification library
+const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  // For demo purposes, we'll use browser notifications
+  // In a real app, you'd want to use a proper notification library like react-hot-toast
+  console.log(`[${type.toUpperCase()}] ${message}`);
+  
+  // Simple visual feedback
+  if (typeof window !== 'undefined') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6'};
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      z-index: 9999;
+      font-family: system-ui, -apple-system, sans-serif;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 3000);
+  }
+};
+
+export const WalletNotification = {
+  onConnect: ({ shortAddress, walletName }: IWalletNotification) => {
+    showNotification(`Connected to ${walletName} (${shortAddress})`, 'success');
+  },
+  onConnecting: ({ walletName }: IWalletNotification) => {
+    showNotification(`Connecting to ${walletName}...`, 'info');
+  },
+  onDisconnect: ({ walletName }: IWalletNotification) => {
+    showNotification(`Disconnected from ${walletName}`, 'info');
+  },
+  onError: ({ walletName }: IWalletNotification) => {
+    showNotification(`Failed to connect to ${walletName}`, 'error');
+  },
+  onNotInstalled: ({ walletName }: IWalletNotification) => {
+    showNotification(`${walletName} is not installed`, 'error');
+  },
+};
+
+export default WalletNotification;
+```
+
+## Step 4: Wrap your app in the Wallet Kit
+
+In `/src/app/page.tsx`, wrap your app with `<UnifiedWalletProvider />`.
+
+This example code covers the base usage of the wallet kit which allows all wallets in your browser to be detected and used. If you have downloaded the [Jupiter Wallet Extension]() <Icon icon="download" />, you should be able to see and connect to it.
+
+```typescript expandable
+"use client";
+
+import { Adapter, UnifiedWalletButton, UnifiedWalletProvider } from "@jup-ag/wallet-adapter";
+import { WalletNotification } from "../components/WalletNotification";
+
+export default function Home() {
+  // You can add specific wallet adapters here if needed
+  // For now, we'll rely on the Unified Wallet Kit's built-in wallet discovery
+  const wallets: Adapter[] = [];
+
+  return (
+    <UnifiedWalletProvider
+      wallets={wallets}
+      config={{
+        autoConnect: false,
+        env: "mainnet-beta",
+        metadata: {
+          name: "Jupiter Wallet Kit Demo",
+          description: "A demo application showcasing the Jupiter Wallet Kit",
+          url: "https://localhost:3000",
+          iconUrls: ["https://jup.ag/favicon.ico"],
+        },
+        notificationCallback: WalletNotification,
+        walletlistExplanation: {
+          href: "https://dev.jup.ag/tool-kits/wallet-kit",
+        },
+        theme: "dark",
+        lang: "en",
+      }}
+    >
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center p-8">
+        <div className="max-w-md w-full space-y-8 text-center">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-4">
+              Jupiter Wallet Extension Demo
+            </h1>
+            <p className="text-gray-300 mb-8">
+              Connect your Solana wallet to get started
+            </p>
+          </div>
+          
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <UnifiedWalletButton />
+          </div>
+                          
+          <div className="text-sm text-gray-400">
+            <p>Powered by Jupiter Wallet Kit</p>
+          </div>
+        </div>
+      </div>
+    </UnifiedWalletProvider>
+  );
+}
+```
+
+There you have it! You've successfully integrated Jupiter Wallet Kit into your Next.js application and able to connect the Jupiter Wallet Extension!
+
+* Please test the wallet functionality and build into your own application.
+* If you require more customizations, check out the [Wallet Kit Playground](https://wallet-kit.jup.ag) or [Github repo](https://github.com/TeamRaccoons/Unified-Wallet-Kit).
+* If you have any questions or issues, please reach out to us in [Discord](https://discord.gg/jup).

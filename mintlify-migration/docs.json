@@ -506,8 +506,8 @@
             "group": "Jupiter Wallet Kit",
             "pages": [
               "tool-kits/wallet-kit/index",
-              "tool-kits/wallet-kit/walkthrough",
-              "tool-kits/wallet-kit/jupiter-mobile"
+              "tool-kits/wallet-kit/jupiter-wallet-extension",
+              "tool-kits/wallet-kit/jupiter-mobile-adapter"
             ]
           },
           {
@@ -864,6 +864,10 @@
     {
       "source": "/docs/tool-kits/terminal/:slug*",
       "destination": "/tool-kits/plugin/:slug*"
+    },
+    {
+      "source": "/partners?category=Wallets",
+      "destination": "/tool-kits/wallet-kit"
     }
   ]
 }

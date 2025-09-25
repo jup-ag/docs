@@ -1,0 +1,146 @@
+---
+title: "Jupiter Mobile Adapter"
+description: "Using the Jupiter Wallet Kit, we can pass in the Jupiter Mobile Adapter as a wallet in your app."
+---
+
+<Note>
+The Jupiter Mobile Adapter allows you to integrate Jupiter Mobile login functionality into your app! By allowing Jupiter Mobile users to simply use the app to scan a QR code to login, they can utilize their wallets on Jupiter Mobile across any platform.
+</Note>
+
+## Overview
+
+<Steps>
+  <Step >
+    Install [@jup-ag/jup-mobile-adapter](https://www.npmjs.com/package/@jup-ag/jup-mobile-adapter)
+  </Step>
+  <Step>
+    Use `useWrappedReownAdapter` (Prerequisite to create an app id on [https://dashboard.reown.com/](https://dashboard.reown.com/))
+  </Step>
+  <Step>
+    Add the `jupiterAdapter` to wallets
+  </Step>
+</Steps>
+
+## Prerequisite
+
+Building on top of the example in [Jupiter Wallet Extension example](/tool-kits/wallet-kit/jupiter-wallet-extension), we will pass in the Jupiter Mobile Adapter (which uses Reown's AppKit).
+
+## Step 1: Install dependency
+
+You will need to install the following dependency:
+
+```bash
+npm i @jup-ag/jup-mobile-adapter
+```
+
+<Card title="Download Jupiter Mobile">
+  <CardGroup cols={3}>
+    <Card title="iOS" icon="apple" href="https://apps.apple.com/us/app/jupiter-mobile/id6484069059" horizontal/>
+    <Card title="Android" icon="android" href="https://play.google.com/store/apps/details?id=ag.jup.jupiter.android" horizontal/>
+    <Card title="Web" icon="globe" href="https://jup.ag/mobile" horizontal/>
+  </CardGroup>
+</Card>
+
+## Step 2: Get Reown project ID
+
+You need to input the project ID on from your [Reown's dashboard](https://dashboard.reown.com/), before you can use the Jupiter Mobile Adapter. This project ID is required for the AppKit integration that powers the mobile wallet connection functionality.
+
+To get your project ID:
+1. Visit [https://dashboard.reown.com/](https://dashboard.reown.com/)
+2. Sign up or log in to your account
+3. Create a new project
+4. Copy the project ID from your project settings (should be in the navbar)
+
+## Step 3: Add Jupiter Mobile Adapter to wallets
+
+In your `/src/app/page.tsx` file, add the Jupiter Mobile Adapter as a wallet.
+
+```js expandable
+"use client";
+
+import { Adapter, UnifiedWalletButton, UnifiedWalletProvider } from "@jup-ag/wallet-adapter";
+import { useWrappedReownAdapter } from '@jup-ag/jup-mobile-adapter';
+import { WalletNotification } from "../components/WalletNotification";
+import { useMemo } from "react";
+
+export default function Home() {
+  // Initialize Jupiter Mobile Adapter with WalletConnect/Reown configuration
+  // This adapter enables mobile wallet connections through WalletConnect protocol
+  const { jupiterAdapter } = useWrappedReownAdapter({
+    appKitOptions: {
+      metadata: {
+        name: 'Jupiter Wallet Kit Demo',
+        description: `This is a Jupiter Wallet Kit Demo with Jupiter Mobile Adapter`,
+        url: 'https://localhost:3000',
+        icons: ['https://jup.ag/favicon.ico'],
+      },
+      projectId: '', // Get your project id from https://dashboard.reown.com/
+      features: {
+        analytics: false,
+        socials: ['google', 'x', 'apple'],
+        email: false,
+      },
+      // Disable built-in wallet list to use only Jupiter Mobile Adapter
+      enableWallets: false,
+    },
+  });
+  
+  // Configure wallet adapters for the UnifiedWalletProvider
+  // This memoized array includes the Jupiter Mobile Adapter and filters out any invalid adapters
+  // The filter ensures each adapter has required properties (name and icon) before being used
+  const wallets: Adapter[] = useMemo(() => {
+      return [
+        jupiterAdapter, // Jupiter Mobile Adapter with WalletConnect integration
+      ].filter((item) => item && item.name && item.icon) as Adapter[];
+  }, []);
+
+  return (
+    <UnifiedWalletProvider
+      wallets={wallets}
+      config={{
+        autoConnect: false,
+        env: "mainnet-beta",
+        metadata: {
+          name: "Jupiter Wallet Kit Demo",
+          description: "A demo application showcasing the Jupiter Wallet Kit",
+          url: "https://localhost:3000",
+          iconUrls: ["https://jup.ag/favicon.ico"],
+        },
+        notificationCallback: WalletNotification,
+        walletlistExplanation: {
+          href: "https://dev.jup.ag/tool-kits/wallet-kit",
+        },
+        theme: "dark",
+        lang: "en",
+      }}
+    >
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center p-8">
+        <div className="max-w-md w-full space-y-8 text-center">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-4">
+              Jupiter Mobile Adapter Demo
+            </h1>
+            <p className="text-gray-300 mb-8">
+              Connect your Solana wallet to get started
+            </p>
+          </div>
+          
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <UnifiedWalletButton />
+          </div>
+                    
+          <div className="text-sm text-gray-400">
+            <p>Powered by Jupiter Wallet Kit</p>
+          </div>
+        </div>
+      </div>
+    </UnifiedWalletProvider>
+  );
+};
+```
+
+There you have it! You've successfully integrated Jupiter Wallet Kit into your Next.js application and able to connect the Jupiter Mobile Adapter!
+
+* Please test the wallet functionality and build into your own application.
+* If you require more customizations, check out the [Wallet Kit Playground](https://wallet-kit.jup.ag) or [Github repo](https://github.com/TeamRaccoons/Unified-Wallet-Kit).
+* If you have any questions or issues, please reach out to us in [Discord](https://discord.gg/jup).

@@ -1,0 +1,88 @@
+---
+title: "Deposit Price Order"
+---
+
+<Info>
+  **NOTE**
+
+  * Lite URL: `https://lite-api.jup.ag/recurring/v1/priceDeposit`
+  * Pro URL: `https://api.jup.ag/recurring/v1/priceDeposit`
+
+  To upgrade to Pro or understand our rate limiting, please refer to this section.
+
+  <CardGroup>
+    <Card title="API Key Setup" href="/api-setup" icon="key" horizontal/>
+    <Card title="API Rate Limit" href="/api-rate-limit" icon="gauge" horizontal/>
+  </CardGroup>
+</Info>
+
+<Warning>
+  **CAUTION**
+
+  Price-based orders via API is deprecated.
+</Warning>
+
+## Deposit Order
+
+If you want to deposit funds into a price-based order, you need to do these steps:
+
+<Steps>
+  <Step>
+  Get a list of the order accounts you want to deposit via `/getRecurringOrders` endpoint.
+  </Step>
+  <Step>
+  Choose the order account to deposit by making a post request to the `/priceDeposit` endpoint to get the transaction to deposit into the order.
+  </Step>
+  <Step>
+  Sign then send the transaction to the network either via `/execute` endpoint or by yourself.
+  </Step>
+</Steps>
+
+<Note>
+  **GET RECURRING ORDERS**
+
+  [Refer to the `/getRecurringOrders` section](/recurring-api/get-recurring-orders) to prepare the order account you want to deposit into.
+</Note>
+
+```js
+const priceDepositResponse = await (
+    await fetch('https://lite-api.jup.ag/recurring/v1/priceDeposit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            order: "EpTsCUnKComCd8FDNZn3kVrQBQo2uEn5rRzYk9ocqFPH",
+            user: wallet.publicKey,
+            amount: 1000000
+        }),
+    })
+).json();
+```
+
+## Deposit Order Response
+
+**Success Example Response**
+
+```json
+{
+  "requestId": "cbc021a6-8a61-49cd-8c5a-9ea29fc2dd4d",
+  "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAcLRL7cu4ZNuxh1wI9W7GVURyr3A06dH348HDpIQzcAJ4ou00rM6bvrYH/o3YhDOZ97jIgg/zdwEtLlVk6ddEK3BXdUeDGIufeWFDvFYjcKVm9e/kPQ8ZFXM+X1qUqo7Q8ozVCa3wbmwfzRz1Av5JAlFtGgdIbvPspoQDO0MABdFvQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAABt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkHNtIX+MwRgQakd3fYovqoEXuKqaHTmdCmjuWoQiMib4yXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZxvp6877brTo9ZfNqq8l0MbG75MLS9uDkfKYCA0UvXWHbZsKfr6NrDjI7Q7M2CqAquH41g9AMbtaLYPfmHMqbN3la+2QyLhVSaIunpVo3X8k4VAEj0cBT/ANSk2IKq9g1BAUABQL3nQAABQAJA0ANAwAAAAAACAYAAgAJBAYBAQcIAAMJAQIGCgcQ8iPGiVLh8rZAQg8AAAAAAA=="
+}
+```
+
+**Failed Example Response**
+
+```json
+{
+  "code": 400,
+  "error": "Failed to deserialize account data: failed to fill whole buffer",
+  "status": "Bad Request"
+}
+```
+
+## Execute Deposit Order
+
+To sign then send the transaction to the network to execute the deposit, you can use the `/execute` endpoint or by yourself.
+
+Refer to the [Execute Order](/recurring-api/execute-order) section for more details.

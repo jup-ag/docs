@@ -1,0 +1,526 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Jupiter",
+  "colors": {
+    "primary": "#00b45a",
+    "light": "#c7f284",
+    "dark": "#c7f284"
+  },
+  "favicon": "/favicon.png",
+  "contextual": {
+    "options": ["copy", "chatgpt", "claude", "view"]
+  },
+  "appearance": {
+    "default": "dark"
+  },
+  "background": {
+    "decoration": "gradient"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Home",
+        "groups": [
+          {
+            "group": " ",
+            "pages": ["index"]
+          }
+        ]
+      },
+      {
+        "tab": "APIs",
+        "dropdowns": [
+          {
+            "dropdown": "Getting Started",
+            "icon": "rocket",
+            "groups": [
+              {
+                "group": "Development",
+                "pages": [
+                  "get-started",
+                  "environment-setup",
+                  "development-basics"
+                ]
+              },
+              {
+                "group": "Portal",
+                "pages": [
+                  "api-setup",
+                  "api-responses",
+                  "api-rate-limit",
+                  "api-faq"
+                ]
+              }
+            ]
+          },
+          {
+            "dropdown": "Ultra API",
+            "icon": "bolt",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["ultra-api"]
+              },
+              {
+                "group": "Ultra API",
+                "pages": [
+                  "ultra-api/get-order",
+                  "ultra-api/execute-order",
+                  "ultra-api/get-balances",
+                  "ultra-api/get-shield",
+                  "ultra-api/search-token"
+                ]
+              },
+              {
+                "group": "Ultra API Guides",
+                "pages": ["ultra-api/add-fees-to-ultra"]
+              }
+            ]
+          },
+          {
+            "dropdown": "Swap API",
+            "icon": "swap",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["swap-api"]
+              },
+              {
+                "group": "Swap API",
+                "pages": [
+                  "swap-api/get-quote",
+                  "swap-api/build-swap-transaction",
+                  "swap-api/send-swap-transaction"
+                ]
+              },
+              {
+                "group": "Swap API Guides",
+                "pages": [
+                  "swap-api/add-fees-to-swap",
+                  "swap-api/payments-through-swap",
+                  "swap-api/requote-with-lower-max-accounts",
+                  "swap-api/solana-unity-sdk"
+                ]
+              },
+              {
+                "group": "Debugging",
+                "pages": ["swap-api/common-errors"]
+              }
+            ]
+          },
+          {
+            "dropdown": "Lend API (Beta)",
+            "icon": "money-bill-transfer",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["lend-api"]
+              },
+              {
+                "group": "Lend API",
+                "pages": ["lend-api/earn", "lend-api/borrow"]
+              }
+            ]
+          },
+          {
+            "dropdown": "Trigger API",
+            "icon": "arrow-right-arrow-left",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["trigger-api"]
+              },
+              {
+                "group": "Trigger API",
+                "pages": [
+                  "trigger-api/create-order",
+                  "trigger-api/execute-order"
+                ]
+              },
+              {
+                "group": "Order Management",
+                "pages": [
+                  "trigger-api/cancel-order",
+                  "trigger-api/get-trigger-orders"
+                ]
+              },
+              {
+                "group": "Debugging",
+                "pages": ["trigger-api/best-practices"]
+              }
+            ]
+          },
+          {
+            "dropdown": "Recurring API",
+            "icon": "clock-rotate-left",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["recurring-api"]
+              },
+              {
+                "group": "Recurring API",
+                "pages": [
+                  "recurring-api/create-order",
+                  "recurring-api/execute-order"
+                ]
+              },
+              {
+                "group": "Order Management",
+                "pages": [
+                  "recurring-api/cancel-order",
+                  "recurring-api/deposit-price-order",
+                  "recurring-api/withdraw-price-order",
+                  "recurring-api/get-recurring-orders"
+                ]
+              },
+              {
+                "group": "Debugging",
+                "pages": ["recurring-api/best-practices"]
+              }
+            ]
+          },
+          {
+            "dropdown": "Token API",
+            "icon": "key",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["token-api"]
+              },
+              {
+                "group": "Versions",
+                "pages": ["token-api/v2", "token-api/v1"]
+              },
+              {
+                "group": "Expanding on Token API",
+                "pages": [
+                  "token-api/organic-score",
+                  "token-api/token-tag-standard"
+                ]
+              }
+            ]
+          },
+          {
+            "dropdown": "Price API",
+            "icon": "tag",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["price-api"]
+              },
+              {
+                "group": "Token API",
+                "pages": ["price-api/v3", "price-api/v2"]
+              }
+            ]
+          },
+          {
+            "dropdown": "Send API (Beta)",
+            "icon": "paper-plane",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["send-api"]
+              },
+              {
+                "group": "Send API",
+                "pages": [
+                  "send-api/invite-code",
+                  "send-api/craft-send",
+                  "send-api/craft-clawback",
+                  "send-api/manage-invites"
+                ]
+              }
+            ]
+          },
+          {
+            "dropdown": "Studio API (Beta)",
+            "icon": "building-columns",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["studio-api"]
+              },
+              {
+                "group": "Studio API",
+                "pages": ["studio-api/create-token", "studio-api/claim-fee"]
+              }
+            ]
+          },
+          {
+            "dropdown": "Prep API",
+            "icon": "chart-line",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["prep-api"]
+              },
+              {
+                "group": "Prep Program",
+                "pages": [
+                  "perp-api/position-account",
+                  "perp-api/position-request-account",
+                  "perp-api/pool-account",
+                  "perp-api/custody-account"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Routing Integration",
+        "groups": [
+          {
+            "group": " ",
+            "pages": ["routing"]
+          },
+          {
+            "group": "Routing Integrations",
+            "pages": [
+              "routing/dex-integration",
+              "routing/rfq-integration"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Tool Kits",
+        "groups": [
+          {
+            "group": " ",
+            "pages": ["/tool-kits"]
+          },
+          {
+            "group": "Jupiter Plugin",
+            "pages": [
+              "tool-kits/plugin",
+              "tool-kits/plugin/nextjs-app-example",
+              "tool-kits/plugin/react-app-example",
+              "tool-kits/plugin/html-app-example",
+              "tool-kits/plugin/customization",
+              "tool-kits/plugin/faq"
+            ]
+          },
+          {
+            "group": "Jupiter Mobile Adapter",
+            "pages": ["tool-kits/mobile-adapter"]
+          },
+          {
+            "group": "Jupiter Wallet Kit",
+            "pages": ["tool-kits/wallet-kit"]
+          },
+          {
+            "group": "Jupiter Referral Program",
+            "pages": ["tool-kits/referral-program"]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "api-reference",
+              {
+                "group": "Ultra API Schema",
+                "pages": [
+                  "api-reference/ultra-api",
+                  "api-reference/ultra-api/order",
+                  "api-reference/ultra-api/execute",
+                  "api-reference/ultra-api/balances",
+                  "api-reference/ultra-api/shield",
+                  "api-reference/ultra-api/search",
+                  "api-reference/ultra-api/routers"
+                ]
+              },
+              {
+                "group": "Swap API Schema",
+                "pages": [
+                  "api-reference/swap-api",
+                  "api-reference/swap-api/quote",
+                  "api-reference/swap-api/swap",
+                  "api-reference/swap-api/swap-instructions",
+                  "api-reference/swap-api/program-id-to-label"
+                ]
+              },
+              {
+                "group": "Lend API Schema",
+                "pages": [
+                  "api-reference/lend-api",
+                  {
+                    "group": "Earn (Beta)",
+                    "pages": [
+                      "api-reference/lend-api/earn",
+                      "api-reference/lend-api/earn/deposit",
+                      "api-reference/lend-api/earn/withdraw",
+                      "api-reference/lend-api/earn/mint",
+                      "api-reference/lend-api/earn/redeem",
+                      "api-reference/lend-api/earn/deposit-instructions",
+                      "api-reference/lend-api/earn/withdraw-instructions",
+                      "api-reference/lend-api/earn/mint-instructions",
+                      "api-reference/lend-api/earn/redeem-instructions",
+                      "api-reference/lend-api/earn/tokens",
+                      "api-reference/lend-api/earn/positions",
+                      "api-reference/lend-api/earn/earnings"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Trigger API Schema",
+                "pages": [
+                  "api-reference/trigger-api",
+                  "api-reference/trigger-api/create-order",
+                  "api-reference/trigger-api/execute",
+                  "api-reference/trigger-api/cancel-order",
+                  "api-reference/trigger-api/cancel-orders",
+                  "api-reference/trigger-api/get-trigger-orders"
+                ]
+              },
+              {
+                "group": "Recurring API Schema",
+                "pages": [
+                  "api-reference/recurring-api",
+                  "api-reference/recurring-api/create-order",
+                  "api-reference/recurring-api/execute",
+                  "api-reference/recurring-api/cancel-order",
+                  "api-reference/recurring-api/price-deposit",
+                  "api-reference/recurring-api/price-withdraw",
+                  "api-reference/recurring-api/get-recurring-orders"
+                ]
+              },
+              {
+                "group": "Token API Schema",
+                "pages": [
+                  "api-reference/token-api",
+                  {
+                    "group": "V2 (Beta)",
+                    "pages": [
+                      "api-reference/token-api/v2",
+                      "api-reference/token-api/v2/search",
+                      "api-reference/token-api/v2/tag",
+                      "api-reference/token-api/v2/category",
+                      "api-reference/token-api/v2/recent"
+                    ]
+                  },
+                  {
+                    "group": "V1 (Deprecated)",
+                    "pages": [
+                      "api-reference/token-api/v1",
+                      "api-reference/token-api/v1/token-information",
+                      "api-reference/token-api/v1/mints-in-market",
+                      "api-reference/token-api/v1/tradable",
+                      "api-reference/token-api/v1/tagged",
+                      "api-reference/token-api/v1/new",
+                      "api-reference/token-api/v1/all"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Price API Schema",
+                "pages": [
+                  "api-reference/price-api",
+                  {
+                    "group": "V3 (Beta)",
+                    "pages": [
+                      "api-reference/price-api/v3",
+                      "api-reference/price-api/v3/price"
+                    ]
+                  },
+                  {
+                    "group": "V2 (Deprecated)",
+                    "pages": ["api-reference/price-api/v2", "api-reference/price-api/v2/price"]
+                  }
+                ]
+              },
+              {
+                "group": "Send API Schema (Beta)",
+                "pages": [
+                  "api-reference/send-api",
+                  "api-reference/send-api/craft-send",
+                  "api-reference/send-api/craft-clawback",
+                  "api-reference/send-api/pending-invites",
+                  "api-reference/send-api/invite-history"
+                ]
+              },
+              {
+                "group": "Studio API Schema (Beta)",
+                "pages": [
+                  "api-reference/studio-api",
+                  "api-reference/studio-api/dbc-pool-create-tx",
+                  "api-reference/studio-api/dbc-pool-submit",
+                  "api-reference/studio-api/dbc-pool-addresses-by-mint",
+                  "api-reference/studio-api/dbc-fee",
+                  "api-reference/studio-api/dbc-fee-create-tx"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Misc",
+        "groups": [
+          {
+            "group": " ",
+            "pages": ["misc"]
+          },
+          {
+            "group": "Legal & Guidelines",
+            "pages": [
+              "misc/sdk-api-license-agreement",
+              "misc/terms-of-use",
+              "misc/privacy-policy",
+              "misc/integrator-guidelines"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Status",
+          "href": "https://status.jup.ag/",
+          "icon": "signal"
+        },
+        {
+          "anchor": "Community",
+          "href": "https://discord.gg/jup",
+          "icon": "discord"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/logo.png",
+    "dark": "/logo/logo.png",
+    "href": "https://jup.ag/"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Create",
+        "href": "https://jup.ag/studio"
+      }
+    ],
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/jup-ag/docs"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://twitter.com/JupiterExchange",
+      "discord": "https://discord.gg/jup",
+      "telegram": "https://t.me/jup_marketing",
+      "github": "https://github.com/jup-ag",
+      "youtube": "https://www.youtube.com/@Jupiter-Exchange"
+    }
+  }
+}

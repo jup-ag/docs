@@ -1,0 +1,429 @@
+---
+mode: "custom"
+title: "Jupiter Developer Docs"
+---
+
+<div className="relative w-full flex items-center justify-center" style={{ height: '26rem', overflow: 'hidden'}}>
+<div id="background-div" className="absolute inset-0 h-full bg-[#00000000] bg-cover bg-center"></div>
+
+<div
+  id="background-div"
+  className="absolute inset-0 h-full bg-cover bg-center"
+></div>
+
+<div style={{ position: 'absolute', textAlign: 'center', padding: '0 1rem' }}>
+  <div
+    className="text-5xl font-bold w-full mt-12 mb-2"
+  >
+    <span className="bg-gradient-to-r from-[#00BEF0] via-[#8DE3A3] to-[#C7F284] bg-clip-text text-transparent">Jupiter Developer Docs</span>
+  </div>
+
+   <p className="text-lg" style={{  fontWeight: '500' , maxWidth: '40rem', margin: '0 auto', marginTop: '0.5rem'}}>
+      How can we help you today?
+    </p>
+    <div className="flex items-center justify-center" style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <button
+        type="button"
+        className="hidden w-full lg:flex items-center text-sm leading-6 py-4 pl-4 pr-4 text-gray-500 rounded-full"
+        id="home-search-entry"
+        style={{
+          marginTop: '2rem',
+          maxWidth: '40rem',
+          background: '#FFF',
+          boxShadow: '0px 1px 4px 0px rgba(8, 9, 10, 0.25), 0px 0px 0px 4px rgba(255, 255, 255, 0.20)',
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+        onClick={()=> document.getElementById('search-bar-entry').click()}
+      >
+        <svg
+          className="h-4 w-4 ml-1.5 flex-none bg-primary hover:bg-gray-600 dark:bg-primary-dark dark:hover:bg-white/70"
+          style={{
+          marginRight: '0.5rem',
+          maskImage:
+            'url("https://mintlify.b-cdn.net/v6.5.1/solid/magnifying-glass.svg")',
+          maskRepeat: 'no-repeat',
+          maskPosition: 'center center',
+          }}
+        />
+        Search or ask...
+      </button>
+    </div>
+  </div>
+</div>
+
+<div
+  style={{marginTop: '1rem', marginBottom: '8rem', maxWidth: '70rem', marginLeft: 'auto',
+  marginRight: 'auto', paddingLeft: '1.25rem',
+  paddingRight: '1.25rem' }}
+>
+
+<CardGroup cols={2}>
+  <Card title="Integrate APIs" icon="code">
+
+Develop with the most comprehensive set of APIs offering a full range of Jupiter Products like [Ultra](/ultra-api/), [Swap](/swap-api/), [Trigger](/trigger-api/), [Recurring](/recurring-api/), [Lend](/lend-api/), and more.
+
+  <Columns cols={2}>
+ <Card title="Get Started" href="/get-started" icon="rocket" horizontal/>
+ <Card title="Setup API Key" href="/api-setup" icon="key" horizontal/>
+  </Columns>
+  </Card>
+  <Card title="Tool Kits" icon="wrench">
+  For those looking for low-code solutions, we provide a customizable tools like Jupiter Plugin for you to develop faster and smoother.
+  <Card title="Explore Tool Kits" href="/tool-kits" icon="box" horizontal/>
+  </Card>
+  <Card title="Get Routed" icon="route">
+  If you are a decentralized exchange or market maker and have an interest to be part of our routing engines, refer to the routing integration guides.
+   <Columns cols={2}>
+ <Card title="DEX Integration" href="/routing/dex-integration" icon="link" horizontal/>
+ <Card title="RFQ Integration" href="/routing/rfq-integration" icon="repeat" horizontal/>
+  </Columns>
+  </Card>
+    <Card title="Expansive Ecosystem" icon="airplay" >
+  Explore our ecosystem of projects and protocols that are part of our routing engine, or utilize Jupiter's developer tools to build their applications.
+<Card title="Explore Ecosystem" href="https://dev.jup.ag/ecosystem" icon="globe" horizontal/>
+  </Card>
+</CardGroup>
+
+<div className="flex flex-col w-full " style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+<h2
+    className="text-gray-900 dark:text-gray-200"
+    style={{
+      fontSize: '2rem',
+      fontWeight: '700',
+    }}
+  >
+    Browse by API
+
+  </h2>
+  <p
+    style={{
+      fontSize: '1rem',
+      fontWeight: '500',
+      marginTop: '4px',
+    }}
+  >
+    Most comprehensive set of endpoints to integrate Jupiter Products into your
+  applications
+  </p>
+</div>
+
+<CardGroup cols={4}>
+
+<Card title="Ultra API">
+  <a
+    href="/ultra-api/"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+  <a
+    href="/api-reference/ultra-api/"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Schemas
+  </a>
+</Card>
+<Card title="Swap API">
+  <a
+    href="/swap-api/"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+  <a
+    href="/api-reference/swap-api/"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Schemas
+  </a>
+</Card>
+
+<Card title="Lend API (Beta)">
+  <a
+    href="/lend-api/"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+  <a
+    href="/api-reference/lend-api/"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Schemas
+  </a>
+</Card>
+
+<Card title="Trigger API">
+  <a
+    href="/trigger-api/"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+  <a
+    href="/api-reference/trigger-api/"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Schemas
+  </a>
+</Card>
+
+<Card title="Recurring API">
+  <a
+    href="/recurring-api/"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+  <a
+    href="/api-reference/recurring-api/"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Schemas
+  </a>
+</Card>
+
+<Card title="Token API">
+  <a
+    href="/token-api/"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+  <a
+    href="/api-reference/token-api/"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Schemas
+  </a>
+</Card>
+
+<Card title="Price API">
+  <a
+    href="/price-api/"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+  <a
+    href="/api-reference/price-api/"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Schemas
+  </a>
+</Card>
+
+<Card title="Send API (Beta)">
+  <a
+    href="/send-api/"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+  <a
+    href="/api-reference/send-api/"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Schemas
+  </a>
+</Card>
+
+<Card title="Studio API (Beta)">
+  <a
+    href="/studio-api/"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+  <a
+    href="/api-reference/studio-api/"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Schemas
+  </a>
+</Card>
+
+</CardGroup>
+
+<div className="flex flex-col w-full " style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+<h2
+    className="text-gray-900 dark:text-gray-200"
+    style={{
+      fontSize: '2rem',
+      fontWeight: '700',
+    }}
+  >
+    Browse by Tool Kits
+  </h2>
+  <p
+    style={{
+      fontSize: '1rem',
+      fontWeight: '500',
+      marginTop: '4px',
+    }}
+  >
+  Ready-to-use components and libraries to accelerate your development
+  </p>
+</div>
+
+<CardGroup cols={4}>
+<Card title="Jupiter Plugin">
+  <a href="https://plugin.jup.ag/" target="_blank" rel="noopener noreferrer" className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline">Playground</a>
+  <a href="/tool-kits/plugin" rel="noopener noreferrer" className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline">Docs</a>
+</Card>
+
+<Card title="Jupiter Mobile Adapter">
+  <a
+    href="https://www.npmjs.com/package/@jup-ag/jup-mobile-adapter"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    NPM
+  </a>
+  <a
+    href="/tool-kits/mobile-adapter"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+</Card>
+
+<Card title="Unified Wallet Kit">
+  <a
+    href="https://unified.jup.ag/"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Playground
+  </a>
+  <a
+    href="/tool-kits/wallet-kit"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Docs
+  </a>
+</Card>
+
+<Card title="NPM Package">
+  <a
+    href="https://www.npmjs.com/package/@jup-ag/api"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    NPM
+  </a>
+  <a
+    href="https://github.com/jup-ag/jupiter-quote-api-node/tree/main/example"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Example
+  </a>
+</Card>
+
+</CardGroup>
+
+<div className="flex flex-col w-full " style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+<h2
+    className="text-gray-900 dark:text-gray-200"
+    style={{
+      fontSize: '2rem',
+      fontWeight: '700',
+    }}
+  >
+    Developed by DevRel Working Group
+  </h2>
+  <p
+    style={{
+      fontSize: '1rem',
+      fontWeight: '500',
+      marginTop: '4px',
+    }}
+  >
+   Community-driven resources and examples to help you build with Jupiter
+  </p>
+</div>
+
+<CardGroup cols={4}>
+<Card title="Example Scripts">
+  <a href="https://github.com/Jupiter-DevRel/typescript-examples" target="_blank" rel="noopener noreferrer" className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline">Typescript</a>
+  <a href="https://github.com/Jupiter-DevRel/python-examples" target="_blank" rel="noopener noreferrer" className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline">Python</a>
+</Card>
+
+<Card title="Jupiverse Kit">
+  <a
+    href="https://www.jupiversekit.xyz/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="mr-2 dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    Playground
+  </a>
+  <a
+    href="https://github.com/dannweeeee/jupiverse-kit"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="dark:hover:text-[#c7f284] hover:text-[#00b45a] dark:hover:underline hover:underline"
+  >
+    GitHub
+  </a>
+</Card>
+
+</CardGroup>
+
+<div className="flex flex-col w-full " style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+<h2
+    className="text-gray-900 dark:text-gray-200"
+    style={{
+      fontSize: '2rem',
+      fontWeight: '700',
+    }}
+  >
+     We'd love to hear from you!
+  </h2>
+  <p
+    style={{
+      fontSize: '1rem',
+      fontWeight: '500',
+      marginTop: '4px',
+    }}
+  >
+  Join our community and share your feedback to help us improve
+  </p>
+</div>
+
+
+<CardGroup cols={2}>
+<Card title="Get Support" icon="discord" horizontal href="https://discord.gg/jup">
+Join our Discord Community
+</Card>
+<Card title="Feedback & Contribute" icon="github" horizontal href="https://github.com/jup-ag/space-station/issues">
+Share your suggestions on GitHub
+</Card>
+</CardGroup>
+
+</div>

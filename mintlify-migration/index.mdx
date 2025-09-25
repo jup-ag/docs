@@ -20,23 +20,34 @@ import { JupiterPluginModalTrigger } from "/snippets/jupiter-plugin-modal-trigge
 
       {/* Hero card group to display stats */}
       <div className="mx-1 md:mx-20 grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-6 p-2 md:p-6">
-        <div className="bg-gradient-to-br from-[#C7F284]/10 to-[#00BEF0]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center hover:border-[#00BEF0]/40">
+        <div className="bg-gradient-to-br from-[#C7F284]/10 to-[#00BEF0]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center ">
           <div className="text-xl md:text-3xl font-bold text-[#00BEF0] dark:text-[#C7F284] mb-1 md:mb-2">#1</div>
           <div className="text-xs md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 md:mb-2">Superapp</div>
           <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden md:block">Leading DeFi across all chains</div>
         </div>
-        <div className="bg-gradient-to-br from-[#00BEF0]/10 to-[#C7F284]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center hover:border-[#00BEF0]/40">
+        <div className="bg-gradient-to-br from-[#00BEF0]/10 to-[#C7F284]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center ">
           <div className="text-xl md:text-3xl font-bold text-[#00BEF0] dark:text-[#C7F284] mb-1 md:mb-2">$50B+</div>
           <div className="text-xs md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 md:mb-2">Volume</div>
           <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden md:block">Loved by millions of users</div>
         </div>
-        <div className="bg-gradient-to-br from-[#C7F284]/10 to-[#00BEF0]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center hover:border-[#00BEF0]/40">
+        <div className="bg-gradient-to-br from-[#C7F284]/10 to-[#00BEF0]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center ">
           <div className="text-xl md:text-3xl font-bold text-[#00BEF0] dark:text-[#C7F284] mb-1 md:mb-2">500+</div>
           <div className="text-xs md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 md:mb-2">Integrations</div>
           <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden md:block">Trusted by leading protocols</div>
         </div>
       </div>
-
+    </div>
+    <div className="mt-8 md:mt-12">
+      {/* Add a CTA button to Get Started */}
+      <a 
+        href="/get-started" 
+        className="inline-flex items-center px-8 md:px-10 py-1 md:py-2 bg-gradient-to-r from-[#00BEF0] to-[#C7F284] text-black font-semibold text-base md:text-lg rounded-xl md:rounded-xl shadow-lg hover:shadow-xl hover:shadow-[#00BEF0]/20 hover:scale-105 transition-all duration-300 ease-in-out hover:from-[#00D4FF] hover:to-[#D9FF96] active:scale-95"
+      >
+        Get Started
+        <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </a>
     </div>
   </div>
 
@@ -125,33 +136,48 @@ import { JupiterPluginModalTrigger } from "/snippets/jupiter-plugin-modal-trigge
     <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
   </div>
 
-  {/* Developer Products Section */}
+  {/* Developer Suite Section */}
   <div className="max-w-6xl mx-auto pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
-    <div className="flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight md:leading-10 pb-[10px]">Developer Products</div>
+    <div className="flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight md:leading-10 pb-[10px]">Developer Suite</div>
     <div className="flex justify-center text-[#535862] dark:text-[#A6A09E] text-xs sm:text-lg font-normal leading-6 sm:leading-7 pb-[40px] sm:pb-[56px] text-center">Build with Jupiter's comprehensive DeFi and tech stack</div>
 
+    <Card title="Core Products" icon="diamonds-4">
+      Create your own DeFi superapp with Jupiter's core products.
+      <Columns cols={2}>
+        <Card title="Ultra Swap" icon="bolt" href="/docs/ultra" horizontal>
+            All-in-one swap solution
+        </Card>
+        <Card title="Lend" icon="piggy-bank" href="/docs/lend" horizontal>
+            Earn, borrow and multiply
+        </Card>
+        <Card title="Perpetuals" icon="chart-line" href="/docs/perps" horizontal>
+            Leverage trading
+        </Card>
+        <Card title="Trigger" icon="bullseye" href="/docs/trigger" horizontal>
+            Limit orders
+        </Card>
+        <Card title="Recurring" icon="clock-rotate-left" href="/docs/recurring" horizontal>
+            Dollar-cost averaging
+        </Card>
+        <Card title="Tokens" icon="coin" href="/docs/tokens" horizontal>
+            Comprehensive token information
+        </Card>
+        <Card title="Price" icon="dollar-sign" href="/docs/price" horizontal>
+            Heuristics-based token pricing
+        </Card>
+        <Card title="Send" icon="paper-plane" href="/docs/send" horizontal>
+            Seamless token transfers
+        </Card>
+        <Card title="Studio" icon="building-columns" href="/docs/studio" horizontal>
+            Token creation and LP management
+        </Card>
+        <Card title="Lock" icon="lock" href="/docs/lock" horizontal>
+            Token vesting
+        </Card>
+      </Columns>
+    </Card>
+
     <CardGroup cols={2}>
-      <Card title="Core Products" icon="diamonds-4">
-        Create your own DeFi superapp with Jupiter's core products.
-        <Columns cols={2}>
-          <Card title="Ultra Swap" href="/docs/ultra" icon="bolt" horizontal/>
-          <Card title="Lend" href="/docs/lend" icon="piggy-bank" horizontal/>
-          <Card title="Perps" href="/docs/perps" icon="chart-line" horizontal/>
-          <Card title="Studio" href="/docs/studio" icon="building-columns"  horizontal/>
-          <Card title="Trigger" href="/docs/trigger" icon="bullseye"  horizontal/>
-          <Card title="Recurring" href="/docs/recurring" icon="clock-rotate-left"  horizontal/>
-        </Columns>
-      </Card>
-
-      <Card title="Other Products" icon="ethernet">
-        Utilize additional products to enhance your DeFi superapp.
-        <Columns cols={2}>
-          <Card title="Tokens" href="/docs/tokens" icon="coin" horizontal/>
-          <Card title="Price" href="/docs/price" icon="dollar-sign" horizontal/>
-          <Card title="Send" href="/docs/send" icon="paper-plane" horizontal/>
-        </Columns>
-      </Card>
-
       <Card title="Tool Kits" icon="toolbox">
         Supercharge your integration by using our easy-to-use tool kits.
         <Columns cols={1}>
@@ -161,7 +187,7 @@ import { JupiterPluginModalTrigger } from "/snippets/jupiter-plugin-modal-trigge
           <Card title="Wallet Kit" href="/tool-kits/wallet-kit" icon="wallet" horizontal>
             Swiss army knife adapter for seamless wallet connectivity.
           </Card>
-          <Card title="Mobile Wallet Adapter" href="/tool-kits/mobile-adapter" icon="mobile" horizontal>
+          <Card title="Jupiter Mobile Adapter" href="/tool-kits/wallet-kit/jupiter-mobile" icon="mobile" horizontal>
             Onboard Jupiter Mobile users to connect to your website.
           </Card>
           <Card title="Referral Program" href="/tool-kits/referral-program" icon="percent"  horizontal>

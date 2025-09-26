@@ -433,7 +433,6 @@ components:
           description: |
             - Value of one 1 jlToken token to underlying mint, like 1 jlUSDC = X USDC
             - Used for conversion
-          type: string
         rewardsRate:
           type: string
           description: |
@@ -511,7 +510,6 @@ components:
           type: string
           description: |
             - Available withdrawal limit for this asset
-          type: string
         lastUpdateTimestamp:
           type: string
           description: |

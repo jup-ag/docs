@@ -1,0 +1,45 @@
+---
+title: "Integrator Gas Payer"
+description: "Walkthrough on how to use the payer parameter to pay for networks fees and rent on behalf of your users."
+---
+
+<Note>
+    If you are unfamiliar with [Ultra Swap's Gasless Support mechanisms](/docs/ultra/gasless), please refer to the guide.
+</Note>
+
+## Key Points
+
+The Jupiter Ultra Swap API allows you to pay for networks fees and rent on behalf of your users. This feature further reduces onboarding friction as the integrator can now cover the network fees and rent for their users **without using the user's swap amount**.
+<AccordionGroup>
+    <Accordion title="Integrator payer takes precedent">
+        When `payer` parameter is passed in, it **always** takes precedent over Metis's Gasless Support mechanism.
+    </Accordion>
+
+    <Accordion title="No minimum trade size requirement">
+        When `payer` parameter is passed in, it **does not** require a minimum trade size.
+    </Accordion>
+    
+    <Accordion title="Network fees handling">
+        Since you are paying for the network fees, you should account for the costs in your integrator fee.
+
+        We will not incur any additional fees on top of your integrator fee (This is only for Gasless Support mechanism), which also means the `feeBps` field will always remain as what integrator pass in.
+    </Accordion>
+
+    <Accordion title="Rent costs handling">
+        Since you are paying for the rent of the other required accounts, we have additional instructions to handle them.
+
+        * **When wSOL TAs are created**, an additional transfer of SOL equal to the amount of rent paid is made to the external payer.
+        * **When non-wSOL TAs are created**, the TA's [`closeAuthority`](https://solana.com/docs/tokens/basics/create-token-account) is set to be the external payer. Refer to [Close Authority](/docs/ultra/close-authority) for more details.
+    </Accordion>
+
+</AccordionGroup>
+
+**Limitations:**
+- Doesn't work for RFQ quotes (as of now) or other routers → our backend will handle by only providing Metis quotes in the future
+- **What happens if you only route via Metis:**
+- Metis covers almost all swap pairs (RFQ mainly covers bluechips)
+- Metis routes through AMMs → still prone to slippage, while RFQ is firm quotes (no slippage) - we can share more data about slippage as well, since we handle that for you/users
+- On averages: Metis handles ~50% of quotes, RFQ ~30%. RFQ only wins pricing about 5% of the time
+- Trade size diff: Metis ~$600 avg, RFQ ~$6k avg. Market makers usually prefer larger trades
+- In short, you are not losing out on much, since our own FE users are still being heavily routed via Metis and significant amount of swaps goes to long tail/meme tokens outside of RFQ's support
+- Integrator is required to proxy the request to their backend in order to sign the transaction (partially signed by user) before sending to `/execute`

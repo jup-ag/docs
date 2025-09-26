@@ -185,14 +185,12 @@ Slippage is an unavoidable aspect of trading on decentralized exchanges (DEXes).
 * **Transaction Landing:** How efficiently your transaction lands on-chain also affects slippage. Poorly optimized transactions may experience more slippage.
 
 <Tip>
-  **USE ULTRA API!**
-
   - If you use the Legacy Swap API:
 
-    * You are limited to fixed and dynamic slippage settings.
+    * You are limited to fixed and dynamic slippage (no longer maintained) settings.
     * You are responsible for handling slippage and optimizing transaction landing yourself.
 
-  - [Alternatively, consider using the Ultra API](/docs/ultra):
+  - [Alternatively, consider using the Ultra Swap API](/docs/ultra):
 
     * All of these optimizations are handled for you - without any RPC from you.
     * Additional routing is available to RFQ (Request for Quote) systems like Jupiterz where slippage is not an issue because the market maker fills your order exactly as quoted.
@@ -211,7 +209,7 @@ Apart from the fixed slippage setting, you can use Dynamic Slippage: During swap
   * **Algorithms**: Exponential Moving Average (EMA) on slippage data, and more.
   * **Monitoring**: Real-time monitoring of failure rates to ensure reactiveness to increase slippage when necessary.
 
-  <Card title="Refer to Ultra API for more information on RTSE" href="/docs/ultra#real-time-slippage-estimator" icon="book-open" horizontal/>
+  <Card title="Refer to Ultra Swap API for more information on RTSE" href="/docs/ultra#real-time-slippage-estimator" icon="book-open" horizontal/>
 </Note>
 
 <Warning>

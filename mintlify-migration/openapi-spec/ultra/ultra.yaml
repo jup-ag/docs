@@ -243,11 +243,15 @@ paths:
           required: false
         - in: query
           name: referralAccount
+          description: |
+            - Refer to [Integrator Fees](/docs/ultra/fee) for more details
           schema:
             type: string
           required: false
         - in: query
           name: referralFee
+          description: |
+            - Refer to [Integrator Fees](/docs/ultra/fee) for more details
           schema:
             type: number
             minimum: 50
@@ -273,6 +277,14 @@ paths:
               - **Only include** Meteora DLMM: `excludeRouters=<all-except-Metis>` and `excludeDexes=<all-except-MeteoraDLMM>`
           schema:
             type: string
+        - in: query
+          name: payer
+          description: |
+            - The address of an external gas payer to pay for the network fees and rent on behalf of the taker
+            - Refer to [Integrator Gas Payer](/docs/ultra/payer) for more details
+          schema:
+            type: string
+          required: false
   /execute:
     post:
       summary: execute
@@ -454,11 +466,6 @@ paths:
       summary: holdings (native)
       description: |
         Request for native SOL holdings only, without other tokens
-        
-        :::note
-        - This is a more efficient endpoint when you only need SOL balance
-        - Refer to [Ultra API doc](/docs/ultra/get-holdings) for more information
-        :::
       responses:
         '200':
           description: Successful response

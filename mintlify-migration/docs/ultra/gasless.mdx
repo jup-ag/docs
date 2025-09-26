@@ -3,155 +3,50 @@ title: "Gasless Support"
 description: "In-depth breakdown of the different gasless mechanisms supported by Ultra Swap."
 ---
 
-The Jupiter Ultra API includes **2 different** **gasless mechanism** that allows users to execute swaps without directly paying network fees in SOL. This feature reduces onboarding friction and supports a smoother user experience where end-users don’t need to hold SOL just to trade tokens.
-
----
+The Jupiter Ultra Swap API includes **2 different gasless mechanisms** that allow users to execute swaps without directly paying network fees in SOL. This feature reduces onboarding friction and supports a smoother user experience where end-users don't need to hold SOL just to trade tokens.
 
 ## Types of Gas
 
-1. Base network gas fees
-2. Associated Token Account (ATA) gas fees
-3. Priority fees (or tips, etc)
-4. Other accounts (some DEX may require additional accounts opened per user (e.g. Pumpfun)
-
----
+1. Base network transaction fee
+2. Associated Token Account (ATA) rent
+3. Priority fee (or tips, etc)
+4. Other accounts rent (some DEX may require additional accounts opened per user (e.g. Pumpfun))
 
 ## Gasless Coverage & Requirements
 
-| Router | Gasless | Network Fees | ATA Creation | Requirements |
+| Router | Network / Priority Fees | ATA Rent | Other Accounts Rent | Requirements |
 | --- | --- | --- | --- | --- |
-| **Metis** | ✅ Yes | ✅ Yes | ✅ Yes | - Minimum trade size of 10 USD
-- Gas is taken from swap amount, meaning more fees taken from user |
-| **JupiterZ** (RFQ) | ✅ Yes | ✅ Yes | ❌ No (as of now) | - No minimum trade size
-- Dependent on if MM provides a quote |
+| **Metis** | ✅ Yes | ✅ Yes | ✅ Yes | - Minimum trade size of 10 USD<br/>- Gas is taken from swap amount, meaning more fees taken from user |
+| **JupiterZ** (RFQ) | ✅ Yes | ❌ No (as of now) | ❌ Not required | - No minimum trade size<br/>- Dependent on if MM provides a quote |
 | **Others** | ❌ No | ❌ No | ❌ No | N/A |
-
----
 
 ## Scenario Matrix
 
-<aside>
-🚨
+<Warning>
+Note that Metis's Gasless Support mechanism only kicks in when user has insufficient SOL.
+</Warning>
 
-Note that Metis’s Gasless Support mechanism only kicks in when user has insufficient SOL - it does not always apply like JupiterZ
-
-For JupiterZ to be routable, it largely depends on the trade size and other factors as well, MMs prefer to provide quotes for larger swap sizes
-
-</aside>
-
-| User Scenario | Metis Router (Gasless Support) | JupiterZ Router (Gasless) | Other Routers |
+| User Scenario | Metis (Gasless Support) | JupiterZ | Others |
 | --- | --- | --- | --- |
-| Sufficient SOL
-With ATA | - User pays for gas | - MM must provide quote
-- MM pays for gas | - User pays for gas |
-| Sufficient SOL
-Without ATA | - User pays for gas
-- User pays for ATA | - MM must provide quote
-- MM pays for gas
-- User pays for ATA | - User pays for gas
-- User pays for ATA |
-| No SOL
-With ATA | - All gas covered from swap amount
-- Minimum trade of 10 USD required | - MM must provide quote
-- MM pays for gas | - Not routed |
-| No SOL
-Without ATA | - All gas covered from swap amount
-- Minimum trade of 10 USD required | - No quote from MM
-- Because user can’t provide SOL for ATA | - Not routed |
-| No SOL
-With ATA
-Insufficient size | - Quote provided but no transaction
-- All gas covered from swap amount
-- Minimum trade of 10 USD required | - MM must provide quote
-- MM pays for gas | - Not routed |
-| No SOL
-Without ATA
-Insufficient size | - Quote provided but no transaction
-- All gas covered from swap amount
-- Minimum trade of 10 USD required | - No quote from MM
-- Because user can’t provide SOL for ATA | - Not routed |
-
----
+| **Sufficient SOL<br/>With ATA** | - User pays for gas | - MM must provide quote<br/>- MM pays for gas | - User pays for gas |
+| **Sufficient SOL<br/>Without ATA** | - User pays for gas<br/>- User pays for ATA | - MM must provide quote<br/>- MM pays for gas<br/>- User pays for ATA | - User pays for gas<br/>- User pays for ATA |
+| **No SOL<br/>With ATA** | - All gas covered from swap amount<br/>- Minimum trade size of 10 USD required | - MM must provide quote<br/>- MM pays for gas | - Not routed |
+| **No SOL<br/>Without ATA** | - All gas and rent covered from swap amount<br/>- Minimum trade size of 10 USD required | - No quote from MM<br/>- Because user can't provide SOL for ATA | - Not routed |
+| **No SOL<br/>With ATA<br/>Small swap size** | - Quote provided but no transaction<br/>- `errorCode=3` | - MM must provide quote<br/>- MM pays for gas | - Not routed |
+| **No SOL<br/>Without ATA<br/>Small swap size** | - Quote provided but no transaction<br/>-`errorCode=3` | - No quote from MM<br/>- Because user can't provide SOL for ATA | - Not routed |
 
 ## Ongoing Improvements
 
-- **Reduction of minimum trade size**
-    - Currently, still requires ~50 USD and above, but will be reducing to 10 soon
-- **ATA coverage is inconsistent**
-    - Currently, only Metis covers ATA creation
-    - JupiterZ may support ATA coverage in the future
-- **Potential `payer={address}` field (refer to [Scenario Matrix for `payer={address}`](https://www.notion.so/Scenario-Matrix-for-payer-address-25d9650318e9800080a5ec28885dc7ea?pvs=21))**
-    - This allows integrator to be fee payer
-    - Which means gasful quotes by default can be covered by integrator as well
-    - This should also take precedent over Metis’s Gasless Support
-    - Integrator also must note to cover for such costs since user can drain the gas payer - ATA rent cannot be taken back, only user has authority to close and claim the SOL
-        - If the extra fee needed to cover for other fee amounts to 1% of the swap - the API will return an additional 100 bps to cover
-    - Limitations
-        - Doesn’t work for RFQ quotes (as of now) or other routers → our backend will handle by only providing Metis quotes
-            - **What happens if you only route via Metis:**
-                - Metis covers almost all swap pairs (RFQ mainly covers bluechips)
-                - Metis routes through AMMs → still prone to slippage, while RFQ is firm quotes (no slippage) - we can share more data about slippage as well, since we handle that for you/users
-                - On averages: Metis handles ~50% of quotes, RFQ ~30%. RFQ only wins pricing about 5% of the time
-                - Trade size diff: Metis ~$600 avg, RFQ ~$6k avg. Market makers usually prefer larger trades
-                - In short, you are not losing out on much, since our own FE users are still being heavily routed via Metis and significant amount of swaps goes to long tail/meme tokens outside of RFQ's support
-        - Integrator is required to proxy the request to their backend in order to sign the transaction (partially signed by user) before sending to `/execute`
+<Accordion title="Reduction of minimum trade size">
+    Currently, it requires at least 10 USD of swap size to be applicable for Gasless Support.
+</Accordion>
 
----
+<Accordion title="Sponsoring of ATA rent is inconsistent">
+    Currently, only Metis covers ATA creation. JupiterZ **might** support ATA coverage in the future.
+</Accordion>
 
-## End-State
-
-The ideal outcome for **Jupiter Ultra Gasless** is:
-
-Users can **swap without ever holding SOL**, regardless of whether a new ATA is required
-
----
-
-### Scenario Matrix for `payer={address}`
-
-Example below shows if `payer` is **ALWAYS** passed in to `/order`
-
-| User Scenario | Metis Router (Gasless Support) | JupiterZ Router (Gasless) | Other Routers |
-| --- | --- | --- | --- |
-| Sufficient SOL
-With ATA | ~~- User pays for gas~~
-
-GASFUL QUOTE
-- Integrator pay for gas instead | - MM must provide quote
-- MM pays for gas | - User pays for gas |
-| Sufficient SOL
-Without ATA | ~~- User pays for gas
-- User pays for ATA~~
-
-GASFUL QUOTE
-- Integrator pay for gas instead | - MM must provide quote
-- MM pays for gas
-- User pays for ATA | - User pays for gas
-- User pays for ATA |
-| No SOL
-With ATA | ~~- All gas covered from swap amount
-- Minimum trade of 10 USD required~~
-
-PAYER TAKES PRECEDENT
-- Integrator pay for gas instead | - MM must provide quote
-- MM pays for gas | - Not routed |
-| No SOL
-Without ATA | ~~- All gas covered from swap amount
-- Minimum trade of 10 USD required~~
-
-PAYER TAKES PRECEDENT
-- Integrator pay for gas instead | - No quote from MM
-- Because user can’t provide SOL for ATA | - Not routed |
-| Insufficient SOL
-With ATA | ~~- All gas covered from swap amount
-- Minimum trade of 10 USD required~~
-
-PAYER TAKES PRECEDENT
-- Integrator pay for gas instead | - MM must provide quote
-- MM pays for gas | - Not routed |
-| Insufficient SOL
-Without ATA | ~~- All gas covered from swap amount
-- Minimum trade of 10 USD required~~
-
-PAYER TAKES PRECEDENT
-- Integrator pay for gas instead | - No quote from MM
-- Because user can’t provide SOL for ATA | - Not routed |
+<Accordion title="`payer={integratorGasPayer}` parameter">
+    <Note>
+        Refer to [`payer`](/docs/ultra/payer) for more details.
+    </Note>
+</Accordion>

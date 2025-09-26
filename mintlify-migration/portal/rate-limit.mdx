@@ -13,13 +13,13 @@ In this section, you can find the rate limiting details of Jupiter API.
 
 **Dynamic Rate Limit**
 
-* Only Ultra API has a unique dynamic rate limit system, [you can find more details in this section](#dynamic-rate-limit).
+* Only Ultra Swap API has a unique dynamic rate limit system, [you can find more details in this section](#dynamic-rate-limit).
 
 **API Key rules**
 
 * API Keys are universal
 
-  * Use the same API Key for Ultra API (Dynamic Rate Limit) and all Pro APIs `api.jup.ag` (Fixed Rate Limit).
+  * Use the same API Key for Ultra Swap API (Dynamic Rate Limit) and all Pro APIs `api.jup.ag` (Fixed Rate Limit).
   * You do not need an API Key for Lite APIs `lite-api.jup.ag`.
 
 * Rate limits apply on a per account basis, not to individual API keys.
@@ -32,7 +32,7 @@ In this section, you can find the rate limiting details of Jupiter API.
 
 ## Fixed Rate Limit
 
-The Fixed Rate Limit system applies to the Lite and Pro plans (does not include Ultra API), using the sliding window method to enforce request quotas.
+The Fixed Rate Limit system applies to the Lite and Pro plans (does not include Ultra Swap API), using the sliding window method to enforce request quotas.
 
 | Property                | Lite                       | Pro                           |
 | :----------------------- | :-------------------------- | :----------------------------- |
@@ -69,7 +69,7 @@ Requests are distributed to each bucket:
 
 ## Dynamic Rate Limit (BETA)
 
-The [**Ultra API**](/docs/ultra) uses a unique rate limiting mechanism that scales with your **executed swap volume** over time.
+The [**Ultra Swap API**](/docs/ultra) uses a unique rate limiting mechanism that scales with your **executed swap volume** over time.
 
 | Property                | Dynamic                                 |
 | :----------------------- | :--------------------------------------- |

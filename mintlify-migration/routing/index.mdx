@@ -18,7 +18,7 @@ Juno is Jupiter's latest liquidity engine, it is built with the combined learnin
 | **Self-learning** | Automatically detects and sidelines underperforming or problematic sources, while continuously learning to provide competitive quotes. |
 | **Continuous optimizations** | By integrating external liquidity sources directly, Juno creates a competitive environment that drives continuous improvement across all routing engines. This approach ensures users consistently receive optimal execution rates while providing valuable performance data to enhance both Metis and JupiterZ routing capabilities. |
 
-Juno is directly powering the Ultra Swap on Jupiter frontend (jup.ag) and is also accessible via [**Ultra API**](/docs/ultra): The Jupiter Ultra API is the *only* API you ever need to experience or build the best trading experience on Solana - Jupiter handles all the complexities such as RPCs, slippage, broadcast method and landing rates, all while accessing the best liquidity available through Juno.
+Juno is directly powering the Ultra Swap on Jupiter frontend (jup.ag) and is also accessible via [**Ultra Swap API**](/docs/ultra): The Jupiter Ultra Swap API is the *only* API you ever need to experience or build the best trading experience on Solana - Jupiter handles all the complexities such as RPCs, slippage, broadcast method and landing rates, all while accessing the best liquidity available through Juno.
 
 ## Jupiter Metis Routing Engine
 
@@ -46,20 +46,20 @@ Metis v1's impact extends far beyond simple facilitation of on-chain trades. It 
 
 Currently, Metis v1 powers the [**Swap API**](/docs/swap): A robust interface designed for developers and applications requiring programmatic access to Solana's liquidity. It currently has tens of thousands of requests per second, with demonstrated capacity to handle peak loads reaching hundreds of thousands of requests per second.
 
-## Jupiter Z (RFQ) Routing Engine
+## JupiterZ (RFQ) Routing Engine
 
-Since its launch in 2024, Jupiter Z has emerged as a transformative addition to Jupiter's routing capabilities. Jupiter Z functions as an RFQ (Request For Quote) system that connects users directly with market makers, enabling market makers to provide competitive quotes for top token pairs. This ensures users receive the best possible execution price available from both on-chain and off-chain liquidity at the moment they wish to trade.
+Since its launch in 2024, JupiterZ has emerged as a transformative addition to Jupiter's routing capabilities. JupiterZ functions as an RFQ (Request For Quote) system that connects users directly with market makers, enabling market makers to provide competitive quotes for top token pairs. This ensures users receive the best possible execution price available from both on-chain and off-chain liquidity at the moment they wish to trade.
 
 |  |  |
 | :--- | :--- |
 | **Intent-based architecture** | Employs an intent-based system where users express their desired trade and market makers compete to fulfill it. |
 | **Integrating diverse market makers** | Utilizes a standardized interface to integrate with multiple market makers, abstracting away the complexities of each liquidity provider. |
 | **Optimizing for price and execution** | Creates a competitive environment where market makers compete to provide the best quotes, while ensuring the transaction is executed successfully and efficiently. |
-| **Real-time quote aggregation** | Employs a versatile proxy to collect and compare quotes from multiple routing sources (such as Jupiter Metis v1 and Jupiter Z) in real-time. |
+| **Real-time quote aggregation** | Employs a versatile proxy to collect and compare quotes from multiple routing sources (such as Jupiter Metis v1 and JupiterZ) in real-time. |
 | **Gasless transactions** | Enables users to execute trades without incurring transaction fees, providing a seamless and cost-effective trading experience. |
 
-Jupiter Z has been handling a large portion of trades on the Jupiter frontend (jup.ag) - which has demonstrated Jupiter Z's reliability and effectiveness in providing competitive quotes and successful trade execution.
+JupiterZ has been handling a large portion of trades on the Jupiter frontend (jup.ag) - which has demonstrated JupiterZ's reliability and effectiveness in providing competitive quotes and successful trade execution.
 
-Currently, Jupiter Z is accessible through the **Ultra API**: A streamlined interface that makes it simple for developers and applications to tap into Metis v1, Jupiter Z and other routing sources.
+Currently, JupiterZ is accessible through the **Ultra Swap API**: A streamlined interface that makes it simple for developers and applications to tap into Metis v1, JupiterZ and other routing sources.
 
-For more information about Jupiter Z, please refer to our [RFQ Integration](/routing/rfq-integration) guide.
+For more information about JupiterZ, please refer to our [RFQ Integration](/routing/rfq-integration) guide.

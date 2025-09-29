@@ -20,18 +20,7 @@ paths:
       summary: price
       deprecated: true
       description: |
-        Returns prices of specified tokens.
-        <Warning>
-        **DEPRECATED**
-
-        This endpoint has been deprecated and may be replaced or removed in future versions of the API.
-        </Warning>
-
-        <Info>
-        **NOTE**
-
-        - Refer to [Price API doc](/docs/price) for more information.
-        </Info>
+        Returns prices of specified tokens. Price V2 API is deprecated, please use Price V3 API instead.
       parameters:
       - name: ids
         in: query

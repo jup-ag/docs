@@ -20,19 +20,7 @@ paths:
       summary: token information
       deprecated: true
       description: |
-        Returns the specified mint address's token information and metadata.
-
-        <Warning>
-        **DEPRECATED**
-
-        This endpoint has been deprecated and may be replaced or removed in future versions of the API.
-        </Warning>
-
-        <Info>
-        **NOTE**
-
-        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
-        </Info>
+        Returns the specified mint address's token information and metadata. Tokens API V1 is deprecated, please use Tokens API V2 instead.
       parameters:
       - name: mint_address
         in: path
@@ -53,18 +41,7 @@ paths:
       summary: mints in market
       deprecated: true
       description: |
-        Returns the mints involved in a market.
-        <Warning>
-        **DEPRECATED**
-
-        This endpoint has been deprecated and may be replaced or removed in future versions of the API.
-        </Warning>
-
-        <Info>
-        **NOTE**
-
-        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
-        </Info>
+        Returns the mints involved in a market. Tokens API V1 is deprecated, please use Tokens API V2 instead.
       parameters:
       - name: market_address
         in: path
@@ -87,19 +64,7 @@ paths:
       summary: tradable
       deprecated: true
       description: |
-        Returns a list of all mints tradable via Jupiter routing.
-
-        <Warning>
-        **DEPRECATED**
-
-        This endpoint has been deprecated and may be replaced or removed in future versions of the API.
-        </Warning>
-
-        <Info>
-        **NOTE**
-
-        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
-        </Info>
+        Returns a list of all mints tradable via Jupiter routing. Tokens API V1 is deprecated, please use Tokens API V2 instead.
       responses:
         '200':
           description: List of mints which are tradable via Jupiter routing
@@ -114,18 +79,7 @@ paths:
       summary: tagged
       deprecated: true
       description: |
-        Returns a list of mints with specified tag(s) along with their metadata.
-        <Warning>
-        **DEPRECATED**
-
-        This endpoint has been deprecated and may be replaced or removed in future versions of the API.
-        </Warning>
-
-        <Info>
-        **NOTE**
-
-        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
-        </Info>
+        Returns a list of mints with specified tag(s) along with their metadata. Tokens API V1 is deprecated, please use Tokens API V2 instead.
       parameters:
       - name: tag
         in: path
@@ -147,19 +101,7 @@ paths:
       summary: new
       deprecated: true
       description: |
-        Returns new tokens with metadata, created at timestamp and markets.
-
-        <Warning>
-        **DEPRECATED**
-
-        This endpoint has been deprecated and may be replaced or removed in future versions of the API.
-        </Warning>
-
-        <Info>
-        **NOTE**
-
-        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
-        </Info>
+        Returns new tokens with metadata, created at timestamp and markets. Tokens API V1 is deprecated, please use Tokens API V2 instead.
       parameters:
       - name: limit
         in: query
@@ -196,18 +138,7 @@ paths:
       summary: all
       deprecated: true
       description: |
-        Returns all tokens with all metadata.
-
-        <Warning>
-        **DEPRECATED**
-
-        This endpoint has been deprecated and may be replaced or removed in future versions of the API.
-        </Warning>
-
-        <Info>
-        **NOTE**
-        - Refer to [Tokens API doc](/docs/tokens/v1) for more information.
-        </Info>
+        Returns all tokens with all metadata. Tokens API V1 is deprecated, please use Tokens API V2 instead.
       responses:
         '200':
           description: List of all tokens with all metadata

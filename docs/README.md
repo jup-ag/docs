@@ -52,7 +52,7 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 :::caution Complete deprecation of old endpoints
 *Last updated: October 2025*
 
-As of 1 October 2025, the following endpoints are deprecated completely:
+As of 1 October 2025, the following endpoints are deprecated completely, please migrate to their respective new endpoints:
 
 | Old Endpoints | New Endpoints |
 | --- | --- |
@@ -61,6 +61,8 @@ As of 1 October 2025, the following endpoints are deprecated completely:
 | `https://price.jup.ag/**` | `https://lite-api.jup.ag/price/v3/**` |
 | `https://lite-api.jup.ag/tokens/v1/**` | `https://lite-api.jup.ag/tokens/v2/**` |
 | `https://lite-api.jup.ag/price/v2/**` | `https://lite-api.jup.ag/price/v3/**` |
+
+Reach out to us on Discord if you need assistance or higher rate limits.
 :::
 
 :::caution Deprecation of Price API V2 and Token API V1

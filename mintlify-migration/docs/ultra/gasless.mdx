@@ -34,19 +34,3 @@ Note that Metis's Gasless Support mechanism only kicks in when user has insuffic
 | **No SOL<br/>Without ATA** | - All gas and rent covered from swap amount<br/>- Minimum trade size of 10 USD required | - No quote from MM<br/>- Because user can't provide SOL for ATA | - Not routed |
 | **No SOL<br/>With ATA<br/>Small swap size** | - Quote provided but no transaction<br/>- `errorCode=3` | - MM must provide quote<br/>- MM pays for gas | - Not routed |
 | **No SOL<br/>Without ATA<br/>Small swap size** | - Quote provided but no transaction<br/>-`errorCode=3` | - No quote from MM<br/>- Because user can't provide SOL for ATA | - Not routed |
-
-## Ongoing Improvements
-
-<Accordion title="Reduction of minimum trade size">
-    Currently, it requires at least 10 USD of swap size to be applicable for Gasless Support.
-</Accordion>
-
-<Accordion title="Sponsoring of ATA rent is inconsistent">
-    Currently, only Metis covers ATA creation. JupiterZ **might** support ATA coverage in the future.
-</Accordion>
-
-<Accordion title="`payer={integratorGasPayer}` parameter">
-    <Note>
-        Refer to [`payer`](/docs/ultra/payer) for more details.
-    </Note>
-</Accordion>

@@ -49,6 +49,20 @@ Refer to the [What's New?](#whats-new) section for the latest API updates and br
 
 ## What's New?
 
+:::caution Complete deprecation of old endpoints
+*Last updated: October 2025*
+
+As of 1 October 2025, the following endpoints are deprecated completely:
+
+| Old Endpoints | New Endpoints |
+| --- | --- |
+| `https://quote-api.jup.ag/v6/**` | `https://lite-api.jup.ag/swap/v1/**` |
+| `https://tokens.jup.ag/**` | `https://lite-api.jup.ag/tokens/v1/**` |
+| `https://price.jup.ag/**` | `https://lite-api.jup.ag/price/v3/**` |
+| `https://lite-api.jup.ag/tokens/v1/**` | `https://lite-api.jup.ag/tokens/v2/**` |
+| `https://lite-api.jup.ag/price/v2/**` | `https://lite-api.jup.ag/price/v3/**` |
+:::
+
 :::caution Deprecation of Price API V2 and Token API V1
 *Last updated: June 2025*
 

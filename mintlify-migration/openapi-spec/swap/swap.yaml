@@ -215,7 +215,6 @@ components:
           format: uint16
       required:
         - swapInfo
-        - percent
 
     SwapInfo:
       type: object
@@ -276,10 +275,9 @@ components:
           type: boolean
         feeAccount:
           description: |
-            - An token account that will be used to collect fees
+            - An initialized token account that will be used to collect fees
             - The mint of the token account **can only be either the input or output mint of the swap**
-            - You no longer are required to use the Referral Program
-            - See [Add Fees](/docs/swap/add-fees-to-swap) guide for more details
+            - Swap API no longer requires the use of the Referral Program
           type: string
         trackingAccount:
           description: |
@@ -292,30 +290,13 @@ components:
             - To specify a level or amount of additional fees to prioritize the transaction
             - It can be used for EITHER priority fee OR Jito tip (not both at the same time)
             - If you want to include both, you will need to use `/swap-instructions` to add both at the same time
-          type: object
-          properties:
-            priorityLevelWithMaxLamports:
-              type: object
-              properties:
-                priorityLevel:
-                  type: string
-                  enum:
-                    - medium
-                    - high
-                    - veryHigh
-                maxLamports:
-                  description: |
-                    - Maximum lamports to cap the priority fee estimation, to prevent overpaying
-                  type: integer
-                  format: uint64
-            jitoTipLamports:
-              type: integer
-              format: uint64
-              description: |
-                - Exact amount of tip to use in a tip instruction
-                - Refer to Jito docs on how to estimate the tip amount based on percentiles
-                - It has to be used together with a connection to a Jito RPC
-                - [See their docs](https://docs.jito.wtf/)
+            - Defaults to `auto`, but preferred to use `priorityLevelWithMaxLamports` as it may be more accurate when accounting local fee market
+          oneOf:
+            - $ref: '#/components/schemas/PriorityLevelWithMaxLamports'
+            - $ref: '#/components/schemas/JitoTipLamports'
+            - $ref: '#/components/schemas/JitoTipLamportsWithPayer'
+            - $ref: '#/components/schemas/Lamports'
+            - $ref: '#/components/schemas/Disabled'
         asLegacyTransaction:
           description: |
             - Builds a legacy transaction rather than the default versioned transaction
@@ -344,8 +325,7 @@ components:
         dynamicSlippage:
           description: |
             - When enabled, it estimates slippage and apply it in the swap transaction directly, overwriting the `slippageBps` parameter in the quote response.
-            - Used together with `dynamicSlippage` in `/quote`, otherwise the slippage used will be the one in the `/quote`'s `slippageBps`
-            - [See notes for more information](/docs/swap/send-swap-transaction#how-jupiter-estimates-slippage)
+            - This is no longer maintained, we are focusing efforts on RTSE on Ultra Swap API
           type: boolean
           default: false
         computeUnitPriceMicroLamports:
@@ -412,7 +392,7 @@ components:
       properties:
         otherInstructions:
           description: |
-            - If you set `{\"prioritizationFeeLamports\": {\"jitoTipLamports\": 5000}}`, you will see a custom tip instruction to Jito here.
+            - If you set jito tips using the `prioritizationFeeLamports` parameter, you will see a custom tip instruction to Jito here.
           type: array
           items:
             $ref: '#/components/schemas/Instruction'
@@ -444,6 +424,7 @@ components:
             type: string
       required:
         - computeBudgetInstructions
+        - otherInstructions
         - setupInstructions
         - swapInstruction
         - addressLookupTableAddresses
@@ -476,6 +457,78 @@ components:
               - 3
               - 4
 
+    PriorityLevelWithMaxLamports:
+      title: "priorityLevelWithMaxLamports"
+      type: object
+      properties:
+        priorityLevelWithMaxLamports:
+          type: object
+          properties:
+            priorityLevel:
+              type: string
+              enum: [medium, high, veryHigh]
+            maxLamports:
+              type: integer
+              format: uint64
+              description: |
+                - Maximum lamports to cap the priority fee estimation, to prevent overpaying
+            global:
+              type: boolean
+              default: false
+              description: |
+                - A boolean to choose between using a global or local fee market to estimate. If `global` is set to `false`, the estimation focuses on fees relevant to the **writable accounts** involved in the instruction.
+          required: [priorityLevel, maxLamports]
+          additionalProperties: false
+      required: [priorityLevelWithMaxLamports]
+      additionalProperties: false
+
+    JitoTipLamports:
+      title: "jitoTipLamports"
+      type: object
+      properties:
+        jitoTipLamports:
+          type: integer
+          format: uint64
+          description: |
+            - Exact amount of tip to use in a tip instruction
+            - Refer to Jito docs on how to estimate the tip amount based on percentiles
+            - It has to be used together with a connection to a Jito RPC
+            - See their docs at https://docs.jito.wtf/
+      required: [jitoTipLamports]
+      additionalProperties: false
+    
+    JitoTipLamportsWithPayer:
+      title: "jitoTipLamportsWithPayer"
+      type: object
+      properties:
+        jitoTipLamportsWithPayer:
+          type: object
+          properties:
+            lamports:
+              type: integer
+              format: uint64
+              description: Exact amount of lamports to use for the tip
+            payer:
+              type: string
+              description: Public key of an account that will be used to pay for the tip
+          required: [lamports, payer]
+          additionalProperties: false
+      required: [jitoTipLamportsWithPayer]
+      additionalProperties: false
+
+    Disabled:
+      title: "disabled"
+      type: string
+      enum: ["disabled"]
+      description: Disables prioritization fees entirely
+    
+    Lamports:
+      title: "lamports"
+      type: integer
+      format: uint64
+      description: Exact amount of lamports to use for the priority fee
+    
+
   parameters:
     InputMintParameter:
       name: inputMint
@@ -502,17 +555,23 @@ components:
         format: uint64
     SlippageParameter:
       name: slippageBps
+      description: |
+        - Default: 50
+        - This is threshold denoted in basis points.
+        - If exact in and output amount exceeds the threshold, then the swap transaction will fail.
       in: query
       schema:
         type: integer
         format: uint16
+        default: 50
     SwapModeParameter:
       name: swapMode
       description: |
-        - ExactOut is for supporting use cases where you need an exact output amount, like using [Swap API as a payment service](/docs/swap/payments-through-swap)
+        - ExactOut is for supporting use cases where you need an exact output amount
         - In the case of `ExactIn`, the slippage is on the output token
         - In the case of `ExactOut`, the slippage is on the input token
         - Not all AMMs support `ExactOut`: Currently only Orca Whirlpool, Raydium CLMM, Raydium CPMM
+        - We do not recommend using `ExactOut` for most use cases
       in: query
       schema:
         type: string
@@ -526,7 +585,7 @@ components:
         - Multiple DEXes can be pass in by comma separating them
         - For example: `dexes=Raydium,Orca+V2,Meteora+DLMM`
         - If a DEX is indicated, the route will **only use** that DEX
-        - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label)
+        - Full list of DEXes here: https://lite-api.jup.ag/swap/v1/program-id-to-label
       in: query
       schema:
         type: array
@@ -538,7 +597,7 @@ components:
         - Multiple DEXes can be pass in by comma separating them
         - For example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
         - If a DEX is indicated, the route will **not use** that DEX
-        - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label)
+        - Full list of DEXes here: https://lite-api.jup.ag/swap/v1/program-id-to-label
       in: query
       schema:
         type: array
@@ -556,7 +615,7 @@ components:
     OnlyDirectRoutesParameter:
       name: onlyDirectRoutes
       description: |
-        - Direct Routes limits Jupiter routing to single hop routes only
+        - Direct route limits Jupiter routing to single hop routes only
         - This may result in worse routes
       in: query
       schema:
@@ -584,17 +643,19 @@ components:
       name: platformFeeBps
       description: |
         - Take fees in basis points
-        - Used together with `feeAccount` in /swap, see [Adding Fees](/docs/swap/add-fees-to-swap) guide
+        - Must be used together with `feeAccount` in /swap
       in: query
       schema:
         type: integer
         format: uint16
-    DynamicSlippage:
-      name: dynamicSlippage
+    InstructionVersion:
+      name: instructionVersion
       description: |
-        - If true, `slippageBps` will be overriden by Dynamic Slippage's estimated value
-        - The value is returned in `/swap` endpoint
+        - The version of instruction to use in the swap program
       in: query
       schema:
-        type: boolean
-        default: false
+        type: string
+        enum:
+          - V1
+          - V2
+        default: V1

@@ -217,18 +217,10 @@ Apart from the fixed slippage setting, you can use Dynamic Slippage: During swap
 <Warning>
   **WARNING**
 
-  To use Dynamic Slippage, you will need to pass in `dynamicSlippage=true` to both the `/swap/v1/quote` and `/swap/v1/swap` endpoints.
-
   Do note that we have discontinued development on Dynamic Slippage.
 </Warning>
 
 ```js
-const quoteResponse = await (
-  await fetch(
-    'https://lite-api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&slippageBps=50&restrictIntermediateTokens=true&dynamicSlippage=true'
-  )
-).json();
-
 const swapTransaction = await (
   await fetch('https://lite-api.jup.ag/swap/v1/swap', {
     method: 'POST',

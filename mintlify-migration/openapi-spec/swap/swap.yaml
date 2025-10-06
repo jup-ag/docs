@@ -20,6 +20,7 @@ servers:
 paths:
   /quote:
     get:
+      operationId: quoteGet
       tags:
         - Swap
       summary: quote
@@ -38,7 +39,7 @@ paths:
         - $ref: '#/components/parameters/AsLegacyTransactionParameter'
         - $ref: '#/components/parameters/PlatformFeeBpsParameter'
         - $ref: '#/components/parameters/MaxAccountsParameter'
-        - $ref: '#/components/parameters/DynamicSlippage'
+        - $ref: '#/components/parameters/InstructionVersion'
       responses:
         '200':
           description: "Successful response to be used in `/swap`"
@@ -48,6 +49,7 @@ paths:
                 $ref: '#/components/schemas/QuoteResponse'
   /swap:
     post:
+      operationId: swapPost
       tags:
         - Swap
       summary: swap
@@ -68,6 +70,7 @@ paths:
                 $ref: '#/components/schemas/SwapResponse'
   /swap-instructions:
     post:
+      operationId: swapInstructionsPost
       tags:
         - Swap
       summary: swap-instructions
@@ -88,6 +91,7 @@ paths:
                 $ref: '#/components/schemas/SwapInstructionsResponse'
   /program-id-to-label:
     get:
+      operationId: programIdToLabelGet
       tags:
         - Swap
       summary: program-id-to-label
@@ -278,6 +282,7 @@ components:
             - An initialized token account that will be used to collect fees
             - The mint of the token account **can only be either the input or output mint of the swap**
             - Swap API no longer requires the use of the Referral Program
+            - If `platformFeeBps` is passed in `/quote`, the `feeAccount` must be passed as well
           type: string
         trackingAccount:
           description: |
@@ -291,12 +296,11 @@ components:
             - It can be used for EITHER priority fee OR Jito tip (not both at the same time)
             - If you want to include both, you will need to use `/swap-instructions` to add both at the same time
             - Defaults to `auto`, but preferred to use `priorityLevelWithMaxLamports` as it may be more accurate when accounting local fee market
+            - Fixed lamports can be passed in as an integer in the `prioritizationFeeLamports` parameter
           oneOf:
             - $ref: '#/components/schemas/PriorityLevelWithMaxLamports'
             - $ref: '#/components/schemas/JitoTipLamports'
             - $ref: '#/components/schemas/JitoTipLamportsWithPayer'
-            - $ref: '#/components/schemas/Lamports'
-            - $ref: '#/components/schemas/Disabled'
         asLegacyTransaction:
           description: |
             - Builds a legacy transaction rather than the default versioned transaction
@@ -515,18 +519,6 @@ components:
           additionalProperties: false
       required: [jitoTipLamportsWithPayer]
       additionalProperties: false
-
-    Disabled:
-      title: "disabled"
-      type: string
-      enum: ["disabled"]
-      description: Disables prioritization fees entirely
-    
-    Lamports:
-      title: "lamports"
-      type: integer
-      format: uint64
-      description: Exact amount of lamports to use for the priority fee
     
 
   parameters:
@@ -643,7 +635,7 @@ components:
       name: platformFeeBps
       description: |
         - Take fees in basis points
-        - Must be used together with `feeAccount` in /swap
+        - If `platformFeeBps` is passed in, the `feeAccount` in `/swap` must be passed as well
       in: query
       schema:
         type: integer

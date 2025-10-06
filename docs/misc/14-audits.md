@@ -13,7 +13,8 @@ Jupiter's protocols are audited by reputable security firms to ensure the highes
 
 ## Jupiter Swap
 
-- [Offside Labs](/audits/swap-v6-offside.pdf) (v6)
+- [Offside Labs: October 2025](/audits/swap-v6-offside-october-2025.pdf) (v7)
+- [Offside Labs: April 2024](/audits/swap-v6-offside-april-2024.pdf) (v6)
 - [Sec3](/audits/swap-v3-sec3.pdf) (v3)
 
 ## Jupiter Limit Order

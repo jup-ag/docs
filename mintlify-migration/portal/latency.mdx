@@ -1,0 +1,67 @@
+---
+title: "Latency"
+description: "Latency details of Jupiter APIs"
+---
+
+In this section, you can find the latency details of Jupiter API.
+
+## Overview
+
+Jupiter API operates through a distributed API gateway infrastructure to provide optimal performance across different geographic regions. The APIs are exclusively HTTP-based, with self-hosted API binary protocols no longer supported.
+
+**Key Factors Affecting Latency:**
+
+* **Geographic Location**: Latency varies significantly based on your server's proximity to Jupiter's API gateways
+* **Network Conditions**: Internet routing and congestion can impact response times
+* **Request Complexity**: Different endpoints have different processing requirements
+
+## API Gateway Latency
+
+There are no significant differences or no penalty/benefits between the different Portal plans.
+
+<Info>
+Lite APIs typically provides slightly better latency than Pro APIs since it doesn't require additional rate limiter infrastructure processing.
+</Info>
+
+## Regional Distribution
+
+Jupiter's API gateway is distributed across multiple AWS regions.
+
+### Supported AWS Regions
+
+| AWS Region Code | Location | Recommended For |
+|:----------------|:---------|:----------------|
+| `us-east-1` | N. Virginia | North America East Coast |
+| `us-east-2` | Ohio | North America Central |
+| `eu-central-1` | Frankfurt | Central Europe |
+| `eu-west-1` | Ireland | Western Europe |
+| `ap-southeast-1` | Singapore | Southeast Asia |
+| `ap-northeast-1` | Tokyo | Northeast Asia |
+
+## Latency Optimization Tips
+
+### Server Collocation
+
+**Recommended**: Deploy your servers in the same AWS regions as Jupiter's API gateways for optimal performance.
+
+### Request Simplification
+
+* Simplify your API requests to reduce processing time
+* Avoid unnecessary parameters or complex queries
+* Use the most direct endpoint for your use case
+
+## Troubleshooting High Latency
+
+If you're experiencing higher than expected latency:
+
+1. **Check your server location** - Ensure you're in a supported AWS region.
+2. **Monitor network conditions** - Check for routing issues or congestion.
+3. **Log your requests** - Monitor request timing to identify where latency bottlenecks occur. Log both request initiation and response times to pinpoint whether delays are from network transit, API processing, or client-side handling.
+
+## Support
+
+If you need further assistance, please reach out to us in [Discord](https://discord.gg/jup).
+
+* Share your request logs and ensure they include latency breakdowns.
+* Provide details about your server setup and network configuration.
+* Log response header's CloudFront request ID to help us identify the request.

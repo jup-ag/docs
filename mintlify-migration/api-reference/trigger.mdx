@@ -1,0 +1,23 @@
+---
+title: "Trigger API"
+sidebarTitle: "Overview"
+description: "Overview of Jupiter Trigger API"
+---
+
+<CardGroup>
+  <Card title="createOrder" href="/api-reference/trigger/create-order" icon="file-lines" horizontal>
+    Request for a base64-encoded unsigned trigger order creation transaction to be used in `POST /trigger/v1/execute`
+  </Card>
+  <Card title="execute" href="/api-reference/trigger/execute" icon="file-lines" horizontal>
+    Execute the signed transaction and get the execution status
+  </Card>
+  <Card title="cancelOrder" href="/api-reference/trigger/cancel-order" icon="file-lines" horizontal>
+    Request for a base64-encoded unsigned trigger order cancellation transaction to be used in `POST /trigger/v1/execute`
+  </Card>
+  <Card title="cancelOrders" href="/api-reference/trigger/cancel-orders" icon="file-lines" horizontal>
+    Request for a base64-encoded unsigned trigger order cancellation transaction(s) to be used in `POST /trigger/v1/execute`
+  </Card>
+  <Card title="getTriggerOrders" href="/api-reference/trigger/get-trigger-orders" icon="file-lines" horizontal>
+    Request for the active or historical orders associated to the provided account
+  </Card>
+</CardGroup>

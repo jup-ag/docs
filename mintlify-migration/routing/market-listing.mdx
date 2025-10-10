@@ -1,0 +1,62 @@
+---
+title: "Market Listing"
+description: "Understand how markets are listed and maintained on Jupiter."
+---
+
+## Routing Type
+
+Jupiter Metis creates routes in the perspective of markets and there are 2 types of routing for all markets.
+
+We constantly index for updated market data and newly created markets to check against the rules for market listing to ensure markets are eligible for and remain in the Jupiter Metis routing engine.
+
+<Card title="Instant routing">
+  * We automatically list all new markets that are created on specific DEXes (list is below).
+  * These markets have a grace period, where the liquidity criteria is not applied.
+  * After the grace period has passed, the liquidity criteria will apply (refer to normal routing).
+  * For bonding curves, if it does not graduate after the grace period, it will be removed from routing.
+    * Only when the bonding curve has graduated to a new market, the graduated market will be added to routing.
+
+  <Accordion title="List of DEXes that are eligible for Instant Routing">
+    - Meteora Dynamic Bonding Curve
+    - Meteora Dynamic AMM
+    - Meteora DAMM V2
+    - Meteora DLMM
+    - Raydium
+    - Raydium CLMM
+    - Raydium CPMM
+    - Raydium Launchlab
+    - Pump.fun AMM
+    - Pump.fun
+    - Fluxbeam
+    - Whirlpool
+    - Moonshot
+    - Virtuals
+    - Boop.fun
+  </Accordion>
+</Card>
+
+<Card title="Normal routing">
+  * This is the default for all markets.
+  * Every 30 minutes, we will check the liquidity of the market.
+  * If the liquidity is not enough, we will remove the market from routing.
+</Card>
+
+## Market Liquidity Requirements
+
+The market must fit one of the following criteria for it to be routable:
+
+1. **Less than 30\% price difference on \$500**
+
+Using a benchmark position size of \$500, a user should encounter less than 30% price difference after buying \$500 worth and then selling back on the same market.
+
+Price Difference = (\$500 - Final USD value) / \$500 If the price difference is more than 30%, it means that there is insufficient liquidity in the market for the benchmark position size of \$500.
+
+2. **Less than 20\% price impact on market**
+
+If the above (sell back \$500 worth) fails, we will compare the price per token received from buying \$1000 worth vs the price per token received from buying \$500 worth to calculate price impact.
+
+If the price impact is more than 20\%, it means that the market is illiquid.
+
+<Tip>
+If you are unsure if your market has passed the liquidity requirement, you can check your pool directly via the UI of the DEX you created the market on.
+</Tip>

@@ -1,0 +1,55 @@
+---
+title: "Get Trigger Orders"
+---
+
+<Info>
+  **NOTE**
+
+  * Lite URL: `https://lite-api.jup.ag/trigger/v1/getTriggerOrders`
+  * Pro URL: `https://api.jup.ag/trigger/v1/getTriggerOrders`
+
+  To upgrade to Pro or understand our rate limiting, please refer to this section.
+
+  <CardGroup>
+    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
+    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
+  </CardGroup>
+</Info>
+
+This is a GET request to `/getTriggerOrders` endpoint.
+
+The response is paginated for every 10 orders and you can view different pages using the `page` parameter. The `hasMoreData` boolean will indicate if you have more data in the next page.
+
+<Warning>
+  **CHANGE OF RESPONSE FORMAT**
+
+  The `/getTriggerOrders` endpoint does not provide the same data format as the old `orderHistory` or `openOrders` endpoint.
+</Warning>
+
+## Active Orders
+
+To get the active orders, you can pass in the `orderStatus` parameter as `active`.
+
+<Tip>
+  You can optionally pass in the input and output token mint addresses to filter the open orders.
+</Tip>
+
+```js
+const openOrdersResponse = await (
+    await fetch(
+        'https://lite-api.jup.ag/trigger/v1/getTriggerOrders?user=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3&orderStatus=active'
+    )
+).json();
+```
+
+## Order History
+
+To get the order history, you can pass in the `orderStatus` parameter as `history`.
+
+```js
+const orderHistoryResponse = await (
+    await fetch(
+        'https://lite-api.jup.ag/trigger/v1/getTriggerOrders?user=ErJKdNoarixqGGQTHbBtvHtg2nkcCqcKtYjGbVKUxY7D&orderStatus=history'
+    )
+).json();
+```

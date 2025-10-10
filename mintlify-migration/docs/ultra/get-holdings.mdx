@@ -1,0 +1,57 @@
+---
+title: "Get Holdings"
+description: "Ultra Swap API to get the detailed token holdings of an account."
+---
+
+```js
+const holdingsResponse = await (
+  await fetch(`https://lite-api.jup.ag/ultra/v1/holdings/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`)
+).json();
+
+console.log(JSON.stringify(holdingsResponse, null, 2));
+```
+
+## Holdings Response
+
+The holdings response will return the following:
+- A list of token holdings for the user's wallet address.
+- Token account information for each token holding.
+- Note that the top level response outside of `tokens` is the native SOL balance.
+
+:::tip
+For tokens with more than thousands of token holdings, the response may be slow - depending on the number of token holdings, the response time may vary.
+
+If you only need the native SOL balance, you can use `/holdings/{address}/native` to get the native SOL balance.
+:::
+
+**Successful example response:**
+
+```json
+{
+    "amount": "1000000000",
+    "uiAmount": 1,
+    "uiAmountString": "1",
+    "tokens": {
+        "jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v": [
+            {
+                "account": "tokenaccountaddress",
+                "amount": "1000000000",
+                "uiAmount": 1,
+                "uiAmountString": "1",
+                "isFrozen": false,
+                "isAssociatedTokenAccount": true,
+                "decimals": 9,
+                "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+            }
+        ]
+    }
+}
+```
+
+**Failed example response:**
+
+```json
+{
+  "error": "Invalid address"
+}
+```

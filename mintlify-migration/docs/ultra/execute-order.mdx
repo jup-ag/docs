@@ -1,0 +1,103 @@
+---
+title: "Execute Order"
+description: "Swap via Ultra by signing then submitting the transaction to the Execute endpoint ."
+---
+
+## Sign Transaction
+
+Using the Solana `web3.js@1` library, you can sign the transaction as follows:
+
+<Accordion title="Set up dependencies and wallet for signing">
+  **Set up dependencies for signing**
+  ```bash
+  npm install @solana/web3.js@1
+  ```
+
+  **Set up Development Wallet**
+  <Info>
+    You can paste in your private key for testing but this is not recommended for production.
+    * Either use your private key in the project directly, you can do it via a `.env` file.
+    * Or set up your private key in the [Solana CLI](https://solana.com/docs/intro/installation#create-wallet).
+  </Info>
+
+  <CodeGroup>
+    ```javascript Store private key in .env
+    // In your .env file
+    PRIVATE_KEY=""
+
+    // In your index.js (or any file that needs the private key)
+    import { Keypair } from '@solana/web3.js';
+    import dotenv from 'dotenv';
+    require('dotenv').config();
+
+    const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || '')));
+    ```
+
+    ```javascript Store private key in Solana CLI
+    import { Keypair } from '@solana/web3.js';
+    import fs from 'fs';
+
+    const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+    const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
+    ```
+  </CodeGroup>
+</Accordion>
+
+```js Sign Transaction
+import { VersionedTransaction } from '@solana/web3.js';
+
+// ... Get Order's response
+
+// Extract the transaction from the order response
+const transactionBase64 = orderResponse.transaction
+
+// Deserialize, sign and serialize the transaction
+const transaction = VersionedTransaction.deserialize(Buffer.from(transactionBase64, 'base64'));
+transaction.sign([wallet]);
+const signedTransaction = Buffer.from(transaction.serialize()).toString('base64');
+```
+
+## Execute Order
+
+By making a post request to the `/execute` endpoint, Jupiter executes the swap transaction on behalf of you/your users through our own proprietary transaction sending infrastructure. This already includes handling of slippage, priority fees, transaction landing and more.
+
+To make a post request to execute a swap order, you need to pass in the required parameters,:
+
+* `signedTransaction`: The signed and serialized base64 encodedtransaction [like above](#sign-transaction)
+* `requestId`: The order response's request ID [from Get Order](/docs/ultra/get-order)
+
+```js Execute Order
+const executeResponse = await (
+    await fetch('https://lite-api.jup.ag/ultra/v1/execute', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            signedTransaction: signedTransaction,
+            requestId: orderResponse.requestId,
+        }),
+    })
+).json();
+```
+
+## Transaction Status Polling
+
+After our transaction sending service has submitted your swap, we will actively poll for your transaction status as part of the `/execute` endpoint. You will receive a response with the status of the swap.
+
+<Tip>
+* You can submit with the same `signedTransaction` and `requestId` for **up to 2 minutes regardless of state**, to poll for the transaction status.
+* The transaction will not double execute since it has the same signature.
+* If connection got dropped, you can try again with the same `signedTransaction` and `requestId` to poll for the status of the swap.
+* If there is no status, the order likely expired (did not get processed onchain and failed), but reach out to us if cases like this happen.
+</Tip>
+
+```js Transaction Status Polling
+if (executeResponse.status === "Success") {
+    console.log('Swap successful:', JSON.stringify(executeResponse, null, 2));
+    console.log(`https://solscan.io/tx/${executeResponse.signature}`);
+} else {
+    console.error('Swap failed:', JSON.stringify(executeResponse, null, 2));
+    console.log(`https://solscan.io/tx/${executeResponse.signature}`);
+}
+```

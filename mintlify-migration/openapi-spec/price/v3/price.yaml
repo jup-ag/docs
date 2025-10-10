@@ -1,0 +1,58 @@
+openapi: 3.0.3
+info:
+  title: Quickstart
+  version: 3.0.0
+  description: |
+    | Link |
+    | --- |
+    | [V3](/docs/price/v3) |
+    | [V2 (Deprecated)](/docs/price/v2) |
+
+servers:
+  - url: https://lite-api.jup.ag
+    description: Free tier API endpoint with rate limits
+  - url: https://api.jup.ag
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+
+paths:
+  "/price/v3":
+    get:
+      summary: price
+      description: |
+        Returns prices of specified tokens.
+      parameters:
+      - name: ids
+        in: query
+        description: "Comma separate to pass in multiple"
+        required: true
+        schema:
+          type: string
+        example: 'So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  description: Token addresses as keys
+                  type: object
+                  properties:
+                    blockId:
+                      type: integer
+                      nullable: true
+                    decimals:
+                      type: integer
+                    usdPrice:
+                      type: number
+                    priceChange24h:
+                      type: number
+                      nullable: true
+                  required:
+                    - decimals
+                    - usdPrice
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error

@@ -1,0 +1,104 @@
+---
+title: "Create Order"
+---
+
+<Warning>
+  **NEW PATHS**
+
+  The `/limit/v2` path will be deprecated soon, please update your API calls to use the `/trigger/v1` path immediately.
+
+  When updating to the new path, please refer to the documentation as there are some breaking changes.
+
+  * `/execute` endpoint is introduced.
+  * `/createOrder` endpoint now includes an additional `requestId` parameter to be used with the `/execute` endpoint.
+  * `/cancelOrder` endpoint only builds the transaction for 1 order, while `/cancelOrders` endpoint builds the transaction for multiple orders.
+  * The `tx` field in the responses are now `transaction` or `transactions`.
+  * `/getTriggerOrders` endpoint is introduced to get either active or historical orders (based on the query parameters) in a new format.
+</Warning>
+
+<Info>
+  **NOTE**
+
+  * Lite URL: `https://lite-api.jup.ag/trigger/v1/createOrder`
+  * Pro URL: `https://api.jup.ag/trigger/v1/createOrder`
+
+  To upgrade to Pro or understand our rate limiting, please refer to this section.
+
+  <CardGroup>
+    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
+    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
+  </CardGroup>
+</Info>
+
+## Create Order
+
+This is a POST request to `/createOrder` endpoint, where you pass in the necessary parameters and our backend will create the transaction for you to sign and send to the network seamlessly.
+
+<Tip>
+  **OPTIONAL PARAMETERS**
+
+  Do note that there are a few optional parameters that you can use, such as:
+
+  * Adding slippage to the order: This corresponds to the "Ultra" mode on jup.ag frontend. Higher slippage increases execution success rate but may result in less favorable prices. Omitting this parameter (or setting it to 0) corresponds to "Exact" mode. [Learn more about UI modes vs API implementation](/docs/trigger#faq).
+  * Setting an expiry date on the order.
+  * Adding fees through our referral program, please ensure that your `feeAccount` has the necessary `referralTokenAccount`s of the output mint of the limit order for it to work, you can learn more about creating them dynamically in the [Add Fees To Swap](/docs/swap/add-fees-to-swap) guide. (Note that the fees are transferred only after the trigger order has been executed.)
+</Tip>
+
+**Create a POST request to the `/createOrder` endpoint.**
+
+```js
+const createOrderResponse = await (
+    await fetch('https://lite-api.jup.ag/trigger/v1/createOrder', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            inputMint: inputMint.toString(),
+            outputMint: outputMint.toString(),
+            maker: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
+            payer: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
+            params: {
+                makingAmount: "1000000",
+                takingAmount: "300000",
+                // slippageBps: "", // Optional, by nature, trigger orders execute with 0 slippage
+                // expiredAt: "", // In unix seconds (e.g. Date.now()/1_000) or optional
+                // feeBps: "", // Requires referral account or optional
+            },
+            computeUnitPrice: "auto",
+            // feeAccount: "", // Optional but if specified it is the referral token account of the output mint
+            // wrapAndUnwrapSol: true, // Default true or optional
+        })
+    })
+).json();
+
+console.log(createOrderResponse);
+```
+
+Now that you have the order transaction, you can sign and send to the network. There are 2 methods, after signing the transaction, you can either send it to the network yourself or use the Trigger API's `/execute` endpoint to do it for you.
+
+<CardGroup>
+  <Card title="Let's execute the order" href="/docs/trigger/execute-order" icon="arrow-right" horizontal/>
+</CardGroup>
+
+## Create Order Response
+
+**Success Example Response**
+
+```json
+{
+  "order": "CFG9Bmppz7eZbna96UizACJPYT3UgVgps3KkMNNo6P4k",
+  "transaction": "AQAAAAAAAAAAAAAAAAAAAAAA......AgAKCAkBAQsPAAADBAEMCwcKCQkIBg0LIoVuSq9wn/WfdskdmHlfUulAQg8AAAAAAICpAwAAAAAAAAAJAwEAAAEJAA==",
+  "requestId": "370100dd-1a85-421b-9278-27f0961ae5f4"
+}
+```
+
+**Failed Example Response**
+
+```json
+{
+  "error": "invalid create order request",
+  "cause": "input mint making amount must be at least 5 USD, received: 2",
+  "code": 400
+}
+```

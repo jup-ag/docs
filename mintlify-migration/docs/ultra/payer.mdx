@@ -13,7 +13,7 @@ The Jupiter Ultra Swap API allows you to pay for networks fees and rent on behal
 
 <AccordionGroup>
     <Accordion title="Integrator payer takes precedent">
-        When `payer` parameter is passed in, it **always** takes precedent over Iris's Gasless Support mechanism.
+        When `payer` parameter is passed in, it **always** takes precedent over Metis's Gasless Support mechanism.
     </Accordion>
 
     <Accordion title="No minimum trade size requirement">
@@ -44,22 +44,22 @@ The Jupiter Ultra Swap API allows you to pay for networks fees and rent on behal
 ## Limitations
 
 <AccordionGroup>
-    <Accordion title="Enforces routing to Iris only">
-        When `payer` parameter is passed in, it will default routing to only Iris and other routers like JupiterZ will not be routed.
+    <Accordion title="Enforces routing to Metis only">
+        When `payer` parameter is passed in, it will default routing to only Metis and other routers like JupiterZ will not be routed.
 
         (We are exploring to support JupiterZ in the future.)
 
         <Note>
-            **What happens if you only route via Iris:**
+            **What happens if you only route via Metis:**
             
             | Aspect | Note |
             |--------|------|
-            | Total coverage | Iris covers almost all swap pairs (JupiterZ mainly covers bluechips). |
-            | Slippage exposure | Iris routes through AMMs which is still prone to slippage, while JupiterZ provides firm quotes (no slippage).<br/><br/>Iris uses Real Time Slippage Estimator (RTSE) to handle slippage optimizations which improves success rate by 10%. |
-            | Router % | On averages: Iris handles 50% of quotes, JupiterZ 30%. JupiterZ only wins pricing about 5% of the time. |
-            | Trade size coverage | Iris handles a significantly wider range of trade sizes, with 600 USD on average.<br/><br/>JupiterZ has 6,000 USD on average. Market makers usually prefer larger trades |
+            | Total coverage | Metis covers almost all swap pairs (JupiterZ mainly covers bluechips). |
+            | Slippage exposure | Metis routes through AMMs which is still prone to slippage, while JupiterZ provides firm quotes (no slippage).<br/><br/>Metis uses Real Time Slippage Estimator (RTSE) to handle slippage optimizations which improves success rate by 10%. |
+            | Router % | On averages: Metis handles 50% of quotes, JupiterZ 30%. JupiterZ only wins pricing about 5% of the time. |
+            | Trade size coverage | Metis handles a significantly wider range of trade sizes, with 600 USD on average.<br/><br/>JupiterZ has 6,000 USD on average. Market makers usually prefer larger trades |
             
-            To conclude, it is evident that most orders are still being routed via Iris and significant amount of swaps goes to long tail/meme tokens outside of JupiterZ's support. By routing to only Iris, it does not make a significant impact.
+            To conclude, it is evident that most orders are still being routed via Metis and significant amount of swaps goes to long tail/meme tokens outside of JupiterZ's support. By routing to only Metis, it does not make a significant impact.
         </Note>
     </Accordion>
     <Accordion title="Integrator require additional backend signing for their gas payer">

@@ -38,6 +38,12 @@ paths:
                     type: string
                   outAmount:
                     type: string
+                  otherAmountThreshold:
+                    type: string
+                  swapMode:
+                    type: string
+                  slippageBps:
+                    type: number
                   inUsdValue: 
                     type: number
                   outUsdValue:
@@ -45,12 +51,6 @@ paths:
                   priceImpact:
                     type: number
                   swapUsdValue:
-                    type: number
-                  otherAmountThreshold:
-                    type: string
-                  swapMode:
-                    type: string
-                  slippageBps:
                     type: number
                   priceImpactPct:
                     type: string
@@ -101,51 +101,18 @@ paths:
                     type: string
                   feeBps:
                     type: number
-                    description: |
-                      - The fee includes either Ultra default fee or your integrator fee, depending on if referral and/or payer params are passed in
-                      - If `referralAccount`, `referralFee` (and `payer` if passed in) are passed in, the fee will be the integrator fee only
-                      - If no additional referral params are passed in, the fee will be the Ultra default fee only and can include additional fees for gasless support mechanism
-                  platformFee:
-                    type: object
-                    properties:
-                      amount:
-                        type: string
-                      feeBps:
-                      type: number
-                      description: |
-                        - This field shows the platform fee only, does not include fee for gas
-                        - Platform fee can either be the Ultra default fee or your integrator fee
-                    required:
-                      - feeBps
                   signatureFeeLamports:
                     type: number
                     description: |
-                      - The number of lamports the `taker` or `payer` has to pay for the base network fee, if a valid transaction is returned.
-                  signatureFeePayer:
-                    type: string
-                    nullable: true
-                    description: |
-                      - The public key of the account that will cover the signature fee, it can be either `taker` or `payer` if passed in
+                      - The number of lamports the taker has to pay as a base network fee, if a valid transaction is returned. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee.
                   prioritizationFeeLamports:
                     type: number
                     description: |
-                      - The number of lamports the `taker` or `payer` has to pay for higher priority landing, if a valid transaction is returned
-                      - Includes priority fees and tips for services such as Jito, etc, if any
-                  prioritizationFeePayer:
-                    type: string
-                    nullable: true
-                    description: |
-                      - The public key of the account that will cover the prioritization fee, it can be either `taker` or `payer` if passed in
+                      - The number of lamports the taker has to pay for higher priority landing, if a valid transaction is returned. Includes priority fees and tips for services such as Jito, if any. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee.
                   rentFeeLamports:
                     type: number
                     description: |
-                      - The number of lamports the `taker` or `payer` has to pay for account rent, if a valid transaction is returned
-                      - Note that this value is just an estimate
-                  rentFeePayer:
-                    type: string
-                    nullable: true
-                    description: |
-                      - The public key of the account that will cover the rent fee, it can be either `taker` or `payer` if passed in
+                      - The number of lamports the taker has to pay for rent, if a valid transaction is returned. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee. Note that this value is just an estimate.
                   swapType:
                     type: string
                     description: |
@@ -153,17 +120,16 @@ paths:
                   router:
                     type: string
                     enum:
-                      - iris
+                      - aggregator
                       - jupiterz
                       - dflow
-                      - okx                
+                      - okx                  
                   transaction:
                     type: string
                     nullable: true
                     description: |
                       - Unsigned base-64 encoded transaction to be signed and used in `/execute`
-                      - If `taker` is null, this field will be null.
-                      - If the `transaction` field is empty, it is returned with `errorCode` and `errorMessage` such as Insufficient Funds
+                      - If `taker` is null, this field will be null. Else, it will either be a valid base64 encoded transaction or the empty string
                   gasless:
                     type: boolean
                   requestId:
@@ -181,6 +147,16 @@ paths:
                     type: string
                   expireAt:
                     type: string
+                  platformFee:
+                    type: object
+                    properties:
+                      amount:
+                        type: string
+                      feeBps:
+                        type: number
+                    required:
+                      - amount
+                      - feeBps
                   errorCode:
                     type: number
                     enum:
@@ -188,7 +164,7 @@ paths:
                       - 2
                       - 3
                     description: |
-                      - This field will be present if `taker` is defined and `transaction` is an empty string
+                      - This field will be present if `taker` is defined and `transaction` is the empty string
                       - It is unique for each error scenarios
                   errorMessage:
                     type: string
@@ -197,7 +173,7 @@ paths:
                       - Top up `${solAmount}` SOL for gas
                       - Minimum `${swapAmount}` for gasless
                     description: |
-                      - This field will be present if `taker` is defined and `transaction` is an empty string
+                      - This field will be present if `taker` is defined and `transaction` is the empty string
                       - This field can still return despite having a valid order/quote
                       - This is meant for display purposes only and it is discouraged to match these error messages as they could be parameterized
                 required:
@@ -231,7 +207,6 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: Failed to get quotes
                 required:
                   - error
         '500':
@@ -267,25 +242,6 @@ paths:
             type: string
           required: false
         - in: query
-          name: payer
-          description: |
-            - The public key of an account that will be used to cover 'gas-related' fees on behalf of the taker
-            - Gas related fees such as signature fees, priority fees and rent. Note that enabling this may result in different routing decisions.
-            - When `payer` is passed in, `closeAuthority` is required
-          schema:
-            type: string
-          required: false
-        - in: query
-          name: closeAuthority
-          description: |
-            - The public key of an account to set as the close authority of ATAs created during the swap transaction. Only applies to non-wSOL ATAs that persist beyond the execution of the transaction.
-            - When `payer` is passed in, `closeAuthority` is required
-            - If the `closeAuthority==taker`, the `taker` is the close authority and no additional instructions will be added
-            - If the `closeAuthority!==taker`, the `closeAuthority` will be set by adding an instruction to the transaction to set the close authority
-          schema:
-            type: string
-          required: false
-        - in: query
           name: referralAccount
           description: |
             - Refer to [Integrator Fees](/docs/ultra/fee) for more details
@@ -306,7 +262,7 @@ paths:
           schema:
             type: string
             enum:
-              - iris
+              - metis
               - jupiterz
               - dflow
               - okx
@@ -315,16 +271,17 @@ paths:
           name: excludeDexes
           description: |
             - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label), for example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
-            - **Important**: This only excludes DEXes on the Iris router, does not apply to other routers
+            - **Important**: This only excludes DEXes on the Metis router, does not apply to other routers
             - For example:
-              - **Exclude** Raydium: `excludeRouters=<all-except-Iris>` and `excludeDexes=Raydium`
-              - **Only include** Meteora DLMM: `excludeRouters=<all-except-Iris>` and `excludeDexes=<all-except-MeteoraDLMM>`
+              - **Exclude** Raydium: `excludeRouters=<all-except-Metis>` and `excludeDexes=Raydium`
+              - **Only include** Meteora DLMM: `excludeRouters=<all-except-Metis>` and `excludeDexes=<all-except-MeteoraDLMM>`
           schema:
             type: string
         - in: query
           name: payer
           description: |
             - The address of an external gas payer to pay for the network fees and rent on behalf of the taker
+            - Refer to [Integrator Gas Payer](/docs/ultra/payer) for more details
           schema:
             type: string
           required: false
@@ -637,7 +594,7 @@ paths:
                     name:
                       type: string
                       enum:
-                        - Iris
+                        - Metis v1.6
                         - JupiterZ
                         - DFlow
                         - OKX DEX Router

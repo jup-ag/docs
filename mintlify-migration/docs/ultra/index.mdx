@@ -20,7 +20,7 @@ Ultra Swap is the most advanced yet developer-friendly solution for building tra
 
 <AccordionGroup>
 <Accordion title="Juno Liquidity Engine">
-Ultra Swap utilizes the latest [Juno Liquidity Engine](/routing) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines both Iris and Jupiter Z (RFQ), and third-party liquidity sources, for the best possible price. It also includes self-learning capabilities (to detect and sideline low-quality liquidity sources) which creates a competitive environment for all liquidity sources to continously optimize their performance and price.
+Ultra Swap utilizes the latest [Juno Liquidity Engine](/routing) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines both Metis and Jupiter Z (RFQ), and third-party liquidity sources, for the best possible price. It also includes self-learning capabilities (to detect and sideline low-quality liquidity sources) which creates a competitive environment for all liquidity sources to continously optimize their performance and price.
 </Accordion>
 
 <Accordion title="Transaction Sending">
@@ -58,7 +58,7 @@ Ultra Swap provides different gasless mechanisms for different scenarios.
 | Endpoint    | Description                                                                                           | Latency (P90 Average)   |
 | :----------- | :----------------------------------------------------------------------------------------------------- | :----------------------- |
 | `/order`    | Aggregating across multiple liquidity sources and selecting the best price.                           | 500ms                   |
-| `/execute`  | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Iris: 1.5s; JupiterZ: 5s |
+| `/execute`  | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Metis: 1.5sJupiterZ: 5s |
 | `/balances` | Retrieving the user's balances.                                                                       | 200ms                   |
 | `/shield`   | Enhanced token security feature to provide critical token information.                                | 400ms                   |
 </Accordion>

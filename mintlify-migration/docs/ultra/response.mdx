@@ -8,7 +8,7 @@ description: "Ultra Swap API Responses that can be returned from both the `/orde
 <Tabs>
     <Tab title="Success" icon="face-smile">
         <CodeGroup>
-            ```json Metis
+            ```json Iris
             {
                 "mode": "ultra",
                 "inAmount": "100000000",
@@ -44,7 +44,7 @@ description: "Ultra Swap API Responses that can be returned from both the `/orde
                 "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
                 "outputMint": "So11111111111111111111111111111111111111112",
                 "swapType": "aggregator",
-                "router": "metis",
+                "router": "iris",
                 "requestId": "019974a8-5fbb-7395-9355-9ebf8f844884",
                 "inUsdValue": 99.96761068334662,
                 "outUsdValue": 99.95449893632635,
@@ -179,7 +179,7 @@ description: "Ultra Swap API Responses that can be returned from both the `/orde
         }
         ```
 
-        In cases where the routes are of aggregator types like Metis and has been submitted to the network, but failed to land due to program related errors, the response will be as follows.
+        In cases where the routes are of aggregator types like Iris and has been submitted to the network, but failed to land due to program related errors, the response will be as follows.
 
         Only Jupiter V6 Aggregator Program Codes are parsed with description, for other DEX program codes, the error message can be `custom program error: #<code>`.
 

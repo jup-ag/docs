@@ -16,17 +16,17 @@ The Jupiter Ultra Swap API includes **2 different gasless mechanisms** that allo
 
 | Router | Network / Priority Fees | ATA Rent | Other Accounts Rent | Requirements |
 | --- | --- | --- | --- | --- |
-| **Metis** | ✅ Yes | ✅ Yes | ✅ Yes | - Minimum trade size of 10 USD<br/>- Gas is taken from swap amount, meaning more fees taken from user |
+| **Iris** | ✅ Yes | ✅ Yes | ✅ Yes | - Minimum trade size of 10 USD<br/>- Gas is taken from swap amount, meaning more fees taken from user |
 | **JupiterZ** (RFQ) | ✅ Yes | ❌ No (as of now) | ❌ Not required | - No minimum trade size<br/>- Dependent on if MM provides a quote |
 | **Others** | ❌ No | ❌ No | ❌ No | N/A |
 
 ## Scenario Matrix
 
 <Warning>
-Note that Metis's Gasless Support mechanism only kicks in when user has insufficient SOL.
+Note that Iris's Gasless Support mechanism only kicks in when user has insufficient SOL.
 </Warning>
 
-| User Scenario | Metis (Gasless Support) | JupiterZ | Others |
+| User Scenario | Iris (Gasless Support) | JupiterZ | Others |
 | --- | --- | --- | --- |
 | **Sufficient SOL<br/>With ATA** | - User pays for gas | - MM must provide quote<br/>- MM pays for gas | - User pays for gas |
 | **Sufficient SOL<br/>Without ATA** | - User pays for gas<br/>- User pays for ATA | - MM must provide quote<br/>- MM pays for gas<br/>- User pays for ATA | - User pays for gas<br/>- User pays for ATA |

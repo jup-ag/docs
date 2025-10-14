@@ -20,7 +20,7 @@ servers:
 paths:
   /quote:
     get:
-      operationId: quoteGet
+      operationId: QuoteGet
       tags:
         - Swap
       summary: quote
@@ -40,6 +40,7 @@ paths:
         - $ref: '#/components/parameters/PlatformFeeBpsParameter'
         - $ref: '#/components/parameters/MaxAccountsParameter'
         - $ref: '#/components/parameters/InstructionVersion'
+        - $ref: '#/components/parameters/DynamicSlippage'
       responses:
         '200':
           description: "Successful response to be used in `/swap`"
@@ -49,7 +50,7 @@ paths:
                 $ref: '#/components/schemas/QuoteResponse'
   /swap:
     post:
-      operationId: swapPost
+      operationId: SwapPost
       tags:
         - Swap
       summary: swap
@@ -70,7 +71,7 @@ paths:
                 $ref: '#/components/schemas/SwapResponse'
   /swap-instructions:
     post:
-      operationId: swapInstructionsPost
+      operationId: SwapInstructionsPost
       tags:
         - Swap
       summary: swap-instructions
@@ -91,7 +92,7 @@ paths:
                 $ref: '#/components/schemas/SwapInstructionsResponse'
   /program-id-to-label:
     get:
-      operationId: programIdToLabelGet
+      operationId: ProgramIdToLabelGet
       tags:
         - Swap
       summary: program-id-to-label
@@ -651,3 +652,11 @@ components:
           - V1
           - V2
         default: V1
+    DynamicSlippage:
+      name: dynamicSlippage
+      description: |
+        - No longer applicable, only required to pass in via `/swap` endpoint
+      in: query
+      schema:
+        type: boolean
+        default: false

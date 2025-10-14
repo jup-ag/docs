@@ -24,7 +24,7 @@ Mainnet Deployment: `LocpQgucEQHbqNABEYvBvwoxCPsSbG91A1QaQhQQqjn`
 The **IDL** for the Jupiter Lock program can be found on [Solscan](https://solscan.io/account/LocpQgucEQHbqNABEYvBvwoxCPsSbG91A1QaQhQQqjn#anchorProgramIdl), or available here: 
 
 :::info Jupiter Lock is in Beta
-Feel free to submit PRs, suggestions, or reach out to us! If you need help with Jupiter Lock or have any feedback on how to improve, let us know on Discord or [Telegram](https://t.me/xianxlb).
+Feel free to submit PRs, suggestions, or reach out to us! If you need help with Jupiter Lock or have any feedback on how to improve, let us know on Discord
 :::
 
 ---

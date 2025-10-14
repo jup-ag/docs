@@ -120,32 +120,34 @@ paths:
                   signatureFeeLamports:
                     type: number
                     description: |
-                      - The number of lamports the `taker` or `payer` has to pay for the base network fee, if a valid transaction is returned.
+                      - The number of lamports the `taker`, `maker` (JupiterZ's MM) or `payer` has to pay for the base network fee, if a valid transaction is returned.
                   signatureFeePayer:
                     type: string
                     nullable: true
                     description: |
-                      - The public key of the account that will cover the signature fee, it can be either `taker` or `payer` if passed in
+                      - The public key of the account that will cover the signature fee, it can be either `taker`, `maker` (JupiterZ's MM) or `payer` if passed in
                   prioritizationFeeLamports:
                     type: number
                     description: |
-                      - The number of lamports the `taker` or `payer` has to pay for higher priority landing, if a valid transaction is returned
+                      - The number of lamports the `taker`, `maker` (JupiterZ's MM) or `payer` has to pay for higher priority landing, if a valid transaction is returned
                       - Includes priority fees and tips for services such as Jito, etc, if any
                   prioritizationFeePayer:
                     type: string
                     nullable: true
                     description: |
-                      - The public key of the account that will cover the prioritization fee, it can be either `taker` or `payer` if passed in
+                      - The public key of the account that will cover the prioritization fee, it can be either `taker`, `maker` (JupiterZ's MM) or `payer` if passed in
                   rentFeeLamports:
                     type: number
                     description: |
                       - The number of lamports the `taker` or `payer` has to pay for account rent, if a valid transaction is returned
                       - Note that this value is just an estimate
+                      - JupiterZ's MM currently does not cover for rent fees
                   rentFeePayer:
                     type: string
                     nullable: true
                     description: |
                       - The public key of the account that will cover the rent fee, it can be either `taker` or `payer` if passed in
+                      - JupiterZ's MM currently does not cover for rent fees
                   swapType:
                     type: string
                     description: |

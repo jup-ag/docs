@@ -5,7 +5,7 @@
   "colors": {
     "primary": "#00BEF0",
     "light": "#C7F284",
-    "dark": "#C7F284"
+    "dark": "#000000"
   },
   "favicon": "/favicon.png",
   "contextual": {
@@ -228,40 +228,28 @@
             ]
           },
           {
-            "item": "Tokens",
+            "item": "Tokens & Price",
             "icon": "coin",
             "groups": [
               {
-                "group": " ",
-                "pages": ["docs/tokens/index"]
-              },
-              {
-                "group": "Versions",
+                "group": "Tokens Docs",
                 "pages": [
+                  {
+                    "group": "Overview",
+                    "pages": [
+                      "docs/tokens/index",
+                      "docs/tokens/organic-score",
+                      "docs/tokens/token-tag-standard"
+                    ]
+                  },
                   "docs/tokens/v2",
                   "docs/tokens/v1"
                 ]
               },
               {
-                "group": "Expanding on Tokens API",
+                "group": "Price Docs",
                 "pages": [
-                  "docs/tokens/organic-score",
-                  "docs/tokens/token-tag-standard"
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Price",
-            "icon": "dollar-sign",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/price/index"]
-              },
-              {
-                "group": "Versions",
-                "pages": [
+                  "docs/price/index",
                   "docs/price/v3",
                   "docs/price/v2"
                 ]
@@ -313,6 +301,30 @@
               {
                 "group": " ",
                 "pages": ["docs/lock/index"]
+              }
+            ]
+          },
+          {
+            "item": "Routing",
+            "icon": "route",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["docs/routing/index"]
+              },
+              {
+                "group": "Routing Integrations",
+                "pages": [
+                  "routing/dex-integration",
+                  "routing/rfq-integration"
+                ]
+              },
+              {
+                "group": "Creating Markets & Tokens",
+                "pages": [
+                  "routing/market-listing",
+                  "routing/token-listing"
+                ]
               }
             ]
           }
@@ -511,49 +523,6 @@
         ]
       },
       {
-        "tab": "Routing",
-        "groups": [
-          {
-            "group": " ",
-            "pages": ["routing/index"]
-          },
-          {
-            "group": "Routing Integrations",
-            "pages": [
-              "routing/dex-integration",
-              "routing/rfq-integration"
-            ]
-          },
-          {
-            "group": "Creating Markets & Tokens",
-            "pages": [
-              "routing/market-listing",
-              "routing/token-listing"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Updates",
-        "groups": [
-          {
-            "group": " ",
-            "pages": ["updates/index"]
-          },
-          {
-            "group": "Full Updates",
-            "pages": [
-              {
-                "group": "October 2025",
-                "pages": [
-                  "updates/jupiter-build"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
         "tab": "Resources",
         "groups": [
           {
@@ -574,6 +543,26 @@
               "legal/sdk-api-license-agreement",
               "legal/terms-of-use",
               "legal/privacy-policy"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Updates",
+        "pages": ["updates/index"]
+      },
+      {
+        "tab": "Blog",
+        "groups": [
+          {
+            "group": " ",
+            "pages": ["blog/index"]
+          },
+          {
+            "group": "Articles",
+            "pages": [
+              "blog/ultra-v3",
+              "blog/jupiter-cloud"
             ]
           }
         ]
@@ -602,12 +591,13 @@
   "logo": {
     "light": "/logo/logo.png",
     "dark": "/logo/logo.png",
-    "href": "https://build.jup.ag/"
+    "href": "https://cloud.jup.ag/"
   },
   "navbar": {
     "primary": {
-      "type": "github",
-      "href": "https://github.com/jup-ag/docs"
+      "type": "button",
+      "label": "Blog",
+      "href": "https://cloud.jup.ag/blog"
     }
   },
   "footer": {
@@ -623,19 +613,19 @@
         "items": [
           {
             "label": "Support",
-            "href": "https://build.jup.ag/resources/support"
+            "href": "https://cloud.jup.ag/resources/support"
           },
           {
             "label": "Guidelines",
-            "href": "https://build.jup.ag/legal"
+            "href": "https://cloud.jup.ag/legal"
           },
           {
             "label": "Legal",
-            "href": "https://build.jup.ag/legal/sdk-api-license-agreement"
+            "href": "https://cloud.jup.ag/legal/sdk-api-license-agreement"
           },
           {
             "label": "Brand Kit",
-            "href": "https://build.jup.ag/resources/brand-kit"
+            "href": "https://cloud.jup.ag/resources/brand-kit"
           }
         ]
       }
@@ -643,18 +633,18 @@
   },
   "seo": {
     "metatags": {
-        "og:title": "Build with Jupiter",
-        "og:description": "Build with the most comprehensive set of APIs offering a full range of Jupiter products like Ultra Swap, Lend, Perps and more.",
+        "og:title": "Jupiter Cloud",
+        "og:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
         "og:image": "/logo/og.png",
         "og:type": "website",
-        "og:url": "https://build.jup.ag/",
-        "og:site_name": "Build with Jupiter",
-        "description": "Build with the most comprehensive set of APIs offering a full range of Jupiter products like Ultra Swap, Lend, Perps and more.",
+        "og:url": "https://cloud.jup.ag/",
+        "og:site_name": "Jupiter Cloud",
+        "description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
         "keywords": "Jupiter, Jupiter Developer Documentation, Jupiter API, Jupiter SDK, Jupiter Swap, Jupiter V6, Jupiter Lend, Jupiter Perps, Jupiter Studio, Jupiter Tool Kits, Jupiter Plugin, Jupiter Terminal, Jupiter Mobile Adapter, Jupiter Wallet Kit, Jupiter Referral Program, Jupiter Routing, Solana, Crypto, Solana Swap, Crypto Swap",
         "twitter:card": "summary_large_image",
         "twitter:site": "@JupiterExchange",
-        "twitter:title": "Build with Jupiter",
-        "twitter:description": "Build with the most comprehensive set of APIs offering a full range of Jupiter products like Ultra Swap, Lend, Perps and more.",
+        "twitter:title": "Jupiter Cloud",
+        "twitter:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
         "twitter:image": "/logo/og.png"
     }
   },
@@ -836,16 +826,8 @@
       "destination": "/docs/studio/"
     },
     {
-      "source": "/docs/routing/:slug*",
-      "destination": "/routing/:slug*"
-    },
-    {
       "source": "/docs/tool-kits/:slug*",
       "destination": "/tool-kits/:slug*"
-    },
-    {
-      "source": "/docs/routing/",
-      "destination": "/routing/"
     },
     {
       "source": "/docs/tool-kits/",

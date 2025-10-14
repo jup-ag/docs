@@ -1,0 +1,186 @@
+---
+title: "Ultra Swap V3"
+description: "Introducing Ultra Swap V3: A Technical Deep Dive into Best-in-Class Execution"
+category: "Inside Jupiter"
+tags: ["building with jupiter", "ultra", "swap", "announcement", "technical", "improvements"]
+date: "2024-10-08"
+image: "/static/blog/ultra-v3/ultra-v3.png"
+author: "Jupiter Engineering Team"
+seo:
+  title: "Ultra Swap V3 - Latest Improvements to Jupiter's Swap Experience"
+  description: "Discover the latest improvements in Ultra V3 that enhance the swap experience on Jupiter's Ultra Swap platform."
+  image: "/static/blog/ultra-v3/ultra-v3.png"
+---
+
+![Ultra Swap V3](/static/blog/ultra-v3/ultra-v3.png)
+
+# Introducing Ultra Swap V3: A Technical Deep Dive into Best-in-Class Execution
+
+Ultra V3 represents the culmination of months of infrastructure work, algorithm optimization, and real-world testing under production load. This release fundamentally changes how we approach swap execution on Solana, with measurable improvements across every dimension that matters: pricing accuracy, transaction success rates, landing speed, and MEV protection.
+
+## The Execution Quality Problem
+
+Let's start with a problem that's often overlooked: quoted price versus executed price. In today's Solana DeFi landscape dominated by proprietary AMMs, these two numbers are increasingly divergent.
+
+Consider this real-world scenario:
+- **Route A (Traditional AMM)**: Quote = 100 tokens, Execution = 80 tokens → Slippage = 20 tokens (20%)
+- **Route B (Prop AMM)**: Quote = 150 tokens, Execution = 50 tokens → Slippage = 100 tokens (66%)
+
+Route B shows a 50% better quote, but Route A delivers 60% more tokens to your wallet. This is why quote comparison between platforms is fundamentally misleading - and why we've rebuilt our routing engine from the ground up.
+
+## JIT Simulation: Real-Time Execution Verification
+
+Ultra V3 introduces **Just-In-Time simulation** for every quote returned by every router we aggregate (including OKX, Jupiter's internal routers, dFlow, and others).
+
+**How it works:**
+1. Aggregated routers return their best quotes
+2. Ultra performs on-chain simulation of each route before returning quotes to users
+3. Simulations verify actual executable price vs quoted price
+4. Routes are ranked by simulated outcome, not just quoted price
+
+**Impact:** Users receive quotes that reflect actual on-chain execution, not theoretical best-case scenarios. This shift from quote-optimized to execution-optimized routing is responsible for our swap success rate improvement from **85% to ~96%**.
+
+## Granular Route Optimization
+
+We've overhauled our trade splitting logic to maximize execution quality:
+
+**Before:** 10% bucket sizes for split trades
+**After:** 1% bucket sizes for split trades
+
+**Why this matters:** Smaller buckets allow more precise distribution of trade volume across multiple routes and liquidity sources. When splitting between two different routes, we can now allocate capital in much finer increments, reducing price impact and improving average execution price.
+
+**Data:** Testing across thousands of trades shows consistent improvement in execution price, particularly for trades between $10K-$1M where route splitting is most effective.
+
+## Slippage Management & Volatility Adaptation
+
+Ultra V3 implements dynamic slippage protection that adapts to token volatility characteristics:
+
+- **Reduced RTSE (Real-Time Slippage Estimation) slippage set** while maintaining high success rates
+- **Automatic prioritization** of slippage-protected routes over purely price-optimized routes
+- **Increased volatility sensitivity** for tokens with high historical volatility patterns
+
+This represents a fundamental shift in routing philosophy: we optimize for the probability of successful execution at near-quoted prices, not just the theoretical best price.
+
+## IronJup: Sub-Second Transaction Landing
+
+IronJup is Jupiter's proprietary transaction landing infrastructure, delivering measurable improvements in both speed and security.
+
+### Performance Metrics
+
+**Transaction Landing Latency:**
+- Traditional methods: 2-3 blocks (~2-3 seconds)
+- IronJup: 1 block (~1 second)
+- **Improvement: 50-66% reduction in landing time**
+
+**Why this matters:** Every block your transaction waits is exposure to:
+- Market movement against your position
+- Increased effective slippage
+- MEV extraction opportunities
+
+Reducing landing time by 1-2 blocks directly translates to lower realized slippage, particularly in volatile market conditions.
+
+### MEV Protection
+
+IronJup transactions are routed through Jupiter's own validator infrastructure, providing:
+- **Complete transaction privacy** until on-chain execution
+- **Zero frontrunning exposure** - transactions are invisible to public mempool scanners
+- **Elimination of sandwich attack vectors** - see [sandwiched.me](https://sandwiched.me/sandwiches) for MEV analytics
+
+**Data point:** Ultra's sandwich rate is significantly lower than competing platforms despite higher volume, demonstrating the effectiveness of private transaction routing.
+
+### Multi-Method Transaction Landing
+
+Ultra intelligently routes transactions across multiple landing methods:
+- Traditional RPC/TPU
+- Jito
+- Nozomi  
+- Sanctum Gateway
+- IronJup (proprietary)
+
+This redundancy ensures optimal performance even when individual methods experience degraded service, contributing to our 96% success rate.
+
+## Universal Token Coverage
+
+Ultra V3 solves a long-standing technical limitation: routing for tokens that have "fallen out of favor."
+
+**The Problem:** When tokens lose activity, we stop tracking their markets to optimize resource allocation. This makes them unroutable, trapping users in positions they can't close.
+
+**The Solution:** Just-In-Time token and market revival mechanism that dynamically re-indexes token markets on-demand.
+
+**Capabilities:**
+- Routes virtually any token on Solana, including extremely long-tail assets
+- Supports old, inactive tokens that historically failed to route
+- No minimum liquidity threshold for token eligibility
+
+**Note:** This behavior is exclusive to Ultra - standard Swap API clients do not have JIT revival enabled.
+
+### Pre-Graduation Token Optimization
+
+For tokens on Pump.fun that haven't graduated to Raydium:
+
+**Before:** 200ms average quote latency (requires checking multiple potential routes)
+**After:** 10-15ms average quote latency (direct Pump pool routing)
+**Improvement: 90%+ latency reduction**
+
+This optimization leverages the fact that pre-graduation tokens only have liquidity on Pump.fun, allowing us to skip multi-route aggregation entirely.
+
+## Gasless Transaction Coverage
+
+Significant improvements to gasless transaction support:
+
+**Coverage expansion:**
+- ✅ Token2022 program support
+- ✅ Memecoin-to-memecoin swaps (when liquidity permits)
+- ✅ Reduced minimum trade size to ~$10 USD
+
+**Use case:** Particularly valuable for integrators like Robinhood who want to abstract gas management from end users.
+
+## Fee Structure Comparison
+
+Jupiter's platform fees are transparent and competitive:
+
+**Jupiter Ultra:**
+- 0-10 bps depending on token pair
+- Most pairs: 0-5 bps
+
+**Competitors:**
+- Phantom: 85 bps
+- Photon/BullX/Padre/Trojan/GMGN/Axiom: 100 bps (1%)
+
+**Impact:** On a $10,000 trade, Jupiter charges $0-$10 in fees. Competitors charge $85-$100. Over time, this difference compounds significantly for active traders.
+
+## Performance Summary
+
+| Metric | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| Swap Success Rate | 85% | ~96% | +11 percentage points |
+| Transaction Landing | 2-3 blocks | 1 block | -50-66% latency |
+| Pre-grad Quote Latency | 200ms | 10-15ms | -93% latency |
+| Trade Split Granularity | 10% buckets | 1% buckets | 10x precision |
+| Token Coverage | Limited | Universal | N/A |
+
+## Architecture Philosophy
+
+Ultra is more than a swap API - it's an abstraction layer over Solana's execution complexity:
+
+**For end users:** No need to understand slippage settings, gas fees, RPC selection, or MEV protection. Ultra handles everything.
+
+**For developers:** No need to build and maintain RPC infrastructure, implement transaction landing optimization, or integrate multiple MEV protection services. Ultra provides a single API that handles all of this.
+
+The same endpoints powering jup.ag's UI are available to integrators, including:
+- Token balance queries
+- Token search functionality  
+- Gasless transfer support
+- Multi-method transaction landing
+
+## Try Ultra V3
+
+Ultra V3 is live in production on jup.ag. All swaps automatically leverage the full Ultra V3 stack: execution-optimized routing, JIT simulation, IronJup transaction landing, and dynamic slippage protection.
+
+For developers, Ultra provides comprehensive API access to these capabilities. Documentation is available at [cloud.jup.ag](https://cloud.jup.ag).
+
+---
+
+Ultra V3 demonstrates that the best execution isn't about finding the best quote - it's about delivering the best outcome. Through rigorous measurement, continuous optimization, and proprietary infrastructure, we've built a system that consistently outperforms on the metrics that actually matter: tokens in your wallet, transaction success rate, and capital efficiency.
+
+The data speaks for itself.

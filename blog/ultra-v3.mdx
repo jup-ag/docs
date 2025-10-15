@@ -12,25 +12,41 @@ description: "A Technical Deep Dive into Best-in-Class Execution"
 
 Ultra V3 represents the culmination of months of infrastructure work, algorithm optimization, 
 and real-world testing under production load. This release fundamentally changes how we approach 
-swap execution, with measurable improvements across every aspect that matters: execution quality, 
-pricing accuracy, transaction success rates, landing speed, and MEV protection.
+swap execution, with measurable improvements across every aspect that matters:
 
-## IronJup: Sub-Second Transaction Landing
+<div className="text-xs leading-snug">
+	- [Sub-Second Transaction Landing](#sub-second-transaction-landing)
+	- [MEV Protection](#mev-protection)
+	- [Just-In-Time Quote Simulation](#just-in-time-quote-simulation)
+	- [Just-In-Time Market Revival](#just-in-time-market-revival)
+	- [Pre-graduation Routing Latency Reduction](#pre-graduation-routing-latency-reduction)
+	- [Slippage Optimization](#slippage-optimization)
+	- [Gasless Support Coverage](#gasless-support-coverage)
+</div>
 
-IronJup is Jupiter's proprietary transaction landing infrastructure, delivering measurable 
-improvements in both speed and security.
+## Sub-Second Transaction Landing
+
+IronJup is Jupiter’s proprietary transaction landing infrastructure, designed for measurable 
+improvements in both speed and reliability.
 
 ### Transaction Landing Latency
 
-Transaction landing latency improved by **50-66%** compared to traditional methods.
+Transaction landing latency has improved by **50–66%** compared with our previous approach that 
+relied on multiple providers.
+
 | Method               | Blocks     | Latency         |
 |----------------------|------------|-----------------|
-| **IronJup**          | 0-1 block  | ~400ms          |
-| **Traditional methods** | 2-3 blocks | ~800ms - 1.2s  |
+| **IronJup**          | 0-1 block  | ~ 50ms - 400ms    |
+| **Traditional methods** | 1-3 blocks | ~ 400ms - 1.2s  |
 
-Why this matters, because every block your transaction waits is an exposure to poorer execution 
-quality such as market movement against your position, increased effective slippage, and higher 
-risk of MEV extraction opportunities.
+Every block your transaction waits is an exposure to poorer execution quality, such as market 
+movement against your position, increased effective slippage, and a higher risk of MEV extraction 
+opportunities.
+
+With IronJup we now leverage our own validator stake and dedicated R&D efforts, IronJup consistently 
+processes transactions within 50–400 ms and by operating entirely on our own infrastructure instead 
+of relying on external providers, we eliminate the risk of artificial delays and front-running, ensuring 
+faster and more secure execution for our users.
 
 ### MEV Protection
 
@@ -55,7 +71,7 @@ for MEV analytics.
 	</div>
 </Card>
 
-## Just-In-Time Simulation to Verify Executable Price
+## Just-In-Time Quote Simulation
 
 A problem that is often overlooked is the lack of comparison between **Quoted Price versus Executed 
 Price**. When a quote is provided, it does not necessarily represent the actual executable price and 
@@ -77,7 +93,7 @@ quote comparison between platforms is fundamentally misleading - but we have mad
 improvements to our routing engine to ensure that the provided quotes have verifiable executable 
 prices.
 
-### Just-In-Time Simulation
+### Verifiable Executable Price
 
 Ultra V3 introduces **Just-In-Time Simulation** for every quote returned by every router we aggregate.
 
@@ -90,15 +106,6 @@ Ultra V3 introduces **Just-In-Time Simulation** for every quote returned by ever
 **Impact:** Users receive quotes that reflect actual on-chain execution, not theoretical best-case 
 scenarios. This shift from quote-optimized to execution-optimized routing is responsible for our 
 swap success rate improvement from **85% to ~96%**.
-
-## Slippage Optimization
-
-Since the inception of RTSE (Real-Time Slippage Estimator), we have made strides to improve the 
-slippage protection for our users. With Ultra V3, we have implemented the following improvements:
-
-- **Reduced RTSE slippage set** while maintaining high success rates.
-- **Automatic prioritization** of slippage-protected routes over purely price-optimized routes.
-- **Increased volatility sensitivity** for tokens with high historical volatility patterns.
 
 ## Just-In-Time Market Revival
 
@@ -117,7 +124,7 @@ re-indexes token markets on-demand.**
 This behavior is exclusive to Ultra only. Legacy Swap API does not have this capability.
 </Note>
 
-## Pre-Graduation Routing Optimization
+## Pre-Graduation Routing Latency Reduction
 
 To further enhance the trading experience for trenchers, we have optimized the routing logic for 
 all pre-graduated bonding curve markets by skipping multi-route aggregation to reduce the quote 
@@ -127,6 +134,15 @@ latency by 90%+:
 |--------|----------------------|-----------------------------------|
 | Before | 200ms                | Checking multiple potential routes |
 | After  | 10-15ms              | Direct routing to pre-graduated markets |
+
+## Slippage Optimization
+
+Since the inception of RTSE (Real-Time Slippage Estimator), we have made strides to improve the 
+slippage protection for our users. With Ultra V3, we have implemented the following improvements:
+
+- **Reduced RTSE slippage set** while maintaining high success rates.
+- **Automatic prioritization** of slippage-protected routes over purely price-optimized routes.
+- **Increased volatility sensitivity** for tokens with high historical volatility patterns.
 
 ## Gasless Support Coverage
 

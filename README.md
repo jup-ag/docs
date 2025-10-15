@@ -1,3 +1,5 @@
+> This version of documentation will no longer be maintained. We will be using Mintlify moving forward with new docs!
+
 # Jupiter Developer Docs
 
 Welcome to Jupiter Developer Documentation! You'll find detailed API guides, schemas, and powerful tool kits built by the team and DevRel Working Group to help you build with Jupiter.

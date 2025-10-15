@@ -33,7 +33,11 @@ const sidebars = {
             },
             {
               type: 'doc',
-              id: 'api/ultra-api/balances',
+              id: 'api/ultra-api/holdings',
+            },
+            {
+              type: 'doc',
+              id: 'api/ultra-api/holdings-native',
             },
             {
               type: 'doc',
@@ -46,6 +50,10 @@ const sidebars = {
             {
               type: 'doc',
               id: 'api/ultra-api/routers',
+            },
+            {
+              type: 'doc',
+              id: 'api/ultra-api/balances',
             },
           ],
         },

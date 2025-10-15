@@ -52,6 +52,10 @@ const sidebars = {
           id: 'api-faq',
         },
         {
+          type: 'doc',
+          id: 'api-payment-method',
+        },
+        {
           type: 'html',
           value: '<div class="sidebar-line-break"></div>',
         },
@@ -143,7 +147,7 @@ const sidebars = {
         },
         {
           type: 'doc',
-          id: 'ultra-api/get-balances',
+          id: 'ultra-api/get-holdings',
         },
         {
           type: 'doc',
@@ -152,6 +156,10 @@ const sidebars = {
         {
           type: 'doc',
           id: 'ultra-api/search-token',
+        },
+        {
+          type: 'doc',
+          id: 'ultra-api/get-balances',
         },
       ],
     },
@@ -483,6 +491,22 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Architecture',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'lend-api/oracle',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
       label: 'Lend API',
       collapsible: false,
       collapsed: false,
@@ -494,6 +518,26 @@ const sidebars = {
         {
           type: 'doc',
           id: 'lend-api/borrow',
+        },
+      ],
+    },
+    {
+      type: 'html',
+      value: '<div class="sidebar-line-break"></div>',
+    },
+    {
+      type: 'category',
+      label: 'Guides',
+      collapsible: false,
+      collapsed: false,
+      items: [
+        {
+          type: 'doc',
+          id: 'lend-api/sdk',
+        },
+        {
+          type: 'doc',
+          id: 'lend-api/liquidation',
         },
       ],
     },

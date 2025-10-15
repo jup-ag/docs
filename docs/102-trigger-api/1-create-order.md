@@ -46,7 +46,7 @@ Do note that there are a few optional parameters that you can use, such as:
 
 ```jsx
 const createOrderResponse = await (
-    await fetch('https://api.jup.ag/trigger/v1/createOrder', {
+    await fetch('https://lite-api.jup.ag/trigger/v1/createOrder', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

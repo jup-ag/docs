@@ -17,20 +17,27 @@ pricing accuracy, transaction success rates, landing speed, and MEV protection.
 
 ## IronJup: Sub-Second Transaction Landing
 
-IronJup is Jupiter's proprietary transaction landing infrastructure, delivering measurable 
-improvements in both speed and security.
+IronJup is Jupiter’s proprietary transaction landing infrastructure, designed for measurable 
+improvements in both speed and reliability.
 
 ### Transaction Landing Latency
 
-Transaction landing latency improved by **50-66%** compared to traditional methods.
+Transaction landing latency has improved by **50–66%** compared with our previous approach that 
+relied on multiple providers.
+
 | Method               | Blocks     | Latency         |
 |----------------------|------------|-----------------|
-| **IronJup**          | 0-1 block  | ~400ms          |
-| **Traditional methods** | 2-3 blocks | ~800ms - 1.2s  |
+| **IronJup**          | 0-1 block  | ~ 50ms - 400ms    |
+| **Traditional methods** | 1-3 blocks | ~ 400ms - 1.2s  |
 
-Why this matters, because every block your transaction waits is an exposure to poorer execution 
-quality such as market movement against your position, increased effective slippage, and higher 
-risk of MEV extraction opportunities.
+Every block your transaction waits is an exposure to poorer execution quality, such as market 
+movement against your position, increased effective slippage, and a higher risk of MEV extraction 
+opportunities.
+
+With IronJup we now leverage our own validator stake and dedicated R&D efforts, IronJup consistently 
+processes transactions within 50–400 ms and by operating entirely on our own infrastructure instead 
+of relying on external providers, we eliminate the risk of artificial delays and front-running, ensuring 
+faster and more secure execution for our users.
 
 ### MEV Protection
 

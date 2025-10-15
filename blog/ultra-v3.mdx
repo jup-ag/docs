@@ -1,20 +1,14 @@
 ---
 title: "Ultra Swap V3"
-description: "A Technical Deep Dive into Ultra Swap V3"
-category: "Inside Jupiter"
-tags: ["building with jupiter", "ultra", "swap", "announcement", "technical", "improvements"]
-date: "2025-10-15"
-image: "/static/blog/ultra-v3/ultra-v3.png"
-author: "Jupiter Engineering Team"
-seo:
-  title: "Ultra Swap V3 - A Technical Deep Dive"
-  description: "Discover the latest improvements in Ultra V3 that enhance the swap experience on Jupiter's Ultra Swap platform."
-  image: "/static/blog/ultra-v3/ultra-v3.png"
+description: "A Technical Deep Dive into Best-in-Class Execution"
+"og:title": "Ultra Swap V3 - A Technical Deep Dive"
+"og:description": "Discover the latest improvements in Ultra V3 that enhance the swap experience on Jupiter."
+"og:image": "/static/blog/ultra-v3/ultra-v3.png"
+"og:type": "article"
+"og:site_name": "Jupiter Developers Blog"
 ---
 
 ![Ultra Swap V3](/static/blog/ultra-v3/ultra-v3.png)
-
-# A Technical Deep Dive into Ultra Swap V3
 
 Ultra V3 represents the culmination of months of infrastructure work, algorithm optimization, 
 and real-world testing under production load. This release fundamentally changes how we approach 
@@ -110,7 +104,7 @@ slippage protection for our users. With Ultra V3, we have implemented the follow
 
 Ultra V3 solves a long-standing technical limitation which is to provide routes for tokens that 
 have "fallen out of favor" - When markets are have low liquidity or yet to graduate for a long time, 
-we downgrade these markets to optimize resource allocation. This makes them unroutable, disallowing 
+we downgrade these markets to optimize resource allocation. This makes them unroutable, preventing 
 users to enter or exit their positions.
 
 To address this, we have implemented a Just-In-Time market Revival Mechanism that **dynamically 
@@ -125,14 +119,14 @@ This behavior is exclusive to Ultra only. Legacy Swap API does not have this cap
 
 ## Pre-Graduation Routing Optimization
 
-To further enhance the trading experience for trenchers, we have optimized Pump.fun pre-graduation
-routing logic by skipping multi-route aggregation to reduce the quote latency by 90%+ for 
-pre-graduated Pump.fun tokens:
+To further enhance the trading experience for trenchers, we have optimized the routing logic for 
+all pre-graduated bonding curve markets by skipping multi-route aggregation to reduce the quote 
+latency by 90%+:
 
 |        | Average Quote Latency | Routing Method                    |
 |--------|----------------------|-----------------------------------|
 | Before | 200ms                | Checking multiple potential routes |
-| After  | 10-15ms              | Direct routing to Pump.fun           |
+| After  | 10-15ms              | Direct routing to pre-graduated markets |
 
 ## Gasless Support Coverage
 
@@ -161,7 +155,7 @@ protection. Ultra handles everything.
 **For developers:** The exact same Ultra infrastructure that powers jup.ag's UI is also available 
 to developers via API. No need to build, host, or maintain your own RPC, transaction landing 
 infrastructure and manage other trading optimizations. For more information, please refer to 
-the [Ultra Swap docs](/docs/ultra).
+the [Ultra Swap Docs](/docs/ultra).
 
 Ultra V3 demonstrates that the best execution isn't about finding the best quote - it's about 
 delivering the best outcome. Through rigorous measurement, continuous optimization, and proprietary 

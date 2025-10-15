@@ -1,8 +1,8 @@
 ---
-title: "Ultra Swap V3"
-description: "A Technical Deep Dive into Best-in-Class Execution"
-"og:title": "Ultra Swap V3 - A Technical Deep Dive"
-"og:description": "Discover the latest improvements in Ultra V3 that enhance the swap experience on Jupiter."
+title: "Ultra V3: Apex Trading Engine"
+description: "A Technical Deep Dive into Jupiter's Best-In-Class Swap Execution Engine."
+"og:title": "Ultra V3: Apex Trading Engine"
+"og:description": "A Technical Deep Dive into Jupiter's Best-In-Class Swap Execution Engine."
 "og:image": "/static/blog/ultra-v3/ultra-v3.png"
 "og:type": "article"
 "og:site_name": "Jupiter Developers Blog"
@@ -39,7 +39,7 @@ relied on multiple providers.
 | **IronJup**          | 0-1 block  | ~ 50ms - 400ms    |
 | **Traditional methods** | 1-3 blocks | ~ 400ms - 1.2s  |
 
-Every block your transaction waits is an exposure to poorer execution quality, such as market 
+Every block your transaction waits, is an exposure to poorer execution quality, such as market 
 movement against your position, increased effective slippage, and a higher risk of MEV extraction 
 opportunities.
 
@@ -93,7 +93,7 @@ quote comparison between platforms is fundamentally misleading - but we have mad
 improvements to our routing engine to ensure that the provided quotes have verifiable executable 
 prices.
 
-### Verifiable Executable Price
+### Verifying Executable Price
 
 Ultra V3 introduces **Just-In-Time Simulation** for every quote returned by every router we aggregate.
 
@@ -119,10 +119,6 @@ re-indexes token markets on-demand.**
 - Routes virtually any token on Solana, including extremely long-tail assets.
 - Supports old, inactive tokens that historically failed to route.
 - Essentially, no minimum liquidity threshold for token eligibility.
-
-<Note>
-This behavior is exclusive to Ultra only. Legacy Swap API does not have this capability.
-</Note>
 
 ## Pre-Graduation Routing Latency Reduction
 
@@ -172,6 +168,10 @@ protection. Ultra handles everything.
 to developers via API. No need to build, host, or maintain your own RPC, transaction landing 
 infrastructure and manage other trading optimizations. For more information, please refer to 
 the [Ultra Swap Docs](/docs/ultra).
+
+<Note>
+	All of the improvements mentioned in this blog post are exclusive to Ultra only, it does not include Legacy Swap API.
+</Note>
 
 Ultra V3 demonstrates that the best execution isn't about finding the best quote - it's about 
 delivering the best outcome. Through rigorous measurement, continuous optimization, and proprietary 

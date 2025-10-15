@@ -1,0 +1,36 @@
+---
+title: "Gasless Support"
+description: "Key features and pointers on gasless mechanisms in Ultra Swap API."
+---
+
+The Jupiter Ultra Swap API includes **2 different gasless mechanisms** that allow users to execute swaps without directly paying network fees in SOL. This feature reduces onboarding friction and supports a smoother user experience where end-users don't need to hold SOL just to trade tokens.
+
+## Types of Gas
+
+1. Base network transaction fee
+2. Associated Token Account (ATA) rent
+3. Priority fee (or tips, etc)
+4. Other accounts rent (some DEX may require additional accounts opened per user (e.g. Pumpfun))
+
+## Gasless Coverage & Requirements
+
+| Router | Network / Priority Fees | ATA Rent | Other Accounts Rent | Requirements |
+| --- | --- | --- | --- | --- |
+| **Metis** | ✅ Yes | ✅ Yes | ✅ Yes | - Minimum trade size of 10 USD<br/>- Gas is taken from swap amount, meaning more fees taken from user |
+| **JupiterZ** (RFQ) | ✅ Yes | ❌ No (as of now) | ❌ Not required | - No minimum trade size<br/>- Dependent on if MM provides a quote |
+| **Others** | ❌ No | ❌ No | ❌ No | N/A |
+
+## Scenario Matrix
+
+<Warning>
+Note that Metis's Gasless Support mechanism only kicks in when user has insufficient SOL.
+</Warning>
+
+| User Scenario | Metis (Gasless Support) | JupiterZ | Others |
+| --- | --- | --- | --- |
+| **Sufficient SOL<br/>With ATA** | - User pays for gas | - MM must provide quote<br/>- MM pays for gas | - User pays for gas |
+| **Sufficient SOL<br/>Without ATA** | - User pays for gas<br/>- User pays for ATA | - MM must provide quote<br/>- MM pays for gas<br/>- User pays for ATA | - User pays for gas<br/>- User pays for ATA |
+| **No SOL<br/>With ATA** | - All gas covered from swap amount<br/>- Minimum trade size of 10 USD required | - MM must provide quote<br/>- MM pays for gas | - Not routed |
+| **No SOL<br/>Without ATA** | - All gas and rent covered from swap amount<br/>- Minimum trade size of 10 USD required | - No quote from MM<br/>- Because user can't provide SOL for ATA | - Not routed |
+| **No SOL<br/>With ATA<br/>Small swap size** | - Quote provided but no transaction<br/>- `errorCode=3` | - MM must provide quote<br/>- MM pays for gas | - Not routed |
+| **No SOL<br/>Without ATA<br/>Small swap size** | - Quote provided but no transaction<br/>-`errorCode=3` | - No quote from MM<br/>- Because user can't provide SOL for ATA | - Not routed |

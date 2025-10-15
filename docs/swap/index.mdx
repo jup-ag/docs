@@ -1,0 +1,47 @@
+---
+title: "About Legacy Swap API"
+decsription: "Overview of the Legacy Swap API and its features."
+---
+
+The Jupiter Legacy Swap API enables you to tap into the Jupiter Metis v1 Routing Engine, which aggregates across all liquidity available within the DEXes of Solana's DeFi ecosystem, allowing you to swap seamlessly from any token to any token.
+
+## We recommend using Ultra Swap API
+
+Ultra Swap API is the spiritual successor to Swap API, and is much simpler to use than Swap API. If you are first starting out on your Solana development journey, using Ultra Swap API is highly recommended over Swap API.
+
+<Tip>
+For more information about Ultra Swap API, please refer to the [Ultra Swap API](/docs/ultra) documentation.
+</Tip>
+
+<Info>
+**Using Legacy Swap API**
+
+Requires your own maintenance, optimizations and dependencies.
+   * **Upkeep of RPCs**: To retrieve wallet balances, broadcast and retrieve transactions, etc.
+   * **Deciding transaction fee**: Including, but not limited to, priority fee, Jito fee, etc.
+   * **Deciding slippage**: The optimal slippage to use to balance between trade success and price protection, do note that [RTSE is only available via Ultra Swap API](/docs/ultra#real-time-slippage-estimator).
+   * **Broadcasting the transaction**: Ultra uses a proprietary transaction sending engine which dramatically improves landing rate and speed.
+   * **Parsing the swap results**: Polling and parsing the resulting transaction from the RPC, including handling for success and error cases.
+
+Though comes with other ways to use Jupiter.
+   * Add custom instructions.
+   * Use via Cross Program Invocation (CPI) calls.
+   * Choose your own transactionbroadcasting method (like Typical RPCs, Jito, etc).
+   * Modify the number of accounts to use in a transaction.
+</Info>
+
+## Getting Started with Legacy Swap API
+
+1. [**Get Quote**](/docs/swap/get-quote): Request for a quote which consists of the route plan, and other params such as integrator fee, slippage, etc.
+
+2. [**Build Swap Transaction**](/docs/swap/build-swap-transaction): Post the quote to build a swap transaction.
+
+   * You can utilize other methods to return swap instructions or use CPI rather than the default swap transaction.
+   * You can utilize other parameters such as priority fee, dynamic slippage, etc to customize the transaction.
+
+3. [**Send Swap Transaction**](/docs/swap/send-swap-transaction): Sign and send the swap transaction to the network via your preferred RPC or other methods.
+
+**Other Guides**
+
+* [**Adding Fees to Legacy Swap API**](/docs/swap/add-fees-to-swap): Add custom integrator fees to the swap transaction.
+* [**Using Legacy Swap API as a payment method**](/docs/swap/payments-through-swap): Use Legacy Swap API as a payment method for your users.

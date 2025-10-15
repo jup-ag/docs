@@ -1,0 +1,37 @@
+---
+title: "Get Balances"
+description: "Ultra Swap API to get the token balances of an account."
+---
+
+```js
+const balancesResponse = await (
+  await fetch(`https://lite-api.jup.ag/ultra/v1/balances/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`)
+).json();
+
+console.log(JSON.stringify(balancesResponse, null, 2));
+```
+
+## Balances Response
+
+The balances response will return a list of token balances for the user's wallet address.
+
+**Successful example response:**
+
+```json
+{
+  "SOL": {
+    "amount": "0",
+    "uiAmount": 0,
+    "slot": 324307186,
+    "isFrozen": false
+  }
+}
+```
+
+**Failed example response:**
+
+```json
+{
+  "error": "Invalid address"
+}
+```

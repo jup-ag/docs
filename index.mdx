@@ -1,0 +1,406 @@
+---
+mode: "custom"
+title: "Build with Jupiter"
+---
+
+import { JupiterPluginIntegrated } from "/snippets/jupiter-plugin-integrated.jsx"
+import { JupiterPluginModalTrigger } from "/snippets/jupiter-plugin-modal-trigger.jsx"
+
+<script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
+
+<div className="relative min-h-screen text-[#181D27] dark:text-[#F9F9FB]">
+  <div className="w-full h-[525px] absolute opacity-60 overflow-hidden">
+  </div>
+
+  {/* Hero Section */}
+  <div className="flex flex-col items-center justify-center pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
+    <div className="text-center max-w-6xl mx-auto pt-8 sm:pt-0">
+      <div className="text-center justify-start text-xs sm:text-base text-[#00BEF0] dark:text-[#C7F284] font-medium leading-normal">Welcome to Jupiter’s Developer Docs!</div>
+      <div className="text-center justify-start text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold leading-tight sm:leading-[60px] md:leading-[80px] lg:leading-[96px] mt-2">Build with Jupiter</div>
+
+      {/* Hero card group to display stats */}
+      <div className="mx-1 md:mx-20 grid grid-cols-3 md:grid-cols-3 gap-2 md:gap-6 p-2 md:p-6">
+        <div className="bg-gradient-to-br from-[#C7F284]/10 to-[#00BEF0]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center ">
+          <div className="text-xl md:text-3xl font-bold text-[#00BEF0] dark:text-[#C7F284] mb-1 md:mb-2">500+</div>
+          <div className="text-xs md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 md:mb-2">Integrations</div>
+          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden md:block">Trusted by leading protocols</div>
+        </div>
+        <div className="bg-gradient-to-br from-[#00BEF0]/10 to-[#C7F284]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center ">
+          <div className="text-xl md:text-3xl font-bold text-[#00BEF0] dark:text-[#C7F284] mb-1 md:mb-2">$50B+</div>
+          <div className="text-xs md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 md:mb-2">Volume</div>
+          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden md:block">Loved by millions of users</div>
+        </div>
+        <div className="bg-gradient-to-br from-[#C7F284]/10 to-[#00BEF0]/10 border border-[#00BEF0]/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center ">
+          <div className="text-xl md:text-3xl font-bold text-[#00BEF0] dark:text-[#C7F284] mb-1 md:mb-2">#1</div>
+          <div className="text-xs md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 md:mb-2">Superapp</div>
+          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 hidden md:block">Leading DeFi on Solana</div>
+        </div>
+      </div>
+    </div>
+    <div className="mt-8 md:mt-12">
+      {/* Add a CTA button to Get Started */}
+      <a 
+        href="/get-started" 
+        className="inline-flex items-center px-8 md:px-10 py-1 md:py-2 bg-gradient-to-r from-[#00BEF0] to-[#C7F284] text-black font-semibold text-base md:text-lg rounded-xl md:rounded-xl shadow-lg hover:shadow-xl hover:shadow-[#00BEF0]/20 hover:scale-105 transition-all duration-300 ease-in-out hover:from-[#00D4FF] hover:to-[#D9FF96] active:scale-95"
+      >
+        Get Started
+        <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  {/* Line break */}
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+  </div>
+  
+  {/* Ultra Swap Section */}
+  <div className="max-w-6xl mx-auto pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
+    <div className="flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight md:leading-10 pb-[10px]">Start with Ultra Swap</div>
+    <div className="flex justify-center text-[#535862] dark:text-[#A6A09E] text-xs sm:text-lg font-normal leading-6 sm:leading-7 pb-[40px] sm:pb-[56px] text-center">Integrate the perfect swap experience into your application</div>
+
+          {/* Desktop: Left-Right Layout, Mobile: Stacked with Modal */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        {/* Left side: Integration options and Benefits */}
+        <div className="order-2 lg:order-1 space-y-6">
+
+          <CardGroup cols={1}>
+            <Card title="Why Ultra Swap?">
+              <div className="space-y-8 mt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#00BEF0] shrink-0"></div>
+                  <div className="font-normal text-sm text-gray-600 dark:text-gray-400">The most comprehensive liquidity aggregation, from launchpads, traditional DEXes to the top marketmakers via RFQ.</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#00BEF0] shrink-0"></div>
+                  <div className="font-normal text-sm text-gray-600 dark:text-gray-400"><a href="https://sandwiched.me/sandwiches" className="underline text-gray-600 dark:text-gray-400 inline-flex items-center gap-1">Best performing MEV mitigation<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a> with superior trade execution.</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#00BEF0] shrink-0"></div>
+                  <div className="font-normal text-sm text-gray-600 dark:text-gray-400">Optimized slippage & priority fee estimations for best price execution.</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#00BEF0] shrink-0"></div>
+                  <div className="font-normal text-sm text-gray-600 dark:text-gray-400">Access our optimised RPC stack, transaction sending & polling through a single clientside API call.</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#00BEF0] shrink-0"></div>
+                  <div className="font-normal text-sm text-gray-600 dark:text-gray-400">Zero transaction infrastructure required from you.</div>
+                </div>
+              </div>
+            </Card>
+
+            <Card title="Ultra Swap API" icon="bolt" href="/docs/ultra" horizontal>
+              Integrate Ultra Swap via API for full customization and control over the swap experience.
+            </Card>
+
+            <Card title="Plugin" icon="rocket-launch" href="/tool-kits/plugin" horizontal>
+              Easiest and most seamless way to embed the full end-to-end Ultra Swap functionality into any website.
+            </Card>
+          </CardGroup>
+
+          {/* Mobile Plugin Demo Button */}
+          <div className="mt-4 pt-6 lg:hidden">
+            <JupiterPluginModalTrigger 
+              className="w-full px-4 py-2 text-black font-bold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              style={{
+                background: 'linear-gradient(to right, #00BEF0, #C7F284)',
+              }}
+            >
+              Try Plugin Live
+            </JupiterPluginModalTrigger>
+          </div>
+        </div>
+
+      {/* Right side: Plugin Demo (Desktop only) */}
+      <div className="order-1 lg:order-2 hidden lg:block my-2">
+        <div className="sticky top-8">
+          <div className="p-6 bg-gradient-to-r from-[#00BEF0] to-[#C7F284] rounded-2xl">
+            <div className="text-center mb-6">
+              <div className="text-xl font-semibold text-gray-900 mb-2">Try Jupiter Plugin Live</div>
+              <div className="text-xs text-gray-900">Experience the full swap functionality embedded directly in our docs</div>
+            </div>
+            <div className="overflow-hidden">
+              <JupiterPluginIntegrated />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Line break */}
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+  </div>
+
+  {/* Developer Suite Section */}
+  <div className="max-w-6xl mx-auto pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
+    <div className="flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight md:leading-10 pb-[10px]">Developer Suite</div>
+    <div className="flex justify-center text-[#535862] dark:text-[#A6A09E] text-xs sm:text-lg font-normal leading-6 sm:leading-7 pb-[40px] sm:pb-[56px] text-center">Build with Jupiter's comprehensive DeFi and tech stack</div>
+
+    <Card title="Core Products" icon="diamonds-4">
+      Create your own DeFi superapp with Jupiter's core products.
+      <Columns cols={2}>
+        <Card title="Ultra Swap" icon="bolt" href="/docs/ultra" horizontal>
+            All-in-one swap solution
+        </Card>
+        <Card title="Lend" icon="piggy-bank" href="/docs/lend" horizontal>
+            Earn, borrow and multiply
+        </Card>
+        <Card title="Perpetuals" icon="chart-line" href="/docs/perps" horizontal>
+            Leverage trading
+        </Card>
+        <Card title="Trigger" icon="bullseye" href="/docs/trigger" horizontal>
+            Limit orders
+        </Card>
+        <Card title="Recurring" icon="clock-rotate-left" href="/docs/recurring" horizontal>
+            Dollar-cost averaging
+        </Card>
+        <Card title="Tokens" icon="coin" href="/docs/tokens" horizontal>
+            Comprehensive token information
+        </Card>
+        <Card title="Price" icon="dollar-sign" href="/docs/price" horizontal>
+            Heuristics-based token pricing
+        </Card>
+        <Card title="Send" icon="paper-plane" href="/docs/send" horizontal>
+            Seamless token transfers
+        </Card>
+        <Card title="Studio" icon="building-columns" href="/docs/studio" horizontal>
+            Token creation and LP management
+        </Card>
+        <Card title="Lock" icon="lock" href="/docs/lock" horizontal>
+            Token vesting
+        </Card>
+      </Columns>
+    </Card>
+
+    <CardGroup cols={2}>
+      <Card title="Tool Kits" icon="toolbox">
+        Supercharge your integration by using our easy-to-use tool kits.
+        <Columns cols={1}>
+          <Card title="Plugin" href="/tool-kits/plugin" icon="rocket-launch" horizontal>
+            Few lines of code to integrate full end-to-end Ultra Swap.
+          </Card>
+          <Card title="Wallet Kit" href="/tool-kits/wallet-kit" icon="wallet" horizontal>
+            Swiss army knife adapter for seamless wallet connectivity.
+          </Card>
+          <Card title="Jupiter Mobile Adapter" href="/tool-kits/wallet-kit/jupiter-mobile-adapter" icon="mobile" horizontal>
+            Onboard Jupiter Mobile users to connect to your website.
+          </Card>
+          <Card title="Referral Program" href="/tool-kits/referral-program" icon="percent"  horizontal>
+            Utilize together with Ultra Swap to earn integrator fees.
+          </Card>
+        </Columns>
+      </Card>
+
+      <Card title="Routing" icon="split">
+        Provide your liquidity capabilities into Jupiter's routing engines.
+        <Columns cols={1}>
+          <Card title="For DEXes" href="/docs/routing/dex-integration" icon="split" horizontal>
+            Integrate your DEX into Jupiter's Metis routing engine.
+          </Card>
+          <Card title="For MMs" href="/docs/routing/rfq-integration" icon="arrow-right" horizontal> 
+            Integrate your MM into JupiterZ (RFQ) routing engine.
+          </Card>
+        </Columns>
+      </Card>
+    </CardGroup>
+  </div>
+
+  {/* Line break */}
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+  </div>
+
+  {/* Expansive Ecosystem Section */}
+  <div className="max-w-6xl mx-auto pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
+    <div className="flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight md:leading-10 pb-[10px]">Expansive Ecosystem</div>
+    <div className="flex justify-center text-[#535862] dark:text-[#A6A09E] text-xs sm:text-lg font-normal leading-6 sm:leading-7 pb-[40px] sm:pb-[56px] text-center">Explore our ecosystem of protocols utilizing Jupiter</div>
+    
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+      {/* Integrators Subsection */}
+      <div>
+        <div className="flex justify-center lg:justify-start text-sm sm:text-xl font-semibold leading-tight pb-[10px] text-[#181D27] dark:text-[#F9F9FB]">Integrators</div>
+        <div className="flex justify-center lg:justify-start text-[#535862] dark:text-[#A6A09E] text-xs sm:text-sm font-normal leading-6 pb-[30px] text-center lg:text-left">Protocols powered by Jupiter</div>
+        
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-4 justify-items-center lg:justify-items-start">
+          {[
+            { name: 'moonshot', image: '/static/logos/integrator/moonshot.png', url: 'https://moonshot.com' },
+            { name: 'metengine', image: '/static/logos/integrator/metengine.png', url: 'https://metengine.xyz' },
+            { name: 'basedbot', image: '/static/logos/integrator/basedbot.png', url: 'https://x.com/BasedTradingBot' },
+            { name: 'birdeye', image: '/static/logos/integrator/birdeye.png', url: 'https://birdeye.so' },
+            { name: 'hawksight', image: '/static/logos/integrator/hawksight.png', url: 'https://www.hawksight.co' },
+            { name: 'backpack', image: '/static/logos/integrator/backpack.png', url: 'https://backpack.app' },
+            { name: 'phantom', image: '/static/logos/integrator/phantom.svg', url: 'https://phantom.com' },
+            { name: 'solflare', image: '/static/logos/integrator/solflare.svg', url: 'https://solflare.com' },
+            { name: 'metamask', image: '/static/logos/integrator/metamask.svg', url: 'https://metamask.io' },
+            { name: 'binance', image: '/static/logos/integrator/binance.png', url: 'https://binance.com' },
+            { name: 'bybit', image: '/static/logos/integrator/bybit.jpg', url: 'https://bybit.com' },
+            { name: 'bitget', image: '/static/logos/integrator/bitget.png', url: 'https://bitget.com' },
+            { name: 'coinbase', image: '/static/logos/integrator/coinbase.png', url: 'https://coinbase.com' },
+            { name: 'cryptodotcom', image: '/static/logos/integrator/cryptodotcom.png', url: 'https://crypto.com' },
+            { name: 'gatedotio', image: '/static/logos/integrator/gatedotio.png', url: 'https://gate.io' },
+            { name: 'kraken', image: '/static/logos/integrator/kraken.png', url: 'https://kraken.com' },
+            { name: 'okx', image: '/static/logos/integrator/okx.png', url: 'https://okx.com' },
+            { name: '...', image: '', url: '' },
+          ].map((integrator, index) => (
+            integrator.url ? (
+              <a
+                key={integrator.name}
+                href={integrator.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-2xl flex justify-start items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                <div className="w-12 h-12 sm:w-16 sm:h-16 relative overflow-hidden">
+                  {integrator.image ? (
+                    <img 
+                      className="w-full h-full object-cover pointer-events-none select-none"
+                      src={integrator.image}
+                      alt={integrator.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      draggable="false"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xs sm:text-sm font-semibold text-[#00BEF0] dark:text-[#C7F284] text-center px-1">
+                        {integrator.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </a>
+            ) : (
+              <div
+                key={integrator.name}
+                className="p-2 rounded-2xl flex justify-start items-center gap-2"
+              >
+                <div className="w-12 h-12 sm:w-16 sm:h-16 relative overflow-hidden">
+                  {integrator.image ? (
+                    <img 
+                      className="w-full h-full object-cover pointer-events-none select-none"
+                      src={integrator.image}
+                      alt={integrator.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      draggable="false"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xs sm:text-sm font-semibold text-[#00BEF0] dark:text-[#C7F284] text-center px-1">
+                        {integrator.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
+
+      {/* DEXes Subsection */}
+      <div>
+        <div className="flex justify-center lg:justify-start text-sm sm:text-xl font-semibold leading-tight pb-[10px] text-[#181D27] dark:text-[#F9F9FB]">Routing</div>
+        <div className="flex justify-center lg:justify-start text-[#535862] dark:text-[#A6A09E] text-xs sm:text-sm font-normal leading-6 pb-[30px] text-center lg:text-left">Liquidity venues integrated into Metis</div>
+        
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-6 gap-4 justify-items-center lg:justify-items-start">
+          {[
+            { name: 'meteora', image: '/static/logos/dex/meteora.svg', url: 'https://meteora.ag' },
+            { name: 'raydium', image: '/static/logos/dex/raydium.png', url: 'https://raydium.io' },
+            { name: 'orca', image: '/static/logos/dex/orca.png', url: 'https://orca.so' },
+            { name: 'pumpfun', image: '/static/logos/dex/pumpfun.png', url: 'https://pump.fun' },
+            { name: 'sanctum', image: '/static/logos/dex/sanctum.svg', url: 'https://sanctum.so' },
+            { name: 'stabble', image: '/static/logos/dex/stabble.png', url: 'https://stabble.org' },
+            { name: 'lifinity', image: '/static/logos/dex/lifinity.png', url: 'https://lifinity.io' },
+            { name: 'saros', image: '/static/logos/dex/saros.png', url: 'https://dex.saros.xyz' },
+            { name: 'phoenix', image: '/static/logos/dex/phoenix.svg', url: 'https://www.phoenix.trade' },
+            { name: 'pancakswap', image: '/static/logos/dex/pancakeswap.png', url: 'https://pancakeswap.finance' },
+            { name: 'byreal', image: '/static/logos/dex/byreal.png', url: 'https://x.com/byreal_io' },
+            { name: 'moonit', image: '/static/logos/dex/moonit.png', url: 'https://moon.it' },
+            { name: 'orbric', image: '/static/logos/dex/obric.jpg', url: 'https://obric.xyz' },
+            { name: 'solfi', image: '/static/logos/dex/solfi.jpg', url: 'https://x.com/SolFiAMM' },
+            { name: 'goonfi', image: '', url: '' },
+            { name: 'humidifi', image: '', url: '' },
+            { name: 'zerofi', image: '', url: '' },
+            { name: '...', image: '', url: '' },
+          ].map((dex, index) => (
+            dex.url ? (
+              <a
+                key={dex.name}
+                href={dex.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-2xl flex justify-start items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                <div className="w-12 h-12 sm:w-16 sm:h-16 relative overflow-hidden">
+                  {dex.image ? (
+                    <img 
+                      className="w-full h-full object-cover pointer-events-none select-none"
+                      src={dex.image}
+                      alt={dex.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      draggable="false"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xs sm:text-sm font-semibold text-[#00BEF0] dark:text-[#C7F284] text-center px-1">
+                        {dex.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </a>
+            ) : (
+              <div
+                key={dex.name}
+                className="p-2 rounded-2xl flex justify-start items-center gap-2"
+              >
+                <div className="w-12 h-12 sm:w-16 sm:h-16 relative overflow-hidden">
+                  {dex.image ? (
+                    <img 
+                      className="w-full h-full object-cover pointer-events-none select-none"
+                      src={dex.image}
+                      alt={dex.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      draggable="false"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xs sm:text-sm font-semibold text-[#00BEF0] dark:text-[#C7F284] text-center px-1">
+                        {dex.name.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Line break */}
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+  </div>
+
+  {/* Support Section */}
+  <div className="max-w-6xl mx-auto pt-[60px] md:pt-[120px] pb-[60px] md:pb-[120px] relative px-4">
+    <div className="flex justify-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight md:leading-10 pb-[10px]">Build Together</div>
+    <div className="flex justify-center text-[#535862] dark:text-[#A6A09E] text-base sm:text-lg font-normal leading-6 sm:leading-7 pb-[40px] sm:pb-[56px] text-center">We're here to help you build with Jupiter.</div>
+
+    <CardGroup cols={3}>
+      <Card title="Support" icon="people-group" href="/resources/support">
+        Get support our developer community.
+      </Card>
+
+      <Card title="Updates" icon="triangle-exclamation" href="/updates">
+        Refer to the latest developer updates.
+      </Card>
+
+      <Card title="Status" icon="signal" href="https://status.jup.ag">
+        Check the status of our services.
+      </Card>
+    </CardGroup>
+  </div>
+</div>

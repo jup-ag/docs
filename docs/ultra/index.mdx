@@ -1,0 +1,96 @@
+---
+title: "Overview"
+description: "Overview of Ultra Swap and its features."
+---
+
+Ultra Swap is the most advanced yet developer-friendly solution for building trading applications on Solana. Ultra Swap is designed to be the only solution you’ll ever need for creating exceptional trading experiences.
+
+## Quick Launch
+
+<CardGroup cols={2}>
+    <Card title="Ultra Swap API" icon="code" href="/docs/ultra/get-started">
+        RPC-less architecture and Jupiter handles all trading optimizations for you.
+    </Card>
+    <Card title="Plugin" icon="puzzle-piece" href="/tool-kits/plugin">
+        Easiest way to integrate full end-to-end Ultra Swap interface.
+    </Card>
+</CardGroup>
+
+## Features
+
+<AccordionGroup>
+<Accordion title="Juno Liquidity Engine">
+Ultra Swap utilizes the latest [Juno Liquidity Engine](/docs/routing) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines both Metis and Jupiter Z (RFQ), and third-party liquidity sources, for the best possible price. It also includes self-learning capabilities (to detect and sideline low-quality liquidity sources) which creates a competitive environment for all liquidity sources to continously optimize their performance and price.
+</Accordion>
+
+<Accordion title="Transaction Sending">
+Over the years of experiment and development, we have optimized and continues to better our transaction sending service. Using various strategies involving multiple RPCs, priority fees/Jito tips estimation, and more, we are able to send transactions at a blazing fast speed with a high success rate (while still being [MEV-protected](#mev-protection)).
+
+<Note>
+  95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine.
+
+  For more information on latencies, [refer to the latency section](#latency).
+</Note>
+</Accordion>
+
+<Accordion title="MEV Protection">
+According to both our internal monitoring system and external resources such as [Sandwiched.me](https://sandwiched.me/sandwiches), Ultra has the lowest incidence of MEV attacks across all existing applications, by far. Comparing using the ratio of volume to the amount of value extracted, Ultra Swap has the highest volume yet the lowest value extracted.
+</Accordion>
+
+<Accordion title="Real Time Slippage Estimator">
+Building on top of our previous versions of slippage estimation/optimization engines, we have developed a new Real Time Slippage Estimator (RTSE), that is able to intelligently estimate the best possible slippage to use at the time of execution, balancing between trade success and price protection. RTSE uses a variety of heuristics, algorithms and monitoring to ensure the best user experience:
+
+* **Heuristics**: Token categories, historical and real-time slippage data, and more.
+* **Algorithms**: Exponential Moving Average (EMA) on slippage data, and more.
+* **Monitoring**: Real-time monitoring of failure rates to ensure reactiveness to increase slippage when necessary.
+</Accordion>
+
+<Accordion title="Gasless">
+Ultra Swap provides different gasless mechanisms for different scenarios.
+
+* **Gasless via Jupiter Z (RFQ)**: All swaps routed via Jupiter Z are gasless, as the market maker is the fee payer for the transaction.
+* **Gasless via Gasless Support**: Depending on the tokens and trade sizes of your swap, Ultra Swap will automatically determine if it can provide gasless support to your swap by helping you pay for the transaction fee of your swap - you can identify this via the secondary signer in the transaction.
+</Accordion>
+
+<Accordion title="Latency">
+95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine.
+
+| Endpoint    | Description                                                                                           | Latency (P90 Average)   |
+| :----------- | :----------------------------------------------------------------------------------------------------- | :----------------------- |
+| `/order`    | Aggregating across multiple liquidity sources and selecting the best price.                           | 500ms                   |
+| `/execute`  | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Metis: 1.5s; JupiterZ: 5s |
+| `/balances` | Retrieving the user's balances.                                                                       | 200ms                   |
+| `/shield`   | Enhanced token security feature to provide critical token information.                                | 400ms                   |
+</Accordion>
+</AccordionGroup>
+
+| Feature                     | Description                                                                                                                                                                                                                                                                                                                                   |
+| :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Best Trading Experience** | Ultra Swap is the best trading experience in crypto, it handles all the complexities and headaches such as slippage protection, transaction landing and more.                                                                                                                                                                                      |
+| **RPC-less**                | You do not need to provide a RPC endpoint to send transactions, get token information, or get user balances - we handle everything for you.                                                                                                                                                                                                   |
+| **Holistic Coverage**       | Ultra Swap covers all the necessary features for you to build your application, including the features mentioned below and useful information such as user wallet balances, token information, and more.                                                                                                                                       |
+| **Integrator Fees**         | Ultra Swap allows you to add custom integrator fees to your transactions, on top of Jupiter's fees. Refer to the [Add Fees To Ultra Swap](/docs/ultra/add-fees-to-ultra) guide for more information.                                                                                                                                            |
+| **Developer Support**       | Get the [best developer support in our Discord](https://discord.gg/jup).                                                                                                                                                                      |
+| **World Class Support**     | Ultra Swap is the best trading experience in crypto, it handles all the complexities such as slippage protection and transaction landing, and if you ever face any issues or need help when using Ultra Swap, our support team is here to assist you 24/7. Read more about [Ultra Swap Customer Support](/resources/support#customer-support). |
+
+## What About Legacy Swap API?
+
+Ultra Swap API is the next evolution of our swap infrastructure, designed and continuously optimized to deliver the best possible trading experience on Solana. We are focused on providing a high-performance, reliable, and feature-rich API that incorporates the latest advancements and optimizations for users and integrators.
+
+While Ultra Swap API is engineered for optimal performance and ease of integration, the Legacy Swap API remains available for developers who require advanced customization, such as:
+
+* Adding custom instructions.
+* Incorporating Cross Program Invocation (CPI) calls.
+* Selecting specific broadcasting strategies for signed transactions (e.g., priority fee, Jito, etc.).
+* Choosing which DEXes or AMMs to route through.
+* Modifying the number of accounts used in a transaction.
+
+If your use case demands these highly custom features, the Legacy Swap API may be more suitable. However, it also requires you to manage many aspects that Ultra Swap API handles automatically, including:
+
+* **RPC management**: Retrieving wallet balances, broadcasting, and tracking transactions.
+* **Transaction fee selection**: Managing priority fees, Jito fees, and more.
+* **Slippage optimization**: Determining the best slippage settings for trade success and price protection.
+* **Transaction broadcasting**: Ultra Swap leverages a proprietary transaction engine for superior speed and reliability.
+* **Swap result parsing**: Handling transaction polling, parsing, and error management.
+
+For most developers and applications, Ultra Swap API is the recommended choice, as it is purpose-built and continually improved to provide the best possible swap experience on Solana.

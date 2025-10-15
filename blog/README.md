@@ -27,7 +27,7 @@ Examples:
 
 ## Overview
 
-1. **Create the MDX file**: Use `template.mdx` as a starting point
+1. **Create the MDX file**: Use existing blog posts as a starting point
 2. **Update frontmatter**: Fill in all the frontmatter fields
 3. **Write your content**: Use standard Markdown syntax for your blog post content.
 4. **Add to navigation**: Update `docs.json` and `blog/index.mdx` to include the new post.
@@ -36,7 +36,7 @@ Examples:
 ## Step By Step
 
 ### Step 1: Create the MDX file
-Use the template file `blog/template.mdx` to create your new blog post at `blog/your-post-slug.mdx`
+Use existing blog posts as a starting point to create your new blog post at `blog/your-post-slug.mdx`
 
 ### Step 2: Update the frontmatter
 Edit the metadata at the top of your new file.

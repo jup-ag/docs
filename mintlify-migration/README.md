@@ -1,6 +1,6 @@
-# Jupiter Cloud
+# Jupiter Developers Documentation
 
-Welcome to Jupiter Cloud! You'll find detailed API, powerful tool kits and technical deep dives built/written by the team to help you build with Jupiter.
+Welcome to Jupiter! You'll find detailed API, powerful tool kits and technical deep dives built/written by the team to help you build with Jupiter.
 
 ## Contributing
 To contribute to our documentation, please follow the steps below.

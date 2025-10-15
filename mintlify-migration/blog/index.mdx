@@ -1,58 +1,27 @@
 ---
-title: "Jupiter Cloud Blog"
-description: "Stay updated with the latest developments, technical insights, and announcements from Jupiter"
-mode: "custom"
+title: "Overview"
+description: "Technical deep dives into Jupiter products, team's research and learnings"
+mode: "wide"
 ---
 
-<div className="relative min-h-screen text-[#181D27] dark:text-[#F9F9FB]">
-    <div className="w-full opacity-60 overflow-hidden">
-    </div>
-    {/* Pinned Article */}
-    <div className="max-w-6xl mx-auto px-4 pt-8 pb-8">
-        <a href="/blog/ultra-v3" className="block group cursor-pointer">
-            <div className="rounded-xl overflow-hidden bg-black hover:shadow-xl border border-transparent hover:border-[#C7F284] transition-all duration-200">
-                <div className="md:flex">
-                    <div className="md:w-1/2">
-                        <img
-                            src="/static/blog/ultra-v3/ultra-v3.png"
-                            alt="Ultra Swap V3: A Technical Deep Dive into Best-in-Class Execution"
-                            className="w-full h-64 md:h-full pointer-events-none select-none"
-                            draggable="false"
-                        />
-                    </div>
-                    <div className="md:w-1/2 p-8">
-                        <h2 className="text-2xl font-bold text-white mb-3">
-                            Introducing Ultra Swap V3: A Technical Deep Dive into Best-in-Class Execution
-                        </h2>
-                        <p className="text-gray-300 mb-4 leading-relaxed">
-                            Ultra Swap V3 represents the culmination of months of infrastructure work, algorithm optimization, and real-world testing under production load. This release fundamentally changes how we approach swap execution on Solana - read more to find out.
-                        </p>
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded flex items-center gap-1">
-                                Building With Jupiter
-                            </span>
-                            <span className="text-sm text-gray-400">Oct 15, 2025</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
+<Card title="Introducing Ultra Swap V3: A Technical Deep Dive into Best-in-Class Execution" href="/blog/ultra-v3" img="/static/blog/ultra-v3/ultra-v3.png">
+	Ultra Swap V3 represents the culmination of months of infrastructure work, algorithm optimization, and real-world testing under production load. This release fundamentally changes how we approach swap execution on Solana - read more to find out.
 
-    {/* Line break */}
-    <div className="max-w-6xl mx-auto px-4">
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
-    </div>
+	<div className="flex items-center gap-2 mb-3">
+		<span className="px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded flex items-center gap-1">
+			Building With Jupiter
+		</span>
+		<span className="text-sm text-gray-400">Oct 15, 2025</span>
+	</div>
+</Card>
 
-    <div className="max-w-6xl mx-auto pt-8 pb-8 relative px-4">
-        <Columns cols={3}>
-            <Card title="Jupiter Cloud" href="/blog/jupiter-cloud" img="/static/blog/jupiter-cloud/jupiter-cloud.png">
-                Our comprehensive new developer platform designed to empower developers building with Jupiter.
-            </Card>
-
-            <Card title="More Articles Coming Soon" href="/resources/support" img="/static/blog/stay-tuned.png">
-                Stay tuned for more technical insights and updates from Jupiter Cloud
-            </Card>
-        </Columns>
-    </div>
+{/* Line break */}
+<div className="max-w-6xl mx-auto px-4 pt-8 pb-8">
+	<div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
 </div>
+
+<Columns cols={3}>
+	<Card title="More Articles Coming Soon" href="/resources/support" img="/static/blog/stay-tuned.png">
+		Stay tuned for more technical insights and updates from Jupiter
+	</Card>
+</Columns>

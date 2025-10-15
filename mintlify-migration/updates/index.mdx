@@ -7,11 +7,14 @@ description: "Announcements and Changes"
 
 ## Ultra V3
 We're excited to introduce Ultra V3, featuring major improvements on quoting and swap execution for the Ultra Swap API.  
-[Read the full announcement here](/blog/ultra-v3)!
-
-## Jupiter Cloud  
-We're excited to introduce Jupiter Cloud, our comprehensive new developer platform designed to empower developers building with Jupiter.  
-[Read the full announcement here](/blog/jupiter-cloud)!
+* [Read the full technical deep dive in the Jupiter Developer Blog](/blog/ultra-v3).
+* **IronJup - Sub-Second Transaction Landing**: Transaction sending infrastructure helps reduce landing time by 50-66% compared to traditional methods and significantly reduces MEV opportunities.
+* **Just-In-Time Simulation to Verify Executable Price**: Rank quotes from multiple routers based on executable price by simulating quotes on-chain to verify actual executable price vs quoted price.
+* **Just-In-Time Market Revival**: Dynamically re-indexes markets to enable tradability for all tokens.
+* **Reduce Pre-Graduation Quote Latency**: Optimized Pump.fun pre-graduation routing logic by skipping multi-route aggregation to improve quote latency from 200ms to 10ms - a 90% improvement.
+* **Slippage Optimization**: Automatically prioritize slippage-protected routes over purely price-optimized routes and increase volatility sensitivity for tokens with high historical volatility patterns.
+* **Gasless Support Coverage**: Expanded coverage to Token2022 tokens, memecoin-to-memecoin swaps (when liquidity permits), and reduced minimum trade size to ~$10 USD.
+* **[Try Ultra Swap API](/docs/ultra)**: Ultra V3 features are live in the Ultra Swap API V1, try it and let us know your feedback!
 </Update>
 
 <Update label="August 2025" description="">

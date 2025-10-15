@@ -549,20 +549,18 @@
       },
       {
         "tab": "Updates",
-        "pages": ["updates/index"]
-      },
-      {
-        "tab": "Blog",
-        "groups": [
+        "pages": [
+          "updates/index",
           {
-            "group": " ",
-            "pages": ["blog/index"]
-          },
-          {
-            "group": "Articles",
+            "group": "Blog",
             "pages": [
-              "blog/ultra-v3",
-              "blog/jupiter-cloud"
+              "blog/index",
+              {
+                "group": "Articles",
+                "pages": [
+                  "blog/ultra-v3"
+                ]
+              }
             ]
           }
         ]
@@ -591,13 +589,13 @@
   "logo": {
     "light": "/logo/logo.png",
     "dark": "/logo/logo.png",
-    "href": "https://cloud.jup.ag/"
+    "href": "https://dev.jup.ag/"
   },
   "navbar": {
     "primary": {
       "type": "button",
       "label": "Blog",
-      "href": "https://cloud.jup.ag/blog"
+      "href": "https://dev.jup.ag/blog"
     }
   },
   "footer": {
@@ -613,19 +611,19 @@
         "items": [
           {
             "label": "Support",
-            "href": "https://cloud.jup.ag/resources/support"
+            "href": "https://dev.jup.ag/resources/support"
           },
           {
             "label": "Guidelines",
-            "href": "https://cloud.jup.ag/legal"
+            "href": "https://dev.jup.ag/legal"
           },
           {
             "label": "Legal",
-            "href": "https://cloud.jup.ag/legal/sdk-api-license-agreement"
+            "href": "https://dev.jup.ag/legal/sdk-api-license-agreement"
           },
           {
             "label": "Brand Kit",
-            "href": "https://cloud.jup.ag/resources/brand-kit"
+            "href": "https://dev.jup.ag/resources/brand-kit"
           }
         ]
       }
@@ -633,17 +631,17 @@
   },
   "seo": {
     "metatags": {
-        "og:title": "Jupiter Cloud",
+        "og:title": "Jupiter Developers",
         "og:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
         "og:image": "/logo/og.png",
         "og:type": "website",
-        "og:url": "https://cloud.jup.ag/",
-        "og:site_name": "Jupiter Cloud",
+        "og:url": "https://dev.jup.ag/",
+        "og:site_name": "Jupiter Developers",
         "description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
         "keywords": "Jupiter, Jupiter Developer Documentation, Jupiter API, Jupiter SDK, Jupiter Swap, Jupiter V6, Jupiter Lend, Jupiter Perps, Jupiter Studio, Jupiter Tool Kits, Jupiter Plugin, Jupiter Terminal, Jupiter Mobile Adapter, Jupiter Wallet Kit, Jupiter Referral Program, Jupiter Routing, Solana, Crypto, Solana Swap, Crypto Swap",
         "twitter:card": "summary_large_image",
         "twitter:site": "@JupiterExchange",
-        "twitter:title": "Jupiter Cloud",
+        "twitter:title": "Jupiter Developers",
         "twitter:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
         "twitter:image": "/logo/og.png"
     }

@@ -52,7 +52,12 @@ The Jupiter Ultra Swap API allows you to add integrator fees to the orders.
     </Accordion>
 
     <Accordion title="Token support">
-        You can now take fees in SPL and Token2022 tokens. As long as `feeMint` is a Token2022 and you have the valid referral token account created for the specific fee mint, you can take fees in them.
+        You can now take fees in SPL or Token2022 tokens. As long as you have the referral token account initialized before calling `/order`, and the `feeMint` is one of the token mints you have initialized for, your fees will apply.
+
+        * For example, if you have the referral token account initialized for `SOL` only and the `feeMint` is `SOL`, your fees will be applied.
+        * If you have the referral token account initialized for `USDC` only and the `feeMint` is `USDC`, your fees will be applied.
+        * If you have the referral token account initialized for `XYZ` only BUT the `feeMint` is `USDC`, your fees will not be applied.
+        
     </Accordion>
 </AccordionGroup>
 

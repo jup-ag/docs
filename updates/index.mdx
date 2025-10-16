@@ -5,6 +5,16 @@ description: "Announcements and Changes"
 
 <Update label="October 2025" description="">
 
+## Ultra V3
+We're excited to introduce Ultra V3, featuring major improvements on quoting and swap execution for the Ultra Swap API.  
+* [Read the full technical deep dive in the Jupiter Developer Blog](/blog/ultra-v3).
+* **Execution-Optimized Predictive Routing**: Simulates routes on-chain to verify executable price versus quote and predict potential slippage to select the route with the least overall incurred slippage at the time of execution.
+* **Hyperlane: Sub-Second Transaction Landing**: Transaction sending infrastructure helps reduce landing time by 50-66% compared to traditional methods and significantly reduces MEV opportunities.
+* **Just-In-Time Market Revival**: Dynamically re-indexes markets to enable tradability for all tokens.
+* **Reduce Pre-Graduation Quote Latency**: Optimized pre-graduated bonding curve markets routing logic by skipping multi-route aggregation to improve quote latency from 200ms to 10ms - a 90% improvement.
+* **Slippage Optimization**: Automatically prioritize slippage-protected routes over purely price-optimized routes and increase volatility sensitivity for tokens with high historical volatility patterns.
+* **[Try Ultra Swap API](/docs/ultra)**: Ultra V3 features are live in the Ultra Swap API V1, try it and let us know your feedback!
+
 ## Jupiter Aggregator V6 Program Update
 * 4 new instruction types are introduced:
     * `route_v2`

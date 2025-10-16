@@ -18,60 +18,84 @@ Ultra Swap is the most advanced yet developer-friendly solution for building tra
 
 ## Features
 
+<Callout icon="book-open" color="#FFC107" iconType="regular">[Read our latest blog on Ultra V3](/blog/ultra-v3).</Callout>
+
 <AccordionGroup>
 <Accordion title="Juno Liquidity Engine">
-Ultra Swap utilizes the latest [Juno Liquidity Engine](/docs/routing) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines both Metis and Jupiter Z (RFQ), and third-party liquidity sources, for the best possible price. It also includes self-learning capabilities (to detect and sideline low-quality liquidity sources) which creates a competitive environment for all liquidity sources to continously optimize their performance and price.
+Ultra Swap utilizes the latest [Juno Liquidity Engine](/docs/routing) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines: improved versions of Metis and JupiterZ, and third-party liquidity sources, for the best possible price.
+
+It also includes self-learning capabilities (to detect and sideline low-quality liquidity sources) which creates a competitive environment for all liquidity sources to continously optimize their performance and price.
 </Accordion>
 
-<Accordion title="Transaction Sending">
-Over the years of experiment and development, we have optimized and continues to better our transaction sending service. Using various strategies involving multiple RPCs, priority fees/Jito tips estimation, and more, we are able to send transactions at a blazing fast speed with a high success rate (while still being [MEV-protected](#mev-protection)).
+<Accordion title="Execution-Optimized Predictive Routing">
+Ultra runs Predictive Routing for every route before execution:
+1. Aggregated routers return their best quotes.
+2. Ultra performs on-chain simulation of each route.
+3. Simulating quotes on-chain to verify actual executable price vs quoted price.
+4. Predicting potential slippage for each route, and dynamically prioritizing the route with the least overall incurred slippage at the time of execution.
 
-<Note>
-  95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine.
-
-  For more information on latencies, [refer to the latency section](#latency).
-</Note>
+Results:
+* Quotes reflect actual on-chain execution, not theoretical best-case scenarios.
+* With this feature, we have increased our swap success rate from 85% to ~96%.
 </Accordion>
 
-<Accordion title="MEV Protection">
-According to both our internal monitoring system and external resources such as [Sandwiched.me](https://sandwiched.me/sandwiches), Ultra has the lowest incidence of MEV attacks across all existing applications, by far. Comparing using the ratio of volume to the amount of value extracted, Ultra Swap has the highest volume yet the lowest value extracted.
+<Accordion title="Sub-second Transaction Landing & MEV Protection">
+Ultra is now using our new in-house transaction-landing engine, Hyperlane, which allows us to send transactions via our own infrastructure: designed to make every trade faster, more private, and more precise.
+* Leverage our own validator stake and dedicated R&D efforts.
+* Complete transaction privacy until on-chain execution.
+* Eliminate the risk of artificial delays and front-running, ensuring faster and more secure execution for our users.
+
+Results:
+* Landing Latency: Improved by 50-66% compared to our previous approach that relied on multiple providers
+    * Lands in 0–1 block (~50–400ms)
+    * Compared to the 1–3 blocks (~400ms–1.2s) previously.
+* MEV Protection: Routing transactions through our own infrastructure provides:
+    * Complete transaction privacy until on-chain execution.
+    * Reduce frontrunning exposure - transactions are invisible to public mempool scanners.
+    * Reduce risk of sandwich attack vectors - [see our blog post on Ultra's swap volume to value extracted ratio](/blog/ultra-v3#mev-protection).
 </Accordion>
 
 <Accordion title="Real Time Slippage Estimator">
-Building on top of our previous versions of slippage estimation/optimization engines, we have developed a new Real Time Slippage Estimator (RTSE), that is able to intelligently estimate the best possible slippage to use at the time of execution, balancing between trade success and price protection. RTSE uses a variety of heuristics, algorithms and monitoring to ensure the best user experience:
+Building on top of our previous versions of slippage estimation/optimization engines, we have developed a new Real Time Slippage Estimator (RTSE), that is able to intelligently estimate the best possible slippage to use at the time of execution, balancing between trade success and price protection.
 
-* **Heuristics**: Token categories, historical and real-time slippage data, and more.
-* **Algorithms**: Exponential Moving Average (EMA) on slippage data, and more.
-* **Monitoring**: Real-time monitoring of failure rates to ensure reactiveness to increase slippage when necessary.
+RTSE uses a variety of heuristics, algorithms and monitoring to ensure the best user experience:
+
+* Heuristics: Token categories, historical and real-time slippage data, and more.
+    * Uses token categories to intelligently estimate slippage for different token types.
+    * Automatic prioritization of slippage-protected routes over purely price-optimized routes.
+    * Increased volatility sensitivity for tokens with high historical volatility patterns.
+* Algorithms: Exponential Moving Average (EMA) on slippage data, and more.
+* Monitoring: Real-time monitoring of failure rates to ensure reactiveness to increase slippage when necessary.
 </Accordion>
 
 <Accordion title="Gasless">
 Ultra Swap provides different gasless mechanisms for different scenarios.
 
-* **Gasless via Jupiter Z (RFQ)**: All swaps routed via Jupiter Z are gasless, as the market maker is the fee payer for the transaction.
-* **Gasless via Gasless Support**: Depending on the tokens and trade sizes of your swap, Ultra Swap will automatically determine if it can provide gasless support to your swap by helping you pay for the transaction fee of your swap - you can identify this via the secondary signer in the transaction.
+* Gasless via Jupiter Z (RFQ): All swaps routed via Jupiter Z are gasless, as the market maker is the fee payer for the transaction.
+* Gasless via Gasless Support: Depending on the tokens and trade sizes of your swap, Ultra Swap will automatically determine if it can provide gasless support to your swap by helping you pay for the transaction fee of your swap - you can identify this via the secondary signer in the transaction.
 </Accordion>
 
-<Accordion title="Latency">
+<Accordion title="API Latency">
 95% of all swaps are executed under 2 seconds via our proprietary transaction sending engine.
 
-| Endpoint    | Description                                                                                           | Latency (P90 Average)   |
+| Endpoint    | Description                                                                                           | Latency (P50 Average)   |
 | :----------- | :----------------------------------------------------------------------------------------------------- | :----------------------- |
-| `/order`    | Aggregating across multiple liquidity sources and selecting the best price.                           | 500ms                   |
-| `/execute`  | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Metis: 1.5s; JupiterZ: 5s |
-| `/balances` | Retrieving the user's balances.                                                                       | 200ms                   |
-| `/shield`   | Enhanced token security feature to provide critical token information.                                | 400ms                   |
+| `/order`    | Aggregating across multiple liquidity sources and selecting the best price.                           | 300ms                   |
+| `/execute`  | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Roundtrip<br/>Metis: 700ms; JupiterZ: 2s |
+| `/holdings` | Retrieving the user's balances.                                                                       | 70ms                   |
+| `/shield`   | Enhanced token security feature to provide critical token information.                                | 150ms                   |
+| `/search`   | Searching for a token by its symbol, name or mint address.                                            | 15ms                   |
 </Accordion>
 </AccordionGroup>
 
 | Feature                     | Description                                                                                                                                                                                                                                                                                                                                   |
-| :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| :-------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Best Trading Experience** | Ultra Swap is the best trading experience in crypto, it handles all the complexities and headaches such as slippage protection, transaction landing and more.                                                                                                                                                                                      |
-| **RPC-less**                | You do not need to provide a RPC endpoint to send transactions, get token information, or get user balances - we handle everything for you.                                                                                                                                                                                                   |
-| **Holistic Coverage**       | Ultra Swap covers all the necessary features for you to build your application, including the features mentioned below and useful information such as user wallet balances, token information, and more.                                                                                                                                       |
-| **Integrator Fees**         | Ultra Swap allows you to add custom integrator fees to your transactions, on top of Jupiter's fees. Refer to the [Add Fees To Ultra Swap](/docs/ultra/add-fees-to-ultra) guide for more information.                                                                                                                                            |
-| **Developer Support**       | Get the [best developer support in our Discord](https://discord.gg/jup).                                                                                                                                                                      |
-| **World Class Support**     | Ultra Swap is the best trading experience in crypto, it handles all the complexities such as slippage protection and transaction landing, and if you ever face any issues or need help when using Ultra Swap, our support team is here to assist you 24/7. Read more about [Ultra Swap Customer Support](/resources/support#customer-support). |
+| **RPC-less**                | You do not need to maintain your own RPC for blockchain actions such as send transactions, get token information, or get user balances - we handle everything for you.                                                                                                                                                                                                   |
+| **API Coverage**            | Ultra Swap covers all the necessary features for you to build your application, including the features mentioned below and useful information such as user wallet balances, token information, and more.                                                                                                                                       |
+| **Integrator Fee**          | Ultra Swap allows you to add custom integrator fees to your transactions, on top of Jupiter's fees. Refer to the [Add Fees To Ultra Swap](/docs/ultra/add-fees-to-ultra) guide for more information.                                                                                                                                            |
+| **Developer Support**       | Get help from our [developer support in Discord](https://discord.gg/jup).                                                                                                                                                                      |
+| **World Class Support**     | If you ever face any issues or need help when using Ultra Swap, our support team is here to assist you 24/7. Read more about [Ultra Swap Customer Support](/resources/support#customer-support). |
 
 ## What About Legacy Swap API?
 

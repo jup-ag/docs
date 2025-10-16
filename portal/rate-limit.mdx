@@ -68,7 +68,16 @@ Requests are distributed to each bucket:
   * Lite users do not have a separate Price API Bucket — all requests are counted against the Default Bucket.
 </Info>
 
-## Dynamic Rate Limit (BETA)
+## Dynamic Rate Limit
+
+<Note>
+  **INFO**
+
+  Dynamic Rate Limit is currently in BETA.
+
+  * The rate limit is subject to changes as we experiment with the Dynamic Rate Limit system.
+  * If you find that the rate limit is too restrictive, please reach out to us in [Discord](https://discord.gg/jup).
+</Note>
 
 The [**Ultra Swap API**](/docs/ultra) uses a unique rate limiting mechanism that scales with your **executed swap volume** over time.
 
@@ -92,14 +101,6 @@ Every **10 minutes**
 | $10,000     | 50 Base + 1 Added = 51    | 10 seconds            |
 | $100,000    | 50 Base + 11 Added = 61   | 10 seconds            |
 | $1,000,000  | 50 Base + 115 Added = 165 | 10 seconds            |
-
-<Info>
-  **NOTE**
-
-  The formula is subject to changes as we experiment with the Dynamic Rate Limit system.
-
-  If you find that the rate limit is too restrictive, please reach out to us in Discord.
-</Info>
 
 ## Managing Rate Limits
 

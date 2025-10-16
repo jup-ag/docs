@@ -15,7 +15,31 @@ We're excited to introduce Ultra V3, featuring major improvements on quoting and
 * **Slippage Optimization**: Automatically prioritize slippage-protected routes over purely price-optimized routes and increase volatility sensitivity for tokens with high historical volatility patterns.
 * **Gasless Support Coverage**: Expanded coverage to Token2022 tokens, memecoin-to-memecoin swaps (when liquidity permits), and reduced minimum trade size to ~$10 USD.
 * **[Try Ultra Swap API](/docs/ultra)**: Ultra V3 features are live in the Ultra Swap API V1, try it and let us know your feedback!
+
+## Jupiter Aggregator V6 Program Update
+* 4 new instruction types are introduced:
+    * `route_v2`
+    * `exact_out_route_v2`
+    * `shared_accounts_route_v2`
+    * `shared_accounts_exact_out_route_v2`
+* You can find the details in the latest IDL: [Solscan](https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#programIdl)
+* V1 instructions will continue to be valid and usable.
+
+## Integrator Fee
+**Ultra Swap API**
+* Integrator fee for Ultra now supports Token2022 tokens.
+* No additional parameters are required, simply create Token2022 referral token accounts for your referral account.
+* You can find the details in the [Add Fees To Ultra Swap](/docs/ultra/add-fees-to-ultra) guide.
+
+**Legacy Swap API**
+* Integrator fee for Legacy Swap now supports Token2022 tokens.
+* New [`instructionVersion` parameter](http://localhost:3000/api-reference/swap/quote#parameter-instruction-version) is introduced to the Legacy Swap API's Quote endpoint to support the new instruction types.
+* To collect fees in Token2022 tokens, create Token2022 token accounts and pass in via `feeAccount`.
+* You can find the details in the [Add Fees To Swap](/docs/swap/add-fees-to-swap) guide.
+
 </Update>
+
+---
 
 <Update label="August 2025" description="">
 ## Sunsetting Legacy Endpoints
@@ -32,6 +56,8 @@ We’re sunsetting several legacy endpoints over the next few weeks by gradually
 </Danger>
 </Update>
 
+---
+
 <Update label="June 2025" description="">
 ## Deprecation of Price API V2 and Tokens API V1
 
@@ -46,6 +72,8 @@ We’re sunsetting several legacy endpoints over the next few weeks by gradually
 * The older versions will be deprecated by 30 September 2025
 </Danger>
 </Update>
+
+---
 
 <Update label="March 2025" description="">
 ## API Gateway: Improvements
@@ -80,6 +108,8 @@ We will be deploying 2 different endpoints, 1 for free usage and 1 for plans wit
 </Danger>
 </Update>
 
+---
+
 <Update label="March 2025" description="">
 ## Trigger API: New Hostname and Breaking Changes
 
@@ -100,6 +130,8 @@ We will be deploying 2 different endpoints, 1 for free usage and 1 for plans wit
 | `/limit/v2/openOrders`   `/limit/v2/orderHistory` | `/trigger/v1/getTriggerOrders` |
 </Accordion>
 </Update>
+
+---
 
 <Update label="January 2025" description="">
 ## API Gateway: New Hostnames and API Keys

@@ -41,7 +41,7 @@ This is a POST request to `/createOrder` endpoint, where you pass in the necessa
 
   * Adding slippage to the order: This corresponds to the "Ultra" mode on jup.ag frontend. Higher slippage increases execution success rate but may result in less favorable prices. Omitting this parameter (or setting it to 0) corresponds to "Exact" mode. [Learn more about UI modes vs API implementation](/docs/trigger#faq).
   * Setting an expiry date on the order.
-  * Adding fees through our referral program, please ensure that your `feeAccount` has the necessary `referralTokenAccount`s of the output mint of the limit order for it to work, you can learn more about creating them dynamically in the [Add Fees To Swap](/docs/swap/add-fees-to-swap) guide. (Note that the fees are transferred only after the trigger order has been executed.)
+  * Adding fees through our referral program, please ensure that your `feeAccount` has the necessary `referralTokenAccount`s of the output mint of the limit order for it to work, you can learn more about creating them dynamically in the [Add Fees To Swap](/docs/swap/add-fees-to-swap#for-trigger-api-integrator-fee) guide. (Note that the fees are transferred only after the trigger order has been executed.)
 </Tip>
 
 **Create a POST request to the `/createOrder` endpoint.**

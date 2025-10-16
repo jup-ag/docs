@@ -21,135 +21,18 @@ description: "Walkthrough on how to add fees to the Legacy Swap API."
   The Referral Program is an open source program by Jupiter to provide referral fees for integrators who are integrating Jupiter Swap and Jupiter Limit Order. You can check out the code [here](https://github.com/TeamRaccoons/referral) to gain a better understanding of how it works.
 </Info>
 
-## Use Case
+## Overview
 
 By default, there are **zero** protocol fees on Jupiter Swap. Integrators have the option to introduce a platform fee denoted in basis points, e.g. **20 bps** for **0.2%** of the token input or output.
 
 ### Important Notes
 
-* **Input mint or the output mint** on the swap for ExactIn.
-* **Input mint ONLY** on the swap for ExactOut.
-* Example, if you swap JUP to USDC, you cannot take fees in SOL, it has to be part of the swap.
-* It does not support Token2022 tokens.
-* Referral Program is no longer required.
-
-<Accordion title="Via Referral Program (Required only for Trigger API)">
-
-  **Important Notes**
-
-  * The Jupiter Swap project account for the Referral Program is `45ruCyfdRkWpRNGEqWzjCiXRHkZs8WXCLQ67Pnpye7Hp`.
-
-  * The `referralTokenAccount` can either be:
-
-    * **Input mint or the output mint** on the swap for ExactIn.
-    * **Input mint ONLY** on the swap for ExactOut.
-
-  * You can use the [Dashboard](https://referral.jup.ag/dashboard), [SDK](https://github.com/TeamRaccoons/referral/blob/main/example/src/createReferralAccount.ts) or [API](https://referral.jup.ag/api) to set up the `referralAccount` and `referralTokenAccount` in this guide.
-
-  **Let’s Get Started**
-
-  **1. Set up**
-
-  You will need to complete the prerequisites and understanding of [Environment Setup](/get-started/environment-setup) and [Get Quote and Swap](/docs/swap/get-quote) guide as this is reliant on the Legacy Swap API.
-
-  **Obtain `referralAccount` and `referralTokenAccount`**
-
-  There are 3 ways you can set up a referral account.
-
-  1. Use our [referral dashboard](https://referral.jup.ag/dashboard) to create them. After creating, remember to find your `Referral Key` on the page and the associated token accounts.
-  2. Use our SDK to create them. You can use the [example scripts](https://github.com/TeamRaccoons/referral/tree/main/example/src) to create.
-  3. Use our API to create them. You can use this [API reference](https://referral.jup.ag/api) to create.
-
-  **Obtain `mintAccount`**
-
-  As for the mint account, assuming you have an interface where a user swaps, you will know up front what are the input or output mints. For the sake of example, we will use a hardcoded mint public key.
-
-  ```js
-  const referralAccount = new Publickey('ReplaceWithPubkey');
-  const mintAccount = new Publickey('So11111111111111111111111111111111111111112');
-  ```
-
-  **2. Set your referral fee in Quote**
-
-  Setting your referral fee is simple, just add `platformFeeBps` parameter to the `/quote` endpoint.
-
-  In this example, we set `platformFeeBps` to `20` which equates to 0.2%.
-
-  ```js
-  const quoteResponse = await (
-    await fetch(
-        'https://lite-api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000&slippageBps=50&restrictIntermediateTokens=true&platformFeeBps=20'
-    )
-  ).json();
-
-console.log(JSON.stringify(quoteResponse, null, 2));
-  ```
-
-  **3. Set your referral token account in Swap**
-
-  In order to refer and receive fees from all types of tokens, you will need to have already initialize `referralTokenAccount`s (owned by your `referralAccount`) for the mint in the swap. By calling the Swap API with the parameter `feeAccount`, which is the `referralTokenAccount`, you will receive the serialized swap transaction that will set a fee to be taken from the referred and sent to that token account.
-
-  In this code block, we will be using the SDK to try to find the `referralTokenAccount` based on our previously defined `referralAccount` and `mintAccount`.
-
-  * If the token account is found, it will proceed to the Legacy Swap API.
-  * If the token account is not found, it will send a transaction to the network to attempt to initialize one for the mint. **Do note that transactions may fail due to various reasons like Priority Fees.**
-
-```js
-import { ReferralProvider } from "@jup-ag/referral-sdk";
-
-const { tx, referralTokenAccountPubKey } = await provider.initializeReferralTokenAccount({
-    payerPubKey: wallet.publicKey,
-    referralAccountPubKey: referralAccount,
-    mint: mintAccount,
-});
-
-const referralTokenAccount = await connection.getAccountInfo(referralTokenAccountPubKey);
-
-// Attempt to initialize a token account
-if (!referralTokenAccount) {
-    const signature = await sendAndConfirmTransaction(connection, tx, [wallet]);
-    console.log({ signature, referralTokenAccountPubKey: referralTokenAccountPubKey.toBase58() });
-
-// Since initialized, it will carry on
-} else {
-    console.log(`referralTokenAccount ${referralTokenAccountPubKey.toBase58()} for mint ${mintAccount.toBase58()} already exists`);
-};
-
-const feeAccount = referralTokenAccountPubKey;
-console.log(feeAccount);
-  ```
-
-  However, if you are confident that the `referralTokenAccount` for specific mints have been created, you can use this method to get it. **Do note that, even if the token account is not intialized, it will return a pubkey as it is a Program Derived Address. [Read more here.](https://solana.com/docs/core/pda#findprogramaddress)**
-
-```js
-const [feeAccount] = PublicKey.findProgramAddressSync(
-    [
-        Buffer.from("referral_ata"), // A string that signifies the account type, here "referral_ata."
-        referralAccount.toBuffer(), //  The public key of the referral account converted into a buffer.
-        mintAccount.toBuffer(), // The mint public key, converted into a buffer.
-    ],
-    new PublicKey("REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3") // The public key of the Referral Program
-);
-```
-
-  Using the above, we will now know the `feeAccount` to be passed in as the parameter in Legacy Swap API. You can refer to the [Build Swap Transaction](/docs/swap/build-swap-transaction) guide to add any parameters where necessary to help transaction sending, etc.
-
-```js
-  const swapResponse = await (
-    await fetch('https://lite-api.jup.ag/swap/v1/swap', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            quoteResponse,
-            userPublicKey: wallet.publicKey.toBase58(), // Pass in actual referred user in production
-            feeAccount: feeAccount,
-        })
-    })
-).json();
-```
-</Accordion>
+* For ExactIn swaps, the `feeAccount`'s mint can be either the **input mint or output mint** of the swap pair, and not any other mints.
+* For ExactOut swaps, the `feeAccount`'s mint can only be the **input mint** of the swap pair.
+* Example, if you swap JUP to USDC, you cannot take fees in SOL, it has to be part of the swap pair.
+* It supports SPL and Token2022 tokens.
+  * [Refer to this update for support of Token2022 tokens](/updates#jupiter-aggregator-v6-program-update).
+* Referral Program is no longer required for Legacy Swap API.
 
 ### 1. Set up
 
@@ -164,14 +47,27 @@ In this example, we set `platformFeeBps` to `20` which equates to 0.2%.
 ```js
 const quoteResponse = await (
     await fetch(
-        'https://lite-api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000&slippageBps=50&restrictIntermediateTokens=true&platformFeeBps=20'
+        'https://lite-api.jup.ag/swap/v1/quote? +
+        'inputMint=So11111111111111111111111111111111111111112&' +
+        'outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&' +
+        'amount=100000&' +
+        'slippageBps=50&' +
+        'restrictIntermediateTokens=true&' +
+        'platformFeeBps=20&' +
+        'instructionVersion=V2' // required if you want to collect fees in Token2022 tokens
     )
   ).json();
 ```
 
 ### 3. Set your feeAccount in Swap
 
-In the `/swap` endpoint, you will need to pass in the `feeAccount` parameter. The `feeAccount` is any token account that will receive the fees from the swap. Do ensure that the token account is initialized and is the correct mint to receive the fees in.
+In the `/swap` endpoint, you will need to pass in the `feeAccount` parameter.
+* The `feeAccount` is a token account that will receive the fees from the swap - the mint of the token account has to be part of the swap pair.
+* Do ensure that the token account needs to be initialized beforehand and is the correct mint to receive the fees in.
+* For ExactIn swaps, the `feeAccount`'s mint can be either the **input mint or output mint** of the swap pair, and not any other mints.
+* For ExactOut swaps, the `feeAccount`'s mint can only be the **input mint** of the swap pair.
+* Example, if you swap JUP to USDC, you cannot take fees in SOL, it has to be part of the swap pair.
+* Refer to the [Create Token Account](#create-token-account) section to create a token account.
 
 ```js
 const swapResponse = await (
@@ -183,7 +79,7 @@ const swapResponse = await (
         body: JSON.stringify({
             quoteResponse,
             userPublicKey: wallet.publicKey, // Pass in actual referred user in production
-            feeAccount: feeAccount,
+            feeAccount: feeAccount, // feeAccount is the token account that will receive the fees
         })
     })
 ).json();
@@ -219,3 +115,111 @@ let ata = await createAssociatedTokenAccount(
 );
 console.log(`ATA: ${ata.toBase58()}`);
 ```
+
+## For Trigger API Integrator Fee
+
+**Important Notes**
+
+* The Jupiter Swap project account for the Referral Program is `45ruCyfdRkWpRNGEqWzjCiXRHkZs8WXCLQ67Pnpye7Hp`.
+
+* The `referralTokenAccount` can either be:
+
+  * **Input mint or the output mint** on the swap for ExactIn.
+  * **Input mint ONLY** on the swap for ExactOut.
+
+* You can use the [Dashboard](https://referral.jup.ag/dashboard), [SDK](https://github.com/TeamRaccoons/referral/blob/main/example/src/createReferralAccount.ts) or [API](https://referral.jup.ag/api) to set up the `referralAccount` and `referralTokenAccount` in this guide.
+
+**1. Set up**
+
+**Obtain `referralAccount` and `referralTokenAccount`**
+
+There are 2 ways you can set up a referral account.
+
+1. Use our [referral dashboard](https://referral.jup.ag/dashboard) to create them. After creating, remember to find your `Referral Key` on the page and the associated token accounts.
+2. Use our SDK to create them. You can use the [example scripts](https://github.com/TeamRaccoons/referral/tree/main/example/src) to create.
+
+**Obtain `mintAccount`**
+
+As for the mint account, assuming you have an interface where a user swaps, you will know up front what are the input or output mints. For the sake of example, we will use a hardcoded mint public key.
+
+```js
+const referralAccount = new Publickey('ReplaceWithPubkey');
+const mintAccount = new Publickey('So11111111111111111111111111111111111111112');
+```
+
+**2. Get your referral token account for `feeAccount`**
+
+In order to refer and receive fees from all types of tokens, you will need to have already initialize `referralTokenAccount`s (owned by your `referralAccount`) for the mint in the order.
+
+In this code block, we will be using the SDK to try to find the `referralTokenAccount` based on our previously defined `referralAccount` and `mintAccount`. If the token account is not found, it will send a transaction to the network to attempt to initialize one for the mint.
+
+```js
+import { ReferralProvider } from "@jup-ag/referral-sdk";
+
+const { tx, referralTokenAccountPubKey } = await provider.initializeReferralTokenAccount({
+    payerPubKey: wallet.publicKey,
+    referralAccountPubKey: referralAccount,
+    mint: mintAccount,
+});
+
+const referralTokenAccount = await connection.getAccountInfo(referralTokenAccountPubKey);
+
+// Attempt to initialize a token account
+if (!referralTokenAccount) {
+    const signature = await sendAndConfirmTransaction(connection, tx, [wallet]);
+    console.log({ signature, referralTokenAccountPubKey: referralTokenAccountPubKey.toBase58() });
+
+// Since initialized, it will carry on
+} else {
+    console.log(`referralTokenAccount ${referralTokenAccountPubKey.toBase58()} for mint ${mintAccount.toBase58()} already exists`);
+};
+
+const feeAccount = referralTokenAccountPubKey;
+console.log(feeAccount);
+  ```
+
+If you are confident that the `referralTokenAccount` for specific mints have been created, you can use this method to get it. **Do note that, even if the token account is not intialized, it will still return a pubkey as it is a Program Derived Address and is deterministic. [Read more here.](https://solana.com/docs/core/pda#findprogramaddress)**
+
+```js
+const [feeAccount] = PublicKey.findProgramAddressSync(
+    [
+        Buffer.from("referral_ata"), // A string that signifies the account type, here "referral_ata."
+        referralAccount.toBuffer(), //  The public key of the referral account converted into a buffer.
+        mintAccount.toBuffer(), // The mint public key, converted into a buffer.
+    ],
+    new PublicKey("REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3") // The public key of the Referral Program
+);
+```
+
+**3. Set your `feeAccount` and `params.feeBps`**
+
+Setting your referral fee is simple, just add `feeAccount` and `params.feeBps` parameters to the `/createOrder` endpoint.
+
+In this example, we set `params.feeBps` to `20` which equates to 0.2%.
+
+```js
+const createOrderResponse = await (
+    await fetch('https://lite-api.jup.ag/trigger/v1/createOrder', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            inputMint: inputMint.toString(),
+            outputMint: outputMint.toString(),
+            maker: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
+            payer: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3",
+            params: {
+                makingAmount: "1000000",
+                takingAmount: "300000",
+                // slippageBps: "", // Optional, by nature, trigger orders execute with 0 slippage
+                // expiredAt: "", // In unix seconds (e.g. Date.now()/1_000) or optional
+                feeBps: "20", // feeBps is the amount of fees in bps that will be sent to the fee account
+            },
+            computeUnitPrice: "auto",
+            feeAccount, // feeAccount is the token account that will receive the fees
+            // wrapAndUnwrapSol: true, // Default true or optional
+        })
+    })
+).json();
+  ```

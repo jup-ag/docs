@@ -6,13 +6,42 @@ description: "Announcements and Changes"
 <Update label="October 2025" description="">
 
 ## Ultra V3
-We're excited to introduce Ultra V3, featuring major improvements on quoting and swap execution for the Ultra Swap API.  
-* [Read the full technical deep dive in the Jupiter Developer Blog](/blog/ultra-v3).
-* **Execution-Optimized Predictive Routing**: Simulates routes on-chain to verify executable price versus quote and predict potential slippage to select the route with the least overall incurred slippage at the time of execution.
-* **Hyperlane: Sub-Second Transaction Landing**: Transaction sending infrastructure helps reduce landing time by 50-66% compared to traditional methods and significantly reduces MEV opportunities.
+We're excited to introduce Ultra V3, featuring major improvements on quoting 
+and swap execution for the Ultra Swap API.  
+
+* [Read the full technical deep dive in the Jupiter Developers Blog](/blog/ultra-v3).
+
+* **Improved Routers in Meta Aggregation**: Granular splitting of 0.01%; and began usage 
+of Golden-section and Brent's method for routing algorithms.
+
+* **Ultra Signaling for Tighter Prop AMM Quotes**: Ultra signals to Prop AMMs, allowing 
+them to confidently provide tighter quotes by distinguishing Ultra trades as "non-toxic" 
+order flow from other "toxic" order flow - 3 bps tighter (50% better) quotes for our Ultra 
+users compared to other platforms.
+
+* **Predictive Execution to Simulate Executable Price & Potential Slippage**: Simulates routes 
+on-chain to verify executable price versus quote and predict potential slippage to select the 
+route with the least overall incurred slippage at the time of execution.
+
+* **ShadowLane: Sub-Second Transaction Landing & MEV Protection**: Transaction sending 
+infrastructure helps reduce landing time by 50-66% compared to traditional methods and 
+significantly reduces MEV opportunities by 34x.
+
+* **Real-Time Slippage Estimator (RTSE) Optimizations**: Automatically prioritize 
+slippage-protected routes over purely price-optimized routes and increase volatility 
+sensitivity for tokens with high historical volatility patterns.
+
+* **Gasless Support Coverage**: Expanded gasless support coverage to Token2022 tokens, 
+memecoin-to-memecoin swaps (when liquidity permits), and reduced minimum trade size to ~$10 USD.
+
 * **Just-In-Time Market Revival**: Dynamically re-indexes markets to enable tradability for all tokens.
-* **Reduce Pre-Graduation Quote Latency**: Optimized pre-graduated bonding curve markets routing logic by skipping multi-route aggregation to improve quote latency from 200ms to 10ms - a 90% improvement.
-* **Slippage Optimization**: Automatically prioritize slippage-protected routes over purely price-optimized routes and increase volatility sensitivity for tokens with high historical volatility patterns.
+
+* **Reduce Pre-Graduation Quote Latency**: Optimized pre-graduated bonding curve markets routing logic 
+by skipping multi-route aggregation to improve quote latency from 200ms to 10ms - a 90% improvement.
+
+* **Sunsetted Legacy Jupiter Swap API**: As part of this upgrade, moving forward, we will be focusing our 
+efforts on the ongoing development and improvement of Ultra V3 with our new router, Iris.
+
 * **[Try Ultra Swap API](/docs/ultra)**: Ultra V3 features are live in the Ultra Swap API V1, try it and let us know your feedback!
 
 ## Jupiter Aggregator V6 Program Update

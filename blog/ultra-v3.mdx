@@ -1,8 +1,8 @@
 ---
-title: "Ultra V3: Apex Trading Engine"
-description: "A Technical Deep Dive into Jupiter's Best-In-Class Swap Execution Engine."
-"og:title": "Ultra V3: Apex Trading Engine"
-"og:description": "A Technical Deep Dive into Jupiter's Best-In-Class Swap Execution Engine."
+title: "Ultra V3: The Ultimate Trading Engine"
+description: "A Technical Deep Dive into Jupiter's most comprehensive trading engine with exclusive new features: Iris, ShadowLane, and Predictive Execution."
+"og:title": "Ultra V3: The Ultimate Trading Engine"
+"og:description": "A Technical Deep Dive into Jupiter's most comprehensive trading engine with exclusive new features: Iris, ShadowLane, and Predictive Execution."
 "og:image": "/static/blog/ultra-v3/ultra-v3.png"
 "og:type": "article"
 "og:site_name": "Jupiter Developers Blog"
@@ -10,27 +10,46 @@ description: "A Technical Deep Dive into Jupiter's Best-In-Class Swap Execution 
 
 ![Ultra Swap V3](/static/blog/ultra-v3/ultra-v3.png)
 
-Ultra V3 represents the culmination of months of infrastructure work, algorithm optimization, 
-and real-world testing under production load. This release fundamentally changes how we approach 
-swap execution, with measurable improvements across every aspect that matters:
+Ultra V3 is the culmination of months of infrastructure work, algorithm optimization, and real-world 
+testing in production. This release introduces Iris, ShadowLane, Predictive Execution, and more - fundamentally 
+transforming swap execution with measurable improvements at every level. 
 
-<div className="text-xs leading-snug">
-	- [Execution-Optimized Predictive Routing](#execution-optimized-predictive-routing)
-	- [Hyperlane: Sub-Second Transaction Landing](#sub-second-transaction-landing)
-	- [MEV Protection](#mev-protection)
-	- [Just-In-Time Market Revival](#just-in-time-market-revival)
-	- [Pre-graduation Routing Latency Reduction](#pre-graduation-routing-latency-reduction)
-	- [Slippage Optimization](#slippage-optimization)
-</div>
+---
 
-## Execution-Optimized Predictive Routing
+## Improved Routers in Meta Aggregation
+
+Ultra uses meta aggregation to compare and aggregate quotes from various liquidity sources such as 
+our own routers like Iris and JupiterZ, and 3rd party routers like Dflow, Hashflow, and OKX to find 
+you the best pricing from various liquidity sources.
+
+<Card title="Iris: Algorithm and Splitting Improvements">
+Meet Iris! Our new router exclusive to Jupiter Ultra, designed for better price and routing 
+performance.
+
+* Iris now utilzies better routing algorithms like [Golden-section](https://en.wikipedia.org/wiki/Golden-section_search) 
+and [Brent's method](https://en.wikipedia.org/wiki/Brent%27s_method).
+* Iris allows more granular splitting, **up to 0.01%**, 
+
+We are seeing **100x performance improvements** with these changes compared to our sunsetted Metis router.
+</Card>
+
+<Card title="JupiterZ: Growing Volume">
+JupiterZ is our own RFQ engine exclusive to Jupiter Ultra.
+
+* JupiterZ now facilitates **~$100M daily volume** with zero slippage.
+* All of the volume is **executed with zero slippage**.
+
+We are also working on new improvements for JupiterZ, stay tuned for more updates!
+</Card>
+
+---
+
+## Maximising Execution Price and Quality
 
 A problem often overlooked is the lack of comparison between **Executed Price versus Quoted Price**. 
 When a quote is provided, it does not necessarily represent the actual executable price and quality.
 
-### Executed Price versus Quoted Price
-
-In today's Solana DeFi landscape dominated by proprietary AMMs, these two numbers are increasingly 
+In today's Solana DeFi landscape dominated by Proprietary (Prop) AMMs, these two numbers are increasingly 
 divergent. Consider this scenario:
 
 | Route                | Quoted Amount | Executed Amount | Slippage (Amount) | Slippage (%) |
@@ -39,21 +58,47 @@ divergent. Consider this scenario:
 | **Route B (Prop AMM)**        | 150 tokens    | 50 tokens       | 100 tokens       | 66%         |
 
 Route B shows a 50% better quote, but Route A delivers 60% more tokens to your wallet. This is why 
-quote comparison between platforms is fundamentally misleading - but we have made significant 
-improvements to our routing engine to ensure that the provided quotes are executable and have minimal 
-slippage.
+quote comparison between platforms is fundamentally misleading. With Ultra V3, we have made significant 
+improvements to ensure that the provided quotes reflect actual on-chain execution, not theoretical 
+best cases or inflated "best prices".
 
-### Predictive Routing
+### Ultra Signaling
 
-Ultra V3 introduces **Predictive Routing** for every route before execution:
+Ultra V3 introduces **Ultra Signaling**, a mechanism built directly on-chain in our Jupiter Aggregator 
+Program that allows Prop AMMs to distinguish between different types of user flow when submitting quotes 
+to Ultra. With Ultra Signaling, Prop AMMs can identify which requests originate from Ultra and are thus 
+able to differentiate between "non-toxic" and "toxic" order flow when quoting.
+
+* **Non-toxic flow** in this context refers to trades initiated by Ultra that are unlikely to be 
+exploited by malicious practices like sandwiching or frontrunning. Since, these trades are seen as 
+more "genuine" and less likely to adversely affect the AMM's profit, Prop AMMs are incentivized to 
+offer more competitive, tighter pricing to these trades.
+
+* **Toxic flow** typically comes from sources outside of Ultra (as seen from [MEV-Protection](#mev-protection)) 
+and may include trades that are more susceptible to MEV opportunities. Since these trades carry 
+more risk for Prop AMMs, they are generally quoted with wider spreads or less favorable prices.
+
+<Card title="Impact">
+By signaling to Prop AMMs that a user is coming through Ultra (and, therefore, more protected 
+from MEV or sandwich attacks), Prop AMMs can confidently provide their best possible quotes 
+without the heightened risk associated with toxic order flow. This results in Ultra users 
+consistently getting better, more reliable prices compared to other platforms, as the risk profile 
+for their transactions is demonstrably lower.
+
+One of the Prop AMMs we are working with, is now **quoting 3 bps tighter (50% better)** for our Ultra 
+users compared to other platforms.
+</Card>
+
+### Predictive Execution
+
+Ultra V3 introduces **Predictive Execution** for every route before execution:
 1. Aggregated routers return their best quotes.
-2. Ultra performs on-chain simulation of each route.
-3. Simulating quotes on-chain to verify actual executable price vs quoted price.
-4. Predicting potential slippage for each route, and dynamically prioritizing the route with the 
+2. Simulating quotes on-chain to verify actual executable price vs quoted price.
+3. Predicting potential slippage for each route, and dynamically prioritizing the route with the 
 least overall incurred slippage at the time of execution.
 
 <Card title="Result">
-	Since deployment of Predictive Routing in production, we have seen great results in terms of 
+	Since deployment of Predictive Execution in production, we have seen great results in terms of 
 	slippage protection for our users. Using the volume weighted average of the difference between 
 	executed slippage and quoted for the past 7 days:
 	* Jupiter Ultra on average gave users on average - **positive slippage of +0.63 bps**.
@@ -74,90 +119,93 @@ least overall incurred slippage at the time of execution.
 	</div>
 </Card>
 
-<Card title="Impact">
-	Users receive quotes that reflect actual on-chain execution, not theoretical best-case scenarios. 
-	This shift from quote-optimized to execution-optimized routing is responsible for our **swap success 
-	rate improvement from 85% to 96%**.
-
-	Jupiter Ultra's swap success rate is on average 96%, but has been battle-tested and proven resilient, 
-	maintaining strong performance even during periods of significantly increased market activity and 
-	volatility, as demonstrated by the spike in swap volume on October 11th.
-
-	<Columns cols={2}>
-		<img 
-		src="/static/blog/ultra-v3/swap-execution-success-rate.png" 
-		alt="Swap Execution Success Rate"
-		className="rounded-lg"
-		/>
-		<img 
-		src="/static/blog/ultra-v3/swap-success-count.png" 
-		alt="Swap Success Count"
-		className="rounded-lg"
-		/>
-	</Columns>
-
-	<div className="flex items-center gap-2 mt-4">
-		<span className="px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded flex items-center gap-1">
-			Source: Jupiter Internal Monitoring
-		</span>
-		<span className="text-sm text-gray-400">Oct 7 - Oct 14, 2025</span>
-	</div>
-</Card>
-
 ## Sub-Second Transaction Landing
 
 Every block your transaction waits, is an exposure to poorer execution quality, such as market 
 movement against your position, increased effective slippage, and a higher risk of MEV extraction 
 opportunities.
 
-**Meet Hyperlane!** Our in-house transaction landing engine, designed to make every trade faster, 
-more private, and more precise.
+**Meet ShadowLane!** Our in-house transaction landing engine - leveraging our own validator stake 
+and dedicated R&D efforts from our newly formed RPC team, led by Italo and team members who have 
+contributed to Yellowstone-gRPC, NFT DAS API, Lite-RPC, Agave, and more.
 
-With Hyperlane, we now leverage our own validator stake and dedicated R&D efforts, Hyperlane consistently 
-processes transactions within sub-second latency and by operating entirely on our own infrastructure instead 
-of relying on external providers, we eliminate the risk of artificial delays and front-running, ensuring 
-faster and more secure execution for our users.
+Thanks to their massive efforts, ShadowLane consistently processes transactions within sub-second 
+latency and by operating entirely on our own infrastructure instead of relying on external providers, 
+we eliminate the risk of artificial delays and front-running, ensuring faster and more secure execution 
+for our users.
 
 ### Transaction Landing Latency
 
-<Card title="Result">
-	Transaction landing latency has **improved by 50-66%** compared with our previous approach that 
+<Card title="Result: 50-66% Faster Transaction Landing">
+	Transaction landing latency has improved by 50-66% compared with our previous approach that 
 	relied on multiple providers.
 
 	| Method                  | Blocks     | Latency         |
 	|-------------------------|------------|-----------------|
-	| **Hyperlane**           | 0-1 block  | ~ 50ms - 400ms  |
+	| **ShadowLane**          | 0-1 block  | ~ 50ms - 400ms  |
 	| **Traditional methods** | 1-3 blocks | ~ 400ms - 1.2s  |
-
-	<img 
-	src="/static/blog/ultra-v3/hyperlane.png" 
-	alt="Hyperlane Overview"
-	className="rounded-lg"
-	/>
 </Card>
 
 ### MEV Protection
 
-Hyperlane routes transactions through our own infrastructure, providing:
-- **Complete transaction privacy** until on-chain execution.
-- **Reduce frontrunning exposure** - transactions are invisible to public mempool scanners.
-- **Reduce risk of sandwich attack vectors** - see [sandwiched.me](https://sandwiched.me/sandwiches) 
-for MEV analytics.
+When using other providers, there is always a risk of front-running and sandwich attacks - as the trades 
+may be sold to third-party MEV searchers.
 
-<Card title="Result" href="https://sandwiched.me/sandwiches" img="/static/blog/ultra-v3/sandwiched.me-chart.png">
+Ultra V3 does the opposite. Since we are using our own infrastructure to send transactions via ShadowLane, 
+we are able to minimize the exposure to susceptible MEV risks by ensuring trades are never handed off to 
+any external providers for on-chain execution.
+
+<Note>
+	The risk is not zero as validators still broadcast to the leader, but Ultra brings it as close to zero 
+	as possible.
+</Note>
+
+<Card title="Result: 34x Better than Top Trading Terminals" href="https://sandwiched.me/sandwiches" img="/static/blog/ultra-v3/sandwiched.me-chart.png">
 	Jupiter Ultra's swap volume to value extracted ratio is significantly lower than others despite 
-  higher volume, demonstrating the effectiveness of our efforts to bring the best execution quality 
-  to our users.
+	higher volume, demonstrating the effectiveness of our efforts to bring the best execution quality 
+	to our users.
 
-  This redundancy ensures optimal performance even when individual methods experience degraded 
-  service, contributing to our 96% success rate.
-	<div className="flex items-center gap-2 mb-3">
+	By comparing Jupiter Ultra's volume to value extracted ratio to other top trading terminals, 
+	we are able to see that Jupiter Ultra is 34x better than the top trading terminals.
+	<div className="flex items-center gap-2 mb-3 mt-6">
 		<span className="px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded flex items-center gap-1">
 			Source: Sandwiched.me
 		</span>
 		<span className="text-sm text-gray-400">Oct 15, 2025</span>
 	</div>
 </Card>
+
+## Real-Time Slippage Estimator
+
+Setting the right slippage can be tricky — whether you're dealing with volatile tokens, 
+stablecoins, or large caps, it's never a one-size-fits-all scenario. This uncertainty 
+impacts everyone, from newcomers in DeFi to seasoned traders.
+
+Since the inception of RTSE (Real-Time Slippage Estimator), we have been monitoring 
+real-time market data and transactions, and applying token-specific heuristics and 
+algorithms to improve the slippage protection for our users. With Ultra V3, we have made 
+strides by implementing the following improvements:
+
+- **Tighter RTSE slippage heuristics** while maintaining high success rates and reduce overpaying.
+- **Automatic prioritization** of slippage-protected routes over purely price-optimized routes.
+- **Increased volatility sensitivity** for tokens with high historical volatility patterns.
+
+## Gasless Support Coverage
+
+With Gasless Support acting as a just-in-time fee payer, you can make trades without holding SOL 
+to cover gas fees - as long as at least one of the tokens in your trade meets the minimum value 
+requirement, Ultra automatically calculates and covers the gas fee, deducting it from the swap amount.
+
+With Ultra V3, we have expanded gasless support coverage:
+* Token2022 tokens
+* Memecoin-to-memecoin swaps (when liquidity permits)
+* Reduced minimum trade size to ~$10 USD
+
+Gasless Support will continue to improve over time.
+
+<Note>
+JupiterZ by default is gasless, as the market maker is the fee payer for the transaction!
+</Note>
 
 ## Just-In-Time Market Revival
 
@@ -195,24 +243,21 @@ Pre-graduated bonding curve markets routing latency has been **reduced by 90%+**
 | After  | 10-15ms               | Direct routing to pre-graduated markets |
 </Card>
 
-## Slippage Optimization
+## Legacy Jupiter Swap
 
-Since the inception of RTSE (Real-Time Slippage Estimator), we have made strides to improve the 
-slippage protection for our users. With Ultra V3, we have implemented the following improvements:
+As part of this upgrade, moving forward, we will be focusing our efforts on the ongoing development 
+and improvement of Ultra V3 with our new router, Iris. We are also rolling out the Ultra API to allow 
+our partners to utilize the best-in-class routing, execution and transaction landing infrastructure 
+behind Ultra V3.
 
-- **Tighter RTSE slippage heuristics** while maintaining high success rates.
-- **Automatic prioritization** of slippage-protected routes over purely price-optimized routes.
-- **Increased volatility sensitivity** for tokens with high historical volatility patterns.
+Currently, many meta aggregation platforms and others are still using our sunsetted Jupiter Legacy API (Metis) 
+or deprecated Self-hosted Legacy Swap API binary. We will be working with them to upgrade their routing to 
+adopt the new Ultra API.
 
-## Jupiter Ultra Fee Structure
-
-We have the best price, protection, and execution infrastructure, yet Jupiter Ultra fee remains 
-competitive and transparent.
-
-|                                                                             | Fee (bps)                | Example fee of a<br/>$10,000-size trade |
-|-----------------------------------------------------------------------------|--------------------------|-----------------------------------------|
-| **Jupiter Ultra is 10x cheaper**.                                           | 0-10                     | `$0 – $10`                              |
-| Competitors typically charges at least 1% and costs compound over time.     | ≥ 85-100                 | `$85 – $100`                            |
+If you are using Jupiter Legacy API in your app, please correctly label to avoid misleading your users that 
+this is the best price from Jupiter. In particular, certain apps are using the free binary, which is deprecated 
+and we have no control over the results, and it is very discouraging to see certain platforms abuse something that 
+we have offered to the ecosystem for free for years.
 
 ## Summary
 
@@ -236,3 +281,5 @@ Ultra V3 demonstrates that the best execution isn't about finding the best quote
 delivering the best outcome. Through rigorous measurement, continuous optimization, and proprietary 
 infrastructure, we've built a system that consistently outperforms on the metrics that actually 
 matter - the data speaks for itself.
+
+Just use Jupiter.

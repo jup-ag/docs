@@ -109,14 +109,14 @@ We enforce a fixed expiry timing flow for all quotes and transactions. This simp
 
 **Breakdown of the expiry flow:**
 
-- **Total of 50 seconds**: Transaction expiry time
-- **1st 25 seconds**: Reserved for the webhook to verify, sign, and send the transaction on-chain
-- **2nd 25 seconds**: Allocated for the user to accept the quote
+- **Total of 55 seconds**: Transaction expiry time
+- **1st 35 seconds**: Reserved for the webhook to verify, sign, and send the transaction on-chain
+- **2nd 20 seconds**: Allocated for the user to accept the quote
 
 <Info>
 **NOTE**
 
-The frontend automatically re-quotes every 5 seconds.
+The frontend automatically re-quotes every 3 seconds.
 
 </Info>
 

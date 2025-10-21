@@ -29,7 +29,8 @@ performance.
 
 * Iris now utilzies better routing algorithms like [Golden-section](https://en.wikipedia.org/wiki/Golden-section_search) 
 and [Brent's method](https://en.wikipedia.org/wiki/Brent%27s_method).
-* Iris allows more granular splitting, **up to 0.01%**, 
+* Iris uses Brent's method to optimize route splitting
+* Iris is now capable of more granular splitting, **up to 0.01%**.
 
 We are seeing **100x performance improvements** with these changes compared to our sunsetted Metis router.
 </Card>
@@ -45,10 +46,10 @@ We are also working on new improvements for JupiterZ, stay tuned for more update
 
 ---
 
-## Maximising Execution Price and Quality
+## Maximising Executed Price
 
 A problem often overlooked is the lack of comparison between **Executed Price versus Quoted Price**. 
-When a quote is provided, it does not necessarily represent the actual executable price and quality.
+When a quote is provided, it does not necessarily represent the actual executed price.
 
 In today's Solana DeFi landscape dominated by Proprietary (Prop) AMMs, these two numbers are increasingly 
 divergent. Consider this scenario:
@@ -59,9 +60,9 @@ divergent. Consider this scenario:
 | **Route B (Prop AMM)**        | 150 tokens    | 50 tokens       | 100 tokens       | 66%         |
 
 Route B shows a 50% better quote, but Route A delivers 60% more tokens to your wallet. This is why 
-quote comparison between platforms is fundamentally misleading. With Ultra V3, we have made significant 
-improvements to ensure that the provided quotes reflect actual on-chain execution, not theoretical 
-best cases or inflated "best prices".
+quote comparison between platforms is fundamentally misleading. With Ultra V3, we are accounting for 
+slippage when deciding which AMM to use to ensure that the provided quotes reflect actual on-chain 
+execution, not theoretical best cases or inflated "best prices". 
 
 ### Ultra Signaling
 
@@ -94,7 +95,7 @@ users compared to other platforms.
 
 Ultra V3 introduces **Predictive Execution** for every route before execution:
 1. Aggregated routers return their best quotes.
-2. Simulating quotes on-chain to verify actual executable price vs quoted price.
+2. Simulating quotes on-chain to verify actual executed price vs quoted price.
 3. Predicting potential slippage for each route, and dynamically prioritizing the route with the 
 least overall incurred slippage at the time of execution.
 
@@ -122,7 +123,7 @@ least overall incurred slippage at the time of execution.
 
 ## Sub-Second Transaction Landing
 
-Every block your transaction waits, is an exposure to poorer execution quality, such as market 
+Every block your transaction waits, is an exposure to poorer executed price, such as market 
 movement against your position, increased effective slippage, and a higher risk of MEV extraction 
 opportunities.
 
@@ -163,7 +164,7 @@ any external providers for on-chain execution.
 
 <Card title="Result: 34x Better than Top Trading Terminals" href="https://sandwiched.me/sandwiches" img="/static/blog/ultra-v3/sandwiched.me-chart.png">
 	Jupiter Ultra's swap volume to value extracted ratio is significantly lower than others despite 
-	higher volume, demonstrating the effectiveness of our efforts to bring the best execution quality 
+	higher volume, demonstrating the effectiveness of our efforts to bring the best executed price 
 	to our users.
 
 	By comparing Jupiter Ultra's volume to value extracted ratio to other top trading terminals, 
@@ -227,7 +228,7 @@ re-indexes token markets on-demand**.
 ## Pre-Graduation Routing Latency Reduction
 
 By default, for all swap pairs, Jupiter Ultra checks for multiple route paths to get the best 
-price and execution quality. This adds to quote latency.
+price. This adds to quote latency.
 
 To further enhance the trading experience for trenchers, we have optimized the routing logic for 
 all pre-graduated bonding curve markets when applicable.

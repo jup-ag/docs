@@ -313,6 +313,16 @@ components:
             - Public key of a token account that will be used to receive the token out of the swap
             - If not provided, the signer's token account will be used
             - If provided, we assume that the token account is already initialized
+            - `destinationTokenAccount` and `nativeDestinationAccount` are mutually exclusive
+          type: string
+        nativeDestinationAccount:
+          description: |
+            - Public key of an account that will be used to receive the native SOL token out of the swap
+            - If not provided, the signer's SOL token account will be used
+            - If provided, we will unwrap the WSOL and transfer the native SOL to the account
+            - Only works if the output mint is SOL, is using the V2 instructions and the account passed in is not owned by token program
+            - When sending native SOL to a new account, you must swap at least enough to cover the rent required to create it.
+            - `destinationTokenAccount` and `nativeDestinationAccount` are mutually exclusive
           type: string
         dynamicComputeUnitLimit:
           description: |

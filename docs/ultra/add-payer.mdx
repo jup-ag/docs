@@ -1,0 +1,70 @@
+---
+title: "Add Integrator Payer"
+description: "Walkthrough on how to use the payer parameter to pay for networks fees and rent on behalf of your users."
+---
+
+<Note>
+    If you are unfamiliar with [Ultra Swap's Gasless Support mechanisms](/docs/ultra/gasless), please refer to the doc.
+</Note>
+
+## Key Points
+
+The Jupiter Ultra Swap API allows you to pay for networks fees and rent on behalf of your users. This feature further reduces onboarding friction as the integrator can now ensure gasless is enforced without requiring any additional requirements in Ultra's Gasless Support like taker has to have < 0.01 SOL, minimum trade size or having to use the user's swap amount.
+
+| Aspect | Description |
+|--------|-------------|
+| **Required with referral parameters** | When the `payer` parameter is passed in, it is expected to be used with referral parameters such as `referralAccount` and `referralFee`.<br/><br/>It is assumed that if the integrator is using their own gas payer for users, they will need to recoup the costs using referral fees. |
+| **Integrator payer takes precedent**  | When the `payer` parameter is passed in, it **always** takes precedent over Ultra's Gasless Support mechanism.|
+| **No minimum trade size requirement** | It does not require a minimum trade size. |
+| **ATA rent handling**                 | **Temporary WSOL TA**: At the end of the swap, the WSOL TA will be closed and only the rent amount refunded to payer.<br/><br/>**Non-WSOL TA**: The TA will not be closed, since it is highly likely used for the output amount of the swap. However, [integrator may use `closeAuthority` to control the close authority of the TA, different rules may apply](#close-authority). |
+| **Enforces routing to Iris only**     | When the `payer` parameter is passed in, it will default routing to only Iris. |
+| **Requires backend signing**          | Integrator is required to proxy the request to their backend in order to sign the transaction (partially signed by user) before sending to `/execute`
+
+## Payer
+
+To use the `payer` parameter, you need to pass in the following parameters:
+- `payer`: The public key of the account that will be used to pay for the network fees, priority fees/tips and rents.
+- `closeAuthority`: The public key of the account that will be the close authority of the token accounts created during the swap (apart from WSOL token account).
+
+However, as mentioned above, to use `payer`, it is expected to be used with referral parameters such as `referralAccount` and `referralFee` because it is assumed that the integrator will need to recoup the costs using referral fees.
+- `referralAccount`: The public key of the referral account that is collecting the fees.
+- `referralFee`: The fee bps that will be collected from the swap.
+- [Refer to Add Fees to Ultra Swap guide](/docs/ultra/add-fees-to-ultra) for more details on how to set up.
+
+```js Get Order
+const orderResponse = await (
+    await fetch(
+        'https://lite-api.jup.ag/ultra/v1/order'
+        '?inputMint=So11111111111111111111111111111111111111112' +
+        '&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' +
+        '&amount=100000000' +
+        '&taker=<pass-in-taker-account>' +
+        '&referralAccount=<pass-in-referral-account>' +
+        '&referralFee=100' +
+        '&payer=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3' +
+        '&closeAuthority=<pass-in-taker-account>' // dependent on how you want to handle taker's ATA
+    )
+  ).json();
+```
+
+## Close Authority
+
+When using `payer` parameter, you are required to use `closeAuthority` parameter as well.
+
+When token accounts are created for the output swap amount, the rent of the token accounts are essentially being given away, in order to prevent a loss or abuse of the integrator gas payer, there are a few ways to handle it.
+1. You can charge sufficient fees to ensure that it can cover the amount used by the payer.
+2. You can set yourself as the close authority of the token account such that you have the authority to close the account and be the recipient of the rent.
+
+**Usage of `closeAuthority` parameter**:
+- If `closeAuthority == taker`, we DO NOT add instruction to set `closeAuthority`.
+- If `closeAuthority !== taker`, we add the instruction to set new `closeAuthority`.
+
+<Warning>
+When setting a new `closeAuthority`, the taker can hold the account hostage if the balance in the token account is never zero.
+
+*You can only close the token account when balance is zero*.
+</Warning>
+
+<Note>
+Refer to [Solana Docs](https://solana.com/docs/tokens/basics/create-token-account) for more details on the close authority.
+</Note>

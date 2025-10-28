@@ -1,0 +1,39 @@
+---
+title: "Fees"
+description: "Key features and pointers on how to handle integrator fees in Ultra Swap API."
+---
+
+The Jupiter Ultra Swap has 8-10x lower fees than market average, with only 5 to 10 bps of the swap amount as a fee.
+
+## Key Points
+
+| Aspect | Description |
+|--------|-------------|
+| **Default fees** | 5 to 10 bps of the swap amount |
+| **Integrator fees** | Ultra takes 20% of your integrator fees |
+| **Token support** | SPL and Token2022 tokens |
+| **Fee mint** | Fee mint is determined by Ultra based on a [priority list](#priority-list) |
+
+### Priority List
+
+When requesting for an order, Ultra will decide which mint to take fees in based on a priority list. The list consists of different categories of tokens.
+
+1. SOL - Solana!
+2. Stablecoins - USDC, USDT, etc
+3. Liquid Staked Tokens (LSTs) - JupSOL, etc
+4. Bluechips - Typically large market cap tokens
+5. Others - Other tokens that do not fall into the above categories
+
+<Note>
+You can use the `/order` endpoint to check for the `feeMint` and `feeBps` field directly.
+
+Or you can use the `/fees` endpoint to check the fees and category given the input and output mint.
+
+https://lite-api.jup.ag/ultra/v1/fees?inputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&outputMint=So11111111111111111111111111111111111111112
+</Note>
+
+### Integrator Fees
+
+To add integrator fees to Ultra Swaps, you will be required to set up referral accounts and token accounts for the specific token mints you want to collect fees in.
+
+Refer to the [Add Integrator Fees](/docs/ultra/add-fees-to-ultra) guide for more details on how to set up.

@@ -1,71 +1,84 @@
 ---
-title: "Add Fees To Ultra Swap"
+title: "Add Integrator Fees"
 description: "Walkthrough to create the necessary accounts for adding fees to your Ultra Swap transaction."
 ---
+
+<Note>
+    If you are unfamiliar with [Ultra Swap Fees](/docs/ultra/fees), please refer to the doc.
+</Note>
 
 ## Key Points
 
 The Jupiter Ultra Swap API allows you to add integrator fees to the orders.
 
 <AccordionGroup>
-    <Accordion title="Utilizes Referral Program and its accounts">
+    <Accordion title="Requires specific Referral Program Accounts">
         The Ultra Swap Integrator Fees are governed by the [Referral Program](/tool-kits/referral-program).
         
         It is required to create a valid **referral account** and it's **referral token accounts** for the specific token mints to collect fees in. These accounts are initalized under the [**Jupiter Ultra Referral Project**](https://solscan.io/account/DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc).
+
+        Refer to the rest of the guide for more details on the set up.
     </Accordion>
 
-    <Accordion title="`feeMint` is decided by Ultra Swap">
+    <Accordion title="Fee split when adding fees">
+        If you plan to take 100bps, Jupiter will take 20bps for the fee split (there will be no Ultra base fee).
+
+        | Type | Fee |
+        | :--- | :--- |
+        | Ultra default fees | 5 to 10 bps |
+        | Added integrator fees | Ultra takes 20% of your integrator fees |
+    </Accordion>
+
+    <Accordion title="Ultra decides which mint to take fees in">
         In the `/order` response, you will see the `feeMint` field which is the token mint we will collect the fees in for that particular order.
 
         Since Jupiter will always dictate which token mint to collect the fees in, you must ensure that you have the valid referral token account created for the specific fee mint.
 
         <Info>
-            The `feeMint` is based on a priority list, you can refer to this [JSON file for the list](https://github.com/jup-ag/dynamic-slippage-config/blob/main/token_categories.json).
+            The `feeMint` is based on a priority list, you can refer to the [Ultra Fees](/docs/ultra/fees) doc for more details.
 
-            For example,
-                * If the `inputMint=SOL` and the `outputMint=USDC`, the `feeMint` will be `SOL`, as it is of highest priority.
-                * If the `inputMint=USDC` and the `outputMint=SOL`, the `feeMint` will be `SOL`, as it is of highest priority, regardless of side.
-                * If the `inputMint=MEME` and the `outputMint=USDC`, the `feeMint` will be `USDC`, as the stablecoin has higher priority.
+            | inputMint  | outputMint | feeMint | Reason                                  |
+            |------------|------------|---------|-----------------------------------------|
+            | SOL        | USDC       | SOL     | SOL is of highest priority              |
+            | USDC       | SOL        | SOL     | SOL is of highest priority, regardless of side |
+            | MEME       | USDC       | USDC    | Stablecoin (USDC) has higher priority   |
         </Info>
         
         <Warning>
             If the `referralTokenAccount` for the `feeMint` is not initialized, the order will still return and can be executed without your fees. This is to ensure your user still receives a quote to proceed with the swap.
 
-            For example, if the `feeMint` is `SOL`, but the `referralTokenAccount` for `SOL` is not initialized, the order will still return and can be executed without your fees.
+            For example, if the `feeMint` is `SOL`, but the `referralTokenAccount` for `SOL` is not initialized, the order will still return but will be executed without your fees.
             
             You can refer to if `feeBps` tallies with what you specified in `referralFee`, in this case, the `feeBps` will default to Jupiter Ultra's default fees.
         </Warning>
     </Accordion>
 
-    <Accordion title="Integrator fee split">
-        By default, Jupiter Ultra Swap incurs a 5 to 10 bps fee based on token mint.
-        
-        When you add integrator fee, Jupiter will take a flat 20% of your integrator fees.
-        
-        For example, if you plan to take 100bps, Jupiter will take 20bps for the fee split (there will be no Ultra base fee).
-    </Accordion>
-
-    <Accordion title="Check the `feeBps` field">
+    <Accordion title="Check the feeBps field">
         You can configure `referralFee` to be between 50bps to 255bps. The `/order` response will show the total fee in `feeBps` field which should be exactly what you specified in `referralFee`.
 
-        Do note that, the referral token account has to be created before calling `/order` because during the request, we will check if the token account is initialized before applying your referral fee (if it is not applied, we will only apply our default fees).
+        <Warning>
+            If the `referralTokenAccount` for the `feeMint` is not initialized, the order will still return and can be executed without your fees. This is to ensure your user still receives a quote to proceed with the swap.
+
+            For example, if the `feeMint` is `SOL`, but the `referralTokenAccount` for `SOL` is not initialized, the order will still return but will be executed without your fees.
+            
+            You can refer to if `feeBps` tallies with what you specified in `referralFee`, in this case, the `feeBps` will default to Jupiter Ultra's default fees.
+        </Warning>
     </Accordion>
 
     <Accordion title="Token support">
         You can now take fees in SPL or Token2022 tokens. As long as you have the referral token account initialized before calling `/order`, and the `feeMint` is one of the token mints you have initialized for, your fees will apply.
 
-        * For example, if you have the referral token account initialized for `SOL` only and the `feeMint` is `SOL`, your fees will be applied.
-        * If you have the referral token account initialized for `USDC` only and the `feeMint` is `USDC`, your fees will be applied.
-        * If you have the referral token account initialized for `XYZ` only BUT the `feeMint` is `USDC`, your fees will not be applied.
-        
+        | Only initialized for this token mint | feeMint | Are your fees applied?        |
+        |:-------------------------------------|:--------|:------------------------------|
+        | SOL                                  | SOL     | Yes                           |
+        | USDC                                 | JupSOL  | No                            |
+        | XYZ                                  | USDC    | No                            |
     </Accordion>
-</AccordionGroup>
-
-## Limitations
-
-<AccordionGroup>
-    <Accordion title="JupiterZ does not support Integrator Fees">
-        JupiterZ does not support integrator fees and it will not be routed when referral params are passed in to get an order.
+    
+    <Accordion title="Enforces routing to Iris and other DEX aggregator routes">
+        When integrator fees are being added, it defaults routing to Iris and other DEX aggregator routes.
+        
+        JupiterZ does not support integrator fees currently.
     </Accordion>
 </AccordionGroup>
 
@@ -310,11 +323,11 @@ async function initReferralTokenAccount() {
 * Then, you can sign and send the transaction via the Ultra Swap `/execute` endpoint.
 
 <Warning>
-  **DANGER**
+    If the `referralTokenAccount` for the `feeMint` is not initialized, the order will still return and can be executed without your fees. This is to ensure your user still receives a quote to proceed with the swap.
 
-  Do note that, during your request to `/order`, we will check if the specific fee mint's referral token account is initialized. If it is not, the order will still return and can be executed without your fees. This is to ensure success rates and the best experience with Jupiter Ultra Swap.
-
-  Hence, please verify the transaction when testing with a new referral token account, and always create the referral token account before calling `/order`.
+    For example, if the `feeMint` is `SOL`, but the `referralTokenAccount` for `SOL` is not initialized, the order will still return but will be executed without your fees.
+    
+    You can refer to if `feeBps` tallies with what you specified in `referralFee`, in this case, the `feeBps` will default to Jupiter Ultra's default fees.
 </Warning>
 
 ```js expandable

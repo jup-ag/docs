@@ -22,25 +22,23 @@ Ultra Swap is the most advanced yet developer-friendly solution for building tra
 
 <AccordionGroup>
 <Accordion title="Juno Liquidity Engine">
-Ultra Swap utilizes the latest [Juno Liquidity Engine](/docs/routing) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines: improved versions of Metis and JupiterZ, and third-party liquidity sources, for the best possible price.
+Ultra Swap utilizes the latest [Juno Liquidity Engine](/docs/routing) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines: improved versions of Iris and JupiterZ, and third-party liquidity sources, for the best possible price.
 
 It also includes self-learning capabilities (to detect and sideline low-quality liquidity sources) which creates a competitive environment for all liquidity sources to continously optimize their performance and price.
 </Accordion>
 
-<Accordion title="Execution-Optimized Predictive Routing">
-Ultra runs Predictive Routing for every route before execution:
-1. Aggregated routers return their best quotes.
-2. Ultra performs on-chain simulation of each route.
-3. Simulating quotes on-chain to verify actual executable price vs quoted price.
-4. Predicting potential slippage for each route, and dynamically prioritizing the route with the least overall incurred slippage at the time of execution.
+<Accordion title="Best Executed Price">
+Ultra Swap guarantees the best executed price through several key innovations:
 
-Results:
-* Quotes reflect actual on-chain execution, not theoretical best-case scenarios.
-* With this feature, we have increased our swap success rate from 85% to ~96%.
+* **Predictive Execution**: Ultra simulates and compares executed prices (not just quoted prices) before actually sending a transaction, dynamically selecting the route with the least slippage for real user outcomes.
+* **Ultra Signaling**: Ultra provides signaling to Proprietary AMMs to help them distinguish Ultra user flow, incentivizing them to quote tighter spreads and better prices.
+* **Slippage-Aware Routing**: Automatically prioritizes and selects routes that minimize realized slippage, protecting users from misleading "best quotes" that deliver poor executed results.
+
+For detailed examples and results, see [our Ultra V3 blog post](/blog/ultra-v3#maximising-executed-price).
 </Accordion>
 
 <Accordion title="Sub-second Transaction Landing & MEV Protection">
-Ultra is now using our new in-house transaction-landing engine, ShadowLane, which allows us to send transactions via our own infrastructure: designed to make every trade faster, more private, and more precise.
+Ultra is now using our new in-house transaction-landing engine, Jupiter Beam, which allows us to send transactions via our own infrastructure: designed to make every trade faster, more private, and more precise.
 * Leverage our own validator stake and dedicated R&D efforts.
 * Complete transaction privacy until on-chain execution.
 * Eliminate the risk of artificial delays and front-running, ensuring faster and more secure execution for our users.
@@ -81,7 +79,7 @@ Ultra Swap provides different gasless mechanisms for different scenarios.
 | Endpoint    | Description                                                                                           | Latency (P50 Average)   |
 | :----------- | :----------------------------------------------------------------------------------------------------- | :----------------------- |
 | `/order`    | Aggregating across multiple liquidity sources and selecting the best price.                           | 300ms                   |
-| `/execute`  | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Roundtrip<br/>Metis: 700ms; JupiterZ: 2s |
+| `/execute`  | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Roundtrip<br/>Iris: 700ms; JupiterZ: 2s |
 | `/holdings` | Retrieving the user's balances.                                                                       | 70ms                   |
 | `/shield`   | Enhanced token security feature to provide critical token information.                                | 150ms                   |
 | `/search`   | Searching for a token by its symbol, name or mint address.                                            | 15ms                   |

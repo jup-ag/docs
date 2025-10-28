@@ -1,36 +1,118 @@
 ---
 title: "Gasless Support"
-description: "Key features and pointers on gasless mechanisms in Ultra Swap API."
+description: "Important notes and limitations of gasless mechanisms in Ultra Swap API."
 ---
 
-The Jupiter Ultra Swap API includes **2 different gasless mechanisms** that allow users to execute swaps without directly paying network fees in SOL. This feature reduces onboarding friction and supports a smoother user experience where end-users don't need to hold SOL just to trade tokens.
+The Jupiter Ultra Swap includes **2 different gasless mechanisms** that allow users to 
+execute swaps without having to pay for network fees, priority fees/tips or rent in SOL. This 
+feature reduces onboarding friction and supports a smoother user experience where end-users 
+don't need to hold SOL just to trade tokens.
+
+## Quick Overview
+
+| Gasless Mechanism | Coverage | Requirements & Notes |
+|-------------------|----------|----------------------|
+| **Ultra<br/>Gasless Support** | - Base network fee<br/>- Priority fee/tips<br/>- ATA rent<br/>- Other accounts rent | - Taker has less than 0.01 SOL<br/>- Minimum trade size of ~10 USD<br/>- Gas is taken from swap amount which increases swap fee<br/>- Does not work with referral/payer params<br/>- Does not work with manual mode params |
+| **JupiterZ<br/>(RFQ)**         | - Base network fee<br/>- Priority fee/tips                                          | - Always gasless for network/prio fees (paid by MM)<br/>- ATA rent NOT covered: user must have enough SOL<br/>- No minimum trade size<br/>- Only applies if a market maker provides a route |
+| **Other Routers**              | - | - |
 
 ## Types of Gas
 
 1. Base network transaction fee
 2. Associated Token Account (ATA) rent
 3. Priority fee (or tips, etc)
-4. Other accounts rent (some DEX may require additional accounts opened per user (e.g. Pumpfun))
+4. Other accounts rent (some DEX may require additional accounts opened per taker (e.g. Pumpfun))
 
-## Gasless Coverage & Requirements
+## Types of Gasless Mechanism
 
-| Router | Network / Priority Fees | ATA Rent | Other Accounts Rent | Requirements |
-| --- | --- | --- | --- | --- |
-| **Metis** | ✅ Yes | ✅ Yes | ✅ Yes | - Minimum trade size of 10 USD<br/>- Gas is taken from swap amount, meaning more fees taken from user |
-| **JupiterZ** (RFQ) | ✅ Yes | ❌ No (as of now) | ❌ Not required | - No minimum trade size<br/>- Dependent on if MM provides a quote |
-| **Others** | ❌ No | ❌ No | ❌ No | N/A |
+<Note>
+Refer to [Payer](/docs/ultra/payer) section for more details and usage on the Integrator Gas Payer.
+</Note>
+
+<Tabs>
+    <Tab title="Jupiter Ultra Gasless Support">
+        1. **When does it apply?**
+            * Gasless Support only kicks in for Iris router.
+            * Requires taker to have less than 0.01 SOL.
+            * Minimum trade size of 10 USD is required, but this is dynamic as priority fees/tips can vary based on the current market conditions.
+
+        2. **What does it cover?**
+            * Base network transaction fee
+            * Priority fee/tips
+            * Associated token account rent
+            * Other accounts rent
+
+        3. **How does it work?**
+            * It calculates the required SOL amount to cover the cost of gasless support, and increases the swap fee to cover the cost, this means the taker will recieve lesser output tokens. You can use the `feeBps` field to identify the increased fee.
+            * It adds a secondary signer to the transaction to pay to be the gas payer which is Jupiter Ultra's self gas payer.
+
+        4. **What are the limitations?**
+            * It only works for default Ultra transactions
+            * It does not work when passing in integrator parameters like `referralAccount`, `referralFee`, `payer`, etc.
+            * It does not work when passing in manual mode parameters like `slippageBps`, `priorityFeeLamports`, `excludeRouters`, etc.
+
+        ![Gasless Support Mechanism](/static/images/gasless-support-mechanism.png)
+    </Tab>
+
+    <Tab title="Jupiter Z (RFQ) Gasless">
+        1. **When does it apply?**
+            * JupiterZ is our RFQ engine, it is gasless by default.
+            * No minimum trade size required but dependent on if MM provides a quote.
+
+        2. **What does it cover?**
+            * Base network transaction fee
+            * Priority fee (or tips, etc)
+            * **Does not cover for associated token account rent**.
+            * It also means the taker will have to pay for the rent themselves, and if they do not have sufficient SOL for rent, JupiterZ will not be routed.
+
+        3. **How does it work?**
+            * As long as the JupiterZ (or the market makers) provide a quote for your request, the transaction will be gasless.
+            * It adds a secondary signer to the transaction to pay to be the gas payer - which is the market maker.
+
+        4. **What are the limitations?**
+            * It only works for default Ultra transactions
+            * It does not work when passing in integrator parameters like `referralAccount`, `referralFee`, `payer`, etc.
+            * It does not work when passing in manual mode parameters like `slippageBps`, `priorityFeeLamports`, `excludeRouters`, etc.
+            * If taker does not have sufficient SOL for rent, JupiterZ will not be routed.
+
+        ![JupiterZ Gasless Mechanism](/static/images/jupiterz-gasless-mechanism.png)    
+    </Tab>
+
+    <Tab title="Integrator Gas Payer">
+        1. **When does it apply?**
+            * Integrator Gas Payer works only when integrator passes in `referralAccount` and `referralFee`, together with `payer` and `closeAuthority`.
+            * Regardless of how much SOL the taker has, the payer will be the fee payer.
+            * Applying these parameters will default routing to only Iris.
+
+        2. **What does it cover?**
+            * The `payer` address will be the fee payer of the entire transaction:
+                * Base network transaction fee
+                * Priority fee/tips
+                * Associated token account rent
+                * Other account rents
+
+        3. **How does it work?**
+            * The transaction returned will require both taker and payer signature before submitting to `/execute`.
+            * The associated token account rent such as:
+                * Temporary WSOL ATA will be covered by payer and will be returned to payer in the same transaction.
+                * Any other ATAs will be covered by payer, but not returned to payer in the same transaction, since it is likely the ATA holds the tokens post-swap.
+            * The `closeAuthority` address will be decided by you, refer to [Payer](/docs/ultra/payer) for more details.
+            * It adds a secondary signer to the transaction to pay to be the gas payer - which is the integrator.
+
+        4. **What are the limitations?**
+            * Passing in `payer` parameters will default routing to only Iris.
+
+        ![Integrator Gas Payer Mechanism](/static/images/integrator-gas-payer-mechanism.png)
+    </Tab>
+</Tabs>
 
 ## Scenario Matrix
 
-<Warning>
-Note that Metis's Gasless Support mechanism only kicks in when user has insufficient SOL.
-</Warning>
-
-| User Scenario | Metis (Gasless Support) | JupiterZ | Others |
-| --- | --- | --- | --- |
-| **Sufficient SOL<br/>With ATA** | - User pays for gas | - MM must provide quote<br/>- MM pays for gas | - User pays for gas |
-| **Sufficient SOL<br/>Without ATA** | - User pays for gas<br/>- User pays for ATA | - MM must provide quote<br/>- MM pays for gas<br/>- User pays for ATA | - User pays for gas<br/>- User pays for ATA |
-| **No SOL<br/>With ATA** | - All gas covered from swap amount<br/>- Minimum trade size of 10 USD required | - MM must provide quote<br/>- MM pays for gas | - Not routed |
-| **No SOL<br/>Without ATA** | - All gas and rent covered from swap amount<br/>- Minimum trade size of 10 USD required | - No quote from MM<br/>- Because user can't provide SOL for ATA | - Not routed |
-| **No SOL<br/>With ATA<br/>Small swap size** | - Quote provided but no transaction<br/>- `errorCode=3` | - MM must provide quote<br/>- MM pays for gas | - Not routed |
-| **No SOL<br/>Without ATA<br/>Small swap size** | - Quote provided but no transaction<br/>-`errorCode=3` | - No quote from MM<br/>- Because user can't provide SOL for ATA | - Not routed |
+| **Scenario** | **Ultra<br/>Gasless Support** | **JupiterZ<br/>(Assuming if quoted)** |
+| --- | --- | --- |
+| **Taker has SOL & ATA** | Taker pays gas | MM pays gas |
+| **Taker has SOL, no ATA** | Taker pays gas & ATA rent | MM pays gas, taker pays ATA rent |
+| **No SOL, has ATA** | - Gas taken from swap amount<br/>- Min $10 swap | MM pays gas |
+| **No SOL, no ATA** | - Gas & rent from swap amount<br/>- Min $10 swap | Not supported (no ATA funding) |
+| **No SOL, has ATA,<br/>Small swap** | Quote shown, but cannot swap<br/>[`errorCode=3`](/docs/ultra/response#order-response-codes) | MM pays gas |
+| **No SOL, no ATA,<br/>Small swap** | Quote shown, but cannot swap<br/>[`errorCode=3`](/docs/ultra/response#order-response-codes) | Not supported (no ATA funding) |

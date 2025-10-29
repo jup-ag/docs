@@ -8,70 +8,49 @@ The Jupiter Lend API is built on top of Jupiter Lend Program.
 ## About Earn
 
 <AccordionGroup>
-
-<Accordion title="What is the Jupiter Earn Protocol?">
-The Earn Protocol is the 'Deposit and Earn' side of Jupiter Lend. Simply deposit assets to the Jupiter Earn and earn yield.
-</Accordion>
-
-<Accordion title="Why is this separate from borrowing?">
-
-  Jupiter Lend uses a unified liquidity layer where both Earn (lending) and Borrow (vault) protocol can source liquidity from. For depositors this means you earn the best possible rate at all times without having to migrate your funds when new protocols are launched on Jupiter Lend. You can supply once and earn the most up to date yield from the Jupiter Lend protocol.
-</Accordion>
-
-<Accordion title="Are there supply or withdraw limits?">
-
-  There is no limits on supplying funds to the Earn Protocol. Withdrawals from Jupiter Lend utilize an Automated Debt Ceiling. Withdrawals increase every block creating a smoothing curve for withdrawals preventing any sudden large movements.
-
-</Accordion>
-
-<Accordion title="What are the risk?">
-
-  Jupiter Lend is a novel protocol and like all DeFi protocols contains smart contract risk, market risk and other factors which can cause loss of user funds.
-</Accordion>
-
-<Accordion title="What are the fees for the Earn Protocol?">
-
-  There are no fees to use the Earn Protocol on Jupiter Lend.
-</Accordion>
-
+  <Accordion title="What is the Jupiter Earn Protocol?">
+    The Earn Protocol is the 'Deposit and Earn' side of Jupiter Lend. Simply deposit assets to the Jupiter Earn and earn yield.
+  </Accordion>
+  <Accordion title="Why is this separate from borrowing?">
+    Jupiter Lend uses a unified liquidity layer where both Earn (lending) and Borrow (vault) protocol can source liquidity from. For depositors this means you earn the best possible rate at all times without having to migrate your funds when new protocols are launched on Jupiter Lend. You can supply once and earn the most up to date yield from the Jupiter Lend protocol.
+  </Accordion>
+  <Accordion title="Are there supply or withdraw limits?">
+    There is no limits on supplying funds to the Earn Protocol. Withdrawals from Jupiter Lend utilize an Automated Debt Ceiling. Withdrawals increase every block creating a smoothing curve for withdrawals preventing any sudden large movements.
+  </Accordion>
+  <Accordion title="What are the risk?">
+    Jupiter Lend is a novel protocol and like all DeFi protocols contains smart contract risk, market risk and other factors which can cause loss of user funds.
+  </Accordion>
+  <Accordion title="What are the fees for the Earn Protocol?">
+    There are no fees to use the Earn Protocol on Jupiter Lend.
+  </Accordion>
 </AccordionGroup>
 
 ## About Borrow
 
 <AccordionGroup>
-
-<Accordion title="What is Jupiter Borrow Protocol?">
-
-  Borrow Vaults are a known standard mechanism for locking collateral and borrowing debt. Jupiter Lend utilizes this familiar single asset - single debt vault approach. Jupiter Lend takes borrow vaults to the next level by being the most capital efficient and optimized protocol enabling up to 95% LTV on collateral.
-</Accordion>
-
-<Accordion title="How does Jupiter Lend achieve such high LTV?">
-
-  Jupiter borrow vaults has the most advanced liquidation mechanisms, and are able to provide the highest LTVs in the market, the protocol easily removes bad debt and enables the most gas efficient liquidation mechanism in DeFi.
-</Accordion>
-
-<Accordion title="What happens if I am liquidated?">
-
-  When your NFT or position is liquidated, a portion of your collateral is sold to repay your debt and return your position to a safe state. In addition to selling a part of your collateral, a liquidation penalty is also charged.
-</Accordion>
-
-<Accordion title="What is the Max Liquidation Threshold?">
-
-  While the Liquidation Threshold determines when a vault can be liquidated, the protocol also has a 'hard' ceiling for liquidation. When a vault passes the max liquidation threshold it is entirely (100%) liquidated automatically.
-</Accordion>
-
-<Accordion title="My vault passed the liquidation threshold but is not liquidated, will I be liquidated?">
-
-  **Yes your position is still at risk of being liquidated!** Once your position passes the threshold it can be liquidated, but it may not happen immediately. If your position is still at risk you can take the time now to unwind/reduce your risk ratio to make your position safe and prevent a liquidation event.
-</Accordion>
+  <Accordion title="What is Jupiter Borrow Protocol?">
+    Borrow Vaults are a known standard mechanism for locking collateral and borrowing debt. Jupiter Lend utilizes this familiar single asset - single debt vault approach. Jupiter Lend takes borrow vaults to the next level by being the most capital efficient and optimized protocol enabling up to 95% LTV on collateral.
+  </Accordion>
+  <Accordion title="How does Jupiter Lend achieve such high LTV?">
+    Jupiter borrow vaults has the most advanced liquidation mechanisms, and are able to provide the highest LTVs in the market, the protocol easily removes bad debt and enables the most gas efficient liquidation mechanism in DeFi.
+  </Accordion>
+  <Accordion title="What happens if I am liquidated?">
+    When your NFT or position is liquidated, a portion of your collateral is sold to repay your debt and return your position to a safe state. In addition to selling a part of your collateral, a liquidation penalty is also charged.
+  </Accordion>
+  <Accordion title="What is the Max Liquidation Threshold?">
+    While the Liquidation Threshold determines when a vault can be liquidated, the protocol also has a 'hard' ceiling for liquidation. When a vault passes the max liquidation threshold it is entirely (100%) liquidated automatically.
+  </Accordion>
+  <Accordion title="My vault passed the liquidation threshold but is not liquidated, will I be liquidated?">
+    **Yes your position is still at risk of being liquidated!** Once your position passes the threshold it can be liquidated, but it may not happen immediately. If your position is still at risk you can take the time now to unwind/reduce your risk ratio to make your position safe and prevent a liquidation event.
+  </Accordion>
 </AccordionGroup>
 
 ## Program ID
 
-| Program | Address |
-|:--------|:--------|
-| **Jupiter Lend Earn** | [`jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9`](https://solscan.io/account/jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9) |
-| **Jupiter Lend Borrow** | [`jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi`](https://solscan.io/account/jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi) |
-| **Jupiter Lend Earn Rewards** | [`jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar`](https://solscan.io/account/jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar) |
-| **Jupiter Lend Liquidity** | [`jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC`](https://solscan.io/account/jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC) |
+| Program                        | Address                                                                                                                 |
+| :----------------------------- | :---------------------------------------------------------------------------------------------------------------------- |
+| **Jupiter Lend Earn**          | [`jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9`](https://solscan.io/account/jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9) |
+| **Jupiter Lend Borrow**        | [`jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi`](https://solscan.io/account/jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi) |
+| **Jupiter Lend Earn Rewards**  | [`jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar`](https://solscan.io/account/jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar) |
+| **Jupiter Lend Liquidity**     | [`jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC`](https://solscan.io/account/jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC) |
 | **Jupiter Lend Borrow Oracle** | [`jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc`](https://solscan.io/account/jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) |

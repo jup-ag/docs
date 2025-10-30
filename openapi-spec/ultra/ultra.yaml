@@ -107,14 +107,14 @@ paths:
                       - If no additional referral params are passed in, the fee will be the Ultra default fee only and can include additional fees for gasless support mechanism
                   platformFee:
                     type: object
+                    description: |
+                      - This field shows the platform fee only, does not include fee for gas
+                      - Platform fee can either be the Ultra default fee or your integrator fee
                     properties:
                       amount:
                         type: string
                       feeBps:
-                      type: number
-                      description: |
-                        - This field shows the platform fee only, does not include fee for gas
-                        - Platform fee can either be the Ultra default fee or your integrator fee
+                        type: number
                     required:
                       - feeBps
                   signatureFeeLamports:
@@ -323,13 +323,7 @@ paths:
               - **Only include** Meteora DLMM: `excludeRouters=<all-except-Iris>` and `excludeDexes=<all-except-MeteoraDLMM>`
           schema:
             type: string
-        - in: query
-          name: payer
-          description: |
-            - The address of an external gas payer to pay for the network fees and rent on behalf of the taker
-          schema:
-            type: string
-          required: false
+        
   /execute:
     post:
       summary: execute
@@ -616,6 +610,7 @@ paths:
             name: mints
             schema:
               type: string
+              default: "So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
             required: true
             description: |
               - Comma separated list of mints to get information for
@@ -689,6 +684,7 @@ paths:
           name: query
           schema:
             type: string
+            default: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
           required: true
           description: |
             - Search for a token and its information by its symbol, name or mint address

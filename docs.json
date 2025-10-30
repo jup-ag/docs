@@ -158,8 +158,15 @@
             "icon": "chart-line",
             "groups": [
               {
-                "group": " ",
-                "pages": ["docs/perps/index"]
+                "group": "About Perps",
+                "pages": [
+                  "docs/perps/index",
+                  "docs/perps/get-started",
+                  "docs/perps/jlp",
+                  "docs/perps/oracles",
+                  "docs/perps/fees",
+                  "docs/perps/liquidation"
+                ]
               },
               {
                 "group": "Perps Program",
@@ -389,6 +396,27 @@
                       "api-reference/lend/earn/earnings"
                     ]
                   }
+                ]
+              },
+              {
+                "group": "Perps",
+                "tag": "BETA",
+                "pages": [
+                  "api-reference/perps",
+                  "api-reference/perps/get-positions",
+                  "api-reference/perps/post-positionsincrease",
+                  "api-reference/perps/post-positionsdecrease",
+                  "api-reference/perps/post-positionsclose-all",
+                  "api-reference/perps/post-tpsl",
+                  "api-reference/perps/patch-tpsl",
+                  "api-reference/perps/delete-tpsl",
+                  "api-reference/perps/get-ordersexpired",
+                  "api-reference/perps/get-market-stats",
+                  "api-reference/perps/get-positionscollateral-limits",
+                  "api-reference/perps/get-trades",
+                  "api-reference/perps/get-top-traders",
+                  "api-reference/perps/get-trader-stats",
+                  "api-reference/perps/get-pool-info"
                 ]
               },
               {

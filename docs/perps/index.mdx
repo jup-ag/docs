@@ -1,20 +1,74 @@
 ---
-title: "About Perps API"
+title: "Overview"
+sidebarTitle: "Overview"
+description: "Overview of Jupiter Perpetuals where you can trade with leverage up to 250x on SOL, ETH and wBTC."
 ---
 
-<Warning>
-  **WARNING**
+## Features
 
-  The Perps API is still a **work in progress**, stay tuned!
-</Warning>
+In this overview, we will cover the core features of the Jupiter Perps 
+and how it differs from traditional leverage trading exchanges.
 
-<Tip>
-  **TIP**
-  
-  In the meantime, you can use this amazing github repository to direct Anchor IDL parse the Perps Program.
+<Note>
+  To quickstart your developer integration, you can head over to the 
+  [Get Started](/docs/perps/get-started) guide or dive into the 
+  [API Reference](/api-reference/perps) for the complete API documentation.
+</Note>
 
-  * Fetch Perps or JLP pool data
-  * Interact with the Perps Program
+### Trader-to-LP Exchange
+**Jupiter Liquidity Providers**: Liquidity for the Jupiter Perps is provided by the JLP Pool, which holds 
+SOL, ETH, wBTC, and USDC as the underlying tokens. The pool provides ample 
+liquidity for traders to open highly-leveraged positions, while earning an 
+attractive return on a portion of the trading fees.
 
-  [https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing](https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing)
-</Tip>
+**Traders**: Traders can deposit collateral to enter positions and borrow the rest of 
+the position from the pool. Subsequently, they can manage their positions 
+by withdrawing collateral to close their positions fully or partially. The 
+Jupiter Perpetuals Exchange features a simple interface and underlying 
+trading mechanisms to provide a safe and seamless trading experience.
+
+### Pool-Based Liquidity
+* Liquidity comes from the JLP pool, not from resting orders.
+* Traders open and close positions directly against the pool.
+* Trade size is limited only by available liquidity and position-level size constraints.
+* Refer to the [JLP](/docs/perps/jlp) document for more information.
+
+### Oracle-Based Pricing
+* All trades execute at the oracle price.
+* Large trades (e.g., $10 million) do not affect the price for others.
+* Prices are sourced from verified oracles and are unaffected by trade size or direction.
+* Refer to the [Oracles](/docs/perps/oracles) document for more information.
+
+### On-Chain Position Accounts
+* Each user's exposure per asset and direction (long/short) is stored as a position account on-chain.
+* Multiple trades on the same side (e.g., two long SOL trades) merge into a single position.
+* Opening opposite positions (e.g., closing a long by shorting) does not flip exposure; it closes the existing position and realizes PnL.
+* Refer to the [Position Account](/docs/perps/position-account) document for more information.
+
+### Immediate-or-Revert Execution
+* Every trade executes in a single transaction or fails atomically.
+* No partial fills, maker/taker matching, or time-in-force orders.
+
+### Position-Level Risk Controls
+* Before execution, every trade passes a full validation layer:
+  * Collateral checks: minimum margin and leverage caps.
+  * Pool liquidity checks: ensure sufficient tokens exist to back exposure.
+  * Position limits: wallet-level and pool-level maximum size caps.
+* Orderbooks typically handle risk at the matching engine level; Jupiter enforces it at the position and pool level.
+
+### Pool-Driven Fees
+* Trading fees are derived from pool mechanics, not spreads or maker/taker roles.
+* Open/close/price impact fees: based on pool math (swap, borrow, and price-impact fees).
+* Continuous borrow fees: accrue based on the pool's open exposure, not paid between counterparties.
+* No traditional funding rates; both longs and shorts pay borrow fees to the pool.
+* Refer to the [Fees](/docs/perps/fees) document for more information.
+
+### Collateral Model
+* Longs are backed by the underlying asset (e.g., SOL, ETH, wBTC).
+* Shorts are backed by USDC.
+* The program handles collateral assignment automatically - traders simply supply margin in their chosen deposit asset.
+
+### No Synthetic Flipping
+* Positions are stored on-chain as PDAs, not synthetic toggles.
+* Reducing or closing exposure adjusts the position account.
+* You can't accidentally “flip” from long to short via over-selling; you can only close or reduce up to your existing position size.

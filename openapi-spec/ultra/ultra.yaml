@@ -252,21 +252,25 @@ paths:
           name: inputMint
           schema:
             type: string
+            default: "So11111111111111111111111111111111111111112"
           required: true
         - in: query
           name: outputMint
           schema:
             type: string
+            default: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
           required: true
         - in: query
           name: amount
           schema:
             type: string
+            default: "10000000"
           required: true
         - in: query
           name: taker
           schema:
             type: string
+            default: "vBXNsd5SRtTPpW7GWv3wREA6Ztm2jCWp5eqqTsVhyG5"
           required: false
         - in: query
           name: payer
@@ -496,6 +500,7 @@ paths:
       parameters:
           - schema:
               type: string
+              default: "vBXNsd5SRtTPpW7GWv3wREA6Ztm2jCWp5eqqTsVhyG5"
             in: path
             name: address
             required: true

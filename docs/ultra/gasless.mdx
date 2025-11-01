@@ -26,7 +26,7 @@ don't need to hold SOL just to trade tokens.
 ## Types of Gasless Mechanism
 
 <Note>
-Refer to [Payer](/docs/ultra/payer) section for more details and usage on the Integrator Gas Payer.
+Refer to [Payer](/docs/ultra/add-payer) section for more details and usage on the Integrator Gas Payer.
 </Note>
 
 <Tabs>
@@ -96,7 +96,7 @@ Refer to [Payer](/docs/ultra/payer) section for more details and usage on the In
             * The associated token account rent such as:
                 * Temporary WSOL ATA will be covered by payer and will be returned to payer in the same transaction.
                 * Any other ATAs will be covered by payer, but not returned to payer in the same transaction, since it is likely the ATA holds the tokens post-swap.
-            * The `closeAuthority` address will be decided by you, refer to [Payer](/docs/ultra/payer) for more details.
+            * The `closeAuthority` address will be decided by you, refer to [Payer](/docs/ultra/add-payer) for more details.
             * It adds a secondary signer to the transaction to pay to be the gas payer - which is the integrator.
 
         4. **What are the limitations?**

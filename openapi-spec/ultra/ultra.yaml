@@ -290,14 +290,14 @@ paths:
         - in: query
           name: referralAccount
           description: |
-            - Refer to [Integrator Fees](/docs/ultra/fee) for more details
+            - Refer to [Integrator Fees](/docs/ultra/add-fees-to-ultra) for more details
           schema:
             type: string
           required: false
         - in: query
           name: referralFee
           description: |
-            - Refer to [Integrator Fees](/docs/ultra/fee) for more details
+            - Refer to [Integrator Fees](/docs/ultra/add-fees-to-ultra) for more details
           schema:
             type: number
             minimum: 50

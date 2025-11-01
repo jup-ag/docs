@@ -278,6 +278,7 @@ paths:
             - The public key of an account that will be used to cover 'gas-related' fees on behalf of the taker
             - Gas related fees such as signature fees, priority fees and rent. Note that enabling this may result in different routing decisions.
             - When `payer` is passed in, `closeAuthority` is required
+            - Refer to [Integrator Payer](/docs/ultra/add-payer) for more details
           schema:
             type: string
           required: false

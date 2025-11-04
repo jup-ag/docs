@@ -45,3 +45,13 @@ In addition to `llms.txt`, Jupiter also provides a [`llms-full.txt`](/llms-full.
 - **For LLMs and AI tools** that require a complete, granular map of the documentation for deep indexing or advanced search.
 - **For developers** who want to see every available page and resource in one place.
 - **For building custom AI workflows** that benefit from the most detailed documentation context.
+
+## claude code MCP
+
+
+Claude Code MCP connects Claude to developer tools via the Model Context Protocol. Adding the Jupiter MCP enables Claude to query your docs and OpenAPI in-context, prefill API requests, scaffold sample calls, and debug errors against the real spec. This reduces context switching, speeds up integrations, and turns natural‑language prompts into executable workflows directly in your editor.
+
+```bash
+claude mcp add jupiter --transport http --scope user
+```
+

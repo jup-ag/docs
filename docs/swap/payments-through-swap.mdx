@@ -118,6 +118,10 @@ The merchant then retrieves the serialized swap transaction, but the merchant ne
 
 The `destinationTokenAccount` should be the merchant’s token account to receive the payment in. Also do note that `customerAccount` should be accounted for. **You can refer to the [Build Swap Transaction](/docs/swap/build-swap-transaction) guide for other parameters to be passed in.**
 
+<Note>
+There is an alternative `nativeDestinationAccount`, where you can pass in a public key of an account that will be used to receive the native SOL token out of the swap. This is useful if you want to receive native SOL to a new account.
+</Note>
+
 ```js
 const swapResponse = await (
     await fetch('https://lite-api.jup.ag/swap/v1/swap', {

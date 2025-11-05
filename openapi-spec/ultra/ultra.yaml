@@ -107,14 +107,14 @@ paths:
                       - If no additional referral params are passed in, the fee will be the Ultra default fee only and can include additional fees for gasless support mechanism
                   platformFee:
                     type: object
+                    description: |
+                      - This field shows the platform fee only, does not include fee for gas
+                      - Platform fee can either be the Ultra default fee or your integrator fee
                     properties:
                       amount:
                         type: string
                       feeBps:
-                      type: number
-                      description: |
-                        - This field shows the platform fee only, does not include fee for gas
-                        - Platform fee can either be the Ultra default fee or your integrator fee
+                        type: number
                     required:
                       - feeBps
                   signatureFeeLamports:
@@ -252,21 +252,25 @@ paths:
           name: inputMint
           schema:
             type: string
+            default: "So11111111111111111111111111111111111111112"
           required: true
         - in: query
           name: outputMint
           schema:
             type: string
+            default: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
           required: true
         - in: query
           name: amount
           schema:
             type: string
+            default: "10000000"
           required: true
         - in: query
           name: taker
           schema:
             type: string
+            default: "vBXNsd5SRtTPpW7GWv3wREA6Ztm2jCWp5eqqTsVhyG5"
           required: false
         - in: query
           name: payer
@@ -274,6 +278,7 @@ paths:
             - The public key of an account that will be used to cover 'gas-related' fees on behalf of the taker
             - Gas related fees such as signature fees, priority fees and rent. Note that enabling this may result in different routing decisions.
             - When `payer` is passed in, `closeAuthority` is required
+            - Refer to [Integrator Payer](/docs/ultra/add-payer) for more details
           schema:
             type: string
           required: false
@@ -290,14 +295,14 @@ paths:
         - in: query
           name: referralAccount
           description: |
-            - Refer to [Integrator Fees](/docs/ultra/fee) for more details
+            - Refer to [Integrator Fees](/docs/ultra/add-fees-to-ultra) for more details
           schema:
             type: string
           required: false
         - in: query
           name: referralFee
           description: |
-            - Refer to [Integrator Fees](/docs/ultra/fee) for more details
+            - Refer to [Integrator Fees](/docs/ultra/add-fees-to-ultra) for more details
           schema:
             type: number
             minimum: 50
@@ -323,13 +328,7 @@ paths:
               - **Only include** Meteora DLMM: `excludeRouters=<all-except-Iris>` and `excludeDexes=<all-except-MeteoraDLMM>`
           schema:
             type: string
-        - in: query
-          name: payer
-          description: |
-            - The address of an external gas payer to pay for the network fees and rent on behalf of the taker
-          schema:
-            type: string
-          required: false
+        
   /execute:
     post:
       summary: execute
@@ -502,6 +501,7 @@ paths:
       parameters:
           - schema:
               type: string
+              default: "vBXNsd5SRtTPpW7GWv3wREA6Ztm2jCWp5eqqTsVhyG5"
             in: path
             name: address
             required: true
@@ -616,6 +616,7 @@ paths:
             name: mints
             schema:
               type: string
+              default: "So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
             required: true
             description: |
               - Comma separated list of mints to get information for
@@ -689,6 +690,7 @@ paths:
           name: query
           schema:
             type: string
+            default: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
           required: true
           description: |
             - Search for a token and its information by its symbol, name or mint address

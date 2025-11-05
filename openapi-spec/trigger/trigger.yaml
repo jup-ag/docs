@@ -35,6 +35,7 @@ paths:
               properties:
                 maker:
                   type: string
+                  default: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
                 computeUnitPrice:
                   type: string
                   default: auto
@@ -54,7 +55,9 @@ paths:
                 orders:
                   - 6fe8ByaiFHisjnYnH5qdpyiNtkn89mMBQUemRkVmKhro
                   - 9jwzPKHxcrSozdrTYzPnTqy7psRvNGxaYUAiiyxwZKjj
-                computeUnitPrice: auto
+                computeUnitPrice:
+                  type: string
+                  default: auto
       responses:
         '200':
           description: |
@@ -152,21 +155,27 @@ paths:
               properties:
                 inputMint:
                   type: string
+                  default: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
                 outputMint:
                   type: string
+                  default: "So11111111111111111111111111111111111111112"
                 maker:
                   type: string
+                  default: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
                 payer:
                   type: string
+                  default: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
                 params:
                   type: object
                   properties:
                     makingAmount:
                       type: string
                       description: Amount of input mint to swap
+                      default: "100000000"
                     takingAmount:
                       type: string
                       description: Amount of output mint to receive
+                      default: "50000000"
                     expiredAt:
                       type: string
                     slippageBps:
@@ -307,8 +316,10 @@ paths:
               properties:
                 maker:
                   type: string
+                  default: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
                 order:
                   type: string
+                  default: "6fe8ByaiFHisjnYnH5qdpyiNtkn89mMBQUemRkVmKhro"
                 computeUnitPrice:
                   type: string
                   default: auto

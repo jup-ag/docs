@@ -179,10 +179,795 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/errorSchema'
+  /orders/limit:
+    description: Returns a serialized transaction to create a limit order.
+    delete:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                positionRequestPubkey:
+                  type: string
+                  description: >-
+                    Public key / account address for the position request
+                    account for the limit order.
+              required:
+                - positionRequestPubkey
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  serializedTxBase64:
+                    type:
+                      - string
+                      - 'null'
+                    description: >-
+                      The serialized transaction (base64 encoded) containing the
+                      instructions and given parameters for the close limit
+                      order request. The transaction can be deserialized, signed
+                      by the owner of `walletAddress` and submitted onchain to
+                      execute the close limit order request
+                  txMetadata:
+                    type: object
+                    properties:
+                      blockhash:
+                        type: string
+                        description: >-
+                          The blockhash used for the serialized transaction.
+                          This blockhash must be used when submitting the
+                          transaction.
+                      lastValidBlockHeight:
+                        type: string
+                        description: >-
+                          The block height used for the serialized transaction.
+                          This block height must be used when submitting the
+                          transaction.
+                      transactionFeeLamports:
+                        type: string
+                        description: The transaction fee (in lamports) in decimal format.
+                        example: '0.5'
+                      accountRentLamports:
+                        type: string
+                        description: The account rent (in lamports) for the transaction
+                        example: '0.5'
+                    required:
+                      - blockhash
+                      - lastValidBlockHeight
+                      - transactionFeeLamports
+                      - accountRentLamports
+                  positionPubkey:
+                    type:
+                      - string
+                      - 'null'
+                    description: >-
+                      The unique identifier (i.e. a program derived address) for
+                      the position account. Use this address to find the
+                      position account onchain.
+                  positionRequestPubkey:
+                    type:
+                      - string
+                      - 'null'
+                    description: >-
+                      The unique identifier (i.e. a program derived address) for
+                      the position request. Use this address to find the
+                      position request account onchain
+                  requireKeeperSignature:
+                    type:
+                      - boolean
+                      - 'null'
+                    description: ''
+                required:
+                  - serializedTxBase64
+                  - txMetadata
+                  - positionPubkey
+                  - positionRequestPubkey
+        '400':
+          description: 400 Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '404':
+          description: 404 Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '422':
+          description: 422 Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '500':
+          description: 500 Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+    get:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                walletAddress:
+                  type: string
+                  description: Public key for the wallet to fetch expired orders
+              required:
+                - walletAddress
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                  dataList:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        collateralMint:
+                          type: string
+                          description: >-
+                            The mint address for the limit order's collateral
+                            token / custody
+                        collateralCustody:
+                          type: string
+                          description: The public key for the collateral custody account
+                        collateralUsd:
+                          type: string
+                          description: >-
+                            The collateral value (USD) expressed as a raw
+                            integer with 6 decimal places.
+                          example: '1234000000'
+                        collateralUsdAtTriggerPrice:
+                          type: string
+                          description: >-
+                            The collateral value (USD) at the trigger price (raw
+                            value with 6 decimal places).
+                          example: '1234000000'
+                        collateralTokenAmount:
+                          type: string
+                          description: >-
+                            The collateral amount for the limit order scaled to
+                            the token mint's decimals.
+                        custody:
+                          type: string
+                          description: The mint address for the limit order custody
+                        executed:
+                          type: boolean
+                          description: >-
+                            `executed` is true when the limit order has been
+                            executed, `false` otherwise.
+                        inputMint:
+                          type: string
+                          description: >-
+                            The mint address for the token used to create the
+                            limit order.
+                        liquidationPriceUsd:
+                          type: string
+                          description: >-
+                            The liquidation price (USD) expressed as a raw
+                            integer with 6 decimal places.
+                          example: '13240000'
+                        marketMint:
+                          type: string
+                          description: >-
+                            The mint address for the limit order's token /
+                            custody.
+                        maxSizeUsdDelta:
+                          type: string
+                          description: >-
+                            The maximum size (USD) for the limit order (raw
+                            value with 6 decimal places).
+                          example: '1234000000'
+                        minSizeUsdDelta:
+                          type: string
+                          description: >-
+                            The minimum size (USD) for the limit order (raw
+                            value with 6 decimal places).
+                          example: '1234000000'
+                        openTime:
+                          type: string
+                          description: The UNIX timestamp when the limit order was created
+                        positionPubkey:
+                          type: string
+                          description: >-
+                            The public key / account address for the limit
+                            order's open position
+                        positionRequestPubkey:
+                          type: string
+                          description: >-
+                            The public key / account address for the limit
+                            order's position request
+                        side:
+                          type: string
+                          enum:
+                            - long
+                            - short
+                        sizeUsdDelta:
+                          type: string
+                          description: >-
+                            The size (USD) of the limit order (raw value with 6
+                            decimal places).
+                        triggerPrice:
+                          type:
+                            - string
+                            - 'null'
+                          description: >-
+                            The price (USD) at which the limit order is executed
+                            (raw value with 6 decimal places).
+                        triggerToLiquidationPercent:
+                          type:
+                            - string
+                            - 'null'
+                          description: >-
+                            Percentage buffer between the limit order trigger
+                            price and position liquidation price. Calculated as
+                            ((triggerPrice - liquidationPrice) /
+                            liquidationPrice) * 100.
+                          example: '5.75'
+                      required:
+                        - collateralMint
+                        - collateralCustody
+                        - collateralUsd
+                        - collateralUsdAtTriggerPrice
+                        - collateralTokenAmount
+                        - custody
+                        - executed
+                        - inputMint
+                        - liquidationPriceUsd
+                        - marketMint
+                        - maxSizeUsdDelta
+                        - minSizeUsdDelta
+                        - openTime
+                        - positionPubkey
+                        - positionRequestPubkey
+                        - side
+                        - sizeUsdDelta
+                        - triggerPrice
+                        - triggerToLiquidationPercent
+                required:
+                  - count
+                  - dataList
+        '400':
+          description: 400 Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '404':
+          description: 404 Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '422':
+          description: 422 Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '500':
+          description: 500 Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                asset:
+                  type: string
+                  enum:
+                    - BTC
+                    - ETH
+                    - SOL
+                  description: The asset or market to trade against for the limit order.
+                  example: SOL
+                includeSerializedTx:
+                  type: boolean
+                  default: true
+                  description: >-
+                    Sets whether to return a serialized transaction
+                    (`serializedTxBase64`) in the response.
+                inputToken:
+                  type: string
+                  enum:
+                    - BTC
+                    - ETH
+                    - SOL
+                    - USDC
+                  description: >-
+                    The token symbol for the input token used to fund the limit
+                    order.
+                  example: USDC
+                inputTokenAmount:
+                  type: string
+                  description: >-
+                    The amount of tokens for the input token. NOTE: The token
+                    amount needs to be an integer and must conform to the token
+                    mint decimals specified onchain. For example, to deposit 1
+                    SOL, the value would be '1000000000' (9 decimals).
+                  example: '1000000000'
+                leverage:
+                  type: string
+                  description: >-
+                    Leverage of the limit order. Either provide leverage or
+                    sizeUsdDelta.
+                  example: '10'
+                side:
+                  type: string
+                  enum:
+                    - long
+                    - short
+                  description: Required when creating a limit order request.
+                sizeUsdDelta:
+                  type: string
+                  description: >-
+                    The amount in USD for the size of the limit order (raw value
+                    with 6 decimal places). Either provide leverage or
+                    sizeUsdDelta.
+                  example: '10000000'
+                triggerPrice:
+                  type: string
+                  description: >-
+                    Trigger price at which the limit order will be executed (raw
+                    value with 6 decimal places). For example, to set a trigger
+                    price of $20, pass in 20000000.
+                  example: '20000000'
+                walletAddress:
+                  type: string
+                  description: >-
+                    The wallet address / public key for the trader. Required
+                    when creating a limit order that returns a serialized
+                    transaction.
+              required:
+                - asset
+                - inputToken
+                - inputTokenAmount
+                - side
+                - triggerPrice
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  positionPubkey:
+                    type:
+                      - string
+                      - 'null'
+                    description: >-
+                      The unique identifier (i.e. a program derived address) for
+                      the position account. Use this address to find the
+                      position account onchain.
+                  quote:
+                    type: object
+                    properties:
+                      averagePriceUsd:
+                        type: string
+                        description: >-
+                          The average price for the position in USD (raw value
+                          with 6 decimal places)
+                        example: '10000000'
+                      collateralUsdDelta:
+                        type: string
+                        description: >-
+                          The change in collateral amount in USD (raw value with
+                          6 decimal places)
+                        example: '1124450000'
+                      leverage:
+                        type: string
+                        description: The leverage amount for the position
+                        example: '2.99'
+                      liquidationPriceUsd:
+                        type: string
+                        description: >-
+                          The liquidation price in USD (raw value with 6 decimal
+                          places)
+                        example: '13240000'
+                      openFeeUsd:
+                        type: string
+                        description: >-
+                          The total fee in USD for opening the position or
+                          depositing collateral including base fees, borrowing
+                          fees, and price impact fees (raw value with 6 decimal
+                          places)
+                        example: '100000'
+                      outstandingBorrowFeeUsd:
+                        type: string
+                        description: >-
+                          The outstanding borrow fees due / to be paid on
+                          depositing collateral to the position (raw value with
+                          6 decimal places)
+                        example: '100000'
+                      positionCollateralUsd:
+                        type: string
+                        description: >-
+                          The total position collateral size in USD after the
+                          increase (raw value with 6 decimal places)
+                        example: '100000000'
+                      positionSizeUsd:
+                        type: string
+                        description: >-
+                          The total position size in USD including leverage
+                          after the increase (raw value with 6 decimal places)
+                        example: '10000000'
+                      priceImpactFeeBps:
+                        type: string
+                        description: >-
+                          The price impact fee bps for opening the position
+                          based on the position size. For more info on how the
+                          price impact fee calculation works:
+                          https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
+                        example: '100'
+                      priceImpactFeeUsd:
+                        type: string
+                        description: >-
+                          The price impact fee in USD for opening the position
+                          based on the position size (raw value with 6 decimal
+                          places). For more info:
+                          https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
+                        example: '13301'
+                      side:
+                        type: string
+                        enum:
+                          - long
+                          - short
+                        description: The position side
+                        example: long
+                      sizeUsdDelta:
+                        type: string
+                        description: >-
+                          The change in position size in USD (raw value with 6
+                          decimal places)
+                        example: '1124450000'
+                      sizeTokenDelta:
+                        type: string
+                        description: >-
+                          The change in the position's size in the token amount
+                          for the position's collateral token.
+                        example: '14420000'
+                    required:
+                      - averagePriceUsd
+                      - collateralUsdDelta
+                      - leverage
+                      - liquidationPriceUsd
+                      - openFeeUsd
+                      - outstandingBorrowFeeUsd
+                      - positionCollateralUsd
+                      - positionSizeUsd
+                      - priceImpactFeeBps
+                      - priceImpactFeeUsd
+                      - side
+                      - sizeUsdDelta
+                      - sizeTokenDelta
+                  serializedTxBase64:
+                    type:
+                      - string
+                      - 'null'
+                    description: >-
+                      The serialized transaction (base64 encoded) containing the
+                      instructions and given parameters for the limit order. The
+                      transaction can be deserialized, signed by the owner of
+                      `walletAddress` and submitted onchain to execute the
+                      request
+                  txMetadata:
+                    type:
+                      - object
+                      - 'null'
+                    properties:
+                      blockhash:
+                        type: string
+                        description: >-
+                          The blockhash used for the serialized transaction.
+                          This blockhash must be used when submitting the signed
+                          limit order transaction.
+                      lastValidBlockHeight:
+                        type: string
+                        description: >-
+                          The block height used for the serialized transaction.
+                          This block height must be used when submitting the
+                          signed limit order transaction.
+                      transactionFeeLamports:
+                        type: string
+                        description: >-
+                          The transaction fee in lamports (1 SOL = 1,000,000,000
+                          lamports)
+                        example: '5000'
+                      accountRentLamports:
+                        type: string
+                        description: >-
+                          The account rent in lamports for creating the position
+                          request (1 SOL = 1,000,000,000 lamports)
+                        example: '2039280'
+                    required:
+                      - blockhash
+                      - lastValidBlockHeight
+                      - transactionFeeLamports
+                      - accountRentLamports
+                    description: >-
+                      Contains relevant metadata for the serialized transaction.
+                      Null if no wallet address passed in.
+                required:
+                  - positionPubkey
+                  - quote
+                  - serializedTxBase64
+                  - txMetadata
+        '400':
+          description: 400 Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '404':
+          description: 404 Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '422':
+          description: 422 Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '500':
+          description: 500 Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                positionRequestPubkey:
+                  type: string
+                  description: The public key for the limit order position request.
+                triggerPrice:
+                  type: string
+                  description: >-
+                    Trigger price at which the limit order will be executed (raw
+                    value with 6 decimal places). For example, to set a trigger
+                    price of $20, pass in 20000000.
+                  example: '20000000'
+              required:
+                - positionRequestPubkey
+                - triggerPrice
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  positionPubkey:
+                    type:
+                      - string
+                      - 'null'
+                    description: >-
+                      The unique identifier (i.e. a program derived address) for
+                      the position account. Use this address to find the
+                      position account onchain.
+                  positionRequestPubkey:
+                    type:
+                      - string
+                      - 'null'
+                    description: >-
+                      The unique identifier (i.e. a program derived address) for
+                      the position request. Use this address to find the
+                      position request account onchain
+                  quote:
+                    type: object
+                    properties:
+                      averagePriceUsd:
+                        type: string
+                        description: >-
+                          The average price for the position in USD (raw value
+                          with 6 decimal places)
+                        example: '10000000'
+                      collateralUsdDelta:
+                        type: string
+                        description: >-
+                          The change in collateral amount in USD (raw value with
+                          6 decimal places)
+                        example: '1124450000'
+                      leverage:
+                        type: string
+                        description: The leverage amount for the position
+                        example: '2.99'
+                      liquidationPriceUsd:
+                        type: string
+                        description: >-
+                          The liquidation price in USD (raw value with 6 decimal
+                          places)
+                        example: '13240000'
+                      openFeeUsd:
+                        type: string
+                        description: >-
+                          The total fee in USD for opening the position or
+                          depositing collateral including base fees, borrowing
+                          fees, and price impact fees (raw value with 6 decimal
+                          places)
+                        example: '100000'
+                      outstandingBorrowFeeUsd:
+                        type: string
+                        description: >-
+                          The outstanding borrow fees due / to be paid on
+                          depositing collateral to the position (raw value with
+                          6 decimal places)
+                        example: '100000'
+                      positionCollateralUsd:
+                        type: string
+                        description: >-
+                          The total position collateral size in USD after the
+                          increase (raw value with 6 decimal places)
+                        example: '100000000'
+                      positionSizeUsd:
+                        type: string
+                        description: >-
+                          The total position size in USD including leverage
+                          after the increase (raw value with 6 decimal places)
+                        example: '10000000'
+                      priceImpactFeeBps:
+                        type: string
+                        description: >-
+                          The price impact fee bps for opening the position
+                          based on the position size. For more info on how the
+                          price impact fee calculation works:
+                          https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
+                        example: '100'
+                      priceImpactFeeUsd:
+                        type: string
+                        description: >-
+                          The price impact fee in USD for opening the position
+                          based on the position size (raw value with 6 decimal
+                          places). For more info:
+                          https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
+                        example: '13301'
+                      side:
+                        type: string
+                        enum:
+                          - long
+                          - short
+                        description: The position side
+                        example: long
+                      sizeUsdDelta:
+                        type: string
+                        description: >-
+                          The change in position size in USD (raw value with 6
+                          decimal places)
+                        example: '1124450000'
+                      sizeTokenDelta:
+                        type: string
+                        description: >-
+                          The change in the position's size in the token amount
+                          for the position's collateral token.
+                        example: '14420000'
+                    required:
+                      - averagePriceUsd
+                      - collateralUsdDelta
+                      - leverage
+                      - liquidationPriceUsd
+                      - openFeeUsd
+                      - outstandingBorrowFeeUsd
+                      - positionCollateralUsd
+                      - positionSizeUsd
+                      - priceImpactFeeBps
+                      - priceImpactFeeUsd
+                      - side
+                      - sizeUsdDelta
+                      - sizeTokenDelta
+                  serializedTxBase64:
+                    type:
+                      - string
+                      - 'null'
+                    description: >-
+                      The serialized transaction (base64 encoded) containing the
+                      instructions and given parameters for the update limit
+                      order request. The transaction can be deserialized, signed
+                      by the owner of `walletAddress` and submitted onchain to
+                      execute the update limit order request
+                  txMetadata:
+                    type:
+                      - object
+                      - 'null'
+                    properties:
+                      blockhash:
+                        type: string
+                        description: >-
+                          The blockhash used for the serialized transaction.
+                          This blockhash must be used when submitting the signed
+                          limit order transaction.
+                      lastValidBlockHeight:
+                        type: string
+                        description: >-
+                          The block height used for the serialized transaction.
+                          This block height must be used when submitting the
+                          signed limit order transaction.
+                      transactionFeeLamports:
+                        type: string
+                        description: >-
+                          The transaction fee in lamports (1 SOL = 1,000,000,000
+                          lamports)
+                        example: '5000'
+                      accountRentLamports:
+                        type: string
+                        description: >-
+                          The account rent in lamports for creating the position
+                          request (1 SOL = 1,000,000,000 lamports)
+                        example: '2039280'
+                    required:
+                      - blockhash
+                      - lastValidBlockHeight
+                      - transactionFeeLamports
+                      - accountRentLamports
+                    description: Contains relevant metadata for the serialized transaction.
+                required:
+                  - positionPubkey
+                  - positionRequestPubkey
+                  - quote
+                  - serializedTxBase64
+                  - txMetadata
+        '400':
+          description: 400 Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '404':
+          description: 404 Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '422':
+          description: 422 Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '500':
+          description: 500 Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
   /positions:
     description: Fetches the open positions for the given wallet address
     get:
       parameters:
+        - in: query
+          name: includeClosedPositions
+          description: Set to true to return closed positions
+          schema:
+            type: boolean
+            default: false
+            description: Set to true to return closed positions
         - in: query
           name: walletAddress
           description: Public key for the wallet to fetch trades
@@ -203,119 +988,36 @@ paths:
                     items:
                       type: object
                       properties:
-                        borrowFees:
+                        asset:
                           type: string
-                          description: >-
-                            The outstanding borrow fees for the position in the
-                            integer format corresponding to the 6 decimals
-                            places used by the USDC and USDT token mint
-                          example: '100000'
-                        borrowFeesUsd:
-                          type: string
-                          description: The outstanding borrow fees (USD) for the position
-                          example: '10.00'
-                        closeFees:
-                          type: string
-                          description: >-
-                            The fee for closing the position (0.06%) in the
-                            integer format corresponding to the 6 decimals
-                            places used by the USDC and USDT token mint
-                          example: '100000'
-                        closeFeesUsd:
-                          type: string
-                          description: The fee (USD) for closing the position (0.06%)
-                          example: '10.00'
-                        collateral:
-                          type: string
-                          description: USD value of the position's collateral size
-                          example: '250.00'
-                        collateralUsd:
-                          type: string
-                          description: Raw USD value of the position's collateral size
-                          example: '250000000'
-                        collateralMint:
-                          type: string
-                          description: >-
-                            The mint address for the position's collateral
-                            token. 'SOL' =
-                            'So11111111111111111111111111111111111111112', 'ETH'
-                            = '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs',
-                            'BTC' =
-                            '3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh',
-                            'USDC' =
-                            'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-                            'USDT' =
-                            'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'
-                          example: So11111111111111111111111111111111111111112
-                        createdTime:
-                          type: number
-                          description: UNIX timestamp of when the trade was created
-                          example: 1722851463
-                        entryPrice:
-                          type: string
-                          description: USD value of the position's entry price
-                          example: '123.45'
-                        leverage:
-                          type: string
-                          description: Leverage amount for the position
-                          example: '21.30'
-                        liquidationPrice:
-                          type: string
-                          description: USD value of the position's liquidation price
-                          example: '123.45'
-                        marketMint:
-                          type: string
+                          enum:
+                            - BTC
+                            - ETH
+                            - SOL
                           description: >-
                             The asset or market being traded against for the
-                            position. 'SOL' =
-                            'So11111111111111111111111111111111111111112', 'ETH'
-                            = '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs',
-                            'BTC' =
-                            '3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh'
+                            position.
+                          example: SOL
+                        assetMint:
+                          type: string
+                          description: The mint address for the position asset.
                           example: So11111111111111111111111111111111111111112
-                        markPrice:
+                        collateralToken:
                           type: string
-                          description: USD value of the position's mark price
-                          example: '123.45'
-                        openFees:
-                          type: string
+                          enum:
+                            - BTC
+                            - ETH
+                            - SOL
+                            - USDC
+                            - USDT
                           description: >-
-                            The fee for opening the position (0.06%) in the
-                            integer format corresponding to the 6 decimals
-                            places used by the USDC and USDT token mint
-                          example: '100000'
-                        openFeesUsd:
+                            The token symbol for the collateral backing the
+                            position.
+                          example: SOL
+                        collateralMint:
                           type: string
-                          description: The fee (USD) for opening the position (0.06%)
-                          example: '10.00'
-                        pnlAfterFees:
-                          type: string
-                          description: >-
-                            The position's PNL after fees in the integer format
-                            corresponding to the 6 decimals places used by the
-                            USDC and USDT token mint
-                          example: '10.45'
-                        pnlAfterFeesUsd:
-                          type: string
-                          description: The position's PNL (USD) after fees
-                          example: '10.45'
-                        pnlBeforeFees:
-                          type: string
-                          description: >-
-                            The position's PNL before fees in the integer format
-                            corresponding to the 6 decimals places used by the
-                            USDC and USDT token mint
-                          example: '10.45'
-                        pnlBeforeFeesUsd:
-                          type: string
-                          description: The position's PNL (USD) before fees
-                          example: '10.45'
-                        pnlChangePctAfterFees:
-                          type: string
-                          description: The position's PNL change percentage after fees
-                        pnlChangePctBeforeFees:
-                          type: string
-                          description: The position's PNL change percentage before fees
+                          description: The mint address for the collateral token.
+                          example: So11111111111111111111111111111111111111112
                         positionPubkey:
                           type: string
                           description: The public key / address for the position
@@ -325,50 +1027,114 @@ paths:
                           enum:
                             - long
                             - short
-                        size:
+                          description: Side for the position
+                        leverage:
                           type: string
-                          description: >-
-                            USD value of the position's trade size (including
-                            leverage)
-                          example: '12345.68'
-                        sizeUsdDelta:
+                          description: Leverage amount for the position
+                          example: '21.30'
+                        sizeUsd:
                           type: string
                           description: >-
                             Raw USD value of the position's trade size
                             (including leverage)
-                          example: '12345.68'
+                          example: '1234567800'
                         sizeTokenAmount:
                           type: string
                           description: >-
                             Raw token amount for the position's size scaled to
                             the custody token's mint decimals
                           example: '250000000'
-                        totalFees:
+                        collateralUsd:
+                          type: string
+                          description: Raw USD value of the position's collateral size
+                          example: '250000000'
+                        valueUsd:
                           type: string
                           description: >-
-                            The total fees for the position in the integer
-                            format corresponding to the 6 decimals places used
-                            by the USDC and USDT token mint.
+                            Raw USD value of the currently open position
+                            including opening, closing, and borrowing fees
+                            incurred
+                          example: '120000000'
+                        entryPriceUsd:
+                          type: string
+                          description: Raw USD value of the position's entry price
+                          example: '123450000'
+                        markPriceUsd:
+                          type: string
+                          description: Raw USD value of the position's mark price
+                          example: '125000000'
+                        liquidationPriceUsd:
+                          type: string
+                          description: Raw USD value of the position's liquidation price
+                          example: '113450000'
+                        openFeesUsd:
+                          type: string
+                          description: >-
+                            Raw fee for opening the position in the integer
+                            format corresponding to 6 decimal places (USD terms)
+                          example: '100000'
+                        closeFeesUsd:
+                          type: string
+                          description: >-
+                            Raw fee for closing the position in the integer
+                            format corresponding to 6 decimal places (USD terms)
+                          example: '100000'
+                        borrowFeesUsd:
+                          type: string
+                          description: >-
+                            Raw outstanding borrow fees for the position in the
+                            integer format corresponding to 6 decimal places
+                            (USD terms)
                           example: '100000'
                         totalFeesUsd:
                           type: string
-                          description: The total fees (USD) for the position.
-                          example: '10.00'
+                          description: >-
+                            Raw total fees for the position in the integer
+                            format corresponding to 6 decimal places (USD terms)
+                          example: '200000'
+                        pnlBeforeFeesUsd:
+                          type: string
+                          description: >-
+                            Raw value of the position's PNL before fees in the
+                            integer format corresponding to 6 decimal places
+                            (USD terms)
+                          example: '1045000'
+                        pnlBeforeFeesPct:
+                          type: string
+                          description: >-
+                            The PNL change (%) from closing the position before
+                            fees.
+                          example: '20.24'
+                        pnlAfterFeesUsd:
+                          type: string
+                          description: >-
+                            Raw value of the position's PNL after fees in the
+                            integer format corresponding to 6 decimal places
+                            (USD terms)
+                          example: '1045000'
+                        pnlAfterFeesPct:
+                          type: string
+                          description: >-
+                            The PNL change (%) from closing the position after
+                            fees.
+                          example: '-20.24'
+                        createdTime:
+                          type: number
+                          description: UNIX timestamp of when the trade was created
+                          example: 1722851463
+                        updatedTime:
+                          type: number
+                          example: 1722851463
                         tpslRequests:
                           type: array
                           items:
                             type: object
                             properties:
-                              desiredMint:
-                                type: string
-                                description: >-
-                                  The mint address for the TP position request
-                                  account's desired mint
                               positionRequestPubkey:
                                 type: string
                                 description: >-
-                                  The public key / address for the TP position
-                                  request account
+                                  The public key / address for the TP / SL
+                                  position request account
                               requestType:
                                 type: string
                                 enum:
@@ -377,95 +1143,102 @@ paths:
                                 description: >-
                                   Returns `tp` if it is a take profit request,
                                   `sl` if it is a stop loss request
+                              desiredMint:
+                                type: string
+                                description: >-
+                                  The mint address for the TP / SL position
+                                  request account desired mint
+                                example: So11111111111111111111111111111111111111112
+                              desiredToken:
+                                type: string
+                                enum:
+                                  - BTC
+                                  - ETH
+                                  - SOL
+                                  - USDC
+                                  - USDT
+                                description: >-
+                                  The token symbol for the TP / SL position
+                                  request account desired mint
+                                example: SOL
+                              collateralUsdDelta:
+                                type: string
+                                description: >-
+                                  Raw collateral delta (USD) for the TP / SL in
+                                  the integer format corresponding to 6 decimal
+                                  places
+                                example: '1234000000'
+                              entirePosition:
+                                type: boolean
+                                description: >-
+                                  Whether the TP / SL request closes the entire
+                                  position
                               sizeUsd:
                                 type: string
                                 description: >-
-                                  The close size for the TP / SL in integer
-                                  format corresponding to the 6 decimals places
+                                  Raw close size for the TP / SL in integer
+                                  format corresponding to the 6 decimal places
                                   used by the USDC and USDT token mint
                                 example: '1234000000'
-                              sizeUsdFormatted:
-                                type: string
-                                description: >-
-                                  The formatted close size for the TP / SL in
-                                  integer format corresponding to the 6 decimals
-                                  places used by the USDC and USDT token mint
-                                example: '12.34'
                               sizePercentage:
                                 type: string
                                 description: >-
                                   The percentage / ratio TP / SL size to the
                                   position size
                                 example: '12.34'
-                              triggerPrice:
-                                type:
-                                  - string
-                                  - 'null'
-                                description: >-
-                                  The trigger price for the TP / SL request in
-                                  integer format corresponding to the 6 decimals
-                                  places used by the USDC and USDT token mint
-                                example: '20000000'
                               triggerPriceUsd:
                                 type:
                                   - string
                                   - 'null'
                                 description: >-
-                                  The trigger price (USD) for the TP / SL
-                                  request
+                                  Raw trigger price for the TP / SL request in
+                                  integer format corresponding to the 6 decimals
+                                  places used by the USDC and USDT token mint
                                 example: '20000000'
+                              openTime:
+                                type: string
+                                description: >-
+                                  Unix timestamp of when the TP / SL request was
+                                  created
+                                example: '1722851463'
                             required:
-                              - desiredMint
                               - positionRequestPubkey
                               - requestType
+                              - desiredMint
+                              - desiredToken
+                              - collateralUsdDelta
+                              - entirePosition
                               - sizeUsd
-                              - sizeUsdFormatted
                               - sizePercentage
-                              - triggerPrice
                               - triggerPriceUsd
+                              - openTime
                           description: The active TP / SL requests for the position
-                        updatedTime:
-                          type: number
-                          example: 1722851463
-                        value:
-                          type: string
-                          description: >-
-                            USD value of the currently open position including
-                            fees incurred by opening, closing, and borrowing the
-                            position
-                          example: '120.00'
                       required:
-                        - borrowFees
-                        - borrowFeesUsd
-                        - closeFees
-                        - closeFeesUsd
-                        - collateral
-                        - collateralUsd
+                        - asset
+                        - assetMint
+                        - collateralToken
                         - collateralMint
-                        - createdTime
-                        - entryPrice
-                        - leverage
-                        - liquidationPrice
-                        - marketMint
-                        - markPrice
-                        - openFees
-                        - openFeesUsd
-                        - pnlAfterFees
-                        - pnlAfterFeesUsd
-                        - pnlBeforeFees
-                        - pnlBeforeFeesUsd
-                        - pnlChangePctAfterFees
-                        - pnlChangePctBeforeFees
                         - positionPubkey
                         - side
-                        - size
-                        - sizeUsdDelta
+                        - leverage
+                        - sizeUsd
                         - sizeTokenAmount
-                        - totalFees
+                        - collateralUsd
+                        - valueUsd
+                        - entryPriceUsd
+                        - markPriceUsd
+                        - liquidationPriceUsd
+                        - openFeesUsd
+                        - closeFeesUsd
+                        - borrowFeesUsd
                         - totalFeesUsd
-                        - tpslRequests
+                        - pnlBeforeFeesUsd
+                        - pnlBeforeFeesPct
+                        - pnlAfterFeesUsd
+                        - pnlAfterFeesPct
+                        - createdTime
                         - updatedTime
-                        - value
+                        - tpslRequests
                   count:
                     type: number
                 required:
@@ -730,7 +1503,9 @@ paths:
               type: object
               properties:
                 collateralUsdDelta:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: >-
                     The amount of collateral to withdraw in USD from the
                     position. Must be an integer representing the USD amount
@@ -739,18 +1514,6 @@ paths:
                     decrease by $10 USD, set 'collateralUsdDelta' to 10000000;
                     for $20.50 USD, set 'collateralUsdDelta' to 20500000.
                   example: '10000000'
-                desiredMint:
-                  type: string
-                  enum:
-                    - So11111111111111111111111111111111111111112
-                    - 7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs
-                    - 3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh
-                    - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-                    - Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
-                  description: >-
-                    The mint address for the token to be used when withdrawing
-                    collateral or closing position.
-                  example: So11111111111111111111111111111111111111112
                 entirePosition:
                   type: boolean
                   default: false
@@ -763,9 +1526,8 @@ paths:
                   type: string
                   default: '200'
                   description: >-
-                    The maximum slippage in (BPS) for the token swap (if
-                    required) and the token price when executing the increase
-                    position trade
+                    The maximum slippage in (BPS) for the asset's price when
+                    executing the trade
                   example: '100'
                 positionPubkey:
                   type: string
@@ -774,8 +1536,24 @@ paths:
                     positions` endpoint to fetch the public key for the trader's
                     open positions.
                   example: 5HHB8sCKjWPU2zr3p4Lg49mQiaPQiHbCjHW7jgVzp583
-                sizeUsdDelta:
+                priorityFeeMicroLamports:
                   type: string
+                  description: >-
+                    Custom priority fee in microlamports for the transaction
+                    (1,000,000 microlamports = 1 lamport). If not set, the API
+                    will automatically set the optimal priority fee
+                receiveToken:
+                  type: string
+                  enum:
+                    - BTC
+                    - ETH
+                    - SOL
+                    - USDC
+                  description: The token to receive.
+                sizeUsdDelta:
+                  type:
+                    - string
+                    - 'null'
                   description: >-
                     The amount in USD to decrease the position size by. Must be
                     an integer representing the USD amount multiplied by 10^6 (1
@@ -785,10 +1563,8 @@ paths:
                     'sizeUsdDelta' to 20500000.
                   example: '10000000'
               required:
-                - collateralUsdDelta
-                - desiredMint
                 - positionPubkey
-                - sizeUsdDelta
+                - receiveToken
       responses:
         '200':
           description: 200 OK
@@ -803,95 +1579,76 @@ paths:
                       The unique identifier (i.e. a program derived address) for
                       the position account. Use this address to find the
                       position account onchain.
-                  positionRequestPubkey:
-                    type:
-                      - string
-                      - 'null'
-                    description: >-
-                      The unique identifier (i.e. a program derived address) for
-                      the position request. Use this address to find the
-                      position request account onchain. Returns null if
-                      `requireKeeperSignature` is true.
                   quote:
                     type: object
                     properties:
                       closeFeeUsd:
                         type: string
                         description: >-
-                          The base close fee (USD) for closing the position or
-                          withdrawing collateral from the position.
-                        example: '0.0063'
-                      feeUsd:
+                          The base close fee for closing the position or
+                          withdrawing collateral (raw value with 6 decimal
+                          places)
+                        example: '100000'
+                      collateralUsdDelta:
                         type: string
                         description: >-
-                          The total fee (USD) for closing or withdrawing
-                          collateral from the position including base fees,
-                          borrowing fees, and price impact fees
-                        example: '0.0063'
+                          The change in collateral amount in USD (raw value with
+                          6 decimal places)
+                        example: '10000000'
                       leverage:
                         type: string
                         description: >-
-                          The leverage amount for the position after withdrawing
-                          collateral
+                          The leverage amount for the position after the
+                          decrease
                         example: '2.99'
                       liquidationPriceUsd:
                         type: string
                         description: >-
-                          The liquidation price (USD) for the position after
-                          withdrawing collateral
-                        example: '13.24'
+                          The liquidation price in USD (raw value with 6 decimal
+                          places)
+                        example: '13240000'
                       outstandingBorrowFeeUsd:
                         type: string
                         description: >-
                           The outstanding borrow fees due / to be paid on
-                          closing the position
-                        example: '0.1000'
-                      pnlAfterFees:
+                          closing the position (raw value with 6 decimal places)
+                        example: '100000'
+                      pnlAfterFeesUsd:
                         type: string
                         description: >-
-                          The position's PNL after fees in the integer format
-                          corresponding to the 6 decimals places used by the
-                          USDC and USDT token mint
+                          The position PNL after fees (raw value with 6 decimal
+                          places)
                         example: '1045000'
                       pnlAfterFeesPercent:
                         type: string
                         description: >-
                           The PNL change (%) from closing the position after
-                          fees.
+                          fees
                         example: '-20.24'
-                      pnlAfterFeesUsd:
-                        type: string
-                        description: The position's PNL (USD) after fees
-                        example: '10.45'
-                      pnlBeforeFees:
+                      pnlBeforeFeesUsd:
                         type: string
                         description: >-
-                          The position's PNL before fees in the integer format
-                          corresponding to the 6 decimals places used by the
-                          USDC and USDT token mint
+                          The position PNL before fees (raw value with 6 decimal
+                          places)
                         example: '1045000'
                       pnlBeforeFeesPercent:
                         type: string
                         description: >-
                           The PNL change (%) from closing the position before
-                          fees.
+                          fees
                         example: '20.24'
-                      pnlBeforeFeesUsd:
-                        type: string
-                        description: The position's PNL (USD) before fees
-                        example: '10.45'
-                      positionCollateralSizeUsd:
+                      positionCollateralUsd:
                         type: string
                         description: >-
-                          The total position collateral size (USD) after
-                          withdrawing
-                        example: '1124.45'
+                          The total position collateral size in USD after the
+                          decrease (raw value with 6 decimal places)
+                        example: '100000000'
                       positionSizeUsd:
                         type: string
                         description: >-
-                          The total position size (USD) including leverage after
-                          withdrawing
-                        example: '1124.45'
+                          The total position size in USD including leverage
+                          after the decrease (raw value with 6 decimal places)
+                        example: '10000000'
                       priceImpactFeeBps:
                         type: string
                         description: >-
@@ -903,11 +1660,11 @@ paths:
                       priceImpactFeeUsd:
                         type: string
                         description: >-
-                          The price impact fee (USD) for closing the position
-                          based on the position size. For more info on how the
-                          price impact fee calculation works:
+                          The price impact fee for closing the position based on
+                          the position size (raw value with 6 decimal places).
+                          For more info:
                           https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
-                        example: '1.3301'
+                        example: '13301'
                       side:
                         type: string
                         enum:
@@ -915,53 +1672,58 @@ paths:
                           - short
                         description: The position side
                         example: long
+                      sizeUsdDelta:
+                        type: string
+                        description: >-
+                          The change in position size in USD (raw value with 6
+                          decimal places)
+                        example: '10000000'
+                      totalFeeUsd:
+                        type: string
+                        description: >-
+                          The total fee in USD for closing or withdrawing
+                          collateral including base fees, borrowing fees, and
+                          price impact fees (raw value with 6 decimal places)
+                        example: '100000'
+                      transferAmountToken:
+                        type: string
+                        description: >-
+                          The collateral token amount to transfer to the owner
+                          after withdrawing collateral or closing the position
+                          (raw value)
+                        example: '100000000'
+                      transferAmountUsd:
+                        type: string
+                        description: >-
+                          The collateral token amount in USD to transfer to the
+                          owner (raw value with 6 decimal places)
+                        example: '10000000'
                       transferTokenMint:
                         type: string
                         description: >-
                           The mint address for the token used to transfer the
                           collateral withdrawal or closing position amount
                         example: So11111111111111111111111111111111111111112
-                      transferAmountToken:
-                        type: string
-                        description: >-
-                          The collateral token amount to transfer to the owner
-                          after withdrawing collateral or closing the position
-                        example: '100000000'
-                      transferAmountUsd:
-                        type: string
-                        description: >-
-                          The collateral token amount in USD to transfer to the
-                          owner withdrawing collateral or closing the position
-                        example: '1099.95'
                     required:
                       - closeFeeUsd
-                      - feeUsd
+                      - collateralUsdDelta
                       - leverage
                       - liquidationPriceUsd
                       - outstandingBorrowFeeUsd
-                      - pnlAfterFees
-                      - pnlAfterFeesPercent
                       - pnlAfterFeesUsd
-                      - pnlBeforeFees
-                      - pnlBeforeFeesPercent
+                      - pnlAfterFeesPercent
                       - pnlBeforeFeesUsd
-                      - positionCollateralSizeUsd
+                      - pnlBeforeFeesPercent
+                      - positionCollateralUsd
                       - positionSizeUsd
                       - priceImpactFeeBps
                       - priceImpactFeeUsd
                       - side
-                      - transferTokenMint
+                      - sizeUsdDelta
+                      - totalFeeUsd
                       - transferAmountToken
                       - transferAmountUsd
-                    description: >-
-                      The 'quote' object contains the position's updated values
-                      (leverage, size, collateral size, etc.) after withdrawing
-                      collateral.
-                  requireKeeperSignature:
-                    type:
-                      - boolean
-                      - 'null'
-                    description: ''
+                      - transferTokenMint
                   serializedTxBase64:
                     type: string
                     description: >-
@@ -987,12 +1749,16 @@ paths:
                           signed decrease position transaction.
                       transactionFeeLamports:
                         type: string
-                        description: The transaction fee (in lamports) in decimal format.
-                        example: '0.5'
+                        description: >-
+                          The transaction fee in lamports (1 SOL = 1,000,000,000
+                          lamports)
+                        example: '5000'
                       accountRentLamports:
                         type: string
-                        description: The account rent (in lamports) for the transaction
-                        example: '0.5'
+                        description: >-
+                          The account rent in lamports for the transaction (1
+                          SOL = 1,000,000,000 lamports)
+                        example: '2039280'
                     required:
                       - blockhash
                       - lastValidBlockHeight
@@ -1041,75 +1807,59 @@ paths:
             schema:
               type: object
               properties:
-                collateralMint:
+                asset:
                   type: string
                   enum:
-                    - So11111111111111111111111111111111111111112
-                    - 7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs
-                    - 3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh
-                    - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-                    - Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
+                    - BTC
+                    - ETH
+                    - SOL
+                  description: The asset or market to trade against
+                  example: SOL
+                inputToken:
+                  type: string
+                  enum:
+                    - BTC
+                    - ETH
+                    - SOL
+                    - USDC
                   description: >-
-                    The mint address for the collateral token (e.g.
-                    'So11111111111111111111111111111111111111112' for 'SOL').
-                    'collateralMint' must be the same as 'marketMint' for long
-                    positions, or USDC
-                    (EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v) for short
-                    positions.
-                  example: So11111111111111111111111111111111111111112
-                collateralTokenDelta:
+                    The token symbol for the input token used to fund the
+                    position
+                  example: SOL
+                inputTokenAmount:
                   type: string
                   description: >-
-                    The amount of tokens for the input mint to open the position
-                    or deposit collateral. NOTE: The token amount needs to be an
-                    integer and must conform to the token mint decimals
-                    specified onchain. For example, to deposit 1 'SOL', the
-                    'collateralTokenDelta' value would be equal to '1000000000'
+                    The amount of tokens for the input token to open the
+                    position or deposit collateral. NOTE: The token amount needs
+                    to be an integer and must conform to the token mint decimals
+                    specified onchain. For example, to deposit 1 SOL, the value
+                    would be '1000000000' (9 decimals)
                   example: '1000000000'
-                inputMint:
-                  type: string
-                  description: >-
-                    The mint address for the input token (e.g.
-                    'So11111111111111111111111111111111111111112' for 'SOL')
-                  example: So11111111111111111111111111111111111111112
                 leverage:
                   type: string
                   description: >-
-                    Leverage of the increase position. Either provide leverage
-                    or sizeUsdDelta. Max leverage for SOL is 100. Max leverage
-                    for BTC / ETH is 150
-                  example: '10'
-                marketMint:
-                  type: string
-                  enum:
-                    - So11111111111111111111111111111111111111112
-                    - 7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs
-                    - 3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh
-                  description: >-
-                    The asset or market to trade against. Required when opening
-                    a new position. 'SOL' =
-                    'So11111111111111111111111111111111111111112', 'ETH' =
-                    '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs', 'BTC' =
-                    '3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh'
-                  example: So11111111111111111111111111111111111111112
+                    Leverage of the increase position, up to 1 decimal place.
+                    Either provide 'leverage' or 'sizeUsdDelta' to open a trade.
+                    Min leverage is '1.1'. Max leverage for SOL is 250.0
+                  example: '11.5'
                 maxSlippageBps:
                   type: string
                   description: >-
-                    The maximum slippage in (BPS) for the custody token price
-                    when executing the decrease position trade
+                    The maximum slippage in (BPS) for the asset's price when
+                    executing trade
                   example: '100'
-                includeSerializedTx:
-                  type: boolean
-                  default: true
+                priorityFeeMicroLamports:
+                  type: string
                   description: >-
-                    Sets whether to return a serialized transaction
-                    (`serializedTxBase64`) in the response
+                    Custom priority fee in microlamports for the transaction
+                    (1,000,000 microlamports = 1 lamport). If not set, the API
+                    will automatically set the optimal priority fee
                 side:
                   type: string
                   enum:
                     - long
                     - short
-                  description: Required when opening a new position
+                  description: Side for the trade
                 sizeUsdDelta:
                   type: string
                   description: >-
@@ -1119,23 +1869,8 @@ paths:
                     USDC/USDT tokens on-chain. For example, to increase the
                     position size by $10 USD, set 'sizeUsdDelta' to 10000000;
                     for $0.50 USD, set 'sizeUsdDelta' to 500000. Either provide
-                    leverage or sizeUsdDelta.
+                    'leverage' or 'sizeUsdDelta'.
                   example: '10000000'
-                transactionType:
-                  type: string
-                  enum:
-                    - legacy
-                    - mixed
-                    - instant
-                  default: mixed
-                  description: >-
-                    Sets the type of serialized transaction to execute the
-                    action. If the transaction type is `legacy`, the transaction
-                    must be submitted by the client itself through the RPC. If
-                    the transaction type is `instant`, the transaction must be
-                    sent to the `POST /transaction/execute` endpoint. If the
-                    transaction type is `mixed`, the `transactionType` returned
-                    in the response will be either `legacy` or `instant`.
                 tpsl:
                   type:
                     - array
@@ -1143,18 +1878,14 @@ paths:
                   items:
                     type: object
                     properties:
-                      desiredMint:
+                      receiveToken:
                         type: string
                         enum:
-                          - So11111111111111111111111111111111111111112
-                          - 7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs
-                          - 3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh
-                          - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-                          - Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
-                        description: >-
-                          The mint address for the token used when withdrawing
-                          collateral or closing position when the TPSL is
-                          executed.
+                          - BTC
+                          - ETH
+                          - SOL
+                          - USDC
+                        description: The token to receive when the TPSL is executed.
                       triggerPrice:
                         type: string
                         description: >-
@@ -1172,20 +1903,23 @@ paths:
                           Pass in `tp` to set a take profit request or `sl` to
                           set a stop loss request
                     required:
-                      - desiredMint
+                      - receiveToken
                       - triggerPrice
                       - requestType
-                  description: TPSL requests to set
+                  maxItems: 2
+                  description: >-
+                    TPSL requests to set. TPSL requests can only be set for
+                    positions that 150x leverage or below. Only 2 TPSLs can be
+                    set at a time.
                 walletAddress:
                   type: string
                   description: >-
                     The wallet address / public key for the trader, Required
                     when opening a new position.
               required:
-                - collateralMint
-                - collateralTokenDelta
-                - inputMint
-                - marketMint
+                - asset
+                - inputToken
+                - inputTokenAmount
                 - maxSlippageBps
                 - side
       responses:
@@ -1204,99 +1938,58 @@ paths:
                       The unique identifier (i.e. a program derived address) for
                       the position account. Use this address to find the
                       position account onchain.
-                  positionRequestPubkey:
-                    type:
-                      - string
-                      - 'null'
-                    description: >-
-                      The unique identifier (i.e. a program derived address) for
-                      the position request. Use this address to find the
-                      position request account onchain
-                  tpslRequests:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        estimatedPnlUsd:
-                          type: string
-                          description: The estimated PNL (USD) for the TPSL request
-                        estimatedPnlPercent:
-                          type: string
-                          description: The estimated PNL percentage for the TPSL request
-                        hasProfit:
-                          type: boolean
-                          description: Whether the TPSL request has profit
-                        requestType:
-                          type: string
-                          enum:
-                            - tp
-                            - sl
-                          description: The type of TPSL request
-                        positionRequestPubkey:
-                          type: string
-                          description: >-
-                            The unique identifier (i.e. a program derived
-                            address) for the position request. Use this address
-                            to find the position request account onchain
-                      required:
-                        - estimatedPnlUsd
-                        - estimatedPnlPercent
-                        - hasProfit
-                        - requestType
-                        - positionRequestPubkey
-                    description: >-
-                      TPSL requests created with the increase position. Only
-                      returned when TPSL is requested.
                   quote:
                     type: object
                     properties:
-                      collateralLessThanFees:
-                        type: boolean
-                        description: >-
-                          When true, this means the trade's collateral is not
-                          enough to cover the fees required to execute the
-                          trade, causing the trade size to be zero (equivalent
-                          to a collateral deposit).
-                        example: true
-                      entryPriceUsd:
+                      averagePriceUsd:
                         type: string
-                        description: The entry price (USD) for the position
-                        example: '2.99'
+                        description: >-
+                          The average price for the position in USD (raw value
+                          with 6 decimal places)
+                        example: '10000000'
+                      collateralUsdDelta:
+                        type: string
+                        description: >-
+                          The change in collateral amount in USD (raw value with
+                          6 decimal places)
+                        example: '1124450000'
                       leverage:
                         type: string
                         description: The leverage amount for the position
                         example: '2.99'
                       liquidationPriceUsd:
                         type: string
-                        description: The liquidation price (USD) for the position
-                        example: '13.24'
+                        description: >-
+                          The liquidation price in USD (raw value with 6 decimal
+                          places)
+                        example: '13240000'
                       openFeeUsd:
                         type: string
                         description: >-
-                          The total fee (USD) for opening the position or
-                          depositing collateral to the position including base
-                          fees, borrowing fees, and price impact fees
-                        example: '0.0063'
+                          The total fee in USD for opening the position or
+                          depositing collateral including base fees, borrowing
+                          fees, and price impact fees (raw value with 6 decimal
+                          places)
+                        example: '100000'
                       outstandingBorrowFeeUsd:
                         type: string
                         description: >-
                           The outstanding borrow fees due / to be paid on
-                          depositing collateral to the position
-                        example: '0.1000'
-                      positionCollateralSizeUsd:
-                        type: string
-                        description: The total position collateral size (USD)
-                        example: '1124.45'
-                      positionSizeTokenAmount:
+                          depositing collateral to the position (raw value with
+                          6 decimal places)
+                        example: '100000'
+                      positionCollateralUsd:
                         type: string
                         description: >-
-                          The total position size in the underlying collateral
-                          token's token amount including leverage
-                        example: '112445000'
+                          The total position collateral size in USD after the
+                          increase (raw value with 6 decimal places)
+                        example: '100000000'
                       positionSizeUsd:
                         type: string
-                        description: The total position size (USD) including leverage
-                        example: '1124.45'
+                        description: >-
+                          The total position size in USD including leverage
+                          after the increase (raw value with 6 decimal places)
+                        example: '10000000'
                       priceImpactFeeBps:
                         type: string
                         description: >-
@@ -1304,40 +1997,15 @@ paths:
                           based on the position size. For more info on how the
                           price impact fee calculation works:
                           https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
-                        example: '1.3301'
+                        example: '100'
                       priceImpactFeeUsd:
                         type: string
                         description: >-
-                          The price impact fee (USD) for opening the position
-                          based on the position size. For more info on how the
-                          price impact fee calculation works:
+                          The price impact fee in USD for opening the position
+                          based on the position size (raw value with 6 decimal
+                          places). For more info:
                           https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
-                        example: '1.3301'
-                      quoteOutAmount:
-                        type:
-                          - string
-                          - 'null'
-                        description: >-
-                          The output amount from Jupiter's quote for the
-                          collateral token if a token swap is required (i.e. if
-                          the `inputMint` is not the same as the collateral
-                          mint)
-                      quotePriceSlippagePct:
-                        type:
-                          - string
-                          - 'null'
-                        description: >-
-                          The price slippage percentage from Jupiter's quote if
-                          a token swap is required (i.e. if the `inputMint` is
-                          not the same as the collateral mint)
-                      quoteSlippageBps:
-                        type:
-                          - string
-                          - 'null'
-                        description: >-
-                          The slippage (BPS) from Jupiter's quote if a token
-                          swap is required (i.e. if the `inputMint` is not the
-                          same as the collateral mint)
+                        example: '13301'
                       side:
                         type: string
                         enum:
@@ -1345,59 +2013,32 @@ paths:
                           - short
                         description: The position side
                         example: long
+                      sizeUsdDelta:
+                        type: string
+                        description: >-
+                          The change in position size in USD (raw value with 6
+                          decimal places)
+                        example: '1124450000'
                       sizeTokenDelta:
                         type: string
                         description: >-
                           The change in the position's size in the token amount
                           for the position's collateral token.
                         example: '14420000'
-                      expectedSizeUsdDelta:
-                        type: string
-                        description: >-
-                          The expected change in the position's size in USD
-                          before accounting for fees.
-                        example: '112445'
-                      expectedSizeUsdDeltaDiffPct:
-                        type: string
-                        description: >-
-                          The difference between the expected change in the
-                          position's size in USD before fees and the actual
-                          change in the position's size in USD.
-                        example: '14.45'
-                      sizeUsdDelta:
-                        type: string
-                        description: >-
-                          The actual change in the position's size in USD with
-                          formatting.
-                        example: '1124.45'
-                      sizeUsdDeltaRaw:
-                        type: string
-                        description: The actual change in the position's size in USD.
-                        example: '112445'
                     required:
-                      - collateralLessThanFees
-                      - entryPriceUsd
+                      - averagePriceUsd
+                      - collateralUsdDelta
                       - leverage
                       - liquidationPriceUsd
                       - openFeeUsd
                       - outstandingBorrowFeeUsd
-                      - positionCollateralSizeUsd
-                      - positionSizeTokenAmount
+                      - positionCollateralUsd
                       - positionSizeUsd
                       - priceImpactFeeBps
                       - priceImpactFeeUsd
-                      - quoteOutAmount
-                      - quotePriceSlippagePct
-                      - quoteSlippageBps
                       - side
-                      - sizeTokenDelta
-                      - expectedSizeUsdDelta
-                      - expectedSizeUsdDeltaDiffPct
                       - sizeUsdDelta
-                      - sizeUsdDeltaRaw
-                  requireKeeperSignature:
-                    type: boolean
-                    description: DEPRECATED
+                      - sizeTokenDelta
                   serializedTxBase64:
                     type:
                       - string
@@ -1408,19 +2049,38 @@ paths:
                       position request. The transaction can be deserialized,
                       signed by the owner of `walletAddress` and submitted
                       onchain to execute the increase position request
-                  transactionType:
-                    type: string
-                    enum:
-                      - mixed
-                      - instant
-                      - legacy
-                    description: >-
-                      Returns the type of serialized transaction to execute the
-                      action. If the transaction type is `legacy`, the
-                      transaction must be submitted by the client itself through
-                      the RPC. If the transaction type is `instant`, the
-                      transaction must be sent to the `POST
-                      /transaction/execute` endpoint.
+                  tpsl:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        hasProfit:
+                          type: boolean
+                          description: Whether the TPSL request is profitable
+                        pnlUsd:
+                          type: string
+                          description: The estimated PNL (USD) delta for the TPSL request
+                        pnlPercent:
+                          type: string
+                          description: The estimated PNL percentage for the TPSL request
+                        pubkey:
+                          type: string
+                          description: >-
+                            The pubkey for the TPSL. Use this address to find
+                            the TPSL account onchain
+                        requestType:
+                          type: string
+                          enum:
+                            - tp
+                            - sl
+                          description: The type of TPSL request
+                      required:
+                        - hasProfit
+                        - pnlUsd
+                        - pnlPercent
+                        - pubkey
+                        - requestType
+                    description: TPSL requests created with the increase position
                   txMetadata:
                     type:
                       - object
@@ -1440,12 +2100,16 @@ paths:
                           signed increase position transaction.
                       transactionFeeLamports:
                         type: string
-                        description: The transaction fee (in lamports) in decimal format.
-                        example: '0.5'
+                        description: >-
+                          The transaction fee in lamports (1 SOL = 1,000,000,000
+                          lamports)
+                        example: '5000'
                       accountRentLamports:
                         type: string
-                        description: The account rent (in lamports) for the transaction
-                        example: '0.5'
+                        description: >-
+                          The account rent in lamports for creating the position
+                          account (1 SOL = 1,000,000,000 lamports)
+                        example: '2039280'
                     required:
                       - blockhash
                       - lastValidBlockHeight
@@ -1456,12 +2120,900 @@ paths:
                       Null if no wallet address passed in.
                 required:
                   - positionPubkey
-                  - positionRequestPubkey
-                  - tpslRequests
                   - quote
-                  - requireKeeperSignature
                   - serializedTxBase64
-                  - transactionType
+                  - tpsl
+                  - txMetadata
+        '400':
+          description: 400 Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '404':
+          description: 404 Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '422':
+          description: 422 Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '500':
+          description: 500 Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+  /positions/increase-with-fee:
+    description: >-
+      Uses the `increasePositionParams` object from calling `GET
+      /positions/increase/quote` and returns a base64-serialized transaction for
+      the request, the position request PDA, and the position PDA that acts as
+      the unique identifier for the position.
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                asset:
+                  type: string
+                  enum:
+                    - BTC
+                    - ETH
+                    - SOL
+                  description: >-
+                    The asset or market to trade against. Required when opening
+                    a new position. 'SOL' =
+                    'So11111111111111111111111111111111111111112', 'ETH' =
+                    '7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs', 'BTC' =
+                    '3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh'
+                  example: SOL
+                feeToken:
+                  type: string
+                  enum:
+                    - USDC
+                  description: >-
+                    The token symbol for the fee token. Currently only USDC is
+                    supported. Must be the same as input token.
+                feeTokenAmount:
+                  type: string
+                  description: >-
+                    The amount of fee tokens to send to `feeReceiver`. The value
+                    must match the token mint decimals specified in `feeToken`
+                    (e.g., for USDC with 6 decimals, 1000000 = 1 USDC)
+                  example: '1000000'
+                feeReceiver:
+                  type: string
+                  description: >-
+                    The token address (ATA) to receive the fee specified in
+                    `feeTokenAmount`. The ATA must match the token mint
+                    specified in `feeToken`
+                inputToken:
+                  type: string
+                  enum:
+                    - BTC
+                    - ETH
+                    - SOL
+                    - USDC
+                  description: >-
+                    The token symbol for the input token used to fund the
+                    position. Must be the same as fee token.
+                  example: SOL
+                inputTokenAmount:
+                  type: string
+                  description: >-
+                    The amount of tokens for the input token to open the
+                    position or deposit collateral. NOTE: The token amount needs
+                    to be an integer and must conform to the token mint decimals
+                    specified onchain. For example, to deposit 1 SOL, the value
+                    would be '1000000000' (9 decimals)
+                  example: '1000000000'
+                leverage:
+                  type: string
+                  description: >-
+                    Leverage of the increase position, up to 1 decimal place.
+                    Either provide 'leverage' or 'sizeUsdDelta' to open a trade.
+                    Min leverage is '1.1'. Max leverage for SOL is 100.0. Max
+                    leverage for BTC / ETH is 150.0
+                  example: '11.5'
+                maxSlippageBps:
+                  type: string
+                  description: >-
+                    The maximum slippage in (BPS) for the custody token price
+                    when executing the decrease position trade
+                  example: '100'
+                priorityFeeMicroLamports:
+                  type: string
+                  description: >-
+                    Custom priority fee in microlamports for the transaction
+                    (1,000,000 microlamports = 1 lamport). If not set, the API
+                    will automatically set the optimal priority fee
+                side:
+                  type: string
+                  enum:
+                    - long
+                    - short
+                  description: Required when opening a new position
+                sizeUsdDelta:
+                  type: string
+                  description: >-
+                    The amount in USD to increase the position size by. Must be
+                    an integer representing the USD amount multiplied by 10^6 (1
+                    million) to align with the 6 decimal places used for
+                    USDC/USDT tokens on-chain. For example, to increase the
+                    position size by $10 USD, set 'sizeUsdDelta' to 10000000;
+                    for $0.50 USD, set 'sizeUsdDelta' to 500000. Either provide
+                    leverage or sizeUsdDelta.
+                  example: '10000000'
+                tpsl:
+                  type:
+                    - array
+                    - 'null'
+                  items:
+                    type: object
+                    properties:
+                      receiveToken:
+                        type: string
+                        enum:
+                          - BTC
+                          - ETH
+                          - SOL
+                          - USDC
+                        description: The token to receive when the TPSL is executed.
+                      triggerPrice:
+                        type: string
+                        description: >-
+                          Trigger price at which the TP / SL request will be
+                          executed. The value must be an integer corresponding
+                          to 6 decimal places. For example, to set a trigger
+                          price of $20, pass in 20000000
+                        example: '20000000'
+                      requestType:
+                        type: string
+                        enum:
+                          - tp
+                          - sl
+                        description: >-
+                          Pass in `tp` to set a take profit request or `sl` to
+                          set a stop loss request
+                    required:
+                      - receiveToken
+                      - triggerPrice
+                      - requestType
+                  description: TPSL requests to set
+                walletAddress:
+                  type: string
+                  description: >-
+                    The wallet address / public key for the trader, Required
+                    when opening a new position.
+              required:
+                - asset
+                - feeToken
+                - feeTokenAmount
+                - feeReceiver
+                - inputToken
+                - inputTokenAmount
+                - maxSlippageBps
+                - side
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  positionPubkey:
+                    type:
+                      - string
+                      - 'null'
+                    description: >-
+                      The unique identifier (i.e. a program derived address) for
+                      the position account. Use this address to find the
+                      position account onchain.
+                  quote:
+                    type: object
+                    properties:
+                      collateralUsdDelta:
+                        type: string
+                        description: >-
+                          The change in collateral amount in USD (raw value with
+                          6 decimal places)
+                        example: '1124450000'
+                      collateralUsdDeltaFormatted:
+                        type: string
+                        description: >-
+                          The change in collateral amount in USD (human-readable
+                          format)
+                        example: '1124.45'
+                      leverage:
+                        type: string
+                        description: The leverage amount for the position
+                        example: '2.99'
+                      integratorFeeTokenMint:
+                        type: string
+                        description: The token mint for the integrator fee token
+                      integratorFeeTokenAmount:
+                        type: string
+                        description: The amount of the integrator fee token
+                      integratorFeeUsd:
+                        type: string
+                        description: >-
+                          The estimated integrator fee in USD (raw value with 6
+                          decimal places)
+                      integratorFeeUsdFormatted:
+                        type: string
+                        description: >-
+                          The estimated integrator fee in USD (human-readable
+                          format)
+                      liquidationPriceUsd:
+                        type: string
+                        description: >-
+                          The liquidation price in USD (raw value with 6 decimal
+                          places)
+                        example: '13240000'
+                      liquidationPriceUsdFormatted:
+                        type: string
+                        description: The liquidation price in USD (human-readable format)
+                        example: '13.24'
+                      openFeeUsd:
+                        type: string
+                        description: >-
+                          The total fee in USD for opening the position or
+                          depositing collateral including base fees, borrowing
+                          fees, and price impact fees (raw value with 6 decimal
+                          places)
+                        example: '100000'
+                      openFeeUsdFormatted:
+                        type: string
+                        description: >-
+                          The total fee in USD for opening the position or
+                          depositing collateral including base fees, borrowing
+                          fees, and price impact fees (human-readable format)
+                        example: '0.1000'
+                      outstandingBorrowFeeUsd:
+                        type: string
+                        description: >-
+                          The outstanding borrow fees due / to be paid on
+                          depositing collateral to the position (raw value with
+                          6 decimal places)
+                        example: '100000'
+                      outstandingBorrowFeeUsdFormatted:
+                        type: string
+                        description: >-
+                          The outstanding borrow fees due / to be paid on
+                          depositing collateral to the position (human-readable
+                          format)
+                        example: '0.1000'
+                      positionCollateralUsd:
+                        type: string
+                        description: >-
+                          The total position collateral size in USD after the
+                          increase (raw value with 6 decimal places)
+                        example: '100000000'
+                      positionCollateralUsdFormatted:
+                        type: string
+                        description: >-
+                          The total position collateral size in USD after the
+                          increase (human-readable format)
+                        example: '100.00'
+                      positionPriceUsd:
+                        type: string
+                        description: >-
+                          The position's average price in USD (raw value with 6
+                          decimal places)
+                        example: '2990000'
+                      positionPriceUsdFormatted:
+                        type: string
+                        description: >-
+                          The position's average price in USD (human-readable
+                          format)
+                        example: '2.99'
+                      positionSizeUsd:
+                        type: string
+                        description: >-
+                          The total position size in USD including leverage
+                          after the increase (raw value with 6 decimal places)
+                        example: '10000000'
+                      positionSizeUsdFormatted:
+                        type: string
+                        description: >-
+                          The total position size in USD including leverage
+                          after the increase (human-readable format)
+                        example: '10.00'
+                      priceImpactFeeBps:
+                        type: string
+                        description: >-
+                          The price impact fee bps for opening the position
+                          based on the position size. For more info on how the
+                          price impact fee calculation works:
+                          https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
+                        example: '1.3301'
+                      priceImpactFeeUsd:
+                        type: string
+                        description: >-
+                          The price impact fee in USD for opening the position
+                          based on the position size (raw value with 6 decimal
+                          places). For more info:
+                          https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
+                        example: '13301'
+                      priceImpactFeeUsdFormatted:
+                        type: string
+                        description: >-
+                          The price impact fee in USD for opening the position
+                          based on the position size (human-readable format).
+                          For more info:
+                          https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
+                        example: '0.0133'
+                      side:
+                        type: string
+                        enum:
+                          - long
+                          - short
+                        description: The position side
+                        example: long
+                      sizeUsdDelta:
+                        type: string
+                        description: >-
+                          The change in position size in USD (raw value with 6
+                          decimal places)
+                        example: '1124450000'
+                      sizeUsdDeltaFormatted:
+                        type: string
+                        description: >-
+                          The change in position size in USD (human-readable
+                          format)
+                        example: '1124.45'
+                    required:
+                      - collateralUsdDelta
+                      - collateralUsdDeltaFormatted
+                      - leverage
+                      - integratorFeeTokenMint
+                      - integratorFeeTokenAmount
+                      - integratorFeeUsd
+                      - integratorFeeUsdFormatted
+                      - liquidationPriceUsd
+                      - liquidationPriceUsdFormatted
+                      - openFeeUsd
+                      - openFeeUsdFormatted
+                      - outstandingBorrowFeeUsd
+                      - outstandingBorrowFeeUsdFormatted
+                      - positionCollateralUsd
+                      - positionCollateralUsdFormatted
+                      - positionPriceUsd
+                      - positionPriceUsdFormatted
+                      - positionSizeUsd
+                      - positionSizeUsdFormatted
+                      - priceImpactFeeBps
+                      - priceImpactFeeUsd
+                      - priceImpactFeeUsdFormatted
+                      - side
+                      - sizeUsdDelta
+                      - sizeUsdDeltaFormatted
+                  serializedTxBase64:
+                    type:
+                      - string
+                      - 'null'
+                    description: >-
+                      The serialized transaction (base64 encoded) containing the
+                      instructions and given parameters for the increase
+                      position request. The transaction can be deserialized,
+                      signed by the owner of `walletAddress` and submitted
+                      onchain to execute the increase position request
+                  tpsl:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        hasProfit:
+                          type: boolean
+                          description: Whether the TPSL request is profitable
+                        pnlUsd:
+                          type: string
+                          description: The estimated PNL (USD) delta for the TPSL request
+                        pnlUsdFormatted:
+                          type: string
+                          description: The estimated PNL (USD) delta for the TPSL request
+                        pnlPercent:
+                          type: string
+                          description: The estimated PNL percentage for the TPSL request
+                        pubkey:
+                          type: string
+                          description: >-
+                            The pubkey for the TPSL. Use this address to find
+                            the TPSL account onchain
+                        requestType:
+                          type: string
+                          enum:
+                            - tp
+                            - sl
+                          description: The type of TPSL request
+                      required:
+                        - hasProfit
+                        - pnlUsd
+                        - pnlUsdFormatted
+                        - pnlPercent
+                        - pubkey
+                        - requestType
+                    description: TPSL requests created with the increase position
+                  txMetadata:
+                    type:
+                      - object
+                      - 'null'
+                    properties:
+                      blockhash:
+                        type: string
+                        description: >-
+                          The blockhash used for the serialized transaction.
+                          This blockhash must be used when submitting the signed
+                          increase position transaction.
+                      lastValidBlockHeight:
+                        type: string
+                        description: >-
+                          The block height used for the serialized transaction.
+                          This block height must be used when submitting the
+                          signed increase position transaction.
+                      transactionFeeLamports:
+                        type: string
+                        description: >-
+                          The transaction fee in lamports (1 SOL = 1,000,000,000
+                          lamports)
+                        example: '5000'
+                      accountRentLamports:
+                        type: string
+                        description: >-
+                          The account rent in lamports for creating the position
+                          account (1 SOL = 1,000,000,000 lamports)
+                        example: '2039280'
+                    required:
+                      - blockhash
+                      - lastValidBlockHeight
+                      - transactionFeeLamports
+                      - accountRentLamports
+                    description: >-
+                      Contains relevant metadata for the serialized transaction.
+                      Null if no wallet address passed in.
+                required:
+                  - positionPubkey
+                  - quote
+                  - serializedTxBase64
+                  - tpsl
+                  - txMetadata
+        '400':
+          description: 400 Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '404':
+          description: 404 Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '422':
+          description: 422 Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '500':
+          description: 500 Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+  /positions/decrease-with-fee:
+    description: >-
+      Uses the `decreasePositionParams` object from calling `GET
+      /positions/decrease/quote` and returns a base64-serialized transaction for
+      the request, the position request PDA, and the position PDA that acts as
+      the unique identifier for the position.
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                collateralUsdDelta:
+                  type:
+                    - string
+                    - 'null'
+                  description: >-
+                    The amount of collateral to withdraw in USD from the
+                    position. Must be an integer representing the USD amount
+                    multiplied by 10^6 (1 million) to align with the 6 decimal
+                    places used for USDC/USDT tokens on-chain. For example, to
+                    decrease by $10 USD, set 'collateralUsdDelta' to 10000000;
+                    for $20.50 USD, set 'collateralUsdDelta' to 20500000.
+                  example: '10000000'
+                entirePosition:
+                  type: boolean
+                  default: false
+                  description: >-
+                    When set to `true`, this will close the position and
+                    transfer the remaining collateral and realised profits (if
+                    the position is profitable) to the trader.
+                  example: false
+                feeToken:
+                  type: string
+                  enum:
+                    - USDC
+                  description: >-
+                    The token symbol for the fee token. Currently only USDC is
+                    supported
+                feeTokenAmount:
+                  type: string
+                  description: >-
+                    The amount of fee tokens to send to `feeReceiver`. The value
+                    must match the token mint decimals specified in `feeToken`
+                    (e.g., for USDC with 6 decimals, 1000000 = 1 USDC)
+                  example: '1000000'
+                feeReceiver:
+                  type: string
+                  description: >-
+                    The token address (ATA) to receive the fee specified in
+                    `feeTokenAmount`. The ATA must match the token mint
+                    specified in `feeToken`
+                maxSlippageBps:
+                  type: string
+                  default: '200'
+                  description: >-
+                    The maximum slippage in (BPS) for the token swap (if
+                    required) and the token price when executing the increase
+                    position trade
+                  example: '100'
+                positionPubkey:
+                  type: string
+                  description: >-
+                    The public key for the open position. Use the `GET
+                    positions` endpoint to fetch the public key for the trader's
+                    open positions.
+                  example: 5HHB8sCKjWPU2zr3p4Lg49mQiaPQiHbCjHW7jgVzp583
+                priorityFeeMicroLamports:
+                  type: string
+                  description: >-
+                    Custom priority fee in microlamports for the transaction
+                    (1,000,000 microlamports = 1 lamport). If not set, the API
+                    will automatically set the optimal priority fee
+                receiveToken:
+                  type: string
+                  enum:
+                    - BTC
+                    - ETH
+                    - SOL
+                    - USDC
+                  description: The token to receive.
+                sizeUsdDelta:
+                  type:
+                    - string
+                    - 'null'
+                  description: >-
+                    The amount in USD to decrease the position size by. Must be
+                    an integer representing the USD amount multiplied by 10^6 (1
+                    million) to align with the 6 decimal places used for
+                    USDC/USDT tokens on-chain. For example, to decrease by $10
+                    USD, set 'sizeUsdDelta' to 10000000; for $20.50 USD, set
+                    'sizeUsdDelta' to 20500000.
+                  example: '10000000'
+              required:
+                - feeToken
+                - feeTokenAmount
+                - feeReceiver
+                - positionPubkey
+                - receiveToken
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  positionPubkey:
+                    type: string
+                    description: >-
+                      The unique identifier (i.e. a program derived address) for
+                      the position account. Use this address to find the
+                      position account onchain.
+                  quote:
+                    type: object
+                    properties:
+                      closeFeeUsd:
+                        type: string
+                        description: >-
+                          The base close fee for closing the position or
+                          withdrawing collateral (raw value with 6 decimal
+                          places)
+                        example: '100000'
+                      closeFeeUsdFormatted:
+                        type: string
+                        description: >-
+                          The base close fee for closing the position or
+                          withdrawing collateral (human-readable format)
+                        example: '0.1000'
+                      collateralUsdDelta:
+                        type: string
+                        description: >-
+                          The change in collateral amount in USD (raw value with
+                          6 decimal places)
+                        example: '10000000'
+                      collateralUsdDeltaFormatted:
+                        type: string
+                        description: >-
+                          The change in collateral amount in USD (human-readable
+                          format)
+                        example: '10.00'
+                      integratorFeeTokenMint:
+                        type: string
+                        description: The token mint for the integrator fee token
+                      integratorFeeTokenAmount:
+                        type: string
+                        description: The amount of the integrator fee token
+                      integratorFeeUsd:
+                        type: string
+                        description: >-
+                          The estimated integrator fee in USD (raw value with 6
+                          decimal places)
+                      integratorFeeUsdFormatted:
+                        type: string
+                        description: >-
+                          The estimated integrator fee in USD (human-readable
+                          format)
+                      leverage:
+                        type: string
+                        description: >-
+                          The leverage amount for the position after the
+                          decrease
+                        example: '2.99'
+                      liquidationPriceUsd:
+                        type: string
+                        description: >-
+                          The liquidation price in USD (raw value with 6 decimal
+                          places)
+                        example: '13240000'
+                      liquidationPriceUsdFormatted:
+                        type: string
+                        description: The liquidation price in USD (human-readable format)
+                        example: '13.24'
+                      outstandingBorrowFeeUsd:
+                        type: string
+                        description: >-
+                          The outstanding borrow fees due / to be paid on
+                          closing the position (raw value with 6 decimal places)
+                        example: '100000'
+                      outstandingBorrowFeeUsdFormatted:
+                        type: string
+                        description: >-
+                          The outstanding borrow fees due / to be paid on
+                          closing the position (human-readable format)
+                        example: '0.1000'
+                      pnlAfterFeesUsd:
+                        type: string
+                        description: >-
+                          The position PNL after fees (raw value with 6 decimal
+                          places)
+                        example: '1045000'
+                      pnlAfterFeesUsdFormatted:
+                        type: string
+                        description: The position PNL after fees (human-readable format)
+                        example: '1.045'
+                      pnlAfterFeesPercent:
+                        type: string
+                        description: >-
+                          The PNL change (%) from closing the position after
+                          fees
+                        example: '-20.24'
+                      pnlBeforeFeesUsd:
+                        type: string
+                        description: >-
+                          The position PNL before fees (raw value with 6 decimal
+                          places)
+                        example: '1045000'
+                      pnlBeforeFeesUsdFormatted:
+                        type: string
+                        description: The position PNL before fees (human-readable format)
+                        example: '1.045'
+                      pnlBeforeFeesPercent:
+                        type: string
+                        description: >-
+                          The PNL change (%) from closing the position before
+                          fees
+                        example: '20.24'
+                      positionCollateralUsd:
+                        type: string
+                        description: >-
+                          The total position collateral size in USD after the
+                          decrease (raw value with 6 decimal places)
+                        example: '100000000'
+                      positionCollateralUsdFormatted:
+                        type: string
+                        description: >-
+                          The total position collateral size in USD after the
+                          decrease (human-readable format)
+                        example: '100.00'
+                      positionSizeUsd:
+                        type: string
+                        description: >-
+                          The total position size in USD including leverage
+                          after the decrease (raw value with 6 decimal places)
+                        example: '10000000'
+                      positionSizeUsdFormatted:
+                        type: string
+                        description: >-
+                          The total position size in USD including leverage
+                          after the decrease (human-readable format)
+                        example: '10.00'
+                      priceImpactFeeBps:
+                        type: string
+                        description: >-
+                          The price impact fee bps for closing the position
+                          based on the position size. For more info on how the
+                          price impact fee calculation works:
+                          https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
+                        example: '1.3301'
+                      priceImpactFeeUsd:
+                        type: string
+                        description: >-
+                          The price impact fee for closing the position based on
+                          the position size (raw value with 6 decimal places).
+                          For more info:
+                          https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
+                        example: '13301'
+                      priceImpactFeeUsdFormatted:
+                        type: string
+                        description: >-
+                          The price impact fee for closing the position based on
+                          the position size (human-readable format). For more
+                          info:
+                          https://www.jupresear.ch/t/jupiter-perpetuals-price-impact-fee-mechanism/17140
+                        example: '0.0133'
+                      side:
+                        type: string
+                        enum:
+                          - long
+                          - short
+                        description: The position side
+                        example: long
+                      sizeUsdDelta:
+                        type: string
+                        description: >-
+                          The change in position size in USD (raw value with 6
+                          decimal places)
+                        example: '10000000'
+                      sizeUsdDeltaFormatted:
+                        type: string
+                        description: >-
+                          The change in position size in USD (human-readable
+                          format)
+                        example: '10.00'
+                      totalFeeUsd:
+                        type: string
+                        description: >-
+                          The total fee in USD for closing or withdrawing
+                          collateral including base fees, borrowing fees, and
+                          price impact fees (raw value with 6 decimal places)
+                        example: '100000'
+                      totalFeeUsdFormatted:
+                        type: string
+                        description: >-
+                          The total fee in USD for closing or withdrawing
+                          collateral including base fees, borrowing fees, and
+                          price impact fees (human-readable format)
+                        example: '0.1000'
+                      transferAmountToken:
+                        type: string
+                        description: >-
+                          The collateral token amount to transfer to the owner
+                          after withdrawing collateral or closing the position
+                          (raw value)
+                        example: '100000000'
+                      transferAmountUsd:
+                        type: string
+                        description: >-
+                          The collateral token amount in USD to transfer to the
+                          owner (raw value with 6 decimal places)
+                        example: '10000000'
+                      transferAmountUsdFormatted:
+                        type: string
+                        description: >-
+                          The collateral token amount in USD to transfer to the
+                          owner (human-readable format)
+                        example: '10.00'
+                      transferTokenMint:
+                        type: string
+                        description: >-
+                          The mint address for the token used to transfer the
+                          collateral withdrawal or closing position amount
+                        example: So11111111111111111111111111111111111111112
+                    required:
+                      - closeFeeUsd
+                      - closeFeeUsdFormatted
+                      - collateralUsdDelta
+                      - collateralUsdDeltaFormatted
+                      - integratorFeeTokenMint
+                      - integratorFeeTokenAmount
+                      - integratorFeeUsd
+                      - integratorFeeUsdFormatted
+                      - leverage
+                      - liquidationPriceUsd
+                      - liquidationPriceUsdFormatted
+                      - outstandingBorrowFeeUsd
+                      - outstandingBorrowFeeUsdFormatted
+                      - pnlAfterFeesUsd
+                      - pnlAfterFeesUsdFormatted
+                      - pnlAfterFeesPercent
+                      - pnlBeforeFeesUsd
+                      - pnlBeforeFeesUsdFormatted
+                      - pnlBeforeFeesPercent
+                      - positionCollateralUsd
+                      - positionCollateralUsdFormatted
+                      - positionSizeUsd
+                      - positionSizeUsdFormatted
+                      - priceImpactFeeBps
+                      - priceImpactFeeUsd
+                      - priceImpactFeeUsdFormatted
+                      - side
+                      - sizeUsdDelta
+                      - sizeUsdDeltaFormatted
+                      - totalFeeUsd
+                      - totalFeeUsdFormatted
+                      - transferAmountToken
+                      - transferAmountUsd
+                      - transferAmountUsdFormatted
+                      - transferTokenMint
+                  serializedTxBase64:
+                    type: string
+                    description: >-
+                      The serialized transaction (base64 encoded) containing the
+                      instructions and given parameters for the decrease
+                      position request. The transaction can be deserialized,
+                      signed by the owner of `walletAddress` and submitted
+                      onchain to execute the decrease position request
+                  txMetadata:
+                    type: object
+                    properties:
+                      blockhash:
+                        type: string
+                        description: >-
+                          The blockhash used for the serialized transaction.
+                          This blockhash must be used when submitting the signed
+                          decrease position transaction.
+                      lastValidBlockHeight:
+                        type: string
+                        description: >-
+                          The block height used for the serialized transaction.
+                          This block height must be used when submitting the
+                          signed decrease position transaction.
+                      transactionFeeLamports:
+                        type: string
+                        description: >-
+                          The transaction fee in lamports (1 SOL = 1,000,000,000
+                          lamports)
+                        example: '5000'
+                      accountRentLamports:
+                        type: string
+                        description: >-
+                          The account rent in lamports for the transaction (1
+                          SOL = 1,000,000,000 lamports)
+                        example: '2039280'
+                    required:
+                      - blockhash
+                      - lastValidBlockHeight
+                      - transactionFeeLamports
+                      - accountRentLamports
+                    description: Contains relevant metadata for the serialized transaction.
+                required:
+                  - positionPubkey
+                  - quote
+                  - serializedTxBase64
                   - txMetadata
         '400':
           description: 400 Bad Request
@@ -1908,11 +3460,20 @@ paths:
               the results
         - in: query
           name: walletAddress
-          description: Public key for the wallet to fetch trades
+          description: >-
+            Public key for the wallet to fetch trades (required unless txid is
+            provided)
           schema:
             type: string
-            description: Public key for the wallet to fetch trades
-          required: true
+            description: >-
+              Public key for the wallet to fetch trades (required unless txid is
+              provided)
+        - in: query
+          name: txid
+          description: Transaction ID for the trade to fetch directly
+          schema:
+            type: string
+            description: Transaction ID for the trade to fetch directly
       responses:
         '200':
           description: 200 OK
@@ -1969,6 +3530,18 @@ paths:
                             USD value of the fees paid (including the
                             liquidation penalty) for the trade
                           example: '0.45'
+                        integratorFeeTokenAmount:
+                          type:
+                            - string
+                            - 'null'
+                          description: The fee token amount collected by the integrator
+                        integratorFeeTokenMint:
+                          type:
+                            - string
+                            - 'null'
+                          description: >-
+                            The mint address for the fee token collected by the
+                            integrator
                         mint:
                           type: string
                           enum:
@@ -1990,6 +3563,9 @@ paths:
                             for TP/SL requests. 'Liquidation' orders are also
                             executed by keeper when a position reaches its
                             liquidation price
+                        owner:
+                          type: string
+                          description: The public key / address for the owner
                         pnl:
                           type:
                             - string
@@ -2019,6 +3595,9 @@ paths:
                             - SOL-PERP
                             - ETH-PERP
                             - BTC-PERP
+                        positionPubkey:
+                          type: string
+                          description: The public key / address for the position
                         price:
                           type: string
                           description: USD value of the position's entry price
@@ -2034,6 +3613,45 @@ paths:
                             USD value of the position's trade size (including
                             leverage)
                           example: '12345.68'
+                        transactionFeeLamports:
+                          type:
+                            - string
+                            - 'null'
+                          description: >-
+                            The total transaction fee (lamports) paid for the
+                            transaction
+                          example: '5000'
+                        priorityFeeLamports:
+                          type:
+                            - string
+                            - 'null'
+                          description: The priority fee (lamports) paid for the transaction
+                          example: '2000'
+                        swapFeeBps:
+                          type:
+                            - string
+                            - 'null'
+                          description: The swap fee (BPS) paid for the trade
+                          example: '30'
+                        swapFeeUsd:
+                          type:
+                            - string
+                            - 'null'
+                          description: The estimated swap fee ($) paid for the trade
+                          example: '30'
+                        swapFeeTokenAmount:
+                          type:
+                            - string
+                            - 'null'
+                          description: >-
+                            The estimated swap fee (in the token amount) paid
+                            for the trade
+                          example: '100000'
+                        swapFeeTokenMint:
+                          type:
+                            - string
+                            - 'null'
+                          description: The token mint address for the swap fee
                         txHash:
                           type: string
                           description: Transaction ID for the trade
@@ -2053,7 +3671,9 @@ paths:
                         - fee
                         - mint
                         - orderType
+                        - owner
                         - positionName
+                        - positionPubkey
                         - price
                         - side
                         - size
@@ -2062,6 +3682,75 @@ paths:
                 required:
                   - count
                   - dataList
+        '400':
+          description: 400 Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '404':
+          description: 404 Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '422':
+          description: 422 Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '500':
+          description: 500 Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+  /transaction/execute:
+    description: >-
+      Executes the serialized transaction passed to the endpoint which requires
+      the keeper to sign the and execute the transaction.
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum:
+                    - tpsl
+                    - tpsl-with-fee
+                    - limit-order
+                    - increase-position
+                    - increase-position-with-fee
+                    - decrease-position
+                    - decrease-position-with-fee
+                  description: The action for the serialized transaction to be executed
+                serializedTxBase64:
+                  type: string
+                  description: Serialise signed transaction from user.
+              required:
+                - action
+                - serializedTxBase64
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  action:
+                    type: string
+                    description: The action for the serialized transaction to be executed
+                  txid:
+                    type: string
+                    description: The transaction id of the request
+                required:
+                  - action
+                  - txid
         '400':
           description: 400 Bad Request
           content:
@@ -2202,7 +3891,7 @@ paths:
             schema:
               type: object
               properties:
-                owner:
+                walletAddress:
                   type: string
                   description: The public key for owner of the position.
                   example: 5HHB8sCKjWPU2zr3p4Lg49mQiaPQiHbCjHW7jgVzp583
@@ -2213,85 +3902,21 @@ paths:
                     positions` endpoint to fetch the public key for the trader's
                     open positions.
                   example: 5HHB8sCKjWPU2zr3p4Lg49mQiaPQiHbCjHW7jgVzp583
-                desiredMint:
-                  type:
-                    - string
-                    - 'null'
-                  enum:
-                    - So11111111111111111111111111111111111111112
-                    - 7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs
-                    - 3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh
-                    - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-                    - Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
-                  description: >-
-                    The mint address for the token used when withdrawing
-                    collateral or closing position when the TPSL is executed.
-                sizeUsdDelta:
-                  type:
-                    - string
-                    - 'null'
-                  description: >-
-                    The amount in USD to decrease the position size by. Must be
-                    an integer representing the USD amount multiplied by 10^6 (1
-                    million) to align with the 6 decimal places used for the
-                    USDC mint on-chain. For example, to decrease by $10 USD, set
-                    'sizeUsdDelta' to 10000000; for $20.50 USD, set
-                    'sizeUsdDelta' to 20500000.
-                  example: '10000000'
-                triggerPrice:
-                  type:
-                    - string
-                    - 'null'
-                  description: >-
-                    Trigger price at which the TP / SL request will be executed.
-                    The value must be an integer corresponding to 6 decimal
-                    places. For example, to set a trigger price of $20, pass in
-                    20000000
-                  example: '20000000'
-                requestType:
-                  type:
-                    - string
-                    - 'null'
-                  enum:
-                    - tp
-                    - sl
-                  description: >-
-                    Pass in `tp` to set a take profit request or `sl` to set a
-                    stop loss request
-                transactionType:
-                  type: string
-                  enum:
-                    - legacy
-                    - mixed
-                    - instant
-                  default: mixed
-                  description: >-
-                    Sets the type of serialized transaction to execute the
-                    action. If the transaction type is `legacy`, the transaction
-                    must be submitted by the client itself through the RPC. If
-                    the transaction type is `instant`, the transaction must be
-                    sent to the `POST /transaction/execute` endpoint. If the
-                    transaction type is `mixed`, the `transactionType` returned
-                    in the response will be either `legacy` or `instant`.
                 tpsl:
-                  type:
-                    - array
-                    - 'null'
+                  type: array
                   items:
                     type: object
                     properties:
-                      desiredMint:
+                      receiveToken:
                         type: string
                         enum:
-                          - So11111111111111111111111111111111111111112
-                          - 7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs
-                          - 3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh
-                          - EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
-                          - Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
+                          - BTC
+                          - ETH
+                          - SOL
+                          - USDC
                         description: >-
-                          The mint address for the token used when withdrawing
-                          collateral or closing position when the TPSL is
-                          executed.
+                          The token to receive when the TPSL is executed. Only
+                          BTC, ETH, SOL, and USDC are currently supported.
                       entirePosition:
                         type: boolean
                         default: false
@@ -2300,23 +3925,21 @@ paths:
                           to close a portion of the position (partial TPSL)
                         example: false
                       sizeUsdDelta:
-                        type: string
+                        type:
+                          - string
+                          - 'null'
                         description: >-
-                          The amount in USD to decrease the position size by.
-                          Must be an integer representing the USD amount
-                          multiplied by 10^6 (1 million) to align with the 6
-                          decimal places used for the USDC mint on-chain. For
-                          example, to decrease by $10 USD, set 'sizeUsdDelta' to
-                          10000000; for $20.50 USD, set 'sizeUsdDelta' to
-                          20500000.
+                          The amount in USD to decrease the position size by
+                          (raw value with 6 decimal places). Required when
+                          'entirePosition' is false.
                         example: '10000000'
                       triggerPrice:
                         type: string
                         description: >-
                           Trigger price at which the TP / SL request will be
-                          executed. The value must be an integer corresponding
-                          to 6 decimal places. For example, to set a trigger
-                          price of $20, pass in 20000000
+                          executed (raw value with 6 decimal places). For
+                          example, to set a trigger price of $20, pass in
+                          20000000.
                         example: '20000000'
                       requestType:
                         type: string
@@ -2327,14 +3950,24 @@ paths:
                           Pass in `tp` to set a take profit request or `sl` to
                           set a stop loss request
                     required:
-                      - desiredMint
-                      - sizeUsdDelta
+                      - receiveToken
                       - triggerPrice
                       - requestType
-                  description: TPSL requests to set
+                  maxItems: 20
+                  description: TPSL requests to set.
+                transactionType:
+                  type: string
+                  enum:
+                    - instant
+                    - mixed
+                  default: instant
+                  description: >-
+                    Sets the type of serialized transaction to execute the
+                    action.
               required:
-                - owner
+                - walletAddress
                 - positionPubkey
+                - tpsl
       responses:
         '200':
           description: 200 OK
@@ -2365,6 +3998,41 @@ paths:
                       position request. The transaction can be deserialized,
                       signed by the owner of `walletAddress` and submitted
                       onchain to execute the decrease position request
+                  tpslRequests:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        estimatedPnlUsd:
+                          type: string
+                          description: The estimated PNL (USD) for the TPSL request
+                        estimatedPnlPercent:
+                          type: string
+                          description: The estimated PNL percentage for the TPSL request
+                        hasProfit:
+                          type: boolean
+                          description: Whether the TPSL request has profit
+                        requestType:
+                          type: string
+                          enum:
+                            - tp
+                            - sl
+                          description: The type of TPSL request
+                        positionRequestPubkey:
+                          type: string
+                          description: >-
+                            The unique identifier (i.e. a program derived
+                            address) for the position request. Use this address
+                            to find the position request account onchain
+                      required:
+                        - estimatedPnlUsd
+                        - estimatedPnlPercent
+                        - hasProfit
+                        - requestType
+                        - positionRequestPubkey
+                    description: >-
+                      TPSL requests created with the increase position. Only
+                      returned when TPSL is requested.
                   transactionType:
                     type: string
                     enum:
@@ -2410,6 +4078,7 @@ paths:
                   - tpslPubkeys
                   - requireKeeperSignature
                   - serializedTxBase64
+                  - tpslRequests
                   - transactionType
                   - txMetadata
         '400':
@@ -2450,26 +4119,23 @@ paths:
                 triggerPrice:
                   type: string
                   description: >-
-                    Trigger price at which the TP / SL request will be executed.
-                    The value must be an integer corresponding to 6 decimal
-                    places. For example, to set a trigger price of $20, pass in
-                    20000000
+                    Trigger price at which the TP / SL request will be executed
+                    (raw value with 6 decimal places). For example, to set a
+                    trigger price of $20, pass in 20000000.
                   example: '20000000'
                 transactionType:
                   type: string
                   enum:
-                    - legacy
-                    - mixed
                     - instant
-                  default: mixed
+                    - mixed
+                  default: instant
                   description: >-
                     Sets the type of serialized transaction to execute the
-                    action. If the transaction type is `legacy`, the transaction
-                    must be submitted by the client itself through the RPC. If
-                    the transaction type is `instant`, the transaction must be
-                    sent to the `POST /transaction/execute` endpoint. If the
-                    transaction type is `mixed`, the `transactionType` returned
-                    in the response will be either `legacy` or `instant`.
+                    action. If the transaction type is `instant`, the
+                    transaction must be sent to the `POST /transaction/execute`
+                    endpoint. If the transaction type is `mixed`, the
+                    `transactionType` returned in the response will be either
+                    `legacy` or `instant`.
               required:
                 - positionRequestPubkey
                 - triggerPrice
@@ -2498,6 +4164,39 @@ paths:
                       position request. The transaction can be deserialized,
                       signed by the owner of `walletAddress` and submitted
                       onchain to execute the decrease position request
+                  tpslRequests:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        estimatedPnlUsd:
+                          type: string
+                          description: The estimated PNL (USD) for the TPSL request
+                        estimatedPnlPercent:
+                          type: string
+                          description: The estimated PNL percentage for the TPSL request
+                        hasProfit:
+                          type: boolean
+                          description: Whether the TPSL request has profit
+                        requestType:
+                          type: string
+                          enum:
+                            - tp
+                            - sl
+                          description: The type of TPSL request
+                        positionRequestPubkey:
+                          type: string
+                          description: >-
+                            The unique identifier (i.e. a program derived
+                            address) for the position request. Use this address
+                            to find the position request account onchain
+                      required:
+                        - estimatedPnlUsd
+                        - estimatedPnlPercent
+                        - hasProfit
+                        - requestType
+                        - positionRequestPubkey
+                    description: TPSL requests updated
                   transactionType:
                     type: string
                     enum:
@@ -2541,6 +4240,485 @@ paths:
                     description: Contains relevant metadata for the serialized transaction.
                 required:
                   - requireKeeperSignature
+                  - serializedTxBase64
+                  - tpslRequests
+                  - transactionType
+                  - txMetadata
+        '400':
+          description: 400 Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '404':
+          description: 404 Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '422':
+          description: 422 Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '500':
+          description: 500 Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+  /tpsl-with-fee:
+    description: Returns a serialized transaction to create a TP/SL and charge fees
+    delete:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feeReceiver:
+                  type: string
+                  description: >-
+                    The token address (ATA) to receive the fee specified in
+                    `feeTokenAmount`. The ATA must match the token mint
+                    specified in `feeToken`
+                feeToken:
+                  type: string
+                  enum:
+                    - USDC
+                  description: >-
+                    The token symbol for the fee token. Currently only USDC is
+                    supported.
+                feeTokenAmount:
+                  type: string
+                  description: >-
+                    The amount of fee tokens to send to `feeReceiver`. The value
+                    must match the token mint decimals specified in `feeToken`
+                    (e.g., for USDC with 6 decimals, 1000000 = 1 USDC)
+                  example: '1000000'
+                tpslPubkey:
+                  type: string
+                  description: >-
+                    The public key for the position request account (TPSL) to
+                    cancel
+                  example: 5HHB8sCKjWPU2zr3p4Lg49mQiaPQiHbCjHW7jgVzp583
+              required:
+                - feeReceiver
+                - feeToken
+                - feeTokenAmount
+                - tpslPubkey
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integratorFeeTokenMint:
+                    type: string
+                    description: The token mint for the integrator fee token
+                  integratorFeeTokenAmount:
+                    type: string
+                    description: The amount of the integrator fee token
+                  integratorFeeUsd:
+                    type: string
+                    description: >-
+                      The estimated integrator fee in USD (raw value with 6
+                      decimal places)
+                  integratorFeeUsdFormatted:
+                    type: string
+                    description: >-
+                      The estimated integrator fee in USD (human-readable
+                      format)
+                  serializedTxBase64:
+                    type: string
+                    description: >-
+                      The serialized transaction (base64 encoded) containing the
+                      instructions to cancel the TPSL request
+                  transactionType:
+                    type: string
+                    enum:
+                      - legacy
+                    description: >-
+                      The transaction can be signed and submitted through the
+                      RPC
+                  txMetadata:
+                    type: object
+                    properties:
+                      accountRentLamports:
+                        type: string
+                        description: The account rent in lamports for the transaction
+                        example: '0'
+                      blockhash:
+                        type: string
+                        description: The blockhash used for the serialized transaction
+                      lastValidBlockHeight:
+                        type: string
+                        description: The block height used for the serialized transaction
+                      transactionFeeLamports:
+                        type: string
+                        description: The transaction fee in lamports
+                        example: '5000'
+                    required:
+                      - accountRentLamports
+                      - blockhash
+                      - lastValidBlockHeight
+                      - transactionFeeLamports
+                    description: Contains relevant metadata for the serialized transaction.
+                required:
+                  - integratorFeeTokenMint
+                  - integratorFeeTokenAmount
+                  - integratorFeeUsd
+                  - integratorFeeUsdFormatted
+                  - serializedTxBase64
+                  - transactionType
+                  - txMetadata
+        '400':
+          description: 400 Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '404':
+          description: 404 Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '422':
+          description: 422 Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '500':
+          description: 500 Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feeReceiver:
+                  type: string
+                  description: >-
+                    The token address (ATA) to receive the fee specified in
+                    `feeTokenAmount`. The ATA must match the token mint
+                    specified in `feeToken`
+                feeToken:
+                  type: string
+                  enum:
+                    - USDC
+                  description: >-
+                    The token symbol for the fee token. Currently only USDC is
+                    supported. Must be the same as input token.
+                feeTokenAmount:
+                  type: string
+                  description: >-
+                    The amount of fee tokens to send to `feeReceiver`. The value
+                    must match the token mint decimals specified in `feeToken`
+                    (e.g., for USDC with 6 decimals, 1000000 = 1 USDC)
+                  example: '1000000'
+                positionPubkey:
+                  type: string
+                  description: >-
+                    The public key for the open position. Use the `GET
+                    positions` endpoint to fetch the public key for the trader's
+                    open positions.
+                  example: 5HHB8sCKjWPU2zr3p4Lg49mQiaPQiHbCjHW7jgVzp583
+                tpsl:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      entirePosition:
+                        type: boolean
+                        default: false
+                        description: >-
+                          When set to `true`, this will close the position and
+                          transfer the remaining collateral and realised profits
+                          (if the position is profitable) to the trader.
+                        example: false
+                      receiveToken:
+                        type: string
+                        enum:
+                          - BTC
+                          - ETH
+                          - SOL
+                          - USDC
+                        description: >-
+                          The token to receive when the TPSL is executed. Must
+                          be the asset itself or USDC.
+                      requestType:
+                        type: string
+                        enum:
+                          - tp
+                          - sl
+                        description: >-
+                          Pass in `tp` to set a take profit request or `sl` to
+                          set a stop loss request
+                      sizeUsdDelta:
+                        type:
+                          - string
+                          - 'null'
+                        description: >-
+                          The amount in USD to decrease the position size by.
+                          Must be an integer representing the USD amount
+                          multiplied by 10^6 (1 million) to align with the 6
+                          decimal places used for USDC/USDT tokens on-chain. For
+                          example, to decrease by $10 USD, set 'sizeUsdDelta' to
+                          10000000; for $20.50 USD, set 'sizeUsdDelta' to
+                          20500000.
+                        example: '10000000'
+                      triggerPrice:
+                        type: string
+                        description: >-
+                          Trigger price at which the TP / SL request will be
+                          executed. The value must be an integer corresponding
+                          to 6 decimal places. For example, to set a trigger
+                          price of $20, pass in 20000000
+                        example: '20000000'
+                    required:
+                      - receiveToken
+                      - requestType
+                      - triggerPrice
+                  description: TPSL requests to set
+                walletAddress:
+                  type: string
+                  description: >-
+                    The wallet address / public key for the trader, Required
+                    when opening a new position.
+              required:
+                - feeReceiver
+                - feeToken
+                - feeTokenAmount
+                - positionPubkey
+                - tpsl
+                - walletAddress
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integratorFeeTokenMint:
+                    type: string
+                    description: The token mint for the integrator fee token
+                  integratorFeeTokenAmount:
+                    type: string
+                    description: The amount of the integrator fee token
+                  integratorFeeUsd:
+                    type: string
+                    description: >-
+                      The estimated integrator fee in USD (raw value with 6
+                      decimal places)
+                  integratorFeeUsdFormatted:
+                    type: string
+                    description: >-
+                      The estimated integrator fee in USD (human-readable
+                      format)
+                  serializedTxBase64:
+                    type: string
+                    description: >-
+                      The serialized transaction (base64 encoded) containing the
+                      instructions and given parameters for the decrease
+                      position request. The transaction can be deserialized,
+                      signed by the owner of `walletAddress` and submitted
+                      onchain to execute the decrease position request
+                  tpslPubkeys:
+                    type: array
+                    items:
+                      type: string
+                    description: The position request account pubkeys for the TP / SL
+                  transactionType:
+                    type: string
+                    enum:
+                      - instant
+                    description: >-
+                      Returns the type of serialized transaction to execute the
+                      action. If the transaction type is `legacy`, the
+                      transaction must be submitted by the client itself through
+                      the RPC. If the transaction type is `instant`, the
+                      transaction must be sent to the `POST
+                      /transaction/execute` endpoint.
+                  txMetadata:
+                    type: object
+                    properties:
+                      accountRentLamports:
+                        type: string
+                        description: The account rent (in lamports) for the transaction
+                        example: '0'
+                      blockhash:
+                        type: string
+                        description: >-
+                          The blockhash used for the serialized transaction.
+                          This blockhash must be used when submitting the signed
+                          decrease position transaction.
+                      lastValidBlockHeight:
+                        type: string
+                        description: >-
+                          The block height used for the serialized transaction.
+                          This block height must be used when submitting the
+                          signed decrease position transaction.
+                      transactionFeeLamports:
+                        type: string
+                        description: The transaction fee (in lamports) in decimal format.
+                        example: '0.5'
+                    required:
+                      - accountRentLamports
+                      - blockhash
+                      - lastValidBlockHeight
+                      - transactionFeeLamports
+                    description: Contains relevant metadata for the serialized transaction.
+                required:
+                  - integratorFeeTokenMint
+                  - integratorFeeTokenAmount
+                  - integratorFeeUsd
+                  - integratorFeeUsdFormatted
+                  - serializedTxBase64
+                  - tpslPubkeys
+                  - transactionType
+                  - txMetadata
+        '400':
+          description: 400 Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '404':
+          description: 404 Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '422':
+          description: 422 Unprocessable entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+        '500':
+          description: 500 Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorSchema'
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feeReceiver:
+                  type: string
+                  description: >-
+                    The token address (ATA) to receive the fee specified in
+                    `feeTokenAmount`. The ATA must match the token mint
+                    specified in `feeToken`
+                feeToken:
+                  type: string
+                  enum:
+                    - USDC
+                  description: >-
+                    The token symbol for the fee token. Currently only USDC is
+                    supported.
+                feeTokenAmount:
+                  type: string
+                  description: >-
+                    The amount of fee tokens to send to `feeReceiver`. The value
+                    must match the token mint decimals specified in `feeToken`
+                    (e.g., for USDC with 6 decimals, 1000000 = 1 USDC)
+                  example: '1000000'
+                tpslPubkey:
+                  type: string
+                  description: The public key for the position request account (TPSL)
+                  example: 5HHB8sCKjWPU2zr3p4Lg49mQiaPQiHbCjHW7jgVzp583
+                triggerPrice:
+                  type: string
+                  description: >-
+                    New trigger price at which the TP / SL request will be
+                    executed. The value must be an integer corresponding to 6
+                    decimal places. For example, to set a trigger price of $20,
+                    pass in 20000000
+                  example: '20000000'
+              required:
+                - feeReceiver
+                - feeToken
+                - feeTokenAmount
+                - tpslPubkey
+                - triggerPrice
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integratorFeeTokenMint:
+                    type: string
+                    description: The token mint for the integrator fee token
+                  integratorFeeTokenAmount:
+                    type: string
+                    description: The amount of the integrator fee token
+                  integratorFeeUsd:
+                    type: string
+                    description: >-
+                      The estimated integrator fee in USD (raw value with 6
+                      decimal places)
+                  integratorFeeUsdFormatted:
+                    type: string
+                    description: >-
+                      The estimated integrator fee in USD (human-readable
+                      format)
+                  serializedTxBase64:
+                    type: string
+                    description: >-
+                      The serialized transaction (base64 encoded) containing the
+                      instructions to update the TPSL request
+                  transactionType:
+                    type: string
+                    enum:
+                      - instant
+                    description: Always returns `instant` for fee-based transactions
+                  txMetadata:
+                    type: object
+                    properties:
+                      accountRentLamports:
+                        type: string
+                        description: The account rent (in lamports) for the transaction
+                        example: '0'
+                      blockhash:
+                        type: string
+                        description: The blockhash used for the serialized transaction
+                      lastValidBlockHeight:
+                        type: string
+                        description: The block height used for the serialized transaction
+                      transactionFeeLamports:
+                        type: string
+                        description: The transaction fee in lamports
+                        example: '5000'
+                    required:
+                      - accountRentLamports
+                      - blockhash
+                      - lastValidBlockHeight
+                      - transactionFeeLamports
+                    description: Contains relevant metadata for the serialized transaction.
+                required:
+                  - integratorFeeTokenMint
+                  - integratorFeeTokenAmount
+                  - integratorFeeUsd
+                  - integratorFeeUsdFormatted
                   - serializedTxBase64
                   - transactionType
                   - txMetadata

@@ -403,20 +403,81 @@
                 "tag": "BETA",
                 "pages": [
                   "api-reference/perps",
-                  "api-reference/perps/get-positions",
-                  "api-reference/perps/post-positionsincrease",
-                  "api-reference/perps/post-positionsdecrease",
-                  "api-reference/perps/post-positionsclose-all",
-                  "api-reference/perps/post-tpsl",
-                  "api-reference/perps/patch-tpsl",
-                  "api-reference/perps/delete-tpsl",
-                  "api-reference/perps/get-ordersexpired",
-                  "api-reference/perps/get-market-stats",
-                  "api-reference/perps/get-positionscollateral-limits",
-                  "api-reference/perps/get-trades",
-                  "api-reference/perps/get-top-traders",
-                  "api-reference/perps/get-trader-stats",
-                  "api-reference/perps/get-pool-info"
+                  {
+                    "group": "Transaction Execution",
+                    "pages": [
+                      "api-reference/perps/post-transaction-execute"
+                    ]
+                  },
+                  {
+                    "group": "Trading",
+                    "pages": [
+                      "api-reference/perps/trading-overview",
+                      {
+                        "group": "Informational",
+                        "pages": [
+                          "api-reference/perps/get-market-stats",
+                          "api-reference/perps/get-trader-stats",
+                          "api-reference/perps/get-top-traders",
+                          "api-reference/perps/get-pool-info",
+                          "api-reference/perps/get-positions",
+                          "api-reference/perps/get-positions-collateral-limits",
+                          "api-reference/perps/get-orders-limit",
+                          "api-reference/perps/get-orders-expired",
+                          "api-reference/perps/get-trades"
+                        ]
+                      },
+                      {
+                        "group": "Positions",
+                        "pages": [
+                          "api-reference/perps/post-positions-increase",
+                          "api-reference/perps/post-positions-increase-with-fee",
+                          "api-reference/perps/post-positions-decrease",
+                          "api-reference/perps/post-positions-decrease-with-fee",
+                          "api-reference/perps/post-positions-close-all"
+                        ]
+                      },
+                      {
+                        "group": "Limit Orders",
+                        "pages": [
+                          "api-reference/perps/post-orders-limit",
+                          "api-reference/perps/patch-orders-limit",
+                          "api-reference/perps/delete-orders-limit"
+                        ]
+                      },
+                      {
+                        "group": "TPSL",
+                        "pages": [
+                          "api-reference/perps/post-tpsl",
+                          "api-reference/perps/post-tpsl-with-fee",
+                          "api-reference/perps/patch-tpsl",
+                          "api-reference/perps/patch-tpsl-with-fee",
+                          "api-reference/perps/delete-tpsl",
+                          "api-reference/perps/delete-tpsl-with-fee"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "JLP",
+                    "pages": [
+                      "api-reference/perps/jlp-overview",
+                      "api-reference/perps/get-jlp-info",
+                      "api-reference/perps/post-jlp-mint",
+                      "api-reference/perps/post-jlp-burn"
+                    ]
+                  },
+                  {
+                    "group": "JLP Lending",
+                    "pages": [
+                      "api-reference/perps/jlp-lending-overview",
+                      "api-reference/perps/post-lending-deposit-borrow",
+                      "api-reference/perps/post-lending-pay-withdraw",
+                      "api-reference/perps/get-lending-positions",
+                      "api-reference/perps/get-lending-info",
+                      "api-reference/perps/get-lending-history"
+                    ]
+                  }
                 ]
               },
               {

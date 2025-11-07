@@ -5,8 +5,9 @@ description: "Announcements and Changes"
 
 <Update label="November 2025" description="">
 
-## Legacy Swap API: nativeDestinationAccount
+## Legacy Swap API
 
+### nativeDestinationAccount
 * We've added a new parameter to the Legacy Swap API that lets you send native SOL 
   directly to any account.
 * This is similar to `destinationTokenAccount`, but instead of receiving 
@@ -15,6 +16,15 @@ description: "Announcements and Changes"
   for more details.  
 * [npm package version 6.0.46](https://www.npmjs.com/package/@jup-ag/api/v/6.0.46) 
   has been released with the latest schema.
+
+### Remove feeAmount and feeMint fields in SwapInfo
+* We will be removing the `feeAmount` and `feeMint` fields from the `SwapInfo` schema in a quote response.
+* Since `outAmount` already factor in these fees.
+* These fees are related to each AMM's own fee, not to any Jupiter or platform fees you may add.
+* Refer to [`SwapInfo` API Reference](/api-reference/swap/quote#response-route-plan-swap-info) for more details.
+* [npm package version 6.0.47](https://www.npmjs.com/package/@jup-ag/api/v/6.0.47) 
+  has been released with the latest schema.
+
 </Update>
 
 <Update label="October 2025" description="">

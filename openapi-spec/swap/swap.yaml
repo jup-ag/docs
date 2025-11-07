@@ -242,6 +242,12 @@ components:
           type: string
         outAmount:
           type: string
+        feeAmount:
+          type: string
+          deprecated: true
+        feeMint:
+          type: string
+          deprecated: true
 
     SwapRequest:
       type: object

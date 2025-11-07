@@ -229,8 +229,6 @@ components:
         - outputMint
         - inAmount
         - outAmount
-        - feeAmount
-        - feeMint
       properties:
         ammKey:
           type: string
@@ -243,10 +241,6 @@ components:
         inAmount:
           type: string
         outAmount:
-          type: string
-        feeAmount:
-          type: string
-        feeMint:
           type: string
 
     SwapRequest:
@@ -359,34 +353,6 @@ components:
           format: uint8
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponse'
-      example:
-        userPublicKey: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
-        quoteResponse:
-          inputMint: "So11111111111111111111111111111111111111112"
-          inAmount: "1000000"
-          outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-          outAmount: "125630"
-          otherAmountThreshold: "125002"
-          swapMode: "ExactIn"
-          slippageBps: 50
-          platformFee: null
-          priceImpactPct: "0"
-          routePlan:
-            - swapInfo:
-                ammKey: "AvBSC1KmFNceHpD6jyyXBV6gMXFxZ8BJJ3HVUN8kCurJ"
-                label: "Obric V2"
-                inputMint: "So11111111111111111111111111111111111111112"
-                outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-                inAmount: "1000000"
-                outAmount: "125630"
-                feeAmount: "5"
-                feeMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-              percent: 100
-        prioritizationFeeLamports:
-          priorityLevelWithMaxLamports:
-            maxLamports: 10000000
-            priorityLevel: "veryHigh"
-        dynamicComputeUnitLimit: true
 
     SwapResponse:
       type: object

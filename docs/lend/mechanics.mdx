@@ -1,0 +1,640 @@
+---
+title: "How Lend Works"
+description: "Technical mechanics of Jupiter Lend's unified liquidity layer, interest rates, and liquidation system."
+---
+
+Understanding the mechanics of Jupiter Lend helps you integrate safely and make informed decisions about lending and borrowing.
+
+## Unified Liquidity Layer Architecture
+
+Jupiter Lend uses a novel unified liquidity layer that connects both Earn (lending) and Borrow (vaults) protocols:
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  Unified Liquidity Layer                                   │
+├────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌──────────────────┐         ┌──────────────────┐        │
+│  │  Earn Protocol   │         │ Borrow Protocol  │        │
+│  │  (Depositors)    │         │  (Vaults)        │        │
+│  └────────┬─────────┘         └────────┬─────────┘        │
+│           │                             │                  │
+│           │  Supply Liquidity           │ Borrow Liquidity │
+│           ↓                             ↓                  │
+│  ┌──────────────────────────────────────────────┐         │
+│  │     Liquidity Pool (Per Asset)               │         │
+│  │                                               │         │
+│  │  Total Supplied: X                            │         │
+│  │  Total Borrowed: Y                            │         │
+│  │  Available: X - Y                             │         │
+│  │  Utilization: Y / X                           │         │
+│  └──────────────────────────────────────────────┘         │
+│                                                             │
+│  Interest flows from borrowers to lenders                  │
+│  Automatically rebalanced each block                       │
+│                                                             │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Key Benefits:**
+- Depositors automatically earn from all borrow protocols
+- No need to migrate funds when new protocols launch
+- Optimal capital efficiency
+- Best possible rates at all times
+
+## Earn Protocol Mechanics
+
+### Deposit Flow
+
+```
+┌────────────────────────────────────────────────────────┐
+│  Step 1: User Deposits Assets                          │
+├────────────────────────────────────────────────────────┤
+│  User deposits token (e.g., USDC, SOL)                 │
+│  ↓                                                      │
+│  Transferred to Liquidity Pool PDA                     │
+│  ↓                                                      │
+│  User receives jTokens (e.g., jUSDC, jSOL)            │
+└────────────────────────────────────────────────────────┘
+
+jToken Exchange Rate = (Total Pool Value) / (Total jTokens)
+
+Example:
+Pool has 1,000,000 USDC in deposits + 50,000 USDC earned interest
+Total jUSDC supply: 1,000,000
+Exchange rate: 1.05 USDC per jUSDC
+
+When user deposits 10,000 USDC:
+- Receives: 10,000 / 1.05 = 9,523.81 jUSDC
+- jToken balance represents claim on underlying + earned interest
+```
+
+### Interest Accrual
+
+Interest compounds every block (~400ms on Solana):
+
+```typescript
+interface InterestCalculation {
+  utilizationRate: number;     // Borrowed / Supplied
+  baseRate: number;            // Minimum APR
+  optimalUtilization: number;  // Target utilization
+  slope1: number;              // Rate increase before optimal
+  slope2: number;              // Rate increase after optimal
+}
+
+function calculateBorrowAPR(params: InterestCalculation): number {
+  const { utilizationRate, baseRate, optimalUtilization, slope1, slope2 } = params;
+
+  if (utilizationRate <= optimalUtilization) {
+    // Before optimal: gradual rate increase
+    return baseRate + (utilizationRate / optimalUtilization) * slope1;
+  } else {
+    // After optimal: steep rate increase
+    const excessUtilization = utilizationRate - optimalUtilization;
+    const excessSlope = (1 - optimalUtilization);
+    return baseRate + slope1 + (excessUtilization / excessSlope) * slope2;
+  }
+}
+
+// Supply APR is proportional to borrow APR and utilization
+function calculateSupplyAPR(borrowAPR: number, utilization: number): number {
+  const protocolFee = 0.10; // 10% protocol fee
+  return borrowAPR * utilization * (1 - protocolFee);
+}
+```
+
+**Example Interest Rate Curve:**
+
+| Utilization | Borrow APR | Supply APR |
+|:------------|:-----------|:-----------|
+| 0% | 2% | 0% |
+| 25% | 3% | 0.68% |
+| 50% | 5% | 2.25% |
+| 75% (Optimal) | 8% | 5.4% |
+| 90% | 15% | 12.15% |
+| 95% | 25% | 21.38% |
+| 99% | 50% | 44.55% |
+
+### Automated Debt Ceiling (Withdrawal Limits)
+
+Jupiter Lend implements a smoothing curve for withdrawals:
+
+```typescript
+interface DebtCeiling {
+  maxWithdrawalPerBlock: number;  // Maximum per block
+  currentCeiling: number;         // Current available
+  rechargeRate: number;           // Increase per block
+  maxCeiling: number;             // Maximum cap
+}
+
+function calculateAvailableWithdrawal(ceiling: DebtCeiling): number {
+  // Ceiling increases each block (every ~400ms)
+  const blocksPassed = getBlocksSinceLastWithdrawal();
+  const recharged = blocksPassed * ceiling.rechargeRate;
+
+  const current = Math.min(
+    ceiling.currentCeiling + recharged,
+    ceiling.maxCeiling
+  );
+
+  return current;
+}
+```
+
+**Purpose:**
+- Prevents bank run scenarios
+- Smooths large withdrawals over time
+- Protects against flash loan attacks
+- Creates predictable liquidity
+
+**Example:**
+
+```
+Initial ceiling: 100,000 USDC
+Max ceiling: 1,000,000 USDC
+Recharge rate: 1,000 USDC per block (~400ms)
+
+User wants to withdraw 500,000 USDC:
+
+Block 1: Withdraw 100,000 USDC (ceiling hit)
+Wait 400 blocks (~160 seconds)
+Block 401: Withdraw 400,000 USDC (ceiling recharged to 400,000)
+Total time: ~3 minutes for 500K withdrawal
+```
+
+### Withdraw Flow
+
+```
+┌────────────────────────────────────────────────────────┐
+│  Step 1: User Requests Withdrawal                      │
+├────────────────────────────────────────────────────────┤
+│  User burns jTokens (e.g., 9,523.81 jUSDC)             │
+│  ↓                                                      │
+│  Calculate underlying: jTokens × exchange rate         │
+│  (9,523.81 × 1.07 = 10,190.47 USDC including interest) │
+│  ↓                                                      │
+│  Check against automated debt ceiling                  │
+│  ↓                                                      │
+│  Transfer USDC from pool to user                       │
+│  ↓                                                      │
+│  User receives original deposit + accrued interest     │
+└────────────────────────────────────────────────────────┘
+```
+
+## Borrow Protocol Mechanics
+
+### Vault System
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Borrow Vault Structure                                  │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  User deposits collateral (e.g., SOL, wBTC, ETH)        │
+│      ↓                                                   │
+│  ┌────────────────────────────────────┐                │
+│  │  Vault Account                     │                │
+│  │                                    │                │
+│  │  Collateral: 10 SOL ($1,500)      │                │
+│  │  Debt: 1,200 USDC                 │                │
+│  │  Collateral Value: $1,500         │                │
+│  │  LTV: 80% (1,200 / 1,500)         │                │
+│  │  Max LTV: 95%                     │                │
+│  │  Liquidation Threshold: 90%       │                │
+│  │  Max Liquidation: 95%             │                │
+│  │  Health: Safe                     │                │
+│  └────────────────────────────────────┘                │
+│      ↓                                                   │
+│  User borrows USDC against collateral                   │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Loan-to-Value (LTV) Mechanics
+
+```typescript
+interface VaultParameters {
+  collateralAmount: number;
+  collateralPrice: number;
+  debtAmount: number;
+  maxLTV: number;              // Maximum borrowing capacity
+  liquidationThreshold: number; // When liquidation begins
+  maxLiquidationThreshold: number; // Full liquidation point
+}
+
+function calculateVaultHealth(vault: VaultParameters): VaultHealth {
+  const collateralValue = vault.collateralAmount * vault.collateralPrice;
+  const currentLTV = vault.debtAmount / collateralValue;
+
+  // Maximum borrowing capacity
+  const maxBorrowAmount = collateralValue * vault.maxLTV;
+  const availableBorrow = maxBorrowAmount - vault.debtAmount;
+
+  // Health status
+  let status: string;
+  if (currentLTV >= vault.maxLiquidationThreshold) {
+    status = 'CRITICAL - Full Liquidation';
+  } else if (currentLTV >= vault.liquidationThreshold) {
+    status = 'AT RISK - Partial Liquidation Possible';
+  } else if (currentLTV >= vault.maxLTV * 0.95) {
+    status = 'WARNING - Near Max LTV';
+  } else {
+    status = 'SAFE';
+  }
+
+  return {
+    currentLTV,
+    maxLTV: vault.maxLTV,
+    availableBorrow,
+    status,
+    liquidationPrice: calculateLiquidationPrice(vault)
+  };
+}
+```
+
+### High LTV Achievement
+
+Jupiter Lend achieves up to 95% LTV through advanced liquidation mechanics:
+
+```
+Traditional Lending:
+- Lower LTV (60-75%)
+- Manual liquidation triggers
+- Slower liquidation execution
+- Higher bad debt risk
+
+Jupiter Lend:
+- Higher LTV (up to 95%)
+- Automated liquidation system
+- Gas-efficient Dutch auction liquidation
+- Minimal bad debt risk
+```
+
+### Liquidation Mechanics
+
+#### Liquidation Thresholds
+
+```
+Vault Lifecycle:
+
+LTV: 0% ────────────────────────────────────────────→ 100%
+     │         │              │           │          │
+     Safe   Max LTV    Liquidation   Max Liq    Bad Debt
+            (80%)      Threshold    Threshold
+                         (90%)       (95%)
+
+States:
+├─ 0-80%:   Safe - Can borrow more
+├─ 80-90%:  Warning - Cannot borrow more, still safe
+├─ 90-95%:  At Risk - Partial liquidation can occur
+├─ 95-100%: Critical - Full liquidation occurs automatically
+└─ 100%+:   Bad Debt - Undercollateralized (extremely rare)
+```
+
+#### Partial Liquidation
+
+When vault crosses liquidation threshold:
+
+```typescript
+interface PartialLiquidation {
+  vaultLTV: number;           // Current LTV (e.g., 92%)
+  liquidationThreshold: number; // 90%
+  maxLiquidationThreshold: number; // 95%
+}
+
+function calculatePartialLiquidation(vault: PartialLiquidation): LiquidationAmount {
+  // Liquidate just enough to bring vault back to safe LTV
+  const targetLTV = vault.maxLTV * 0.85; // Target 85% of max LTV
+  const currentLTV = vault.vaultLTV;
+
+  // Calculate collateral to liquidate
+  const excessLTV = currentLTV - targetLTV;
+  const collateralToLiquidate = vault.collateralAmount * (excessLTV / currentLTV);
+
+  return {
+    collateralToLiquidate,
+    debtToRepay: collateralToLiquidate * vault.collateralPrice,
+    liquidationPenalty: 0.05 // 5% penalty
+  };
+}
+```
+
+**Example:**
+
+```
+Initial Vault:
+- Collateral: 10 SOL @ $150 = $1,500
+- Debt: 1,350 USDC
+- LTV: 90% (at liquidation threshold)
+
+SOL price drops to $140:
+- Collateral value: 10 × $140 = $1,400
+- LTV: 1,350 / 1,400 = 96.4% (above max liquidation threshold)
+
+Full Liquidation Triggered:
+- All 10 SOL sold to repay debt
+- Debt repaid: 1,350 USDC
+- Liquidation penalty: 5% = 67.50 USDC
+- Total deducted: 1,417.50 USDC worth of SOL
+- Remaining SOL returned to user (if any)
+```
+
+#### Dutch Auction Liquidation
+
+Jupiter uses Dutch auctions for gas-efficient liquidations:
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Dutch Auction Liquidation Process                  │
+├─────────────────────────────────────────────────────┤
+│                                                      │
+│  Starting Discount: 0% (market price)               │
+│      ↓                                               │
+│  Each block: Discount increases by 0.1%             │
+│      ↓                                               │
+│  Liquidator bids when discount is attractive        │
+│      ↓                                               │
+│  First successful bid wins                          │
+│      ↓                                               │
+│  Collateral sold, debt repaid, penalty deducted     │
+│      ↓                                               │
+│  Remaining collateral (if any) returned to user     │
+│                                                      │
+│  Timeline: Usually completes in 10-30 seconds       │
+│                                                      │
+└─────────────────────────────────────────────────────┘
+```
+
+**Efficiency Benefits:**
+- No need to find exact liquidation price
+- Competitive market sets fair price
+- Fast execution (single transaction)
+- Minimal gas costs
+- Automatic price discovery
+
+### Interest Rate Mechanics
+
+Borrowers pay interest that accrues to Earn depositors:
+
+```typescript
+interface BorrowInterest {
+  principal: number;           // Original borrowed amount
+  interestRate: number;        // Annual rate (variable)
+  timeElapsed: number;         // Seconds since last update
+  compoundFrequency: number;   // Per block (~400ms)
+}
+
+function calculateAccruedDebt(params: BorrowInterest): number {
+  const secondsPerYear = 365.25 * 24 * 60 * 60;
+  const blocksPassed = params.timeElapsed / 0.4; // ~400ms per block
+
+  // Compound interest per block
+  const ratePerBlock = params.interestRate / (secondsPerYear / 0.4);
+
+  // A = P(1 + r)^n
+  const totalDebt = params.principal * Math.pow(1 + ratePerBlock, blocksPassed);
+
+  return totalDebt;
+}
+```
+
+**Example:**
+
+```
+Borrowed: 1,000 USDC
+APR: 10%
+Time: 30 days
+
+Debt after 30 days:
+1,000 × (1 + 0.10/365)^30 = 1,008.22 USDC
+
+User must repay 1,008.22 USDC to close vault
+```
+
+## Oracle System
+
+### Price Feeds
+
+```
+┌────────────────────────────────────────────────────────┐
+│  Price Oracle Architecture                             │
+├────────────────────────────────────────────────────────┤
+│                                                         │
+│  ┌──────────────┐     ┌──────────────┐                │
+│  │   Pyth       │     │   Switchboard│                │
+│  │   Network    │     │   Oracle     │                │
+│  └──────┬───────┘     └──────┬───────┘                │
+│         │                     │                         │
+│         └──────────┬──────────┘                        │
+│                    ↓                                    │
+│         ┌─────────────────────┐                        │
+│         │  Jupiter Lend       │                        │
+│         │  Oracle Aggregator  │                        │
+│         │                     │                        │
+│         │  • Median price     │                        │
+│         │  • Staleness check  │                        │
+│         │  • Confidence bands │                        │
+│         └─────────────────────┘                        │
+│                                                         │
+└────────────────────────────────────────────────────────┘
+```
+
+### Price Update Frequency
+
+```typescript
+interface OracleParameters {
+  maxStaleness: number;      // Maximum age of price data (e.g., 60s)
+  minConfidence: number;     // Minimum confidence score
+  priceDeviationThreshold: number; // Max % deviation between sources
+}
+
+function validateOraclePrice(
+  prices: number[],
+  params: OracleParameters
+): number {
+  // Check staleness
+  if (getLatestPriceAge() > params.maxStaleness) {
+    throw new Error('Price data stale');
+  }
+
+  // Calculate median (resistant to outliers)
+  const medianPrice = calculateMedian(prices);
+
+  // Check deviation
+  const maxDeviation = Math.max(...prices.map(p =>
+    Math.abs(p - medianPrice) / medianPrice
+  ));
+
+  if (maxDeviation > params.priceDeviationThreshold) {
+    throw new Error('Price sources diverged');
+  }
+
+  return medianPrice;
+}
+```
+
+## Risk Management
+
+### Protocol-Level Safeguards
+
+```
+┌──────────────────────────────────────────────────────┐
+│  Risk Management Layers                              │
+├──────────────────────────────────────────────────────┤
+│                                                       │
+│  1. Collateral Quality Tiers                         │
+│     • Bluechip (SOL, BTC, ETH): Up to 95% LTV       │
+│     • Midcap: 85% LTV                                │
+│     • Long-tail: 70% LTV or not accepted             │
+│                                                       │
+│  2. Borrow Caps                                       │
+│     • Maximum borrowable per asset                   │
+│     • Prevents over-concentration                    │
+│     • Dynamically adjusted                           │
+│                                                       │
+│  3. Oracle Diversification                            │
+│     • Multiple price feed sources                    │
+│     • Median price calculation                       │
+│     • Staleness checks                               │
+│                                                       │
+│  4. Interest Rate Caps                                │
+│     • Maximum APR to prevent extreme rates           │
+│     • Protects both lenders and borrowers            │
+│                                                       │
+│  5. Emergency Pause                                   │
+│     • Can halt new borrows/withdrawals               │
+│     • Existing positions unaffected                  │
+│     • Used only in critical situations               │
+│                                                       │
+└──────────────────────────────────────────────────────┘
+```
+
+### Smart Contract Security
+
+- Multiple audits by top firms
+- Formal verification of critical paths
+- Bug bounty program
+- Gradual rollout with caps
+- Real-time monitoring and alerts
+
+## Fee Structure
+
+```typescript
+interface LendFees {
+  earnProtocol: {
+    depositFee: 0,          // Free to deposit
+    withdrawalFee: 0,       // Free to withdraw
+    managementFee: 0,       // No management fee
+    performanceFee: 0.10    // 10% of interest earned goes to protocol
+  },
+  borrowProtocol: {
+    borrowFee: 0,           // Free to borrow
+    repaymentFee: 0,        // Free to repay
+    liquidationPenalty: 0.05 // 5% penalty on liquidated collateral
+  }
+}
+
+// Example: Earn Protocol Fee
+// User earns 100 USDC in interest
+// User receives: 90 USDC
+// Protocol keeps: 10 USDC
+
+// Example: Liquidation Fee
+// Collateral liquidated: $1,000
+// Debt repaid: $950
+// Liquidation penalty: $50
+// Liquidator profit: ~$0-30 (depending on auction discount)
+```
+
+## Best Practices
+
+<AccordionGroup>
+<Accordion title="Maintain safe collateral ratios">
+
+```typescript
+// Recommended safety margins
+const recommendations = {
+  conservative: {
+    targetLTV: 0.60,    // 60% of max LTV
+    alertLTV: 0.70,     // Alert when above 70%
+    maxLTV: 0.75        // Never exceed 75%
+  },
+  moderate: {
+    targetLTV: 0.75,
+    alertLTV: 0.80,
+    maxLTV: 0.85
+  },
+  aggressive: {
+    targetLTV: 0.85,
+    alertLTV: 0.88,
+    maxLTV: 0.92        // Leave buffer before liquidation
+  }
+};
+
+// Monitor price movements and adjust accordingly
+```
+</Accordion>
+
+<Accordion title="Set up liquidation alerts">
+
+```typescript
+async function monitorVaultHealth(vaultAddress: string) {
+  const vault = await getVaultData(vaultAddress);
+  const health = calculateVaultHealth(vault);
+
+  if (health.currentLTV >= vault.liquidationThreshold) {
+    sendAlert('CRITICAL: Vault at risk of liquidation!');
+  } else if (health.currentLTV >= vault.maxLTV * 0.95) {
+    sendAlert('WARNING: Vault near max LTV');
+  }
+
+  // Calculate liquidation price
+  const liqPrice = vault.debtAmount / (vault.collateralAmount * vault.liquidationThreshold);
+  console.log(`Liquidation price: $${liqPrice}`);
+}
+```
+</Accordion>
+
+<Accordion title="Understand interest rate volatility">
+
+Interest rates can change significantly based on utilization:
+
+```typescript
+// During high utilization (90%+), rates can spike
+// Plan for variable APRs when borrowing
+
+// Check current rates before borrowing
+const currentAPR = await getBorrowAPR(asset);
+const projectedInterest = loanAmount * (currentAPR / 365) * durationDays;
+
+// Add 20-30% buffer for rate increases
+const safeInterestEstimate = projectedInterest * 1.25;
+```
+</Accordion>
+
+<Accordion title="Use automated debt ceiling for large withdrawals">
+
+```typescript
+// For large withdrawals, check ceiling first
+const available = await getAvailableWithdrawal(asset);
+
+if (withdrawAmount > available) {
+  // Calculate time needed for ceiling to recharge
+  const shortfall = withdrawAmount - available;
+  const blocksNeeded = Math.ceil(shortfall / rechargeRate);
+  const timeNeeded = blocksNeeded * 0.4; // seconds
+
+  console.log(`Wait ${timeNeeded}s for ceiling to recharge`);
+
+  // Option: Split withdrawal across multiple transactions
+}
+```
+</Accordion>
+</AccordionGroup>
+
+## Related Documentation
+
+- [Earn Protocol API](/docs/lend/deposit) - Deposit and withdraw from Earn
+- [Borrow Protocol](/docs/lend/borrow) - API documentation (work in progress)
+- [Jupiter Lend Program IDs](/docs/lend/index#program-id) - On-chain program addresses
+- [Risk Disclosure](/legal) - Important risk information

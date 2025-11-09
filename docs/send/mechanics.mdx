@@ -1,0 +1,662 @@
+---
+title: "How Send Works"
+description: "Technical mechanics of Jupiter Send's invite code system, escrow management, and gasless claiming process."
+---
+
+Understanding the mechanics of Jupiter Send helps you integrate the perfect onboarding experience for new users, even those without wallets.
+
+## Send Lifecycle
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Complete Send Flow                                       │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│  Phase 1: Create Send                                    │
+│  ├─> Sender creates send transaction                     │
+│  ├─> Tokens transferred to escrow PDA                    │
+│  ├─> Unique invite code generated                        │
+│  └─> Link/QR code created                                │
+│                                                           │
+│  Phase 2: Share Invite                                   │
+│  ├─> Sender shares link or QR code                       │
+│  ├─> Recipient can be anyone (wallet or not)             │
+│  └─> Invite code valid until expiry or claim             │
+│                                                           │
+│  Phase 3: Claim                                           │
+│  ├─> Recipient opens Jupiter Mobile                      │
+│  ├─> Scans QR or enters invite code                      │
+│  ├─> Creates wallet (if needed) in-app                   │
+│  ├─> Claims tokens to their wallet                       │
+│  └─> Gasless swap available if non-SOL tokens            │
+│                                                           │
+│  Phase 4: Post-Claim (Optional)                          │
+│  ├─> Recipient uses Jupiter Mobile Adapter               │
+│  ├─> Seamlessly connects to sender's app/platform        │
+│  └─> Continues journey with new wallet                   │
+│                                                           │
+│  Alternative: Clawback                                    │
+│  └─> If unclaimed after expiry, sender reclaims funds    │
+│                                                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Invite Code System
+
+### Code Generation
+
+```typescript
+interface InviteCode {
+  code: string;           // Unique identifier (e.g., "JUP-A7B9-C3D2")
+  escrowPDA: string;      // On-chain escrow account
+  tokenMint: string;      // Token being sent
+  amount: number;         // Token amount
+  sender: string;         // Sender's wallet
+  expiryTime: number;     // Unix timestamp
+  claimed: boolean;       // Claim status
+  claimedBy?: string;     // Recipient wallet (after claim)
+}
+
+function generateInviteCode(sendParams: SendParams): InviteCode {
+  // Generate cryptographically secure random code
+  const randomBytes = crypto.randomBytes(8);
+  const code = formatInviteCode(randomBytes); // "JUP-XXXX-XXXX"
+
+  // Create escrow PDA (Program Derived Address)
+  const [escrowPDA] = PublicKey.findProgramAddressSync(
+    [
+      Buffer.from('send_escrow'),
+      Buffer.from(code),
+      sender.toBuffer()
+    ],
+    SEND_PROGRAM_ID
+  );
+
+  return {
+    code,
+    escrowPDA: escrowPDA.toString(),
+    tokenMint: sendParams.tokenMint,
+    amount: sendParams.amount,
+    sender: sendParams.sender,
+    expiryTime: sendParams.expiryTime || (Date.now() + 30 * 24 * 60 * 60 * 1000),
+    claimed: false
+  };
+}
+```
+
+### Link and QR Code Format
+
+```typescript
+interface SendLink {
+  url: string;      // https://send.jup.ag/claim/{inviteCode}
+  qrCode: string;   // Data URL or SVG for QR code
+  deepLink: string; // jupiter://send/claim/{inviteCode}
+}
+
+function createSendLink(inviteCode: string): SendLink {
+  const baseUrl = 'https://send.jup.ag/claim';
+  const url = `${baseUrl}/${inviteCode}`;
+
+  // Generate QR code containing the URL
+  const qrCode = generateQRCode(url);
+
+  // Deep link for Jupiter Mobile
+  const deepLink = `jupiter://send/claim/${inviteCode}`;
+
+  return { url, qrCode, deepLink };
+}
+
+// Usage examples:
+// 1. Share URL via message: "Claim your tokens: https://send.jup.ag/claim/JUP-A7B9-C3D2"
+// 2. Display QR code for scanning
+// 3. Deep link opens directly in Jupiter Mobile if installed
+```
+
+## Escrow Mechanics
+
+### Escrow Account Creation
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Escrow PDA Structure                                     │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│  Program Derived Address (PDA)                           │
+│  ├─> Deterministic address from:                         │
+│  │   • Send program ID                                   │
+│  │   • Invite code                                       │
+│  │   • Sender's wallet                                   │
+│  │                                                        │
+│  └─> Controls:                                           │
+│      • Only claimable with valid invite code             │
+│      • Only clawbackable by original sender              │
+│      • Auto-expires after expiry time                    │
+│                                                           │
+│  Account Data:                                            │
+│  {                                                        │
+│    inviteCode: string,                                   │
+│    sender: PublicKey,                                    │
+│    tokenMint: PublicKey,                                 │
+│    amount: u64,                                          │
+│    expiryTime: i64,                                      │
+│    claimed: bool,                                        │
+│    claimedBy: Option<PublicKey>                          │
+│  }                                                        │
+│                                                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Send Transaction Flow
+
+```typescript
+// Step 1: Create escrow account
+const createEscrowIx = SystemProgram.createAccount({
+  fromPubkey: sender,
+  newAccountPubkey: escrowPDA,
+  lamports: await getMinimumBalanceForRentExemption(),
+  space: ESCROW_ACCOUNT_SIZE,
+  programId: SEND_PROGRAM_ID
+});
+
+// Step 2: Initialize escrow with send parameters
+const initEscrowIx = await sendProgram.methods
+  .initializeEscrow(inviteCode, amount, expiryTime)
+  .accounts({
+    escrow: escrowPDA,
+    sender: senderWallet,
+    tokenMint: tokenMint,
+    systemProgram: SystemProgram.programId
+  })
+  .instruction();
+
+// Step 3: Transfer tokens to escrow
+const transferIx = Token.createTransferInstruction(
+  senderTokenAccount,     // From sender's token account
+  escrowTokenAccount,     // To escrow's token account
+  senderWallet,           // Authority
+  amount,                 // Amount to send
+  [],                     // No additional signers
+  TOKEN_PROGRAM_ID
+);
+
+// Step 4: Submit transaction
+const tx = new Transaction().add(createEscrowIx, initEscrowIx, transferIx);
+const signature = await sendTransaction(tx, [senderWallet]);
+
+// Tokens now held in escrow, waiting to be claimed
+```
+
+### Self-Custodial Security
+
+```
+Security Properties:
+┌──────────────────────────────────────────────────────┐
+│  ✓ Sender maintains control until claimed            │
+│  ✓ Escrow PDA owned by Send Program                  │
+│  ✓ Only valid invite code can claim                  │
+│  ✓ Sender can clawback if unclaimed                  │
+│  ✓ Auto-refund on expiry if not claimed              │
+│  ✓ No third-party can access funds                   │
+│  ✓ Non-custodial: Jupiter never holds tokens         │
+└──────────────────────────────────────────────────────┘
+```
+
+## Claim Process
+
+### Mobile-Only Claiming
+
+Send claims are designed for Jupiter Mobile only:
+
+```
+Why Mobile-Only?
+├─> Optimized onboarding flow
+├─> Built-in wallet creation
+├─> Seamless gasless swap integration
+├─> QR code scanning native support
+└─> Better security for new users
+
+Alternative claiming methods (API/web) not supported
+to ensure best user experience and security.
+```
+
+### Claim Flow in Jupiter Mobile
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Recipient Claim Journey                                  │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│  Step 1: Receive Invite                                  │
+│  ├─> Scan QR code or click link                          │
+│  ├─> Opens Jupiter Mobile (or prompts install)           │
+│  └─> Invite code auto-populated                          │
+│                                                           │
+│  Step 2: Wallet Check                                    │
+│  ├─> Check if user has Jupiter Mobile wallet             │
+│  │                                                        │
+│  │   No wallet?                                          │
+│  │   ├─> Create new wallet in-app                        │
+│  │   ├─> Secure seed phrase generation                   │
+│  │   ├─> Backup options provided                         │
+│  │   └─> Wallet ready in seconds                         │
+│  │                                                        │
+│  │   Has wallet?                                         │
+│  │   └─> Proceed to claim                                │
+│  │                                                        │
+│  Step 3: Claim Validation                                │
+│  ├─> Verify invite code is valid                         │
+│  ├─> Check escrow has funds                              │
+│  ├─> Confirm not already claimed                         │
+│  └─> Validate not expired                                │
+│                                                           │
+│  Step 4: Execute Claim                                   │
+│  ├─> Build claim transaction                             │
+│  ├─> Sign with new/existing wallet                       │
+│  ├─> Submit to Send Program                              │
+│  └─> Tokens transferred from escrow to recipient         │
+│                                                           │
+│  Step 5: Gasless Swap (if applicable)                    │
+│  ├─> If token is not SOL                                 │
+│  ├─> Ultra Swap offers gasless conversion to SOL         │
+│  ├─> User can immediately use tokens for gas             │
+│  └─> Seamless onboarding completed                       │
+│                                                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Claim Transaction Structure
+
+```typescript
+async function claimSend(
+  inviteCode: string,
+  recipientWallet: PublicKey
+): Promise<string> {
+  // Derive escrow PDA from invite code
+  const [escrowPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('send_escrow'), Buffer.from(inviteCode)],
+    SEND_PROGRAM_ID
+  );
+
+  // Get escrow data
+  const escrowData = await getEscrowData(escrowPDA);
+
+  // Validate claim
+  if (escrowData.claimed) {
+    throw new Error('Already claimed');
+  }
+  if (Date.now() > escrowData.expiryTime) {
+    throw new Error('Invite expired');
+  }
+
+  // Build claim instruction
+  const claimIx = await sendProgram.methods
+    .claimSend(inviteCode)
+    .accounts({
+      escrow: escrowPDA,
+      recipient: recipientWallet,
+      escrowTokenAccount: escrowTokenAccount,
+      recipientTokenAccount: recipientTokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID
+    })
+    .instruction();
+
+  // Submit transaction
+  const tx = new Transaction().add(claimIx);
+  const signature = await sendTransaction(tx, [recipientWallet]);
+
+  // Tokens now in recipient's wallet
+  return signature;
+}
+```
+
+## Gasless Swap Integration
+
+### Automatic Gasless Support
+
+When non-SOL tokens are claimed:
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Gasless Swap Flow After Claim                           │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│  User claims 100 USDC                                    │
+│  ↓                                                        │
+│  Jupiter Mobile detects non-SOL token                    │
+│  ↓                                                        │
+│  Offers gasless swap prompt:                             │
+│  "Convert some USDC to SOL for transaction fees?"        │
+│  ↓                                                        │
+│  User confirms (e.g., swap 5 USDC → SOL)                 │
+│  ↓                                                        │
+│  Ultra Swap Gasless Support kicks in:                    │
+│  ├─> Jupiter pays transaction fees                       │
+│  ├─> User receives SOL from swap                         │
+│  ├─> User retains remaining USDC (95 USDC)               │
+│  └─> User now has SOL for future transactions            │
+│  ↓                                                        │
+│  Fully onboarded user ready to transact!                 │
+│                                                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+**Benefits:**
+- Zero friction onboarding
+- No need to pre-fund with SOL
+- Recipient immediately has usable wallet
+- Can continue transacting on Solana
+- Perfect for gifts, payments, and onboarding
+
+### Supported Tokens for Gasless
+
+```typescript
+interface GaslessEligibility {
+  token: string;
+  minAmount: number;     // Minimum for gasless support
+  maxAmount: number;     // Maximum for gasless support
+  eligible: boolean;
+}
+
+// Typically gasless support available for:
+const gaslessTokens = [
+  { token: 'USDC', minAmount: 1, eligible: true },
+  { token: 'USDT', minAmount: 1, eligible: true },
+  { token: 'Bluechip tokens', minAmount: varies, eligible: true },
+  { token: 'SOL', minAmount: 0, eligible: false } // Already gas token
+];
+
+// Meme tokens / long-tail may not qualify for gasless
+// Check Ultra Swap gasless eligibility in real-time
+```
+
+## Expiry and Clawback Mechanics
+
+### Expiry Handling
+
+```typescript
+interface ExpiryConfig {
+  defaultExpiry: number;    // Default 30 days
+  minExpiry: number;        // Minimum 1 day
+  maxExpiry: number;        // Maximum 90 days
+  autoRefund: boolean;      // Auto-refund on expiry
+}
+
+function isExpired(inviteCode: InviteCode): boolean {
+  return Date.now() > inviteCode.expiryTime;
+}
+
+// After expiry:
+// - Invite code no longer claimable
+// - Sender can initiate clawback
+// - Funds returned to sender's wallet
+// - Escrow account closed, rent reclaimed
+```
+
+### Clawback Process
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Sender Clawback Flow                                     │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│  Conditions for Clawback:                                │
+│  ├─> Invite not claimed                                  │
+│  └─> Past expiry time OR sender initiates early          │
+│                                                           │
+│  Step 1: Request Clawback                                │
+│  ├─> POST /send/v1/clawback                              │
+│  ├─> Provide invite code and sender signature            │
+│  └─> Validate sender is original creator                 │
+│                                                           │
+│  Step 2: Execute Clawback Transaction                    │
+│  ├─> Transfer tokens from escrow back to sender          │
+│  ├─> Close escrow account                                │
+│  ├─> Reclaim rent (~0.002 SOL)                           │
+│  └─> Mark invite as cancelled                            │
+│                                                           │
+│  Step 3: Cleanup                                          │
+│  ├─> Invite code invalidated                             │
+│  ├─> Link/QR code no longer works                        │
+│  └─> Sender receives full refund                         │
+│                                                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Clawback Transaction
+
+```typescript
+async function clawbackSend(
+  inviteCode: string,
+  senderWallet: PublicKey
+): Promise<string> {
+  // Derive escrow PDA
+  const [escrowPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('send_escrow'), Buffer.from(inviteCode)],
+    SEND_PROGRAM_ID
+  );
+
+  // Get escrow data
+  const escrowData = await getEscrowData(escrowPDA);
+
+  // Validate clawback eligibility
+  if (escrowData.sender.toString() !== senderWallet.toString()) {
+    throw new Error('Not the original sender');
+  }
+  if (escrowData.claimed) {
+    throw new Error('Already claimed - cannot clawback');
+  }
+
+  // Build clawback instruction
+  const clawbackIx = await sendProgram.methods
+    .clawbackSend(inviteCode)
+    .accounts({
+      escrow: escrowPDA,
+      sender: senderWallet,
+      escrowTokenAccount: escrowTokenAccount,
+      senderTokenAccount: senderTokenAccount,
+      tokenProgram: TOKEN_PROGRAM_ID
+    })
+    .instruction();
+
+  // Submit transaction
+  const tx = new Transaction().add(clawbackIx);
+  const signature = await sendTransaction(tx, [senderWallet]);
+
+  return signature;
+}
+```
+
+## Jupiter Mobile Adapter Integration
+
+### Post-Claim Experience
+
+After claiming, recipients can seamlessly connect to the sender's platform:
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Gamification & Continued Engagement                      │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│  Scenario: Sender wants users to claim AND join platform │
+│                                                           │
+│  Step 1: User Claims Tokens                              │
+│  └─> Receives tokens in Jupiter Mobile                   │
+│                                                           │
+│  Step 2: Redirect to Platform                            │
+│  ├─> After claim, show: "Continue to [Platform]"         │
+│  ├─> Deep link to platform's website/app                 │
+│  └─> User clicks to visit                                │
+│                                                           │
+│  Step 3: Jupiter Mobile Adapter                          │
+│  ├─> Platform shows QR code for wallet connection        │
+│  ├─> User scans with Jupiter Mobile                      │
+│  ├─> Wallet connected to platform                        │
+│  └─> User logged in with their new wallet                │
+│                                                           │
+│  Step 4: Gamification                                     │
+│  ├─> Platform: "Welcome! You have 100 USDC"              │
+│  ├─> Offer quest/task to use tokens                      │
+│  ├─> Reward completion with more tokens                  │
+│  └─> User fully engaged in ecosystem                     │
+│                                                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Integration Example
+
+```typescript
+// After successful claim in Jupiter Mobile
+function handlePostClaimRedirect(
+  platformUrl: string,
+  welcomeBonus: number
+): void {
+  // Construct redirect URL with parameters
+  const redirectUrl = new URL(platformUrl);
+  redirectUrl.searchParams.set('claimed', 'true');
+  redirectUrl.searchParams.set('wallet', recipientWallet.toString());
+  redirectUrl.searchParams.set('bonus', welcomeBonus.toString());
+
+  // Show redirect prompt in Jupiter Mobile
+  showPrompt({
+    title: 'Claim Successful!',
+    message: `You received ${claimedAmount} tokens!`,
+    action: 'Continue to Platform',
+    url: redirectUrl.toString()
+  });
+
+  // User clicks → opens platform in browser
+  // Platform detects 'claimed' param → shows wallet connect QR
+  // User scans with Jupiter Mobile → connected!
+}
+```
+
+## Use Cases and Best Practices
+
+<AccordionGroup>
+<Accordion title="Gifting tokens to friends/family">
+
+```typescript
+// Perfect for sending to non-crypto natives
+const giftSend = {
+  tokenMint: 'USDC',
+  amount: 50_000000,      // $50 USDC
+  expiry: 30 * 24 * 60 * 60, // 30 days
+  message: 'Happy Birthday! Here is $50 in crypto'
+};
+
+// Benefits:
+// - No wallet needed upfront
+// - Easy QR code sharing
+// - Gasless swap to get started
+// - Can use immediately
+```
+</Accordion>
+
+<Accordion title="Onboarding users to your platform">
+
+```typescript
+// Incentivize new user signups
+const onboardingSend = {
+  tokenMint: 'YOUR_TOKEN',
+  amount: 100_000000,     // 100 tokens
+  expiry: 7 * 24 * 60 * 60,  // 7 days
+  redirectUrl: 'https://yourplatform.com/welcome',
+  gamification: {
+    quest: 'Complete your profile',
+    reward: 50_000000   // Extra 50 tokens
+  }
+};
+
+// Flow:
+// 1. User claims welcome tokens
+// 2. Redirected to your platform
+// 3. Connects via Jupiter Mobile Adapter
+// 4. Completes quest for bonus
+// 5. Fully engaged user!
+```
+</Accordion>
+
+<Accordion title="Paying remote workers/contractors">
+
+```typescript
+// Send payments without requiring SOL
+const paymentSend = {
+  tokenMint: 'USDC',
+  amount: 1000_000000,    // $1000 USDC
+  expiry: 90 * 24 * 60 * 60, // 90 days
+  batch: true,            // Send to multiple recipients
+  recipients: [
+    { code: 'WORKER-1', amount: 500_000000 },
+    { code: 'WORKER-2', amount: 300_000000 },
+    { code: 'WORKER-3', amount: 200_000000 }
+  ]
+};
+
+// Benefits:
+// - Recipients don't need existing wallet
+// - No gas fees for recipients
+// - Can convert to SOL if needed
+// - Fast and global
+```
+</Accordion>
+
+<Accordion title="Airdropping to community">
+
+```typescript
+// Mass distribution with minimal friction
+const airdropCampaign = {
+  tokenMint: 'YOUR_TOKEN',
+  totalRecipients: 1000,
+  amountPerRecipient: 100_000000,
+  expiry: 14 * 24 * 60 * 60, // 2 weeks
+  distribution: 'QR codes in Discord/Twitter'
+};
+
+// Strategy:
+// 1. Generate 1000 unique invite codes
+// 2. Create QR codes for each
+// 3. Share via social media
+// 4. Track claim rate
+// 5. Clawback unclaimed after expiry
+// 6. Redistribute to active community
+```
+</Accordion>
+</AccordionGroup>
+
+## Security Considerations
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Security Best Practices                                  │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│  For Senders:                                             │
+│  ✓ Set appropriate expiry times                          │
+│  ✓ Monitor unclaimed sends                               │
+│  ✓ Use clawback for unclaimed funds                      │
+│  ✓ Verify recipient before sending large amounts         │
+│  ✓ Keep invite codes secure (they're like cash)          │
+│                                                           │
+│  For Recipients:                                          │
+│  ✓ Only claim from trusted senders                       │
+│  ✓ Verify invite code authenticity                       │
+│  ✓ Backup Jupiter Mobile wallet seed phrase              │
+│  ✓ Enable security features in Jupiter Mobile            │
+│  ✓ Be cautious of phishing attempts                      │
+│                                                           │
+│  For Integrators:                                         │
+│  ✓ Validate all API responses                            │
+│  ✓ Implement proper error handling                       │
+│  ✓ Rate limit send creation if needed                    │
+│  ✓ Monitor for suspicious patterns                       │
+│  ✓ Educate users on security best practices              │
+│                                                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Related Documentation
+
+- [Create Send](/docs/send/create) - API reference for creating sends
+- [Clawback](/docs/send/clawback) - Reclaim unclaimed funds
+- [Jupiter Mobile Adapter](/tool-kits/wallet-kit/jupiter-mobile-adapter) - Connect users to your platform
+- [Ultra Swap Gasless](/docs/ultra/gasless) - Gasless swap mechanics

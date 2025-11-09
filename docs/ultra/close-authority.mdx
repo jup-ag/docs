@@ -3,4 +3,340 @@ title: "Close Authority"
 description: "Walkthrough to manage close authority and close token accounts when using the payer parameter in Ultra Swap API."
 ---
 
-WIP
+When using the [`payer` parameter](/docs/ultra/payer) in Ultra Swap API, the integrator pays for rent costs when creating new token accounts on behalf of users. To enable rent reclamation, Jupiter sets the `closeAuthority` of newly created token accounts (excluding wSOL) to the integrator's payer address.
+
+## How It Works
+
+### Token Account Creation Mechanics
+
+When a swap requires creating a new token account for the user:
+
+**For wSOL Token Accounts:**
+- Rent is paid by the integrator's payer
+- An additional transfer of SOL equal to the rent amount is automatically made back to the payer
+- No close authority is set (standard wSOL handling)
+
+**For Non-wSOL Token Accounts:**
+- Rent is paid by the integrator's payer
+- The token account's `closeAuthority` is set to the integrator's payer address
+- This allows the integrator to later close the account and reclaim rent
+
+### Close Authority Structure
+
+```typescript
+// Token account with close authority set
+{
+  owner: "user_wallet_address",           // User owns the tokens
+  closeAuthority: "integrator_payer_address"  // Integrator can close the account
+}
+```
+
+## Reclaiming Rent
+
+To reclaim rent from token accounts where your payer is the close authority:
+
+### Step 1: Identify Closeable Accounts
+
+A token account can be closed when:
+- The account has zero token balance
+- Your payer address is set as the `closeAuthority`
+- The account is still open (not already closed)
+
+### Step 2: Close the Token Account
+
+Use the SPL Token `closeAccount` instruction:
+
+<CodeGroup>
+```typescript TypeScript
+import {
+  getAssociatedTokenAddress,
+  createCloseAccountInstruction,
+} from '@solana/spl-token';
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  sendAndConfirmTransaction,
+} from '@solana/web3.js';
+
+async function closeTokenAccount(
+  connection: Connection,
+  payerKeypair: Keypair,  // Your integrator payer keypair
+  userWallet: PublicKey,
+  tokenMint: PublicKey
+) {
+  // Get the associated token account address
+  const tokenAccount = await getAssociatedTokenAddress(
+    tokenMint,
+    userWallet
+  );
+
+  // Create close account instruction
+  const closeInstruction = createCloseAccountInstruction(
+    tokenAccount,        // Token account to close
+    payerKeypair.publicKey,  // Destination for reclaimed rent
+    payerKeypair.publicKey   // Close authority (your payer)
+  );
+
+  // Create and send transaction
+  const transaction = new Transaction().add(closeInstruction);
+
+  const signature = await sendAndConfirmTransaction(
+    connection,
+    transaction,
+    [payerKeypair]  // Signed by the close authority
+  );
+
+  console.log('Token account closed:', signature);
+  return signature;
+}
+```
+
+```python Python
+from solders.pubkey import Pubkey
+from solders.keypair import Keypair
+from solana.rpc.api import Client
+from solana.transaction import Transaction
+from spl.token.instructions import close_account, CloseAccountParams
+
+async def close_token_account(
+    client: Client,
+    payer_keypair: Keypair,  # Your integrator payer keypair
+    user_wallet: Pubkey,
+    token_mint: Pubkey,
+    token_account: Pubkey
+):
+    # Create close account instruction
+    close_ix = close_account(
+        CloseAccountParams(
+            program_id=TOKEN_PROGRAM_ID,
+            account=token_account,
+            dest=payer_keypair.pubkey(),  # Destination for rent
+            owner=payer_keypair.pubkey()  # Close authority
+        )
+    )
+
+    # Create and send transaction
+    tx = Transaction().add(close_ix)
+    result = client.send_transaction(tx, payer_keypair)
+
+    print(f"Token account closed: {result.value}")
+    return result
+```
+</CodeGroup>
+
+### Step 3: Verify Account Balance is Zero
+
+Before closing, ensure the token account has zero balance:
+
+```typescript
+import { getAccount } from '@solana/spl-token';
+
+async function canCloseAccount(
+  connection: Connection,
+  tokenAccount: PublicKey
+): Promise<boolean> {
+  try {
+    const accountInfo = await getAccount(connection, tokenAccount);
+
+    // Can only close if balance is zero
+    return accountInfo.amount === BigInt(0);
+  } catch (error) {
+    console.error('Error checking account:', error);
+    return false;
+  }
+}
+```
+
+## Best Practices
+
+<AccordionGroup>
+<Accordion title="Track created accounts">
+Keep a database of token accounts created through your payer parameter:
+
+```typescript
+interface CreatedAccount {
+  userWallet: string;
+  tokenMint: string;
+  tokenAccount: string;
+  createdAt: Date;
+  rentAmount: number;
+  closed: boolean;
+}
+```
+
+This helps you identify which accounts you can later close to reclaim rent.
+</Accordion>
+
+<Accordion title="Implement batch closing">
+Close multiple empty accounts in batches to save on transaction fees:
+
+```typescript
+async function batchCloseAccounts(
+  connection: Connection,
+  payerKeypair: Keypair,
+  accountsToClose: PublicKey[]
+) {
+  const transaction = new Transaction();
+
+  for (const account of accountsToClose) {
+    const closeIx = createCloseAccountInstruction(
+      account,
+      payerKeypair.publicKey,
+      payerKeypair.publicKey
+    );
+    transaction.add(closeIx);
+  }
+
+  return await sendAndConfirmTransaction(
+    connection,
+    transaction,
+    [payerKeypair]
+  );
+}
+```
+</Accordion>
+
+<Accordion title="Monitor for zero-balance accounts">
+Regularly scan for token accounts with zero balance that can be closed:
+
+```typescript
+async function findCloseableAccounts(
+  connection: Connection,
+  payerAddress: PublicKey,
+  userWallets: PublicKey[]
+): Promise<PublicKey[]> {
+  const closeable: PublicKey[] = [];
+
+  for (const wallet of userWallets) {
+    // Get all token accounts owned by user
+    const accounts = await connection.getParsedTokenAccountsByOwner(
+      wallet,
+      { programId: TOKEN_PROGRAM_ID }
+    );
+
+    for (const { account, pubkey } of accounts.value) {
+      const parsedInfo = account.data.parsed.info;
+
+      // Check if zero balance and we have close authority
+      if (
+        parsedInfo.tokenAmount.uiAmount === 0 &&
+        parsedInfo.closeAuthority === payerAddress.toString()
+      ) {
+        closeable.push(pubkey);
+      }
+    }
+  }
+
+  return closeable;
+}
+```
+</Accordion>
+
+<Accordion title="Handle account closing errors">
+Implement proper error handling for common scenarios:
+
+```typescript
+async function safeCloseAccount(
+  connection: Connection,
+  payerKeypair: Keypair,
+  tokenAccount: PublicKey
+) {
+  try {
+    const accountInfo = await getAccount(connection, tokenAccount);
+
+    // Verify balance is zero
+    if (accountInfo.amount !== BigInt(0)) {
+      throw new Error('Account has non-zero balance');
+    }
+
+    // Verify close authority
+    if (accountInfo.closeAuthority?.toString() !== payerKeypair.publicKey.toString()) {
+      throw new Error('Not the close authority');
+    }
+
+    // Close the account
+    return await closeTokenAccount(
+      connection,
+      payerKeypair,
+      accountInfo.owner,
+      accountInfo.mint
+    );
+  } catch (error) {
+    if (error.message.includes('Account does not exist')) {
+      console.log('Account already closed');
+      return null;
+    }
+    throw error;
+  }
+}
+```
+</Accordion>
+</AccordionGroup>
+
+## Rent Economics
+
+Understanding the economics of rent reclamation:
+
+| Account Type | Rent Amount | When to Close |
+|:-------------|:------------|:--------------|
+| Token Account | ~0.00203928 SOL | After user balance reaches zero |
+| Associated Token Account | ~0.00203928 SOL | After user balance reaches zero |
+
+<Note>
+**Rent Reclamation Strategy**
+
+- **Immediate closing**: Close accounts as soon as they reach zero balance to reclaim rent quickly
+- **Batch closing**: Wait and close multiple accounts together to save on transaction fees
+- **Hybrid approach**: Close high-value accounts immediately, batch low-value accounts
+
+Choose based on your user activity patterns and cost optimization goals.
+</Note>
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="What happens if I don't close the accounts?">
+The rent remains locked in the token account. While the user can still use the account normally, you won't be able to reclaim the rent you paid until the account is closed.
+</Accordion>
+
+<Accordion title="Can users close their own accounts?">
+No, only the designated `closeAuthority` (your payer address) can close the account. Users retain full ownership of the tokens, but cannot close accounts where you are the close authority.
+</Accordion>
+
+<Accordion title="What if the user wants to close their account?">
+Users cannot close accounts where your integrator is the close authority. You should implement a mechanism for users to request account closure (after their balance is zero), or automatically close zero-balance accounts periodically.
+</Accordion>
+
+<Accordion title="Can I transfer close authority back to the user?">
+Yes, you can use the `setAuthority` instruction to transfer close authority back to the user:
+
+```typescript
+import { createSetAuthorityInstruction, AuthorityType } from '@solana/spl-token';
+
+const setAuthorityIx = createSetAuthorityInstruction(
+  tokenAccount,           // Token account
+  payerKeypair.publicKey, // Current authority (your payer)
+  AuthorityType.CloseAccount,
+  userWallet              // New authority (user)
+);
+```
+
+This allows users to close their own accounts and reclaim rent themselves.
+</Accordion>
+
+<Accordion title="How do I check if I'm the close authority?">
+Query the token account and check the `closeAuthority` field:
+
+```typescript
+const accountInfo = await getAccount(connection, tokenAccount);
+const isCloseAuthority = accountInfo.closeAuthority?.toString() === payerKeypair.publicKey.toString();
+```
+</Accordion>
+</AccordionGroup>
+
+## Related Documentation
+
+- [Integrator Gas Payer](/docs/ultra/payer) - Learn about the payer parameter
+- [Gasless Support](/docs/ultra/gasless) - Ultra Swap's gasless mechanisms
+- [SPL Token Documentation](https://spl.solana.com/token) - Official Solana token program docs

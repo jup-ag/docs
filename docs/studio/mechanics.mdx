@@ -1,0 +1,651 @@
+---
+title: "How Studio Works"
+description: "Technical mechanics of Jupiter Studio's bonding curves, token creation, graduation, and LP management."
+---
+
+Understanding the mechanics of Jupiter Studio helps you create tokens with optimal configurations and navigate the token lifecycle effectively.
+
+## Token Lifecycle
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Studio Token Lifecycle                                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Phase 1: Token Creation                                    │
+│  └─> Deploy token with custom parameters                    │
+│      • Supply allocation                                    │
+│      • Bonding curve selection                              │
+│      • Vesting schedules                                    │
+│      • Quote mint (SOL, USDC, etc.)                         │
+│                                                              │
+│  Phase 2: Bonding Curve                                     │
+│  └─> Users buy tokens from curve                            │
+│      • Price increases with supply                          │
+│      • Liquidity accumulates                                │
+│      • Anti-sniper protection active                        │
+│      • Creator can set custom curve parameters              │
+│                                                              │
+│  Phase 3: Graduation                                        │
+│  └─> Market cap reaches graduation threshold                │
+│      • Bonding curve closes                                 │
+│      • LP created on DEX (e.g., Orca, Raydium)              │
+│      • Trading moves to open market                         │
+│      • LP optionally locked                                 │
+│                                                              │
+│  Phase 4: Post-Graduation                                   │
+│  └─> Token trades on DEX                                    │
+│      • Creator earns 50% of LP fees                         │
+│      • Optional 1-year LP lock                              │
+│      • Vested tokens unlock per schedule                    │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Bonding Curve Mechanics
+
+### What is a Bonding Curve?
+
+A bonding curve is an automated market maker (AMM) that prices tokens based on supply:
+
+```
+Price increases as more tokens are purchased
+
+Price
+  ↑
+  │                                    ╱
+  │                                ╱
+  │                            ╱
+  │                        ╱
+  │                    ╱
+  │                ╱
+  │            ╱
+  │        ╱
+  │    ╱
+  │╱
+  └────────────────────────────────────────→ Supply
+  0                                    Max Supply
+```
+
+### Bonding Curve Formula
+
+Studio uses customizable bonding curves:
+
+```typescript
+interface BondingCurveParams {
+  curveType: 'linear' | 'exponential' | 'logarithmic' | 'custom';
+  reserveRatio?: number;     // For exponential curves (0-1)
+  slope?: number;            // For linear curves
+  basePrice: number;         // Starting price
+  maxSupply: number;         // Tokens available on curve
+  quoteMint: string;         // Payment token (SOL, USDC, etc.)
+}
+
+// Linear bonding curve (simplest)
+function linearBondingCurve(
+  tokensSold: number,
+  slope: number,
+  basePrice: number
+): number {
+  return basePrice + (slope * tokensSold);
+}
+
+// Example: Linear curve
+// Base price: 0.0001 SOL
+// Slope: 0.0000001 SOL per token
+// After 1M tokens sold: 0.0001 + (0.0000001 × 1,000,000) = 0.1001 SOL
+
+// Exponential bonding curve (constant reserve ratio)
+function exponentialBondingCurve(
+  tokenSupply: number,
+  reserveBalance: number,
+  reserveRatio: number
+): number {
+  return reserveBalance / (tokenSupply * reserveRatio);
+}
+
+// Example: Exponential curve with 50% reserve ratio
+// Creates more aggressive price appreciation
+```
+
+### Buy Transaction Flow
+
+```
+┌────────────────────────────────────────────────────────┐
+│  User Buys Tokens from Bonding Curve                   │
+├────────────────────────────────────────────────────────┤
+│                                                         │
+│  Step 1: Calculate Purchase                            │
+│  ├─> User specifies: 1 SOL to spend                    │
+│  ├─> Current price: 0.001 SOL per token                │
+│  ├─> Calculate tokens received (accounting for curve)  │
+│  └─> Output: ~950 tokens (after curve + fees)          │
+│                                                         │
+│  Step 2: Execute Transaction                            │
+│  ├─> Transfer 1 SOL from user                          │
+│  ├─> Add to bonding curve reserves                     │
+│  ├─> Mint ~950 tokens to user                          │
+│  ├─> Update curve state (tokens sold ++)               │
+│  └─> New price calculated for next buyer               │
+│                                                         │
+│  Step 3: Anti-Sniper Protection                         │
+│  ├─> Check if buy exceeds per-transaction limit        │
+│  ├─> Check if user exceeded per-wallet limit           │
+│  ├─> Rate limiting on rapid buys                       │
+│  └─> Block if suspicious patterns detected             │
+│                                                         │
+└────────────────────────────────────────────────────────┘
+```
+
+### Sell Transaction Flow
+
+```
+┌────────────────────────────────────────────────────────┐
+│  User Sells Tokens Back to Bonding Curve               │
+├────────────────────────────────────────────────────────┤
+│                                                         │
+│  Step 1: Calculate Sale                                │
+│  ├─> User specifies: 1000 tokens to sell               │
+│  ├─> Current price: 0.001 SOL per token                │
+│  ├─> Calculate SOL received (accounting for curve)     │
+│  └─> Output: ~0.95 SOL (after curve + fees)            │
+│                                                         │
+│  Step 2: Execute Transaction                            │
+│  ├─> Burn 1000 tokens from user                        │
+│  ├─> Transfer 0.95 SOL from reserves to user           │
+│  ├─> Update curve state (tokens sold --)               │
+│  └─> New price calculated (lower than before)          │
+│                                                         │
+│  Price Impact:                                          │
+│  • Selling decreases price along curve                 │
+│  • Larger sells = larger price impact                  │
+│  • Reserves decrease                                    │
+│                                                         │
+└────────────────────────────────────────────────────────┘
+```
+
+### Reserve Accumulation
+
+```typescript
+interface BondingCurveReserves {
+  totalReserve: number;        // Total SOL/USDC accumulated
+  creatorAllocation: number;   // Creator's share of reserves
+  lpAllocation: number;        // Reserved for LP at graduation
+  protocolFee: number;         // Jupiter's fee
+}
+
+function calculateReserveAllocation(
+  purchaseAmount: number,
+  curveParams: BondingCurveParams
+): BondingCurveReserves {
+  // Example allocation (can be customized)
+  const protocolFee = purchaseAmount * 0.01;        // 1% to protocol
+  const creatorShare = purchaseAmount * 0.20;       // 20% to creator
+  const lpReserve = purchaseAmount - protocolFee - creatorShare; // 79% to LP
+
+  return {
+    totalReserve: purchaseAmount - protocolFee,
+    creatorAllocation: creatorShare,
+    lpAllocation: lpReserve,
+    protocolFee
+  };
+}
+
+// Example: 100 SOL in purchases
+// Protocol fee: 1 SOL
+// Creator receives: 20 SOL
+// LP reserves: 79 SOL (used at graduation)
+```
+
+## Graduation Mechanics
+
+### Graduation Triggers
+
+```typescript
+interface GraduationConditions {
+  targetMarketCap: number;     // Market cap threshold
+  minReserve: number;          // Minimum reserve accumulated
+  timeElapsed?: number;        // Optional minimum time
+  minHolders?: number;         // Optional minimum unique holders
+}
+
+function checkGraduationEligibility(
+  curve: BondingCurve,
+  conditions: GraduationConditions
+): boolean {
+  const marketCap = curve.tokensSold * curve.currentPrice;
+
+  return (
+    marketCap >= conditions.targetMarketCap &&
+    curve.reserves >= conditions.minReserve &&
+    (!conditions.timeElapsed || curve.age >= conditions.timeElapsed) &&
+    (!conditions.minHolders || curve.uniqueHolders >= conditions.minHolders)
+  );
+}
+
+// Common graduation thresholds:
+// - Market cap: $50K - $1M (configurable)
+// - Reserve: Sufficient for meaningful LP
+// - Holders: Optional, e.g., 100+ unique wallets
+```
+
+### LP Creation Process
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Automated LP Creation at Graduation                      │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│  Step 1: Close Bonding Curve                             │
+│  ├─> Disable new buys/sells on curve                     │
+│  ├─> Calculate final token distribution                  │
+│  └─> Prepare LP reserves                                 │
+│                                                           │
+│  Step 2: Create Liquidity Pool                           │
+│  ├─> Choose DEX (Orca, Raydium, etc.)                    │
+│  ├─> Deposit token reserves to LP                        │
+│  ├─> Deposit quote mint (SOL/USDC) reserves              │
+│  ├─> Receive LP tokens                                   │
+│  └─> Initial price set based on curve's final price      │
+│                                                           │
+│  Step 3: LP Token Allocation                             │
+│  ├─> 50% to creator (50% of LP fees)                     │
+│  ├─> 50% burned or locked (optional)                     │
+│  └─> If locked: 1-year vesting schedule                  │
+│                                                           │
+│  Step 4: Enable Trading                                  │
+│  ├─> Token now tradeable on DEX                          │
+│  ├─> Bonding curve permanently disabled                  │
+│  ├─> Price determined by open market                     │
+│  └─> Creator earns ongoing LP fees                       │
+│                                                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+### LP Fee Structure
+
+```typescript
+interface LPFeeDistribution {
+  totalFees: number;           // Total LP fees earned
+  creatorShare: 0.50;          // 50% to creator
+  lpHolderShare: 0.50;         // 50% to LP token holders
+}
+
+// Creator earns 50% of LP fees BEFORE and AFTER graduation
+// This is a significant benefit of Studio tokens
+
+// Example:
+// LP generates 10 SOL in fees per month
+// Creator receives: 5 SOL per month
+// LP holders receive: 5 SOL per month (proportional to holdings)
+```
+
+## Token Vesting Mechanics
+
+### Vesting Configuration
+
+```typescript
+interface VestingSchedule {
+  totalVestedTokens: number;   // 0-80% of total supply
+  beneficiary: string;         // Usually creator wallet
+  vestingDuration: number;     // Total vesting period (seconds)
+  cliffDuration: number;       // Initial cliff before vesting starts
+  startTime: number;           // Unix timestamp
+}
+
+// Common configurations:
+const vestingExamples = {
+  conservative: {
+    totalVestedTokens: 0.10,   // 10% of supply
+    vestingDuration: 365 * 24 * 60 * 60, // 1 year
+    cliffDuration: 90 * 24 * 60 * 60     // 3 month cliff
+  },
+  moderate: {
+    totalVestedTokens: 0.30,   // 30% of supply
+    vestingDuration: 2 * 365 * 24 * 60 * 60, // 2 years
+    cliffDuration: 180 * 24 * 60 * 60  // 6 month cliff
+  },
+  aggressive: {
+    totalVestedTokens: 0.80,   // 80% of supply (max)
+    vestingDuration: 4 * 365 * 24 * 60 * 60, // 4 years
+    cliffDuration: 365 * 24 * 60 * 60  // 1 year cliff
+  }
+};
+```
+
+### Vesting Release Calculation
+
+```typescript
+function calculateVestedAmount(
+  schedule: VestingSchedule,
+  currentTime: number
+): number {
+  const elapsedTime = currentTime - schedule.startTime;
+
+  // Before cliff: no tokens vested
+  if (elapsedTime < schedule.cliffDuration) {
+    return 0;
+  }
+
+  // After full vesting: all tokens vested
+  if (elapsedTime >= schedule.vestingDuration) {
+    return schedule.totalVestedTokens;
+  }
+
+  // During vesting: linear release
+  const vestingProgress =
+    (elapsedTime - schedule.cliffDuration) /
+    (schedule.vestingDuration - schedule.cliffDuration);
+
+  return schedule.totalVestedTokens * vestingProgress;
+}
+
+// Example:
+// Total vested: 1,000,000 tokens
+// Cliff: 6 months
+// Duration: 2 years
+
+// At 3 months: 0 tokens (before cliff)
+// At 6 months: 0 tokens (cliff just hit)
+// At 1 year: ~333,333 tokens (6 months of 18 month vesting)
+// At 2 years: 1,000,000 tokens (fully vested)
+```
+
+### Claim Vested Tokens
+
+```
+POST /studio/v1/claimVested
+
+{
+  "tokenMint": "token_address",
+  "beneficiary": "creator_wallet"
+}
+
+Flow:
+1. Calculate currently vested amount
+2. Subtract already claimed amount
+3. Transfer unclaimed vested tokens to beneficiary
+4. Update claimed amount in vesting account
+```
+
+## Anti-Sniper Protection
+
+### Protection Mechanisms
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Anti-Sniper Suite                                        │
+├──────────────────────────────────────────────────────────┤
+│                                                           │
+│  1. Per-Transaction Limits                               │
+│     • Maximum tokens per buy (% of supply)               │
+│     • Prevents single large buys from sniping            │
+│                                                           │
+│  2. Per-Wallet Limits                                     │
+│     • Maximum tokens per wallet (% of supply)            │
+│     • Prevents concentration in few wallets              │
+│     • Can be time-based (first 24h, etc.)                │
+│                                                           │
+│  3. Rate Limiting                                         │
+│     • Cooldown between transactions                      │
+│     • Prevents rapid buy/sell manipulation               │
+│     • Blocks bot-like behavior                           │
+│                                                           │
+│  4. Graduated Limits                                      │
+│     • Stricter limits at launch                          │
+│     • Gradually relaxed over time                        │
+│     • Balances fairness and liquidity                    │
+│                                                           │
+│  5. Wallet Blacklisting (Optional)                       │
+│     • Block known sniper/bot wallets                     │
+│     • Can be managed by creator                          │
+│     • Helps maintain fair distribution                   │
+│                                                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Configuration Example
+
+```typescript
+interface AntiSniperConfig {
+  maxBuyPerTx: number;         // e.g., 1% of supply
+  maxBuyPerWallet: number;     // e.g., 2% of supply
+  cooldownPeriod: number;      // e.g., 60 seconds
+  initialPhase: {
+    duration: number;          // e.g., 24 hours
+    stricterLimits: {
+      maxBuyPerTx: number;     // e.g., 0.5% of supply
+      maxBuyPerWallet: number; // e.g., 1% of supply
+    }
+  }
+}
+
+function validatePurchase(
+  buyer: string,
+  amount: number,
+  config: AntiSniperConfig,
+  tokenState: TokenState
+): boolean {
+  const isInitialPhase = Date.now() - tokenState.launchTime < config.initialPhase.duration;
+
+  const limits = isInitialPhase
+    ? config.initialPhase.stricterLimits
+    : config;
+
+  // Check per-transaction limit
+  if (amount > tokenState.totalSupply * limits.maxBuyPerTx) {
+    throw new Error('Exceeds per-transaction limit');
+  }
+
+  // Check per-wallet limit
+  const walletBalance = getWalletBalance(buyer);
+  if (walletBalance + amount > tokenState.totalSupply * limits.maxBuyPerWallet) {
+    throw new Error('Exceeds per-wallet limit');
+  }
+
+  // Check cooldown
+  const lastPurchase = getLastPurchaseTime(buyer);
+  if (Date.now() - lastPurchase < config.cooldownPeriod * 1000) {
+    throw new Error('Cooldown period active');
+  }
+
+  return true;
+}
+```
+
+## Quote Mint Flexibility
+
+Studio allows choosing the quote mint (payment token):
+
+```typescript
+interface QuoteMintOptions {
+  mint: string;
+  advantages: string[];
+}
+
+const quoteMints: QuoteMintOptions[] = [
+  {
+    mint: 'SOL',
+    advantages: [
+      'Native gas token - users always have it',
+      'Most liquid and recognized',
+      'Lower barriers to entry',
+      'Familiar to all Solana users'
+    ]
+  },
+  {
+    mint: 'USDC',
+    advantages: [
+      'Stable value - predictable pricing',
+      'Easier mental accounting ($1 = $1)',
+      'Reduces price volatility impact',
+      'Professional appearance'
+    ]
+  },
+  {
+    mint: 'Custom Token',
+    advantages: [
+      'Create unique token economies',
+      'Pair with existing ecosystem token',
+      'Enable novel tokenomics',
+      'Build token utility'
+    ]
+  }
+];
+
+// Quote mint impacts:
+// 1. User acquisition (SOL = easiest)
+// 2. Price stability (USDC = most stable)
+// 3. Ecosystem alignment (Custom = strategic)
+```
+
+## LP Locking Mechanics
+
+### Lock Options
+
+```typescript
+interface LPLockConfig {
+  lockPercentage: number;      // 0-50% (50% is max, other 50% to creator)
+  lockDuration: number;        // Up to 1 year
+  unlockSchedule: 'linear' | 'cliff' | 'custom';
+}
+
+// Common configurations:
+const lockExamples = {
+  noLock: {
+    lockPercentage: 0,
+    // Creator gets 50% LP immediately, 50% burned
+  },
+  partialLock: {
+    lockPercentage: 25,          // Lock 25% of total LP
+    lockDuration: 180 * 24 * 60 * 60, // 6 months
+    unlockSchedule: 'linear'
+  },
+  fullLock: {
+    lockPercentage: 50,          // Lock all non-creator LP
+    lockDuration: 365 * 24 * 60 * 60, // 1 year
+    unlockSchedule: 'cliff'      // Unlock all at once
+  }
+};
+```
+
+### Purpose of LP Locking
+
+```
+Benefits:
+├─> Prevents rug pulls (LP can't be removed)
+├─> Builds trust with community
+├─> Stabilizes liquidity
+├─> Shows long-term commitment
+└─> Can improve token perception
+
+Trade-offs:
+├─> Reduces creator's flexibility
+├─> Locks up capital
+└─> May limit response to market conditions
+```
+
+## Best Practices
+
+<AccordionGroup>
+<Accordion title="Choose appropriate bonding curve">
+
+```typescript
+// Consider your goals:
+
+// Fast graduation (smaller community)
+const aggressiveCurve = {
+  curveType: 'exponential',
+  graduationMcap: 50000,  // $50K
+  reserveRatio: 0.3       // Steep curve
+};
+
+// Broad distribution (larger community)
+const gentleCurve = {
+  curveType: 'linear',
+  graduationMcap: 500000, // $500K
+  slope: 0.0001           // Gradual increase
+};
+
+// Choose based on:
+// - Community building vs fast launch
+// - Token distribution goals
+// - Target market cap at graduation
+```
+</Accordion>
+
+<Accordion title="Configure vesting strategically">
+
+```typescript
+// Balance creator allocation with community trust
+
+// Team-focused project
+const teamVesting = {
+  vestedTokens: 0.30,     // 30% to team
+  duration: 2 * 365,      // 2 years
+  cliff: 180              // 6 month cliff
+};
+
+// Community-focused project
+const communityVesting = {
+  vestedTokens: 0.10,     // Only 10% to team
+  duration: 365,          // 1 year
+  cliff: 90               // 3 month cliff
+};
+
+// Lower vesting % = more community trust
+// Longer duration = shows long-term commitment
+```
+</Accordion>
+
+<Accordion title="Enable appropriate anti-sniper protection">
+
+```typescript
+// For meme tokens / high hype
+const strictProtection = {
+  maxBuyPerTx: 0.005,     // 0.5% per transaction
+  maxBuyPerWallet: 0.01,  // 1% per wallet
+  cooldown: 120,          // 2 minute cooldown
+  initialPhase: 86400     // 24 hour strict period
+};
+
+// For established projects
+const moderateProtection = {
+  maxBuyPerTx: 0.02,      // 2% per transaction
+  maxBuyPerWallet: 0.05,  // 5% per wallet
+  cooldown: 30,           // 30 second cooldown
+  initialPhase: 3600      // 1 hour strict period
+};
+
+// Match protection to expected demand
+```
+</Accordion>
+
+<Accordion title="Plan graduation strategy">
+
+```typescript
+// Calculate graduation requirements
+
+const tokenSupply = 1000000000; // 1 billion tokens
+const targetPrice = 0.0001;     // $0.0001 per token
+const graduationMcap = tokenSupply * 0.5 * targetPrice; // $50K
+
+// Ensure graduation is achievable:
+// - Realistic market cap target
+// - Sufficient community interest
+// - Adequate marketing/distribution plan
+// - Clear post-graduation roadmap
+
+// Monitor progress:
+const progress = currentMcap / graduationMcap;
+console.log(`Graduation progress: ${progress * 100}%`);
+```
+</Accordion>
+</AccordionGroup>
+
+## Related Documentation
+
+- [Create Token](/docs/studio/create-token) - API reference for token creation
+- [Manage LP](/docs/studio/manage-lp) - LP management operations
+- [Studio FAQ](/docs/studio/index#faq) - Frequently asked questions
+- [Studio Launch Post](https://x.com/jup_studio/status/1940620377602011566) - Official announcement

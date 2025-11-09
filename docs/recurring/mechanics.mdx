@@ -1,0 +1,577 @@
+---
+title: "How Recurring Works"
+description: "Technical mechanics of Jupiter Recurring API's automated order execution for DCA and value averaging strategies."
+---
+
+Understanding how Jupiter Recurring API executes automated orders helps you build better DCA (Dollar-Cost Averaging) and value averaging applications.
+
+## Order Types
+
+### Time-Based Recurring Orders
+
+Executes swaps at regular time intervals regardless of price.
+
+**Use Cases:**
+- Dollar-cost averaging (DCA)
+- Regular portfolio rebalancing
+- Automated treasury management
+- Payroll token conversions
+
+### Price-Based Recurring Orders
+
+Executes swaps when price conditions are met, with recurring capabilities.
+
+**Use Cases:**
+- Value averaging strategies
+- Automated buy-the-dip strategies
+- Threshold-based accumulation
+
+## Time-Based Order Mechanics
+
+### Order Creation
+
+```typescript
+POST /recurring/v1/createOrder
+
+{
+  "inputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+  "outputMint": "So11111111111111111111111111111111111111112",  // SOL
+  "maker": "user_wallet_address",
+  "payer": "user_wallet_address",
+  "inputAmountPerCycle": "100000000",  // 100 USDC per execution
+  "cycleFrequency": 86400,             // Every 24 hours (in seconds)
+  "numberOfCycles": 30,                // 30 total executions
+  "minPrice": "80.0",                  // Optional: min price boundary
+  "maxPrice": "120.0"                  // Optional: max price boundary
+}
+```
+
+**On-Chain State Created:**
+- Recurring Program account with order parameters
+- Token escrow holding total input amount (100 USDC × 30 = 3,000 USDC)
+- Cycle counter initialized to 0
+- Next execution timestamp calculated
+
+### Execution Schedule
+
+```
+Order Created: Day 0
+├─> Cycle 1: Day 1 (after 24h)
+├─> Cycle 2: Day 2 (after 24h)
+├─> Cycle 3: Day 3 (after 24h)
+├─> ...
+└─> Cycle 30: Day 30 (final execution)
+```
+
+**Scheduling Algorithm:**
+
+```typescript
+// Simplified scheduling logic
+interface TimeBasedSchedule {
+  nextExecutionTime: number;  // Unix timestamp
+  cycleFrequency: number;     // Seconds between executions
+  cyclesCompleted: number;
+  totalCycles: number;
+}
+
+function calculateNextExecution(schedule: TimeBasedSchedule): number {
+  return schedule.nextExecutionTime + schedule.cycleFrequency;
+}
+
+function shouldExecute(schedule: TimeBasedSchedule): boolean {
+  const now = Math.floor(Date.now() / 1000);
+  const cyclesRemaining = schedule.totalCycles - schedule.cyclesCompleted;
+
+  return (
+    now >= schedule.nextExecutionTime &&
+    cyclesRemaining > 0
+  );
+}
+```
+
+### Execution Flow
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Cycle Execution Trigger                                 │
+│  Current time >= Next execution time                     │
+└──────────────────┬──────────────────────────────────────┘
+                   │
+                   ↓
+┌─────────────────────────────────────────────────────────┐
+│  Price Boundary Check (if configured)                    │
+│  minPrice <= currentPrice <= maxPrice                    │
+└──────────────────┬──────────────────────────────────────┘
+                   │
+                   ├─> Price outside bounds
+                   │   └─> Reschedule to next cycle
+                   │
+                   ↓ Price within bounds (or no bounds set)
+┌─────────────────────────────────────────────────────────┐
+│  Execute Swap via Metis Router                           │
+│  • Calculate best route                                  │
+│  • Execute swap for inputAmountPerCycle                  │
+│  • Apply slippage protection                             │
+└──────────────────┬──────────────────────────────────────┘
+                   │
+                   ↓
+┌─────────────────────────────────────────────────────────┐
+│  Update Order State                                      │
+│  • Increment cyclesCompleted                             │
+│  • Set nextExecutionTime += cycleFrequency               │
+│  • Transfer output tokens to maker wallet                │
+│  • Check if all cycles completed                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Price Boundary Mechanics
+
+When `minPrice` and `maxPrice` are set:
+
+```typescript
+interface PriceBoundary {
+  minPrice?: number;  // Skip execution if price below this
+  maxPrice?: number;  // Skip execution if price above this
+}
+
+function checkPriceBoundary(
+  currentPrice: number,
+  boundary: PriceBoundary
+): 'execute' | 'skip' {
+  if (boundary.minPrice && currentPrice < boundary.minPrice) {
+    return 'skip'; // Price too low, wait for next cycle
+  }
+
+  if (boundary.maxPrice && currentPrice > boundary.maxPrice) {
+    return 'skip'; // Price too high, wait for next cycle
+  }
+
+  return 'execute'; // Price within acceptable range
+}
+```
+
+**Skip Behavior:**
+- When price is outside boundaries, execution is skipped for that cycle
+- The cycle counter does NOT increment
+- Next execution time advances to next cycle
+- Funds remain in escrow for future cycles
+
+**Example:**
+
+```
+Day 1: Price = $70 (below minPrice $80) → Skip, retry Day 2
+Day 2: Price = $85 (within bounds) → Execute cycle 1
+Day 3: Price = $130 (above maxPrice $120) → Skip, retry Day 4
+Day 4: Price = $95 (within bounds) → Execute cycle 2
+```
+
+## Price-Based Order Mechanics
+
+### Deposit and Execution Model
+
+Price-based orders use a deposit pool model:
+
+```typescript
+POST /recurring/v1/createPriceOrder
+
+{
+  "inputMint": "USDC",
+  "outputMint": "SOL",
+  "maker": "user_wallet_address",
+  "targetPrice": "90.0",           // Buy SOL when price drops to $90
+  "amountPerExecution": "100000000", // 100 USDC per execution
+  "totalDeposit": "1000000000"     // 1000 USDC total deposit
+}
+```
+
+**How It Works:**
+
+```
+┌────────────────────────────────────────────┐
+│  Initial Deposit: 1000 USDC                │
+│  Remaining: 1000 USDC                      │
+└────────────────────────────────────────────┘
+                   │
+        Price drops to $90
+                   │
+                   ↓
+┌────────────────────────────────────────────┐
+│  Execution 1: Buy 100 USDC worth of SOL   │
+│  Remaining: 900 USDC                       │
+└────────────────────────────────────────────┘
+                   │
+        Price drops to $90 again
+                   │
+                   ↓
+┌────────────────────────────────────────────┐
+│  Execution 2: Buy 100 USDC worth of SOL   │
+│  Remaining: 800 USDC                       │
+└────────────────────────────────────────────┘
+                   │
+                  ...
+```
+
+### Deposit Management
+
+**Adding Funds:**
+
+```typescript
+POST /recurring/v1/depositPriceOrder
+
+{
+  "orderId": "order_id",
+  "additionalDeposit": "500000000"  // Add 500 USDC
+}
+
+// New balance: 800 + 500 = 1300 USDC
+```
+
+**Withdrawing Funds:**
+
+```typescript
+POST /recurring/v1/withdrawPriceOrder
+
+{
+  "orderId": "order_id",
+  "withdrawAmount": "300000000"  // Withdraw 300 USDC
+}
+
+// New balance: 1300 - 300 = 1000 USDC
+```
+
+**Withdrawal Rules:**
+- Can only withdraw funds not earmarked for pending executions
+- Minimum balance must support at least one execution
+- Withdrawal transactions return tokens to maker wallet
+
+## Order State Management
+
+### Order States
+
+```typescript
+enum RecurringOrderStatus {
+  Active = 'active',           // Order is running
+  Paused = 'paused',           // Temporarily paused (price-based)
+  Completed = 'completed',     // All cycles finished
+  Cancelled = 'cancelled',     // Cancelled by user
+  Expired = 'expired',         // Reached max duration without completing
+  InsufficientFunds = 'insufficient_funds'  // Not enough balance (price-based)
+}
+```
+
+### State Transitions
+
+**Time-Based Orders:**
+
+```
+Created → Active → [Executing cycles] → Completed
+    ↓                      ↓
+Cancelled              Cancelled
+```
+
+**Price-Based Orders:**
+
+```
+Created → Active → [Executing when triggered] → Completed
+    ↓        ↓              ↓                        ↓
+Cancelled  Paused    InsufficientFunds          Cancelled
+            ↓              ↓
+         Resumed    Deposit more → Active
+```
+
+## Execution Timing Precision
+
+### Time-Based Execution Windows
+
+Jupiter's Recurring API aims for precise execution timing but operates within practical constraints:
+
+```typescript
+interface ExecutionWindow {
+  targetTime: number;      // Exact scheduled time
+  executionWindow: number; // ±30 seconds tolerance
+  maxDelay: number;        // Maximum 5 minutes delay
+}
+
+// Actual execution can occur within:
+// [targetTime - 30s, targetTime + 5min]
+```
+
+**Factors Affecting Timing:**
+- Network congestion
+- RPC node availability
+- Simultaneous order volume
+- Blockchain confirmation times
+
+**Guaranteed Behavior:**
+- Orders will never execute BEFORE scheduled time
+- Execution attempts begin immediately when time is reached
+- If execution fails, retries occur until success or order cancellation
+
+## Gas and Fee Mechanics
+
+### Fee Structure
+
+```typescript
+interface RecurringFees {
+  jupiterFee: 0.1,  // 0.1% per execution
+  networkFee: number,  // Dynamic based on network conditions
+  rentFees: {
+    orderCreation: number,    // One-time escrow account rent
+    orderClosure: number      // Refunded when order completes
+  }
+}
+
+// Total cost per execution cycle
+function calculateCycleCost(
+  inputAmount: number,
+  currentNetworkFee: number
+): number {
+  const jupiterFee = inputAmount * 0.001; // 0.1%
+  return jupiterFee + currentNetworkFee;
+}
+```
+
+### Gas Optimization
+
+**Batch Processing:**
+- Multiple orders scheduled for same time may be batched
+- Reduces per-order network fees
+- Maintained execution isolation (failure of one doesn't affect others)
+
+**Priority Fee Management:**
+- Dynamic priority fees based on network conditions
+- Higher fees during congestion for reliable execution
+- Fees deducted from user's SOL balance
+
+## Escrow Management
+
+### Fund Custody
+
+```
+┌───────────────────────────────────────────────────────┐
+│  Recurring Order Escrow PDA                           │
+├───────────────────────────────────────────────────────┤
+│  Authority: Recurring Program                         │
+│  Owner: Maker's wallet                                │
+│                                                        │
+│  Total Deposited: inputAmountPerCycle × totalCycles   │
+│  Executed: cyclesCompleted × inputAmountPerCycle      │
+│  Remaining: (totalCycles - cyclesCompleted) × amount  │
+└───────────────────────────────────────────────────────┘
+```
+
+**Security Properties:**
+- Funds held in Program Derived Address (PDA)
+- Only Recurring Program can execute swaps
+- Only maker can cancel and retrieve remaining funds
+- Non-custodial: Jupiter cannot access funds except for executing scheduled swaps
+
+### Cancellation Mechanics
+
+```typescript
+// When order is cancelled
+POST /recurring/v1/cancelOrder
+
+{
+  "orderId": "order_id",
+  "maker": "user_wallet_address"
+}
+
+// Funds returned:
+const remainingCycles = totalCycles - cyclesCompleted;
+const refundAmount = remainingCycles * inputAmountPerCycle;
+
+// Transaction includes:
+// 1. Transfer refundAmount to maker wallet
+// 2. Close escrow account, reclaim rent
+// 3. Update order status to Cancelled
+```
+
+## Performance Characteristics
+
+### Execution Reliability
+
+| Metric | Target | Notes |
+|:-------|:-------|:------|
+| **Execution Success Rate** | >99% | Under normal network conditions |
+| **Timing Precision** | ±30 seconds | For time-based orders |
+| **Price Accuracy** | ±0.5% | For price-based triggers |
+| **Order Capacity** | Unlimited | Per user |
+
+### Latency Breakdown
+
+**Time-Based Orders:**
+
+```
+Scheduled Time
+    ↓ (0-30s)
+Trigger Detection
+    ↓ (1-2s)
+Route Calculation
+    ↓ (2-4s)
+Transaction Execution
+    ↓ (1-3s)
+Confirmation & State Update
+    ↓
+Total: ~5-10 seconds from scheduled time
+```
+
+**Price-Based Orders:**
+
+```
+Price Reaches Target
+    ↓ (0.5-2s)
+Trigger Detection
+    ↓ (1-2s)
+Balance & Boundary Checks
+    ↓ (1-2s)
+Route Calculation
+    ↓ (2-4s)
+Transaction Execution
+    ↓
+Total: ~5-10 seconds from price trigger
+```
+
+## Advanced Features
+
+### Dynamic Cycle Adjustment
+
+Some integrators implement dynamic cycle adjustments:
+
+```typescript
+// Adjust amount per cycle based on market conditions
+function calculateDynamicAmount(
+  baseAmount: number,
+  volatilityIndex: number,
+  currentPrice: number,
+  targetAllocation: number
+): number {
+  // Buy more when price is lower (value averaging)
+  const priceAdjustment = targetAllocation / currentPrice;
+
+  // Reduce during high volatility
+  const volatilityAdjustment = 1 / (1 + volatilityIndex);
+
+  return baseAmount * priceAdjustment * volatilityAdjustment;
+}
+```
+
+### Multi-Asset DCA
+
+Users can run multiple concurrent recurring orders:
+
+```typescript
+// Portfolio DCA strategy
+const dcaOrders = [
+  {
+    input: 'USDC',
+    output: 'SOL',
+    amountPerCycle: 50,  // $50 per day
+    frequency: 86400
+  },
+  {
+    input: 'USDC',
+    output: 'BTC',
+    amountPerCycle: 30,  // $30 per day
+    frequency: 86400
+  },
+  {
+    input: 'USDC',
+    output: 'ETH',
+    amountPerCycle: 20,  // $20 per day
+    frequency: 86400
+  }
+];
+
+// Total: $100/day diversified across three assets
+```
+
+## Best Practices
+
+<AccordionGroup>
+<Accordion title="Choose appropriate cycle frequency">
+
+```typescript
+// Common DCA frequencies
+const frequencies = {
+  daily: 86400,        // 24 hours
+  bidaily: 172800,     // 48 hours
+  weekly: 604800,      // 7 days
+  biweekly: 1209600,   // 14 days
+  monthly: 2592000     // 30 days
+};
+
+// Recommendation: Match to income/cashflow schedule
+```
+
+Shorter frequencies = more averaging, higher fees
+Longer frequencies = lower fees, less price averaging
+</Accordion>
+
+<Accordion title="Set realistic price boundaries">
+
+```typescript
+// Analyze historical price ranges
+const historicalData = await getHistoricalPrices('SOL', 30); // 30 days
+
+const avgPrice = calculateAverage(historicalData);
+const volatility = calculateStdDev(historicalData);
+
+// Set boundaries at ±2 standard deviations
+const boundaries = {
+  minPrice: avgPrice - (2 * volatility),
+  maxPrice: avgPrice + (2 * volatility)
+};
+
+// This captures ~95% of normal price movements
+```
+</Accordion>
+
+<Accordion title="Monitor order progress">
+
+```typescript
+// Regular monitoring loop
+async function monitorRecurringOrder(orderId: string) {
+  const interval = setInterval(async () => {
+    const orders = await getRecurringOrders(walletAddress);
+    const order = orders.find(o => o.id === orderId);
+
+    console.log(`Progress: ${order.cyclesCompleted}/${order.totalCycles}`);
+    console.log(`Next execution: ${new Date(order.nextExecutionTime * 1000)}`);
+
+    if (order.status === 'completed' || order.status === 'cancelled') {
+      clearInterval(interval);
+    }
+  }, 60000); // Check every minute
+}
+```
+</Accordion>
+
+<Accordion title="Account for total costs">
+
+```typescript
+// Calculate total cost including fees
+function calculateTotalDCAInvestment(
+  amountPerCycle: number,
+  cycles: number,
+  jupiterFeeBps: number = 10  // 0.1%
+): number {
+  const baseInvestment = amountPerCycle * cycles;
+  const totalJupiterFees = baseInvestment * (jupiterFeeBps / 10000);
+  const estimatedNetworkFees = cycles * 0.00001; // Approx SOL per tx
+
+  return baseInvestment + totalJupiterFees + estimatedNetworkFees;
+}
+
+// Plan accordingly: if budgeting $1000, account for ~$11 in fees
+```
+</Accordion>
+</AccordionGroup>
+
+## Related Documentation
+
+- [Create Recurring Order](/docs/recurring/create-order) - API reference for creating orders
+- [Cancel Order](/docs/recurring/cancel-order) - Cancelling active orders
+- [Deposit Funds](/docs/recurring/deposit-price-order) - Adding to price-based orders
+- [Withdraw Funds](/docs/recurring/withdraw-price-order) - Withdrawing from price-based orders
+- [Best Practices](/docs/recurring/best-practices) - Recommended integration patterns

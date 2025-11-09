@@ -1,0 +1,412 @@
+---
+title: "How Trigger Works"
+description: "Technical mechanics of how Jupiter Trigger API monitors prices and executes limit orders."
+---
+
+Understanding the internal mechanics of Jupiter Trigger API helps you build better trading applications and set appropriate expectations for your users.
+
+## Order Lifecycle
+
+### 1. Order Creation
+
+When a trigger order is created through the [Create Order](/docs/trigger/create-order) endpoint:
+
+```typescript
+POST /trigger/v1/createOrder
+
+{
+  "inputMint": "So11111111111111111111111111111111111111112",  // SOL
+  "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+  "maker": "user_wallet_address",
+  "payer": "user_wallet_address",
+  "inputAmount": "1000000000",  // 1 SOL
+  "targetPrice": "100.5",       // Target price in output per input
+  "slippageBps": 0              // 0 for exact price execution
+}
+```
+
+**On-chain State:**
+- A Trigger Program account is created containing order parameters
+- Order status is set to `Active`
+- A unique order identifier is assigned
+- The input token amount is transferred to the Trigger Program PDA
+
+**Order Parameters Stored:**
+- Input/output token mints
+- Maker (user) wallet address
+- Input token amount
+- Target price
+- Slippage tolerance (if any)
+- Expiry timestamp (if set)
+- Integrator fee account (if applicable)
+
+### 2. Price Monitoring
+
+Jupiter's infrastructure continuously monitors market prices for all active trigger orders:
+
+**Monitoring Process:**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Price Feed Sources                                      │
+│  • DEX AMM pools (Orca, Raydium, etc.)                  │
+│  • Metis Routing Engine aggregated prices               │
+│  • On-chain oracle data                                  │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  Price Monitoring System                                 │
+│  • Polls prices at regular intervals                     │
+│  • Checks each active order's target price              │
+│  • Accounts for slippage tolerance                       │
+│  • Validates liquidity availability                      │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  Trigger Condition Check                                 │
+│  Current Price >= Target Price (for buy orders)         │
+│  Current Price <= Target Price (for sell orders)        │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Monitoring Frequency:**
+- Prices are checked at sub-second intervals for high-priority pairs
+- Lower-volume pairs are monitored less frequently (but still within seconds)
+- System automatically adjusts monitoring based on market volatility
+
+### 3. Order Execution
+
+When target price conditions are met:
+
+**Execution Flow:**
+
+```
+1. Trigger Detection
+   └─> Target price reached
+   └─> Liquidity check passes
+   └─> Order is still active (not expired/cancelled)
+
+2. Route Calculation
+   └─> Metis Routing Engine finds best execution path
+   └─> Validates price is still within acceptable range
+   └─> Constructs optimal swap route across DEXes
+
+3. Transaction Building
+   └─> Creates swap transaction with best route
+   └─> Includes slippage protection
+   └─> Adds integrator fees (if applicable)
+   └─> Sets appropriate priority fees
+
+4. Transaction Execution
+   └─> Submits transaction to Solana network
+   └─> Monitors for confirmation
+   └─> Updates order status to Filled/Partial/Failed
+
+5. Post-Execution
+   └─> Output tokens sent to maker wallet
+   └─> Order marked as completed
+   └─> Execution details recorded for history
+```
+
+**Execution Guarantees:**
+
+| Scenario | Behavior |
+|:---------|:---------|
+| **Exact Mode** (`slippageBps: 0`) | Order executes only if price matches target exactly (within 0.01%) |
+| **Slippage Mode** (`slippageBps: > 0`) | Order executes if price is within target + slippage tolerance |
+| **Insufficient Liquidity** | Order remains active, waits for better liquidity |
+| **Price Moves Away** | Order remains active, waits for price to return |
+| **Partial Fill** | If possible, partial execution; otherwise remains active |
+
+## Price Calculation Mechanics
+
+### Target Price Format
+
+Target price is expressed as: **Output token per unit of Input token**
+
+**Example:**
+
+```typescript
+// Swapping 1 SOL for USDC at $100 per SOL
+{
+  "inputMint": "SOL",
+  "outputMint": "USDC",
+  "inputAmount": "1000000000",     // 1 SOL (9 decimals)
+  "targetPrice": "100.0"           // Want 100 USDC per SOL
+}
+
+// Expected output: 100 USDC (6 decimals) = 100,000,000
+```
+
+### Price Monitoring Algorithm
+
+```typescript
+// Simplified price checking logic
+function shouldExecuteOrder(order: TriggerOrder, currentPrice: number): boolean {
+  const targetPrice = order.targetPrice;
+  const slippageTolerance = order.slippageBps / 10000;
+
+  if (order.side === 'buy') {
+    // For buy orders: execute when market price drops to or below target
+    const maxAcceptablePrice = targetPrice * (1 + slippageTolerance);
+    return currentPrice <= maxAcceptablePrice;
+  } else {
+    // For sell orders: execute when market price rises to or above target
+    const minAcceptablePrice = targetPrice * (1 - slippageTolerance);
+    return currentPrice >= minAcceptablePrice;
+  }
+}
+```
+
+### Slippage Handling
+
+**Zero Slippage (Exact Mode):**
+```typescript
+slippageBps: 0
+
+// Order executes only if:
+// actualPrice >= targetPrice * 0.9999  (99.99% of target)
+// This accounts for minor price fluctuations during execution
+```
+
+**Custom Slippage:**
+```typescript
+slippageBps: 100  // 1% slippage
+
+// For sell order with target $100:
+// Order executes if actualPrice >= $99.00
+// Provides higher success rate at cost of price precision
+```
+
+## Order State Management
+
+### Order States
+
+```typescript
+enum OrderStatus {
+  Active = 'active',           // Order is being monitored
+  Filled = 'filled',           // Order fully executed
+  PartiallyFilled = 'partial', // Order partially executed
+  Cancelled = 'cancelled',     // Order cancelled by user
+  Expired = 'expired',         // Order reached expiry time
+  Failed = 'failed'            // Execution failed (rare)
+}
+```
+
+### State Transitions
+
+```
+┌─────────┐
+│ Created │
+└────┬────┘
+     │
+     ↓
+┌─────────┐     Cancelled by user     ┌───────────┐
+│ Active  │─────────────────────────→ │ Cancelled │
+└────┬────┘                            └───────────┘
+     │
+     │   Expiry reached
+     ├─────────────────────────────→ ┌──────────┐
+     │                                │ Expired  │
+     │                                └──────────┘
+     │   Price target met
+     ├─────────────────────────────→ ┌──────────┐
+     │                                │ Filled   │
+     │                                └──────────┘
+     │   Partial execution possible
+     └─────────────────────────────→ ┌──────────────────┐
+                                      │ Partially Filled │
+                                      └──────────────────┘
+```
+
+## Execution Priority
+
+Orders are prioritized for execution based on multiple factors:
+
+### Priority Factors
+
+1. **Price Deviation**: Orders where current price exceeds target by larger margins execute first
+2. **Order Age**: Older orders get priority when multiple orders trigger simultaneously
+3. **Order Size**: Larger orders (by value) get slightly higher priority
+4. **Token Pair Liquidity**: Orders on high-liquidity pairs execute faster
+
+### Example Priority Calculation
+
+```typescript
+// Simplified priority score
+function calculatePriority(order: TriggerOrder, currentPrice: number): number {
+  const priceDeviation = Math.abs(currentPrice - order.targetPrice) / order.targetPrice;
+  const ageMinutes = (Date.now() - order.createdAt) / 60000;
+  const sizeUSD = order.inputAmount * order.inputTokenPrice;
+
+  return (
+    priceDeviation * 1000 +  // Price deviation weight
+    ageMinutes * 10 +        // Age weight
+    Math.log(sizeUSD) * 5    // Size weight (logarithmic)
+  );
+}
+```
+
+## Infrastructure Components
+
+### Backend Services
+
+```
+┌────────────────────────────────────────────────────────┐
+│  Trigger API Infrastructure                            │
+├────────────────────────────────────────────────────────┤
+│                                                         │
+│  ┌──────────────┐      ┌───────────────┐             │
+│  │ Price Oracle │◄────►│ Metis Router  │             │
+│  │   Service    │      │    Engine     │             │
+│  └──────┬───────┘      └───────────────┘             │
+│         │                                              │
+│         ↓                                              │
+│  ┌──────────────┐      ┌───────────────┐             │
+│  │   Order      │◄────►│  Execution    │             │
+│  │   Monitor    │      │    Engine     │             │
+│  └──────┬───────┘      └───────┬───────┘             │
+│         │                      │                       │
+│         ↓                      ↓                       │
+│  ┌──────────────────────────────────┐                │
+│  │    Solana RPC Nodes (Multiple)   │                │
+│  └──────────────────────────────────┘                │
+│                                                         │
+└────────────────────────────────────────────────────────┘
+```
+
+### On-Chain Components
+
+**Trigger Program:**
+- Manages order state on-chain
+- Validates execution conditions
+- Handles token custody during order lifetime
+- Enforces access control (only maker can cancel)
+
+**Associated Accounts:**
+- Order PDA (Program Derived Address): Stores order parameters
+- Token escrow account: Holds input tokens until execution
+- Fee accounts: Collects Jupiter and integrator fees
+
+## Performance Characteristics
+
+### Latency Metrics
+
+| Metric | Typical Value | Notes |
+|:-------|:--------------|:------|
+| **Price Check Interval** | 0.5-2 seconds | Faster for volatile pairs |
+| **Trigger Detection to Execution** | 1-3 seconds | Depends on network conditions |
+| **Order Creation** | 200-500ms | Creating on-chain order account |
+| **Order Cancellation** | 200-500ms | Closing on-chain order account |
+
+### Success Rates
+
+| Slippage Mode | Typical Success Rate | Trade-off |
+|:--------------|:--------------------|:----------|
+| **Exact (0 bps)** | 85-90% | Best price, may miss volatile markets |
+| **Low (50 bps)** | 95-97% | Slight price flexibility |
+| **Medium (100 bps)** | 98-99% | Higher success, more slippage |
+
+## Best Practices for Integration
+
+<AccordionGroup>
+<Accordion title="Set realistic target prices">
+Use current market prices and historical data to set achievable targets:
+
+```typescript
+// Check current price before setting target
+const currentPrice = await getCurrentPrice(inputMint, outputMint);
+
+// Set target price with reasonable deviation
+const targetPrice = currentPrice * 1.02; // 2% above current (for sell order)
+```
+</Accordion>
+
+<Accordion title="Use appropriate slippage for market conditions">
+
+```typescript
+// Volatile meme tokens: higher slippage
+const volatilePairSlippage = 100; // 1%
+
+// Stable pairs: exact execution
+const stablePairSlippage = 0;
+
+// Bluechip tokens: low slippage
+const bluechipSlippage = 50; // 0.5%
+```
+</Accordion>
+
+<Accordion title="Monitor order status">
+Implement polling to track order execution:
+
+```typescript
+async function monitorOrder(orderId: string) {
+  const checkInterval = setInterval(async () => {
+    const orders = await getTriggerOrders(walletAddress);
+    const order = orders.find(o => o.id === orderId);
+
+    if (order.status === 'filled') {
+      console.log('Order executed!');
+      clearInterval(checkInterval);
+    } else if (order.status === 'expired' || order.status === 'cancelled') {
+      console.log('Order closed:', order.status);
+      clearInterval(checkInterval);
+    }
+  }, 5000); // Check every 5 seconds
+}
+```
+</Accordion>
+
+<Accordion title="Set expiry times">
+Always set expiry to prevent orders from staying active indefinitely:
+
+```typescript
+// 24 hours from now
+const expiry = Math.floor(Date.now() / 1000) + (24 * 60 * 60);
+
+const order = await createTriggerOrder({
+  // ... other params
+  expiredAt: expiry
+});
+```
+</Accordion>
+</AccordionGroup>
+
+## Fee Structure Mechanics
+
+### Fee Calculation
+
+```typescript
+// Fee breakdown for a trigger order
+interface FeeStructure {
+  jupiterFee: {
+    stablePairs: 0.03,  // 0.03% for stable pairs
+    otherPairs: 0.1     // 0.1% for all other pairs
+  },
+  integratorFee: number, // Custom fee set by integrator
+  networkFees: {
+    orderCreation: number,    // ~0.00001 SOL
+    orderExecution: number,   // Dynamic based on swap complexity
+    orderCancellation: number // ~0.00001 SOL
+  }
+}
+
+// Total fees deducted from output amount
+function calculateTotalFees(
+  outputAmount: number,
+  isStablePair: boolean,
+  integratorFeeBps: number
+): number {
+  const jupiterFeeBps = isStablePair ? 3 : 10;
+  const totalFeeBps = jupiterFeeBps + integratorFeeBps;
+
+  return outputAmount * (totalFeeBps / 10000);
+}
+```
+
+## Related Documentation
+
+- [Create Trigger Order](/docs/trigger/create-order) - API reference for creating orders
+- [Execute Order](/docs/trigger/execute-order) - Manual order execution
+- [Best Practices](/docs/trigger/best-practices) - Recommended integration patterns
+- [Metis Routing Engine](/docs/routing) - How routes are determined

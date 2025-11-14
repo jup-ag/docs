@@ -1,0 +1,103 @@
+---
+title: "Sample Blog Post: Getting Started with Jupiter"
+description: "A sample blog post demonstrating how to create and publish content on the Jupiter Developers blog"
+"og:title": "Sample Blog Post: Getting Started with Jupiter"
+"og:description": "A sample blog post demonstrating how to create and publish content on the Jupiter Developers blog"
+"og:image": "/static/blog/sample-post/sample-post.png"
+"og:type": "article"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![Sample Blog Post](/static/blog/sample-post/sample-post.png)
+
+This is a sample blog post to help you understand the structure and format for creating new blog posts on the Jupiter Developers documentation site.
+
+---
+
+## Understanding the Structure
+
+Blog posts in the Jupiter documentation follow a consistent structure:
+
+1. **Frontmatter**: Metadata at the top of the file
+2. **Hero Image**: Main image displayed at the top
+3. **Introduction**: Overview paragraph
+4. **Content Sections**: Main body with markdown
+5. **Conclusion**: Wrap-up and key takeaways
+
+### Frontmatter Fields
+
+The frontmatter includes important metadata:
+
+- `title`: The main title of your post
+- `description`: SEO and social media description
+- `og:*`: Open Graph tags for social sharing
+- `og:image`: Path to your blog post image
+
+---
+
+## Using Components
+
+Jupiter blog posts support special components:
+
+<Card title="Card Component">
+Use the Card component to highlight important information, features, or callouts. 
+This helps break up the content and draw attention to key points.
+</Card>
+
+<Note>
+The Note component is perfect for additional context, warnings, or supplementary information 
+that doesn't need as much emphasis as a Card.
+</Note>
+
+---
+
+## Code Examples
+
+You can include code blocks with syntax highlighting:
+
+```javascript
+// Example: Using Jupiter API
+const response = await fetch('https://quote-api.jup.ag/v6/quote', {
+  method: 'GET',
+  headers: { 'Content-Type': 'application/json' }
+});
+```
+
+---
+
+## Tables and Lists
+
+Tables are great for comparing data:
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Ultra Swap | Best execution engine | ✅ Live |
+| Lend | Lending and borrowing | ✅ Live |
+| Perps | Perpetuals trading | 🚧 Coming Soon |
+
+You can also use lists:
+
+- Bullet point one
+- Bullet point two
+- Bullet point three
+
+---
+
+## Best Practices
+
+1. **Keep it focused**: Each post should have a clear topic
+2. **Use images**: Visual content improves engagement
+3. **Add examples**: Code snippets and real-world use cases
+4. **Format consistently**: Follow the existing blog post structure
+5. **Test locally**: Always preview before submitting
+
+---
+
+## Conclusion
+
+This sample demonstrates the basic structure and components available for creating blog posts. 
+For more examples, check out the [Ultra V3 blog post](/blog/ultra-v3) which showcases 
+advanced formatting and features.
+
+Ready to create your own? Follow the guide in `BLOG_GUIDE.md` or use `blog/template.mdx` as a starting point!
+

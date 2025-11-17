@@ -1,0 +1,260 @@
+openapi: 3.1.0
+info:
+  title: Jupiter Mission Control API
+  version: 1.0.0
+  description: |
+    Jupiter Mission Control's Content API to query token content and feed
+
+servers:
+  - url: https://lite-api.jup.ag/tokens/v2
+    description: Free tier API endpoint with rate limits
+  - url: https://api.jup.ag/tokens/v2
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+
+paths:
+  /content:
+    get:
+      summary: Get content for multiple mints
+      description: |
+        Retrieves approved content for up to 50 Solana token mint addresses
+      parameters:
+        - schema:
+          name: mints
+          in: query
+          type: string
+          example: >-
+            JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112
+          required: true
+          description: |
+            Comma-separated list of Solana mint addresses (max 50)
+      responses:
+        '200':
+          description: |
+            Successfully retrieved content for the specified mints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultipleMintsResponse'
+        '400':
+          description: |
+            Invalid mint addresses provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /content/feed:
+    get:
+      summary: Get paginated content feed
+      description: |
+        Retrieves a paginated feed of content for a specific mint.
+      parameters:
+        - schema:
+          name: mint
+          in: query
+          type: string
+          example: JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN
+          description: |
+            Token mint address
+          required: true
+        - schema:
+          name: page
+          in: query
+          type: integer
+          minimum: 1
+          default: 1
+          example: 1
+          description: |
+              Page number (starts from 1)
+          required: false
+        - schema:
+          name: limit
+          in: query
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+          example: 50
+          description: |
+            Number of items per page (1-100)
+          required: false
+      responses:
+        '200':
+          description: |
+            Successfully retrieved content feed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedResponse'
+        '400':
+          description: |
+            Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /content/cooking:
+    get:
+      summary: Get content for trending tokens
+      description: |
+        Retrieves approved content for currently trending tokens on Jupiter
+      responses:
+        '200':
+          description: |
+            Successfully retrieved cooking tokens content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CookingTokensResponse'
+        '500':
+          description: |
+            Failed to fetch content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type:
+            - string
+            - 'null'
+        username:
+          type:
+            - string
+            - 'null'
+        role:
+          type:
+            - string
+            - 'null'
+      required:
+        - id
+        - username
+        - role
+    ContentItem:
+      type: object
+      properties:
+        contentId:
+          type: string
+        content:
+          type: string
+        contentType:
+          type: string
+          enum:
+            - text
+            - tweet
+        status:
+          type: string
+          enum:
+            - pending
+            - approved
+        source:
+          type:
+            - string
+            - 'null'
+        submittedAt:
+          type: string
+        submittedBy:
+          $ref: '#/components/schemas/User'
+        updatedAt:
+          type:
+            - string
+            - 'null'
+        updatedBy:
+          $ref: '#/components/schemas/User'
+        postedAt:
+          type:
+            - string
+            - 'null'
+      required:
+        - contentId
+        - content
+        - contentType
+        - status
+        - source
+        - submittedAt
+        - submittedBy
+        - updatedAt
+        - updatedBy
+        - postedAt
+    ContentByMint:
+      type: object
+      properties:
+        mint:
+          type: string
+        contents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentItem'
+        tokenSummary:
+          type: string
+        newsSummary:
+          type: string
+      required:
+        - mint
+        - contents
+    MultipleMintsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentByMint'
+      required:
+        - data
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    Pagination:
+      type: object
+      properties:
+        limit:
+          type: number
+        total:
+          type: number
+        page:
+          type: number
+        totalPages:
+          type: number
+      required:
+        - limit
+        - total
+        - page
+        - totalPages
+    FeedResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            contents:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContentItem'
+            tokenSummary:
+              type: string
+            newsSummary:
+              type: string
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+          required:
+            - contents
+            - pagination
+      required:
+        - data
+    CookingTokensResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentByMint'
+      required:
+        - data

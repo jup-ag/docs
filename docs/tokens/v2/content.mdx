@@ -1,0 +1,227 @@
+---
+title: "Content API (BETA)"
+sidebarTitle: "Content"
+description: "Get content for multiple mints, trending tokens or paginated content feed."
+---
+
+<Info>
+  **NOTE**
+
+  * Lite URL: `https://lite-api.jup.ag/tokens/v2`
+  * Pro URL: `https://api.jup.ag/tokens/v2`
+
+  To upgrade to Pro or understand our rate limiting, please refer to this section.
+
+  <CardGroup>
+    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
+    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
+  </CardGroup>
+</Info>
+
+<Tip>
+  **USEFUL CONTENT INFORMATION**
+
+  * Get approved content for tokens including text posts, tweets, and summaries
+  * Retrieve content for multiple tokens in a single request (up to 50 mints)
+  * Access paginated content feeds for specific tokens
+  * Discover content for trending tokens on Jupiter
+
+  Do note that the response is subject to changes as we continue to improve.
+
+  Refer to [Content API Reference](/api-reference/tokens/v2/get-content) for full schema.
+</Tip>
+
+## Get Content for Multiple Mints
+
+The Content API provides an endpoint to retrieve approved content for multiple token mints in a single request. This is useful when you need to display content for a list of tokens, such as in a token explorer or portfolio view.
+
+<Tip>
+  **MULTIPLE MINTS**
+
+  * Query up to **50 mint addresses** in a single request.
+  * Pass mints as a comma-separated list in the query parameter.
+  * Returns content for each mint including text posts, tweets, token summaries, and news summaries.
+  * Only returns approved content (status: `approved`).
+</Tip>
+
+```js
+const contentResponse = await (
+  await fetch(`https://lite-api.jup.ag/tokens/v2/content?mints=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112`)
+).json();
+```
+
+## Get Content Feed
+
+The Content API provides an endpoint to retrieve a paginated feed of content for a specific token mint. This is useful for displaying a chronological feed of content related to a particular token.
+
+<Tip>
+  **PAGINATED FEED**
+
+  * Get content for a **single mint address** at a time.
+  * Supports pagination with `page` and `limit` parameters.
+  * Default page is 1, default limit is 50 items per page.
+  * Maximum limit is 100 items per page.
+  * Returns pagination metadata including total items and total pages.
+</Tip>
+
+```js
+const feedResponse = await (
+  await fetch(`https://lite-api.jup.ag/tokens/v2/content/feed?mint=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN&page=1&limit=50`)
+).json();
+```
+
+## Get Cooking Tokens Content
+
+The Content API provides an endpoint to retrieve content for currently trending tokens on Jupiter. This is useful for discovering and displaying content related to tokens that are gaining traction.
+
+<Tip>
+  **TRENDING TOKENS**
+
+  * Returns content for tokens that are currently trending on Jupiter.
+  * No parameters required - automatically fetches the latest trending tokens.
+  * Useful for building discovery features or trending token sections.
+</Tip>
+
+```js
+const cookingResponse = await (
+  await fetch(`https://lite-api.jup.ag/tokens/v2/content/cooking`)
+).json();
+```
+
+## Example Response
+
+### Get Content for Multiple Mints
+
+**Successful example response:**
+
+```js expandable
+{
+  "data": [
+    {
+      "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+      "contents": [
+        {
+          "contentId": "content-123",
+          "content": "Jupiter is the leading DEX aggregator on Solana...",
+          "contentType": "text",
+          "status": "approved",
+          "source": "https://example.com/article",
+          "submittedAt": "2025-01-15T10:00:00Z",
+          "submittedBy": {
+            "id": "user-123",
+            "username": "jupiter_team",
+            "role": "admin"
+          },
+          "updatedAt": "2025-01-15T10:05:00Z",
+          "updatedBy": {
+            "id": "user-123",
+            "username": "jupiter_team",
+            "role": "admin"
+          },
+          "postedAt": "2025-01-15T10:05:00Z"
+        }
+      ],
+      "tokenSummary": "Jupiter (JUP) is the governance token of Jupiter, the leading DEX aggregator on Solana.",
+      "newsSummary": "Recent developments include new partnerships and protocol upgrades."
+    }
+  ]
+}
+```
+
+### Get Content Feed
+
+**Successful example response:**
+
+```js expandable
+{
+  "data": {
+    "contents": [
+      {
+        "contentId": "content-456",
+        "content": "Latest update on token developments...",
+        "contentType": "tweet",
+        "status": "approved",
+        "source": "https://twitter.com/example/status/123",
+        "submittedAt": "2025-01-15T09:00:00Z",
+        "submittedBy": {
+          "id": "user-456",
+          "username": "community_member",
+          "role": "user"
+        },
+        "updatedAt": null,
+        "updatedBy": null,
+        "postedAt": "2025-01-15T09:00:00Z"
+      }
+    ],
+    "tokenSummary": "Token summary information...",
+    "newsSummary": "News summary information...",
+    "pagination": {
+      "limit": 50,
+      "total": 150,
+      "page": 1,
+      "totalPages": 3
+    }
+  }
+}
+```
+
+### Get Cooking Tokens Content
+
+**Successful example response:**
+
+```js expandable
+{
+  "data": [
+    {
+      "mint": "So11111111111111111111111111111111111111112",
+      "contents": [
+        {
+          "contentId": "content-789",
+          "content": "SOL is trending with increased trading volume...",
+          "contentType": "text",
+          "status": "approved",
+          "source": null,
+          "submittedAt": "2025-01-15T11:00:00Z",
+          "submittedBy": {
+            "id": "user-789",
+            "username": "system",
+            "role": "system"
+          },
+          "updatedAt": null,
+          "updatedBy": null,
+          "postedAt": "2025-01-15T11:00:00Z"
+        }
+      ],
+      "tokenSummary": "Solana (SOL) is the native token of the Solana blockchain.",
+      "newsSummary": "Recent market activity shows increased interest."
+    }
+  ]
+}
+```
+
+## Content Types
+
+The Content API supports different content types:
+
+| Content Type | Description |
+| :----------- | :---------- |
+| `text`       | Text-based content such as articles, descriptions, or announcements |
+| `tweet`      | Content sourced from Twitter/X |
+
+## Content Status
+
+All content returned by the API has been approved:
+
+| Status   | Description                                    |
+| :------- | :--------------------------------------------- |
+| `approved` | Content has been reviewed and approved for display |
+
+## What's Next
+
+Now that you understand how to use the Content API, you can:
+
+* Integrate content display in your token explorer or portfolio views
+* Build discovery features using trending tokens content
+* Create paginated content feeds for individual token pages
+
+For more details, refer to the [Content API Reference](/api-reference/tokens/v2/get-content).

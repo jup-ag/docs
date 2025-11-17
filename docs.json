@@ -243,24 +243,23 @@
               {
                 "group": "Tokens Docs",
                 "pages": [
+                  "docs/tokens/index",
                   {
-                    "group": "Overview",
+                    "group": "V2 (Beta)",
                     "pages": [
-                      "docs/tokens/index",
-                      "docs/tokens/organic-score",
-                      "docs/tokens/token-tag-standard"
+                      "docs/tokens/v2/token-information",
+                      "docs/tokens/v2/content"
                     ]
                   },
-                  "docs/tokens/v2",
-                  "docs/tokens/v1"
+                  "docs/tokens/organic-score",
+                  "docs/tokens/token-tag-standard"
                 ]
               },
               {
                 "group": "Price Docs",
                 "pages": [
                   "docs/price/index",
-                  "docs/price/v3",
-                  "docs/price/v2"
+                  "docs/price/v3"
                 ]
               }
             ]
@@ -432,7 +431,10 @@
                       "api-reference/tokens/v2/search",
                       "api-reference/tokens/v2/tag",
                       "api-reference/tokens/v2/category",
-                      "api-reference/tokens/v2/recent"
+                      "api-reference/tokens/v2/recent",
+                      "api-reference/tokens/v2/get-content",
+                      "api-reference/tokens/v2/get-content-cooking",
+                      "api-reference/tokens/v2/get-content-feed"
                     ]
                   },
                   {
@@ -900,6 +902,10 @@
     {
       "source": "/docs/legal/sdk-api-license-agreement",
       "destination": "/legal/sdk-api-license-agreement"
+    },
+    {
+      "source": "/docs/tokens/v2",
+      "destination": "/docs/tokens/v2/token-information"
     }
   ]
 }

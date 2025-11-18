@@ -21,6 +21,10 @@ description: "Get content for multiple mints, trending tokens or paginated conte
 
 The Content API provides access to curated and verified content for Solana tokens, including text posts, tweets, token summaries, and news summaries. This content is carefully reviewed and approved to ensure quality and accuracy.
 
+### API Reference
+
+For complete API documentation including request/response schemas, parameters, and examples, refer to the [Content API Reference](/api-reference/tokens/v2/get-content).
+
 <Tip>
   **USEFUL CONTENT INFORMATION**
 
@@ -36,9 +40,9 @@ The Content API provides access to curated and verified content for Solana token
 
 ### How It Works
 
-The Content API operates through a curated content system:
+The Content API operates through a curated content system powered by [Jupiter Verify](https://verified.jup.ag/):
 
-1. **Content Submission**: Content is submitted by verified users through Jupiter's content management system
+1. **Content Submission**: Content is submitted by verified users through [Jupiter Verify](https://verified.jup.ag/), Jupiter's content verification platform
 2. **Review Process**: All submitted content goes through a review process to ensure quality, accuracy, and relevance
 3. **Approval Status**: Only content with `status: approved` is returned by the API endpoints
 4. **Content Types**: The API supports multiple content types including:
@@ -51,14 +55,14 @@ The Content API operates through a curated content system:
 
 ### Attribution and Credits
 
-Content provided through the Content API is curated and verified by **Jupiter Verify**. All content includes attribution information:
+Content provided through the Content API is curated and verified by [Jupiter Verify](https://verified.jup.ag/). All content includes attribution information:
 
 - **Submitted By**: Information about the user who submitted the content
 - **Source**: The original source URL or reference for the content
 - **Citations**: Token and news summaries include citations to their source materials
 - **Timestamps**: All content includes submission, update, and posting timestamps
 
-When displaying content from this API, please maintain proper attribution to Jupiter Verify and the original content sources as provided in the response data.
+When displaying content from this API, please maintain proper attribution to [Jupiter Verify](https://verified.jup.ag/) and the original content sources as provided in the response data.
 
 ## Get Content for Multiple Mints
 

@@ -182,13 +182,17 @@ components:
               items:
                 $ref: '#/components/schemas/ContentItem'
             tokenSummary:
-              anyOf:
+              allOf:
                 - $ref: '#/components/schemas/TokenSummary'
-                - type: 'null'
+                - type:
+                    - object
+                    - 'null'
             newsSummary:
-              anyOf:
+              allOf:
                 - $ref: '#/components/schemas/NewsSummary'
-                - type: 'null'
+                - type:
+                    - object
+                    - 'null'
           required:
             - contents
             - tokenSummary

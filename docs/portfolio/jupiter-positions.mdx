@@ -1,0 +1,149 @@
+---
+title: "Jupiter Positions"
+description: "Query Jupiter positions, platform information, and staking data using the Portfolio API."
+---
+
+<Info>
+  * Lite URL: `https://lite-api.jup.ag/portfolio/v1`
+  * Pro URL: `https://api.jup.ag/portfolio/v1`
+
+  To upgrade to Pro or understand our rate limiting, please refer to this section.
+
+  <CardGroup>
+    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
+    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
+  </CardGroup>
+</Info>
+
+<Tip>
+  **API REFERENCE**
+
+  For complete API reference documentation, check out the [Portfolio API Reference](/api-reference/portfolio).
+</Tip>
+
+## Overview
+
+The Portfolio API provides three main endpoints to help you build portfolio tracking features:
+
+1. **Get Positions**: Retrieve all positions for a wallet across supported platforms
+2. **Get Platforms**: Discover all platforms and protocols supported by the Portfolio API
+3. **Get Staked JUP**: Query staking information for Jupiter's governance token
+
+Let's explore each endpoint in detail.
+
+## Get Jupiter Positions
+
+The Get Jupiter Positions endpoint allows you to retrieve comprehensive position data for Jupiter products.
+
+To get positions for a wallet, you need to pass in:
+
+| Parameter | Type   | Location | Required | Description                                                                 |
+| :-------- | :----- | :------- | :------- | :-------------------------------------------------------------------------- |
+| address   | string | path     | Yes      | The Solana wallet address you want to query                                 |
+| platforms | string | query    | No       | Optional comma-separated list of platform IDs to filter results (e.g., `jupiter-exchange,jupiter-governance`) |
+
+<CodeGroup>
+        ```js All positions wrap
+        const positionsResponse = await (
+            await fetch(
+                'https://lite-api.jup.ag/portfolio/v1/positions/jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3'
+            )
+        ).json();
+
+        console.log(JSON.stringify(positionsResponse, null, 2));
+        ```
+
+        ```js Specific positions wrap
+        const filteredPositionsResponse = await (
+            await fetch(
+                'https://lite-api.jup.ag/portfolio/v1/positions/jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3?platforms=jupiter-exchange,jupiter-governance'
+            )
+        ).json();
+
+        console.log(JSON.stringify(filteredPositionsResponse, null, 2));
+        ```
+</CodeGroup>
+
+**Key Response Fields:**
+
+* `date`: Unix timestamp indicating when the data was fetched
+* `owner`: The wallet address that was queried
+* `fetcherReports`: Array of status reports for each platform queried, showing which fetchers succeeded and how long they took
+* `elements`: Array of portfolio elements (tokens, staking positions, etc.) - this is where the actual position data lives
+* `duration`: Total time taken to fetch all data in milliseconds
+* `tokenInfo`: Token metadata keyed by mint address, useful for displaying token names, symbols, and logos
+
+**Understanding Portfolio Elements:**
+
+Each element in the `elements` array represents a position and contains:
+
+* `type`: The type of position (e.g., `token`, `staking`)
+* `label`: Human-readable label for the position
+* `platformId`: ID of the platform this position belongs to
+* `networkId`: Network identifier (e.g., `solana`)
+* `fetcherId`: ID of the fetcher that retrieved this data
+* `value`: USD value of the position
+* `data`: Position-specific data that varies by type (e.g., token amounts, staking details)
+
+<Note>
+  **NOTE**
+
+  The `data` field structure varies depending on the `type` of element. For token positions, it contains mint addresses and amounts. For staking positions, it contains staking-specific information.
+</Note>
+
+## Get Platforms
+
+Before querying positions, you might want to discover which platforms are supported by the Portfolio API. The Get Platforms endpoint returns a comprehensive list of all available platforms with their metadata.
+
+To get a list of all supported platforms, make a GET request to the `/platforms` endpoint:
+
+```js
+const platformsResponse = await (
+    await fetch('https://lite-api.jup.ag/portfolio/v1/platforms')
+).json();
+
+console.log(JSON.stringify(platformsResponse, null, 2));
+```
+
+**Key Platform Fields:**
+
+* `id`: Unique identifier for the platform - use this with the `platforms` query parameter in Get Positions
+* `name`: Display name of the platform
+* `image`: URL to the platform's logo/image
+* `description`: Description of what the platform does
+* `defiLlamaId`: DeFiLlama ID if the platform is listed there (null if not)
+* `isDeprecated`: Whether the platform is deprecated
+* `tokens`: Array of token mint addresses supported by this platform
+* `tags`: Array of tags categorizing the platform (e.g., `swap`, `staking`, `governance`)
+* `links`: Object containing various links (website, discord, twitter, github, etc.)
+
+<Tip>
+  **TIP**
+
+  Use the platform `id` values from this endpoint with the `platforms` query parameter in the Get Positions endpoint to filter results. This is especially useful when building UI filters or when you only need data from specific protocols.
+</Tip>
+
+## Get Staked JUP
+
+The Get Staked JUP endpoint provides staking information specifically for Jupiter's governance token (JUP). This is useful for displaying staking status, unstaking schedules, and total staked amounts.
+
+### Query Staking Information
+
+To get staking information for a wallet, make a GET request to the `/staked-jup/{address}` endpoint:
+
+```js
+const stakedJupResponse = await (
+    await fetch(
+        'https://lite-api.jup.ag/portfolio/v1/staked-jup/jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3'
+    )
+).json();
+
+console.log(JSON.stringify(stakedJupResponse, null, 2));
+```
+
+**Response Fields:**
+
+* `stakedAmount`: Total amount of JUP currently staked (in native token units, before decimals are applied)
+* `unstaking`: Array of unstaking schedules, each containing:
+  * `amount`: Amount being unstaked (in native token units)
+  * `until`: Unix timestamp when the unstaking period ends

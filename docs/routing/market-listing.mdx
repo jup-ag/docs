@@ -5,13 +5,23 @@ description: "Understand how markets are listed and maintained on Jupiter."
 
 ## Routing Type
 
-Jupiter Iris creates routes in the perspective of markets and there are 2 types of routing for all markets.
+Iris creates routes in the perspective of markets and there are 2 types of routing for all markets.
 
-We constantly index for updated market data and newly created markets to check against the rules for market listing to ensure markets are eligible for and remain in the Jupiter Iris routing engine.
+We constantly index for updated market data and newly created markets to check against the rules for market listing to ensure markets are eligible for and remain in the Iris routing engine.
 
 <Card title="Instant routing">
   * We automatically list all new markets that are created on specific DEXes (list is below).
   * These markets have a grace period, where the liquidity criteria is not applied.
+  * The grace period is determined by token age and not market age.
+    <Tip>
+      **Token age check**
+      | Token Age | Scenario                        | Result   |
+      |-----------|---------------------------------|----------|
+      | -         | Token minted, no pool           | -        |
+      | 1 day     | First pool created and trading  | Within grace period, instant routing |
+      | 20 days   | Second pool created and trading | Within grace period, instant routing |
+      | 30 days   | Third pool created and trading  | Outside grace period, normal routing |
+    </Tip>
   * After the grace period has passed, the liquidity criteria will apply (refer to normal routing).
   * For bonding curves, if it does not graduate after the grace period, it will be removed from routing.
     * Only when the bonding curve has graduated to a new market, the graduated market will be added to routing.
@@ -39,6 +49,7 @@ We constantly index for updated market data and newly created markets to check a
   * This is the default for all markets.
   * Every 30 minutes, we will check the liquidity of the market.
   * If the liquidity is not enough, we will remove the market from routing.
+  * Refer to [Market Liquidity Requirements](#market-liquidity-requirements) for more details.
 </Card>
 
 ## Market Liquidity Requirements

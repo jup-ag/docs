@@ -79,7 +79,11 @@ The Content API provides an endpoint to retrieve approved content for multiple t
 
 ```js
 const contentResponse = await (
-  await fetch('https://lite-api.jup.ag/tokens/v2/content?mints=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112')
+  await fetch('https://api.jup.ag/tokens/v2/content?mints=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112', {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  })
 ).json();
 ```
 
@@ -99,7 +103,11 @@ The Content API provides an endpoint to retrieve a paginated feed of content for
 
 ```js
 const feedResponse = await (
-  await fetch('https://lite-api.jup.ag/tokens/v2/content/feed?mint=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN&page=1&limit=50')
+  await fetch('https://api.jup.ag/tokens/v2/content/feed?mint=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN&page=1&limit=50', {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  })
 ).json();
 ```
 
@@ -117,7 +125,34 @@ The Content API provides an endpoint to retrieve content for currently trending 
 
 ```js
 const cookingResponse = await (
-  await fetch('https://lite-api.jup.ag/tokens/v2/content/cooking')
+  await fetch('https://api.jup.ag/tokens/v2/content/cooking', {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  })
+).json();
+```
+
+## Get Summaries for Multiple Mints
+
+The Content API provides an endpoint to retrieve token and news summaries for multiple token mints in a single request. This is useful when you only need summary information without the full content items.
+
+<Tip>
+  **SUMMARIES ONLY**
+
+  * Query up to **50 mint addresses** in a single request.
+  * Pass mints as a comma-separated list in the query parameter.
+  * Returns only token summaries and news summaries (no content items).
+  * Useful for displaying summary information in token lists or cards.
+</Tip>
+
+```js
+const summariesResponse = await (
+  await fetch('https://api.jup.ag/tokens/v2/content/summaries?mints=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112', {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  })
 ).json();
 ```
 

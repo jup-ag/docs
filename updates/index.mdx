@@ -20,7 +20,41 @@ description: "Announcements and Changes"
 
 ---
 
+### Ultra API
+
+### Deprecate `ctLikes` and `smartCtLikes` response field in search endpoint
+* We'll be deprecating the `ctLikes` and `smartCtLikes` response field in the search endpoints.
+* This will take effect next week and it affects the search endpoints in Ultra API.
+* If you are using the field for any purpose, please move off and stop using it.
+
+---
+
+### Tokens API
+
+### Deprecate `ctLikes` and `smartCtLikes` response field in search endpoint
+* We'll be deprecating the `ctLikes` and `smartCtLikes` response field in the search endpoints.
+* This will take effect next week and it affects the search endpoints in Tokens API.
+* If you are using the field for any purpose, please move off and stop using it.
+
+---
+
 ## Legacy Swap API
+
+### `routePlan[].percent` may return null
+* The `routePlan[].percent` field in the Legacy Swap API quote response may return `null` - due to an an upgrade on the routing algorithm.
+* Please update your code to handle null values for this field.
+* This change will affect `instructionVersion=V2` only and has taken effect.
+* [npm package version 6.0.47](https://www.npmjs.com/package/@jup-ag/api/v/6.0.47) 
+  has been released with the latest schema.
+
+### Deprecate `feeAmount` and `feeMint` fields in `SwapInfo`
+* We will be deprecating the `feeAmount` and `feeMint` fields from the `routePlan[].swapInfo` schema in a quote response.
+* Since `outAmount` already factor in these fees.
+* These fees are related to each AMM's own fee, not to any Jupiter or platform fees you may add.
+* To smooth the migration, we will just show `0` for `feeAmount` and the input mint as the `feeMint`.
+* Refer to [`SwapInfo` API Reference](/api-reference/swap/quote#response-route-plan-swap-info) for more details.
+* [npm package version 6.0.47](https://www.npmjs.com/package/@jup-ag/api/v/6.0.47) 
+  has been released with the latest schema.
 
 ### `nativeDestinationAccount`
 * We've added a new parameter to the Legacy Swap API that lets you send native SOL 
@@ -30,24 +64,6 @@ description: "Announcements and Changes"
 * Refer to [`nativeDestinationAccount` API Reference](/api-reference/swap/swap#body-native-destination-account) 
   for more details.  
 * [npm package version 6.0.46](https://www.npmjs.com/package/@jup-ag/api/v/6.0.46) 
-  has been released with the latest schema.
-
-### `routePlan[].percent` may return null
-* The `routePlan[].percent` field in the Legacy Swap API quote response may return `null` - due to an an upgrade on the routing algorithm.
-* Please update your code to handle null values for this field.
-* This change will affect `instructionVersion=V2` only and has taken effect.
-
-### Deprecate `ctLikes` and `smartCtLikes` response field in search endpoints
-* We'll be deprecating the `ctLikes` and `smartCtLikes` response field in the search endpoints.
-* This will take effect next week and it affects both search endpoints in Ultra API and Tokens API.
-* If you are using the field for any purpose, please move off and stop using it.
-
-### Remove `feeAmount` and `feeMint` fields in `SwapInfo`
-* We will be removing the `feeAmount` and `feeMint` fields from the `routePlan[].swapInfo` schema in a quote response.
-* Since `outAmount` already factor in these fees.
-* These fees are related to each AMM's own fee, not to any Jupiter or platform fees you may add.
-* Refer to [`SwapInfo` API Reference](/api-reference/swap/quote#response-route-plan-swap-info) for more details.
-* [npm package version 6.0.47](https://www.npmjs.com/package/@jup-ag/api/v/6.0.47) 
   has been released with the latest schema.
 
 </Update>

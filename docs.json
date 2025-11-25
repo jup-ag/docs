@@ -164,16 +164,52 @@
             "icon": "chart-line",
             "groups": [
               {
-                "group": " ",
-                "pages": ["docs/perps/index"]
+                "group": "About Perps",
+                "pages": [
+                  "docs/perps/index",
+                  "docs/perps/get-started"
+                ]
+              },
+              {
+                "group": "Architecture",
+                "pages": [
+                  "docs/perps/jlp",
+                  "docs/perps/oracles",
+                  "docs/perps/fees",
+                  "docs/perps/liquidation"
+                ]
+              },
+              {
+                "group": "Perps API",
+                "pages": [
+                  "docs/perps/transaction-execution",
+                  {
+                    "group": "Trading",
+                    "pages": [
+                      "docs/perps/trading/position-data",
+                      "docs/perps/trading/position-management",
+                      "docs/perps/trading/limit-orders",
+                      "docs/perps/trading/tpsl-orders"
+                    ]
+                  },
+                  {
+                    "group": "JLP",
+                    "pages": [
+                      "docs/perps/jlp/getting-jlp",
+                      "docs/perps/lending/position-data",
+                      "docs/perps/lending/position-management"
+                    ]
+                  }
+                ]
               },
               {
                 "group": "Perps Program",
                 "pages": [
-                  "docs/perps/position-account",
-                  "docs/perps/position-request-account",
-                  "docs/perps/pool-account",
-                  "docs/perps/custody-account"
+                  "docs/perps/program/index",
+                  "docs/perps/program/position-account",
+                  "docs/perps/program/position-request-account",
+                  "docs/perps/program/pool-account",
+                  "docs/perps/program/custody-account"
                 ]
               }
             ]
@@ -393,6 +429,86 @@
                       "api-reference/lend/earn/tokens",
                       "api-reference/lend/earn/positions",
                       "api-reference/lend/earn/earnings"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Perps",
+                "tag": "BETA",
+                "pages": [
+                  "api-reference/perps",
+                  {
+                    "group": "Transaction Execution",
+                    "pages": [
+                      "api-reference/perps/post-transaction-execute"
+                    ]
+                  },
+                  {
+                    "group": "Trading",
+                    "pages": [
+                      "api-reference/perps/trading-overview",
+                      {
+                        "group": "Informational",
+                        "pages": [
+                          "api-reference/perps/get-market-stats",
+                          "api-reference/perps/get-trader-stats",
+                          "api-reference/perps/get-top-traders",
+                          "api-reference/perps/get-pool-info",
+                          "api-reference/perps/get-positions",
+                          "api-reference/perps/get-positions-collateral-limits",
+                          "api-reference/perps/get-orders-limit",
+                          "api-reference/perps/get-orders-expired",
+                          "api-reference/perps/get-trades"
+                        ]
+                      },
+                      {
+                        "group": "Positions",
+                        "pages": [
+                          "api-reference/perps/post-positions-increase",
+                          "api-reference/perps/post-positions-increase-with-fee",
+                          "api-reference/perps/post-positions-decrease",
+                          "api-reference/perps/post-positions-decrease-with-fee",
+                          "api-reference/perps/post-positions-close-all"
+                        ]
+                      },
+                      {
+                        "group": "Limit Orders",
+                        "pages": [
+                          "api-reference/perps/post-orders-limit",
+                          "api-reference/perps/patch-orders-limit",
+                          "api-reference/perps/delete-orders-limit"
+                        ]
+                      },
+                      {
+                        "group": "TPSL",
+                        "pages": [
+                          "api-reference/perps/post-tpsl",
+                          "api-reference/perps/post-tpsl-with-fee",
+                          "api-reference/perps/patch-tpsl",
+                          "api-reference/perps/patch-tpsl-with-fee",
+                          "api-reference/perps/delete-tpsl",
+                          "api-reference/perps/delete-tpsl-with-fee"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "JLP",
+                    "pages": [
+                      "api-reference/perps/get-jlp-info",
+                      "api-reference/perps/post-jlp-mint",
+                      "api-reference/perps/post-jlp-burn"
+                    ]
+                  },
+                  {
+                    "group": "JLP Lending",
+                    "pages": [
+                      "api-reference/perps/get-lending-info",
+                      "api-reference/perps/get-lending-positions",
+                      "api-reference/perps/get-lending-history",
+                      "api-reference/perps/post-lending-deposit-borrow",
+                      "api-reference/perps/post-lending-pay-withdraw"
                     ]
                   }
                 ]

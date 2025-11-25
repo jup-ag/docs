@@ -167,7 +167,12 @@
                 "group": "About Perps",
                 "pages": [
                   "docs/perps/index",
-                  "docs/perps/get-started",
+                  "docs/perps/get-started"
+                ]
+              },
+              {
+                "group": "Architecture",
+                "pages": [
                   "docs/perps/jlp",
                   "docs/perps/oracles",
                   "docs/perps/fees",
@@ -175,12 +180,36 @@
                 ]
               },
               {
+                "group": "Perps API",
+                "pages": [
+                  "docs/perps/transaction-execution",
+                  {
+                    "group": "Trading",
+                    "pages": [
+                      "docs/perps/trading/position-data",
+                      "docs/perps/trading/position-management",
+                      "docs/perps/trading/limit-orders",
+                      "docs/perps/trading/tpsl-orders"
+                    ]
+                  },
+                  {
+                    "group": "JLP",
+                    "pages": [
+                      "docs/perps/jlp/getting-jlp",
+                      "docs/perps/lending/position-data",
+                      "docs/perps/lending/position-management"
+                    ]
+                  }
+                ]
+              },
+              {
                 "group": "Perps Program",
                 "pages": [
-                  "docs/perps/position-account",
-                  "docs/perps/position-request-account",
-                  "docs/perps/pool-account",
-                  "docs/perps/custody-account"
+                  "docs/perps/program/index",
+                  "docs/perps/program/position-account",
+                  "docs/perps/program/position-request-account",
+                  "docs/perps/program/pool-account",
+                  "docs/perps/program/custody-account"
                 ]
               }
             ]

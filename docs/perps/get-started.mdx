@@ -8,39 +8,51 @@ description: "Get started to develop with Jupiter Perpetuals."
 Refer to the [Perps API Reference](/api-reference/perps) for the complete API documentation.
 </Note>
 
-## Swap Endpoints
-| Endpoint | Description |
-| :------- | :---------- |
-| [**Get Order**](/docs/ultra/get-order) | Request for a quote and swap transaction. |
-| [**Execute Order**](/docs/ultra/execute-order) | Sign and execute the swap transaction. |
+## Architecture
+| Component | Description |
+| :-------- | :---------- |
+| [**JLP**](/docs/perps/jlp) | Jupiter Liquidity Providers |
+| [**Oracles**](/docs/perps/oracles) | Price oracles for the markets |
+| [**Fees**](/docs/perps/fees) | Fees for the trading operations |
+| [**Liquidation**](/docs/perps/liquidation) | How liquidations are handled |
+| [**Perps Program**](/docs/perps/program) | The smart contract/program of Jupiter Perpetuals |
 
-## Data Endpoints
+## Transaction Execution
+Refer to the [Transaction Execution](/docs/perps/transaction-execution) guide to understand how to execute transactions for both trading, mint/burn of JLP and lending/borrowing.
+
+## Trading Endpoints
 | Endpoint | Description |
 | :------- | :---------- |
-| [**Search Token**](/docs/ultra/search-token) | Search for a token by its symbol, name or mint address. |
-| [**Get Holdings**](/docs/ultra/get-holdings) | Request for token balances of an account. |
-| [**Get Shield**](/docs/ultra/get-shield) | Enhanced security feature to provide critical token information contributing to better informed trading decisions. |
+| [**Position Data**](/docs/perps/trading/position-data) | Get information and data on positions. |
+| [**Position Management**](/docs/perps/trading/position-management) | Manage positions by increasing, decreasing, closing, or closing all positions. |
+| [**Limit Orders**](/docs/perps/trading/limit-orders) | Create, update, or cancel limit orders. |
+| [**TPSL Orders**](/docs/perps/trading/tpsl-orders) | Create, update, or cancel TPSL orders. |
+
+## JLP Endpoints
+| Endpoint | Description |
+| :------- | :---------- |
+| [**JLP Info**](/docs/perps/jlp/getting-jlp) | Get information on JLP tokens. |
+| [**Mint JLP**](/docs/perps/jlp/getting-jlp) | Mint JLP tokens. |
+| [**Burn JLP**](/docs/perps/jlp/getting-jlp) | Burn JLP tokens. |
+
+## JLP Lending Endpoints
+| Endpoint | Description |
+| :------- | :---------- |
+| [**Position Data**](/docs/perps/lending/position-data) | Get information and data on lending positions. |
+| [**Position Management**](/docs/perps/lending/position-management) | Manage lending positions by depositing, borrowing, repaying, withdrawing. |
 
 ## FAQ
 
 <AccordionGroup>
-<Accordion title="Can I add custom integrator fees to Ultra Swap API?">
-
-* **Integrator without custom fees**: Do note that when your users swap using Ultra Swap, we take 5 to 10 bps of the swap amount as a fee.
-* **Integrator with custom fees**: If you are an integrator, you can add custom integrator fees via Ultra Swap API and Jupiter will take 20% of the integrator fees. Please refer to the [Add Fees To Ultra Swap](/docs/ultra/add-fees-to-ultra) guide for more information.
+<Accordion title="Test">
+Test
 </Accordion>
 
-<Accordion title="Can I modify Ultra Swap transactions?">
-* No, you cannot modify Ultra Swap transactions.
-* Ultra Swap is intended to use as is, without any modifications.
+<Accordion title="Test">
+Test
 </Accordion>
 
-<Accordion title="What is the rate limit for Ultra Swap API?">
-* Dynamic Rate Limits are now applied to Ultra Swap API.
-
-  * No Pro plans or payment needed.
-  * Simply generate the universal API Key via [Portal](https://portal.jup.ag)
-  * Rate limits scale together with your swap volume.
-  * [Read more about Ultra Swap API Dynamic Rate Limit](/portal/rate-limit).
+<Accordion title="Test">
+Test
 </Accordion>
 </AccordionGroup>

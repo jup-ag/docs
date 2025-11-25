@@ -1,0 +1,188 @@
+---
+title: "Transaction Execution"
+description: "Understand how to execute transactions for both trading, mint/burn of JLP and lending/borrowing."
+---
+
+## Overview
+
+Many operations in the Jupiter Perps API require **keeper-signed transactions** to be executed. These transactions cannot be submitted directly through standard Solana RPC calls. Instead, they must be sent to the `/transaction/execute` endpoint, where a keeper will sign and execute them on your behalf.
+
+<Note>
+Refer to the [Transaction Execution](/api-reference/perps/post-transaction-execute) endpoint for the complete API documentation.
+</Note>
+
+## When to Use Transaction Execution
+
+All transactional operations in the Jupiter Perps API require the transaction execution endpoint. The following operations may require the transaction execution endpoint:
+
+- **Position Management** (`increase-position`, `decrease-position`)
+- **Limit Orders** (`limit-order`)
+- **TPSL Orders** (`tpsl`, `tpsl-with-fee`)
+- And others
+
+When you call any of these operation endpoints, the response will include:
+
+- `serializedTxBase64`: The serialized transaction ready to be signed
+- `transactionType`: Either `"legacy"` or `"instant"`
+- `requireKeeperSignature`: Boolean indicating if keeper signature is required
+
+## Transaction Types
+
+### Instant Transactions
+
+When `transactionType` is `"instant"` or `requireKeeperSignature` is `true`, you **must** use the `/transaction/execute` endpoint. These transactions require a keeper to sign and execute them.
+
+### Legacy Transactions
+
+When `transactionType` is `"legacy"` and `requireKeeperSignature` is `false`, you can submit the transaction directly through standard Solana RPC methods (e.g., `sendTransaction`).
+
+## Workflow
+
+### Step 1: Create the Transaction
+
+Call the appropriate operation endpoint (e.g., `POST /tpsl`, `POST /positions/increase`) with your parameters:
+
+```typescript
+const response = await fetch('https://api.jup.ag/perps/v1/tpsl', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    walletAddress: 'YOUR_WALLET_ADDRESS',
+    positionPubkey: 'POSITION_PUBKEY',
+    tpsl: [/* your TPSL config */],
+    transactionType: 'instant' // or 'mixed'
+  })
+});
+
+const data = await response.json();
+```
+
+### Step 2: Check Transaction Type
+
+Examine the response to determine how to proceed:
+
+```typescript
+if (data.transactionType === 'instant' || data.requireKeeperSignature) {
+  // Proceed to Step 3 - use transaction execution endpoint
+} else {
+  // Submit directly via RPC
+  await connection.sendRawTransaction(transaction.serialize());
+}
+```
+
+### Step 3: Sign the Transaction
+
+Deserialize and sign the transaction with your wallet:
+
+```typescript
+import { Transaction } from '@solana/web3.js';
+
+const transaction = Transaction.from(
+  Buffer.from(data.serializedTxBase64, 'base64')
+);
+
+// Sign with your wallet
+transaction.sign(wallet);
+
+// Serialize the signed transaction
+const signedSerializedTx = transaction.serialize({
+  requireAllSignatures: false,
+  verifySignatures: false
+});
+
+const signedTxBase64 = Buffer.from(signedSerializedTx).toString('base64');
+```
+
+### Step 4: Execute via Transaction Endpoint
+
+Send the signed transaction to the `/transaction/execute` endpoint with the appropriate `action`:
+
+```typescript
+const executeResponse = await fetch('https://api.jup.ag/perps/v1/transaction/execute', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    action: 'tpsl', // or 'limit-order', 'increase-position', etc.
+    serializedTxBase64: signedTxBase64
+  })
+});
+
+const result = await executeResponse.json();
+// result.txid contains the transaction ID
+```
+
+## Supported Actions
+
+The `action` parameter in `/transaction/execute` must match one of these values:
+
+- `tpsl` - Take profit / Stop loss orders
+- `tpsl-with-fee` - TPSL orders with integrator fees
+- `limit-order` - Limit orders
+- `increase-position` - Increase position size
+- `increase-position-with-fee` - Increase position with integrator fees
+- `decrease-position` - Decrease position size
+- `decrease-position-with-fee` - Decrease position with integrator fees
+
+## Important Notes
+
+1. **Transaction Expiry**: Transactions include blockhash metadata (`txMetadata`) that expires. Ensure you execute the transaction promptly after receiving it.
+
+2. **Serializing Transaction**: When serializing transactions for the execution endpoint, use `requireAllSignatures: false` since the keeper will add its signature.
+
+3. **Error Handling**: The execution endpoint may return errors if:
+   - The transaction is invalid or expired
+   - The keeper cannot execute the transaction
+   - The action type doesn't match the transaction
+
+4. **Transaction ID**: Upon successful execution, you'll receive a `txid` that you can use to track the transaction on-chain.
+
+## Example: Complete TPSL Workflow
+
+```typescript expandable
+// 1. Create TPSL request
+const createResponse = await fetch('https://api.jup.ag/perps/v1/tpsl', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    walletAddress: wallet.publicKey.toString(),
+    positionPubkey: positionPubkey,
+    tpsl: [{
+      requestType: 'tp',
+      triggerPrice: '20000000', // $20.00
+      receiveToken: 'USDC',
+      entirePosition: true
+    }],
+    transactionType: 'instant'
+  })
+});
+
+const createData = await createResponse.json();
+
+// 2. Check if execution endpoint is needed
+if (createData.requireKeeperSignature) {
+  // 3. Deserialize and sign
+  const transaction = Transaction.from(
+    Buffer.from(createData.serializedTxBase64, 'base64')
+  );
+  transaction.sign(wallet);
+  
+  const signedTxBase64 = Buffer.from(
+    transaction.serialize({ requireAllSignatures: false })
+  ).toString('base64');
+  
+  // 4. Execute via transaction endpoint
+  const executeResponse = await fetch('https://api.jup.ag/perps/v1/transaction/execute', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'tpsl',
+      serializedTxBase64: signedTxBase64
+    })
+  });
+  
+  const executeResult = await executeResponse.json();
+  console.log('Transaction ID:', executeResult.txid);
+} else {
+  // Submit directly via RPC
+}
+```

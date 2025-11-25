@@ -1,0 +1,84 @@
+---
+title: "Metis v7: Migration to Metis.builders"
+description: "Metis is now an independent public good at metis.builders with a new access model for v7. This separation establishes Metis as a standalone instruction-level swap primitive for builders who need full control over transaction execution. Additionally, Metis Binary moving forward will require authenticated access with a staked JUP requirement."
+"og:title": "Metis v7: Migration to Metis.builders"
+"og:description": "Metis is now an independent public good at metis.builders with a new access model for v7. This separation establishes Metis as a standalone instruction-level swap primitive for builders who need full control over transaction execution. Additionally, Metis Binary moving forward will require authenticated access with a staked JUP requirement."
+"og:image": "/static/blog/metis-v7/metis-v7.png"
+"og:type": "article"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![Metis v7](/static/blog/metis-v7/metis-v7.png)
+
+Today, we are sharing the coming release of Metis v7 router and its transition to an independent public good under [metis.builders](https://metis.builders).
+
+With Metis v7 no longer serving as Jupiter's primary and sole router, we are formally separating Metis from the Jupiter umbrella. As Metis continues to be prevalent and crucial for the ecosystem, we will continue to provide best-effort support and maintenance for it.
+
+In this post, we will be introducing changes to how Metis will be operated, how to access it, and we need your feedback.
+
+## METIS v7
+Metis is a low-level swap primitive that provides granular control over the entire transaction, designed for builders who require full authority. Metis is a decoupled toolkit offering three core components:
+
+<Card>
+* **Core Routing Intelligence**: Calculates the optimal route plan based on real-time market data
+* **Raw Instruction-Level Payloads**: Returns raw instructions instead of a locked, pre-built transaction
+* **Total Composability**: Add custom instructions, modify accounts, or call Metis from inside any on-chain program (CPI)
+</Card>
+
+This v7 release delivers key improvements to the engine, with new liquidity integrations, critical performance optimizations, and new routing algorithms.
+
+<Card>
+* **Just-in-Time (JIT) aggregation**: Allows the router to compare multiple Prop AMMs directly on-chain at the moment of execution to pick the absolute best-quoting venue
+* **Liquidity Expansion**: Expanded coverage to include 60+ liquidity venues. We will release more as they become available
+* **Brent Op Splitting**: Re-engineered splitting algorithm from GGS to Brent Op Splitting, allowing the router to find more efficient paths by splitting trades with hyper-granularity (down to 1 BPS precision) without sacrificing speed
+</Card>
+
+## BREAKING OUT METIS FROM JUPITER
+Since 2021, Metis has been made available to builders in the ecosystem with the intention of having it function independently of Jupiter as a public good.
+The separation is essential for three reasons:
+
+<Card>
+* Firstly, Jupiter Ultra already utilizes multiple routers to power the platform, so we in essence drive volumes to all routers, not just Metis.
+* Secondly, we've seen Metis quotes being labeled as "Jupiter quotes" across the ecosystem. While this may not always be intentional, it's inaccurate: Jupiter now runs on Ultra's execution engine, which includes our proprietary RFQ system, multi-router aggregation, and features specifically built for end-to-end performance - none of which Metis provides.
+* Thirdly, Jupiter itself has already expanded far more than a router into a DeFi super app encompassing Perps, Wallet, Prediction Markets, amongst many other products. It is important for us that we have a clear messaging moving forward.
+</Card>
+
+As such, we are formally transitioning Metis into an independent public good, separating from the Jupiter umbrella - living entirely under the domain of [metis.builders](https://metis.builders)
+
+## ACCESSING METIS
+Moving forward, to maintain a stable and performative public good, Metis v7 will require authenticated access. Integrators will need to request for an API or Binary Key, and subject to our [Terms & Conditions](https://metis.builders/sdk-and-api-license-agreement).
+
+### API Access
+Metis will offer 2 types of interfaces: either via a hosted API, or by self-hosting the API Binary. In the coming months, we are planning to port over our "Legacy Swap API" under the Metis umbrella, providing a hosted API interface. This will bring cohesiveness and allow for better accessibility to the Metis engine, helping developers to quickstart via a simple Metis API request.
+
+We will be finalizing the plan for the hosted Metis API and will share more on this at a later date.
+
+### Binary Access
+The Self-Hosted Binary is now the Metis Binary. The new site at [metis.builders](https://metis.builders) will house all Metis documentation and Binary Key request form. Access to Metis Binary will require a Binary Key, which can be requested at [portal.metis.builders](https://portal.metis.builders). To prevent spam, the Binary Key will only be distributed based on the requirement of 10,000 staked JUP. Each Binary Key provides access to an instance of the Metis Binary.
+
+Current Metis Binary integrators will have a one-month window to migrate from the day of release, after which any version before v7 will be completely deprecated and will stop working. All integrations of the new v7 Metis Binary must accurately identify and label it as Metis, and comply with our [terms of use](https://metis.builders/sdk-and-api-license-agreement).
+
+<Card>
+To access:
+* Request Binary Key at [portal.metis.builders](https://portal.metis.builders)
+* Describe what you're building
+* Receive your key (contingent on the staked JUP requirement)
+</Card>
+
+## When METIS, When ULTRA?
+**Use METIS when**:
+* You need full control over transaction execution
+* You're building custom on-chain programs that require swap functionality (CPI)
+* You want to set your own priority fees, slippage, and DEX filters
+* You need to modify instructions or add custom logic
+* You're managing your own RPC infrastructure and transaction broadcasting
+
+**Use ULTRA when**:
+* You want Jupiter to handle everything end-to-end
+* You need maximum sandwich protection (34x better)
+* You want the lowest execution fees (8-10x lower)
+* You want industry-leading performance without managing complexity
+* You need quotes aggregated across multiple routers with automated execution and error handling
+
+## TLDR
+Metis v7 is launching with expanded integrations and routing improvements as it moves to its own home at [metis.builders](https://metis.builders). Since Jupiter is now powered end-to-end by Ultra, separating Metis helps avoid confusion and sets clear expectations. Metis v7 will continue to receive best-effort support, while new development focuses on Ultra. Metis remains the flexible, instruction-level swap primitive for builders who need full control.

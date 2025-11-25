@@ -5,8 +5,58 @@ description: "Announcements and Changes"
 
 <Update label="November 2025" description="">
 
-## Legacy Swap API: nativeDestinationAccount
+## Metis Binary Migration
 
+<Card title="Read about the migration and release" href="/blog/metis-v7" icon="book" iconType="solid" horizontal/>
+<Card title="Refer to documentation" href="https://metis.builders" icon="code" iconType="solid" horizontal/>
+
+* [Tweet announcement](https://x.com/jupiterexchange/status/1990479870502031424?s=46)
+
+**Breaking Changes**
+* Migrated self-hosted binary to https://metis.builders
+* Renamed to `Metis Binary`
+* Requires a `BINARY_KEY` or `--binary-key` to authenticate the usage of the binary
+* Refer to [Binary Key](https://metis.builders/docs/binary-key) for more details
+
+---
+
+### Ultra API
+
+### Deprecate `ctLikes` and `smartCtLikes` response field in search endpoint
+* We'll be deprecating the `ctLikes` and `smartCtLikes` response field in the search endpoints.
+* This will take effect next week and it affects the search endpoints in Ultra API.
+* If you are using the field for any purpose, please move off and stop using it.
+
+---
+
+### Tokens API
+
+### Deprecate `ctLikes` and `smartCtLikes` response field in search endpoint
+* We'll be deprecating the `ctLikes` and `smartCtLikes` response field in the search endpoints.
+* This will take effect next week and it affects the search endpoints in Tokens API.
+* If you are using the field for any purpose, please move off and stop using it.
+
+---
+
+## Legacy Swap API
+
+### `routePlan[].percent` may return null
+* The `routePlan[].percent` field in the Legacy Swap API quote response may return `null` - due to an an upgrade on the routing algorithm.
+* Please update your code to handle null values for this field.
+* This change will affect `instructionVersion=V2` only and has taken effect.
+* [npm package version 6.0.47](https://www.npmjs.com/package/@jup-ag/api/v/6.0.47) 
+  has been released with the latest schema.
+
+### Deprecate `feeAmount` and `feeMint` fields in `SwapInfo`
+* We will be deprecating the `feeAmount` and `feeMint` fields from the `routePlan[].swapInfo` schema in a quote response.
+* Since `outAmount` already factor in these fees.
+* These fees are related to each AMM's own fee, not to any Jupiter or platform fees you may add.
+* To smooth the migration, we will just show `0` for `feeAmount` and the input mint as the `feeMint`.
+* Refer to [`SwapInfo` API Reference](/api-reference/swap/quote#response-route-plan-swap-info) for more details.
+* [npm package version 6.0.47](https://www.npmjs.com/package/@jup-ag/api/v/6.0.47) 
+  has been released with the latest schema.
+
+### `nativeDestinationAccount`
 * We've added a new parameter to the Legacy Swap API that lets you send native SOL 
   directly to any account.
 * This is similar to `destinationTokenAccount`, but instead of receiving 
@@ -15,6 +65,7 @@ description: "Announcements and Changes"
   for more details.  
 * [npm package version 6.0.46](https://www.npmjs.com/package/@jup-ag/api/v/6.0.46) 
   has been released with the latest schema.
+
 </Update>
 
 <Update label="October 2025" description="">
@@ -57,6 +108,8 @@ by skipping multi-route aggregation to improve quote latency from 200ms to 10ms 
 efforts on the ongoing development and improvement of Ultra V3 with our new router, Iris.
 
 * **[Try Ultra Swap API](/docs/ultra)**: Ultra V3 features are live in the Ultra Swap API V1, try it and let us know your feedback!
+
+---
 
 ## Jupiter Aggregator V6 Program Update
 * 4 new instruction types are introduced:

@@ -1,19 +1,12 @@
 openapi: 3.0.3
 info:
-  title: Quickstart
+  title: Jupiter Tokens API V2
   version: 2.0.0
   description: |
-    | Link |
-    | --- |
-    | [V1](/docs/tokens/v1) |
-    | [V2](/docs/tokens/v2) |
-    | [V1 Deprecated](/docs/tokens/v1) |
-
+    Jupiter Tokens API V2 Schema
 servers:
-  - url: https://lite-api.jup.ag/tokens/v2
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/tokens/v2
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Tokens API V2 Endpoint
 
 paths:
   /search:
@@ -21,6 +14,8 @@ paths:
       summary: search
       description: |
         Request a search by token's symbol, name or mint address
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: query
@@ -69,6 +64,8 @@ paths:
       description: |
         Request an array of mints and their information by a tag
         - Note that this will return the entire array of existing mints that belongs to the tag.
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: query
@@ -114,6 +111,8 @@ paths:
       summary: category
       description: |
           Returns an array of mints and their information for the given category and interval
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: path
           name: category
@@ -179,6 +178,8 @@ paths:
       description: |
         Returns an array of mints that recently had their **first created pool**
         - Default to 30 mints in response
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful response
@@ -212,6 +213,12 @@ paths:
                   - error
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas:
     MintInformation:
       type: object

@@ -3,20 +3,6 @@ title: "Earn (Beta)"
 description: "Overview of Jupiter Lend Earn API."
 ---
 
-<Info>
-  **NOTE**
-
-  * Lite URL: `https://lite-api.jup.ag/lend/v1/earn`
-  * Pro URL: `https://api.jup.ag/lend/v1/earn`
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 <Tip>
   **API REFERENCE**
 
@@ -156,10 +142,11 @@ Using the Deposit or Withdraw endpoint, the user can do so based on the `amount`
 ```js
 const depositTransactionResponse = await (
     await (
-        await fetch('https://lite-api.jup.ag/lend/v1/earn/deposit', {
+        await fetch('https://api.jup.ag/lend/v1/earn/deposit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'x-api-key': 'your-api-key',
             },
             body: JSON.stringify({
                 asset: mint,
@@ -174,10 +161,11 @@ const depositTransactionResponse = await (
 ```js
 const withdrawTransactionResponse = await (
     await (
-        await fetch('https://lite-api.jup.ag/lend/v1/earn/withdraw', {
+        await fetch('https://api.jup.ag/lend/v1/earn/withdraw', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'x-api-key': 'your-api-key',
             },
             body: JSON.stringify({
                 asset: mint,
@@ -218,10 +206,11 @@ Using the Mint or Redeem endpoint, the user can do so based on the number `share
 ```js
 const mintTransactionResponse = await (
     await (
-        await fetch('https://lite-api.jup.ag/lend/v1/earn/mint', {
+        await fetch('https://api.jup.ag/lend/v1/earn/mint', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'x-api-key': 'your-api-key',
             },
             body: JSON.stringify({
                 asset: mint,
@@ -236,10 +225,11 @@ const mintTransactionResponse = await (
 ```js
 const redeemTransactionResponse = await (
     await (
-        await fetch('https://lite-api.jup.ag/lend/v1/earn/redeem', {
+        await fetch('https://api.jup.ag/lend/v1/earn/redeem', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'x-api-key': 'your-api-key',
             },
             body: JSON.stringify({
                 asset: mint,
@@ -277,10 +267,11 @@ const connection = new Connection('insert-your-own-rpc');
 
 const depositIx = await (
     await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/deposit-instructions', {
+        'https://api.jup.ag/lend/v1/earn/deposit-instructions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'x-api-key': 'your-api-key',
             },
             body: JSON.stringify({
                 asset: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
@@ -360,7 +351,12 @@ Jupiter Lend provides Earnings for individual tokens, meaning SOL and USDC will 
 ```js
 const vaults = await (
     await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/tokens'
+        'https://api.jup.ag/lend/v1/earn/tokens',
+        {
+            headers: {
+                'x-api-key': 'your-api-key',
+            },
+        }
     )
 ).json();
 ```
@@ -376,7 +372,12 @@ Given a user, you are able to get their existing position data such as shares, u
 ```js
 const userPositions = await (
     await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/positions?users={user1},{user2}'
+        'https://api.jup.ag/lend/v1/earn/positions?users={user1},{user2}'
+        {
+            headers: {
+                'x-api-key': 'your-api-key',
+            },
+        }
     )
 ).json();
 ```
@@ -388,7 +389,12 @@ Given a user, you are able to get the rewards of a specific position, for exampl
 ```js
 const userRwards = await (
     await fetch (
-        'https://lite-api.jup.ag/lend/v1/earn/earnings?user={user1}&positions={position1},{position2}'
+        'https://api.jup.ag/lend/v1/earn/earnings?user={user1}&positions={position1},{position2}'
+        {
+            headers: {
+                'x-api-key': 'your-api-key',
+            },
+        }
     )
 ).json();
 ```

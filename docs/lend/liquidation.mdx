@@ -184,7 +184,7 @@ async function getJupiterQuote({
   slippageBps = SLIPPAGE_BPS,
 }) {
   try {
-    const response = await axios.get("https://lite-api.jup.ag/swap/v1/quote", {
+    const response = await axios.get("https://api.jup.ag/swap/v1/quote", {
       params: {
         inputMint,
         outputMint,
@@ -192,6 +192,9 @@ async function getJupiterQuote({
         slippageBps,
         restrictIntermediateTokens: true,
         maxAccounts: 32,
+      },
+      headers: {
+        'x-api-key': 'your-api-key',
       },
     });
 
@@ -208,13 +211,16 @@ async function getJupiterQuote({
 async function getJupiterSwapInstructions({ quoteResponse, userPublicKey }) {
   try {
     const response = await axios.post(
-      "https://lite-api.jup.ag/swap/v1/swap-instructions",
+      "https://api.jup.ag/swap/v1/swap-instructions",
       {
         quoteResponse,
         userPublicKey,
       },
       {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          'x-api-key': 'your-api-key',
+        },
       }
     );
 

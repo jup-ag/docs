@@ -35,7 +35,12 @@ Notice the `ids` parameter with the public key or token address of a token mint,
 
 ```js
 const priceResponse = await fetch(
-    'https://lite-api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112'
+    'https://api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112',
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
 );
 
 const priceData = await priceResponse.json();
@@ -49,7 +54,12 @@ console.log(priceData);
 console.log(JSON.stringify(priceData, null, 2));
 
 const priceResponseWithVsToken = await fetch(
-    'https://lite-api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112&vsToken=So11111111111111111111111111111111111111112'
+    'https://api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112&vsToken=So11111111111111111111111111111111111111112',
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
 );
 
 const priceDataWithVsToken = await priceResponseWithVsToken.json();
@@ -103,7 +113,12 @@ To get extra help information such as confidence level or depth, you will need t
 
 ```js
 const priceResponseShowExtraInfo = await fetch(
-    'https://lite-api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112&showExtraInfo=true'
+    'https://api.jup.ag/price/v2?ids=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112&showExtraInfo=true',
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
 );
 
 const priceDataShowExtraInfo = await priceResponseShowExtraInfo.json();

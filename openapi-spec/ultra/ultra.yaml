@@ -34,7 +34,7 @@ paths:
                     type: string
                   outAmount:
                     type: string
-                  inUsdValue: 
+                  inUsdValue:
                     type: number
                   outUsdValue:
                     type: number
@@ -89,10 +89,14 @@ paths:
                           type: number
                         bps:
                           type: number
+                        usdValue:
+                          type: number
                       required:
                         - swapInfo
                         - percent
                         - bps
+                  referralAccount:
+                    type: string
                   feeMint:
                     type: string
                   feeBps:
@@ -154,7 +158,7 @@ paths:
                       - iris
                       - jupiterz
                       - dflow
-                      - okx                
+                      - okx
                   transaction:
                     type: string
                     nullable: true
@@ -205,14 +209,18 @@ paths:
                   - inAmount
                   - outAmount
                   - otherAmountThreshold
-                  - priceImpactPct
                   - swapMode
                   - slippageBps
+                  - priceImpactPct
                   - routePlan
                   - feeBps
+                  - platformFee
                   - signatureFeeLamports
+                  - signatureFeePayer
                   - prioritizationFeeLamports
+                  - prioritizationFeePayer
                   - rentFeeLamports
+                  - rentFeePayer
                   - swapType
                   - router
                   - transaction
@@ -267,6 +275,19 @@ paths:
           schema:
             type: string
             default: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+          required: false
+        - in: query
+          name: receiver
+          description: |
+            - The public key of the account that will receive the output tokens
+            - If not provided, the output tokens will be sent to the taker like default
+            - It expects an account (NOT a token account)
+            - If the output is non-SOL tokens, it only transfers to ATAs (not token accounts)
+            - If the destination token account is not initialized, an additional create ATA instruction will be added to the transaction
+            - If the output is SOL, it will transfer native SOL directly to the receiver account
+            - It does not support destination WSOL token account
+          schema:
+            type: string
           required: false
         - in: query
           name: payer

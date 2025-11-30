@@ -1,16 +1,12 @@
 openapi: 3.0.3
 info:
-  title: Quickstart
+  title: Jupiter Studio API
   version: 2.0.0
   description: |
-    | Link |
-    | --- |
-
+    Jupiter Studio API Schema
 servers:
-  - url: https://lite-api.jup.ag/studio/v1
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/studio/v1
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Studio API Endpoint
 
 paths:
   /dbc-pool/create-tx:
@@ -18,6 +14,8 @@ paths:
       summary: dbc-pool-create-tx
       description: |
         Request for a base64-encoded unsigned transaction to create a Dynamic Bonding Curve pool with token metadata
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -58,6 +56,8 @@ paths:
       summary: dbc-pool-submit
       description: |
         Execute the signed transaction, and optionally upload content and header image
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           multipart/form-data:
@@ -99,6 +99,8 @@ paths:
       summary: dbc-pool-addresses-by-mint
       description: |
         Request for pool addresses for a given token mint
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: mint
           in: path
@@ -162,6 +164,8 @@ paths:
       summary: dbc-fee
       description: |
         Request for unclaimed creator trading fees of a Dynamic Bonding Curve pool
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -216,6 +220,8 @@ paths:
       description: |
         Request for a base64-encoded unsigned transaction to claim creator trading fees of a Dynamic Bonding Curve pool
         - Handles both direct creator ownership and proxy-based ownership.
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -272,6 +278,12 @@ paths:
 
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas:
     CreateDBCTransactionRequestBody:
       type: object

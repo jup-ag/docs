@@ -2,20 +2,6 @@
 title: "Claim Fee (Beta)"
 ---
 
-<Info>
-  **NOTE**
-
-  * Lite URL: `https://lite-api.jup.ag/studio/v1`: 100 requests per 5 minutes
-  * Pro URL: `https://api.jup.ag/studio/v1`: 10 requests per 10 seconds (for all Tiers)
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 <Tip>
   **API REFERENCE**
 
@@ -130,7 +116,12 @@ Your successfully created token via Jupiter Studio, should have a newly generate
 ```js
 const poolAddressResponse = await (
     await fetch(
-      `https://lite-api.jup.ag/studio/v1/dbc-pool/addresses/${mint}`,
+      `https://api.jup.ag/studio/v1/dbc-pool/addresses/${mint}`,
+      {
+        headers: {
+          'x-api-key': 'your-api-key',
+        },
+      }
     )
 ).json();
 ```
@@ -142,11 +133,12 @@ Using the Pool Address, you will be able to get the total and current unclaimed 
 ```js
 const feeResponse = await (
     await fetch (
-      'https://lite-api.jup.ag/studio/v1/dbc/fee',
+      'https://api.jup.ag/studio/v1/dbc/fee',
       {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             poolAddress: poolAddressResponse.data.dbcPoolAddress,
@@ -162,11 +154,12 @@ In order to claim fees from a Dynamic Bonding Curve pool, you will need to pass 
 ```js
 const claimTransaction = await (
     await fetch (
-      'https://lite-api.jup.ag/studio/v1/dbc/fee/create-tx',
+      'https://api.jup.ag/studio/v1/dbc/fee/create-tx',
       {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             ownerWallet: wallet.publicKey.toBase58(),

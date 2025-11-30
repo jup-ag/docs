@@ -1,13 +1,12 @@
 openapi: 3.0.3
 info:
-  title: Quickstart
+  title: Jupiter Lend API
   version: 1.0.0
-
+  description: |
+    Jupiter Lend API Schema
 servers:
-  - url: https://lite-api.jup.ag/lend/v1
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/lend/v1
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Lend API endpoint
 
 paths:
   /earn/deposit:
@@ -15,6 +14,8 @@ paths:
       summary: deposit
       description: |
         Request for a base64-encoded unsigned earn deposit transaction to deposit assets
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -34,6 +35,8 @@ paths:
       summary: deposit-instructions
       description: |
         Request for the instruction of an earn deposit transaction to deposit assets
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -53,6 +56,8 @@ paths:
       summary: withdraw
       description: |
         Request for a base64-encoded unsigned earn withdraw transaction to withdraw assets
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -72,6 +77,8 @@ paths:
       summary: withdraw-instructions
       description: |
         Request for the instruction of an earn withdraw transaction to withdraw assets
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -91,6 +98,8 @@ paths:
       summary: mint
       description: |
         Request for a base64-encoded unsigned earn mint transaction to mint shares
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -110,6 +119,8 @@ paths:
       summary: mint-instructions
       description: |
         Request for the instruction of an earn mint transaction to mint shares
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -129,6 +140,8 @@ paths:
       summary: redeem
       description: |
         Request for a base64-encoded unsigned earn redeem transaction to redeem shares
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -148,6 +161,8 @@ paths:
       summary: redeem-instructions
       description: |
         Request for the instruction of an earn redeem transaction to redeem shares
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -167,6 +182,8 @@ paths:
       summary: tokens
       description: |
         Request for the tokens available to be deposited and their information
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful response
@@ -180,6 +197,8 @@ paths:
       summary: positions
       description: |
         Request for the position data of one or multiple users
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: users
           in: query
@@ -202,6 +221,8 @@ paths:
       summary: earnings
       description: |
         Request for the earnings of one or multiple positions of a user
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: user
           in: query
@@ -229,6 +250,12 @@ paths:
 
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas:
     EarnAmountRequestBody:
       type: object

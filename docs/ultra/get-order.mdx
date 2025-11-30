@@ -16,14 +16,19 @@ To get an Ultra Swap order, you need to pass in the required parameters such as:
 
 ```js Get Order
 const orderResponse = await (
-    await fetch(
-        'https://lite-api.jup.ag/ultra/v1/order'
-        '?inputMint=So11111111111111111111111111111111111111112' +
-        '&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' +
-        '&amount=100000000' +
-        '&taker=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3'
-    )
-  ).json();
+  await fetch(
+    'https://api.jup.ag/ultra/v1/order' +
+    '?inputMint=So11111111111111111111111111111111111111112' +
+    '&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' +
+    '&amount=100000000' +
+    '&taker=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3',
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
+).json();
 ```
 
 ## Order Response

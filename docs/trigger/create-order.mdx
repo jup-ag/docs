@@ -16,20 +16,6 @@ title: "Create Order"
   * `/getTriggerOrders` endpoint is introduced to get either active or historical orders (based on the query parameters) in a new format.
 </Warning>
 
-<Info>
-  **NOTE**
-
-  * Lite URL: `https://lite-api.jup.ag/trigger/v1/createOrder`
-  * Pro URL: `https://api.jup.ag/trigger/v1/createOrder`
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 ## Create Order
 
 This is a POST request to `/createOrder` endpoint, where you pass in the necessary parameters and our backend will create the transaction for you to sign and send to the network seamlessly.
@@ -48,10 +34,11 @@ This is a POST request to `/createOrder` endpoint, where you pass in the necessa
 
 ```js
 const createOrderResponse = await (
-    await fetch('https://lite-api.jup.ag/trigger/v1/createOrder', {
+    await fetch('https://api.jup.ag/trigger/v1/createOrder', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             inputMint: inputMint.toString(),

@@ -12,16 +12,6 @@ sidebarTitle: "V1 (Deprecated)"
   Please migrate to [Tokens API V2](/docs/tokens/v2) which consists of breaking changes.
 </Warning>
 
-
-
-<Info>
-  **NOTE**
-
-  Base URL: `https://lite-api.jup.ag/tokens/v1`
-
-  For higher rate limits, [refer to the API Key Setup doc](/portal/setup).
-</Info>
-
 ## Get Token Information
 
 Using this endpoint, you can get the token information of the specific mint address. In the following example, we are looking at getting the token information of the JUP token.
@@ -34,7 +24,11 @@ Using this endpoint, you can get the token information of the specific mint addr
 
 ```js
 const tokenInfoResponse = await (
-    await fetch('https://lite-api.jup.ag/tokens/v1/token/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN')
+    await fetch('https://api.jup.ag/tokens/v1/token/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', {
+        headers: {
+            'x-api-key': 'your-api-key',
+        },
+    })
 ).json();
 
 console.log(tokenInfoResponse);
@@ -66,7 +60,11 @@ Using this endpoint, you can get a list of token mints that belong to a market/p
 
 ```js
 const marketTokensResponse = await (
-    await fetch('https://lite-api.jup.ag/tokens/v1/market/BVRbyLjjfSBcoyiYFuxbgKYnWuiFaF9CSXEa5vdSZ9Hh/mints')
+    await fetch('https://api.jup.ag/tokens/v1/market/BVRbyLjjfSBcoyiYFuxbgKYnWuiFaF9CSXEa5vdSZ9Hh/mints', {
+        headers: {
+            'x-api-key': 'your-api-key',
+        },
+    })
 ).json();
 
 console.log(marketTokensResponse);
@@ -91,7 +89,11 @@ Using this endpoint, you can get a list of all token mints that are tradable on 
 
 ```js
 const allTradableResponse = await (
-    await fetch('https://lite-api.jup.ag/tokens/v1/mints/tradable')
+    await fetch('https://api.jup.ag/tokens/v1/mints/tradable', {
+        headers: {
+            'x-api-key': 'your-api-key',
+        },
+    })
 ).json();
 
 console.log(allTradableResponse);
@@ -133,7 +135,11 @@ Using this endpoint, you can get a list of token mints (with information) that a
 
 ```js
 const lstTaggedResponse = await (
-    await fetch('https://lite-api.jup.ag/tokens/v1/tagged/lst')
+    await fetch('https://api.jup.ag/tokens/v1/tagged/lst', {
+        headers: {
+            'x-api-key': 'your-api-key',
+        },
+    })
 ).json();
 
 console.log(lstTaggedResponse);
@@ -179,7 +185,11 @@ Using this endpoint, you can get a list of token mints (with information) **sort
 
 ```js
 const newTokensReponse = await (
-    await fetch('https://lite-api.jup.ag/tokens/v1/new')
+    await fetch('https://api.jup.ag/tokens/v1/new', {
+        headers: {
+            'x-api-key': 'your-api-key',
+        },
+    })
 ).json();
 
 console.log(newTokensReponse);
@@ -234,7 +244,11 @@ Using the endpoint, you can simply query with the `all` resource to get all toke
 
 ```js
 const allResponse = await (
-  await fetch("https://lite-api.jup.ag/tokens/v1/all")
+  await fetch("https://api.jup.ag/tokens/v1/all", {
+    headers: {
+      'x-api-key': 'your-api-key',
+    },
+  })
 ).json();
 
 console.log(allResponse);

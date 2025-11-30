@@ -132,10 +132,11 @@ We are using [Triton’s `getRecentPrioritizationFees`](https://docs.triton.one/
 
 ```js
 const swapResponse = await (
-  await fetch('https://lite-api.jup.ag/swap/v1/swap', {
+  await fetch('https://api.jup.ag/swap/v1/swap', {
       method: 'POST',
       headers: {
-      'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-api-key': 'your-api-key',
       },
       body: JSON.stringify({
           quoteResponse,
@@ -162,10 +163,11 @@ When `true`, it allows the transaction to utilize a dynamic compute unit rather
 
 ```js
 const swapTransaction = await (
-  await fetch('https://lite-api.jup.ag/swap/v1/swap', {
+  await fetch('https://api.jup.ag/swap/v1/swap', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'x-api-key': 'your-api-key',
     },
     body: JSON.stringify({
       quoteResponse,
@@ -222,10 +224,11 @@ Apart from the fixed slippage setting, you can use Dynamic Slippage: During swap
 
 ```js
 const swapTransaction = await (
-  await fetch('https://lite-api.jup.ag/swap/v1/swap', {
+  await fetch('https://api.jup.ag/swap/v1/swap', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'x-api-key': 'your-api-key',
     },
     body: JSON.stringify({
       quoteResponse,
@@ -283,10 +286,11 @@ To include Jito Tips in your Legacy Swap transaction, you can do specify in the 
 
 ```js
 const swapTransaction = await (
-  await fetch('https://lite-api.jup.ag/swap/v1/swap', {
+  await fetch('https://api.jup.ag/swap/v1/swap', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'x-api-key': 'your-api-key',
     },
     body: JSON.stringify({
       quoteResponse,

@@ -1,18 +1,21 @@
 openapi: 3.0.3
 info:
-  title: Quickstart
+  title: Jupiter Price API V3
   version: 3.0.0
   description: |
-    | Link |
-    | --- |
-    | [V3](/docs/price/v3) |
-    | [V2 (Deprecated)](/docs/price/v2) |
+    Jupiter Price API V3 Schema
 
 servers:
-  - url: https://lite-api.jup.ag
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Price API V3 Endpoint
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
 
 paths:
   "/price/v3":
@@ -20,6 +23,8 @@ paths:
       summary: price
       description: |
         Returns prices of specified tokens.
+      security:
+        - ApiKeyAuth: []
       parameters:
       - name: ids
         in: query

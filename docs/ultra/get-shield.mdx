@@ -7,7 +7,13 @@ This is useful when integrating with Jupiter Ultra Swap or any other APIs, allow
 
 ```js
 const shieldResponse = await (
-  await fetch(`https://lite-api.jup.ag/ultra/v1/shield?mints=So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v,someTokenAddressForEducationalPurposes`)
+  await fetch(`https://api.jup.ag/ultra/v1/shield?mints=So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v,someTokenAddressForEducationalPurposes`,
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
 ).json();
 ```
 

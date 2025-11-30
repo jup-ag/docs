@@ -29,7 +29,10 @@ You can use the `/order` endpoint to check for the `feeMint` and `feeBps` field 
 
 Or you can use the `/fees` endpoint to check the fees and category given the input and output mint.
 
-https://lite-api.jup.ag/ultra/v1/fees?inputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&outputMint=So11111111111111111111111111111111111111112
+```bash
+curl -X GET 'https://api.jup.ag/ultra/v1/fees?inputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&outputMint=So11111111111111111111111111111111111111112' \
+  -H 'x-api-key: your-api-key'
+```
 </Note>
 
 ### Integrator Fees

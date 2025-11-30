@@ -2,20 +2,6 @@
 title: "Execute Order"
 ---
 
-<Info>
-  **NOTE**
-
-  * Lite URL: `https://lite-api.jup.ag/trigger/v1/execute`
-  * Pro URL: `https://api.jup.ag/trigger/v1/execute`
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 After getting the order transaction, you can sign and send to the network yourself or use the Trigger API's `/execute` endpoint to do it for you.
 
 ## Sign Transaction
@@ -44,10 +30,11 @@ By making a post request to the `/execute` endpoint, Jupiter executes the order 
 
 ```js
 const executeResponse = await (
-    await fetch('https://lite-api.jup.ag/trigger/v1/execute', {
+    await fetch('https://api.jup.ag/trigger/v1/execute', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             signedTransaction: signedTransaction,

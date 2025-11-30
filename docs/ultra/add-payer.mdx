@@ -34,7 +34,7 @@ However, as mentioned above, to use `payer`, it is expected to be used with refe
 ```js Get Order
 const orderResponse = await (
     await fetch(
-        'https://lite-api.jup.ag/ultra/v1/order'
+        'https://api.jup.ag/ultra/v1/order' +
         '?inputMint=So11111111111111111111111111111111111111112' +
         '&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' +
         '&amount=100000000' +
@@ -42,7 +42,12 @@ const orderResponse = await (
         '&referralAccount=<pass-in-referral-account>' +
         '&referralFee=100' +
         '&payer=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3' +
-        '&closeAuthority=<pass-in-taker-account>' // dependent on how you want to handle taker's ATA
+        '&closeAuthority=<pass-in-taker-account>', // dependent on how you want to handle taker's ATA
+        {
+            headers: {
+                'x-api-key': 'your-api-key',
+            },
+        }
     )
   ).json();
 ```

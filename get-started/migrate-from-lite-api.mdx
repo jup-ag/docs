@@ -15,6 +15,8 @@ This guide will help you migrate from `lite-api.jup.ag` to `api.jup.ag`. The mig
 
 ## What Changed?
 
+We will be stopping support for API requests with no API key, hence you are required to migrate to `api.jup.ag` and use with an API key.
+
 | Before (Deprecated) | After (Current) |
 |---------------------|----------------|
 | `https://lite-api.jup.ag/...` | `https://api.jup.ag/...` |
@@ -47,26 +49,48 @@ Replace all instances of `lite-api.jup.ag` with `api.jup.ag`:
 
 To use your API key, pass in via header as `x-api-key`:
 
-```js
+<CodeGroup>
+```js JS/TS wrap
 // Before (deprecated)
-const response = await fetch('https://lite-api.jup.ag/swap/v1/quote?...');
+const response = await fetch('https://lite-api.jup.ag/ultra/v1/order?...');
 
 // After (current)
-const response = await fetch('https://api.jup.ag/swap/v1/quote?...', {
+const response = await fetch('https://api.jup.ag/ultra/v1/order?...', {
   headers: {
     'x-api-key': 'your-api-key-here',
   },
 });
 ```
 
+```python Python wrap
+# Before (deprecated)
+response = requests.get('https://lite-api.jup.ag/ultra/v1/order?...')
+
+# After (current)
+response = requests.get(
+    'https://api.jup.ag/ultra/v1/order?...', 
+    headers={'x-api-key': 'your-api-key-here'}
+)
+```
+
+```curl curl wrap
+# Before (deprecated)
+curl -X GET 'https://lite-api.jup.ag/ultra/v1/order?...'
+
+# After (current)
+curl -X GET 'https://api.jup.ag/ultra/v1/order?...' \
+    -H 'x-api-key: your-api-key-here'
+```
+</CodeGroup>
+
 ## Migration Checklist
 
-- [ ] Generated API key from [portal.jup.ag](https://portal.jup.ag)
-- [ ] Updated all `lite-api.jup.ag` URLs to `api.jup.ag`
-- [ ] Added `x-api-key` header to all API requests
-- [ ] Tested API calls with new endpoint
-- [ ] Updated environment variables/config files
-- [ ] Updated documentation/comments in code
+- [ ] Generate API key from [portal.jup.ag](https://portal.jup.ag)
+- [ ] Update all `lite-api.jup.ag` URLs to `api.jup.ag`
+- [ ] Add `x-api-key` header to all API requests
+- [ ] Test API calls with new endpoint
+- [ ] Update environment variables/config files
+- [ ] Update documentation/comments in code
 
 ## Endpoint Mapping
 
@@ -74,68 +98,29 @@ All endpoints remain the same, only the base URL changes:
 
 | Service | Old Endpoint | New Endpoint |
 |---------|-------------|--------------|
+| Ultra API | `lite-api.jup.ag/ultra/v1/...` | `api.jup.ag/ultra/v1/...` |
 | Swap API | `lite-api.jup.ag/swap/v1/...` | `api.jup.ag/swap/v1/...` |
 | Price API | `lite-api.jup.ag/price/v2/...` | `api.jup.ag/price/v2/...` |
 | Tokens API | `lite-api.jup.ag/tokens/v1/...` | `api.jup.ag/tokens/v1/...` |
-| Ultra API | `lite-api.jup.ag/ultra/v1/...` | `api.jup.ag/ultra/v1/...` |
 | Trigger API | `lite-api.jup.ag/trigger/v1/...` | `api.jup.ag/trigger/v1/...` |
 | Recurring API | `lite-api.jup.ag/recurring/v1/...` | `api.jup.ag/recurring/v1/...` |
 | Send API | `lite-api.jup.ag/send/v1/...` | `api.jup.ag/send/v1/...` |
 | Studio API | `lite-api.jup.ag/studio/v1/...` | `api.jup.ag/studio/v1/...` |
 | Lend API | `lite-api.jup.ag/lend/v1/...` | `api.jup.ag/lend/v1/...` |
 
-## Code Examples
-
-### JavaScript/TypeScript
-
-```js
-// Before
-const quote = await fetch(
-  'https://lite-api.jup.ag/swap/v1/quote?inputMint=...&outputMint=...'
-);
-
-// After
-const quote = await fetch(
-  'https://api.jup.ag/swap/v1/quote?inputMint=...&outputMint=...',
-  {
-    headers: {
-      'x-api-key': process.env.JUPITER_API_KEY,
-    },
-  }
-);
-```
-
-### Python
-
-```python
-# Before
-response = requests.get('https://lite-api.jup.ag/swap/v1/quote?...')
-
-# After
-headers = {'x-api-key': os.getenv('JUPITER_API_KEY')}
-response = requests.get('https://api.jup.ag/swap/v1/quote?...', headers=headers)
-```
-
-### curl
-
-```bash
-# Before
-curl 'https://lite-api.jup.ag/swap/v1/quote?...'
-
-# After
-curl 'https://api.jup.ag/swap/v1/quote?...' \
-  -H 'x-api-key: your-api-key-here'
-```
-
 ## Common Issues
 
-### 401 Unauthorized
+<AccordionGroup>
+<Accordion title="401 Unauthorized">
 **Problem**: Getting 401 errors after migration  
 **Solution**: Make sure you are including the `x-api-key` header in all requests.
+</Accordion>
 
-### Rate Limit Errors
+<Accordion title="Rate Limit Errors">
 **Problem**: Hitting rate limits  
 **Solution**: Free tier provides 60 requests per minute. Consider upgrading to Pro tier for higher limits. Refer to [Rate Limit](/portal/rate-limit) for more details.
+</Accordion>
+</AccordionGroup>
 
 ## Need Help?
 

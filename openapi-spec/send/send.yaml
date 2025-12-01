@@ -1,17 +1,12 @@
 openapi: 3.0.3
-
 info:
-  title: Quickstart
+  title: Jupiter Send API
   version: 1.0.0
   description: |
-    | Link |
-    | --- |
-
+    Jupiter Send API Schema
 servers:
-  - url: https://lite-api.jup.ag/send/v1
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/send/v1
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Send API Endpoint
 
 paths:
   /craft-send:
@@ -19,6 +14,8 @@ paths:
       summary: craft-send
       description: |
         Request for a base64-encoded unsigned Send transaction
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -105,6 +102,8 @@ paths:
       summary: craft-clawback
       description: |
         Request for a base64-encoded unsigned Send transaction
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -168,6 +167,8 @@ paths:
       summary: pending-invites
       description: |
         Request for the pending invites of an address
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: address
           in: query
@@ -219,6 +220,8 @@ paths:
       summary: invite-history
       description: |
         Request for the invite history of an address
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: address
           in: query
@@ -266,6 +269,12 @@ paths:
                   - error
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas:
     InviteDataResponse:
       type: object

@@ -4,20 +4,6 @@ sidebarTitle: "V2 (Beta)"
 description: "Guide on Tokens V2 API endpoints to query for mint information in specific searches, tags or categories."
 ---
 
-<Info>
-  **NOTE**
-
-  * Lite URL: `https://lite-api.jup.ag/tokens/v2`
-  * Pro URL: `https://api.jup.ag/tokens/v2`
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 <Tip>
   **USEFUL MINT INFORMATION**
 
@@ -47,7 +33,13 @@ This is useful in most user applications, as users need to choose which tokens t
 
 ```js
 const searchResponse = await (
-  await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=So11111111111111111111111111111111111111112`)
+  await fetch(`https://api.jup.ag/tokens/v2/search?query=So11111111111111111111111111111111111111112`,
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
 ).json();
 ```
 
@@ -64,7 +56,13 @@ The Tokens API V2 provides an endpoint to query by tags. This is useful to help 
 
 ```js
 const tagResponse = await (
-  await fetch(`https://lite-api.jup.ag/tokens/v2/tag?query=verified`)
+  await fetch(`https://api.jup.ag/tokens/v2/tag?query=verified`,
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
 ).json();
 ```
 
@@ -83,7 +81,13 @@ The Tokens API V2 provides an endpoint to get mints and their mint information b
 
 ```js
 const categoryResponse = await (
-  await fetch(`https://lite-api.jup.ag/tokens/v2/toporganicscore/5m?limit=100`)
+  await fetch(`https://api.jup.ag/tokens/v2/toporganicscore/5m?limit=100`,
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
 ).json();
 ```
 
@@ -100,7 +104,13 @@ The Tokens API V2 provides an endpoint to get mints and their mint information b
 
 ```js
 const recentResponse = await (
-  await fetch(`https://lite-api.jup.ag/tokens/v2/recent`)
+  await fetch(`https://api.jup.ag/tokens/v2/recent`,
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
 ).json();
 ```
 

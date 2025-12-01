@@ -23,6 +23,10 @@
       "prefill": true
     }
   },
+  "banner": {
+    "content": "🚨 **Action Required:** `lite-api.jup.ag` will be deprecated on 31st December 2025. [View migration guide →](/get-started/migrate-from-lite-api)",
+    "dismissible": true
+  },
   "navigation": {
     "tabs": [
       {
@@ -49,6 +53,7 @@
             "group": "Portal",
             "pages": [
               "portal/setup",
+              "portal/migrate-from-lite-api",
               "portal/payment",
               "portal/responses",
               "portal/rate-limit",

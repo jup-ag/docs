@@ -1,19 +1,12 @@
 openapi: 3.0.3
 info:
-  title: Quickstart
+  title: Jupiter Legacy Swap API
   version: 1.0.0
   description: |
-    | Link |
-    | --- |
-    | [Get Quote](/docs/swap/get-quote) |
-    | [Build Swap Transaction](/docs/swap/build-swap-transaction) |
-    | [Send Swap Transaction](/docs/swap/send-swap-transaction) |
-
+    Jupiter Legacy Swap API Schema
 servers:
-  - url: https://lite-api.jup.ag/swap/v1
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/swap/v1
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Legacy Swap API endpoint
   - url: https://preprod-quote-api.jup.ag/
     description: This is a staging endpoint for tests
 
@@ -26,6 +19,8 @@ paths:
       summary: quote
       description: |
         Request for a quote to be used in `POST /swap`
+      security:
+        - ApiKeyAuth: []
       parameters:
         - $ref: '#/components/parameters/InputMintParameter'
         - $ref: '#/components/parameters/OutputMintParameter'
@@ -56,6 +51,8 @@ paths:
       summary: swap
       description: |
         Request for a base64-encoded unsigned swap transaction based on the `/quote` response
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -77,6 +74,8 @@ paths:
       summary: swap-instructions
       description: |
         Request for swap instructions that you can use from the quote you get from `/quote`
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -100,6 +99,8 @@ paths:
         Returns a hash, which key is the program id and value is the label.
         This is used to help map error from transaction by identifying the fault program id.
         This can be used in conjunction with the `excludeDexes` or `dexes` parameter.
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Default response
@@ -111,6 +112,12 @@ paths:
                   type: string
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas:
     Instruction:
       type: object
@@ -562,7 +569,7 @@ components:
         - Multiple DEXes can be pass in by comma separating them
         - For example: `dexes=Raydium,Orca+V2,Meteora+DLMM`
         - If a DEX is indicated, the route will **only use** that DEX
-        - Full list of DEXes here: https://lite-api.jup.ag/swap/v1/program-id-to-label
+        - Full list of DEXes here using the `/program-id-to-label` endpoint
       in: query
       schema:
         type: array
@@ -574,7 +581,7 @@ components:
         - Multiple DEXes can be pass in by comma separating them
         - For example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
         - If a DEX is indicated, the route will **not use** that DEX
-        - Full list of DEXes here: https://lite-api.jup.ag/swap/v1/program-id-to-label
+        - Full list of DEXes here using the `/program-id-to-label` endpoint
       in: query
       schema:
         type: array

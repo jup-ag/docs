@@ -68,10 +68,11 @@ To make a post request to execute a swap order, you need to pass in the required
 
 ```js Execute Order
 const executeResponse = await (
-    await fetch('https://lite-api.jup.ag/ultra/v1/execute', {
+    await fetch('https://api.jup.ag/ultra/v1/execute', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             signedTransaction: signedTransaction,

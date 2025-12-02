@@ -339,13 +339,18 @@ const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
 
 const orderResponse = await (
   await fetch(
-      'https://lite-api.jup.ag/ultra/v1/order?' +
-      'inputMint=So11111111111111111111111111111111111111112&' +
-      'outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&' +
-      'amount=100000000&' +
-      'taker=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3&' +
-      'referralAccount=&' + // insert referral account public key here
-      'referralFee=50' // insert referral fee in basis points (bps)
+    'https://api.jup.ag/ultra/v1/order?' +
+    'inputMint=So11111111111111111111111111111111111111112&' +
+    'outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&' +
+    'amount=100000000&' +
+    'taker=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3&' +
+    'referralAccount=&' + // insert referral account public key here
+    'referralFee=50', // insert referral fee in basis points (bps)
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
   )
 ).json();
 
@@ -357,10 +362,11 @@ transaction.sign([wallet]); // Sign the transaction
 const signedTransaction = Buffer.from(transaction.serialize()).toString('base64'); // Serialize the transaction to base64 format
 
 const executeResponse = await (
-    await fetch('https://lite-api.jup.ag/ultra/v1/execute', {
+    await fetch('https://api.jup.ag/ultra/v1/execute', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             signedTransaction: signedTransaction,

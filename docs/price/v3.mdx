@@ -5,20 +5,6 @@ sidebarTitle: "V3 (Beta)"
 
 Price API V3 aims to provide a one source of truth across all Jupiter UIs and integrator platforms. The simplified format allows easy integration while letting Jupiter handle the complexity of ensuring the accuracy of the provided prices.
 
-<Info>
-  **NOTE**
-
-  * Lite URL: `https://lite-api.jup.ag/price/v3`
-  * Pro URL: `https://api.jup.ag/price/v3`
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 <Note>
   **INFO**
 
@@ -45,8 +31,13 @@ Simply request via the base URL with the query parameters of your desired mint a
 ```js
 const price = await (
     await fetch(
-        'https://lite-api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112,JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN'
-    )
+        'https://api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112,JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN'
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
 ).json();
 console.log(JSON.stringify(price, null, 2));
 ```

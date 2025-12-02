@@ -2,20 +2,6 @@
 title: "Craft Clawback (Beta)"
 ---
 
-<Info>
-  **NOTE**
-
-  * Lite URL: `https://lite-api.jup.ag/send/v1`
-  * Pro URL: `https://api.jup.ag/send/v1`
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 ## Overview
 
 <Steps>
@@ -76,10 +62,11 @@ const invite_pda = PublicKey.findProgramAddressSync(
 
 // STEP 4: Post request for a Clawback transaction
 const craftClawbackTransaction = await (
-    await fetch ('https://lite-api.jup.ag/send/v1/craft-clawback', {
+    await fetch ('https://api.jup.ag/send/v1/craft-clawback', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             invitePDA: invite_pda.toBase58(),
@@ -174,10 +161,11 @@ const invite_pda = PublicKey.findProgramAddressSync(
 ```js
 // STEP 4: Post request for a Clawback transaction
 const craftClawbackTransaction = await (
-    await fetch ('https://lite-api.jup.ag/send/v1/craft-clawback', {
+    await fetch ('https://api.jup.ag/send/v1/craft-clawback', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             invitePDA: invite_pda.toBase58(),

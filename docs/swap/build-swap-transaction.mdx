@@ -3,20 +3,6 @@ title: "Build Swap Transaction"
 description: "Swap via Metis by building a swap transaction using the Legacy Swap API."
 ---
 
-<Info>
-  **NOTE**
-
-  * Lite URL: `https://lite-api.jup.ag/swap/v1/swap`
-  * Pro URL: `https://api.jup.ag/swap/v1/swap`
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 The Legacy Swap API is one of the ways for you to interact with the Jupiter Swap Aggregator program. Before you send a transaction to the network, you will need to build the transaction that defines the instructions to execute and accounts to read/write to.
 
 It can be complex to handle this yourself, but good news! Most of our APIs and SDKs just handles it for you, so you get a response with the transaction to be prepared and sent to the network.
@@ -65,10 +51,11 @@ Using the root URL and parameters to pass in, it is as simple as the example cod
 
 ```js
 const swapResponse = await (
-await fetch('https://lite-api.jup.ag/swap/v1/swap', {
+await fetch('https://api.jup.ag/swap/v1/swap', {
     method: 'POST',
     headers: {
     'Content-Type': 'application/json',
+    'x-api-key': 'your-api-key',
     },
     body: JSON.stringify({
     quoteResponse,
@@ -145,15 +132,16 @@ If you prefer to compose with instructions instead of the provided transaction t
 
 ```js
   const instructions = await (
-    await fetch('https://lite-api.jup.ag/swap/v1/swap-instructions', {
+    await fetch('https://api.jup.ag/swap/v1/swap-instructions', {
     method: 'POST',
     headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-api-key': 'your-api-key',
     },
     body: JSON.stringify({
         quoteResponse,
         userPublicKey: wallet.publicKey,
-    })
+    }),
     })
 ).json();
 

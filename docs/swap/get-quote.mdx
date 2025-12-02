@@ -5,20 +5,6 @@ description: "Swap via Metis by getting a quote from the Legacy Swap API."
 
 The Quote API enables you to tap into the Jupiter Metis v1 Routing Engine, which accesses the deep liquidity available within the DEXes of Solana's DeFi ecosystem. In this guide, we will walkthrough how you can get a quote for a specific token pair and other related parameters.
 
-<Info>
-  **NOTE**
-
-  * Lite URL: `https://lite-api.jup.ag/swap/v1/quote`
-  * Pro URL: `https://api.jup.ag/swap/v1/quote`
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 <Warning>
   **PLEASE USE THE LEGACY SWAP API AT YOUR OWN DISCRETION.**
 
@@ -65,8 +51,18 @@ Using the root URL and parameters to pass in, it is as simple as the example cod
 ```js
 const quoteResponse = await (
     await fetch(
-        'https://lite-api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&slippageBps=50&restrictIntermediateTokens=true'
-    )
+        'https://api.jup.ag/swap/v1/quote?' +
+        'inputMint=So11111111111111111111111111111111111111112' +
+        '&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' +
+        '&amount=100000000' +
+        '&slippageBps=50' +
+        '&restrictIntermediateTokens=true'
+    ),
+    {
+        headers: {
+            'x-api-key': 'your-api-key',
+        },
+    }
   ).json();
 
 console.log(JSON.stringify(quoteResponse, null, 2));
@@ -93,9 +89,7 @@ Example response:
         "inputMint": "So11111111111111111111111111111111111111112",
         "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
         "inAmount": "100000000",
-        "outAmount": "16198753",
-        "feeAmount": "24825",
-        "feeMint": "So11111111111111111111111111111111111111112"
+        "outAmount": "16198753"
       },
       "percent": 100
     }

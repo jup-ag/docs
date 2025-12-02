@@ -3,50 +3,53 @@ title: "Setting Up API Key"
 description: "Setting up API Key via Jupiter Portal"
 ---
 
-<Info>
-  **API USAGE**
+<Warning>
+`lite-api.jup.ag` will be deprecated on 31st December 2025.
 
-  Refer to [API Rate Limit](/portal/rate-limit) for more detailed information.
+[Refer to migration guide for more details](/portal/migrate-from-lite-api).
+</Warning>
 
-  | <span class="dark:text-white text-black">API Tier</span>  | <span class="dark:text-white text-black">Rate Limit Model</span>  | <span class="dark:text-white text-black">API Key</span> | <span class="dark:text-white text-black">Base URL</span>                      |
-  | :--------- | :----------------- | :------- | :----------------------------- |
-  | **Lite**  | Fixed (Free Tier) | No      | `https://lite-api.jup.ag/**`  |
-  | **Pro**   | Fixed (Tiered)    | Yes     | `https://api.jup.ag/**`       |
-  | **Ultra** | Dynamic           | Yes     | `https://api.jup.ag/ultra/**` |
+<Note>
+To use your API key, pass in via header as `x-api-key`.
+</Note>
 
-```js
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': '' // enter api key here
-},
-```
-</Info>
-
-## Overview
+| Tier        | Rate Limit Model                                    | Base URL                        | API Key    |
+|-------------|-----------------------------------------------------|----------------------------------|------------|
+| Free        | Fixed Rate Limit                                    | `https://api.jup.ag/`            | Required   |
+| Pro         | Fixed Tiered Rate Limits (1 RPS to 500 RPS plans)   | `https://api.jup.ag/`            | Required   |
+| Ultra       | Dynamic Rate Limits (based on executed swap volume) | `https://api.jup.ag/ultra/`      | Required   |
 
 <Steps>
   <Step>
     Open Portal at [https://portal.jup.ag/](https://portal.jup.ag/)
   </Step>
   <Step>
-    Browse and select plan
-  </Step>
-  <Step>
     Connect via email
   </Step>
   <Step>
-    Pay via **Helio (USDC on Solana manual renewal)**<br/>
-    or via **Coinflow (credit card subscription)**<br/>
-    Refer to [Payment Method](/portal/payment) for more details
+    <Card title="Free" icon="1" horizontal>
+      You are just starting out and want to try Jupiter via API.
+
+      1. Generate an API key
+      2. Use the API key with the base URL `https://api.jup.ag/`
+    </Card>
+    <Card title="Pro" icon="2" horizontal>
+      Both small projects and large enterprises can utilize this with the tiered rate limits.
+      
+      1. Choose a plan (1 RPS to 500 RPS plans)
+      2. Pay via **Helio (USDC on Solana manual renewal)**
+      3. Or via **Coinflow (credit card subscription)**
+      * Refer to [Payment Method](/portal/payment) for more details
+    </Card>
+    <Card title="Ultra" icon="3" horizontal>
+      For all types of projects, Ultra Swap API uses a Dynamic Rate Limit model that scales with your swap executions.
+
+      1. Generate an API key
+      2. Use the API key with the base URL `https://api.jup.ag/ultra/`
+
+      <Tip>
+        [Using Ultra Swap API comes with many benefits](/docs/ultra) where Jupiter handles the entire end-to-end execution without the need of an RPC from you.
+      </Tip>
+    </Card>
   </Step>
 </Steps>
-
-## Types of Plans
-
-Depending on your needs, you can choose from the following plans. For more detailed understanding of the rate limiting of each plan, [please refer to this doc](/portal/rate-limit).
-
-| Plan  | Rate Limit Model                                  | Why choose this plan                                                                                                                                                                                                                                                             |
-| :----- | :------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Lite  | Free Tier                                         | You are just starting out and want to test the Jupiter APIs.                                                                                                                                                                                                                     |
-| Pro   | Fixed Tiered Rate Limits                          | Both small projects or large enterprises can utilize this with the tiered rate limits. Rate limits range from 1 RPS to 500 RPS plans.                                                                                                                                            |
-| Ultra | Dynamic Rate Limits based on executed swap volume | [Using Ultra Swap API comes with many benefits](/docs/ultra) where Jupiter will handle slippage, transaction sending, and more without the need of an RPC from you. With that, the Ultra Swap API is governed by a Dynamic Rate Limit model that will scale with your swap executions. |

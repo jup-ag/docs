@@ -77,14 +77,13 @@ To get positions for a wallet, you need to pass in:
 
 * `date`: Unix timestamp indicating when the data was fetched
 * `owner`: The wallet address that was queried
-* `fetcherReports`: Array of status reports for each platform queried, showing which fetchers succeeded and how long they took. Each report contains:
+* `fetcherReports`: Array of status reports for each platform queried, showing which fetchers succeeded and how long they took. Can be an empty array if no reports are available. Each report contains:
   * `id`: Unique identifier of the fetcher
   * `status`: Status of the fetcher execution (`succeeded` or `failed`)
   * `duration`: Execution duration in milliseconds (optional)
-  * `error`: Error message if status is `failed` (optional)
 * `elements`: Array of portfolio elements (tokens, staking positions, liquidity pools, etc.) - this is where the actual position data lives
 * `duration`: Total time taken to fetch all data in milliseconds
-* `tokenInfo`: Object containing token metadata organized by network. Currently supports `solana`, which contains tokens indexed by token address. Each token includes `address`, `name`, `decimals`, `symbol`, `logoURI`, and optional `tags`
+* `tokenInfo`: Object containing token metadata organized by network. Currently supports `solana`, which contains tokens indexed by token address. Each token includes `address`, `name`, `decimals`, `symbol`, `logoURI`, `chainId`, `networkId`, `sourceId`, and optional `tags` array
 
 **Understanding Portfolio Elements:**
 
@@ -100,12 +99,13 @@ Each element in the `elements` array represents a position and contains:
 * `platformId`: ID of the platform this position belongs to
 * `networkId`: Network identifier (currently only `solana` is supported)
 * `value`: USD value of the position
+* `fetcherId`: ID of the fetcher that retrieved this position data
 * `name`: Optional display name for the position
 * `tags`: Optional array of tags categorizing the position
 * `netApy`: Optional net APY (Annual Percentage Yield) as a fraction (e.g., 0.28 = 28%)
 * `data`: Position-specific data that varies by type. The structure depends on the element type:
-  * `multiple`: Contains required `assets` array and optional `assetsYields`, `ref`, `sourceRefs`, `link`
-  * `liquidity`: Contains required `liquidities` array
+  * `multiple`: Contains required `assets` array (each asset has `type`, `networkId`, `value`, `data` with `address`, `amount`, `price`, and optional `attributes`), and optional `assetsYields`, `ref`, `sourceRefs`, `link`
+  * `liquidity`: Contains required `liquidities` array. Each liquidity item includes `assets`, `assetsValue`, `rewardAssets`, `rewardAssetsValue`, `value`, `yields` (array with `apr`, `apy`, and optional `address`), and optional `ref`, `sourceRefs`, `link`
   * `leverage`: Contains required `value` and optional `isolated`/`cross` position data, `contract`, `ref`, `sourceRefs`, `link`
   * `borrowlend`: Contains required `value`, `suppliedAssets`, `borrowedAssets`, `rewardAssets`, `suppliedValue`, `borrowedValue`, `rewardValue`, `suppliedYields`, `borrowedYields`, `healthRatio`, and optional `unsettled`, `expireOn`, `contract`, `ref`, `sourceRefs`, `link`
   * `trade`: Contains required `assets` (input/output), `inputAddress`, `outputAddress`, `initialInputAmount`, `withdrawnOutputAmount`, `inputPrice`, `outputPrice`, `filledPercentage`, and optional `expectedOutputAmount`, `createdAt`, `expireAt`, `recurring` (for DCA orders), `contract`, `ref`, `sourceRefs`, `link`
@@ -136,15 +136,22 @@ console.log(JSON.stringify(platformsResponse, null, 2));
 
 **Key Platform Fields:**
 
-* `id`: Unique identifier for the platform - use this with the `platforms` query parameter in Get Positions
-* `name`: Display name of the platform
-* `image`: URL to the platform's logo/image
-* `description`: Description of what the platform does
-* `defiLlamaId`: DeFiLlama ID if the platform is listed there (null if not)
-* `isDeprecated`: Whether the platform is deprecated
-* `tokens`: Array of token mint addresses owned or launched by the platform
-* `tags`: Array of tags categorizing the platform (e.g., `swap`, `staking`, `governance`)
-* `links`: Object containing various links (website, discord, twitter, github, etc.)
+* `id`: Unique identifier for the platform (string) - use this with the `platforms` query parameter in Get Positions
+* `name`: Display name of the platform (string)
+* `image`: URL to the platform's logo/image (string)
+* `description`: Description of what the platform does (string)
+* `defiLlamaId`: Optional. DeFiLlama ID if the platform is listed there (string, can be absent if not listed)
+* `isDeprecated`: Whether the platform is deprecated (boolean)
+* `tokens`: Optional. Array of token mint addresses owned or launched by the platform (can be absent or an empty array)
+* `tags`: Array of tags categorizing the platform (e.g., `swap`, `staking`, `governance`, `dao`, `dapp`, `tool`)
+* `links`: Optional. Object containing platform links. All properties within `links` are optional and only present if available:
+  * `website`: Website URL
+  * `discord`: Discord server URL
+  * `telegram`: Telegram channel URL
+  * `twitter`: Twitter/X profile URL
+  * `github`: GitHub repository URL
+  * `medium`: Medium blog URL
+  * `documentation`: Documentation URL
 
 <Tip>
   **TIP**

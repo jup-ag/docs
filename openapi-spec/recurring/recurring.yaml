@@ -1,22 +1,13 @@
 openapi: 3.0.0
 info:
-  title: Recurring Order API
+  title: Jupiter Recurring Order API
   version: 1.0.0
   description: |
-    | Link |
-    | --- |
-    | [Create Order](/docs/recurring/create-order) |
-    | [Execute Order](/docs/recurring/execute-order) |
-    | [Cancel Order](/docs/recurring/cancel-order) |
-    | [Price Deposit](/docs/recurring/deposit-price-order) |
-    | [Price Withdraw](/docs/recurring/withdraw-price-order) |
-    | [Get Recurring Orders](/docs/recurring/get-recurring-orders) |
+    Jupiter Recurring Order API Schema
 
 servers:
-  - url: https://lite-api.jup.ag/recurring/v1
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/recurring/v1
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Recurring Order API Endpoint
 
 paths:
   /cancelOrder:
@@ -25,6 +16,8 @@ paths:
       operationId: cancel-order
       description: |
         Request for a base64-encoded unsigned recurring order cancellation transaction to be used in `POST /recurring/v1/execute`
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -48,6 +41,8 @@ paths:
       operationId: create-order
       description: |
         Request for a base64-encoded unsigned recurring order creation transaction to be used in `POST /recurring/v1/execute`
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -71,6 +66,8 @@ paths:
       operationId: execute
       description: |
         Execute the signed transaction and get the execution status
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -91,6 +88,8 @@ paths:
   /getRecurringOrders:
     get:
       summary: getRecurringOrders
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: recurringType
           in: query
@@ -144,6 +143,8 @@ paths:
       deprecated: true
       description: |
         Request for a base64-encoded unsigned price-based recurring order deposit transaction to be used in `POST /recurring/v1/execute`. Price-based recurring orders are deprecated, please use time-based recurring orders instead.
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -168,6 +169,8 @@ paths:
       deprecated: true
       description: |
         Request for a base64-encoded unsigned price-based recurring order withdrawal transaction to be used in `POST /recurring/v1/execute`. Price-based recurring orders are deprecated, please use time-based recurring orders instead.
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -186,6 +189,12 @@ paths:
         '500':
           description: Internal server error
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas:
     AllRecurringResponse:
       oneOf:

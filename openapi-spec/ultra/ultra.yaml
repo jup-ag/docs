@@ -1,18 +1,12 @@
 openapi: 3.0.3
 info:
-  title: Quickstart
+  title: Jupiter Ultra Swap API
   version: 1.0.0
   description: |
-    | Link |
-    | --- |
-    | [Get Order](/docs/ultra/get-order) |
-    | [Execute Order](/docs/ultra/execute-order) |
-
+    Jupiter Ultra Swap API Schema
 servers:
-  - url: https://lite-api.jup.ag/ultra/v1
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/ultra/v1
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Ultra Swap API Endpoint
 
 paths:
   /order:
@@ -20,6 +14,8 @@ paths:
       summary: order
       description: |
         Request for a base64-encoded unsigned swap transaction to be used in `POST /ultra/v1/execute`
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful response
@@ -38,7 +34,7 @@ paths:
                     type: string
                   outAmount:
                     type: string
-                  inUsdValue: 
+                  inUsdValue:
                     type: number
                   outUsdValue:
                     type: number
@@ -93,10 +89,14 @@ paths:
                           type: number
                         bps:
                           type: number
+                        usdValue:
+                          type: number
                       required:
                         - swapInfo
                         - percent
                         - bps
+                  referralAccount:
+                    type: string
                   feeMint:
                     type: string
                   feeBps:
@@ -158,7 +158,7 @@ paths:
                       - iris
                       - jupiterz
                       - dflow
-                      - okx                
+                      - okx
                   transaction:
                     type: string
                     nullable: true
@@ -209,14 +209,18 @@ paths:
                   - inAmount
                   - outAmount
                   - otherAmountThreshold
-                  - priceImpactPct
                   - swapMode
                   - slippageBps
+                  - priceImpactPct
                   - routePlan
                   - feeBps
+                  - platformFee
                   - signatureFeeLamports
+                  - signatureFeePayer
                   - prioritizationFeeLamports
+                  - prioritizationFeePayer
                   - rentFeeLamports
+                  - rentFeePayer
                   - swapType
                   - router
                   - transaction
@@ -270,7 +274,20 @@ paths:
           name: taker
           schema:
             type: string
-            default: "vBXNsd5SRtTPpW7GWv3wREA6Ztm2jCWp5eqqTsVhyG5"
+            default: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+          required: false
+        - in: query
+          name: receiver
+          description: |
+            - The public key of the account that will receive the output tokens
+            - If not provided, the output tokens will be sent to the taker like default
+            - It expects an account (NOT a token account)
+            - If the output is non-SOL tokens, it only transfers to ATAs (not token accounts)
+            - If the destination token account is not initialized, an additional create ATA instruction will be added to the transaction
+            - If the output is SOL, it will transfer native SOL directly to the receiver account
+            - It does not support destination WSOL token account
+          schema:
+            type: string
           required: false
         - in: query
           name: payer
@@ -321,7 +338,7 @@ paths:
         - in: query
           name: excludeDexes
           description: |
-            - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label), for example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
+            - [Full list of DEXes here](https://dev.jup.ag/api-reference/swap/program-id-to-label), for example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
             - **Important**: This only excludes DEXes on the Iris router, does not apply to other routers
             - For example:
               - **Exclude** Raydium: `excludeRouters=<all-except-Iris>` and `excludeDexes=Raydium`
@@ -334,6 +351,8 @@ paths:
       summary: execute
       description: |
         Execute the signed transaction and get the execution status
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful response
@@ -435,6 +454,8 @@ paths:
       deprecated: true
       description: |
         Request for token balances of an account
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful response
@@ -491,6 +512,8 @@ paths:
       summary: holdings
       description: |
         Request for token balances of an account including token account information
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful response
@@ -501,7 +524,7 @@ paths:
       parameters:
           - schema:
               type: string
-              default: "vBXNsd5SRtTPpW7GWv3wREA6Ztm2jCWp5eqqTsVhyG5"
+              default: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
             in: path
             name: address
             required: true
@@ -511,6 +534,8 @@ paths:
       summary: holdings (native)
       description: |
         Request for native SOL holdings only, without other tokens
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful response
@@ -531,6 +556,8 @@ paths:
       summary: shield
       description: |
         Request for token information and warnings of mints
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful response
@@ -625,6 +652,8 @@ paths:
       summary: routers
       description: |
         Request for the list of routers available in the routing engine of Ultra, which is [Juno](/docs/routing#juno-liquidity-engine)
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful response
@@ -654,6 +683,8 @@ paths:
       summary: search
       description: |
         Request a search by token's symbol, name or mint address
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful response
@@ -699,6 +730,12 @@ paths:
             - Default to 20 mints in response when searching via symbol or name
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas:
     MintInformation:
       type: object

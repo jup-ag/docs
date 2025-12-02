@@ -5,7 +5,13 @@ description: "Ultra Swap API to get the token balances of an account."
 
 ```js
 const balancesResponse = await (
-  await fetch(`https://lite-api.jup.ag/ultra/v1/balances/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`)
+  await fetch(`https://api.jup.ag/ultra/v1/balances/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`,
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
 ).json();
 
 console.log(JSON.stringify(balancesResponse, null, 2));

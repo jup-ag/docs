@@ -5,7 +5,13 @@ description: "Ultra Swap API to get the detailed token holdings of an account."
 
 ```js
 const holdingsResponse = await (
-  await fetch(`https://lite-api.jup.ag/ultra/v1/holdings/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`)
+  await fetch(`https://api.jup.ag/ultra/v1/holdings/3X2LFoTQecbpqCR7G5tL1kczqBKurjKPHhKSZrJ4wgWc`,
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
 ).json();
 
 console.log(JSON.stringify(holdingsResponse, null, 2));

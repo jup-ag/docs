@@ -47,7 +47,7 @@ In this example, we set `platformFeeBps` to `20` which equates to 0.2%.
 ```js
 const quoteResponse = await (
     await fetch(
-        'https://lite-api.jup.ag/swap/v1/quote? +
+        'https://api.jup.ag/swap/v1/quote?' +
         'inputMint=So11111111111111111111111111111111111111112&' +
         'outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&' +
         'amount=100000&' +
@@ -55,7 +55,12 @@ const quoteResponse = await (
         'restrictIntermediateTokens=true&' +
         'platformFeeBps=20&' +
         'instructionVersion=V2' // required if you want to collect fees in Token2022 tokens
-    )
+    ),
+    {
+        headers: {
+            'x-api-key': 'your-api-key',
+        },
+    }
   ).json();
 ```
 
@@ -74,13 +79,14 @@ const swapResponse = await (
     await fetch('https://api.jup.ag/swap/v1/swap', {
         method: 'POST',
         headers: {
-        'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             quoteResponse,
             userPublicKey: wallet.publicKey, // Pass in actual referred user in production
             feeAccount: feeAccount, // feeAccount is the token account that will receive the fees
-        })
+        }),
     })
 ).json();
 ```
@@ -199,10 +205,11 @@ In this example, we set `params.feeBps` to `20` which equates to 0.2%.
 
 ```js
 const createOrderResponse = await (
-    await fetch('https://lite-api.jup.ag/trigger/v1/createOrder', {
+    await fetch('https://api.jup.ag/trigger/v1/createOrder', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             inputMint: inputMint.toString(),

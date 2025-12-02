@@ -1,24 +1,21 @@
 openapi: 3.0.0
 info:
-  title: Trigger Order API
+  title: Jupiter Trigger Order API
   version: 1.0.0
   description: |
-    Formerly known as Limit Order API
-
-    | Link |
-    | --- |
-    | [Create Order](/docs/trigger/create-order) |
-    | [Execute Order](/docs/trigger/execute-order) |
-    | [Cancel Order](/docs/trigger/cancel-order) |
-    | [Get Trigger Orders](/docs/trigger/get-trigger-orders) |
+    Jupiter Trigger Order API Schema
 
 servers:
-  - url: 'https://lite-api.jup.ag/trigger/v1'
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/trigger/v1
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Trigger Order API Endpoint
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas: {}
   parameters: {}
 paths:
@@ -27,6 +24,8 @@ paths:
       summary: cancelOrders
       description: |
         Request for a base64-encoded unsigned trigger order cancellation transaction(s) to be used in `POST /trigger/v1/execute`
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -147,6 +146,8 @@ paths:
       summary: createOrder
       description: |
         Request for a base64-encoded unsigned trigger order creation transaction to be used in `POST /trigger/v1/execute`
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -308,6 +309,8 @@ paths:
       summary: cancelOrder
       description: |
         Request for a base64-encoded unsigned trigger order cancellation transaction to be used in `POST /trigger/v1/execute`
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -415,6 +418,8 @@ paths:
       summary: execute
       description: |
         Execute the signed transaction and get the execution status
+      security:
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -523,7 +528,8 @@ paths:
       summary: getTriggerOrders
       description: |
         Request for the active or historical orders associated to the provided account
-
+      security:
+        - ApiKeyAuth: []
       parameters:
         - schema:
             type: string

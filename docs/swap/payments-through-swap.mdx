@@ -91,8 +91,13 @@ By getting a quote first, the customer can know upfront the specific amount of i
 ```js
 const quoteResponse = await (
     await fetch(
-        'https://lite-api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000&slippageBps=50&restrictIntermediateTokens=true&swapMode=ExactOut'
-    )
+        'https://api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000&slippageBps=50&restrictIntermediateTokens=true&swapMode=ExactOut'
+    ),
+    {
+        headers: {
+            'x-api-key': 'your-api-key',
+        },
+    }
   ).json();
 
 console.log(JSON.stringify(quoteResponse, null, 2));
@@ -124,10 +129,11 @@ There is an alternative `nativeDestinationAccount`, where you can pass in a publ
 
 ```js
 const swapResponse = await (
-    await fetch('https://lite-api.jup.ag/swap/v1/swap', {
+    await fetch('https://api.jup.ag/swap/v1/swap', {
         method: 'POST',
         headers: {
-        'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             quoteResponse,

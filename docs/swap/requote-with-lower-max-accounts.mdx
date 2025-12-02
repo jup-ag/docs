@@ -71,8 +71,12 @@ async function getQuote(maxAccounts) {
         maxAccounts: maxAccounts.toString()
     });
 
-    const url = `https://lite-api.jup.ag/swap/v1/quote?${params}`;
-    const response = await fetch(url);
+    const url = `https://api.jup.ag/swap/v1/quote?${params}`;
+    const response = await fetch(url, {
+        headers: {
+            'x-api-key': 'your-api-key',
+        },
+    });
 
     if (!response.ok) {
         const errorText = await response.text();
@@ -89,10 +93,11 @@ async function getQuote(maxAccounts) {
 };
 
 async function getSwapInstructions(quoteResponse) {
-    const response = await fetch('https://lite-api.jup.ag/swap/v1/swap-instructions', {
+    const response = await fetch('https://api.jup.ag/swap/v1/swap-instructions', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             quoteResponse: quoteResponse,
@@ -104,7 +109,7 @@ async function getSwapInstructions(quoteResponse) {
                 }
             },
             dynamicComputeUnitLimit: true,
-        }, null, 2)
+        })
     });
 
     if (!response.ok) {

@@ -2,20 +2,6 @@
 title: "Create Token (Beta)"
 ---
 
-<Info>
-  **NOTE**
-
-  * Lite URL: `https://lite-api.jup.ag/studio/v1`: 100 requests per 5 minutes
-  * Pro URL: `https://api.jup.ag/studio/v1`: 10 requests per 10 seconds (for all Tiers)
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 <Tip>
   **API REFERENCE**
 
@@ -164,11 +150,12 @@ creator: wallet.publicKey.toBase58(),
 ```js
 const createTransaction = await (
     await fetch (
-      'https://lite-api.jup.ag/studio/v1/dbc-pool/create-tx',
+      'https://api.jup.ag/studio/v1/dbc-pool/create-tx',
       {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
         },
         body: JSON.stringify({
             buildCurveByMarketCapParam: {
@@ -287,10 +274,13 @@ formData.append(
 
 const result = await (
     await fetch (
-      'https://lite-api.jup.ag/studio/v1/dbc-pool/submit',
+      'https://api.jup.ag/studio/v1/dbc-pool/submit',
       {
         method: 'POST',
         body: formData,
+        headers: {
+            'x-api-key': 'your-api-key',
+        },
     })
 ).json();
 ```

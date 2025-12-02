@@ -5,3 +5,26 @@ th {
 .dark th {
 color: white !important;
 }
+
+#banner {
+    background-color: #F2E584 !important;
+}
+#banner * {
+    color: black !important;
+    font-size: 0.75rem !important;
+    text-align: left;
+}
+
+/* Hide dismiss button on desktop (show only on mobile) */
+@media screen and (min-width: 768px) {
+    #banner button,
+    #banner [aria-label*="close"],
+    #banner [aria-label*="dismiss"],
+    #banner [data-dismiss],
+    #banner button[type="button"] {
+        display: none !important;
+    }
+    #banner {
+        text-align: center !important;
+    }
+}

@@ -1,0 +1,158 @@
+openapi: 3.1.0
+info:
+  title: Jupiter Portfolio API
+  version: 1.0.0
+
+servers:
+  - url: https://lite-api.jup.ag/portfolio/v1
+    description: Free tier API endpoint with rate limits
+  - url: https://api.jup.ag/portfolio/v1
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+
+components:
+  schemas: {}
+paths:
+  '/positions/{address}':
+    get:
+      parameters:
+        - schema:
+            type: string
+          example: 'jupiter-exchange,jupiter-governance'
+          in: query
+          name: platforms
+          required: false
+          description: Comma separated list of platform ids
+        - schema:
+            type: string
+          in: path
+          name: address
+          required: true
+          description: Solana wallet address
+      responses:
+        '200':
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  date:
+                    type: number
+                  owner:
+                    type: string
+                  fetcherReports:
+                    type: array
+                    description: Fetchers reports
+                    items:
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        id:
+                          type: string
+                        status:
+                          type: string
+                        duration:
+                          type: number
+                  elements:
+                    type: array
+                    description: Elements of the portfolio
+                    items:
+                      type: object
+                      additionalProperties: true
+                      properties:
+                        type:
+                          type: string
+                        data:
+                          type: object
+                          additionalProperties: true
+                        label:
+                          type: string
+                        networkId:
+                          type: string
+                        platformId:
+                          type: string
+                        value:
+                          type: number
+                        fetcherId:
+                          type: string
+                  duration:
+                    type: number
+                  tokenInfo:
+                    type: object
+                    additionalProperties: true
+  /platforms:
+    get:
+      responses:
+        '200':
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    image:
+                      type: string
+                    description:
+                      type: string
+                    defiLlamaId:
+                      type: string
+                    isDeprecated:
+                      type: boolean
+                    tokens:
+                      type: array
+                      items:
+                        type: string
+                    tags:
+                      type: array
+                      items:
+                        type: string
+                    links:
+                      type: object
+                      properties:
+                        website:
+                          type: string
+                        discord:
+                          type: string
+                        telegram:
+                          type: string
+                        twitter:
+                          type: string
+                        github:
+                          type: string
+                        medium:
+                          type: string
+                        documentation:
+                          type: string
+  '/staked-jup/{address}':
+    get:
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: address
+          required: true
+      responses:
+        '200':
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stakedAmount:
+                    type: number
+                  unstaking:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        amount:
+                          type: number
+                        until:
+                          type: number

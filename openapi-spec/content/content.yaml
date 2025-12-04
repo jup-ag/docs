@@ -78,7 +78,9 @@ components:
         - updatedBy
         - postedAt
     TokenSummary:
-      type: object
+      type:
+        - object
+        - 'null'
       properties:
         summaryFull:
           type:
@@ -100,7 +102,9 @@ components:
         - updatedAt
         - citations
     NewsSummary:
-      type: object
+      type:
+        - object
+        - 'null'
       properties:
         summaryFull:
           type:
@@ -182,26 +186,18 @@ components:
               items:
                 $ref: '#/components/schemas/ContentItem'
             tokenSummary:
-              allOf:
-                - $ref: '#/components/schemas/TokenSummary'
-                - type:
-                    - object
-                    - 'null'
+              $ref: '#/components/schemas/TokenSummary'
             newsSummary:
-              allOf:
-                - $ref: '#/components/schemas/NewsSummary'
-                - type:
-                    - object
-                    - 'null'
+              $ref: '#/components/schemas/NewsSummary'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
           required:
             - contents
             - tokenSummary
             - newsSummary
-        pagination:
-          $ref: '#/components/schemas/Pagination'
+            - pagination
       required:
         - data
-        - pagination
     CookingTokensResponse:
       type: object
       properties:
@@ -224,17 +220,9 @@ components:
                 example: JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN
                 description: Solana token mint address
               tokenSummary:
-                allOf:
-                  - $ref: '#/components/schemas/TokenSummary'
-                  - type:
-                      - object
-                      - 'null'
+                $ref: '#/components/schemas/TokenSummary'
               newsSummary:
-                allOf:
-                  - $ref: '#/components/schemas/NewsSummary'
-                  - type:
-                      - object
-                      - 'null'
+                $ref: '#/components/schemas/NewsSummary'
             required:
               - mint
               - tokenSummary

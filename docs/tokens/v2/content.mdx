@@ -4,22 +4,13 @@ sidebarTitle: "Content"
 description: "Get content for multiple mints, trending tokens or paginated content feed."
 ---
 
-<Info>
-  **NOTE**
-
-  * Pro URL: `https://api.jup.ag/tokens/v2`
-
-  To upgrade to Pro or understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
+<Note>
+  The Content API is available on Pro tiers only, refer to [Portal & API Key](/portal/setup) section for more details.
+</Note>
 
 ## About Content API
 
-The Content API provides access to curated and verified content for Solana tokens, including text posts, tweets, token summaries, and news summaries. This content is carefully reviewed and approved to ensure quality and accuracy.
+The Content API is powered by [Jupiter VRFD](https://verified.jup.ag), providing access to curated and verified content for Solana tokens, including text posts, tweets, token summaries, and news summaries. This content is carefully reviewed and approved to ensure quality and accuracy.
 
 ### API Reference
 
@@ -40,29 +31,28 @@ For complete API documentation including request/response schemas, parameters, a
 
 ### How It Works
 
-The Content API operates through a curated content system powered by [Jupiter Verify](https://verified.jup.ag/):
+The Content API operates through a curated content system powered by [Jupiter VRFD](https://verified.jup.ag/):
 
-1. **Content Submission**: Content is submitted by verified users through [Jupiter Verify](https://verified.jup.ag/), Jupiter's content verification platform
+1. **Content Submission**: Content is submitted by verified users through [Jupiter VRFD](https://verified.jup.ag/), Jupiter's content verification platform
 2. **Review Process**: All submitted content goes through a review process to ensure quality, accuracy, and relevance
 3. **Approval Status**: Only content with `status: approved` is returned by the API endpoints
 4. **Content Types**: The API supports multiple content types including:
    - Text-based content (articles, descriptions, announcements)
    - Tweets sourced from Twitter/X
-   - AI-generated token summaries with citations
+   - AI-generated token summaries with source citations
    - News summaries with source citations
-
 5. **Real-time Updates**: Content is updated in real-time as new approved content becomes available
 
 ### Attribution and Credits
 
-Content provided through the Content API is curated and verified by [Jupiter Verify](https://verified.jup.ag/). All content includes attribution information:
+Content provided through the Content API is curated and verified by [Jupiter VRFD](https://verified.jup.ag/). All content includes attribution information:
 
 - **Submitted By**: Information about the user who submitted the content
 - **Source**: The original source URL or reference for the content
 - **Citations**: Token and news summaries include citations to their source materials
 - **Timestamps**: All content includes submission, update, and posting timestamps
 
-When displaying content from this API, please maintain proper attribution to [Jupiter Verify](https://verified.jup.ag/) and the original content sources as provided in the response data.
+When displaying content from this API, please maintain proper attribution to [Jupiter VRFD](https://verified.jup.ag/) and the original content sources as provided in the response data.
 
 ## Get Content for Multiple Mints
 
@@ -173,4 +163,4 @@ Now that you understand how to use the Content API, you can:
 * Build discovery features using trending tokens content
 * Create paginated content feeds for individual token pages
 
-For more details, refer to the [Content API Reference](/api-reference/tokens/v2/get-content).
+[Reach out to us if you have feedback or questions](https://discord.gg/jup)!

@@ -3,24 +3,11 @@ title: "Jupiter Positions"
 description: "Query Jupiter positions, platform information, and staking data using the Portfolio API."
 ---
 
-<Info>
-  API URL: `https://api.jup.ag/portfolio/v1`
-
-  To understand our rate limiting, please refer to this section.
-
-  <CardGroup>
-    <Card title="API Key Setup" href="/portal/setup" icon="key" horizontal/>
-    <Card title="API Rate Limit" href="/portal/rate-limit" icon="gauge" horizontal/>
-  </CardGroup>
-</Info>
-
 <Tip>
   **API REFERENCE**
 
-  For complete API reference documentation, check out the [Portfolio API Reference](/api-reference/portfolio).
+  To fully utilize the Portfolio API, check out the [Portfolio API Reference](/api-reference/portfolio).
 </Tip>
-
-## Overview
 
 The Portfolio API provides three main endpoints to help you build portfolio tracking features:
 
@@ -28,99 +15,74 @@ The Portfolio API provides three main endpoints to help you build portfolio trac
 2. **Get Platforms**: Discover all platforms and protocols supported by the Portfolio API
 3. **Get Staked JUP**: Query staking information for Jupiter's governance token
 
-Let's explore each endpoint in detail.
+## Get Positions
 
-## Get Jupiter Positions
+The Get Positions endpoint allows you to retrieve comprehensive position data for a wallet across all supported platforms.
 
-The Get Jupiter Positions endpoint allows you to retrieve comprehensive position data for Jupiter products.
-
-To get positions for a wallet, you need to pass in:
+To get positions for a wallet, make a GET request to `/positions/{address}`:
 
 | Parameter | Type   | Location | Required | Description                                                                 |
 | :-------- | :----- | :------- | :------- | :-------------------------------------------------------------------------- |
 | address   | string | path     | Yes      | The Solana wallet address you want to query                                 |
 | platforms | string | query    | No       | Optional comma-separated list of platform IDs to filter results (e.g., `jupiter-exchange,jupiter-governance`) |
 
+<Note>
+  Only Jupiter platforms are supported currently. We do not have plans to support all/other platforms yet.
+</Note>
+
 <CodeGroup>
-        ```js All positions wrap
-        const positionsResponse = await (
-            await fetch(
-                'https://api.jup.ag/portfolio/v1/positions/jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3',
-                {
-                    headers: {
-                        'x-api-key': 'YOUR_API_KEY'
-                    }
-                }
-            )
-        ).json();
+```js All positions wrap
+const positionsResponse = await (
+    await fetch(
+        'https://api.jup.ag/portfolio/v1/positions/jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3',
+        {
+            headers: {
+                'x-api-key': 'YOUR_API_KEY'
+            }
+        }
+    )
+).json();
 
-        console.log(JSON.stringify(positionsResponse, null, 2));
-        ```
+console.log(JSON.stringify(positionsResponse, null, 2));
+```
 
-        ```js Specific positions wrap
-        const filteredPositionsResponse = await (
-            await fetch(
-                'https://api.jup.ag/portfolio/v1/positions/jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3?platforms=jupiter-exchange,jupiter-governance',
-                {
-                    headers: {
-                        'x-api-key': 'YOUR_API_KEY'
-                    }
-                }
-            )
-        ).json();
+```js Filtered by platforms wrap
+const filteredPositionsResponse = await (
+    await fetch(
+        'https://api.jup.ag/portfolio/v1/positions/jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3?platforms=jupiter-exchange,jupiter-governance',
+        {
+            headers: {
+                'x-api-key': 'YOUR_API_KEY'
+            }
+        }
+    )
+).json();
 
-        console.log(JSON.stringify(filteredPositionsResponse, null, 2));
-        ```
+console.log(JSON.stringify(filteredPositionsResponse, null, 2));
+```
 </CodeGroup>
 
-**Key Response Fields:**
+### Response Structure
 
-* `date`: Unix timestamp indicating when the data was fetched
-* `owner`: The wallet address that was queried
-* `fetcherReports`: Array of status reports for each platform queried, showing which fetchers succeeded and how long they took. Can be an empty array if no reports are available. Each report contains:
-  * `id`: Unique identifier of the fetcher
-  * `status`: Status of the fetcher execution (`succeeded` or `failed`)
-  * `duration`: Execution duration in milliseconds (optional)
-* `elements`: Array of portfolio elements (tokens, staking positions, liquidity pools, etc.) - this is where the actual position data lives
-* `duration`: Total time taken to fetch all data in milliseconds
-* `tokenInfo`: Object containing token metadata organized by network. Currently supports `solana`, which contains tokens indexed by token address. Each token includes `address`, `name`, `decimals`, `symbol`, `logoURI`, `chainId`, `networkId`, `sourceId`, and optional `tags` array
+The response contains an array of `elements`, where each element represents a position (wallet balance, staking position, liquidity pool, etc.). Each element includes:
 
-**Understanding Portfolio Elements:**
-
-Each element in the `elements` array represents a position and contains:
-
-* `type`: The type of position. Valid types are:
-  * `multiple`: Multiple assets (e.g., wallets, staking positions, vaults)
-  * `liquidity`: Liquidity pool positions
-  * `leverage`: Leveraged trading positions
-  * `borrowlend`: Lending and borrowing positions
-  * `trade`: Trading positions (limit orders, DCA orders, etc.)
-* `label`: Human-readable label for the position. Valid labels include: `Wallet`, `Staked`, `LiquidityPool`, `Farming`, `Vault`, `Lending`, `Vesting`, `Deposit`, `Rewards`, `Airdrop`, `Margin`, `LimitOrder`, `DCA`, `SmartDCA`, `Leverage`
+* `type`: The type of position (`multiple`, `liquidity`, `leverage`, `borrowlend`, `trade`)
+* `label`: Human-readable label (e.g., `Wallet`, `Staked`, `LiquidityPool`, `LimitOrder`, `DCA`)
 * `platformId`: ID of the platform this position belongs to
-* `networkId`: Network identifier (currently only `solana` is supported)
 * `value`: USD value of the position
-* `fetcherId`: ID of the fetcher that retrieved this position data
-* `name`: Optional display name for the position
-* `tags`: Optional array of tags categorizing the position
-* `netApy`: Optional net APY (Annual Percentage Yield) as a fraction (e.g., 0.28 = 28%)
-* `data`: Position-specific data that varies by type. The structure depends on the element type:
-  * `multiple`: Contains required `assets` array (each asset has `type`, `networkId`, `value`, `data` with `address`, `amount`, `price`, and optional `attributes`), and optional `assetsYields`, `ref`, `sourceRefs`, `link`
-  * `liquidity`: Contains required `liquidities` array. Each liquidity item includes `assets`, `assetsValue`, `rewardAssets`, `rewardAssetsValue`, `value`, `yields` (array with `apr`, `apy`, and optional `address`), and optional `ref`, `sourceRefs`, `link`
-  * `leverage`: Contains required `value` and optional `isolated`/`cross` position data, `contract`, `ref`, `sourceRefs`, `link`
-  * `borrowlend`: Contains required `value`, `suppliedAssets`, `borrowedAssets`, `rewardAssets`, `suppliedValue`, `borrowedValue`, `rewardValue`, `suppliedYields`, `borrowedYields`, `healthRatio`, and optional `unsettled`, `expireOn`, `contract`, `ref`, `sourceRefs`, `link`
-  * `trade`: Contains required `assets` (input/output), `inputAddress`, `outputAddress`, `initialInputAmount`, `withdrawnOutputAmount`, `inputPrice`, `outputPrice`, `filledPercentage`, and optional `expectedOutputAmount`, `createdAt`, `expireAt`, `recurring` (for DCA orders), `contract`, `ref`, `sourceRefs`, `link`
+* `data`: Position-specific data that varies by type
+
+The response also includes `tokenInfo` which contains token metadata (name, symbol, decimals, logoURI, etc.) organized by network, and `fetcherReports` which shows the status of each platform queried.
 
 <Note>
-  **NOTE**
+  The `data` field structure varies significantly depending on the `type` of element. Each type has its own required and optional fields. Refer to the [API reference](/api-reference/portfolio/get-positions) for complete schema details.
 
-  The `data` field structure varies significantly depending on the `type` of element. Each type has its own required and optional fields. Refer to the API reference for complete schema details.
+  If you need help, reach out to us in [Discord](https://discord.gg/jup).
 </Note>
 
 ## Get Platforms
 
 Before querying positions, you might want to discover which platforms are supported by the Portfolio API. The Get Platforms endpoint returns a comprehensive list of all available platforms with their metadata.
-
-To get a list of all supported platforms, make a GET request to the `/platforms` endpoint:
 
 ```js
 const platformsResponse = await (
@@ -134,38 +96,25 @@ const platformsResponse = await (
 console.log(JSON.stringify(platformsResponse, null, 2));
 ```
 
-**Key Platform Fields:**
+Each platform object includes:
 
-* `id`: Unique identifier for the platform (string) - use this with the `platforms` query parameter in Get Positions
-* `name`: Display name of the platform (string)
-* `image`: URL to the platform's logo/image (string)
-* `description`: Description of what the platform does (string)
-* `defiLlamaId`: Optional. DeFiLlama ID if the platform is listed there (string, can be absent if not listed)
-* `isDeprecated`: Whether the platform is deprecated (boolean)
-* `tokens`: Optional. Array of token mint addresses owned or launched by the platform (can be absent or an empty array)
-* `tags`: Array of tags categorizing the platform (e.g., `swap`, `staking`, `governance`, `dao`, `dapp`, `tool`)
-* `links`: Optional. Object containing platform links. All properties within `links` are optional and only present if available:
-  * `website`: Website URL
-  * `discord`: Discord server URL
-  * `telegram`: Telegram channel URL
-  * `twitter`: Twitter/X profile URL
-  * `github`: GitHub repository URL
-  * `medium`: Medium blog URL
-  * `documentation`: Documentation URL
+* `id`: Unique identifier for the platform - use this with the `platforms` query parameter in Get Positions
+* `name`: Display name of the platform
+* `image`: URL to the platform's logo/image
+* `description`: Description of what the platform does
+* `tags`: Array of tags categorizing the platform (e.g., `swap`, `staking`, `governance`)
+* `links`: Optional object containing platform links (website, discord, twitter, etc.)
+* `isDeprecated`: Whether the platform is deprecated
 
 <Tip>
-  **TIP**
-
   Use the platform `id` values from this endpoint with the `platforms` query parameter in the Get Positions endpoint to filter results. This is especially useful when building UI filters or when you only need data from specific protocols.
 </Tip>
 
 ## Get Staked JUP
 
-The Get Staked JUP endpoint provides staking information specifically for Jupiter's governance token (JUP). This is useful for displaying staking status, unstaking schedules, and total staked amounts.
+The Get Staked JUP endpoint provides staking information specifically for Jupiter's governance token (JUP). This is useful since it is a simpler way to query for staking status, unstaking schedules, and total staked amounts.
 
-**Query Staking Information**
-
-To get staking information for a wallet, make a GET request to the `/staked-jup/{address}` endpoint:
+To get staking information for a wallet, make a GET request to `/staked-jup/{address}`:
 
 ```js
 const stakedJupResponse = await (
@@ -182,7 +131,7 @@ const stakedJupResponse = await (
 console.log(JSON.stringify(stakedJupResponse, null, 2));
 ```
 
-**Response Fields:**
+The response includes:
 
 * `stakedAmount`: Total amount of JUP currently staked (in native token units, before decimals are applied)
 * `unstaking`: Array of unstaking schedules, each containing:

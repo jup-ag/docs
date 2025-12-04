@@ -1,0 +1,166 @@
+---
+title: "Content API (BETA)"
+sidebarTitle: "Content"
+description: "Get content for multiple mints, trending tokens or paginated content feed."
+---
+
+<Note>
+  The Content API is available on Pro tiers only, refer to [Portal & API Key](/portal/setup) section for more details.
+</Note>
+
+## About Content API
+
+The Content API is powered by [Jupiter VRFD](https://verified.jup.ag), providing access to curated and verified content for Solana tokens, including text posts, tweets, token summaries, and news summaries. This content is carefully reviewed and approved to ensure quality and accuracy.
+
+### API Reference
+
+For complete API documentation including request/response schemas, parameters, and examples, refer to the [Content API Reference](/api-reference/tokens/v2/get-content).
+
+<Tip>
+  **USEFUL CONTENT INFORMATION**
+
+  * Get approved content for tokens including text posts, tweets, and summaries
+  * Retrieve content for multiple tokens in a single request (up to 50 mints)
+  * Access paginated content feeds for specific tokens
+  * Discover content for trending tokens on Jupiter
+
+  Do note that the response is subject to changes as we continue to improve.
+
+  Refer to [Content API Reference](/api-reference/tokens/v2/get-content) for full schema.
+</Tip>
+
+### How It Works
+
+The Content API operates through a curated content system powered by [Jupiter VRFD](https://verified.jup.ag/):
+
+1. **Content Submission**: Content is submitted by verified users through [Jupiter VRFD](https://verified.jup.ag/), Jupiter's content verification platform
+2. **Review Process**: All submitted content goes through a review process to ensure quality, accuracy, and relevance
+3. **Approval Status**: Only content with `status: approved` is returned by the API endpoints
+4. **Content Types**: The API supports multiple content types including:
+   - Text-based content (articles, descriptions, announcements)
+   - Tweets sourced from Twitter/X
+   - AI-generated token summaries with source citations
+   - News summaries with source citations
+5. **Real-time Updates**: Content is updated in real-time as new approved content becomes available
+
+### Attribution and Credits
+
+Content provided through the Content API is curated and verified by [Jupiter VRFD](https://verified.jup.ag/). All content includes attribution information:
+
+- **Submitted By**: Information about the user who submitted the content
+- **Source**: The original source URL or reference for the content
+- **Citations**: Token and news summaries include citations to their source materials
+- **Timestamps**: All content includes submission, update, and posting timestamps
+
+When displaying content from this API, please maintain proper attribution to [Jupiter VRFD](https://verified.jup.ag/) and the original content sources as provided in the response data.
+
+## Get Content for Multiple Mints
+
+The Content API provides an endpoint to retrieve approved content for multiple token mints in a single request. This is useful when you need to display content for a list of tokens, such as in a token explorer or portfolio view.
+
+<Tip>
+  **MULTIPLE MINTS**
+
+  * Query up to **50 mint addresses** in a single request.
+  * Pass mints as a comma-separated list in the query parameter.
+  * Returns content for each mint including text posts, tweets, token summaries, and news summaries.
+  * Only returns approved content (status: `approved`).
+</Tip>
+
+```js
+const contentResponse = await (
+  await fetch('https://api.jup.ag/tokens/v2/content?mints=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112', {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  })
+).json();
+```
+
+## Get Content Feed
+
+The Content API provides an endpoint to retrieve a paginated feed of content for a specific token mint. This is useful for displaying a chronological feed of content related to a particular token.
+
+<Tip>
+  **PAGINATED FEED**
+
+  * Get content for a **single mint address** at a time.
+  * Supports pagination with `page` and `limit` parameters.
+  * Default page is 1, default limit is 50 items per page.
+  * Maximum limit is 100 items per page.
+  * Returns pagination metadata including total items and total pages.
+</Tip>
+
+```js
+const feedResponse = await (
+  await fetch('https://api.jup.ag/tokens/v2/content/feed?mint=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN&page=1&limit=50', {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  })
+).json();
+```
+
+## Get Cooking Tokens Content
+
+The Content API provides an endpoint to retrieve content for currently trending tokens on Jupiter. This is useful for discovering and displaying content related to tokens that are gaining traction.
+
+<Tip>
+  **TRENDING TOKENS**
+
+  * Returns content for tokens that are currently trending on Jupiter.
+  * No parameters required - automatically fetches the latest trending tokens.
+  * Useful for building discovery features or trending token sections.
+</Tip>
+
+```js
+const cookingResponse = await (
+  await fetch('https://api.jup.ag/tokens/v2/content/cooking', {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  })
+).json();
+```
+
+## Get Summaries for Multiple Mints
+
+The Content API provides an endpoint to retrieve token and news summaries for multiple token mints in a single request. This is useful when you only need summary information without the full content items.
+
+<Tip>
+  **SUMMARIES ONLY**
+
+  * Query up to **50 mint addresses** in a single request.
+  * Pass mints as a comma-separated list in the query parameter.
+  * Returns only token summaries and news summaries (no content items).
+  * Useful for displaying summary information in token lists or cards.
+</Tip>
+
+```js
+const summariesResponse = await (
+  await fetch('https://api.jup.ag/tokens/v2/content/summaries?mints=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN,So11111111111111111111111111111111111111112', {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  })
+).json();
+```
+
+## Content Types
+
+The Content API supports different content types:
+
+| Content Type | Description |
+| :----------- | :---------- |
+| `text`       | Text-based content such as articles, descriptions, or announcements |
+| `tweet`      | Content sourced from Twitter/X |
+
+## What's Next
+
+Now that you understand how to use the Content API, you can:
+
+* Integrate content display in your token explorer or portfolio views
+* Build discovery features using trending tokens content
+* Create paginated content feeds for individual token pages
+
+[Reach out to us if you have feedback or questions](https://discord.gg/jup)!

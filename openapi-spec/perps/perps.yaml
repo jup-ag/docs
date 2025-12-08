@@ -1,19 +1,20 @@
 openapi: 3.1.0
-
 info:
-  title: Jupiter Perpetuals API Specification
+  title: Jupiter Perpetuals API
   version: 1.0.0
-
+  description: |
+    Jupiter Perpetuals API Schema
 servers:
-  - url: https://lite-api.jup.ag/perps/v1
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/perps/v1
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Perpetuals API endpoint
+
 
 paths:
   /market-stats:
     description: Fetches 24-hour market stats for the given market
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: mint
@@ -89,6 +90,8 @@ paths:
   /orders/expired:
     description: Fetches expired orders for the wallet address
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: walletAddress
@@ -182,6 +185,8 @@ paths:
   /orders/limit:
     description: Returns a serialized transaction to create a limit order.
     delete:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -292,6 +297,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorSchema'
     get:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -467,6 +474,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorSchema'
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -738,6 +747,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorSchema'
     patch:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -960,6 +971,8 @@ paths:
   /positions:
     description: Fetches the open positions for the given wallet address
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: includeClosedPositions
@@ -1273,6 +1286,8 @@ paths:
       Returns an array of serialized transactions to close all open positions
       for the given wallet address.
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -1375,6 +1390,8 @@ paths:
       Returns the minimum and maximum token amounts for collateral deposits, as
       well as the maximum token amount for collateral withdrawals.
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: inputMint
@@ -1496,6 +1513,8 @@ paths:
       the request, the position request PDA, and the position PDA that acts as
       the unique identifier for the position.
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -1801,6 +1820,8 @@ paths:
       the request, the position request PDA, and the position PDA that acts as
       the unique identifier for the position.
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -2155,6 +2176,8 @@ paths:
       the request, the position request PDA, and the position PDA that acts as
       the unique identifier for the position.
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -2616,6 +2639,8 @@ paths:
       the request, the position request PDA, and the position PDA that acts as
       the unique identifier for the position.
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -3042,6 +3067,8 @@ paths:
   /pool-info:
     description: Fetches the perpetuals base pool config info for the given market
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: mint
@@ -3145,6 +3172,8 @@ paths:
   /jlp-info:
     description: Fetches the JLP token info
     get:
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: 200 OK
@@ -3384,6 +3413,8 @@ paths:
   /trades:
     description: Fetches the trade history for the given wallet address
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: action
@@ -3711,6 +3742,8 @@ paths:
       Executes the serialized transaction passed to the endpoint which requires
       the keeper to sign the and execute the transaction.
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -3778,6 +3811,8 @@ paths:
   /tpsl:
     description: Returns a serialized transaction to create a TP/SL
     delete:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -3885,6 +3920,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorSchema'
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -4106,6 +4143,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorSchema'
     patch:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -4271,6 +4310,8 @@ paths:
   /tpsl-with-fee:
     description: Returns a serialized transaction to create a TP/SL and charge fees
     delete:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -4400,6 +4441,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorSchema'
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -4613,6 +4656,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorSchema'
     patch:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -4749,6 +4794,8 @@ paths:
   /lending/deposit-borrow:
     description: Endpoint to deposit JLP and borrow USDC
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -4949,6 +4996,8 @@ paths:
   /lending/pay-withdraw:
     description: Endpoint to repay debt with USDC and withdraw JLP
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -5141,6 +5190,8 @@ paths:
   /lending/positions:
     description: Fetches the borrow lending positions for the given wallet address
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: walletAddress
@@ -5280,6 +5331,8 @@ paths:
   /lending/info:
     description: Fetches global stats and info for the borrow lending pool
     get:
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: 200 OK
@@ -5382,6 +5435,8 @@ paths:
   /lending/history:
     description: Fetches borrow lending history for the given wallet address
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: walletAddress
@@ -5542,6 +5597,8 @@ paths:
   /top-traders:
     description: Returns traders by top PNL and top volume according to the given period.
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: marketMint
@@ -5667,6 +5724,8 @@ paths:
   /trader-stats:
     description: Returns stats for the given trader
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - in: query
           name: walletAddress
@@ -5759,6 +5818,8 @@ paths:
   /jlp/burn:
     description: Endpoint to burn JLP
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -5902,6 +5963,8 @@ paths:
   /jlp/mint:
     description: Endpoint to mint JLP
     post:
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -6023,6 +6086,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorSchema'
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas:
     errorSchema:
       type: object

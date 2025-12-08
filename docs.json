@@ -270,6 +270,23 @@
             ]
           },
           {
+            "item": "Portfolio",
+            "icon": "wallet",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["docs/portfolio/index"]
+              },
+              {
+                "group": "Portfolio API",
+                "tag": "BETA",
+                "pages": [
+                  "docs/portfolio/jupiter-positions"
+                ]
+              }
+            ]
+          },
+          {
             "item": "Send",
             "icon": "paper-plane",
             "groups": [
@@ -472,6 +489,16 @@
                     "group": "V2 (Deprecated)",
                     "pages": ["api-reference/price/v2", "api-reference/price/v2/price"]
                   }
+                ]
+              },
+              {
+                "group": "Portfolio",
+                "tag": "BETA",
+                "pages": [
+                  "api-reference/portfolio",
+                  "api-reference/portfolio/get-positions",
+                  "api-reference/portfolio/get-staked-jup",
+                  "api-reference/portfolio/get-platforms"
                 ]
               },
               {

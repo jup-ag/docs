@@ -1,0 +1,139 @@
+---
+title: "Jupiter Positions"
+description: "Query Jupiter positions, platform information, and staking data using the Portfolio API."
+---
+
+<Tip>
+  **API REFERENCE**
+
+  To fully utilize the Portfolio API, check out the [Portfolio API Reference](/api-reference/portfolio).
+</Tip>
+
+The Portfolio API provides three main endpoints to help you build portfolio tracking features:
+
+1. **Get Positions**: Retrieve all positions for a wallet across supported platforms
+2. **Get Platforms**: Discover all platforms and protocols supported by the Portfolio API
+3. **Get Staked JUP**: Query staking information for Jupiter's governance token
+
+## Get Positions
+
+The Get Positions endpoint allows you to retrieve comprehensive position data for a wallet across all supported platforms.
+
+To get positions for a wallet, make a GET request to `/positions/{address}`:
+
+| Parameter | Type   | Location | Required | Description                                                                 |
+| :-------- | :----- | :------- | :------- | :-------------------------------------------------------------------------- |
+| address   | string | path     | Yes      | The Solana wallet address you want to query                                 |
+| platforms | string | query    | No       | Optional comma-separated list of platform IDs to filter results (e.g., `jupiter-exchange,jupiter-governance`) |
+
+<Note>
+  Only Jupiter platforms are supported currently. We do not have plans to support all/other platforms yet.
+</Note>
+
+<CodeGroup>
+```js All positions wrap
+const positionsResponse = await (
+    await fetch(
+        'https://api.jup.ag/portfolio/v1/positions/jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3',
+        {
+            headers: {
+                'x-api-key': 'YOUR_API_KEY'
+            }
+        }
+    )
+).json();
+
+console.log(JSON.stringify(positionsResponse, null, 2));
+```
+
+```js Filtered by platforms wrap
+const filteredPositionsResponse = await (
+    await fetch(
+        'https://api.jup.ag/portfolio/v1/positions/jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3?platforms=jupiter-exchange,jupiter-governance',
+        {
+            headers: {
+                'x-api-key': 'YOUR_API_KEY'
+            }
+        }
+    )
+).json();
+
+console.log(JSON.stringify(filteredPositionsResponse, null, 2));
+```
+</CodeGroup>
+
+### Response Structure
+
+The response contains an array of `elements`, where each element represents a position (wallet balance, staking position, liquidity pool, etc.). Each element includes:
+
+* `type`: The type of position (`multiple`, `liquidity`, `leverage`, `borrowlend`, `trade`)
+* `label`: Human-readable label (e.g., `Wallet`, `Staked`, `LiquidityPool`, `LimitOrder`, `DCA`)
+* `platformId`: ID of the platform this position belongs to
+* `value`: USD value of the position
+* `data`: Position-specific data that varies by type
+
+The response also includes `tokenInfo` which contains token metadata (name, symbol, decimals, logoURI, etc.) organized by network, and `fetcherReports` which shows the status of each platform queried.
+
+<Note>
+  The `data` field structure varies significantly depending on the `type` of element. Each type has its own required and optional fields. Refer to the [API reference](/api-reference/portfolio/get-positions) for complete schema details.
+
+  If you need help, reach out to us in [Discord](https://discord.gg/jup).
+</Note>
+
+## Get Platforms
+
+Before querying positions, you might want to discover which platforms are supported by the Portfolio API. The Get Platforms endpoint returns a comprehensive list of all available platforms with their metadata.
+
+```js
+const platformsResponse = await (
+    await fetch('https://api.jup.ag/portfolio/v1/platforms', {
+        headers: {
+            'x-api-key': 'YOUR_API_KEY'
+        }
+    })
+).json();
+
+console.log(JSON.stringify(platformsResponse, null, 2));
+```
+
+Each platform object includes:
+
+* `id`: Unique identifier for the platform - use this with the `platforms` query parameter in Get Positions
+* `name`: Display name of the platform
+* `image`: URL to the platform's logo/image
+* `description`: Description of what the platform does
+* `tags`: Array of tags categorizing the platform (e.g., `swap`, `staking`, `governance`)
+* `links`: Optional object containing platform links (website, discord, twitter, etc.)
+* `isDeprecated`: Whether the platform is deprecated
+
+<Tip>
+  Use the platform `id` values from this endpoint with the `platforms` query parameter in the Get Positions endpoint to filter results. This is especially useful when building UI filters or when you only need data from specific protocols.
+</Tip>
+
+## Get Staked JUP
+
+The Get Staked JUP endpoint provides staking information specifically for Jupiter's governance token (JUP). This is useful since it is a simpler way to query for staking status, unstaking schedules, and total staked amounts.
+
+To get staking information for a wallet, make a GET request to `/staked-jup/{address}`:
+
+```js
+const stakedJupResponse = await (
+    await fetch(
+        'https://api.jup.ag/portfolio/v1/staked-jup/jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3',
+        {
+            headers: {
+                'x-api-key': 'YOUR_API_KEY'
+            }
+        }
+    )
+).json();
+
+console.log(JSON.stringify(stakedJupResponse, null, 2));
+```
+
+The response includes:
+
+* `stakedAmount`: Total amount of JUP currently staked (in native token units, before decimals are applied)
+* `unstaking`: Array of unstaking schedules, each containing:
+  * `amount`: Amount being unstaked (in native token units)
+  * `until`: Unix timestamp when the unstaking period ends

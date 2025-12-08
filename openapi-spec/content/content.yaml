@@ -1,15 +1,20 @@
 openapi: 3.1.0
 info:
-  title: Jupiter Mission Control API
+  title: Jupiter Content API
   version: 1.0.0
   description: |
-    Jupiter Mission Control's Content API to query token content and feed
-
+    Jupiter Content API Schema
 servers:
   - url: https://api.jup.ag/tokens/v2
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Content API endpoint
 
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas:
     User:
       type: object
@@ -235,6 +240,8 @@ paths:
     get:
       summary: Get content for multiple mints
       description: Retrieves approved content for up to 50 Solana token mint addresses
+      security:
+        - ApiKeyAuth: []
       tags:
         - Content
       parameters:
@@ -264,6 +271,8 @@ paths:
     get:
       summary: Get paginated content feed
       description: Retrieves a paginated feed of content for a specific mint.
+      security:
+        - ApiKeyAuth: []
       tags:
         - Content
       parameters:
@@ -313,6 +322,8 @@ paths:
     get:
       summary: Get content for trending (cooking) tokens
       description: Retrieves approved content for currently trending tokens on Jupiter
+      security:
+        - ApiKeyAuth: []
       tags:
         - Content
       responses:
@@ -334,6 +345,8 @@ paths:
       description: >-
         Retrieves token and news summaries for up to 50 Solana token mint
         addresses
+      security:
+        - ApiKeyAuth: []
       tags:
         - Content
       parameters:

@@ -2,18 +2,25 @@ openapi: 3.1.0
 info:
   title: Jupiter Portfolio API
   version: 1.0.0
-
+  description: |
+    Jupiter Portfolio API Schema
 servers:
-  - url: https://lite-api.jup.ag/portfolio/v1
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/portfolio/v1
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
+    description: Jupiter Portfolio API endpoint
 
 components:
   schemas: {}
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
 paths:
   '/positions/{address}':
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - schema:
             type: string
@@ -82,6 +89,8 @@ paths:
                     additionalProperties: true
   /platforms:
     get:
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Default Response
@@ -131,6 +140,8 @@ paths:
                           type: string
   '/staked-jup/{address}':
     get:
+      security:
+        - ApiKeyAuth: []
       parameters:
         - schema:
             type: string

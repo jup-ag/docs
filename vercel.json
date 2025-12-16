@@ -1,6 +1,91 @@
 {
   "buildCommand": "",
   "framework": null,
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/_mintlify/:path*",
+      "destination": "https://[SUBDOMAIN].mintlify.app/_mintlify/:path*"
+    },
+    {
+      "source": "/api/request",
+      "destination": "https://[SUBDOMAIN].mintlify.app/_mintlify/api/request"
+    },
+    {
+      "source": "/docs/llms.txt",
+      "destination": "https://[SUBDOMAIN].mintlify.app/llms.txt"
+    },
+    {
+      "source": "/docs/llms-full.txt",
+      "destination": "https://[SUBDOMAIN].mintlify.app/llms-full.txt"
+    },
+    {
+      "source": "/docs/sitemap.xml",
+      "destination": "https://[SUBDOMAIN].mintlify.app/sitemap.xml"
+    },
+    {
+      "source": "/docs/robots.txt",
+      "destination": "https://[SUBDOMAIN].mintlify.app/robots.txt"
+    },
+    {
+      "source": "/api-reference/:path*",
+      "destination": "https://[SUBDOMAIN].mintlify.app/api-reference/:path*"
+    },
+    {
+      "source": "/blog/:path*",
+      "destination": "https://[SUBDOMAIN].mintlify.app/blog/:path*"
+    },
+    {
+      "source": "/docs/:path*",
+      "destination": "https://[SUBDOMAIN].mintlify.app/docs/:path*"
+    },
+    {
+      "source": "/get-started/:path*",
+      "destination": "https://[SUBDOMAIN].mintlify.app/get-started/:path*"
+    },
+    {
+      "source": "/legal/:path*",
+      "destination": "https://[SUBDOMAIN].mintlify.app/legal/:path*"
+    },
+    {
+      "source": "/portal/:path*",
+      "destination": "https://[SUBDOMAIN].mintlify.app/portal/:path*"
+    },
+    {
+      "source": "/resources/:path*",
+      "destination": "https://[SUBDOMAIN].mintlify.app/resources/:path*"
+    },
+    {
+      "source": "/tool-kits/:path*",
+      "destination": "https://[SUBDOMAIN].mintlify.app/tool-kits/:path*"
+    },
+    {
+      "source": "/updates/:path*",
+      "destination": "https://[SUBDOMAIN].mintlify.app/updates/:path*"
+    },
+    {
+      "source": "/static/:path+",
+      "destination": "https://[SUBDOMAIN].mintlify.app/static/:path+"
+    },
+    {
+      "source": "/logo/:path+",
+      "destination": "https://[SUBDOMAIN].mintlify.app/logo/:path+"
+    },
+    {
+      "source": "/favicon.png",
+      "destination": "https://[SUBDOMAIN].mintlify.app/favicon.png"
+    },
+    {
+      "source": "/style.css",
+      "destination": "https://[SUBDOMAIN].mintlify.app/style.css"
+    },
+    {
+      "source": "/mintlify-assets/:path+",
+      "destination": "https://[SUBDOMAIN].mintlify.app/mintlify-assets/:path+"
+    },
+    {
+      "source": "/",
+      "destination": "https://[SUBDOMAIN].mintlify.app/"
+    }
+  ]
 }
-

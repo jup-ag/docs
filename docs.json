@@ -105,28 +105,34 @@
                 ]
               },
               {
-                "group": "Legacy Swap API",
+                "group": " ",
                 "pages": [
                   {
-                    "group": "Usage",
+                    "group": "Metis Swap API",
+                    "expanded": false,
                     "pages": [
-                      "docs/swap/index",
-                      "docs/swap/get-quote",
-                      "docs/swap/build-swap-transaction",
-                      "docs/swap/send-swap-transaction"
+                      {
+                        "group": "Usage",
+                        "pages": [
+                          "docs/swap/index",
+                          "docs/swap/get-quote",
+                          "docs/swap/build-swap-transaction",
+                          "docs/swap/send-swap-transaction"
+                        ]
+                      },
+                      {
+                        "group": "Guides",
+                        "pages": [
+                          "docs/swap/add-fees-to-swap",
+                          "docs/swap/payments-through-swap",
+                          "docs/swap/requote-with-lower-max-accounts"
+                        ]
+                      },
+                      {
+                        "group": "Debugging",
+                        "pages": ["docs/swap/common-errors"]
+                      }
                     ]
-                  },
-                  {
-                    "group": "Guides",
-                    "pages": [
-                      "docs/swap/add-fees-to-swap",
-                      "docs/swap/payments-through-swap",
-                      "docs/swap/requote-with-lower-max-accounts"
-                    ]
-                  },
-                  {
-                    "group": "Debugging",
-                    "pages": ["docs/swap/common-errors"]
                   }
                 ]
               }
@@ -384,7 +390,7 @@
                 ]
               },
               {
-                "group": "Legacy Swap",
+                "group": "Metis Swap",
                 "pages": [
                   "api-reference/swap",
                   "api-reference/swap/quote",

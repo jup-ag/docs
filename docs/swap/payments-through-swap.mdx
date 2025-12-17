@@ -1,24 +1,24 @@
 ---
 title: "Payments Through Swap"
-description: "Walkthrough on how to use the Legacy Swap API as a form of payment method."
+description: "Walkthrough on how to use the Metis Swap API as a form of payment method."
 ---
 
-The Jupiter Legacy Swap API can be utilized such that you, a merchant can allow your customer to pay in any tokens while you still receive in your preferred token payment at the end of the transaction.
+The Jupiter Metis Swap API can be utilized such that you, a merchant can allow your customer to pay in any tokens while you still receive in your preferred token payment at the end of the transaction.
 
 ## Use Case
 
-Let’s set the stage. You are selling a **jupcake!!!** to your customer and merchant might only accept in 1 USDC, but your customer only has 1 SOL. Well, you’re at the right place! By using the Legacy Swap API, merchant can let customer pay in SOL while merchant still receive USDC in order to complete the payment for a jupcake.
+Let’s set the stage. You are selling a **jupcake!!!** to your customer and merchant might only accept in 1 USDC, but your customer only has 1 SOL. Well, you’re at the right place! By using the Metis Swap API, merchant can let customer pay in SOL while merchant still receive USDC in order to complete the payment for a jupcake.
 
 * Customer has 1,000,000 SOL.
 * Merchant sells 1 jupcake for 1 USDC.
-* Use the Legacy Swap API to swap exactly 1 USDC output from Customer's SOL.
+* Use the Metis Swap API to swap exactly 1 USDC output from Customer's SOL.
 * Merchant receives the 1 USDC, as planned!
 
 ## Let’s Get Started
 
 ### 1. Setup
 
-You will need slightly different imports and also remember to set up connection to an RPC. If you have not set up the other typical libraries or are familiar with the Legacy Swap API, please follow this [Environment Setup](/get-started/environment-setup) and [Get Quote and Swap](/docs/swap/get-quote) guide.
+You will need slightly different imports and also remember to set up connection to an RPC. If you have not set up the other typical libraries or are familiar with the Metis Swap API, please follow this [Environment Setup](/get-started/environment-setup) and [Get Quote and Swap](/docs/swap/get-quote) guide.
 
 ```bash
 npm i @solana/spl-token
@@ -72,6 +72,10 @@ const merchantUSDCTokenAccount = await getAssociatedTokenAddress(
 
 console.log("merchantUSDCTokenAccount:", merchantUSDCTokenAccount.publicKey);
 ```
+
+<Tip>
+You can also use `nativeDestinationAccount` to receive the native SOL token out of the swap. This is useful if you want to receive native SOL in a destination account.
+</Tip>
 
 ### 2. Set `swapMode` to `ExactOut` in Quote
 

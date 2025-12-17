@@ -1,14 +1,14 @@
 ---
 title: "Add Fees To Swap"
-description: "Walkthrough on how to add fees to the Legacy Swap API."
+description: "Walkthrough on how to add fees to the Metis Swap API."
 ---
 
 <Note>
   **INFO**
 
-  As of January 2025, when integrating the Legacy Swap API, you no longer need to use the Referral Program to set up a `referralAccount` and `referralTokenAccount` to collect fees from the swaps you provide to the end users.
+  As of January 2025, when integrating the Metis Swap API, you no longer need to use the Referral Program to set up a `referralAccount` and `referralTokenAccount` to collect fees from the swaps you provide to the end users.
 
-  Simply, just pass in any valid token account as the `feeAccount` parameter in the Legacy Swap API.
+  Simply, just pass in any valid token account as the `feeAccount` parameter in the Metis Swap API.
 
   However, do note that **it is still applicable to the Trigger API**.
 </Note>
@@ -32,11 +32,11 @@ By default, there are **zero** protocol fees on Jupiter Swap. Integrators have t
 * Example, if you swap JUP to USDC, you cannot take fees in SOL, it has to be part of the swap pair.
 * It supports SPL and Token2022 tokens.
   * [Refer to this update for support of Token2022 tokens](/updates#jupiter-aggregator-v6-program-update).
-* Referral Program is no longer required for Legacy Swap API.
+* Referral Program is no longer required for Metis Swap API.
 
 ### 1. Set up
 
-You will need to complete the prerequisites and understanding of [Environment Setup](/get-started/environment-setup) and [Get Quote and Swap](/docs/swap/get-quote) guide as this is reliant on the Legacy Swap API.
+You will need to complete the prerequisites and understanding of [Environment Setup](/get-started/environment-setup) and [Get Quote and Swap](/docs/swap/get-quote) guide as this is reliant on the Metis Swap API.
 
 ### 2. Set your fee in Quote
 

@@ -252,9 +252,11 @@ components:
           type: string
         feeAmount:
           type: string
+          nullable: true
           deprecated: true
         feeMint:
           type: string
+          nullable: true
           deprecated: true
 
     SwapRequest:

@@ -3,12 +3,27 @@ title: "Updates"
 description: "Announcements and Changes"
 ---
 
+<Card title="Stay Updated">
+  Follow our various announcements channels to stay up to date with recent updates and announcements.
+
+  <Columns cols={2}>
+  <Card href="https://discord.com/channels/897540204506775583/1115543693005430854" icon="discord" horizontal>
+  Discord
+  </Card>
+  <Card href="https://t.me/jup_dev" icon="telegram" horizontal>
+  Telegram
+  </Card>
+  </Columns>
+</Card>
+
+---
+
 <Update label="November 2025" description="">
 
 ## Deprecate Lite API URL
 
 * We'll be deprecating the Lite API URL `lite-api.jup.ag`.
-* This will take effect on 31st December 2025.
+* This will take effect on 31st January 2026.
 * Please migrate to the API URL `api.jup.ag`.
 * The paths remain unchanged, only domain/hostname changes.
 * Generate an API key for free at [https://portal.jup.ag](https://portal.jup.ag).
@@ -55,10 +70,10 @@ description: "Announcements and Changes"
 
 ---
 
-## Legacy Swap API
+## Metis Swap API
 
 ### `routePlan[].percent` may return null
-* The `routePlan[].percent` field in the Legacy Swap API quote response may return `null` - due to an an upgrade on the routing algorithm.
+* The `routePlan[].percent` field in the Metis Swap API quote response may return `null` - due to an an upgrade on the routing algorithm.
 * Please update your code to handle null values for this field.
 * This change will affect `instructionVersion=V2` only and has taken effect.
 * [npm package version 6.0.47](https://www.npmjs.com/package/@jup-ag/api/v/6.0.47) 
@@ -74,7 +89,7 @@ description: "Announcements and Changes"
   has been released with the latest schema.
 
 ### `nativeDestinationAccount`
-* We've added a new parameter to the Legacy Swap API that lets you send native SOL 
+* We've added a new parameter to the Metis Swap API that lets you send native SOL 
   directly to any account.
 * This is similar to `destinationTokenAccount`, but instead of receiving 
   WSOL in a token account, you receive native SOL in a regular account.
@@ -121,9 +136,6 @@ memecoin-to-memecoin swaps (when liquidity permits), and reduced minimum trade s
 * **Reduce Pre-Graduation Quote Latency**: Optimized pre-graduated bonding curve markets routing logic 
 by skipping multi-route aggregation to improve quote latency from 200ms to 10ms - a 90% improvement.
 
-* **Sunsetted Legacy Jupiter Swap API**: As part of this upgrade, moving forward, we will be focusing our 
-efforts on the ongoing development and improvement of Ultra V3 with our new router, Iris.
-
 * **[Try Ultra Swap API](/docs/ultra)**: Ultra V3 features are live in the Ultra Swap API V1, try it and let us know your feedback!
 
 ---
@@ -146,9 +158,9 @@ efforts on the ongoing development and improvement of Ultra V3 with our new rout
 * No additional parameters are required, simply create Token2022 referral token accounts for your referral account.
 * You can find the details in the [Add Fees To Ultra Swap](/docs/ultra/add-fees-to-ultra) guide.
 
-**Legacy Swap API**
-* Integrator fee for Legacy Swap now supports Token2022 tokens.
-* New [`instructionVersion` parameter](/api-reference/swap/quote#parameter-instruction-version) is introduced to the Legacy Swap API's Quote endpoint to support the new instruction types.
+**Metis Swap API**
+* Integrator fee for Metis Swap now supports Token2022 tokens.
+* New [`instructionVersion` parameter](/api-reference/swap/quote#parameter-instruction-version) is introduced to the Metis Swap API's Quote endpoint to support the new instruction types.
 * To collect fees in Token2022 tokens, create Token2022 token accounts and pass in via `feeAccount`.
 * You can find the details in the [Add Fees To Swap](/docs/swap/add-fees-to-swap) guide.
 

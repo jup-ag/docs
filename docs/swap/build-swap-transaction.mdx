@@ -1,14 +1,14 @@
 ---
 title: "Build Swap Transaction"
-description: "Swap via Metis by building a swap transaction using the Legacy Swap API."
+description: "Swap via Metis by building a swap transaction using the Metis Swap API."
 ---
 
-The Legacy Swap API is one of the ways for you to interact with the Jupiter Swap Aggregator program. Before you send a transaction to the network, you will need to build the transaction that defines the instructions to execute and accounts to read/write to.
+The Metis Swap API is one of the ways for you to interact with the Jupiter Swap Aggregator program. Before you send a transaction to the network, you will need to build the transaction that defines the instructions to execute and accounts to read/write to.
 
 It can be complex to handle this yourself, but good news! Most of our APIs and SDKs just handles it for you, so you get a response with the transaction to be prepared and sent to the network.
 
 <Tip>
-  **USE LEGACY SWAP API TO HANDLE IT FOR YOU OR...**
+  **USE METIS SWAP API TO HANDLE IT FOR YOU OR...**
 
   If you are looking to interact with the Jupiter Swap Aggregator program in a different way, check out the other guides:
 
@@ -30,10 +30,10 @@ If you have not set up your environment to use the necessary libraries, the RPC 
 <Tip>
   **API REFERENCE**
 
-  To fully utilize the Legacy Swap API, check out the [Legacy Swap API or Swap Instructions Reference](/api-reference/swap/swap).
+  To fully utilize the Metis Swap API, check out the [Metis Swap API or Swap Instructions Reference](/api-reference/swap/swap).
 </Tip>
 
-## Legacy Swap API
+## Metis Swap API
 
 From the previous guide on getting a quote, now using the quote response and your wallet, you can receive a **serialized swap transaction** that needs to be prepared and signed before sending to the network.
 
@@ -44,7 +44,7 @@ Using the root URL and parameters to pass in, it is as simple as the example cod
 <Tip>
   **OPTIMIZING FOR TRANSACTION LANDING IS SUPER SUPER IMPORTANT!**
 
-  This code block includes additional parameters that our Legacy Swap API supports, such as estimating compute units, priority fees and slippage, to optimize for transaction landing.
+  This code block includes additional parameters that our Metis Swap API supports, such as estimating compute units, priority fees and slippage, to optimize for transaction landing.
 
   To understand how these parameters help, the next step, [Send Swap Transaction guide](/docs/swap/send-swap-transaction) will discuss them.
 </Tip>
@@ -106,7 +106,7 @@ From the above example, you should see this response.
 
 ## What’s Next
 
-Now, you are able to get a quote and use our Legacy Swap API to build the swap transaction for you. Next steps is to proceed to prepare and sign the transaction and send the signed transaction to the network.
+Now, you are able to get a quote and use our Metis Swap API to build the swap transaction for you. Next steps is to proceed to prepare and sign the transaction and send the signed transaction to the network.
 
 <CardGroup>
   <Card title="Let’s go sign and send!" href="/docs/swap-api/send-swap-transaction" icon="paper-plane" horizontal/>

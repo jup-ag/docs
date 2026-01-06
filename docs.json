@@ -24,7 +24,7 @@
     }
   },
   "banner": {
-    "content": "🚨 **Action Required:** `lite-api.jup.ag` will be deprecated on 31st December 2025. [View migration guide →](https://dev.jup.ag/portal/migrate-from-lite-api)",
+    "content": "🚨 **Action Required:** `lite-api.jup.ag` will be deprecated on 31st January 2026. [View migration guide →](https://dev.jup.ag/portal/migrate-from-lite-api)",
     "dismissible": true
   },
   "navigation": {
@@ -105,28 +105,34 @@
                 ]
               },
               {
-                "group": "Legacy Swap API",
+                "group": " ",
                 "pages": [
                   {
-                    "group": "Usage",
+                    "group": "Metis Swap API",
+                    "expanded": false,
                     "pages": [
-                      "docs/swap/index",
-                      "docs/swap/get-quote",
-                      "docs/swap/build-swap-transaction",
-                      "docs/swap/send-swap-transaction"
+                      {
+                        "group": "Usage",
+                        "pages": [
+                          "docs/swap/index",
+                          "docs/swap/get-quote",
+                          "docs/swap/build-swap-transaction",
+                          "docs/swap/send-swap-transaction"
+                        ]
+                      },
+                      {
+                        "group": "Guides",
+                        "pages": [
+                          "docs/swap/add-fees-to-swap",
+                          "docs/swap/payments-through-swap",
+                          "docs/swap/requote-with-lower-max-accounts"
+                        ]
+                      },
+                      {
+                        "group": "Debugging",
+                        "pages": ["docs/swap/common-errors"]
+                      }
                     ]
-                  },
-                  {
-                    "group": "Guides",
-                    "pages": [
-                      "docs/swap/add-fees-to-swap",
-                      "docs/swap/payments-through-swap",
-                      "docs/swap/requote-with-lower-max-accounts"
-                    ]
-                  },
-                  {
-                    "group": "Debugging",
-                    "pages": ["docs/swap/common-errors"]
                   }
                 ]
               }
@@ -421,7 +427,7 @@
                 ]
               },
               {
-                "group": "Legacy Swap",
+                "group": "Metis Swap",
                 "pages": [
                   "api-reference/swap",
                   "api-reference/swap/quote",
@@ -736,14 +742,14 @@
           "icon": "key"
         },
         {
-          "anchor": "Status",
+          "anchor": "API Status",
           "href": "https://status.jup.ag/",
           "icon": "signal"
         },
         {
-          "anchor": "Support",
-          "href": "https://discord.gg/jup",
-          "icon": "discord"
+          "anchor": "Stay Updated",
+          "href": "https://dev.jup.ag/resources/support",
+          "icon": "bell"
         }
       ]
     }

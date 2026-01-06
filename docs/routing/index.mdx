@@ -9,6 +9,17 @@ description: "The types of routing engines used in Jupiter's Swap product"
 If you are an exchange or market maker and want to participate in our routing system, please refer to our [DEX Integration](/docs/routing/dex-integration) and [RFQ Integration](/docs/routing/rfq-integration) guides.
 </Info>
 
+## Overview
+
+Jupiter's routing system consists of multiple routing engines working together to provide the best possible execution price and success rate for swaps on Solana. The architecture is hierarchical, with **Juno** serving as the top-level liquidity aggregator that combines multiple routing sources, including Jupiter's proprietary engines (**Iris** and **JupiterZ**) and third-party liquidity providers.
+
+| Engine | Description |
+| :--- | :--- |
+| **Juno** | Latest liquidity aggregator that combines multiple sources (Iris, JupiterZ, DFlow, OKX) with self-learning mechanisms. Powers Ultra Swap and accessible via Ultra Swap API. |
+| **Iris** | Advanced routing engine for Jupiter Ultra, delivering best execution across Solana DEXes through multi-hop, multi-split swaps. |
+| **JupiterZ** | RFQ system connecting users with market makers, creating competitive quotes for top token pairs. |
+| **Metis** | Low-level routing engine providing granular control over swap instructions for developers needing maximum flexibility. |
+
 ## Juno Liquidity Engine
 
 Juno is Jupiter's latest liquidity engine, it is built with the combined learnings from Iris and JupiterZ, with one single objective - to ensure the best possible execution price and success rate across all engines and liquidity sources. Juno employs a sophisticated self-learning mechanism to maintain high availability of competitive routes while automatically sidelining underperforming or potentially problematic quotes. Juno will be incrementally introducing new third-party liquidity sources and a continual effort to improve Iris and JupiterZ routing capabilities.
@@ -23,10 +34,6 @@ Juno is directly powering the Ultra Swap on Jupiter frontend (jup.ag) and is als
 
 ## Jupiter Iris Routing Engine
 
-<Note>
-  Ultra Swap API uses Iris as its router, Legacy Swap API continues to use legacy version of Metis.
-</Note>
-
 Iris is Jupiter's latest and most advanced routing engine, purpose-built for Jupiter Ultra to deliver the best execution price across Solana's diverse liquidity landscape. This new engine reflects our deep learnings from previous iterations and is at the core of Jupiter Ultra's unmatched execution performance.
 
 <Card href="/blog/ultra-v3" icon="book-open" horizontal>
@@ -35,18 +42,13 @@ Iris is Jupiter's latest and most advanced routing engine, purpose-built for Jup
 
 Behind Iris is a proven history of innovation: Jupiter’s original DEX aggregation engine, Metis v1 (launched 2023), set the standard as a reliable, general-purpose liquidity engine for Solana. Successive updates such as Metis v1.5 (April 2025) were introduced for Ultra, and these lessons and ongoing experiments directly informed the design and capabilities of Iris, making it the next evolutionary step in Jupiter’s routing technology.
 
-<Card href="https://x.com/sssionggg/status/1912378618711535889" icon="book-open" horizontal>
-  Metis v1.5 introduced new algorithmic improvements for more granular splits and wider intermediate token support, achieving a significant reduction in quote-execution spread.
-</Card>
-
 |  |  |
 | :--- | :--- |
 | **Overcoming SVM constraints** | Employs a sophisticated and efficient transaction construction to enable multi-hop-multi-split swaps. |
 | **Integrating diverse DEXes** | Utilizes a standardized interface to integrate with a wide range of DEXes, abstracting away the complexities of each individual DEX. |
 | **Optimizing for price and execution** | Ensuring the quoted price is as close as the actual price, while also ensuring the transaction is executed successfully. |
 | **Accessing markets immediately and safely** | Employs necessary infrastructure powered by a network of robust RPC nodes to include markets and checks their liquidity in real-time. |
-
-The engine integrates with most DEXes on Solana, you can find a complete list of supported DEXes via the [program-id-to-label](/api-reference/swap/program-id-to-label?playground=open) endpoint.
+| **Market Revival** | Dynamically re-indexes markets to enable tradability for all tokens. |
 
 ## JupiterZ (RFQ) Routing Engine
 
@@ -65,3 +67,16 @@ JupiterZ has been handling a large portion of trades on the Jupiter frontend (ju
 Currently, JupiterZ is accessible through the **Ultra Swap API**: A streamlined interface that makes it simple for developers and applications to tap into Iris, JupiterZ and other routing sources.
 
 For more information about JupiterZ, please refer to our [RFQ Integration](/docs/routing/rfq-integration) guide.
+
+## Metis Routing Engine
+
+Metis is Jupiter's original, low-level routing engine designed for maximum flexibility, transparency, and composability. Unlike Jupiter Ultra and its Iris engine, which focus on end-to-end execution and abstraction, Metis exposes granular control over raw swap instructions, making it ideal for developers, advanced integrators, and builders who need to fine-tune every aspect such as adding custom instructions, CPI, transaction execution and more.
+
+<Card href="/blog/metis-v7" icon="book-open" horizontal>
+Metis is now an independent public good, no longer coupled to Jupiter or Ultra, and is maintained as a toolkit for the ecosystem.
+
+Though Jupiter continues to provide access to a hosted Metis API for developers.
+</Card>
+
+Metis can be accessed either via the Jupiter-hosted Metis Swap API at [this section of the docs](/docs/swap), or by running your own self-hosted binary (requires a binary key and 10,000 staked JUP) at [metis.builders](https://metis.builders).
+

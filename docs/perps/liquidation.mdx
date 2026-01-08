@@ -1,4 +1,91 @@
 ---
 title: "Liquidation"
-description: "How liquidations are handled."
+description: "Understand how liquidations are handled in Jupiter Perpetuals."
 ---
+
+The liquidation price of an open position represents the price at which the position will be automatically closed by the system when the trader's collateral is insufficient to maintain the position.
+
+## Liquidation Price
+
+The liquidation price is calculated based on the maximum loss the position can sustain before the collateral is exhausted. The formula accounts for closing fees, borrow fees, and maximum leverage constraints.
+
+For **long positions**:
+<Card>
+$$
+\text{LiquidationPrice} = \begin{cases}
+\text{Price} + \text{MaxPriceDiff} & \text{if } \text{MaxLoss} > \text{Collateral} \\
+\text{Price} - \text{MaxPriceDiff} & \text{if } \text{MaxLoss} \leq \text{Collateral}
+\end{cases}
+$$
+</Card>
+
+For **short positions**:
+<Card>
+$$
+\text{LiquidationPrice} = \begin{cases}
+\text{Price} - \text{MaxPriceDiff} & \text{if } \text{MaxLoss} > \text{Collateral} \\
+\text{Price} + \text{MaxPriceDiff} & \text{if } \text{MaxLoss} \leq \text{Collateral}
+\end{cases}
+$$
+</Card>
+
+Where:
+
+**Maximum Loss**
+<Card>
+$$
+\text{MaxLoss} = \frac{\text{Size}}{\text{MaxLeverage}} + \text{TotalFees}
+$$
+</Card>
+
+**Maximum Price Difference**
+<Card>
+$$
+\text{MaxPriceDiff} = \frac{|\text{MaxLoss} - \text{Collateral}| \cdot \text{Price}}{\text{Size}}
+$$
+</Card>
+
+**Variables**
+<Card>
+- $\text{Price}$: The average price (USD) of the position
+- $\text{Collateral}$: The collateral size (USD) for the position
+- $\text{Size}$: The size (USD) of the position
+- $\text{TotalFees}$: Total fees (USD) including closing fees and accumulated borrow fees
+- $\text{MaxLeverage}$: The maximum allowed leverage (500x is the maximum allowed leverage in the Jupiter Perpetuals exchange)
+
+---
+
+The liquidation price determines when your position will be automatically closed due to insufficient collateral.
+
+**Normal Case (MaxLoss ≤ Collateral):**
+- **Long positions**: Liquidation price is below your entry price. You get liquidated if the price drops too low (the expected risk for long positions).
+- **Short positions**: Liquidation price is above your entry price. You get liquidated if the price rises too high (the expected risk for short positions).
+
+**Edge Case (MaxLoss > Collateral):**
+This occurs when accumulated fees (borrow fees + closing fees) exceed your collateral. In this dangerous state, your position is already underwater and may be liquidated to protect the protocol, regardless of price direction. This happens when there is insufficient collateral, typically caused by extended open positions and borrow fees accumulate.
+
+The `MaxPriceDiff` represents how far the price can move before your collateral is exhausted. In the normal case, this works as expected: long positions liquidate on price drops, short positions liquidate on price rises.
+
+</Card>
+
+## Calculate Liquidation Price Programmatically
+
+To calculate the liquidation price programmatically, refer to [this code example](https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing/blob/main/src/examples/get-liquidation-price.ts).
+
+## Managing Liquidation Price
+The liquidation price changes over time as it is affected by fees, particularly with leverage exceeding 10x and the accumulation of borrow fees over extended position durations. Regularly monitoring your liquidation price is essential.
+
+To mitigate the risk of liquidation, collateral adjustments and leverage fine-tuning can be performed by the trader.
+
+## Liquidation Penalty
+When a position is liquidated, any remaining collateral is collected by the protocol and distributed to the JLP as liquidation fees.
+
+<Warning>
+This means you will lose your **entire collateral** when the position is liquidated.
+
+Please ensure you're constantly monitoring your liquidation price and only depositing collateral that is within your risk appetite.
+</Warning>
+
+<Note>
+Refer to the [Fees](/docs/perps/fees#liquidation-penalty) document for more information on liquidation penalty.
+</Note>

@@ -1,0 +1,153 @@
+---
+title: "JLP Loan"
+description: "Understand Jupiter Liquidity Providers (JLP) Loan and how they work."
+---
+
+JLP Loans allows users to deposit their JLP tokens as collateral to borrow USDC, maintaining exposure to JLP yields while accessing liquidity. The lending feature implements an overcollateralized lending model with dynamic interest rates based on utilization for the borrowed token.
+
+<Info>
+JLP Loan and Jupiter Lend are 2 different products.
+</Info>
+
+<Note>
+Check out https://jup.ag/perps/jlp-loans
+</Note>
+
+---
+
+## Key Parameters
+- Collateral: JLP
+- Borrowable tokens: USDC
+- Available liquidity: The amount of tokens available to borrow for the asset
+- Utilization: Utilization (%) of the borrowed token (lower utilization = lower borrow APR)
+- Maximum LTV: 90%
+- Liquidation LTV: 95%
+- Liquidation penalty: The penalty (%) applied on the position's collateral on liquidation
+
+## Position Management
+
+Each user maintains a single lending position per custody, containing:
+
+- My Collateral: JLP deposited as collateral
+- My Debt: Outstanding debt (principal + accrued interest) in the borrowed token amount
+- Liq. Price (JLP): The estimated JLP price at which the position will be liquidated
+- LTV: The loan-to-value (LTV) ratio of the position
+
+## Loan-to-Value
+
+The loan-to-value (LTV) ratio measures how much you have borrowed relative to the value of your deposited JLP collateral.
+
+### LTV Calculation
+<Card>
+$$
+\text{LTV} = \frac{\text{Outstanding Debt}}{\text{JLP Collateral Value in USD}}
+$$
+
+Where:
+- $\text{Outstanding Debt}$: The amount of tokens you have borrowed
+- $\text{JLP Collateral Value in USD}$: The value of your deposited JLP collateral in USD
+</Card>
+
+### LTV Thresholds
+<Card>
+The protocol enforces two critical LTV thresholds:
+
+- Maximum LTV (90%): The maximum initial borrowing limit against deposited collateral
+- Liquidation LTV (95%): The threshold at which positions become eligible for liquidation
+</Card>
+
+## Example Position
+Consider a position with $10,000 worth of JLP deposited:
+
+- Maximum initial borrow: $9,000 (90% LTV)
+- Liquidation occurs if debt reaches: $9,500 (95% LTV)
+- Recommended safe borrow: $6,500 (65% LTV)
+
+## Borrow Rate
+The borrow APR shares the same interest rate curve used in the Jupiter Perpetuals protocol with different parameters specified in the borrowed token's custody account in `jumpRateState` and `borrowsFundingRateState`.
+
+A higher borrow APR means users pay more interest rates to maintain their position, and vice versa.
+
+### Formula
+<Card>
+The protocol calculates your borrow rate based on the pool's utilization:
+
+<Steps>
+
+<Step>
+Calculate pool utilization
+$$
+\text{Utilization} = \frac{\text{Locked for Trading} + \text{Total Borrowed}}{\text{Total Pool Size}}
+$$
+</Step>
+
+<Step>
+Calculate the owned and locked amounts for the custody
+<Note>
+Read the [JLP Economics](/docs/perps/jlp) document for more info on the total locked and owned values:
+- Total owned: Pool assets + outstanding debt
+- Total locked: Assets locked for collateral + outstanding debt
+</Note>
+</Step>
+
+<Step>
+3. Calculate borrow rate
+$$
+\text{Utilization} = \frac{\text{Total Locked} \times 10^9}{\text{Total Owned}}
+$$
+
+<Card>
+If Utilization ≤ Target Utilization (80%):
+$$
+\begin{align*}
+\text{Rate Increase} & = \frac{(\text{Target Rate} - \text{Min Rate}) \times \text{Utilization}}{\text{Target Utilization}} \\
+\text{Yearly Rate} & = \frac{(\text{Min Rate} + \text{Rate Increase}) \times 10^9}{10,\!000}
+\end{align*}
+$$
+</Card>
+
+<Card>
+If Utilization > Target Utilization (80%):
+$$
+\begin{align*}
+\text{Rate Diff} & = \text{Max Rate} - \text{Target Rate} \\
+\text{Util Above Target} & = \text{Utilization} - \text{Target Utilization} \\
+\text{Remaining Capacity} & = 10^9 - \text{Target Utilization} \\
+\text{Extra Rate} & = \frac{\text{Rate Diff} \times \text{Util Above Target}}{\text{Remaining Capacity}} \\
+\text{Yearly Rate} & = \frac{(\text{Target Rate} + \text{Extra Rate}) \times 10^9}{10,\!000}
+\end{align*}
+$$
+</Card>
+
+$$
+\text{Hourly Rate} = \frac{\text{Yearly Rate}}{24 \times 365}
+$$
+</Step>
+
+<Step>
+4. Convert to Borrow APR
+$$
+\text{Borrow APR} = \left( \frac{\text{Hourly Rate}}{10^9} \right) \times 24 \times 365 \times 100
+$$
+</Step>
+
+</Steps>
+</Card>
+
+### Calculating Borrow Rate Programmatically
+[Refer to this code example to calculate the borrow APR programmatically](https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing/blob/main/src/examples/get-borrow-fee-and-funding-rate.ts#L140)
+
+## Liquidation
+<Note>
+JLP Loans does not use external liquidators as only whitelisted keepers are allowed to liquidate borrow positions
+</Note>
+
+When a position's LTV exceeds 95%, it becomes eligible for liquidation. The liquidation is done by burning the position's JLP collateral to repay the debt. JLP Loans charge a 2% liquidation fee which is taken from the collateral and deposited to the JLP as fees. Any remaining collateral after liquidation will be returned to the user.
+
+Users can prevent liquidation through:
+- Depositing collateral: Add more JLP to reduce LTV
+- Repaying debt: Repay the debt to reduce LTV
+
+## References
+- [JLP Loans Initial Parameter Recommendations and Yield Projections](https://discuss.jup.ag/t/jlp-loan-initial-parameter-recommendations-and-yield-projections/38428)
+- [Adjustment of JLP Loan Parameters](https://discuss.jup.ag/t/adjustment-of-jlp-loan-parameters/39564)

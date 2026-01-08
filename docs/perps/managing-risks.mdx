@@ -1,0 +1,32 @@
+---
+title: "Managing Risks"
+description: "Understand and manage risks when using Jupiter Perps."
+---
+
+There are risks involved when using products like Jupiter Perpetuals, hence, when integrating Jupiter Perpetuals for yourself or users, please provide all context to users what are the risks involved and how to manage them.
+
+Please refer to our support documentation for user information: https://support.jup.ag
+
+## Notes
+
+### Risks of Using Leverage
+
+Leverage can magnify both gains and losses. While it may boost your profits, it also increases the risk of liquidation. If the market moves against your position and your collateral is insufficient to cover losses, your position could be closed automatically.  
+- **Start Small:** Begin with lower leverage and only increase as you gain more experience and comfort.
+- **Carefully Manage Leverage:** Avoid unnecessary risk by setting sensible leverage levels relative to your risk appetite.
+- **Set Stop-Loss Orders:** Always utilize stop-loss orders and other risk management tools to limit potential losses and protect your position.
+- **Monitor Regularly:** Continuously keep track of your Profit and Loss (PnL) and collateral levels to reduce the risk of liquidation.
+
+---
+
+### Placing Limit Orders Near Liquidation Price
+
+Jupiter Perps does **not** use First-In, First-Out (FIFO) order matching. The execution order is determined by which transaction—your Limit Order (LO) or the liquidation—reaches the system first, not strictly by price priority.
+
+**If you place a Limit Order close to your liquidation price:**
+- **If the Limit Order is processed first**: You may avoid liquidation, as the limit order could close or reduce your position before liquidation occurs.
+- **If the Liquidation is processed first**: Your position will be liquidated, but the Limit Order will stay active, potentially opening a new position at the set price immediately.
+
+Be cautious when managing orders near liquidation levels, as the outcome is not guaranteed and can result in unintended positions.
+
+

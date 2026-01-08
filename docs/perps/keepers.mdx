@@ -1,0 +1,44 @@
+---
+title: "Keepers"
+description: "Understand how keepers are used in Jupiter Perpetuals."
+---
+
+Jupiter Perpetuals uses an on-chain request fulfilment model to create and execute trade requests, ensuring a seamless and automated trading experience.
+
+This system requires two transactions to complete a trade request:
+1. To create the request.
+2. To fulfill and execute it.
+
+By utilizing this model, Jupiter ensures that every trade request is fulfilled efficiently and automatically, allowing traders to focus on their strategy without worrying about manual intervention. Keepers help ensure that the requests are processed promptly and correctly, making the entire process smooth and seamless.
+
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img
+    src="/static/images/perps-keepers.png"
+    alt="Linear Price Impact Fee"
+    style={{ height: "240px", width: "600px" }}
+    className="rounded-lg"
+  />
+</div>
+
+## Creating a Trade Request
+Traders can perform a variety of actions on the Jupiter Perpetuals exchange, including:
+- Opening a position
+- Closing a position
+- Increasing position size
+- Decreasing position size (or closing a partial position)
+- Depositing collateral
+- Withdrawing collateral
+- Creating, editing, or closing take profit (TP) and stop loss (SL) orders
+- Creating, editing or closing Limit Orders (LO)
+
+These actions can be performed through the Jupiter Perpetuals platform or via the API. Once the trader initiates an action, the frontend or API server verifies the action and submits a transaction to the Solana blockchain, containing all the necessary data (like trade size, collateral size, position side, etc.) to fulfill the request.
+
+For example, when a trader creates an open position request, the submitted transaction will include all details required to open the position on the blockchain.
+
+## Fulfilling a Trade Request
+Jupiter Perpetuals uses keepers to automatically process and execute trade requests.
+
+- Keepers are offchain services that listen to on-chain events (like trade requests) and perform the corresponding actions without manual intervention.
+- Jupiter runs two keepers that continuously poll the Solana blockchain for trade requests.
+
+Once a keeper detects a new trade request, it verifies the details and creates a new transaction to execute the trade. The trade is only executed when the transaction succeeds and is confirmed by the Solana blockchain, which then updates the position.

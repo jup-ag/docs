@@ -24,17 +24,24 @@ The following table summarizes all fee types in Jupiter Perpetuals.
 Fee parameters are subject to change, as Jupiter and third party risk auditors continue to monitor market conditions, protocol performance, pool utilization, and other factors to ensure competitive and sustainable fees.
 </Note>
 
+**Involved in perps trading**:
+
 | Fee Type | Rate | When Charged | Who Pays | Who Receives |
 |----------|------|--------------|----------|--------------|
 | **Base Fee** | 0.06% (6 BPS) | Opening/closing positions, liquidations, TP/SL, limit orders | Traders | JLP Pool (75%) + Protocol (25%) |
 | **Price Impact Fee (Linear)** | Variable | Based on trade size relative to pool liquidity | Traders | JLP Pool (75%) + Protocol (25%) |
 | **Price Impact Fee (Additive)** | Variable | When OI imbalance exceeds threshold | Traders | JLP Pool (75%) + Protocol (25%) |
 | **Borrow Fee** | Variable (hourly) | Continuously on open positions | Traders | JLP Pool (75%) + Protocol (25%) |
-| **Swap Fee** | 0.02% (2 BPS) for stables; 0.1% (10 BPS) for non-stables; Dynamic adjustment based on weightage | Swapping between JLP assets | Traders/LPs | JLP Pool (75%) + Protocol (25%) |
-| **JLP Mint/Burn Fee** | Variable | Minting or burning JLP tokens | LPs | JLP Pool (75%) + Protocol (25%) |
 | **Liquidation Penalty** | 100% of remaining collateral | When position is liquidated | Liquidated traders | JLP Pool (100%) |
 | **Transaction Fees** | Variable | Submitting transactions | Traders | Solana Network |
 
+**Involved in other activities**:
+
+| Fee Type | Rate | When Charged | Who Pays | Who Receives |
+|----------|------|--------------|----------|--------------|
+| **Swap Fee** | 0.02% (2 BPS) for stables; 0.1% (10 BPS) for non-stables; Dynamic adjustment based on weightage | Swapping between JLP assets | Traders/LPs | JLP Pool (75%) + Protocol (25%) |
+| **JLP Mint/Burn Fee** | Variable | Minting or burning JLP tokens | LPs | JLP Pool (75%) + Protocol (25%) |
+| **Transaction Fees** | Variable | Submitting transactions | Traders | Solana Network |
 ---
 
 ## Base Fee
@@ -62,27 +69,50 @@ $$
 
 ## Price Impact Fees
 
+The price impact fee consists of two components: a linear price impact fee and an additive price impact fee, and it is capped with a maximum fee.
+
+$$
+\text{Final Price Impact Fee} = \min\left( \text{Linear Fee} + \text{Additive Penalty},\ \text{Max Fee} \right)
+$$
+
 1. **Linear Price Impact Fee**: Scales with trade size
 2. **Additive Price Impact Fee**: Additional penalty when open interest imbalance is high
+3. **Max Fee**: The maximum price impact fee that can be charged for the trade
 
 ### Rationale
-<Card>
-When trading on Jupiter Perpetuals, large trades don't incur price impact due to the use of oracle prices. This means the price shown to the trader is the price the trade is executed at—providing zero-slippage execution.
+<Accordion title="Orderbook Simulation & Risk Mitigation">
+When trading on Jupiter Perpetuals, price is defined via oracle prices, which allows:
+- Trades have zero-slippage execution.
+- Do not incur price impact.
 
-This is different from orderbook exchanges where large trades consume liquidity at various price levels, resulting in worse execution prices (slippage). While this benefits traders, it creates risks for JLP holders who are exposed to potential losses from large trades. It also opens the possibility for attackers to move prices on other exchanges and profit from opening positions in Jupiter Perpetuals.
+While this benefits traders on Jupiter Perpetuals, but there are risks:
+- Removes the natural price impact that can occur on traditional orderbook exchanges where large orders consuming liquidity will result in less favorable execution prices (slippage).
+- Creates risks for JLP holders who are exposed to potential losses from large trades. It also opens the possibility for attackers to move prices on other exchanges and profit from opening positions in Jupiter Perpetuals.
 
-To address this, Jupiter Perpetuals implements a **price impact fee** that simulates the price impact on traditional exchanges. The price impact fee consists of two components: a linear price impact fee and an additive price impact fee.
-</Card>
+Hence, the price impact fee simulates this slippage, ensuring fees are proportional to a trade's potential impact on the market. This creates a fairer environment and helps prevent arbitrage attacks where malicious actors could move prices on external exchanges and exploit Jupiter's zero-slippage model with large trades.
+</Accordion>
+
+<Accordion title="Fair Compensation for JLP Holders">
+The price impact fee compensates for the undesirable delta imposed on the JLP. Traders cannot benefit from splitting positions across different trades or addresses, as positions must be opened quickly before their alpha decays. The liquidity pool receives reasonable trading fees regardless of whether traders open large trades or split them up.
+</Accordion>
+
+<Accordion title="Risk Auditor Recommendations">
+Jupiter works with **Chaos Labs** to set and optimize the price impact parameters. The parameters may be adjusted over time as market conditions change. For additional information, consult the following proposals:
+
+- [Jupiter Perpetuals Price Impact Fee Mechanism](https://discuss.jup.ag/t/jupiter-perpetuals-price-impact-fee-mechanism/17140)
+- [Price Impact Parameter Recommendations](https://discuss.jup.ag/t/price-impact-parameter-recommendations-june-3rd-2025/38497)
+- [Additive on Imbalance Price Impact Model](https://discuss.jup.ag/t/additive-on-imbalance-price-impact-model/38562)
+</Accordion>
 
 ### Linear Price Impact Fee
 
 <Card>
 $$
-\text{Linear price impact fee coefficient} = \frac{\text{trade size}}{\text{price impact fee scalar constant}}
+\text{Linear Price Impact Fee Coefficient} = \frac{\text{Trade Size}}{\text{Price Impact Fee Scalar Constant}}
 $$
 
 $$
-\text{Final linear price impact fee} = \text{trade size} \times \text{linear price impact fee coefficient}
+\text{Final Linear Price Impact Fee} = \text{Trade Size} \times \text{Linear Price Impact Fee Coefficient}
 $$
 
 <div style={{ display: "flex", justifyContent: "center" }}>
@@ -96,22 +126,49 @@ $$
 
 - The linear price impact fee scales with trade size.
 - The fee increases proportionally as the trade size increases.
-- Each custody (SOL, ETH, BTC) has a fixed constant value (the price impact fee scalar or `pricing.tradeImpactFeeScalar` to be exact) that determines the final linear price impact fee coefficient when calculating the linear price impact fee.
-    - **SOL**: [`7xS2gz2bTp3fwCC7knJvUWTEU9Tycczu6VhJYKgi1wdz`](https://solscan.io/account/7xS2gz2bTp3fwCC7knJvUWTEU9Tycczu6VhJYKgi1wdz#accountData)
-    - **BTC**: [`5Pv3gM9JrFFH883SWAhvJC9RPYmo8UNxuFtv5bMMALkm`](https://solscan.io/account/5Pv3gM9JrFFH883SWAhvJC9RPYmo8UNxuFtv5bMMALkm#accountData)
-    - **ETH**: [`AQCGyheWPLeo6Qp9WpYS9m3Qj479t7R636N9ey1rEjEn`](https://solscan.io/account/AQCGyheWPLeo6Qp9WpYS9m3Qj479t7R636N9ey1rEjEn#accountData)
 
+<Note>
+**Finding Price Impact Fee Scalar:**
+
+Each custody (SOL, ETH, BTC) has a fixed constant value (the price impact fee scalar or `pricing.tradeImpactFeeScalar` to be exact) that determines the final linear price impact fee coefficient when calculating the linear price impact fee.
+- **SOL**: [`7xS2gz2bTp3fwCC7knJvUWTEU9Tycczu6VhJYKgi1wdz`](https://solscan.io/account/7xS2gz2bTp3fwCC7knJvUWTEU9Tycczu6VhJYKgi1wdz#accountData)
+- **BTC**: [`5Pv3gM9JrFFH883SWAhvJC9RPYmo8UNxuFtv5bMMALkm`](https://solscan.io/account/5Pv3gM9JrFFH883SWAhvJC9RPYmo8UNxuFtv5bMMALkm#accountData)
+- **ETH**: [`AQCGyheWPLeo6Qp9WpYS9m3Qj479t7R636N9ey1rEjEn`](https://solscan.io/account/AQCGyheWPLeo6Qp9WpYS9m3Qj479t7R636N9ey1rEjEn#accountData)
+</Note>
 <Note>
 The `pricing.tradeImpactFeeScalar` value is scaled to BPS format in the custody accounts. To calculate against the trade size in dollar amounts, divide the scalar value by 10,000 to match the dollar amount.
 </Note>
 </Card>
 
+### Additive Price Impact Fee
+
 <Card>
-**Example: Linear Price Impact Fee Calculation**
+$$
+\text{Additive Price Impact Fee (BPS)} = \mathrm{factor} \times \left( \frac{\mathrm{imbalance}}{\mathrm{threshold}} \right)^{\mathrm{exp}}
+$$
+
+- In addition to the linear price impact fee, Jupiter Perpetuals charges an **additive price impact fee** when the open interest delta imbalance skews heavily towards one side.
+- The open interest delta imbalance is calculated as the difference between long open interest and short open interest.
+- The additive fee is calculated as a penalty that scales based on the ratio of the open interest imbalance to the predefined threshold. If the imbalance is below the threshold, the additive penalty is zero.
+- This penalty is then added to the linear price impact fee, and the total is capped by a **Max Fee**.
+
+<Note>
+**Finding Imbalance Thresholds:**
+
+Each asset (SOL/ETH/BTC) has a fixed open interest delta imbalance threshold that must be hit before the additive price impact fee is charged. This can be accessed in each asset's custody account in `priceImpactBuffer.deltaImbalanceThresholdDecimal`:
+- **SOL**: [`7xS2gz2bTp3fwCC7knJvUWTEU9Tycczu6VhJYKgi1wdz`](https://solscan.io/account/7xS2gz2bTp3fwCC7knJvUWTEU9Tycczu6VhJYKgi1wdz#accountData)
+- **BTC**: [`5Pv3gM9JrFFH883SWAhvJC9RPYmo8UNxuFtv5bMMALkm`](https://solscan.io/account/5Pv3gM9JrFFH883SWAhvJC9RPYmo8UNxuFtv5bMMALkm#accountData)
+- **ETH**: [`AQCGyheWPLeo6Qp9WpYS9m3Qj479t7R636N9ey1rEjEn`](https://solscan.io/account/AQCGyheWPLeo6Qp9WpYS9m3Qj479t7R636N9ey1rEjEn#accountData)
+</Note>
+</Card>
+
+### Example Calculation
+
+<Accordion title="Example: Linear Price Impact Fee Calculation">
 
 **Position**: SOL long  
-**Trade size**: $10,000   
-**Calculation:**
+**Trade size**: 10,000   
+**Calculation**:
 
 Linear price impact fee scalar constant, normalized for dollar amounts (refer to above):
 $$
@@ -127,4 +184,229 @@ Final linear price impact fee:
 $$
 10{,}000 \times 0.000000026666667 = \$0.00026666667
 $$
+</Accordion>
+
+<Accordion title="Example: Additive Price Impact Fee Calculation">
+
+**Position**: SOL long  
+**Trade size**: 10,000  
+**New OI Imbalance**: 2,000,000    
+**SOL Parameters (at time of writing)**:
+  - `tradeImpactFeeScalar`: 1.25e9 (or 1,250,000,000 in dollar terms)
+  - `deltaImbalanceThreshold`: 750,000
+  - `factor` and `exp` are also defined per-custody
+
+**Calculation**:
+
+The imbalance of 2,000,000 is greater than the 750,000 threshold, so the penalty is applied:
+
+$$
+\text{Additive Fee (BPS)} = \text{factor} \times \left( \frac{2,\!000,\!000}{750,\!000} \right)^{\text{exp}}
+$$
+$$
+\text{Additive Fee (USD)} = \text{Trade Size} \times \frac{\text{Additive Fee (BPS)}}{10{,}000}
+$$
+</Accordion>
+
+<Accordion title="Example: Max Price Impact Fee Calculation">
+The final price impact fee is the sum of the two components, capped at the max fee, which at the time of writing is 50 BPS (0.50%) of trade size.
+
+$$
+\text{Final Fee} = \min\left(\text{Linear Fee} + \text{Additive Fee},\; \text{Max Fee}\right)
+$$
+$$
+\text{Final Fee} = \min\left(\text{Linear Fee} + \text{Additive Fee},\; \text{Trade Size} \times 0.005\right)
+$$
+</Accordion>
+
+### Calculating Price Impact Fees Programmatically
+
+For code examples on calculating price impact fees, refer to:
+- [Linear Price Impact Fee Example](https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing/blob/main/src/examples/price-impact-fee.ts)
+- [Additive Price Impact Fee Example](https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing/blob/main/src/examples/price-impact-fee.ts)
+
+---
+
+## Borrow Fees
+
+On Jupiter Perpetuals, traders can open leveraged positions by borrowing assets from the liquidity pool. In return, they pay borrow fees.
+
+### Rationale
+
+<Card title="Compensating Liquidity Providers">
+Borrow fees ensure liquidity providers are rewarded for supplying assets to the pool. This also helps align the token mark price with its spot market price.
 </Card>
+
+<Card title="Managing Risk">
+Borrow fees help balance the risks associated with leveraged trading.
+</Card>
+
+<Card title="Different from Funding Rates">
+Unlike other exchanges that charge funding rates for open positions, Jupiter Perpetuals uses a **borrow fee system**. These fees compound hourly based on the amount borrowed for the leveraged position.
+</Card>
+
+### How Borrow Fees Work
+
+<Card>
+The hourly borrow fee is calculated using the following formula:
+
+$$
+\text{Hourly Borrow Fee} = \text{Utilization} \times \text{Hourly Borrow Rate} \times \text{Position Size}
+$$
+
+Or, expanded:
+
+$$
+\text{Hourly Borrow Fee} = \underbrace{\frac{\text{Total Tokens Locked}}{\text{Total Tokens in Pool}}}_{\text{Utilization}} \times \text{Hourly Borrow Rate} \times \text{Position Size}
+$$
+
+Where:
+
+- **Utilization**: The proportion of tokens in the pool that are currently locked in open positions.
+  - **Total Tokens Locked**: Tokens locked in all open positions.
+  - **Total Tokens in Pool**: Tokens deposited into the underlying token's liquidity pool.
+- **Hourly Borrow Rate**: The base rate charged for borrowing, which varies by asset.
+  - In the **Borrow Rate** section of the trade form.
+  - On-chain via the `fundingRateState.hourlyFundingDbps` field in the custody account.
+- **Position Size**: The USD value of the leveraged position.
+</Card>
+
+### Example Calculation
+
+<Accordion title="Example: Borrow Fees & Utilization Calculation">
+**Position**: SOL long  
+**Price of SOL**: 100 USD  
+**Trade size**: 100 SOL  
+**Given**:  
+- Total Tokens Locked = 200 SOL (100 SOL from the position + 100 SOL in the pool)
+- Total Tokens in Pool = 1,010 SOL (1,000 SOL in custody + 10 SOL collateral)
+- Hourly Borrow Rate = 0.012% (0.00012 in decimal)
+- Position Size = 100 SOL × 100 USD = 10,000 USD
+
+**Calculation:**  
+- Utilization:
+  $$
+  \text{Utilization} = \frac{200\ \mathrm{SOL}}{1{,}010\ \mathrm{SOL}} = 0.198 \quad (19.8\%)
+  $$
+
+- Hourly Borrow Fee:
+  $$
+  \text{Hourly Borrow Fee} = 0.198 \times 0.00012 \times \$10{,}000 = \$0.238 \text{ per hour}
+  $$
+
+This means the position will accrue an estimated borrow fee of $0.238 every hour it remains open.
+</Accordion>
+
+#### Calculating Borrow Fee and Utilization Rate Programmatically
+
+To calculate borrow fee and utilization rate programmatically, refer to the [this code example](https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing/blob/main/src/examples/get-borrow-fee-and-funding-rate.ts).
+
+### Managing Borrow Fees
+
+<Card title="Ongoing Borrow Fees">
+Borrow fees are continuously deducted from your collateral. This impacts both your leverage and liquidation price over time.
+</Card>
+
+<Card title="Monitoring Fees">
+Since fees increase with position duration, regularly check your borrow fees and liquidation price. This helps avoid unexpected liquidation, especially during volatile market conditions.
+</Card>
+
+<Card title="Risk Auditor Recommendations">
+Borrow fee parameters are tuned by **Gauntlet** and **Chaos Labs** to balance:
+- Fair compensation for liquidity providers
+- Reasonable costs for traders
+- Risk management for the pool
+
+The `hourlyFundingDbps` parameter may be adjusted over time based on market conditions and pool utilization.
+</Card>
+
+---
+
+## Liquidation Penalty
+
+When a position is liquidated, any remaining collateral is collected by the protocol and distributed to the JLP as liquidation fees.
+
+<Warning>
+This means you will lose your **entire collateral** when the position is liquidated.
+</Warning>
+
+### Example Calculation
+
+**Position collateral**: \$10,000  
+**Remaining collateral after liquidation and fees**: \$1,000  
+**Liquidation penalty**: \$1,000 (the remaining collateral is collected by the JLP as liquidation fees)
+
+<Note>
+Please ensure you're constantly monitoring your liquidation price and only depositing collateral that is within your risk appetite.
+</Note>
+
+---
+
+## Swap Fees
+Trades that swap between JLP assets incur a **base and dynamic swap fee**.
+
+### Base Swap Fees
+- **Non-stables** (SOL, ETH, BTC): 10 BPS (0.1%) of the swap amount
+- **Stables** (USDC): 2 BPS (0.02%) of the swap amount
+
+<Note>
+The pool will take the **max base fee** of the input and output asset. For example, when swapping SOL to USDC, the base fee for SOL (10 BPS) will be used as it is higher than the USDC base fee (2 BPS).
+</Note>
+
+### Dynamic Fee Adjustment
+<Note>
+By swapping in/out of the pool, it will increase/decrease the asset's current weightage, which will then affect the dynamic swap fee.
+
+To understand how the target weightage is defined and why it is necessary, refer to the [JLP Economics: Pool Rebalancing](/docs/perps/jlp#pool-rebalancing) section.
+</Note>
+
+The final swap fee may be **lower or higher** than the base fee depending on the weightage change:
+
+- **Moving closer to target weightage**: Lower swap fees
+- **Moving away from target weightage**: Higher swap fees
+
+This mechanism prevents the JLP assets from being skewed away from their target weightage, which protects the pool and rewards JLP holders when swaps are routed through the JLP.
+
+### Calculating Swap Fees Programmatically
+
+For code examples on calculating swap fees, refer to the [Swap Amount and Fee Calculation Example](https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing/blob/main/src/examples/calculate-swap-amount-and-fee.ts).
+
+---
+
+## JLP Mint & Burn Fees
+
+Fees for minting and burning JLP use the same current/target weightage calculation as swaps, as both actions change the pool size of the asset being deposited or redeemed from the pool.
+
+- **Minting JLP**: Depositing assets increases that asset's current weightage -> Lower fees
+- **Burning JLP**: Redeeming assets decreases that asset's current weightage -> Higher fees
+
+The fee adjusts dynamically based on whether the action moves the asset's weightage closer to or further from its target, similar to swap fees.
+
+### Calculating JLP Mint & Burn Fees Programmatically
+
+For code examples on calculating JLP mint and burn fees, refer to the [JLP Mint & Burn Calculation Example](https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing/blob/main/src/examples/calculate-mint-burn-jlp.ts).
+
+---
+
+## Fee Distribution
+
+All fees collected by the protocol follow this distribution mechanism:
+
+1. **Collection**: Fees accumulate in `feesReserves` for each custody
+2. **Reinvestment**: Periodically, fees are reinvested into the pool
+3. **Distribution**:
+   - **25%** to protocol
+   - **75%** increases the pool's AUM (benefiting all JLP holders through price appreciation)
+
+## Transaction and Priority Fees
+
+Traders will have to pay **SOL** for submitting transactions onto the Solana chain. Traders also pay:
+
+- **Priority fees**: For faster transaction processing
+- **Jito bundle tips**: For guaranteed transaction inclusion (optional)
+
+At the same time, a minor SOL amount will be used for **rent** to create an escrow account (PDA). The SOL rent will be returned to you once you close your position.
+
+The trade form shows the estimated transaction fee and rent amount (in SOL) for the open or close position trade.
+
+---

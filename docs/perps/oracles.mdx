@@ -1,4 +1,50 @@
 ---
 title: "Oracles"
-description: "Understand the oracles used for the pricing of the markets."
+description: "Understand the oracles used in Jupiter Perpetuals."
 ---
+
+Jupiter Perps aggregates token prices from three price oracles:
+
+<Columns cols={3}>
+  <Card title="Edge by Chaos Labs" href="https://oracles.chaoslabs.xyz/price-feeds"/>
+  <Card title="Chainlink" href="https://chain.link/"/>
+  <Card title="Pyth" href="https://www.pyth.network/price-feeds"/>
+</Columns>
+
+<Card title="On-chain Oracle Price Accounts">
+The oracle price data is stored the following onchain accounts:
+
+| Token | Oracle Price Account |
+|-------|---------------------|
+| SOL   | [FYq2BWQ1V5P1WFBqr3qB2Kb5yHVvSv7upzKodgQE5zXh](https://solscan.io/account/FYq2BWQ1V5P1WFBqr3qB2Kb5yHVvSv7upzKodgQE5zXh) |
+| ETH   | [AFZnHPzy4mvVCffrVwhewHbFc93uTHvDSFrVH7GtfXF1](https://solscan.io/account/AFZnHPzy4mvVCffrVwhewHbFc93uTHvDSFrVH7GtfXF1) |
+| BTC   | [hUqAT1KQ7eW1i6Csp9CXYtpPfSAvi835V7wKi5fRfmC](https://solscan.io/account/hUqAT1KQ7eW1i6Csp9CXYtpPfSAvi835V7wKi5fRfmC) |
+| USDC  | [6Jp2xZUTWdDD2ZyUPRzeMdc6AFQ5K3pFgZxk2EijfjnM](https://solscan.io/account/6Jp2xZUTWdDD2ZyUPRzeMdc6AFQ5K3pFgZxk2EijfjnM) |
+| USDT  | [Fgc93D641F8N2d1xLjQ4jmShuD3GE3BsCXA56KBQbF5u](https://solscan.io/account/Fgc93D641F8N2d1xLjQ4jmShuD3GE3BsCXA56KBQbF5u) |
+
+<Note>
+If you were using the old price oracle account (set in the custody account's `dovesOracle` field), you should migrate to the new price oracle accounts by using the `dovesAgOracle` field instead.
+
+[You can also fetch the latest IDL for the oracle program here.](https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing/blob/main/src/idl/doves-idl.ts)
+</Note>
+</Card>
+
+**Edge by Chaos Labs is the primary oracle** for Jupiter Perps, with Chainlink and Pyth being used to verify the Edge oracle prices and acting as backup price oracles. This multi-oracle approach ensures Jupiter Perps uses accurate token prices even during market volatility or when a price oracle fails.
+
+The following describes how the multi-oracle system works:
+
+<Steps>
+<Step>
+If the Edge oracle is not stale and its price difference is within a set threshold of both Chainlink and Pyth prices, the Edge oracle price is used.
+</Step>
+<Step>
+If the Edge oracle is stale or its price exceeds the threshold, the system compares Chainlink and Pyth prices. If Chainlink and Pyth prices are within the threshold, the latest price between the two oracles is selected.
+</Step>
+<Step>
+If two out of three oracles fail, no price update will happen.
+</Step>
+</Steps>
+
+<Note>
+Oracle price updates happen during trade execution and through regular updates by a dedicated keeper.
+</Note>

@@ -1,12 +1,13 @@
 ---
 title: "Transaction Execution"
-description: "Understand how to execute transactions for both trading, mint/burn of JLP and lending/borrowing."
+description: "Understand how to execute transactions for all operations in Jupiter Perpetuals."
 ---
-
-## Overview
 
 Many operations in the Jupiter Perps API require **keeper-signed transactions** to be executed. These transactions cannot be submitted directly through standard Solana RPC calls. Instead, they must be sent to the `/transaction/execute` endpoint, where a keeper will sign and execute them on your behalf.
 
+<Note>
+Refer to the [Keepers](/docs/perps/keepers) document for more information on keepers and flow of execution.
+</Note>
 <Note>
 Refer to the [Transaction Execution](/api-reference/perps/post-transaction-execute) endpoint for the complete API documentation.
 </Note>
@@ -29,12 +30,20 @@ When you call any of these operation endpoints, the response will include:
 ## Transaction Types
 
 ### Instant Transactions
-
-When `transactionType` is `"instant"` or `requireKeeperSignature` is `true`, you **must** use the `/transaction/execute` endpoint. These transactions require a keeper to sign and execute them.
+<Card>
+When:
+- `transactionType` is `"instant"`
+- OR `requireKeeperSignature` is `true`
+- You **must** use the `/transaction/execute` endpoint. These transactions require a keeper to sign and execute them.
+</Card>
 
 ### Legacy Transactions
-
-When `transactionType` is `"legacy"` and `requireKeeperSignature` is `false`, you can submit the transaction directly through standard Solana RPC methods (e.g., `sendTransaction`).
+<Card>
+When:
+- `transactionType` is `"legacy"`
+- AND `requireKeeperSignature` is `false`
+- You can submit the transaction directly through standard Solana RPC methods (e.g., `sendTransaction`).
+</Card>
 
 ## Workflow
 
@@ -65,7 +74,7 @@ Examine the response to determine how to proceed:
 if (data.transactionType === 'instant' || data.requireKeeperSignature) {
   // Proceed to Step 3 - use transaction execution endpoint
 } else {
-  // Submit directly via RPC
+  // Sign and send directly via RPC
   await connection.sendRawTransaction(transaction.serialize());
 }
 ```
@@ -116,12 +125,9 @@ const result = await executeResponse.json();
 The `action` parameter in `/transaction/execute` must match one of these values:
 
 - `tpsl` - Take profit / Stop loss orders
-- `tpsl-with-fee` - TPSL orders with integrator fees
 - `limit-order` - Limit orders
 - `increase-position` - Increase position size
-- `increase-position-with-fee` - Increase position with integrator fees
 - `decrease-position` - Decrease position size
-- `decrease-position-with-fee` - Decrease position with integrator fees
 
 ## Important Notes
 

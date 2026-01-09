@@ -5,6 +5,10 @@ description: "Understand how keepers are used in Jupiter Perpetuals."
 
 Jupiter Perpetuals uses an on-chain request fulfilment model to create and execute trade requests, ensuring a seamless and automated trading experience.
 
+<Note>
+Refer to the [Transaction Execution](/docs/perps/transaction-execution) document for more information on how to execute transactions for all operations in Jupiter Perpetuals when using the API.
+</Note>
+
 This system requires two transactions to complete a trade request:
 1. To create the request.
 2. To fulfill and execute it.
@@ -30,6 +34,7 @@ Traders can perform a variety of actions on the Jupiter Perpetuals exchange, inc
 - Withdrawing collateral
 - Creating, editing, or closing take profit (TP) and stop loss (SL) orders
 - Creating, editing or closing Limit Orders (LO)
+- And others
 
 These actions can be performed through the Jupiter Perpetuals platform or via the API. Once the trader initiates an action, the frontend or API server verifies the action and submits a transaction to the Solana blockchain, containing all the necessary data (like trade size, collateral size, position side, etc.) to fulfill the request.
 

@@ -1,0 +1,121 @@
+---
+title: "Error Handling"
+description: "Understand how to handle errors in the Jupiter Perpetuals API."
+---
+
+All API endpoints return errors in a consistent JSON format:
+```json
+{
+  "code": "string",
+  "message": "string",
+  "metadata": {
+    // Optional additional error details
+  }
+}
+```
+
+Example Error Response
+```json
+{
+  "code": "invalid_argument",
+  "message": "leverage must be between 1.1 and 100",
+  "metadata": null
+}
+```
+
+
+## Error Response Fields
+| Field    | Type    | Description                                                                                  |
+|----------|---------|----------------------------------------------------------------------------------------------|
+| code     | string  | A unique error identifier (snake_case string)                                                |
+| message  | string  | A human-readable error description                                                           |
+| metadata | object  | (Optional) Additional context about the error, present only when relevant                    |
+
+## HTTP Status Codes
+| Status Code | Name                    | Description                                   |
+|-------------|-------------------------|-----------------------------------------------|
+| 400         | Bad Request             | Invalid arguments                             |
+| 404         | Not Found               | Invalid endpoint                              |
+| 422         | Unprocessable Entity    | Business logic errors                         |
+| 500         | Internal Server Error   | An unexpected error occurred on the server    |
+| 503         | Service Unavailable     | The service is temporarily unavailable        |
+
+## 422 Error Codes Reference
+
+These are possible 422 (business logic errors) that you may face when using the Jupiter Perpetuals API.
+
+
+### Position Management
+
+| Error Code                    | Description                          |
+|-------------------------------|--------------------------------------|
+| invalid_position              | Position not found or invalid        |
+| invalid_position_size         | Position size is invalid             |
+| invalid_position_request      | Invalid position request             |
+| invalid_position_request_size | Invalid position request size        |
+
+
+### Trading Limits
+
+| Error Code                  | Description                                       |
+|-----------------------------|---------------------------------------------------|
+| trade_size_below_minimum    | Trade size is below the minimum allowed           |
+| trade_size_exceed_maximum   | Trade size exceeds the maximum allowed            |
+| collateral_size_below_minimum | Collateral must be at least $10 for new positions |
+| position_amount_limit       | No available liquidity in the pool for the position|
+| custody_amount_limit        | Position size exceeds the max limit               |
+
+
+### Leverage & Margin
+
+| Error Code                   | Description                                    |
+|------------------------------|------------------------------------------------|
+| invalid_leverage             | Invalid leverage value                         |
+| borrow_exceeds_margin_limits | Borrow size exceeds margin limits              |
+| withdraw_exceeds_margin_limits | Withdraw size exceeds margin limits           |
+| custody_borrow_disabled      | Borrowing is not enabled for this custody      |
+| custody_borrow_limits_exceeded | Exceeds maximum borrow for custody           |
+
+
+### Take Profit/Stop Loss
+
+| Error Code                           | Description                                    |
+|--------------------------------------|------------------------------------------------|
+| invalid_tp_price                     | Invalid take profit price                      |
+| invalid_sl_price                     | Invalid stop loss price                        |
+| trigger_price_below_minimum_long     | Trigger price below minimum for long position  |
+| trigger_price_below_minimum_short    | Trigger price below minimum for short position |
+| trigger_price_exceed_maximum_long    | Trigger price exceeds maximum for long position|
+| trigger_price_exceed_maximum_short   | Trigger price exceeds maximum for short position|
+| maximum_tpsl_requests_exceeded       | Maximum TPSL requests exceeded                 |
+
+
+### Orders
+
+| Error Code                  | Description                                        |
+|-----------------------------|----------------------------------------------------|
+| limit_order_exists          | A limit order already exists for this position     |
+| maximum_limit_orders_exceeded | Maximum limit orders exceeded                    |
+
+
+### Token & Fee Errors
+
+| Error Code               | Description                                     |
+|--------------------------|-------------------------------------------------|
+| invalid_custody          | Invalid custody                                 |
+| invalid_collateral_token | Invalid collateral token                        |
+| invalid_input_mint       | Invalid input mint                              |
+| invalid_fee_amount       | Invalid fee amount                              |
+| invalid_fee_token        | Invalid fee token                               |
+| insufficient_funds       | Insufficient funds to execute the request       |
+
+
+### Transaction Errors
+
+| Error Code               | Description                                  |
+|--------------------------|----------------------------------------------|
+| transaction_too_large    | Transaction exceeds max Solana transaction size |
+| simulation_error         | Transaction simulation failed                |
+| stale_request            | Request timestamp is stale                   |
+| unable_to_quote          | No available route to swap                   |
+

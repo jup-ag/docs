@@ -190,40 +190,25 @@
                   "docs/perps/oracles",
                   "docs/perps/fees",
                   "docs/perps/liquidation",
-                  "docs/perps/jlp-loan"
-                ]
-              },
-              {
-                "group": "Perps API",
-                "pages": [
-                  "docs/perps/transaction-execution",
+                  "docs/perps/jlp-loan",
                   {
-                    "group": "Trading",
+                    "group": "Program",
                     "pages": [
-                      "docs/perps/trading/position-data",
-                      "docs/perps/trading/position-management",
-                      "docs/perps/trading/limit-orders",
-                      "docs/perps/trading/tpsl-orders"
-                    ]
-                  },
-                  {
-                    "group": "JLP",
-                    "pages": [
-                      "docs/perps/jlp/getting-jlp",
-                      "docs/perps/jlp-lend/position-data",
-                      "docs/perps/jlp-lend/position-management"
+                      "docs/perps/program/index",
+                      "docs/perps/program/position-account",
+                      "docs/perps/program/position-request-account",
+                      "docs/perps/program/pool-account",
+                      "docs/perps/program/custody-account"
                     ]
                   }
                 ]
               },
               {
-                "group": "Perps Program",
+                "group": "Perps API",
                 "pages": [
-                  "docs/perps/program/index",
-                  "docs/perps/program/position-account",
-                  "docs/perps/program/position-request-account",
-                  "docs/perps/program/pool-account",
-                  "docs/perps/program/custody-account"
+                  "docs/perps/api-usage",
+                  "docs/perps/transaction-execution",
+                  "/docs/perps/error-handling"
                 ]
               }
             ]

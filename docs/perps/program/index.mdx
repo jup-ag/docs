@@ -1,4 +1,77 @@
 ---
 title: "Overview"
-description: "Overview of the Jupiter Perps Program."
+description: "Overview of the Jupiter Perpetuals program."
 ---
+
+Refer to these pages for more information on the Jupiter Perpetuals program:
+- [Position Account](/docs/perps/program/position-account)
+- [Position Request Account](/docs/perps/program/position-request-account)
+- [Pool Account](/docs/perps/program/pool-account)
+- [Custody Account](/docs/perps/program/custody-account)
+
+## Example Account Parsing
+
+### Position Account
+
+- Positions are stored as on-chain accounts in the Jupiter Perpetuals program.
+- To retrieve and parse position data, you need to:
+    - Fetch the position account using its public key
+    - Fetch associated custody accounts (market and collateral)
+    - Fetch current oracle prices
+    - Calculate PnL, fees, and other metrics
+    - Format the data for consumption
+    - [This code snippet demonstrates the steps above in Typescript](https://gist.github.com/julianfssen/446d7d92b566e963b32d7947b269f6be)
+    - The code block below show an example of the output returned by the code snippet above
+```
+{
+  // Position Identifiers
+  positionPubkey: string;         // On-chain account address
+  marketMint: string;             // Market token mint (SOL, BTC, ETH)
+  collateralMint: string;         // Collateral token mint
+  side: 'long' | 'short';         // Position direction
+
+  // Size & Collateral
+  size: string;                   // Position size in USD (formatted)
+  sizeUsdDelta: string;           // Position size in USD (raw)
+  sizeTokenAmount: string;        // Position size in tokens
+  collateral: string;             // Collateral in USD (formatted)
+  collateralUsd: string;          // Collateral in USD (raw)
+  leverage: string;               // Current leverage
+
+  // Prices
+  entryPrice: string;             // Average entry price
+  markPrice: string;              // Current market price
+  liquidationPrice: string;       // Liquidation trigger price
+
+  // PnL (Profit & Loss)
+  pnlBeforeFees: string;          // Unrealized PnL before fees (raw)
+  pnlBeforeFeesUsd: string;       // Unrealized PnL before fees (formatted)
+  pnlAfterFees: string;           // Unrealized PnL after fees (raw)
+  pnlAfterFeesUsd: string;        // Unrealized PnL after fees (formatted)
+  pnlChangePctBeforeFees: string; // PnL percentage before fees
+  pnlChangePctAfterFees: string;  // PnL percentage after fees
+
+  // Fees
+  openFees: string;               // Opening fees paid (raw)
+  openFeesUsd: string;            // Opening fees paid (formatted)
+  borrowFees: string;             // Accumulated funding fees (raw)
+  borrowFeesUsd: string;          // Accumulated funding fees (formatted)
+  closeFees: string;              // Estimated closing fees (raw)
+  closeFeesUsd: string;           // Estimated closing fees (formatted)
+  totalFees: string;              // Total fees (raw)
+  totalFeesUsd: string;           // Total fees (formatted)
+
+  // Timestamps
+  createdTime: number;            // Position open time (Unix seconds)
+  updatedTime: number;            // Last update time (Unix seconds)
+
+  // Other
+  value: string;                  // Position value (collateral + PnL - fees)
+}
+```
+
+### Position Request Account
+
+- Take Profit / Stop Loss / Limit orders are stored as position request accounts onchain.
+- The fetching and parsing steps are almost the same as the position account above, but a lot easier as the position request account has a lot less fields to decode and calculate
+- [This code snippet shows the steps to parse a TP/SL account as we show in the UI](https://gist.github.com/julianfssen/ebb0606de947a2c516230a2892ec5d38)

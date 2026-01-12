@@ -1,0 +1,91 @@
+---
+title: "Usage"
+description: "Overview of the Jupiter Perpetuals API."
+---
+
+Jupiter Perpetuals API provides comprehensive endpoints for trading, JLP operations, and JLP Loan.
+
+<Note>
+For the full API reference, refer to the [Perps API Reference](/api-reference/perps).
+</Note>
+
+## Overview of the Perps API
+
+The **Jupiter Perpetuals API** is designed to make it easy to interact with all aspects of the Perps protocol, including trading (opening, closing, and managing positions), as well as JLP and JLP Loan operations. Endpoints are provided for querying market data, managing open positions, placing limit and TPSL (Take Profit / Stop Loss) orders, and more.
+
+**Quick links to various operations:**
+- [Transaction Execution](/api-reference/perps/post-transaction-execute)
+- [Perps position management](/api-reference/perps/trading-overview)
+    - [Increase/decrease position](/api-reference/perps/post-positions-increase)
+    - [Limit order](/api-reference/perps/post-orders-limit)
+    - [TP/SL order](/api-reference/perps/post-tpsl)
+- [Perps data and information](/api-reference/perps/get-market-stats)
+- [JLP operations](/api-reference/perps/get-jlp-info)
+- [JLP Loan operations](/api-reference/perps/get-loan-info)
+
+## API Validation
+There are certain validation rules that must be followed for each endpoint, please refer to the following information when using the Perps API. For the full usage, please refer to the [Perps API Reference](/api-reference/perps).
+<AccordionGroup>
+<Accordion title="POST /v1/positions/increase">
+- One of `leverage` or `sizeUsdDelta` must be provided.
+- New positions must deposit at least $10 USD of collateral (after buffer).
+- Trade size must be positive and below custody `maxPositionSizeUsd`; liquidity and position limits are enforced.
+- Longs require `collateralMint === marketMint`; shorts require a stable `collateralMint`, and new shorts cannot use USDT.
+- TPSL requests are only accepted when `transactionType !== legacy`; TPSL `desiredMint` must be either the asset itself (SOL, ETH, BTC) or USDC and trigger prices must fall inside the buffered ranges around entry/liquidation.
+- Requests from the keeper wallet are rejected.
+</Accordion>
+<Accordion title="POST /v1/positions/decrease">
+- `entirePosition = true` requires both `collateralUsdDelta` and `sizeUsdDelta` to be zero; partial closes need at least one non-zero delta.
+- `receiveToken` must equal the custody mint or USDC. Shorts that still hold legacy USDT collateral may withdraw to USDT via legacy flow.
+- If only `sizeUsdDelta` is provided, the API derives the collateral withdrawal; realized losses and fees can reduce the resulting payout.
+</Accordion>
+<Accordion title="POST /v1/tpsl">
+- `positionPubkey` must reference an open position.
+- Up to 20 TP / SL requests can be created for a position.
+- Every request must be supplied through `tpsl[]`; single-request payloads are not supported.
+- Each entry must set `receiveToken`, `requestType`, `triggerPrice`, and either `entirePosition = true (auto-sets sizeUsdDelta = 0)` or a non-zero `sizeUsdDelta`.
+- Requests created with `transactionType = instant` must be sent to `POST /v1/transaction/execute`.
+</Accordion>
+<Accordion title="PATCH /v1/tpsl">
+- The TP / SL request must exist, remain unexecuted, and belong to an active position.
+- Trigger prices must stay within buffered oracle guardrails (longs: 50%–100% of spot, shorts: 100%–200%).
+- Updates automatically clamp the request size so it cannot exceed the remaining position size.
+- Instant responses require execution via `/v1/transaction/execute`; legacy responses can be submitted directly to your RPC.
+</Accordion>
+<Accordion title="DELETE /v1/tpsl">
+- The request must exist and remain open.
+- Cancellations always return a legacy transaction and do not require a keeper signature.
+</Accordion>
+<Accordion title="POST /v1/orders/limit">
+- `walletAddress` must not be the keeper wallet.
+- Up to 20 open limit orders are allowed per custody/side for a wallet.
+- Provide exactly one of `leverage` or `sizeUsdDelta`; supplying both or neither is rejected.
+- `inputMint` must be the custody mint or USDC. Long orders require `collateralMint === marketMint`; shorts require a supported stablecoin collateral.
+- Trigger prices must stay within oracle guardrails (longs: 50%–100% of spot, shorts: 100%–200%).
+- Collateral valued at the trigger price must meet the $10 minimum (buffered).
+- Custody- and pool-level position size checks are enforced to ensure liquidity is available.
+- Supplied leverage is re-evaluated after fees to ensure the resulting leverage stays within custody limits.
+</Accordion>
+<Accordion title="PATCH /v1/orders/limit">
+- The request must exist, remain unexecuted, and be a trigger-type order.
+- Trigger prices must respect the same 50%/200% spot bounds. Violations yield trigger price errors.
+- Collateral and leverage are recomputed at the new trigger price to ensure custody leverage limits are preserved.
+- Updates always generate keeper-signed transactions that close the existing request and recreate it with the new trigger.
+</Accordion>
+<Accordion title="DELETE /v1/order/limit">
+- The request must exist and remain unexecuted.
+- Closures always return legacy transactions and do not require keeper signatures.
+</Accordion>
+</AccordionGroup>
+
+## Transaction Execution & Keepers
+Some actions in the Perps API require blockchain transactions that must be signed by a **keeper** in addition to your wallet. This is necessary due to the [design of the keeper-based system that uses a request-fulfillment model](/docs/perps/keepers), such as increasing/decreasing positions, placing limit orders, and managing TPSL orders.
+
+<Tip>
+Transactions requiring a keeper **must be submitted to the `/transaction/execute` endpoint**, not directly to RPC.
+
+For a complete step-by-step guide and workflow examples—including code on how to handle transaction execution with keepers—see [Transaction Execution](/docs/perps/transaction-execution).
+</Tip>
+
+## Error Handling
+All endpoints return consistent JSON error responses, making it easy to understand and handle errors in your integration. See [Error Handling](/docs/perps/error-handling) for details and error code references.

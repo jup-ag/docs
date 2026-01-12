@@ -4,7 +4,7 @@ title: "Pool Account"
 
 This page contains an overview of the  used in the Jupiter Perpetuals Program, and specifically the  account.
 
-The `Pool` account is a struct which represents a set of parameters and states associated to the data for JLP pool, including AUM and [`Custody`](/docs/perps/custody-account) data.
+The `Pool` account is a struct which represents a set of parameters and states associated to the data for JLP pool, including AUM and [`Custody`](/docs/perps/program/custody-account) data.
 
 <Info>
   **ONLY ONE POOL ACCOUNT**
@@ -28,7 +28,7 @@ Each `Pool` account contains the following data:
 | :---------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`      | **Type:** `string` <br/><br/> The name for the account.                                                                                                                                                                                                                                                                                                     |
 | `custodies` | **Type:** `publicKey` <br/><br/> An array containing the public keys for the custodies (tokens) managed by the JLP pool.                                                                                                                                                                                                                                    |
-| `aumUsd`    | **Type:** `u128` <br/><br/> The current AUM value (USD) for the JLP pool. The `aumUsd` value's calculation can be summarized by getting the USD value of the tokens managed by the pool minus the USD value reserved to pay off trader profits. <br/> <br/>Refer to the [Custody account](/docs/perps/custody-account) details for more details on AUM calculation. |
+| `aumUsd`    | **Type:** `u128` <br/><br/> The current AUM value (USD) for the JLP pool. The `aumUsd` value's calculation can be summarized by getting the USD value of the tokens managed by the pool minus the USD value reserved to pay off trader profits. <br/> <br/>Refer to the [Custody account](/docs/perps/program/custody-account) details for more details on AUM calculation. |
 | `limit`     | **Type:** [`Limit`](#limit) <br/><br/> Contains values for the pool's limits.                                                                                                                                                                                                                                                                               |
 | `fees`      | **Type:** [`Fees`](#fees) <br/><br/> Sets the fee amounts or percentages for the Jupiter Perpetuals exchange.                                                                                                                                                                                                                                               |
 | `poolApr`   | **Type:** [`PoolApr`](#poolapr) <br/><br/> Contains data related to the pool's APR / APY calculations.                                                                                                                                                                                                                                                      |

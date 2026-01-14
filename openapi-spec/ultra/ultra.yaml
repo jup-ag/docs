@@ -296,6 +296,7 @@ paths:
           name: closeAuthority
           description: |
             - Optional. If used, requires `payer`
+            - Ignored, if `payer` is not provided
             - The public key of an account to set as the close authority of ATAs created during the swap transaction. Only applies to non-wSOL ATAs that persist beyond the execution of the transaction.
             - If `closeAuthority` is not provided, we will default to `taker`
             - If `closeAuthority` is provided and is different from `taker`, we will add the instruction to set the new `closeAuthority`

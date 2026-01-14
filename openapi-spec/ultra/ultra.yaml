@@ -72,10 +72,6 @@ paths:
                               type: string
                             outAmount:
                               type: string
-                            feeAmount:
-                              type: string
-                            feeMint:
-                              type: string
                           required:
                             - ammKey
                             - label
@@ -83,8 +79,6 @@ paths:
                             - outputMint
                             - inAmount
                             - outAmount
-                            - feeAmount
-                            - feeMint
                         percent:
                           type: number
                         bps:

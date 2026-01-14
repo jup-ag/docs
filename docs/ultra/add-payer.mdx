@@ -24,7 +24,7 @@ The Jupiter Ultra Swap API allows you to pay for networks fees and rent on behal
 
 To use the `payer` parameter, you need to pass in the following parameters:
 - `payer`: The public key of the account that will be used to pay for the network fees, priority fees/tips and rents.
-- `closeAuthority`: The public key of the account that will be the close authority of the token accounts created during the swap (apart from WSOL token account).
+- `closeAuthority`: Optional. Defaults to `taker` if not used. The public key of the account that will be the close authority of the token accounts created during the swap (apart from WSOL token account).
 
 However, as mentioned above, to use `payer`, it is expected to be used with referral parameters such as `referralAccount` and `referralFee` because it is assumed that the integrator will need to recoup the costs using referral fees.
 - `referralAccount`: The public key of the referral account that is collecting the fees.
@@ -54,22 +54,18 @@ const orderResponse = await (
 
 ## Close Authority
 
-When using `payer` parameter, you are required to use `closeAuthority` parameter as well.
+When using `payer` parameter, you may optionally use `closeAuthority` parameter, but only use when necessary/intentional.
 
 When token accounts are created for the output swap amount, the rent of the token accounts are essentially being given away, in order to prevent a loss or abuse of the integrator gas payer, there are a few ways to handle it.
 1. You can charge sufficient fees to ensure that it can cover the amount used by the payer.
 2. You can set yourself as the close authority of the token account such that you have the authority to close the account and be the recipient of the rent.
 
-**Usage of `closeAuthority` parameter**:
-- If `closeAuthority == taker`, we DO NOT add instruction to set `closeAuthority`.
-- If `closeAuthority !== taker`, we add the instruction to set new `closeAuthority`.
-
 <Warning>
-When setting a new `closeAuthority`, the taker can hold the account hostage if the balance in the token account is never zero.
-
-*You can only close the token account when balance is zero*.
+If the taker's token account never reaches zero amount, it means that you are unable to close the token account, causing your SOL to be "stuck".
 </Warning>
 
-<Note>
+**Usage of `closeAuthority` parameter**:
+- If `closeAuthority` is not provided, we will default to `taker`.
+- If `closeAuthority` is provided and is different from `taker`, we will add the instruction to set the new `closeAuthority`.
+
 Refer to [Solana Docs](https://solana.com/docs/tokens/basics/create-token-account) for more details on the close authority.
-</Note>

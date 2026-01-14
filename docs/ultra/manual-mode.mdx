@@ -1,0 +1,122 @@
+---
+title: "Manual Mode"
+description: "Use manual mode to control Ultra API parameters like slippage or priority fee settings."
+---
+
+Ultra is a production-grade execution engine that we run as our core product. The default behavior reflects years of operational tuning, and continuous optimization with data gathered from network conditions, execution outcomes and real-world feedback.
+
+Contrastingly, manual mode parameters exist to allow explicit control over execution behavior in **user-facing manual trading experiences** (e.g. similar to the jup.ag frontend), or for **personal, self-directed usage** where the operator intentionally manages execution trade-offs.
+
+---
+
+## When to use manual mode
+
+- You are an integrator looking to mirror a manual trading UX like jup.ag's manual mode (e.g. slippage, transaction prioritization strategy).
+- You are an individual looking to customize your Ultra swaps and intentionally manage execution trade-offs.
+
+<Warning>
+Manual mode should NOT be used as a default interface.
+</Warning>
+
+---
+
+## Why refrain from using manual mode
+
+For most integrations, using Ultra as-is provides significant benefits, as seen directly on our own frontend at jup.ag:
+
+- Proven higher and more consistent success rates
+- Adaptive and optimized execution tuned with real-world feedback, execution outcomes
+- Full observability, debugging, and customer support
+
+When manual parameters are set:
+
+- Execution behavior deviates from supported defaults
+- Outcomes depend on user-selected trade-offs
+- We cannot reliably reproduce or debug failures
+
+As a result, transactions executed with manual overrides fall outside our supported execution model, and we are unable to provide full debugging assistance or customer support for issues arising from these configurations.
+
+<Warning>
+Manual mode is not guaranteed stable or supported API usage. It may be subject to changes as Ultra evolves.
+</Warning>
+
+---
+
+## Recommended approach
+
+If your goal is to provide a **reliable, production‑ready execution experience**, the recommended approach is:
+
+- Use Ultra with its default behavior
+- Only if absolutely necessary, use and treat manual mode as an *advanced, opt‑in feature*
+- Avoid building core execution logic around manual overrides
+
+By doing so, you benefit directly from the same execution system, optimizations, and ongoing improvements that power our own products.
+
+---
+
+## Manual mode parameters
+
+The following parameters are documented for reference only. They are optional, and should be used with caution.
+
+```json
+    {
+      "in": "query",
+      "name": "slippageBps",
+      "schema": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 10000
+      },
+      "required": false
+    },
+    {
+      "in": "query",
+      "name": "broadcastFeeType",
+      "schema": {
+        "type": "string",
+        "enum": [
+          "maxCap",
+          "exactFee"
+        ]
+      },
+      "required": false
+    },
+    {
+      "in": "query",
+      "name": "priorityFeeLamports",
+      "schema": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      },
+      "required": false
+    },
+    {
+      "in": "query",
+      "name": "jitoTipLamports",
+      "schema": {
+        "type": "number",
+        "minimum": 1000
+      },
+      "required": false
+    },
+```
+
+---
+
+## Using manual mode parameters with integrator parameters
+
+We allow manual mode parameters to be used with integrator parameters, such as `slippageBps` with `payer` / `referral`. There are some pointers to take note of:
+
+<Card>
+**`slippageBps` causes `payer` account being drained**
+
+If you allow taker to set slippage and you provide gasless via `payer` at the same time, there is a possibility where taker sets `slippageBps=0` which may result in high failure rates - however, these transactions are still submitted on-chain and the default network fee for processing will still apply - making the `payer` account susceptible to be drained.
+
+</Card>
+
+<Card>
+**Priority fee parameters causes `payer` account being drained**
+
+If you allow taker to set priority fee parameters and you provide gasless via `payer` at the same time, there is a possibility where taker sets `high-priority-fees` which may cause the `payer` account to overspend on gas fee.
+
+</Card>

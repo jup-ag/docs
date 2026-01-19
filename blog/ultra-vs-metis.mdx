@@ -20,7 +20,9 @@ very different features and use cases.
 
 **Just Integrate Ultra.**
 
-Unless you have a specific reason not to. The only reasons to use Metis are:
+TL;DR: Ultra is a complete execution engine for teams that want to ship fast. 
+Metis is a routing primitive for teams that need CPI, custom instructions, or full 
+infrastructure control.
 
 1. You need CPI (Cross Program Invocation) to call swaps from your on-chain program
 2. You need to add custom instructions to the transaction
@@ -98,10 +100,9 @@ across Solana and serves as the foundation for Ultra's Iris engine.
 
 | Aspect | Ultra API | Metis API |
 |--------|-----------|-----------|
-| **Architecture** | Meta-aggregator combining multiple engines:<br/><br/>- Iris (enhanced Metis)<br/>- DFlow<br/>- OKX<br/>- JupiterZ | Single, proven routing engine focused on on-chain liquidity |
+| **Architecture** | Meta-aggregator combining:<br/><br/>- Iris (enhanced Metis with new features and self-learning capabilities)<br/>- DFlow<br/>- OKX<br/>- JupiterZ (RFQ with 20+ MMs) | Single, proven routing engine for on-chain liquidity |
 | **RFQ Access** | Built-in access to JupiterZ with 20+ market makers | Not supported |
 | **Liquidity Sources** | Aggregates across multiple aggregators and RFQ networks | Direct access to Solana's on-chain liquidity via optimized routing |
-| **Features** | Active development on 
 
 <Info>
 Iris is an enhanced version of Metis, it is built with the learnings and experiences of Metis, 
@@ -240,16 +241,14 @@ Production reliability, support, operational overhead and fees involved differ s
 | **Fee Involved** | Usage incurs swap fees<br/><br/>Integrator can earn fees: Referral and Advance Fee | Usage incurs Portal fees to increase rate limits<br/><br/>Integrator can earn fees: Referral |
 
 **What this means:**
-- Ultra shifts the operational burden to Jupiter, including production-grade observability, incident response, 
-    and direct user support. This is because Ultra enforces opinionated and Jupiter-optimized configurations, 
-    and consistent transaction structures, Jupiter can log and monitor all swap executions — whether from jup.ag's 
-    own interface or third-party integrations via the API — enabling comprehensive support for your users without 
-    requiring you to build diagnostics or troubleshooting tools.
-- Metis requires you to build your own infrastructure for transaction handling, hence it is also required that 
-    you maintain your own infrastructure with custom monitoring, alerting, and support systems. This gives you 
-    complete visibility and control over your execution quality, enabling you to optimize and differentiate at the 
-    infrastructure layer itself.
+- Ultra shifts the operational burden to Jupiter, including production-grade observability, incident response, and 
+    direct user support. Because Ultra enforces opinionated, Jupiter-optimized configurations and consistent transaction 
+    structures, Jupiter can log and monitor all swap executions — whether from jup.ag's own interface or third-party 
+    integrations via the API — enabling comprehensive support for your users without requiring you to build your own.
 
+- Metis requires you to build your own infrastructure for transaction handling, maintain custom monitoring, alerting, 
+    and support systems. This gives you complete visibility and control over your execution quality, enabling you to 
+    optimize and differentiate at the infrastructure layer itself.
 ---
 
 ## The Decision Framework
@@ -295,16 +294,6 @@ Production reliability, support, operational overhead and fees involved differ s
     Unless you have your own validator stake and transaction landing infrastructure, you're using what everyone else is using. Ultra 
     uses Jupiter Beam on Jupiter's own infrastructure. [The data is public](https://sandwiched.me/sandwiches): Ultra has the lowest 
     value extraction ratio despite the highest volume.
-
-## Summary: Two Tools, Two Visions
-
-Ultra and Metis represent different strategic choices, not different quality levels.
-
-**Ultra is swap service**: You inherit Jupiter's execution expertise, continuous optimization, and operational excellence. You trade customization flexibility for immediate performance and reduced engineering overhead.
-
-**Metis is infrastructure primitive**: You gain Jupiter's routing intelligence as a foundation to build upon. You trade immediate optimization for the freedom to build exactly what you envision.
-
-Both approaches power successful applications. Both represent years of Jupiter's infrastructure investment. The right choice depends entirely on your product vision, team capabilities, and competitive strategy.
 
 ## Summary: Two Tools, Two Visions
 

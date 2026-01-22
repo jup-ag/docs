@@ -72,10 +72,6 @@ paths:
                               type: string
                             outAmount:
                               type: string
-                            feeAmount:
-                              type: string
-                            feeMint:
-                              type: string
                           required:
                             - ammKey
                             - label
@@ -83,8 +79,6 @@ paths:
                             - outputMint
                             - inAmount
                             - outAmount
-                            - feeAmount
-                            - feeMint
                         percent:
                           type: number
                         bps:
@@ -294,7 +288,6 @@ paths:
           description: |
             - The public key of an account that will be used to cover 'gas-related' fees on behalf of the taker
             - Gas related fees such as signature fees, priority fees and rent. Note that enabling this may result in different routing decisions.
-            - When `payer` is passed in, `closeAuthority` is required
             - Refer to [Integrator Payer](/docs/ultra/add-payer) for more details
           schema:
             type: string
@@ -302,10 +295,11 @@ paths:
         - in: query
           name: closeAuthority
           description: |
+            - Optional. If used, requires `payer`
+            - Ignored, if `payer` is not provided
             - The public key of an account to set as the close authority of ATAs created during the swap transaction. Only applies to non-wSOL ATAs that persist beyond the execution of the transaction.
-            - When `payer` is passed in, `closeAuthority` is required
-            - If the `closeAuthority==taker`, the `taker` is the close authority and no additional instructions will be added
-            - If the `closeAuthority!==taker`, the `closeAuthority` will be set by adding an instruction to the transaction to set the close authority
+            - If `closeAuthority` is not provided, we will default to `taker`
+            - If `closeAuthority` is provided and is different from `taker`, we will add the instruction to set the new `closeAuthority`
           schema:
             type: string
           required: false

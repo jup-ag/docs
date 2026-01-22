@@ -3603,7 +3603,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/errorSchema'
-  /lending/pay-withdraw:
+  /lending/repay-withdraw:
     description: Endpoint to repay debt with USDC and withdraw JLP
     post:
       security:

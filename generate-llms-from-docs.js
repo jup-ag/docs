@@ -231,8 +231,10 @@ function processData(folderPath) {
       const frontmatter = extractFrontmatter(entryPath);
       if (frontmatter) {
         const relativePath = `/${path.relative(baseFolder, entryPath)}`;
+        // Use .md extension for LLM-friendly markdown export (not .mdx which returns 404)
+        const markdownLink = relativePath.replace(/\.mdx?$/, '.md');
         frontmatter.path = relativePath;
-        frontmatter.link = BASE_URL + relativePath;
+        frontmatter.link = BASE_URL + markdownLink;
         frontmatter.copy = `- [${frontmatter.title}](${frontmatter.link}): ${frontmatter.description}`;
         collectedData.push(frontmatter);
       }

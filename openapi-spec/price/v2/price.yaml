@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: Jupiter Price API V2
+  title: Jupiter Price API V2 (Deprecated)
   version: 2.0.0
-  description: |
-    Jupiter Price API V2 Schema
+  x-deprecated: true
+  description: Jupiter Price API V2 Schema (Deprecated)
 
 servers:
   - url: https://api.jup.ag/price/v2

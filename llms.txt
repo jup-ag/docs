@@ -1,0 +1,202 @@
+# Jupiter
+
+> Jupiter provides a comprehensive DeFi infrastructure on Solana, offering APIs for swaps, lending, perpetuals, and more. This documentation covers API references, integration guides, tool kits, and best practices for building with Jupiter.
+
+## Get Started
+
+- [Get Started](https://dev.jup.ag/get-started/index.md): Welcome to Jupiter’s Developer Docs. Whether you’re building your own DeFi superapp or integrating a swap into an existing application, we provide the tools and infrastructure you need to succeed.
+- [Environment Setup](https://dev.jup.ag/get-started/environment-setup.md): Get Started with setting up libraries, connection and local wallet to build with Jupiter API.
+- [Development Basics](https://dev.jup.ag/get-started/development-basics.md): Learn the basics of Solana and Jupiter development, including interacting with Solana programs and accounts, building transactions, and sending transactions to the network.
+
+## Portal
+
+- [Setting Up API Key](https://dev.jup.ag/portal/setup.md): Setting up API Key via Jupiter Portal
+- [Migrate from Lite API](https://dev.jup.ag/portal/migrate-from-lite-api.md): Step-by-step guide to migrate from lite-api.jup.ag to api.jup.ag
+- [Payment Methods](https://dev.jup.ag/portal/payment.md): Payment methods for Jupiter Portal
+- [Response Codes](https://dev.jup.ag/portal/responses.md): Response codes for Jupiter APIs
+- [Rate Limit](https://dev.jup.ag/portal/rate-limit.md): Rate limiting details of Jupiter APIs
+- [Latency](https://dev.jup.ag/portal/latency.md): Latency details of Jupiter APIs
+- [FAQ](https://dev.jup.ag/portal/faq.md): FAQ for Jupiter Portal
+
+## Docs
+
+### Ultra
+
+- [Overview](https://dev.jup.ag/docs/ultra/index.md): Overview of Ultra Swap and its features.
+- [Get Started](https://dev.jup.ag/docs/ultra/get-started.md): Get started with the Ultra Swap API.
+- [Gasless Support](https://dev.jup.ag/docs/ultra/gasless.md): Important notes and limitations of gasless mechanisms in Ultra Swap API.
+- [Fees](https://dev.jup.ag/docs/ultra/fees.md): Key features and pointers on how to handle integrator fees in Ultra Swap API.
+- [Manual Mode](https://dev.jup.ag/docs/ultra/manual-mode.md): Use manual mode to control Ultra API parameters like slippage or priority fee settings.
+- [Get Order](https://dev.jup.ag/docs/ultra/get-order.md): Swap via Ultra by getting a quote from the Order endpoint.
+- [Execute Order](https://dev.jup.ag/docs/ultra/execute-order.md): Swap via Ultra by signing then submitting the transaction to the Execute endpoint .
+- [Search Token](https://dev.jup.ag/docs/ultra/search-token.md): Ultra Swap API to search tokens and their information by mint, name or symbol
+- [Get Holdings](https://dev.jup.ag/docs/ultra/get-holdings.md): Ultra Swap API to get the detailed token holdings of an account.
+- [Get Shield](https://dev.jup.ag/docs/ultra/get-shield.md): Ultra Swap API to retrieve token information and associated warnings for the specified mint addresses.
+- [Response](https://dev.jup.ag/docs/ultra/response.md): Ultra Swap API Responses that can be returned from both the `/order` and `/execute` endpoints.
+- [Rate Limit](https://dev.jup.ag/docs/ultra/rate-limit.md): The Ultra Swap API uses a unique rate limiting mechanism that scales with your executed swap volume over time.
+- [Add Integrator Fees](https://dev.jup.ag/docs/ultra/add-fees-to-ultra.md): Walkthrough to create the necessary accounts for adding fees to your Ultra Swap transaction.
+- [Add Integrator Payer](https://dev.jup.ag/docs/ultra/add-payer.md): Walkthrough on how to use the payer parameter to pay for networks fees and rent on behalf of your users.
+- [Integrate Jupiter Plugin](https://dev.jup.ag/docs/ultra/plugin-integration.md): Seamlessly integrate end-to-end Ultra Swap functionality into any application with just a few lines of code.
+
+### Swap
+
+- [About Metis Swap API](https://dev.jup.ag/docs/swap/index.md): Overview of the Metis Swap API and its features.
+- [Get Quote](https://dev.jup.ag/docs/swap/get-quote.md): Swap via Metis by getting a quote from the Metis Swap API.
+- [Build Swap Transaction](https://dev.jup.ag/docs/swap/build-swap-transaction.md): Swap via Metis by building a swap transaction using the Metis Swap API.
+- [Send Swap Transaction](https://dev.jup.ag/docs/swap/send-swap-transaction.md): Swap via Metis by sending a swap transaction to the network.
+- [Add Fees To Swap](https://dev.jup.ag/docs/swap/add-fees-to-swap.md): Walkthrough on how to add fees to the Metis Swap API.
+- [Payments Through Swap](https://dev.jup.ag/docs/swap/payments-through-swap.md): Walkthrough on how to use the Metis Swap API as a form of payment method.
+- [Requote with Lower Max Accounts](https://dev.jup.ag/docs/swap/requote-with-lower-max-accounts.md): Walkthrough on how to requote with lower max accounts via the Metis Swap API.
+- [Common Errors](https://dev.jup.ag/docs/swap/common-errors.md): List of errors that can be returned by the Metis Swap API, Swap Program or from other programs like DEXes, System or Token programs.
+
+### Lend
+
+- [About Lend](https://dev.jup.ag/docs/lend/index.md): Overview of Jupiter Lend and its features.
+- [Oracles](https://dev.jup.ag/docs/lend/oracles.md): Overview of Jupiter Lend Oracles.
+- [Earn (Beta)](https://dev.jup.ag/docs/lend/earn.md): Overview of Jupiter Lend Earn API.
+- [Borrow (Soon)](https://dev.jup.ag/docs/lend/borrow.md): Jupiter Lend Borrow API - coming soon
+- [Lend SDK](https://dev.jup.ag/docs/lend/sdk.md): Walkthrough on integrating via the Jupiter Lend SDK.
+- [Liquidation](https://dev.jup.ag/docs/lend/liquidation.md): Walkthrough on building a liquidation bot with Jupiter Lend.
+
+### Perps
+
+- [About Perps API](https://dev.jup.ag/docs/perps/index.md): Overview of Jupiter Perps API for leverage trading on Solana
+- [Position Account](https://dev.jup.ag/docs/perps/position-account.md): Overview of the Position account used in the Jupiter Perpetuals Program, representing trade position data for a given token
+- [PositionRequest Account](https://dev.jup.ag/docs/perps/position-request-account.md): Overview of the PositionRequest account used in the Jupiter Perpetuals Program, representing a request to open or close a position
+- [Pool Account](https://dev.jup.ag/docs/perps/pool-account.md): Overview of the Pool account used in the Jupiter Perpetuals Program, representing data for the JLP pool including AUM and Custody data
+- [Custody Account](https://dev.jup.ag/docs/perps/custody-account.md): Overview of the Custody account used in the Jupiter Perpetuals Program, representing tokens managed by the JLP pool
+
+### Trigger
+
+- [About Trigger API](https://dev.jup.ag/docs/trigger/index.md): Overview of Jupiter Trigger API for creating limit orders on Solana
+- [Create Order](https://dev.jup.ag/docs/trigger/create-order.md): Walkthrough on how to create trigger orders using the Trigger API
+- [Execute Order](https://dev.jup.ag/docs/trigger/execute-order.md): Walkthrough on how to execute trigger orders using the Trigger API
+- [Cancel Order](https://dev.jup.ag/docs/trigger/cancel-order.md): Walkthrough on how to cancel trigger orders using the Trigger API
+- [Get Trigger Orders](https://dev.jup.ag/docs/trigger/get-trigger-orders.md): Get the active or historical orders associated to the provided account
+- [Best Practices](https://dev.jup.ag/docs/trigger/best-practices.md): Some best practices when using the Trigger API.
+
+### Recurring
+
+- [About Recurring API](https://dev.jup.ag/docs/recurring/index.md): Overview of Jupiter Recurring API for automated recurring orders and dollar-cost averaging on Solana
+- [Create Order](https://dev.jup.ag/docs/recurring/create-order.md): Walkthrough on how to create recurring orders using the Recurring API
+- [Execute Order](https://dev.jup.ag/docs/recurring/execute-order.md): Walkthrough on how to execute recurring orders using the Recurring API
+- [Cancel Order](https://dev.jup.ag/docs/recurring/cancel-order.md): Walkthrough on how to cancel recurring orders using the Recurring API
+- [Deposit Price Order](https://dev.jup.ag/docs/recurring/deposit-price-order.md): Walkthrough on how to create price-based recurring order deposits (deprecated - use time-based orders instead)
+- [Withdraw Price Order](https://dev.jup.ag/docs/recurring/withdraw-price-order.md): Walkthrough on how to create price-based recurring order withdrawals (deprecated - use time-based orders instead)
+- [Get Recurring Orders](https://dev.jup.ag/docs/recurring/get-recurring-orders.md): Walkthrough on how to retrieve recurring orders using the Recurring API
+- [Best Practices](https://dev.jup.ag/docs/recurring/best-practices.md): Some best practices when using the Recurring API.
+
+### Tokens
+
+- [About Tokens](https://dev.jup.ag/docs/tokens/index.md): Understand how tokens are listed and verified on Jupiter.
+
+#### V2
+
+- [Tokens API V2 (BETA)](https://dev.jup.ag/docs/tokens/v2/token-information.md): Guide on Tokens V2 API endpoints to query for mint information in specific searches, tags or categories.
+- [Content API (BETA)](https://dev.jup.ag/docs/tokens/v2/content.md): Get content for multiple mints, trending tokens or paginated content feed.
+
+- [Organic Score](https://dev.jup.ag/docs/tokens/organic-score.md): Understand how Organic Score is derived and how it is used to measure the genuine activity and health of a token.
+- [Token Tag Standard](https://dev.jup.ag/docs/tokens/token-tag-standard.md): Use the token tag standard to get your tokens tagged for better visibility on Jupiter UI or via the Tokens API.
+
+### Price
+
+- [About Price](https://dev.jup.ag/docs/price/index.md): Overview of Jupiter Price API providing accurate token prices across all Jupiter UIs and integrator platforms
+- [Price API V3 (Beta)](https://dev.jup.ag/docs/price/v3.md): Overview of Jupiter Price API V3 providing a single source of truth for token prices across all Jupiter UIs and integrator platforms
+
+### Portfolio
+
+- [About Portfolio](https://dev.jup.ag/docs/portfolio/index.md): Overview of Jupiter Portfolio API for comprehensive portfolio tracking across the Solana ecosystem
+- [Jupiter Positions](https://dev.jup.ag/docs/portfolio/jupiter-positions.md): Query Jupiter positions, platform information, and staking data using the Portfolio API.
+
+### Send
+
+- [About Send API](https://dev.jup.ag/docs/send/index.md): Overview of Jupiter Send API for gifting, paying, or onboarding users even without a wallet
+- [Invite Code (Beta)](https://dev.jup.ag/docs/send/invite-code.md): Walkthrough on how to use invite codes with the Send API
+- [Craft Send (Beta)](https://dev.jup.ag/docs/send/craft-send.md): Walkthrough on how to craft Send transactions using the Send API
+- [Craft Clawback (Beta)](https://dev.jup.ag/docs/send/craft-clawback.md): Walkthrough on how to craft clawback transactions using the Send API
+- [Manage Invites (Beta)](https://dev.jup.ag/docs/send/manage-invites.md): Walkthrough on how to manage invites using the Send API
+
+### Studio
+
+- [Studio API](https://dev.jup.ag/docs/studio/index.md): Overview of Jupiter Studio API for token creation and LP management
+- [Create Token (Beta)](https://dev.jup.ag/docs/studio/create-token.md): Walkthrough on how to create tokens using the Studio API
+- [Claim Fee (Beta)](https://dev.jup.ag/docs/studio/claim-fee.md): Walkthrough on how to claim fees using the Studio API
+
+### Lock
+
+- [Jupiter Lock](https://dev.jup.ag/docs/lock/index.md): Jupiter Lock is an open-sourced, audited, and free ecosystem tool to lock and distribute tokens over-time.
+
+### Routing
+
+- [About Routing](https://dev.jup.ag/docs/routing/index.md): The types of routing engines used in Jupiter's Swap product
+- [Integrate DEX into Iris](https://dev.jup.ag/docs/routing/dex-integration.md): Walkthrough on how to integrate your decentralized exchanged (DEX) into Iris
+- [Integrate MM into JupiterZ (RFQ)](https://dev.jup.ag/docs/routing/rfq-integration.md): Walkthrough on how to integrate your RFQ service into Jupiter's routing system.
+- [Market Listing](https://dev.jup.ag/docs/routing/market-listing.md): Understand how markets are listed and maintained on Jupiter.
+- [Token Listing](https://dev.jup.ag/docs/routing/token-listing.md): Understand how tokens are listed and verified on Jupiter.
+
+## Api Reference
+
+- [Jupiter Ultra Swap API](https://dev.jup.ag/openapi-spec/ultra/ultra.yaml): Jupiter Ultra Swap API Schema
+- [Metis Swap API](https://dev.jup.ag/openapi-spec/swap/swap.yaml): Metis Swap API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Trigger Order API](https://dev.jup.ag/openapi-spec/trigger/trigger.yaml): Jupiter Trigger Order API Schema
+- [Jupiter Recurring Order API](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Jupiter Recurring Order API Schema
+- [Jupiter Tokens API V2](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Jupiter Tokens API V2 Schema
+- [Jupiter Price API V3](https://dev.jup.ag/openapi-spec/price/v3/price.yaml): Jupiter Price API V3 Schema
+- [Jupiter Portfolio API](https://dev.jup.ag/openapi-spec/portfolio/portfolio.yaml): Jupiter Portfolio API Schema
+- [Jupiter Send API](https://dev.jup.ag/openapi-spec/send/send.yaml): Jupiter Send API Schema
+- [Jupiter Studio API](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Jupiter Studio API Schema
+
+## Tool Kits
+
+- [Jupiter Tool Kits](https://dev.jup.ag/tool-kits/index.md): Powerful developer tools and SDKs that help you integrate Jupiter products into your applications with minimal effort.
+
+### Plugin
+
+- [Integrate Jupiter Plugin](https://dev.jup.ag/tool-kits/plugin/index.md): Seamlessly integrate end-to-end Ultra Swap functionality into any application with just a few lines of code.
+- [Next.js App Example](https://dev.jup.ag/tool-kits/plugin/nextjs-app-example.md): In this guide, we'll walk you through from scratch the steps to integrate Jupiter Plugin into a Next.js application.
+- [React App Example](https://dev.jup.ag/tool-kits/plugin/react-app-example.md): In this guide, we'll walk you through from scratch the steps to integrate Jupiter Plugin into a React application.
+- [HTML App Example](https://dev.jup.ag/tool-kits/plugin/html-app-example.md): In this guide, we'll walk you through from scratch the steps to integrate Jupiter Plugin into a HTML application.
+- [Customizing Plugin](https://dev.jup.ag/tool-kits/plugin/customization.md): Learn how to customize Jupiter Plugin's appearance and behavior.
+- [FAQ](https://dev.jup.ag/tool-kits/plugin/faq.md): Frequently asked questions about Jupiter Plugin
+
+### Wallet Kit
+
+- [Integrate Wallet Kit](https://dev.jup.ag/tool-kits/wallet-kit/index.md): Integrate Jupiter Wallet Kit into your application to simplify wallet connectivity across all Solana wallets, all in a unified wallet interface
+- [Jupiter Wallet Extension](https://dev.jup.ag/tool-kits/wallet-kit/jupiter-wallet-extension.md): Using the Jupiter Wallet Kit, we can pass in the Jupiter Wallet Extension as a wallet in your app.
+- [Jupiter Mobile Adapter](https://dev.jup.ag/tool-kits/wallet-kit/jupiter-mobile-adapter.md): Using the Jupiter Wallet Kit, we can pass in the Jupiter Mobile Adapter as a wallet in your app.
+
+- [Referral Program](https://dev.jup.ag/tool-kits/referral-program.md): The Referral Program is an open-source program used by Jupiter Programs (or any other programs) to enable developers to earn fees via our APIs.
+
+## Resources
+
+- [Support](https://dev.jup.ag/resources/support.md): Technical and customer support platforms for Jupiter
+- [AI Workflow](https://dev.jup.ag/resources/ai-workflow.md): How to use Jupiter docs with AI tools
+- [Brand Kit](https://dev.jup.ag/resources/brand-kit.md): Brand kit assets for Jupiter
+- [Stats](https://dev.jup.ag/resources/stats.md): Stats for Jupiter
+- [Audits](https://dev.jup.ag/resources/audits.md): Formal audit reports for Jupiter programs
+- [References](https://dev.jup.ag/resources/references.md): Links and references to Jupiter's GitHub repositories.
+
+## Legal
+
+- [Guidelines](https://dev.jup.ag/legal/index.md): Important legal documentation and guidelines that governs the use of our services and platform. Please review these documents carefully.
+- [SDK & API License Agreement](https://dev.jup.ag/legal/sdk-api-license-agreement.md): Jupiter API & SDK License Agreement
+- [Terms of Use](https://dev.jup.ag/legal/terms-of-use.md): Jupiter Terms of Use
+- [Privacy Policy](https://dev.jup.ag/legal/privacy-policy.md): Privacy Policy for Jupiter
+
+## Updates
+
+- [Updates](https://dev.jup.ag/updates/index.md): Announcements and Changes
+
+## Blog
+
+- [Overview](https://dev.jup.ag/blog/index.md): Technical deep dives into Jupiter products, team's research and learnings
+- [Ultra V3: The Ultimate Trading Engine](https://dev.jup.ag/blog/ultra-v3.md): A technical deep dive into Jupiter's most comprehensive trading engine, featuring exclusive new capabilities: Iris, Jupiter Beam, Predictive Execution and more.
+- [600 Lines of Code Nobody Asked For](https://dev.jup.ag/blog/why-ultra-v3.md): Better execution, zero infrastructure, faster shipping. Why teams should just use Ultra V3
+- [Metis v7: Migration to Metis.builders](https://dev.jup.ag/blog/metis-v7.md): Metis is now an independent public good at metis.builders with a new access model for v7. This separation establishes Metis as a standalone instruction-level swap primitive for builders who need full control over transaction execution. Additionally, Metis Binary moving forward will require authenticated access with a staked JUP requirement.
+
+## Optional
+
+- [Dev Portal](https://portal.jup.ag/): Access the Jupiter Portal to manage API key, access to metrics and logs
+- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs
+- [Stay Updated](https://dev.jup.ag/resources/support): Get support and stay updated with Jupiter

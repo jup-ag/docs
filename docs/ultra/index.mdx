@@ -95,24 +95,77 @@ Ultra Swap provides different gasless mechanisms for different scenarios.
 | **Developer Support**       | Get help from our [developer support in Discord](https://discord.gg/jup).                                                                                                                                                                      |
 | **World Class Support**     | If you ever face any issues or need help when using Ultra Swap, our support team is here to assist you 24/7. Read more about [Ultra Swap Customer Support](/resources/support#customer-support). |
 
-## What About Metis Swap API?
+## Ultra vs Metis Matrix
 
-Ultra Swap API is the next evolution of our swap infrastructure, designed and continuously optimized to deliver the best possible trading experience on Solana. We are focused on providing a high-performance, reliable, and feature-rich API that incorporates the latest advancements and optimizations for users and integrators.
+| Question | Ultra | Metis |
+|----------|-------|-------|
+| Can I use this for standard swap UX? | ✅ Yes—recommended | ✅ Yes—requires infrastructure |
+| Can I use this for CPI? | ❌ No | ✅ Yes |
+| Can I add custom instructions? | ❌ No | ✅ Yes |
+| Do I need my own RPC? | ❌ No | ✅ Yes—required |
+| Is gasless supported? | ✅ Yes—automatic | ⚠️ Build yourself |
+| Who handles user support? | Jupiter | You |
+| Do I get automatic optimizations? | ✅ Yes—continuous | ❌ No—build yourself |
+| What's the integration timeline? | Hours | Months |
+| Infrastructure maintenance? | ❌ None—managed | ✅ Full—self-managed |
 
-While Ultra Swap API is engineered for optimal performance and ease of integration, the Metis Swap API remains available for developers who require advanced customization, such as:
+**Choose Ultra API if you:**
+- Want to focus on product differentiation rather than infrastructure  
+- Value battle-tested execution quality out of the box  
+- Need gasless swaps without building infrastructure  
+- Prefer operational/technical and customer support
+- Want to iterate quickly on user experience  
+- Don't need CPI or custom transaction composition  
 
-* Adding custom instructions.
-* Incorporating Cross Program Invocation (CPI) calls.
-* Selecting specific broadcasting strategies for signed transactions (e.g., priority fee, Jito, etc.).
-* Choosing which DEXes or AMMs to route through.
-* Modifying the number of accounts used in a transaction.
+**Choose Metis API if you:**
+- Need CPI (Cross Program Invocation) capabilities  
+- Require custom instructions in transactions  
+- Want full control over fee monetization  
+- Have existing RPC/execution infrastructure to leverage  
+- Are building execution infrastructure as competitive advantage  
+- Need transaction-level flexibility an opinionated engine can't provide  
 
-If your use case demands these highly custom features, the Metis Swap API may be more suitable. However, it also requires you to manage many aspects that Ultra Swap API handles automatically, including:
+---
 
-* **RPC management**: Retrieving wallet balances, broadcasting, and tracking transactions.
-* **Transaction fee selection**: Managing priority fees, Jito fees, and more.
-* **Slippage optimization**: Determining the best slippage settings for trade success and price protection.
-* **Transaction broadcasting**: Ultra Swap leverages a proprietary transaction engine for superior speed and reliability.
-* **Swap result parsing**: Handling transaction polling, parsing, and error management.
+The following table provides a comprehensive comparison between Ultra Swap API and Metis Swap API to help you choose the right solution for your needs:
 
-For most developers and applications, Ultra Swap API is the recommended choice, as it is purpose-built and continually improved to provide the best possible swap experience on Solana.
+| Category | Aspect | Ultra API | Metis API |
+|----------|--------|-----------|-----------|
+| **Architecture** | **Design Philosophy** | End-to-end execution engine with integrated components | Routing primitive requiring custom execution infrastructure |
+| | **Configuration Philosophy** | Optimized defaults refined by millions of swaps | Complete flexibility to build your own strategies |
+| | **Primary Use Case** | Teams wanting immediate, optimized swap execution | Teams needing CPI, custom instructions, or infrastructure control |
+| | **Complexity** | Opinionated, streamlined integration | Flexible, requires extensive custom development |
+| **Routing** | **Routing Engine** | Meta-aggregator combining:<br/>• Iris (enhanced Metis with self-learning)<br/>• DFlow<br/>• OKX<br/>• JupiterZ (RFQ with 20+ market makers) | Single, proven routing engine for on-chain liquidity |
+| | **RFQ Access** | Built-in JupiterZ RFQ with 20+ market makers | Not supported |
+| | **Liquidity Sources** | Aggregates across multiple DEXes, PropAMMs, RFQ's MMs | Direct access to Solana's on-chain liquidity |
+| | **Iris Features** | • Ultra Signaling for tighter PropAMM quotes<br/>• Predictive Execution<br/>• Just-In-Time Market Revival<br/>• Self-learning route optimization<br/>• And more | Not applicable |
+| | **Continuous Improvement** | Automatic improvements deployed from millions of swaps | Stable routing engine, you build improvements |
+| **Execution** | **Transaction Flow** | Get order → Sign → Submit to execute endpoint | Get quote → Build transaction → Send via your infrastructure |
+| | **Transaction Sending** | Jupiter Beam proprietary engine with network of transaction senders | You build and maintain your own RPC pipeline |
+| | **Landing Performance** | 50-400ms average via Jupiter Beam | Varies based on your priority fee optimization |
+| | **Transaction Polling** | Built-in status polling with intelligent error handling | You implement polling logic and parse on-chain errors |
+| | **End-to-End Execution Latency** | P95 < 1000ms (400-600ms average), includes polling | Entirely dependent on your infrastructure quality |
+| | **Quote Latency** | P95 < 900ms (100-200ms average)<br/>*Higher due to simulations and optimizations* | P95 < 500ms (100-200ms average)<br/>*Raw routing data* |
+| | **RPC Requirements** | None—Jupiter provisions all infrastructure | You provision and pay for RPC access |
+| | **MEV Protection** | Industry-lowest MEV attack rate ([sandwiched.me](https://sandwiched.me)) | Dependent on your infrastructure choices |
+| **Configuration** | **Slippage Optimization** | RTSE (Real-Time Slippage Estimator) applying heuristics and real-time adjustments using token categories, historical and real-time data | Manual configuration based on your strategy |
+| | **Priority Fee Management** | Automatic estimation and optimization using quality RPC and network data | You build custom fee estimation logic |
+| | **Manual Mode** | Available for user-facing trading experiences<br/>*Not recommended as default integration* | Full manual control always |
+| **Gasless** | **Ultra Gasless Support (Iris)** | Automatic when user has trade value but insufficient SOL<br/>Jupiter pays: tx fee, priority fee, token account rent | Not supported |
+| | **JupiterZ Gasless** | Market makers cover tx and priority fees<br/>*(Not token account rent)* | Not applicable |
+| | **Integrator as Payer** | Supported (Iris quotes only, all gas covered) | Supported with full control over implementation |
+| **Customization** | **Transaction Customization** | Opinionated—no custom instructions, no CPI, no instruction modification | Full flexibility—add instructions, use for CPI, compose as needed |
+| **Operations** | **Customer Support** | Jupiter provides direct support to your users via official channels | Minimal technical support—you handle user-facing support |
+| | **Rate Limits** | Dynamic based on executed volume<br/>Base quota can be increased on request | Fixed tiers via [portal.jup.ag](https://portal.jup.ag), no overages |
+| | **Incident Response** | P0 direct contact available, monitored business chats | [status.jup.ag](https://status.jup.ag) updates, monitored chats by severity |
+| | **Monitoring & Observability** | Same infrastructure as jup.ag—24/7 monitoring, end-to-end logging | Self-service status page—you log and monitor your own infrastructure |
+| | **Infrastructure Maintenance** | Fully managed by Jupiter | You build and maintain all infrastructure |
+| **Fees** | **Fees Involved** | 5-10 bps swap fee | Portal fees to increase rate limits |
+| **Best For** | **Ideal Use Cases** | • Standard swap UX<br/>• Quick time to market<br/>• Product differentiation focus<br/>• Inherited optimization<br/>• Operational support needs | • CPI integration<br/>• Custom instructions<br/>• Novel transaction compositions<br/>• Infrastructure as competitive advantage<br/>• Full execution control |
+| | **Team Profile** | Teams focusing on product, not infrastructure | Teams with infrastructure expertise and resources |
+| | **Strategic Trade-off** | Customization flexibility → Immediate performance + reduced overhead | Immediate optimization → Freedom to build proprietary infrastructure |
+| **Technical** | **Shared Infrastructure** | Same infrastructure powering jup.ag core product | Independent integration |
+| | **Automatic Improvements** | Continuous optimizations deployed automatically | Stable API, you build improvements |
+| | **Data Sources** | Learns from millions of swaps across jup.ag and API integrations | You collect and analyze your own data |
+| | **Integration Complexity** | Get order → Sign → Execute (3 steps) | Get quote → Build → Send → Poll (multiple steps + infrastructure) |
+| | **Infrastructure Investment** | Zero—fully managed | 3-6 months development + ongoing DevOps |

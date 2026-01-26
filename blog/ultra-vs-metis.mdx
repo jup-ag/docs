@@ -1,0 +1,320 @@
+---
+title: "Ultra vs Metis: Execution Engine or Routing Primitive"
+description: "A technical comparison between Jupiter's Swap APIs offering both execution engine or routing primitive options."
+"og:title": "Ultra vs Metis"
+"og:description": "A technical comparison between Jupiter's Swap APIs offering both execution engine or routing primitive options."
+"og:image": "/static/blog/ultra-vs-metis/ultra-vs-metis.png"
+"og:type": "article"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![Ultra vs Metis: Execution Engine or Routing Primitive](/static/blog/ultra-vs-metis/ultra-vs-metis.png)
+
+This technical comparison will break down the differences between the Jupiter's Swap APIs:
+Ultra and Metis - One is an execution engine, the other is a routing primitive. Both offering 
+very different features and use cases.
+
+---
+
+## The Short Answer
+
+**Just Integrate Ultra.**
+
+TL;DR: Ultra is a complete execution engine for teams that want to ship fast. 
+Metis is a routing primitive for teams that need CPI, custom instructions, or full 
+infrastructure control.
+
+1. You need CPI (Cross Program Invocation) to call swaps from your on-chain program
+2. You need to add custom instructions to the transaction
+3. You need complete control over your infrastructure
+
+If none of those apply, Ultra is the answer. Close this tab. [Go build](/docs/ultra).
+
+Still here? Let's find out which one is right for you.
+
+---
+
+## The Vehicle Analogy
+
+Imagine two ways to get a high-performance driving experience:
+
+**Option 1: The Complete Performance Vehicle (Ultra)**
+
+You get a fully-built car where every component has been engineered together. The engine's 
+power curve matches the transmission's gear ratios. The suspension is tuned for the tire 
+compound. The aerodynamics complement the drivetrain. This integration comes from years of 
+testing, telemetry data, and iteration.
+
+You don't choose the engine or modify the chassis, but you don't need to. You turn the key 
+and experience performance that took a team of engineers years to perfect. You focus on 
+where you're going, not how the car gets you there.
+
+**Option 2: The Racing Engine (Metis)**
+
+You get an engine built with years of research: optimized combustion, proven reliability, 
+power delivery refined across thousands of builds. It's a powerplant in the truest sense.
+
+But it's a component, not a complete vehicle. Install it in a sports car if you need speed. 
+Mount it in an off-road truck if you need durability. Build a custom racing machine around it. 
+The engine is production-grade, but the vehicle you build around it, the chassis, the drivetrain, 
+the purpose, that's your innovation.
+
+---
+
+**Ultra and Metis weren't designed to compete, but to serve different types of builders. The 
+real question is: which one fits what you're building?**
+
+---
+
+## Understanding the Architectural Divide
+
+The difference between Ultra API and Metis API isn't just about features. It's a fundamental 
+difference in philosophy.
+
+**Metis** gives you a widely adopted, battle-tested routing primitive in the ecosystem. It 
+trusts you to orchestrate everything else: transaction sending, polling, execution, slippage 
+strategies, priority fees, and more.
+
+**Ultra** provides an end-to-end execution engine that handles the complexity of modern DeFi 
+infrastructure so you can focus on your product. It includes a proprietary RFQ system, 
+multi-router aggregation, and features built for execution quality.
+
+Let's break down what this means across four critical dimensions.
+1. [Routing Engines: Meta-aggregated vs. Single Routing Primitive](#routing-engines)
+2. [Execution Model: Integrated Engine vs. Routing Primitive](#execution-model)
+3. [Configuration Layer: Optimized & Opinionated vs. Flexible Control](#configuration-layer)
+4. [Operational Realities: Managed Service vs. Self-Service](#operational-realities)
+
+---
+
+## Routing Engines
+
+**Meta-Aggregated vs. Single Routing Primitive**
+
+Ultra meta-aggregates multiple routing engines, including Iris (an enhanced version of Metis), 
+DFlow, OKX, and JupiterZ RFQ, to find the best execution path across all available liquidity 
+sources. Metis is the battle-tested, single routing primitive that powers many applications 
+across Solana and serves as the foundation for Ultra's Iris engine.
+
+| Aspect | Ultra API | Metis API |
+|--------|-----------|-----------|
+| **Architecture** | Meta-aggregator combining:<br/><br/>- Iris (enhanced Metis with new features and self-learning capabilities)<br/>- DFlow<br/>- OKX<br/>- JupiterZ (RFQ with 20+ MMs) | Single, proven routing engine for on-chain liquidity |
+| **RFQ Access** | Built-in access to JupiterZ with 20+ market makers | Not supported |
+| **Liquidity Sources** | Aggregates across multiple aggregators and RFQ networks | Direct access to Solana's on-chain liquidity via optimized routing |
+
+<Info>
+Iris is an enhanced version of Metis, it is built with the learnings and experiences of Metis, 
+with one single objective - to ensure the best possible execution price and success rate across 
+all engines and liquidity sources.
+
+Iris includes self-learning capabilities to maintain high availability of competitive routes while 
+automatically sidelining underperforming or potentially problematic quotes; and features such as 
+- [Ultra Signaling](/blog/ultra-v3#ultra-signaling) to allow PropAMMs to quote tighter for Ultra's non-toxic flow, 
+- [Predictive Execution](/blog/ultra-v3#predictive-execution) to predict slippage and select route with best execution outcome, 
+- [Just-In-Time Market Revival](/blog/ultra-v3#just-in-time-market-revival) to trade all markets (unrestricted by [Metis' market grace period](/docs/routing/market-listing))
+- And more.
+</Info>
+
+
+**What this means:**
+- Ultra's meta-aggregation automatically finds the best price across multiple routing engines and 
+    RFQ sources. Features are actively developed and deployed to improve execution quality without 
+    any changes to your integration.
+- Metis provides direct access to Solana's on-chain liquidity through a focused, battle-tested 
+    routing engine, giving you the foundation to build your own infrastructure and use it to your 
+    advantage.
+
+## Execution Model
+
+**Integrated Engine vs. Routing Primitive**
+
+Getting a quote is only the beginning. Consistently high-quality successful swaps 
+require transaction construction, execution pipelines, priority fee optimization, 
+confirmation polling, and error handling. Ultra manages this entire execution pipeline as an integrated 
+system. Metis provides routing intelligence as a primitive, expecting you to build the execution 
+infrastructure around it. This choice determines your engineering investment, operational complexity, 
+and degree of control over execution quality.
+
+| Aspect | Ultra API | Metis API |
+|--------|-----------|-----------|
+| **Usage** | Complete execution engine — get order, sign, submit to execute endpoint | Provides routing and quote — you handle execution infrastructure |
+| **Transaction Sending** | Jupiter Beam handles submission via network of in-house transaction senders, resulting in lowest latency and best MEV protection | You build and maintain your own RPC pipeline |
+| **Landing Performance** | 50-400ms average via Jupiter Beam proprietary engine | Varies based on your priority fee optimization |
+| **Transaction Polling** | Built-in status polling with intelligent error handling | You implement polling logic and parse on-chain program errors |
+| **Execution Latency (End-to-end)** | P95 < 1000ms (400-600ms average), includes polling | Entirely dependent on your infrastructure quality |
+| **RPC Requirements** | None! Jupiter provisions and maintains all infrastructure | You provision and pay for RPC access |
+| **MEV Protection** | Industry-lowest MEV attack rate (verifiable at [sandwiched.me](https://sandwiched.me)) despite highest swap volume | Your infrastructure choices determine MEV exposure |
+
+**The tradeoff:**
+- Ultra eliminates the need for months of infrastructure development and ongoing DevOps overhead, 
+    letting teams focus on product differentiation and what truly matters while inheriting battle-tested 
+    execution quality. What jup.ag gets, you get too, without any additional effort.
+- Metis gives complete control over the execution stack. You provision, control and maintain your 
+    own infrastructure. This opens the door to building exactly what you need with optimizations tuned 
+    to your specific use cases.
+
+<Info>
+Read about what it takes to build your own execution infrastructure in our previous blog 
+post on [*600 Lines of Code Nobody Asked For*](/blog/why-ultra-v3).
+</Info>
+
+---
+
+## Configuration Layer
+
+**Optimized & Opinionated vs. Flexible Control**
+
+Slippage settings, priority fees, and route selection interact in complex ways. Conservative slippage 
+reduces MEV risk but increases failure rates, while aggressive fees improve landing speed but can waste 
+capital. Ultra embeds years of optimization data into automatic parameter tuning that evolves with network 
+conditions. Metis gives you the routing foundation to build optimization strategies tailored to your 
+product's specific needs and risk profile.
+
+### Swap Configurations
+
+| Aspect | Ultra API | Metis API |
+|--------|-----------|-----------|
+| **Slippage Optimization** | RTSE (Real-Time Slippage Estimator), applying heuristics and real-time adjustments based on token categories, historical and real-time data | You configure slippage based on your strategy and risk tolerance |
+| **Priority Fee Management** | Using quality RPC and network data to automatically estimate and optimize priority fees to land fast without overpaying | You build fee estimation logic tuned to your needs |
+
+<Info>
+Manual mode in Ultra API is provided to allow explicit control over execution behavior in user-facing manual trading experiences (e.g. similar to the jup.ag frontend), or for personal, self-directed usage where the operator intentionally manages execution trade-offs.
+
+However, manual mode should NOT be used as a default integration pattern and Ultra is meant to be used as-is and out of the box.
+</Info>
+
+**In practice:**
+- Ultra's RTSE and automatic optimization increase success rates out of the box. This is the same intelligence 
+    that powers jup.ag, refined through millions of swaps showing that the vast majority of users (from experienced 
+    traders to whales to casual users) successfully trade using default settings without manual adjustments.
+- Metis delivers raw routing data that you can layer with your own optimization strategies, enabling 
+    proprietary slippage logic or custom priority fee algorithms that become part of your technical moat.
+
+### Gasless Capabilities
+
+| Aspect | Ultra API | Metis API |
+|--------|-----------|-----------|
+| **Default Gasless (Iris)** | Automatic when user has trade value but insufficient SOL. Jupiter pays tx fee, priority fee, and token account rent | Not supported. You build gasless logic from scratch |
+| **JupiterZ Gasless** | Market makers cover tx and priority fees (not token account rent) when routed via RFQ | Not supported. Allows you to integrate custom gasless mechanisms |
+| **Integrator as Payer** | Integrator can be fee payer (Iris quotes only, all gas covered) | Supported: Integrator as fee payer with full control over implementation |
+| **Implementation Complexity** | Zero implementation. Automatic based on quote type | You manage gas payer wallet, signer logic, and drain protection |
+
+**In practice:**
+- Ultra provides gasless swaps immediately for most scenarios with automatic edge case handling, eliminating the 
+    need to build and maintain gasless infrastructure.
+- Metis requires you to build the entire gasless implementation, managing gas payer wallets, signer logic, and 
+    drain protection. This investment enables you to build your own gasless UX patterns, custom sponsor 
+    logic, or integration with your existing wallet infrastructure in ways an opinionated engine cannot support.
+
+### Transaction Customization
+
+| Aspect | Ultra API | Metis API |
+|--------|-----------|-----------|
+| **Transaction Customization** | Opinionated: no custom instructions, no CPI, no instruction modification | Full flexibility: add instructions, use for CPI, compose as needed |
+
+**The tradeoff:**
+- Ultra's opinionated approach enables streamlined, consistent execution that gives Jupiter complete observability 
+    across the entire stack. This allows for comprehensive customer support, faster issue resolution, and continuous 
+    optimization based on aggregated execution data.
+- Metis gives you full transaction composition flexibility such as adding custom instructions, integrating via CPI, 
+    or building transaction structures. Essential for products where the swap is part of a larger onchain 
+    operation or where transaction-level innovation is core to your value proposition.
+
+---
+
+## Operational Realities
+
+**Managed Service vs. Self-Service**
+
+Production reliability, support, operational overhead and fees involved differ significantly between approaches.
+
+| Aspect | Ultra API | Metis API |
+|--------|-----------|-----------|
+| **Customer Support** | Jupiter provides direct support to your users via official channels | Minimal technical support for integration. You handle user-facing support |
+| **Rate Limits** | Dynamic based on executed volume. Base quota can be increased when requested | Fixed tiers via portal.jup.ag, no overages |
+| **Incident Response** | Can provide P0 direct contact and monitored business chats | status.jup.ag updates, monitored business chats prioritized by severity |
+| **Monitoring & Observability** | Same infrastructure as jup.ag, monitored 24/7 with immediate response and logged end-to-end | Self-service status page, you monitor your execution layer and log all API requests end-to-end for support/debugging |
+| **Fee Involved** | Usage incurs swap fees<br/><br/>Integrator can earn fees: Referral and Advance Fee | Usage incurs Portal fees to increase rate limits<br/><br/>Integrator can earn fees: Referral |
+
+**The tradeoff:**
+- Ultra shifts the operational burden to Jupiter, including production-grade observability, incident response, and 
+    direct user support. Because Ultra enforces opinionated configurations and consistent transaction 
+    structures, Jupiter can log and monitor all swap executions, enabling comprehensive support for your users without requiring you to build your own.
+- Metis requires you to build your own infrastructure for transaction handling, maintain custom monitoring, alerting, 
+    and support systems. This gives you complete visibility and control over your execution quality, enabling you to 
+    optimize and differentiate at the infrastructure layer itself.
+
+---
+
+## The Decision Framework
+
+**Ultra API is designed for teams that:**
+- Want to focus on product differentiation rather than infrastructure
+- Value battle-tested execution quality and optimization out of the box
+- Prefer operational/technical and customer support from Jupiter
+- Want to iterate quickly on user experience
+
+**Metis API is designed for teams that:**
+- Need transaction-level customization (CPI, custom instructions, novel compositions)
+- Want full control over fee monetization with no mandatory splits
+- Have existing RPC and execution infrastructure they want to leverage
+- Are building execution infrastructure as a core competitive advantage
+- Need integration flexibility that an opinionated engine cannot provide
+- Want to innovate on execution quality itself, not just user experience
+
+---
+
+## Questions We Often Get
+
+> **"Metis gives better prices because I can optimize myself"**  
+    Ultra aggregates more liquidity sources (Iris, JupiterZ, DFlow, OKX). Specifically Iris is an enhanced version of 
+    Metis with features like Ultra Signaling for PropAMMs, Predictive Execution, Just-In-Time Market Revival, and more. 
+    You're competing against systems trained on billions in daily volume. The data shows Ultra delivers better executed 
+    prices, not just quoted prices.
+
+> **"I need Metis for lower latency"**  
+    Ultra's `/order` endpoint averages around 300ms. The extra time is spent on simulations, slippage estimation, and 
+    optimizations that result in better execution. Raw quote speed doesn't matter if your transaction fails or gets sandwiched. 
+    Transaction landing latency is 50-400ms for Ultra via Jupiter Beam.
+
+> **"Ultra takes a swap fee, Metis or API-reseller providers don't"**  
+    Ultra's platform fee is the lowest in the industry at 5-10 bps. The fee pays for Jupiter's own infrastructure and scale. You get 
+    the best possible execution quality out of the box, plus all improvements and optimizations based on millions of swap data and 
+    user feedback that are continuously implemented directly into Ultra. Otherwise, you'd have to build your own infrastructure and 
+    maintain it.
+
+> **"I can add my own MEV protection"**  
+    Unless you have your own validator stake and transaction landing infrastructure, you're using what everyone else is using. Ultra 
+    uses Jupiter Beam on Jupiter's own infrastructure. [The data is public](https://sandwiched.me/sandwiches): Ultra has the lowest 
+    value extraction ratio despite the highest volume.
+
+## Summary: Two Tools, Two Visions
+
+Ultra and Metis represent different strategic choices, not different quality levels.
+
+**Ultra is an end-to-end execution engine**
+- You focus on building the best user experience and product differentiation. We handle the infrastructure to provide battle-tested performance and zero overhead.
+- You get an integrated execution engine where routing (Iris + aggregators + JupiterZ RFQ), optimization (RTSE for slippage, automatic priority fees), transaction execution (Jupiter Beam), and operational support all work together as a unified system.
+- You inherit Jupiter's continuously evolving intelligence, refined by millions of swaps across jup.ag and API integrations, with improvements automatically deployed to your integration.
+
+**Metis is a routing primitive**
+- You build your own execution infrastructure, leveraging Jupiter's proven routing engine as a foundational primitive for your own use cases.
+- You control the execution layer (your RPC infrastructure, transaction sending, polling), the optimization layer (slippage logic, priority fee estimation, MEV protection), and the transaction structure (custom instructions, CPI composition).
+- You trade Jupiter's automatic optimizations for the freedom to build execution infrastructure that becomes your competitive differentiator.
+
+Both approaches power successful applications. Both represent years of Jupiter's research, development and user feedback. The right choice depends on what you're building and how much infrastructure you want to own.
+
+---
+
+## Resources
+
+For complete technical specifications, integration guides, and API references:
+- **[Ultra API Documentation](/docs/ultra)**
+- **[Metis API Documentation](/docs/swap)**
+
+Talk to us:
+- Discord: [discord.gg/jup](https://discord.gg/jup)
+- Twitter: [@JupiterExchange](https://twitter.com/JupiterExchange)
+- Telegram: [Jupiter Dev Notifications](https://t.me/jup_dev)
+
+Built something? Tag [@JupDevRel](https://x.com/JupDevRel) or [@0xYankee](https://x.com/0xYankee) / [@0xanmol](https://x.com/0xanmol).

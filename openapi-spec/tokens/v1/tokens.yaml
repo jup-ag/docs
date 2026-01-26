@@ -1,9 +1,10 @@
 openapi: 3.0.3
 info:
-  title: Jupiter Tokens API V1
+  title: Jupiter Tokens API V1 (Deprecated)
   version: 1.0.0
-  description: |
-    Jupiter Tokens API V1 Schema
+  x-deprecated: true
+  description: Jupiter Tokens API V1 Schema (Deprecated)
+
 servers:
   - url: https://api.jup.ag/tokens/v1
     description: Jupiter Tokens API V1 Endpoint

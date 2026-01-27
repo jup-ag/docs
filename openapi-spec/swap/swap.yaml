@@ -43,6 +43,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuoteResponse'
+              example:
+                inputMint: "So11111111111111111111111111111111111111112"
+                inAmount: "100000000"
+                outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                outAmount: "17057460"
+                otherAmountThreshold: "16886885"
+                swapMode: "ExactIn"
+                slippageBps: 100
+                priceImpactPct: "0.0001"
+                platformFee:
+                  amount: "0"
+                  feeBps: 0
+                routePlan:
+                  - swapInfo:
+                      ammKey: "HXpGFJGCEEFdV31tDmjDBaJMEB1fKLiAoKoWr3Fnonid"
+                      label: "Meteora DLMM"
+                      inputMint: "So11111111111111111111111111111111111111112"
+                      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                      inAmount: "100000000"
+                      outAmount: "17057460"
+                      feeAmount: "1285"
+                      feeMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    percent: 100
+                contextSlot: 324307186
+                timeTaken: 0.012
   /swap:
     post:
       operationId: SwapPost
@@ -59,6 +84,24 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SwapRequest'
+            example:
+              userPublicKey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              quoteResponse:
+                inputMint: "So11111111111111111111111111111111111111112"
+                inAmount: "100000000"
+                outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                outAmount: "17057460"
+                otherAmountThreshold: "16886885"
+                swapMode: "ExactIn"
+                slippageBps: 100
+                priceImpactPct: "0.0001"
+                routePlan: []
+              dynamicComputeUnitLimit: true
+              dynamicSlippage: true
+              prioritizationFeeLamports:
+                priorityLevelWithMaxLamports:
+                  priorityLevel: "veryHigh"
+                  maxLamports: 1000000
       responses:
         '200':
           description: Successful response
@@ -66,6 +109,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwapResponse'
+              example:
+                swapTransaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+                lastValidBlockHeight: 324307300
+                prioritizationFeeLamports: 254600
+                dynamicSlippageReport:
+                  slippageBps: 12
+                  otherAmount: 17055413
+                  simulatedIncurredSlippageBps: 1
+                  amplificationRatio: "1.5"
   /swap-instructions:
     post:
       operationId: SwapInstructionsPost
@@ -89,6 +141,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwapInstructionsResponse'
+              example:
+                computeBudgetInstructions:
+                  - programId: "ComputeBudget111111111111111111111111111111"
+                    accounts: []
+                    data: "AsBcAA=="
+                setupInstructions:
+                  - programId: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+                    accounts:
+                      - pubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                        isSigner: true
+                        isWritable: true
+                    data: ""
+                swapInstruction:
+                  programId: "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+                  accounts:
+                    - pubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                      isSigner: true
+                      isWritable: true
+                  data: "3Dc2AAAAAAA..."
+                cleanupInstruction: null
+                otherInstructions: []
+                addressLookupTableAddresses:
+                  - "GxS6FiQ9RbErBB48mE34U4Jv13MdEJov4R1e5KgFzRFY"
   /program-id-to-label:
     get:
       operationId: ProgramIdToLabelGet
@@ -110,6 +185,11 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+              example:
+                JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4: "Jupiter V6"
+                whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc: "Orca Whirlpool"
+                CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK: "Raydium CLMM"
+                LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo: "Meteora DLMM"
 
 components:
   securitySchemes:

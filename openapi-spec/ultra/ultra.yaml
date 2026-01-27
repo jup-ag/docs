@@ -222,6 +222,49 @@ paths:
                   - requestId
                   - totalTime
                   - taker
+              example:
+                mode: "ExactIn"
+                inputMint: "So11111111111111111111111111111111111111112"
+                outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                inAmount: "100000000"
+                outAmount: "17057460"
+                inUsdValue: 17.13
+                outUsdValue: 17.06
+                priceImpact: 0.0001
+                swapUsdValue: 17.06
+                otherAmountThreshold: "17040402"
+                swapMode: "ExactIn"
+                slippageBps: 1
+                priceImpactPct: "0.0001"
+                routePlan:
+                  - swapInfo:
+                      ammKey: "HXpGFJGCEEFdV31tDmjDBaJMEB1fKLiAoKoWr3Fnonid"
+                      label: "Meteora DLMM"
+                      inputMint: "So11111111111111111111111111111111111111112"
+                      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                      inAmount: "100000000"
+                      outAmount: "17057460"
+                    percent: 100
+                    bps: 10000
+                    usdValue: 17.06
+                feeMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                feeBps: 5
+                platformFee:
+                  amount: "8529"
+                  feeBps: 5
+                signatureFeeLamports: 5000
+                signatureFeePayer: null
+                prioritizationFeeLamports: 254600
+                prioritizationFeePayer: null
+                rentFeeLamports: 0
+                rentFeePayer: null
+                swapType: "aggregator"
+                router: "iris"
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+                gasless: false
+                requestId: "b5e5f3a7-8c4d-4e2f-9a1b-3c6d8e0f2a4b"
+                totalTime: 320
+                taker: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
         '400':
           description: Bad request
           content:
@@ -397,6 +440,20 @@ paths:
                 required:
                   - status
                   - code
+              example:
+                status: "Success"
+                signature: "5UfDuX7hXbTiKFJqS1MzGsNpbXTzMKJe2bZP1zrd7DnFBSChKvF2FVDNAuqz7SJpaHXTB9E5DP6tMjfZmVDMJRs"
+                slot: "324307186"
+                code: 0
+                totalInputAmount: "100000000"
+                totalOutputAmount: "17057460"
+                inputAmountResult: "100000000"
+                outputAmountResult: "17057460"
+                swapEvents:
+                  - inputMint: "So11111111111111111111111111111111111111112"
+                    inputAmount: "100000000"
+                    outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    outputAmount: "17057460"
         '400':
           description: Bad request
           content:
@@ -442,6 +499,9 @@ paths:
               required:
                 - signedTransaction
                 - requestId
+            example:
+              signedTransaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+              requestId: "b5e5f3a7-8c4d-4e2f-9a1b-3c6d8e0f2a4b"
   /balances/{address}:
     get:
       summary: balances

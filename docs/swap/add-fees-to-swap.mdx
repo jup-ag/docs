@@ -1,7 +1,10 @@
 ---
 title: "Add Fees To Swap"
-description: "Walkthrough on how to add fees to the Metis Swap API."
+description: "Add integrator fees to Metis swaps and collect revenue from user trades."
+llmsDescription: "Add integrator fees to Metis swaps using the platformFeeBps quote parameter and feeAccount swap parameter. Supports SPL and Token2022 tokens."
 ---
+
+Add a platform fee to Metis swaps by passing `platformFeeBps` (in basis points) when requesting a quote and `feeAccount` (any valid token account for the swap pair mint) when building the swap transaction. No referral program setup is required for the Metis Swap API.
 
 <Note>
   **INFO**

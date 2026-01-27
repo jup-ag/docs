@@ -1,7 +1,10 @@
 ---
 title: "Cancel Order"
-description: "Walkthrough on how to cancel trigger orders using the Trigger API"
+description: "Cancel an open trigger order and reclaim unfilled tokens."
+llmsDescription: "POST /trigger/v1/cancelOrder cancels an open trigger order and returns unfilled tokens to the maker."
 ---
+
+The `POST /trigger/v1/cancelOrder` endpoint cancels an open trigger order and returns any unfilled tokens to the maker. Use `/cancelOrders` to cancel multiple orders in batched transactions. You can retrieve order accounts to cancel via the `/getTriggerOrders` endpoint.
 
 If you want to cancel order(s), you need to do these steps:
 

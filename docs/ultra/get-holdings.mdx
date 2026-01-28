@@ -1,7 +1,12 @@
 ---
 title: "Get Holdings"
-description: "Ultra Swap API to get the detailed token holdings of an account."
+description: "Retrieve detailed token holdings and balances for a wallet address."
+llmsDescription: "GET /ultra/v1/holdings/{address} returns detailed token holdings including token account info, frozen status, and native SOL balance."
 ---
+
+The `/ultra/v1/holdings/{address}` endpoint returns all token holdings for a wallet, including token account details (amount, frozen status, ATA flag, decimals). The top-level response contains the native SOL balance. For SOL-only queries, use `/holdings/{address}/native`.
+
+Fetch token holdings for a wallet:
 
 ```js
 const holdingsResponse = await (

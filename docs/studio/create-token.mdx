@@ -1,7 +1,10 @@
 ---
 title: "Create Token (Beta)"
-description: "Walkthrough on how to create tokens using the Studio API"
+description: "Launch a token with configurable bonding curves, metadata, and images through the Studio API."
+llmsDescription: "Use the Studio API create-tx and submit endpoints to launch a token with configurable bonding curves, upload metadata and images, and submit the signed transaction."
 ---
+
+This guide walks through the full token creation flow using the Studio API: calling the `/studio/v1/dbc-pool/create-tx` endpoint to generate a transaction and presigned URLs, uploading token image and metadata, then signing and submitting via `/studio/v1/dbc-pool/submit`.
 
 <Tip>
   **API REFERENCE**

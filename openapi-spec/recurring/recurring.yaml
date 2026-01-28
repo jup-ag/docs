@@ -30,6 +30,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecurringResponse'
+              example:
+                requestId: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
         '400':
           description: Bad request
         '500':
@@ -55,6 +58,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecurringResponse'
+              example:
+                requestId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
         '400':
           description: Bad request
         '500':
@@ -72,6 +78,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ExecuteRecurring'
+            example:
+              requestId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+              signedTransaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
         required: true
       responses:
         '200':
@@ -80,6 +89,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExecuteRecurringResponse'
+              example:
+                status: "Success"
+                signature: "5UfDuX7hXbTiKFJqS1MzGsNpbXTzMKJe2bZP1zrd7DnFBSChKvF2FVDNAuqz7SJpaHXTB9E5DP6tMjfZmVDMJRs"
+                order: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+                error: null
         '400':
           description: Bad request
         '500':
@@ -131,6 +145,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetRecurringOrderResponse'
+              example:
+                user: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                orderStatus: "active"
+                time:
+                  - userPubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    orderKey: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+                    inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    outputMint: "So11111111111111111111111111111111111111112"
+                    inDeposited: "100.0"
+                    inWithdrawn: "0.0"
+                    rawInDeposited: "100000000"
+                    rawInWithdrawn: "0"
+                    cycleFrequency: 60
+                    outWithdrawn: "0.0"
+                    inAmountPerCycle: "10.0"
+                    minOutAmount: "0"
+                    maxOutAmount: "0"
+                    inUsed: "10.0"
+                    outReceived: "0.058"
+                    rawOutWithdrawn: "0"
+                    rawInAmountPerCycle: "10000000"
+                    rawMinOutAmount: "0"
+                    rawMaxOutAmount: "0"
+                    rawInUsed: "10000000"
+                    rawOutReceived: "58000000"
+                    openTx: "4xKpN2..."
+                    closeTx: null
+                    userClosed: false
+                    createdAt: "2025-03-15T10:30:00.000Z"
+                    updatedAt: "2025-03-15T11:30:00.000Z"
+                    trades:
+                      - orderKey: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+                        keeper: "J1TnP8zvVxbtF5KFp5xRmWuvG9McnhzmBd9XGfCyuxFP"
+                        inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                        outputMint: "So11111111111111111111111111111111111111112"
+                        inputAmount: "10.0"
+                        outputAmount: "0.058"
+                        rawInputAmount: "10000000"
+                        rawOutputAmount: "58000000"
+                        feeMint: "So11111111111111111111111111111111111111112"
+                        feeAmount: "0.000058"
+                        rawFeeAmount: "58000"
+                        txId: "3yZe7d..."
+                        confirmedAt: "2025-03-15T11:30:00.000Z"
+                        action: "Fill"
+                        productMeta: null
+                price: []
+                all: []
+                totalPages: 1
+                page: 1
         '400':
           description: Bad request
         '500':
@@ -157,6 +221,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecurringResponse'
+              example:
+                requestId: "d4e5f6a7-b8c9-0123-def0-234567890123"
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
         '400':
           description: Bad request
         '500':
@@ -183,6 +250,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecurringResponse'
+              example:
+                requestId: "e5f6a7b8-c9d0-1234-ef01-345678901234"
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
         '400':
           description: Bad request
         '500':

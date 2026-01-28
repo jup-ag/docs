@@ -1,6 +1,7 @@
 ---
 title: "Search Token"
-description: "Ultra Swap API to search tokens and their information by mint, name or symbol"
+description: "Search for tokens by symbol, name, or mint address through the Ultra Swap API."
+llmsDescription: "GET /ultra/v1/search?query={query} returns token metadata by symbol, name, or mint address. Supports comma-separated queries, up to 100 mints."
 ---
 
 The Ultra Swap API provides an endpoint to search tokens in the background for you and returns you the search results, along with the mint information.
@@ -15,6 +16,8 @@ This is useful in most user applications, as users need to choose which tokens t
   * Limit to 100 mint addresses in query.
   * Default to 20 mints in response when searching via symbol or name.
 </Info>
+
+Search for a token by mint address:
 
 ```js
 const searchResponse = await (

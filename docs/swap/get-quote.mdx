@@ -1,7 +1,10 @@
 ---
 title: "Get Quote"
-description: "Swap via Metis by getting a quote from the Metis Swap API."
+description: "Get a swap route quote from the Metis routing engine."
+llmsDescription: "GET /swap/v1/quote returns route plans from the Metis routing engine. Required params: inputMint, outputMint, amount, slippageBps."
 ---
+
+The `/swap/v1/quote` endpoint returns route plans from the Metis routing engine. Pass `inputMint`, `outputMint`, `amount`, and `slippageBps` to receive the best route with price impact and detailed swap info. The quote is the first step in the Metis swap flow.
 
 The Quote API enables you to tap into the Metis Routing Engine, which accesses the deep liquidity available within the DEXes of Solana's DeFi ecosystem. In this guide, we will walkthrough how you can get a quote for a specific token pair and other related parameters.
 
@@ -47,6 +50,8 @@ The most common trading pair on Solana is SOL and USDC, to get a quote for this 
 ## Get Quote
 
 Using the root URL and parameters to pass in, it is as simple as the example code below!
+
+Fetch a quote for 1 SOL to USDC with 0.5% slippage:
 
 ```js
 const quoteResponse = await (

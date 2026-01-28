@@ -1,7 +1,10 @@
 ---
 title: "Build Swap Transaction"
-description: "Swap via Metis by building a swap transaction using the Metis Swap API."
+description: "Build a serialized swap transaction from a Metis quote with configurable compute and fee settings."
+llmsDescription: "POST /swap/v1/swap builds a serialized swap transaction from a quote. Supports dynamicComputeUnitLimit, dynamicSlippage, and prioritizationFeeLamports."
 ---
+
+The `/swap/v1/swap` endpoint takes a quote response and user public key, then returns a serialized transaction ready for signing. You can optimize landing with `dynamicComputeUnitLimit`, `dynamicSlippage`, and `prioritizationFeeLamports`. For instruction-level control, use `/swap/v1/swap-instructions` instead.
 
 The Metis Swap API is one of the ways for you to interact with the Jupiter Swap Aggregator program. Before you send a transaction to the network, you will need to build the transaction that defines the instructions to execute and accounts to read/write to.
 
@@ -48,6 +51,8 @@ Using the root URL and parameters to pass in, it is as simple as the example cod
 
   To understand how these parameters help, the next step, [Send Swap Transaction guide](/docs/swap/send-swap-transaction) will discuss them.
 </Tip>
+
+Build a swap transaction with landing optimizations:
 
 ```js
 const swapResponse = await (

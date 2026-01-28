@@ -1,11 +1,16 @@
 ---
 title: "Execute Order"
-description: "Swap via Ultra by signing then submitting the transaction to the Execute endpoint ."
+description: "Submit a signed Ultra Swap transaction for execution and receive the swap result."
+llmsDescription: "POST /ultra/v1/execute accepts the signed transaction and requestId, broadcasts it, and returns the swap result."
 ---
+
+After signing the transaction from `/order`, submit it to `POST /ultra/v1/execute` with the `signedTransaction` and `requestId`. Jupiter broadcasts the transaction via its proprietary engine and returns the swap status.
 
 ## Sign Transaction
 
 Using the Solana `web3.js@1` library, you can sign the transaction as follows:
+
+For wallet setup details, see [Environment Setup](/get-started/environment-setup).
 
 <Accordion title="Set up dependencies and wallet for signing">
   **Set up dependencies for signing**
@@ -43,6 +48,8 @@ Using the Solana `web3.js@1` library, you can sign the transaction as follows:
   </CodeGroup>
 </Accordion>
 
+Deserialize, sign, and re-serialize the transaction:
+
 ```js Sign Transaction
 import { VersionedTransaction } from '@solana/web3.js';
 
@@ -65,6 +72,8 @@ To make a post request to execute a swap order, you need to pass in the required
 
 * `signedTransaction`: The signed and serialized base64 encodedtransaction [like above](#sign-transaction)
 * `requestId`: The order response's request ID [from Get Order](/docs/ultra/get-order)
+
+Submit the signed transaction to the execute endpoint:
 
 ```js Execute Order
 const executeResponse = await (
@@ -92,6 +101,8 @@ After our transaction sending service has submitted your swap, we will actively 
 * If connection got dropped, you can try again with the same `signedTransaction` and `requestId` to poll for the status of the swap.
 * If there is no status, the order likely expired (did not get processed onchain and failed), but reach out to us if cases like this happen.
 </Tip>
+
+Check the execute response status:
 
 ```js Transaction Status Polling
 if (executeResponse.status === "Success") {

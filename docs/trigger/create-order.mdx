@@ -1,7 +1,10 @@
 ---
 title: "Create Order"
-description: "Walkthrough on how to create trigger orders using the Trigger API"
+description: "Create a new trigger (limit) order specifying the token pair, amounts, and target price."
+llmsDescription: "POST /trigger/v1/createOrder builds a limit order transaction. Required params: inputMint, outputMint, maker, payer, makingAmount, takingAmount."
 ---
+
+The `POST /trigger/v1/createOrder` endpoint builds a transaction for a new limit order. You must provide `inputMint`, `outputMint`, `maker`, `payer`, `makingAmount`, and `takingAmount`. The endpoint returns a base64-encoded transaction that you sign and send to the network (either directly or via the `/execute` endpoint).
 
 <Warning>
   **NEW PATHS**

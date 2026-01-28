@@ -1,7 +1,13 @@
 ---
-title: "Get Balances"
-description: "Ultra Swap API to get the token balances of an account."
+title: "Get Balances (Deprecated)"
+sidebarTitle: "Get Balances"
+description: "Retrieve token balances for a wallet address. Deprecated in favor of the Holdings endpoint."
+llmsDescription: "GET /ultra/v1/balances/{address} returns token balances. Deprecated — use GET /ultra/v1/holdings/{address} for detailed token holdings instead."
 ---
+
+**Deprecated:** This endpoint returns simplified token balances. Use [Get Holdings](/docs/ultra/get-holdings) (`/ultra/v1/holdings/{address}`) instead for detailed token account information including frozen status and ATA flags.
+
+Fetch balances for a wallet (deprecated):
 
 ```js
 const balancesResponse = await (

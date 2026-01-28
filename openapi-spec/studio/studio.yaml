@@ -21,6 +21,26 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateDBCTransactionRequestBody'
+            example:
+              buildCurveByMarketCapParam:
+                quoteMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                initialMarketCap: 16000
+                migrationMarketCap: 69000
+                tokenQuoteDecimal: 6
+                lockedVestingParam:
+                  totalLockedVestingAmount: 0
+                  cliffUnlockAmount: 0
+                  numberOfVestingPeriod: 0
+                  totalVestingDuration: 0
+                  cliffDurationFromMigrationTime: 0
+              antiSniping: true
+              fee:
+                feeBps: 100
+              isLpLocked: true
+              tokenName: "My Token"
+              tokenSymbol: "MTK"
+              tokenImageContentType: "image/png"
+              creator: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
       responses:
         '200':
           description: Successful response
@@ -28,6 +48,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateDBCTransactionResponse'
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+                mint: "TokenMintAddressExample111111111111111111111"
+                imagePresignedUrl: "https://storage.example.com/upload/image?token=abc123"
+                metadataPresignedUrl: "https://storage.example.com/upload/metadata?token=def456"
+                imageUrl: "https://storage.example.com/tokens/TokenMintAddressExample111111111111111111111/image.png"
         '400':
           description: Bad request
           content:
@@ -80,6 +106,11 @@ paths:
                         type: string
                       configKey:
                         type: string
+              example:
+                success: true
+                data:
+                  mint: "TokenMintAddressExample111111111111111111111"
+                  configKey: "ConfigKeyAddressExample11111111111111111111"
         '400':
           description: Bad request
           content:
@@ -129,6 +160,12 @@ paths:
                       configKey:
                         type: string
                         nullable: true
+              example:
+                success: true
+                data:
+                  dammv2PoolAddress: "PoolAddress11111111111111111111111111111111"
+                  dbcPoolAddress: "DBCPoolAddress111111111111111111111111111111"
+                  configKey: "ConfigKeyAddressExample11111111111111111111"
         '400':
           description: Bad request
           content:
@@ -178,6 +215,8 @@ paths:
                   type: string
                   description: |
                     - Dynamic Bonding Curve pool address
+            example:
+              poolAddress: "PoolAddress11111111111111111111111111111111"
       responses:
         '200':
           description: Successful response
@@ -197,6 +236,9 @@ paths:
                     type: string
                     description: |
                       - Total trading quote fee amount divided by 2 (creator share)
+              example:
+                unclaimed: "5000000"
+                total: "25000000"
 
         '400':
           description: Bad request
@@ -227,6 +269,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateClaimFeeDBCTransactionRequestBody'
+            example:
+              ownerWallet: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              poolAddress: "PoolAddress11111111111111111111111111111111"
+              maxQuoteAmount: 5000000
       responses:
         '200':
           description: Successful response
@@ -240,6 +286,8 @@ paths:
                   transaction:
                     type: string
                     description: Base64-encoded transaction ready for signing
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
         '400':
           description: Bad request
           content:

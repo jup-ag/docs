@@ -1,7 +1,10 @@
 ---
 title: "Craft Clawback (Beta)"
-description: "Walkthrough on how to craft clawback transactions using the Send API"
+description: "Reclaim tokens from an unclaimed Send invite before it expires."
+llmsDescription: "Use the POST /send/v1/craft-clawback endpoint to reclaim tokens from an unclaimed Send invite before it expires."
 ---
+
+This guide walks through crafting a Clawback transaction using the `/send/v1/craft-clawback` endpoint. You will load an existing invite code, derive the Program Derived Address (PDA), POST to the endpoint, then sign with the sender keypair to reclaim unclaimed tokens.
 
 ## Overview
 

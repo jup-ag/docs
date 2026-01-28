@@ -1,7 +1,10 @@
 ---
 title: "Jupiter Positions"
 description: "Query Jupiter positions, platform information, and staking data using the Portfolio API."
+llmsDescription: "Query Jupiter-specific positions including wallet balances, staked JUP, limit orders, DCA, liquidity pools, and leveraged trades via GET /portfolio/v1/positions/{address}."
 ---
+
+**BETA:** The Jupiter Positions endpoints return Jupiter-specific position data for a wallet, including wallet balances, staking positions, limit orders, DCA, liquidity pools, and leveraged trades. Filter by platform using the `platforms` query parameter, or query staked JUP directly via `/staked-jup/{address}`.
 
 <Tip>
   **API REFERENCE**

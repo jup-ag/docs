@@ -1,11 +1,16 @@
 ---
-title: "About Metis Swap API"
-description: "Overview of the Metis Swap API and its features."
+title: "Metis Swap API Overview"
+sidebarTitle: "About Metis Swap API"
+description: "Low-level routing engine for developers who need CPI, custom instructions, or full transaction control. Requires your own RPC."
 ---
+
+Metis is Jupiter's low-level routing engine for developers who need CPI, custom instructions, or full transaction control. The flow is three steps: get a quote (`GET /swap/v1/quote`), build a transaction (`POST /swap/v1/swap`), then sign and send via your own RPC. Unlike Ultra, Metis requires you to handle slippage, priority fees, and transaction landing yourself.
 
 Metis is Jupiter's original, low-level routing engine designed for maximum flexibility, transparency, and composability. It was the foundation that set the standard for reliable, general-purpose liquidity aggregation on Solana, and its learnings directly informed the development of newer engines like Iris (which powers Jupiter Ultra).
 
 Unlike Jupiter Ultra and its routing engines (Juno, Iris, JupiterZ), which focus on end-to-end execution and abstraction, Metis exposes granular control over raw swap instructions. This is beneficial for developers and integrators who need to fine-tune every aspect of their swap transactions.
+
+**Related:** [Jupiter routing ecosystem](/docs/routing) | [Metis v7 blog post](/blog/metis-v7)
 
 <Card href="/docs/routing" icon="book-open" horizontal>
 Learn more about how Metis fits into Jupiter's routing ecosystem, including Juno, Iris, and JupiterZ, in our [Routing documentation](/docs/routing).

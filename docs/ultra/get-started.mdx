@@ -1,7 +1,11 @@
 ---
-title: "Get Started"
-description: "Get started with the Ultra Swap API."
+title: "Ultra Swap API Quick Start"
+sidebarTitle: "Get Started"
+description: "Quick start guide to the Ultra Swap API: get an order, sign it, and execute."
+llmsDescription: "Two-step swap flow: call GET /order to get a transaction, sign it, then POST /execute. Includes links to all Ultra endpoints and guides."
 ---
+
+Ultra Swap uses a two-step flow: first call `GET /ultra/v1/order` to receive a base64-encoded unsigned transaction, then sign it and submit via `POST /ultra/v1/execute`. This page lists all Ultra endpoints and guides.
 
 ## Overview
 
@@ -26,6 +30,8 @@ description: "Get started with the Ultra Swap API."
 | [**Plugin Integration**](/docs/ultra/plugin-integration) | Walkthrough on how to integrate Ultra Swap API with Jupiter Plugin. |
 
 ## FAQ
+
+**Frequently asked questions:** Integrator fees are 5–10 bps (you keep 80%), Ultra transactions cannot be modified, and rate limits scale dynamically with swap volume.
 
 <AccordionGroup>
 <Accordion title="Can I add custom integrator fees to Ultra Swap API?">

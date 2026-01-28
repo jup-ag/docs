@@ -1,9 +1,14 @@
 ---
 title: "Get Shield"
-description: "Ultra Swap API to retrieve token information and associated warnings for the specified mint addresses."
+description: "Check token security warnings including freeze authority, mint authority, and organic activity signals."
+llmsDescription: "GET /ultra/v1/shield?mints={mints} returns token security warnings (freeze authority, mint authority, low organic activity, etc.) for specified mint addresses."
 ---
 
+The `/ultra/v1/shield` endpoint returns security warnings for one or more token mint addresses. Warnings include freeze authority, mint authority, unverified status, low organic activity, and new listing alerts. Use this to inform users before they trade.
+
 This is useful when integrating with Jupiter Ultra Swap or any other APIs, allowing you or your user to be informed of any potential malicious mints before conducting your transaction.
+
+Check shield warnings for multiple mints:
 
 ```js
 const shieldResponse = await (

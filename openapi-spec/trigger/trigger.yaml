@@ -84,6 +84,10 @@ paths:
                       AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAkOCWPK8t5w2W1nIsonBw2T/TCNCKkrgBQia9/YVlLEcjM9zTXA2aZIqK0k40U/eCZ0Zu1176lxIuHLsY6UyQjTdash6wigo20Auc3RVYRWME9FjnpbdgdRKYjLJLe0lVi47IZO5XCZ/U0AirZsOIWLoumtNiLomxcYL6d2R2rSxzkNgnQl2IV0spQPT+7K7zraa8oytEZyZ4HSFpxmV2v3WgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEImJzcxhjwZ2dKxnfimarbEo/iDZzNgo5QjJ8b+bMOuSf2yH7EMQBZfZLsgOHg/C5SyLv/x1D4MHZgRX7jOy4YyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAADG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQrDSpbBZnFaYMEjPsolig3zCx7IWOB0XHNqEmJmY0siBpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqXeleaIpvDk6bHUITYxyjNU3ParFA70LbecfV6NupbbBCAkABQKgAwIACQAJAy48AAAAAAAACAYABAAMBQ0BAQUCAAQMAgAAAIDw+gIAAAAADQEEAREIBgABAAoFDQEBCw8AAAIDBAYLDAoNDQUIBwsihW5Kr3Cf9Z9OyUY1qj0LZYDw+gIAAAAAAOH1BQAAAAAAAA0DBAAAAQk=
                     - |
                       AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAkOCWPK8t5w2W1nIsonBw2T/TCNCKkrgBQia9/YVlLEcjM9zTXA2aZIqK0k40U/eCZ0Zu1176lxIuHLsY6UyQjTdash6wigo20Auc3RVYRWME9FjnpbdgdRKYjLJLe0lVi47IZO5XCZ/U0AirZsOIWLoumtNiLomxcYL6d2R2rSxzkNgnQl2IV0spQPT+7K7zraa8oytEZyZ4HSFpxmV2v3WgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEImJzcxhjwZ2dKxnfimarbEo/iDZzNgo5QjJ8b+bMOuSf2yH7EMQBZfZLsgOHg/C5SyLv/x1D4MHZgRX7jOy4YyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAADG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQrDSpbBZnFaYMEjPsolig3zCx7IWOB0XHNqEmJmY0siBpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqXeleaIpvDk6bHUITYxyjNU3ParFA70LbecfV6NupbbBCAkABQKgAwIACQAJAy48AAAAAAAACAYABAAMBQ0BAQUCAAQMAgAAAIDw+gIAAAAADQEEAREIBgABAAoFDQEBCw8AAAIDBAYLDAoNDQUIBwsihW5Kr3Cf9Z9OyUY1qj0LZYDw+gIAAAAAAOH1BQAAAAAAAA0DBAAAAQk=
+              example:
+                requestId: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                transactions:
+                  - "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
         '400':
           description: Bad request body
           content:
@@ -246,6 +250,10 @@ paths:
                   transaction: |
                     AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAkOCWPK8t5w2W1nIsonBw2T/TCNCKkrgBQia9/YVlLEcjM9zTXA2aZIqK0k40U/eCZ0Zu1176lxIuHLsY6UyQjTdash6wigo20Auc3RVYRWME9FjnpbdgdRKYjLJLe0lVi47IZO5XCZ/U0AirZsOIWLoumtNiLomxcYL6d2R2rSxzkNgnQl2IV0spQPT+7K7zraa8oytEZyZ4HSFpxmV2v3WgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEImJzcxhjwZ2dKxnfimarbEo/iDZzNgo5QjJ8b+bMOuSf2yH7EMQBZfZLsgOHg/C5SyLv/x1D4MHZgRX7jOy4YyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAADG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQrDSpbBZnFaYMEjPsolig3zCx7IWOB0XHNqEmJmY0siBpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqXeleaIpvDk6bHUITYxyjNU3ParFA70LbecfV6NupbbBCAkABQKgAwIACQAJAy48AAAAAAAACAYABAAMBQ0BAQUCAAQMAgAAAIDw+gIAAAAADQEEAREIBgABAAoFDQEBCw8AAAIDBAYLDAoNDQUIBwsihW5Kr3Cf9Z9OyUY1qj0LZYDw+gIAAAAAAOH1BQAAAAAAAA0DBAAAAQk=
                   order: CX2iPk4nxarGPkk7ziViJTfL1z2e1LnGWRDimVQ4tzYf
+              example:
+                requestId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+                order: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
         '400':
           description: Bad request body
           content:
@@ -356,6 +364,9 @@ paths:
                   requestId: f7d5dd40-a416-4dae-8367-7dc10cab6554
                   transaction: |
                     AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAkOCWPK8t5w2W1nIsonBw2T/TCNCKkrgBQia9/YVlLEcjM9zTXA2aZIqK0k40U/eCZ0Zu1176lxIuHLsY6UyQjTdash6wigo20Auc3RVYRWME9FjnpbdgdRKYjLJLe0lVi47IZO5XCZ/U0AirZsOIWLoumtNiLomxcYL6d2R2rSxzkNgnQl2IV0spQPT+7K7zraa8oytEZyZ4HSFpxmV2v3WgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEImJzcxhjwZ2dKxnfimarbEo/iDZzNgo5QjJ8b+bMOuSf2yH7EMQBZfZLsgOHg/C5SyLv/x1D4MHZgRX7jOy4YyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAADG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQrDSpbBZnFaYMEjPsolig3zCx7IWOB0XHNqEmJmY0siBpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqXeleaIpvDk6bHUITYxyjNU3ParFA70LbecfV6NupbbBCAkABQKgAwIACQAJAy48AAAAAAAACAYABAAMBQ0BAQUCAAQMAgAAAIDw+gIAAAAADQEEAREIBgABAAoFDQEBCw8AAAIDBAYLDAoNDQUIBwsihW5Kr3Cf9Z9OyUY1qj0LZYDw+gIAAAAAAOH1BQAAAAAAAA0DBAAAAQk=
+              example:
+                requestId: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
         '400':
           description: Bad request body
           content:
@@ -436,6 +447,9 @@ paths:
                 - requestId
                 - signedTransaction
               title: executeRequestBody
+            example:
+              requestId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+              signedTransaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
       responses:
         '200':
           description: Signature of the successful transaction
@@ -462,6 +476,10 @@ paths:
                   signature: |
                     38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
                   status: Success
+              example:
+                status: "Success"
+                signature: "5UfDuX7hXbTiKFJqS1MzGsNpbXTzMKJe2bZP1zrd7DnFBSChKvF2FVDNAuqz7SJpaHXTB9E5DP6tMjfZmVDMJRs"
+                code: 0
         '400':
           description: Bad request body
           content:
@@ -768,6 +786,33 @@ paths:
                           productMeta: null
                   totalPages: 1
                   page: 1
+              example:
+                user: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                orderStatus: "open"
+                orders:
+                  - userPubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    orderKey: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+                    inputMint: "So11111111111111111111111111111111111111112"
+                    outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    makingAmount: "1.0"
+                    takingAmount: "200.0"
+                    remainingMakingAmount: "1.0"
+                    remainingTakingAmount: "200.0"
+                    rawMakingAmount: "1000000000"
+                    rawTakingAmount: "200000000"
+                    rawRemainingMakingAmount: "1000000000"
+                    rawRemainingTakingAmount: "200000000"
+                    slippageBps: "50"
+                    expiredAt: null
+                    createdAt: "2025-03-15T10:30:00.000Z"
+                    updatedAt: "2025-03-15T10:30:00.000Z"
+                    status: "Open"
+                    openTx: "4xKpN2..."
+                    closeTx: null
+                    programVersion: "j1to"
+                    trades: []
+                totalPages: 1
+                page: 1
         '400':
           description: Bad request body
         '500':

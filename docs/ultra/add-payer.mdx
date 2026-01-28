@@ -1,7 +1,10 @@
 ---
 title: "Add Integrator Payer"
-description: "Walkthrough on how to use the payer parameter to pay for networks fees and rent on behalf of your users."
+description: "Pay network fees and rent on behalf of your users through the Ultra Swap API."
+llmsDescription: "Use the payer parameter to pay network fees and rent on behalf of users. Requires referralAccount and referralFee. Enforces Iris-only routing."
 ---
+
+The `payer` parameter lets integrators cover all network fees and rent for their users, removing the gasless requirements (no minimum trade size, no SOL balance check). It must be used with `referralAccount` and `referralFee`, and enforces Iris-only routing. The integrator backend must co-sign the transaction before submitting to `/execute`.
 
 <Note>
     If you are unfamiliar with [Ultra Swap's Gasless Support mechanisms](/docs/ultra/gasless), please refer to the doc.

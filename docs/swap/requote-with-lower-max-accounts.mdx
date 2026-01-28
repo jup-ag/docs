@@ -1,7 +1,10 @@
 ---
 title: "Requote with Lower Max Accounts"
-description: "Walkthrough on how to requote with lower max accounts via the Metis Swap API."
+description: "Handle oversized swap transactions by reducing the account count in your quote request."
+llmsDescription: "Reduce the maxAccounts quote parameter when adding custom instructions causes the swap transaction to exceed Solana's 1232-byte size limit. Includes retry logic to find the right account count."
 ---
+
+When adding custom instructions to a Metis swap transaction causes it to exceed Solana's 1232-byte transaction size limit, reduce `maxAccounts` in the `/quote` request and rebuild. This page provides a retry loop that decrements `maxAccounts` until the transaction fits.
 
 In some cases where you might be limited or require strict control by adding your own instructions to the swap transaction, you might face issues with exceeding transaction size limit. In this section, we will provide some helping code to help you requote when the transaction size is too large.
 

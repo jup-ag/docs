@@ -1008,6 +1008,28 @@ paths:
                         description: Tokens indexed by token address
                         additionalProperties:
                           $ref: '#/components/schemas/TokenInfo'
+              example:
+                date: 1710000000000
+                owner: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                fetcherReports:
+                  - id: "jupiter-exchange"
+                    status: "ok"
+                    duration: 120
+                elements:
+                  - type: "multiple"
+                    label: "Wallet"
+                    platformId: "native-stake"
+                    name: "Native Stake"
+                    data:
+                      assets:
+                        - type: "token"
+                          networkId: "solana"
+                          value: 1713.40
+                          data:
+                            address: "So11111111111111111111111111111111111111112"
+                            amount: 10.0
+                            price: 171.34
+                duration: 450
 
   /platforms:
     get:
@@ -1058,6 +1080,13 @@ paths:
                           type: string
                         documentation:
                           type: string
+              example:
+                - id: "jupiter-exchange"
+                  name: "Jupiter"
+                  image: "https://sonar.watch/img/platforms/jupiter-exchange.webp"
+                  description: "Jupiter Aggregator"
+                  defiLlamaId: "jupiter"
+                  isDeprecated: false
   '/staked-jup/{address}':
     get:
       parameters:
@@ -1085,4 +1114,9 @@ paths:
                           type: number
                         until:
                           type: number
-                          
+              example:
+                stakedAmount: 15000.5
+                unstaking:
+                  - amount: 500.0
+                    until: 1711000000000
+

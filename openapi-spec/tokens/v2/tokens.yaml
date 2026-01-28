@@ -36,6 +36,23 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MintInformation"
+              example:
+                - id: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                  name: "USD Coin"
+                  symbol: "USDC"
+                  icon: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
+                  decimals: 6
+                  holderCount: 2500000
+                  fdv: 45000000000
+                  mcap: 45000000000
+                  usdPrice: 1.0
+                  liquidity: 50000000
+                  organicScore: 95
+                  organicScoreLabel: "high"
+                  isVerified: true
+                  tags:
+                    - "verified"
+                    - "community"
         '400':
           description: Bad request
           content:
@@ -84,6 +101,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MintInformation"
+              example:
+                - id: "So11111111111111111111111111111111111111112"
+                  name: "Wrapped SOL"
+                  symbol: "SOL"
+                  decimals: 9
+                  isVerified: true
+                  tags:
+                    - "verified"
         '400':
           description: Bad request
           content:
@@ -150,6 +175,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MintInformation'
+              example:
+                - id: "So11111111111111111111111111111111111111112"
+                  name: "Wrapped SOL"
+                  symbol: "SOL"
+                  decimals: 9
+                  usdPrice: 171.34
+                  stats24h:
+                    priceChange: 2.5
+                    volumeChange: 15000000
+                    numBuys: 50000
+                    numSells: 48000
         '400':
           description: Bad request
           content:
@@ -189,6 +225,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MintInformation'
+              example:
+                - id: "TokenMintAddressExample111111111111111111111"
+                  name: "New Token"
+                  symbol: "NEW"
+                  decimals: 9
+                  holderCount: 150
+                  usdPrice: 0.001
+                  liquidity: 5000
+                  organicScore: 20
+                  organicScoreLabel: "low"
+                  isVerified: false
+                  firstPool:
+                    id: "PoolAddressExample1111111111111111111111111"
+                    createdAt: "2025-03-15T10:30:00.000Z"
         '400':
           description: Bad request
           content:

@@ -140,6 +140,40 @@
             ]
           },
           {
+            "item": "Tokens",
+            "icon": "coin",
+            "groups": [
+              {
+                "group": "Tokens API",
+                "pages": [
+                  "docs/tokens/index",
+                  {
+                    "group": "V2 (Beta)",
+                    "pages": [
+                      "docs/tokens/v2/token-information",
+                      "docs/tokens/v2/content"
+                    ]
+                  },
+                  "docs/tokens/organic-score",
+                  "docs/tokens/token-tag-standard"
+                ]
+              }
+            ]
+          },
+          {
+            "item": "Price",
+            "icon": "dollar-sign",
+            "groups": [
+              {
+                "group": "Price API",
+                "pages": [
+                  "docs/price/index",
+                  "docs/price/v3"
+                ]
+              }
+            ]
+          },
+          {
             "item": "Lend",
             "icon": "piggy-bank",
             "groups": [
@@ -245,34 +279,6 @@
               {
                 "group": "Debugging",
                 "pages": ["docs/recurring/best-practices"]
-              }
-            ]
-          },
-          {
-            "item": "Tokens & Price",
-            "icon": "coin",
-            "groups": [
-              {
-                "group": "Tokens Docs",
-                "pages": [
-                  "docs/tokens/index",
-                  {
-                    "group": "V2 (Beta)",
-                    "pages": [
-                      "docs/tokens/v2/token-information",
-                      "docs/tokens/v2/content"
-                    ]
-                  },
-                  "docs/tokens/organic-score",
-                  "docs/tokens/token-tag-standard"
-                ]
-              },
-              {
-                "group": "Price Docs",
-                "pages": [
-                  "docs/price/index",
-                  "docs/price/v3"
-                ]
               }
             ]
           },
@@ -401,54 +407,6 @@
                 ]
               },
               {
-                "group": "Lend",
-                "tag": "BETA",
-                "pages": [
-                  "api-reference/lend",
-                  {
-                    "group": "Earn",
-                    "tag": "BETA",
-                    "pages": [
-                      "api-reference/lend/earn",
-                      "api-reference/lend/earn/deposit",
-                      "api-reference/lend/earn/withdraw",
-                      "api-reference/lend/earn/mint",
-                      "api-reference/lend/earn/redeem",
-                      "api-reference/lend/earn/deposit-instructions",
-                      "api-reference/lend/earn/withdraw-instructions",
-                      "api-reference/lend/earn/mint-instructions",
-                      "api-reference/lend/earn/redeem-instructions",
-                      "api-reference/lend/earn/tokens",
-                      "api-reference/lend/earn/positions",
-                      "api-reference/lend/earn/earnings"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Trigger",
-                "pages": [
-                  "api-reference/trigger",
-                  "api-reference/trigger/create-order",
-                  "api-reference/trigger/execute",
-                  "api-reference/trigger/cancel-order",
-                  "api-reference/trigger/cancel-orders",
-                  "api-reference/trigger/get-trigger-orders"
-                ]
-              },
-              {
-                "group": "Recurring",
-                "pages": [
-                  "api-reference/recurring",
-                  "api-reference/recurring/create-order",
-                  "api-reference/recurring/execute",
-                  "api-reference/recurring/cancel-order",
-                  "api-reference/recurring/price-deposit",
-                  "api-reference/recurring/price-withdraw",
-                  "api-reference/recurring/get-recurring-orders"
-                ]
-              },
-              {
                 "group": "Tokens",
                 "pages": [
                   "api-reference/tokens",
@@ -496,6 +454,59 @@
                     "group": "V2 (Deprecated)",
                     "pages": ["api-reference/price/v2", "api-reference/price/v2/price"]
                   }
+                ]
+              }
+            ]
+          },
+          {
+            "group": "More",
+            "pages": [
+              {
+                "group": "Lend",
+                "tag": "BETA",
+                "pages": [
+                  "api-reference/lend",
+                  {
+                    "group": "Earn",
+                    "tag": "BETA",
+                    "pages": [
+                      "api-reference/lend/earn",
+                      "api-reference/lend/earn/deposit",
+                      "api-reference/lend/earn/withdraw",
+                      "api-reference/lend/earn/mint",
+                      "api-reference/lend/earn/redeem",
+                      "api-reference/lend/earn/deposit-instructions",
+                      "api-reference/lend/earn/withdraw-instructions",
+                      "api-reference/lend/earn/mint-instructions",
+                      "api-reference/lend/earn/redeem-instructions",
+                      "api-reference/lend/earn/tokens",
+                      "api-reference/lend/earn/positions",
+                      "api-reference/lend/earn/earnings"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Trigger",
+                "pages": [
+                  "api-reference/trigger",
+                  "api-reference/trigger/create-order",
+                  "api-reference/trigger/execute",
+                  "api-reference/trigger/cancel-order",
+                  "api-reference/trigger/cancel-orders",
+                  "api-reference/trigger/get-trigger-orders"
+                ]
+              },
+              {
+                "group": "Recurring",
+                "pages": [
+                  "api-reference/recurring",
+                  "api-reference/recurring/create-order",
+                  "api-reference/recurring/execute",
+                  "api-reference/recurring/cancel-order",
+                  "api-reference/recurring/price-deposit",
+                  "api-reference/recurring/price-withdraw",
+                  "api-reference/recurring/get-recurring-orders"
                 ]
               },
               {

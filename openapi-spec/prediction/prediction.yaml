@@ -8,6 +8,9 @@ servers:
   - url: https://api.jup.ag/prediction/v1
     description: Jupiter Prediction Market API Endpoint
 
+security:
+  - ApiKeyAuth: []
+
 tags:
   - name: Events
   - name: Markets
@@ -19,6 +22,12 @@ tags:
   - name: Milestones
   - name: Vault
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://portal.jup.ag
   schemas:
     EventMetadata:
       type: object

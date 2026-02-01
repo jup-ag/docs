@@ -23,17 +23,30 @@
     );
   }
 
-  function applyCollapsedState(content) {
-    if (!isDesktop()) {
-      expandContent(content);
-      content.removeAttribute(EXPANDED_ATTR);
-      return;
+  /* On mobile, only the second dropdown (docs menu: Ultra Swap, Tokens, …) gets Show more; the first (tab selector: Home, Get Started, Developer Docs) does not. */
+  function isDocsDropdown(content) {
+    var items = getItems(content);
+    for (var i = 0; i < items.length; i++) {
+      var text = (items[i].textContent || '').trim();
+      if (text === 'Home') return false;
     }
+    return true;
+  }
+
+  function applyCollapsedState(content) {
     if (content.hasAttribute(EXPANDED_ATTR)) return;
     if (content.hasAttribute(COLLAPSED_ATTR)) return;
 
     var items = getItems(content);
     if (items.length <= VISIBLE_ITEMS) return;
+
+    if (!isDesktop()) {
+      if (!isDocsDropdown(content)) {
+        expandContent(content);
+        content.removeAttribute(EXPANDED_ATTR);
+      }
+      if (!isDocsDropdown(content)) return;
+    }
 
     for (var i = VISIBLE_ITEMS; i < items.length; i++) {
       items[i].classList.add(ITEM_HIDDEN_CLASS);
@@ -101,12 +114,19 @@
 
   observer.observe(document.body, { childList: true, subtree: true });
 
-  document.addEventListener('click', function (e) {
+  function handleShowMore(e) {
     var btn = e.target && e.target.closest && e.target.closest('[' + SHOW_MORE_ATTR + ']');
     if (!btn) return;
     var content = btn.closest(CONTENT_SELECTOR);
-    if (content) expandContent(content);
-  });
+    if (content) {
+      e.preventDefault();
+      e.stopPropagation();
+      expandContent(content);
+    }
+  }
+
+  document.addEventListener('click', handleShowMore, true);
+  document.addEventListener('touchstart', handleShowMore, { capture: true, passive: false });
 
   var existing = document.querySelectorAll(CONTENT_SELECTOR);
   for (var j = 0; j < existing.length; j++) {

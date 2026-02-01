@@ -206,6 +206,20 @@
             ]
           },
           {
+            "item": "Prediction",
+            "icon": "check-to-slot",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["docs/prediction/index"]
+              },
+              {
+                "group": "API Guides Coming Soon",
+                "pages": ["docs/prediction/coming-soon"]
+              }
+            ]
+          },
+          {
             "item": "Perps",
             "icon": "chart-line",
             "groups": [
@@ -480,6 +494,78 @@
                       "api-reference/lend/earn/tokens",
                       "api-reference/lend/earn/positions",
                       "api-reference/lend/earn/earnings"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Prediction",
+                "tag": "BETA",
+                "pages": [
+                  "api-reference/prediction",
+                  {
+                    "group": "Events",
+                    "pages": [
+                      "api-reference/prediction/get-events",
+                      "api-reference/prediction/search-events",
+                      "api-reference/prediction/get-event",
+                      "api-reference/prediction/get-suggested-events"
+                    ]
+                  },
+                  {
+                    "group": "Markets",
+                    "pages": [
+                      "api-reference/prediction/get-event-markets",
+                      "api-reference/prediction/get-event-market",
+                      "api-reference/prediction/get-market"
+                    ]
+                  },
+                  {
+                    "group": "Orders",
+                    "pages": [
+                      "api-reference/prediction/get-orders",
+                      "api-reference/prediction/get-order",
+                      "api-reference/prediction/get-order-status",
+                      "api-reference/prediction/create-order",
+                      "api-reference/prediction/close-order",
+                      "api-reference/prediction/close-all-orders"
+                    ]
+                  },
+                  {
+                    "group": "Positions",
+                    "pages": [
+                      "api-reference/prediction/get-positions",
+                      "api-reference/prediction/get-position",
+                      "api-reference/prediction/close-position",
+                      "api-reference/prediction/close-all-positions",
+                      "api-reference/prediction/claim-position"
+                    ]
+                  },
+                  {
+                    "group": "History & Data",
+                    "pages": [
+                      "api-reference/prediction/get-history",
+                      "api-reference/prediction/get-orderbook",
+                      "api-reference/prediction/get-trading-status"
+                    ]
+                  },
+                  {
+                    "group": "Profile & Social",
+                    "pages": [
+                      "api-reference/prediction/get-profile",
+                      "api-reference/prediction/get-pnl-history",
+                      "api-reference/prediction/get-trades",
+                      "api-reference/prediction/get-leaderboards",
+                      "api-reference/prediction/follow-user",
+                      "api-reference/prediction/unfollow-user",
+                      "api-reference/prediction/get-followers",
+                      "api-reference/prediction/get-following"
+                    ]
+                  },
+                  {
+                    "group": "Vault",
+                    "pages": [
+                      "api-reference/prediction/get-vault-info"
                     ]
                   }
                 ]

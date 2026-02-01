@@ -1,7 +1,10 @@
 ---
 title: "Manual Mode"
 description: "Use manual mode to control Ultra API parameters like slippage or priority fee settings."
+llmsDescription: "Use manual mode to control Ultra API parameters like slippage or priority fee settings. Not recommended for default integrations — use only for user-facing trading UIs."
 ---
+
+Manual mode lets you override Ultra's automatic slippage, priority fee, and broadcast settings. It is intended for user-facing trading UIs (like jup.ag's manual mode) or personal use — not as a default integration. Transactions with manual overrides fall outside Jupiter's supported execution model.
 
 Ultra is a production-grade execution engine that we run as our core product. The default behavior reflects years of operational tuning, and continuous optimization with data gathered from network conditions, execution outcomes and real-world feedback.
 

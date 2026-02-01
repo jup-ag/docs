@@ -29,9 +29,17 @@ color: white !important;
     }
 }
 
-/* Dropdown collapse / Show more – desktop only (not on mobile) */
+/* Dropdown collapse / Show more – applies on all viewports (dropdown.js) */
+
+/* Mobile: limit dropdown height so it doesn’t overflow the viewport */
+@media screen and (max-width: 767px) {
+    [data-radix-menu-content] {
+        max-height: 80vh !important;
+    }
+}
+
+/* Desktop: larger dropdown height */
 @media screen and (min-width: 768px) {
-    /* Increase dropdown menu height */
     [data-radix-menu-content] {
         max-height: 600px !important;
     }

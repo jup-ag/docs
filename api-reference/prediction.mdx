@@ -1,0 +1,136 @@
+---
+title: "Prediction API"
+sidebarTitle: "Overview"
+description: "Overview of Jupiter Prediction Market API"
+---
+
+<Note>
+**BETA**
+
+The Prediction Market API is currently in beta and subject to breaking changes. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
+</Note>
+
+## Events
+
+<CardGroup>
+  <Card title="Get Events" href="/api-reference/prediction/get-events" icon="file-lines" horizontal>
+    Get a list of all available prediction events with optional filtering and pagination
+  </Card>
+  <Card title="Search Events" href="/api-reference/prediction/search-events" icon="file-lines" horizontal>
+    Search for events by title or keyword
+  </Card>
+  <Card title="Get Event" href="/api-reference/prediction/get-event" icon="file-lines" horizontal>
+    Get detailed information about a specific event
+  </Card>
+  <Card title="Get Suggested Events" href="/api-reference/prediction/get-suggested-events" icon="file-lines" horizontal>
+    Get personalized event suggestions based on user activity
+  </Card>
+</CardGroup>
+
+## Markets
+
+<CardGroup>
+  <Card title="Get Event Markets" href="/api-reference/prediction/get-event-markets" icon="file-lines" horizontal>
+    Get all markets for a specific event
+  </Card>
+  <Card title="Get Event Market" href="/api-reference/prediction/get-event-market" icon="file-lines" horizontal>
+    Get detailed market information for a specific market within an event
+  </Card>
+  <Card title="Get Market" href="/api-reference/prediction/get-market" icon="file-lines" horizontal>
+    Get detailed market information by market ID
+  </Card>
+</CardGroup>
+
+## Orders
+
+<CardGroup>
+  <Card title="Get Orders" href="/api-reference/prediction/get-orders" icon="file-lines" horizontal>
+    Get a list of orders with optional filtering by owner or market
+  </Card>
+  <Card title="Get Order" href="/api-reference/prediction/get-order" icon="file-lines" horizontal>
+    Get detailed information about a specific order
+  </Card>
+  <Card title="Get Order Status" href="/api-reference/prediction/get-order-status" icon="file-lines" horizontal>
+    Get the latest status and history for an order
+  </Card>
+  <Card title="Create Order" href="/api-reference/prediction/create-order" icon="file-lines" horizontal>
+    Request an unsigned transaction to create a new order
+  </Card>
+  <Card title="Close Order" href="/api-reference/prediction/close-order" icon="file-lines" horizontal>
+    Request an unsigned transaction to close a pending order
+  </Card>
+  <Card title="Close All Orders" href="/api-reference/prediction/close-all-orders" icon="file-lines" horizontal>
+    Request unsigned transactions to close multiple orders
+  </Card>
+</CardGroup>
+
+## Positions
+
+<CardGroup>
+  <Card title="Get Positions" href="/api-reference/prediction/get-positions" icon="file-lines" horizontal>
+    Get a list of positions with optional filtering
+  </Card>
+  <Card title="Get Position" href="/api-reference/prediction/get-position" icon="file-lines" horizontal>
+    Get detailed information about a specific position
+  </Card>
+  <Card title="Close Position" href="/api-reference/prediction/close-position" icon="file-lines" horizontal>
+    Request an unsigned transaction to sell all contracts in a position
+  </Card>
+  <Card title="Close All Positions" href="/api-reference/prediction/close-all-positions" icon="file-lines" horizontal>
+    Request unsigned transactions to close all open positions
+  </Card>
+  <Card title="Claim Position" href="/api-reference/prediction/claim-position" icon="file-lines" horizontal>
+    Request an unsigned transaction to claim payout from a winning position
+  </Card>
+</CardGroup>
+
+## History & Data
+
+<CardGroup>
+  <Card title="Get History" href="/api-reference/prediction/get-history" icon="file-lines" horizontal>
+    Get trading history and event records for an account
+  </Card>
+  <Card title="Get Orderbook" href="/api-reference/prediction/get-orderbook" icon="file-lines" horizontal>
+    Get orderbook data for a specific market
+  </Card>
+  <Card title="Get Trading Status" href="/api-reference/prediction/get-trading-status" icon="file-lines" horizontal>
+    Get current trading status of the prediction market
+  </Card>
+</CardGroup>
+
+## Profile & Social
+
+<CardGroup>
+  <Card title="Get Profile" href="/api-reference/prediction/get-profile" icon="file-lines" horizontal>
+    Get profile statistics for a user
+  </Card>
+  <Card title="Get PnL History" href="/api-reference/prediction/get-pnl-history" icon="file-lines" horizontal>
+    Get historical PnL data for charting
+  </Card>
+  <Card title="Get Trades" href="/api-reference/prediction/get-trades" icon="file-lines" horizontal>
+    Get recent filled trades across all markets
+  </Card>
+  <Card title="Get Leaderboards" href="/api-reference/prediction/get-leaderboards" icon="file-lines" horizontal>
+    Get leaderboard rankings by various metrics
+  </Card>
+  <Card title="Follow User" href="/api-reference/prediction/follow-user" icon="file-lines" horizontal>
+    Follow a user to track their predictions
+  </Card>
+  <Card title="Unfollow User" href="/api-reference/prediction/unfollow-user" icon="file-lines" horizontal>
+    Unfollow a previously followed user
+  </Card>
+  <Card title="Get Followers" href="/api-reference/prediction/get-followers" icon="file-lines" horizontal>
+    Get list of followers for a user
+  </Card>
+  <Card title="Get Following" href="/api-reference/prediction/get-following" icon="file-lines" horizontal>
+    Get list of users being followed
+  </Card>
+</CardGroup>
+
+## Vault
+
+<CardGroup>
+  <Card title="Get Vault Info" href="/api-reference/prediction/get-vault-info" icon="file-lines" horizontal>
+    Get vault account information and balance
+  </Card>
+</CardGroup>

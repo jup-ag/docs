@@ -17,16 +17,12 @@ In the meantime, refer to the [API Reference](/api-reference/prediction) for the
 
 The Jupiter Prediction Market enables you to participate in binary prediction markets on Solana, allowing users to trade on the outcomes of real-world events across categories like Sports, Crypto, Politics, E-sports, Culture, Economics, and Tech.
 
-The system is integrated with:
-1. **Kalshi**
-2. **Polymarket**
-
 ### How It Works
 
 Users can interact with the markets directly on Solana, and Jupiter will handle the off-chain actions required to:
 - **Open Positions**: Buy YES or NO contracts on market outcomes
 - **Manage Positions**: Buy to increase exposure or sell to reduce positions
-- **Claim Winnings**: Receive USDC payouts when your predictions are correct
+- **Claim Winnings**: Receive JupUSD payouts when your predictions are correct
 - **Track Performance**: Monitor positions, P&L, and trading history
 
 Typical flow of actions:
@@ -34,7 +30,7 @@ Typical flow of actions:
 2. **Markets are established** within events, each representing a binary outcome (YES or NO)
 3. **Users trade contracts** at dynamic prices that reflect market sentiment (prices range from \$0 to \$1 per contract)
 4. **Events resolve** based on predetermined rules when the outcome is known
-5. **Winners claim payouts** - each winning contract is worth $1 (no fees)
+5. **Winners claim payouts** - each winning contract is worth $1 (no payout fees)
 
 ## Architectural Components
 
@@ -50,7 +46,6 @@ Events are the top-level container for prediction markets. Each event represents
 - **Category**: Primary classification (crypto, sports, politics, esports, culture, economics, tech)
 - **Subcategory**: More specific classification within the category
 - **Markets**: One or more binary markets within the event
-- **Status Flags**: `isLive`, `isActive`, `isTrending`, `isRecommended`
 - **Metadata**: Title, subtitle, images, rules documents
 - **Metrics**: Total TVL, trading volume, close conditions
 
@@ -67,7 +62,6 @@ Markets are binary prediction markets within an event, representing specific YES
 - **Market ID**: Unique identifier derived as a PDA (Program Derived Address)
 - **Status**: `open`, `closed`, or `cancelled`
 - **Result**: Empty string (unresolved), `pending`, `yes`, or `no`
-- **Timestamps**: `openTime`, `closeTime`, `settlementTime`
 - **Pricing Data**: Buy/sell prices for YES and NO sides, volume, open interest, liquidity
 - **Metadata**: Title, description, trading rules, resolution criteria
 
@@ -144,7 +138,7 @@ Positions represent a user's holdings in a specific market side (YES or NO).
 The Vault manages the settlement and escrow mechanism for the prediction market system.
 
 **Vault Functions:**
-- **Escrow Management**: Holds deposited USDC during active trading
+- **Escrow Management**: Holds deposited JupUSD during active trading
 - **Settlement Distribution**: Pays out winning positions
 - **Fee Collection**: Accumulates protocol and venue fees
 - **Balance Tracking**: Maintains total locked liquidity
@@ -194,7 +188,7 @@ The settlement process resolves markets and enables winners to claim payouts.
 2. **Result Determined**: Authoritative source provides outcome
 3. **Market Settles**: Result recorded on-chain (`yes` or `no`)
 4. **Positions Become Claimable**: Winning positions can claim payouts
-5. **Users Claim**: Winners receive $1 per contract (minus fees)
+5. **Users Claim**: Winners receive $1 per contract (no payout/claim fees)
 6. **Losing Positions**: Contracts become worthless
 
 **Settlement Guarantees:**
@@ -235,13 +229,12 @@ Users can actively manage positions:
 - **Close entirely**: Exit the market completely
 - **Hold to settlement**: Wait for final payout
 
-### Fee Structure
+### Fees
 
-The system charges fees on trading activity:
-- **Underlying Protocol Fees**: Integrated protocols have fees
-- **Platform Fees**: Zero platform fees (Jupiter takes 0% of the trading volume)
+The system charges fees on certain trading activity:
+- **Platform Fees**: Underlying protocol fee
 - **Total Fee**: Displayed before order execution
-- Fees reduce net P&L but are known upfront
+- **Payout Fees**: No payout/claim fees
 
 ### Account Structure (Solana)
 

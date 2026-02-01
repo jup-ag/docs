@@ -29,6 +29,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionResponse'
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
 
   /earn/deposit-instructions:
     post:
@@ -50,6 +52,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InstructionResponse'
+              example:
+                programId: "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"
+                accounts:
+                  - pubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    isSigner: true
+                    isWritable: true
+                  - pubkey: "So11111111111111111111111111111111111111112"
+                    isSigner: false
+                    isWritable: false
+                data: "3Dc2AAAAAAA..."
 
   /earn/withdraw:
     post:
@@ -71,6 +83,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionResponse'
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
 
   /earn/withdraw-instructions:
     post:
@@ -92,6 +106,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InstructionResponse'
+              example:
+                programId: "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"
+                accounts:
+                  - pubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    isSigner: true
+                    isWritable: true
+                data: "4Ec3AAAAAAA..."
 
   /earn/mint:
     post:
@@ -113,6 +134,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionResponse'
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
 
   /earn/mint-instructions:
     post:
@@ -134,6 +157,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InstructionResponse'
+              example:
+                programId: "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"
+                accounts:
+                  - pubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    isSigner: true
+                    isWritable: true
+                data: "5Fd4AAAAAAA..."
 
   /earn/redeem:
     post:
@@ -155,6 +185,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionResponse'
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
 
   /earn/redeem-instructions:
     post:
@@ -176,6 +208,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InstructionResponse'
+              example:
+                programId: "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"
+                accounts:
+                  - pubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    isSigner: true
+                    isWritable: true
+                data: "6Ge5AAAAAAA..."
 
   /earn/tokens:
     get:
@@ -191,6 +230,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokensResponse'
+              example:
+                - id: "So11111111111111111111111111111111111111112"
+                  address: "So11111111111111111111111111111111111111112"
+                  name: "Wrapped SOL"
+                  symbol: "SOL"
+                  decimals: 9
+                  assetAddress: "So11111111111111111111111111111111111111112"
+                  asset:
+                    address: "So11111111111111111111111111111111111111112"
+                    chain_id: 0
+                    name: "Wrapped SOL"
+                    symbol: "SOL"
+                    decimals: 9
+                    logo_url: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
+                    price: 171.34
+                    coingecko_id: "solana"
+                  totalAssets: "1500000000000"
+                  totalSupply: "1450000000000"
+                  convertToShares: "0.966667"
+                  convertToAssets: "1.034483"
+                  rewardsRate: "0.035"
+                  supplyRate: "0.025"
+                  totalRate: "0.06"
 
   /earn/positions:
     get:
@@ -215,6 +277,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserPositionsResponse'
+              example:
+                - token:
+                    id: "So11111111111111111111111111111111111111112"
+                    address: "So11111111111111111111111111111111111111112"
+                    name: "Wrapped SOL"
+                    symbol: "SOL"
+                    decimals: 9
+                  ownerAddress: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                  shares: "100000000"
+                  underlyingAssets: "103448300"
+                  underlyingBalance: "17.72"
+                  allowance: "1000000000"
 
   /earn/earnings:
     get:
@@ -247,6 +321,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserEarningsResponse'
+              example:
+                - address: "So11111111111111111111111111111111111111112"
+                  ownerAddress: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                  totalDeposits: "1000000000"
+                  totalWithdraws: "0"
+                  totalBalance: "1034483000"
+                  totalAssets: "1034483000"
+                  earnings: "34483000"
 
 
 components:

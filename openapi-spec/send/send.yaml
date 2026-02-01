@@ -49,6 +49,11 @@ paths:
                   description: |
                     - Defaults to WSOL mint
                     - Only pass in this parameter with other mint when required
+            example:
+              inviteSigner: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+              sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              amount: "1000000"
+              mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
       responses:
         '200':
           description: Successful response
@@ -74,6 +79,10 @@ paths:
                     type: string
                     description: |
                       - Amount of fees required for network's transaction fee and token accounts
+              example:
+                tx: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+                expiry: "2025-03-22T10:30:00.000Z"
+                totalFeeLamports: "5000"
         '400':
           description: Bad request body
           content:
@@ -125,6 +134,9 @@ paths:
                   description: |
                     - Public key address of the sender
                     - Since this address funded the invite, it will be the receiving address of the full amount
+            example:
+              invitePDA: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+              sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
       responses:
         '200':
           description: Successful response
@@ -139,6 +151,8 @@ paths:
                     type: string
                     description: |
                       - Base64-encoded unsigned Send transaction
+              example:
+                tx: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
         '400':
           description: Bad request body
           content:
@@ -192,6 +206,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InviteDataResponse'
+              example:
+                invites:
+                  - invite_signer: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+                    invite_pda: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+                    sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    expiry: "2025-03-22T10:30:00.000Z"
+                    amount: "1000000"
+                    creation_tx: "4xKpN2..."
+                    deletion_tx: null
+                    receiver: null
+                    action: "created"
+                    creation_time: "2025-03-15T10:30:00.000Z"
+                    deletion_time: null
+                    mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    confirmed: true
+                hasMoreData: false
         '400':
           description: Bad request body
           content:
@@ -245,6 +275,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InviteDataResponse'
+              example:
+                invites:
+                  - invite_signer: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+                    invite_pda: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+                    sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    expiry: "2025-03-22T10:30:00.000Z"
+                    amount: "1000000"
+                    creation_tx: "4xKpN2..."
+                    deletion_tx: "5yLqO3..."
+                    receiver: "9pG5ILqRSOnucCwUSRspuc5MV4pR4sD8fC8qxNL0GWJX"
+                    action: "claimed"
+                    creation_time: "2025-03-15T10:30:00.000Z"
+                    deletion_time: "2025-03-16T08:15:00.000Z"
+                    mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    confirmed: true
+                hasMoreData: false
         '400':
           description: Bad request body
           content:

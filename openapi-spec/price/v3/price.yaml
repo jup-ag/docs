@@ -56,6 +56,40 @@ paths:
                   required:
                     - decimals
                     - usdPrice
+              example:
+                data:
+                  So11111111111111111111111111111111111111112:
+                    id: "So11111111111111111111111111111111111111112"
+                    type: "derivedPrice"
+                    price: "171.340000000"
+                    extraInfo:
+                      lastSwappedPrice:
+                        lastJupiterSellAt: 1710000000
+                        lastJupiterSellPrice: "171.34"
+                        lastJupiterBuyAt: 1710000001
+                        lastJupiterBuyPrice: "171.35"
+                      quotedPrice:
+                        buyPrice: "171.35"
+                        buyAt: 1710000001
+                        sellPrice: "171.34"
+                        sellAt: 1710000000
+                      confidenceLevel: "high"
+                      depth:
+                        buyPriceImpactRatio:
+                          depth:
+                            "10": 0.001
+                            "100": 0.005
+                            "1000": 0.012
+                        sellPriceImpactRatio:
+                          depth:
+                            "10": 0.001
+                            "100": 0.004
+                            "1000": 0.011
+                  EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:
+                    id: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    type: "derivedPrice"
+                    price: "1.000000000"
+                timeTaken: 0.005
         '400':
           description: Bad request
         '500':

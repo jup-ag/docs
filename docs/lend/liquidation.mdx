@@ -1,7 +1,10 @@
 ---
 title: "Liquidation"
-description: "Walkthrough on building a liquidation bot with Jupiter Lend."
+description: "Build a liquidation bot for Jupiter Lend covering fetching liquidations, flash borrowing, and collateral swaps."
+llmsDescription: "Build a liquidation bot for Jupiter Lend using the @jup-ag/lend SDK. Covers fetching available liquidations, flash borrowing, executing liquidation instructions, and swapping collateral via Jupiter Swap."
 ---
+
+This guide walks through building a liquidation bot for Jupiter Lend. The bot uses the `@jup-ag/lend` SDK to fetch available liquidations, flash borrow the debt amount, execute liquidation instructions, swap collateral back to the debt token via Jupiter Swap, and flash repay — all in a single transaction.
 
 Jupiter Lend allows anyone to participate in the liquidation mechanism. In this section, we have included a minimal Typescript example to get you started.
 

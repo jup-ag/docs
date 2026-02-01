@@ -1,7 +1,10 @@
 ---
 title: "Cancel Order"
-description: "Walkthrough on how to cancel recurring orders using the Recurring API"
+description: "Cancel an active recurring order and reclaim remaining funds."
+llmsDescription: "POST /recurring/v1/cancelOrder cancels an active recurring (DCA) order and returns remaining funds to the user."
 ---
+
+The `POST /recurring/v1/cancelOrder` endpoint cancels an active recurring order and returns remaining funds to the user. The endpoint supports one cancellation per transaction. Retrieve order accounts via `/getRecurringOrders` first, then sign and submit the cancel transaction.
 
 If you want to cancel order(s), you need to do these steps:
 

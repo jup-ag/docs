@@ -1,7 +1,10 @@
 ---
 title: "Send Swap Transaction"
-description: "Swap via Metis by sending a swap transaction to the network."
+description: "Sign and send a Metis swap transaction with guidance on priority fees, compute units, and broadcasting."
+llmsDescription: "Sign and send the serialized Metis swap transaction via your own RPC. Covers priority fee estimation, compute unit limits, dynamic slippage, and Jito broadcasting."
 ---
+
+After building the swap transaction, deserialize it, sign with your wallet, and send via `connection.sendRawTransaction()`. This page covers transaction preparation, priority fee estimation, compute unit optimization, dynamic slippage, and alternative broadcasting methods (RPCs and Jito).
 
 Transaction sending can be very simple but optimizing for transaction landing can be challenging. This is critical in periods of network congestion when many users and especially bots are competing for block space to have their transactions processed.
 
@@ -42,6 +45,8 @@ Here's the code to deserialize and sign, then serialize.
 3. Deserialize it to a **VersionedTransaction** object to sign.
 4. Finally, convert it back to **Uint8array** format to send the transaction.
 
+Deserialize, sign, and serialize the transaction:
+
 ```js
 const transactionBase64 = swapResponse.swapTransaction
 const transaction = VersionedTransaction.deserialize(Buffer.from(transactionBase64, 'base64'));
@@ -79,6 +84,8 @@ Finally, there are a 2 [transaction sending options](https://solana.com/docs/adv
   - Simulate the transaction against the bank slot specified by the preflightCommitment. |
 </Accordion>
 
+Send the signed transaction with retry settings:
+
 ```js
 const signature = await connection.sendRawTransaction(transactionBinary, {
     maxRetries: 2,
@@ -91,6 +98,8 @@ const signature = await connection.sendRawTransaction(transactionBinary, {
 In addition, after sending the transaction, it is always a best practice to check the transaction confirmation state, and if not, log the error for debugging or communicating with your users on your interface.
 
 <Card title="Read more about transaction confirmation tips here." href="https://solana.com/docs/advanced/confirmation#transaction-confirmation-tips" icon="book-open" horizontal/>
+
+Confirm the transaction reached finality:
 
 ```js
 const confirmation = await connection.confirmTransaction({signature,}, "finalized");

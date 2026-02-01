@@ -1,7 +1,10 @@
 ---
 title: "Get Recurring Orders"
-description: "Walkthrough on how to retrieve recurring orders using the Recurring API"
+description: "Query active and historical recurring orders by wallet or status."
+llmsDescription: "GET /recurring/v1/getRecurringOrders returns active and historical DCA orders filtered by wallet or status."
 ---
+
+The `GET /recurring/v1/getRecurringOrders` endpoint returns active and historical recurring (DCA) orders for a given wallet. Filter by `orderStatus` (`active` or `history`) and `recurringType` (`time`). Responses are paginated with 10 orders per page.
 
 This is a GET request to `/getRecurringOrders` endpoint. The response is paginated for every 10 orders and you can view different pages using the `page` parameter.
 

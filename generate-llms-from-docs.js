@@ -19,15 +19,23 @@ const folders = [
   'openapi-spec',
   'tool-kits',
   'resources',
-  'legal',
   'updates',
-  'blog'
 ];
+
+const SECTION_SUMMARIES = {
+  'get-started': 'Setup guides for environment, tooling, and first API calls.',
+  'portal': 'API key management, rate limits, tiers, and billing at portal.jup.ag.',
+  'docs': 'Core product documentation covering each Jupiter API with usage guides and code examples.',
+  'api-reference': 'OpenAPI specifications for every Jupiter endpoint.',
+  'tool-kits': 'Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.',
+  'resources': 'Support channels and community resources.',
+  'updates': 'Changelog and release notes.',
+};
 
 // Process all folders and generate output
 const data = folders.flatMap(folder => {
   const folderPath = path.join(baseFolder, folder);
-  return folder === 'openapi-spec' 
+  return folder === 'openapi-spec'
     ? processApiReference(folderPath)
     : processData(folderPath);
 });
@@ -41,9 +49,21 @@ console.log(`✅ Generated llms.txt at: ${path.join(baseFolder, 'llms.txt')}`);
 
 function generateLlmsTxt(sortedData) {
   let output = '# Jupiter\n\n';
-  output += `> Jupiter provides a comprehensive DeFi infrastructure on Solana, offering APIs for swaps, lending, perpetuals, and more. This documentation covers API references, integration guides, tool kits, and best practices for building with Jupiter.\n\n`;
+  output += `> Jupiter is DeFi infrastructure on Solana providing swap, lending, perpetuals, limit-order, DCA, and portfolio APIs.\n`;
+  output += `> Two main swap APIs: **Ultra** (recommended — managed execution, gasless, RPC-less) and **Metis** (advanced — low-level routing primitives, bring your own RPC).\n`;
+  output += `> Base URL: \`https://api.jup.ag\`. All endpoints require an \`x-api-key\` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).\n\n`;
 
-  const formatHeading = (key) => 
+  output += `## Quick Reference\n\n`;
+  output += `- Ultra Swap API (recommended): \`GET /ultra/v1/order\` + \`POST /ultra/v1/execute\`\n`;
+  output += `- Metis Swap API (advanced): \`GET /swap/v1/quote\` + \`POST /swap/v1/swap\`\n`;
+  output += `- Trigger (limit orders): \`POST /trigger/v1/createOrder\`\n`;
+  output += `- Recurring (DCA): \`POST /recurring/v1/createOrder\`\n`;
+  output += `- Lend: \`POST /lend/v1/earn/deposit\`\n`;
+  output += `- Price: \`GET /price/v3?ids={mints}\`\n`;
+  output += `- Tokens: \`GET /tokens/v2/search?query={query}\`\n`;
+  output += `- Portfolio: \`GET /portfolio/v1/positions?wallet={address}\`\n\n`;
+
+  const formatHeading = (key) =>
     key.replace(/-/g, ' ')
       .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
@@ -84,13 +104,17 @@ function generateLlmsTxt(sortedData) {
     const value = sortedData[key];
     const formattedKey = formatHeading(key);
     output += `## ${formattedKey}\n\n`;
-    
+
+    if (SECTION_SUMMARIES[key]) {
+      output += `${SECTION_SUMMARIES[key]}\n\n`;
+    }
+
     if (typeof value === 'string') {
       output += value + '\n';
     } else if (typeof value === 'object' && value !== null) {
       processSection(value, 3);
     }
-    
+
     if (index < topLevelKeys.length - 1) output += '\n';
   });
 
@@ -286,7 +310,7 @@ function extractFrontmatter(filePath) {
     const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*(?:\n|$)/);
     if (!match) throw new Error('No frontmatter found in file: ' + filePath);
 
-    let title, description;
+    let title, description, llmsDescription;
     match[1].split('\n').forEach(line => {
       line = line.trim();
       if (!line || line.startsWith('#')) return;
@@ -295,13 +319,14 @@ function extractFrontmatter(filePath) {
       if (colonIndex > 0) {
         const key = line.substring(0, colonIndex).trim();
         let value = line.substring(colonIndex + 1).trim();
-        
+
         if ((value.startsWith('"') && value.endsWith('"')) ||
             (value.startsWith("'") && value.endsWith("'"))) {
           value = value.slice(1, -1);
         }
         if (key === 'title') title = value;
         if (key === 'description') description = value;
+        if (key === 'llmsDescription') llmsDescription = value;
       }
     });
 
@@ -309,7 +334,7 @@ function extractFrontmatter(filePath) {
       throw new Error(`Missing frontmatter 'title' or 'description' in file: ${filePath}`);
     }
 
-    return { title, description };
+    return { title, description: llmsDescription || description };
   } catch (e) {
     console.error(e.message || e);
     return null;

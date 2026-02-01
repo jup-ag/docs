@@ -1,6 +1,7 @@
 ---
 title: "Add Integrator Fees"
-description: "Walkthrough to create the necessary accounts for adding fees to your Ultra Swap transaction."
+description: "Add custom integrator fees to Ultra Swap using the Referral Program."
+llmsDescription: "Four-step setup to add custom fees (50–255 bps) to Ultra Swap: install referral SDK, create referralAccount, create referralTokenAccount per mint, then pass referralAccount and referralFee to /order."
 ---
 
 <Note>
@@ -10,6 +11,8 @@ description: "Walkthrough to create the necessary accounts for adding fees to yo
 ## Key Points
 
 The Jupiter Ultra Swap API allows you to add integrator fees to the orders.
+
+**Key points summary:** Fees require Referral Program accounts, Jupiter takes 20% of your integrator fees, Ultra decides which mint to take fees in (based on a priority list), you must create referralTokenAccount for each expected feeMint, and fees enforce routing to Iris only.
 
 <AccordionGroup>
     <Accordion title="Requires specific Referral Program Accounts">

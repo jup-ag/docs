@@ -140,6 +140,40 @@
             ]
           },
           {
+            "item": "Tokens",
+            "icon": "coin",
+            "groups": [
+              {
+                "group": "Tokens API",
+                "pages": [
+                  "docs/tokens/index",
+                  {
+                    "group": "V2",
+                    "pages": [
+                      "docs/tokens/v2/token-information",
+                      "docs/tokens/v2/content"
+                    ]
+                  },
+                  "docs/tokens/organic-score",
+                  "docs/tokens/token-tag-standard"
+                ]
+              }
+            ]
+          },
+          {
+            "item": "Price",
+            "icon": "dollar-sign",
+            "groups": [
+              {
+                "group": "Price API",
+                "pages": [
+                  "docs/price/index",
+                  "docs/price/v3"
+                ]
+              }
+            ]
+          },
+          {
             "item": "Lend",
             "icon": "piggy-bank",
             "groups": [
@@ -259,34 +293,6 @@
               {
                 "group": "Debugging",
                 "pages": ["docs/recurring/best-practices"]
-              }
-            ]
-          },
-          {
-            "item": "Tokens & Price",
-            "icon": "coin",
-            "groups": [
-              {
-                "group": "Tokens Docs",
-                "pages": [
-                  "docs/tokens/index",
-                  {
-                    "group": "V2 (Beta)",
-                    "pages": [
-                      "docs/tokens/v2/token-information",
-                      "docs/tokens/v2/content"
-                    ]
-                  },
-                  "docs/tokens/organic-score",
-                  "docs/tokens/token-tag-standard"
-                ]
-              },
-              {
-                "group": "Price Docs",
-                "pages": [
-                  "docs/price/index",
-                  "docs/price/v3"
-                ]
               }
             ]
           },
@@ -415,6 +421,59 @@
                 ]
               },
               {
+                "group": "Tokens",
+                "pages": [
+                  "api-reference/tokens",
+                  {
+                    "group": "V2",
+                    "pages": [
+                      "api-reference/tokens/v2",
+                      "api-reference/tokens/v2/search",
+                      "api-reference/tokens/v2/tag",
+                      "api-reference/tokens/v2/category",
+                      "api-reference/tokens/v2/recent",
+                      "api-reference/tokens/v2/get-content",
+                      "api-reference/tokens/v2/get-content-cooking",
+                      "api-reference/tokens/v2/get-content-feed"
+                    ]
+                  },
+                  {
+                    "group": "V1 (Deprecated)",
+                    "pages": [
+                      "api-reference/tokens/v1",
+                      "api-reference/tokens/v1/token-information",
+                      "api-reference/tokens/v1/mints-in-market",
+                      "api-reference/tokens/v1/tradable",
+                      "api-reference/tokens/v1/tagged",
+                      "api-reference/tokens/v1/new",
+                      "api-reference/tokens/v1/all"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Price",
+                "pages": [
+                  "api-reference/price",
+                  {
+                    "group": "V3",
+                    "pages": [
+                      "api-reference/price/v3",
+                      "api-reference/price/v3/price"
+                    ]
+                  },
+                  {
+                    "group": "V2 (Deprecated)",
+                    "pages": ["api-reference/price/v2", "api-reference/price/v2/price"]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "group": "More",
+            "pages": [
+              {
                 "group": "Lend",
                 "tag": "BETA",
                 "pages": [
@@ -535,56 +594,6 @@
                 ]
               },
               {
-                "group": "Tokens",
-                "pages": [
-                  "api-reference/tokens",
-                  {
-                    "group": "V2",
-                    "tag": "BETA",
-                    "pages": [
-                      "api-reference/tokens/v2",
-                      "api-reference/tokens/v2/search",
-                      "api-reference/tokens/v2/tag",
-                      "api-reference/tokens/v2/category",
-                      "api-reference/tokens/v2/recent",
-                      "api-reference/tokens/v2/get-content",
-                      "api-reference/tokens/v2/get-content-cooking",
-                      "api-reference/tokens/v2/get-content-feed"
-                    ]
-                  },
-                  {
-                    "group": "V1 (Deprecated)",
-                    "pages": [
-                      "api-reference/tokens/v1",
-                      "api-reference/tokens/v1/token-information",
-                      "api-reference/tokens/v1/mints-in-market",
-                      "api-reference/tokens/v1/tradable",
-                      "api-reference/tokens/v1/tagged",
-                      "api-reference/tokens/v1/new",
-                      "api-reference/tokens/v1/all"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Price",
-                "pages": [
-                  "api-reference/price",
-                  {
-                    "group": "V3",
-                    "tag": "BETA",
-                    "pages": [
-                      "api-reference/price/v3",
-                      "api-reference/price/v3/price"
-                    ]
-                  },
-                  {
-                    "group": "V2 (Deprecated)",
-                    "pages": ["api-reference/price/v2", "api-reference/price/v2/price"]
-                  }
-                ]
-              },
-              {
                 "group": "Portfolio",
                 "tag": "BETA",
                 "pages": [
@@ -694,6 +703,7 @@
                 "group": "Blog",
                 "pages": [
                   "blog/index",
+                  "blog/ultra-vs-metis",
                   "blog/ultra-v3",
                   "blog/why-ultra-v3",
                   "blog/metis-v7"

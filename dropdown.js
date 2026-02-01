@@ -2,6 +2,7 @@
   'use strict';
 
   const VISIBLE_ITEMS = 3;
+  const DESKTOP_BREAKPOINT = 768; /* match style.css @media (min-width: 768px) */
   const ITEM_HIDDEN_CLASS = 'dropdown-item-hidden';
   const SHOW_MORE_ATTR = 'data-dropdown-show-more';
   const SEPARATOR_ATTR = 'data-dropdown-separator';
@@ -9,6 +10,10 @@
   const EXPANDED_ATTR = 'data-dropdown-expanded';
   const CONTENT_SELECTOR = '[data-radix-menu-content]';
   const ITEMS_SELECTOR = '> *';
+
+  function isDesktop() {
+    return typeof window !== 'undefined' && window.innerWidth >= DESKTOP_BREAKPOINT;
+  }
 
   function getItems(content) {
     return Array.from(content.querySelectorAll(':scope ' + ITEMS_SELECTOR)).filter(
@@ -19,6 +24,11 @@
   }
 
   function applyCollapsedState(content) {
+    if (!isDesktop()) {
+      expandContent(content);
+      content.removeAttribute(EXPANDED_ATTR);
+      return;
+    }
     if (content.hasAttribute(EXPANDED_ATTR)) return;
     if (content.hasAttribute(COLLAPSED_ATTR)) return;
 
@@ -102,4 +112,11 @@
   for (var j = 0; j < existing.length; j++) {
     applyCollapsedState(existing[j]);
   }
+
+  window.addEventListener('resize', function () {
+    var contents = document.querySelectorAll(CONTENT_SELECTOR);
+    for (var k = 0; k < contents.length; k++) {
+      applyCollapsedState(contents[k]);
+    }
+  });
 })();

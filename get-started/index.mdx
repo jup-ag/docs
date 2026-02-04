@@ -1,102 +1,442 @@
 ---
 title: "Get Started"
-description: "Welcome to Jupiter's Developer Docs. Whether you're building your own DeFi superapp or integrating a swap into an existing application, we provide the tools and infrastructure you need to succeed."
-llmsDescription: "Jupiter developer documentation hub: explore the full product suite (Ultra Swap, Perps, Lend, Trigger, Recurring, Price, Tokens, Send, Studio, Lock) and find quick start paths for your integration."
+description: "Get started instantly to build a swap widget using Jupiter's three core liquidity APIs: Swap for quote and execution, Tokens V2 for discovery, and Price V3 for reference."
+llmsDescription: "This tutorial provides step-by-step guidance for building a token swap widget using Jupiter's core liquidity APIs. Learn to use the Ultra Swap API (for swap quotes and execution), Tokens V2 API (for token discovery and metadata), and Price V3 API (for real-time USD token prices) in standalone functions. Requires no API keys, blockchain RPC, credentials, or upfront payments, making integration fast and accessible for developers and LLM agents."
 ---
 
-**Quick Start Paths:** Add a swap interface with the [Plugin](/tool-kits/plugin), build a trading app with the [Ultra Swap API](/docs/ultra), set up your [API key](/portal/setup), or learn [Solana development basics](/get-started/development-basics).
+Jupiter provides three core liquidity APIs that work together to power complete trading experiences. This guide shows you how to combine them to build a swap widget.
 
-## Product Suite
+## Why These APIs
 
-Jupiter offers a comprehensive suite of products to power every aspect of your application.
-
-### Core
-
-<Card title="Ultra Swap" icon="bolt">
-
-    Ultra is **Jupiter's Flagship Trading Solution**, the most advanced yet developer-friendly solution for building trading applications on Solana.
-
-    <CardGroup cols={2}>
-        <Card title="Ultra Swap API" icon="code" href="/docs/ultra">
-            RPC-less architecture and Jupiter handles all trading optimizations for you.
-        </Card>
-        <Card title="Plugin" icon="puzzle-piece" href="/tool-kits/plugin">
-            Easiest way to integrate full end-to-end Ultra Swap interface.
-        </Card>
-    </CardGroup>
-</Card>
-<CardGroup cols={2}>
-    <Card title="Tokens" icon="coin" href="/docs/tokens" horizontal>
-        Comprehensive token information
-    </Card>
-    <Card title="Price" icon="dollar-sign" href="/docs/price" horizontal>
-        Heuristics-based token pricing
-    </Card>
+<CardGroup cols={3}>
+  <Card title="No RPC Required" icon="server">
+    Our APIs handle all blockchain interactions for you.
+  </Card>
+  <Card title="No API Key Required" icon="key">
+    Start building immediately. API keys are optional (for higher rate limits via [Portal](https://portal.jup.ag)).
+  </Card>
+  <Card title="No Upfront Payments" icon="credit-card">
+    Use via our free and public endpoints.
+  </Card>
 </CardGroup>
 
+## The Three APIs
 
+| API | Base URL | Purpose |
+|:----|:---------|:--------|
+| **Ultra Swap** | `https://lite-api.jup.ag/ultra/v1` | Swap execution - get quotes and execute transactions using your wallet |
+| **Tokens V2** | `https://lite-api.jup.ag/tokens/v2` | Token discovery - search and get token metadata |
+| **Price V3** | `https://lite-api.jup.ag/price/v3` | Pricing - get USD prices for any token |
 
-### More
-<CardGroup cols={2}>
-    <Card title="Lend" icon="piggy-bank" href="/docs/lend" horizontal>
-        Earn, borrow and multiply
-    </Card>
-    <Card title="Prediction Market" icon="check-to-slot" href="/docs/prediction" horizontal>
-        Predict events
-    </Card>
-    <Card title="Perpetuals" icon="chart-line" href="/docs/perps" horizontal>
-        Leverage trading
-    </Card>
-    <Card title="Trigger" icon="bullseye" href="/docs/trigger" horizontal>
-        Limit orders
-    </Card>
-    <Card title="Recurring" icon="clock-rotate-left" href="/docs/recurring" horizontal>
-        Dollar-cost averaging
-    </Card>
-    <Card title="Send" icon="paper-plane" href="/docs/send" horizontal>
-        Seamless token transfers
-    </Card>
-    <Card title="Studio" icon="building-columns" href="/docs/studio" horizontal>
-        Token and LP creation
-    </Card>
-    <Card title="Lock" icon="lock" href="/docs/lock" horizontal>
-        Token vesting
-    </Card>
-</CardGroup>
+## Common Token Addresses
 
-## Programs
+| Token | Mint Address | Decimals |
+|:------|:-------------|:---------|
+| SOL | `So11111111111111111111111111111111111111112` | 9 |
+| USDC | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` | 6 |
 
-All of Jupiter's programs are deployed on the Solana Mainnet only.
+## Dependencies
 
-<Card title="Core Programs" icon="microchip">
-| Program | Address |
-|:--------|:--------|
-| **Jupiter Swap** | [`JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4`](https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4) |
-| **Jupiter Referral** | [`REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3`](https://solscan.io/account/REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3) |
-| **Jupiter Perpetuals** | [`PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu`](https://solscan.io/account/PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu) |
-| **Jupiter Doves** | [`DoVEsk76QybCEHQGzkvYPWLQu9gzNoZZZt3TPiL597e`](https://solscan.io/account/DoVEsk76QybCEHQGzkvYPWLQu9gzNoZZZt3TPiL597e) |
-| **Jupiter Lend Earn** | [`jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9`](https://solscan.io/account/jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9) |
-| **Jupiter Lend Borrow** | [`jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi`](https://solscan.io/account/jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi) |
-| **Jupiter Lend Earn Rewards** | [`jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar`](https://solscan.io/account/jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar) |
-| **Jupiter Lend Liquidity** | [`jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC`](https://solscan.io/account/jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC) |
-| **Jupiter Lend Borrow Oracle** | [`jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc`](https://solscan.io/account/jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) |
-| **Jupiter Limit Order V2** | [`j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X`](https://solscan.io/account/j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X) |
-| **Jupiter DCA** | [`DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M`](https://solscan.io/account/DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M) |
-| **Jupiter Lock** | [`LocpQgucEQHbqNABEYvBvwoxCPsSbG91A1QaQhQQqjn`](https://solscan.io/account/LocpQgucEQHbqNABEYvBvwoxCPsSbG91A1QaQhQQqjn) |
-| **Jupiter Governance** | [`GovaE4iu227srtG2s3tZzB4RmWBzw8sTwrCLZz7kN7rY`](https://solscan.io/account/GovaE4iu227srtG2s3tZzB4RmWBzw8sTwrCLZz7kN7rY) |
-| **Jupiter Voter** | [`voTpe3tHQ7AjQHMapgSue2HJFAh2cGsdokqN3XqmVSj`](https://solscan.io/account/voTpe3tHQ7AjQHMapgSue2HJFAh2cGsdokqN3XqmVSj) |
+For signing and executing swap transactions, install `@solana/web3.js` version 1.x:
+
+```bash
+npm install @solana/web3.js@1 bs58
+```
+
+<Note>
+This guide uses `@solana/web3.js` **v1**. Version 2 has a different API for transaction handling.
+</Note>
+
+<Tip>
+Building a frontend? Use [Jupiter Wallet Kit](/tool-kits/wallet-kit) for easy wallet connectivity across 20+ Solana wallets.
+</Tip>
+
+---
+
+## 1. Token Discovery
+
+Search for tokens by symbol, name, or mint address using the Tokens V2 API.
+
+```
+GET https://lite-api.jup.ag/tokens/v2/search?query={searchTerm}
+```
+
+```javascript
+async function searchTokens(query) {
+  const response = await fetch(
+    `https://lite-api.jup.ag/tokens/v2/search?query=${encodeURIComponent(query)}`
+  );
+  return response.json();
+}
+
+// Example
+const tokens = await searchTokens('usdc');
+console.log(tokens[0]); // { id, name, symbol, icon, decimals, usdPrice, ... }
+```
+
+**Other useful endpoints:**
+- `GET /tag?query=verified` - Get all verified tokens
+- `GET /toptrending/1h` - Get trending tokens
+- `GET /recent` - Get recently listed tokens
+
+<Info>See [Tokens V2 API Reference](/api-reference/tokens/v2) for full response schema and all endpoints.</Info>
+
+---
+
+## 2. Price Fetching
+
+Get USD prices for tokens using the Price V3 API.
+
+```
+GET https://lite-api.jup.ag/price/v3?ids={mint1,mint2,...}
+```
+
+```javascript
+async function getPrices(mints) {
+  const ids = mints.join(',');
+  const response = await fetch(`https://lite-api.jup.ag/price/v3?ids=${ids}`);
+  return response.json();
+}
+
+// Example
+const SOL = 'So11111111111111111111111111111111111111112';
+const USDC = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
+const prices = await getPrices([SOL, USDC]);
+console.log(prices[SOL]?.usdPrice);
+console.log(prices[USDC]?.usdPrice);
+```
+
+<Info>See [Price V3 API Reference](/api-reference/price/v3) for full response schema.</Info>
+
+---
+
+## 3. Swap Execution
+
+Execute swaps using the Ultra Swap API with a simple flow:
+1. Get order
+2. Sign
+3. Execute
+
+### Get a Quote (No Wallet Needed)
+
+```
+GET https://lite-api.jup.ag/ultra/v1/order?inputMint={}&outputMint={}&amount={}
+```
+
+```javascript
+async function getQuote(inputMint, outputMint, amount) {
+  const params = new URLSearchParams({ inputMint, outputMint, amount: amount.toString() });
+  const response = await fetch(`https://lite-api.jup.ag/ultra/v1/order?${params}`);
+  return response.json();
+}
+
+// Example: Quote for 0.01 SOL -> USDC
+const quote = await getQuote(
+  'So11111111111111111111111111111111111111112',
+  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+  0.01 * 1_000_000_000 // Amount to swap: 0.01 SOL (expressed in lamports, where 1 SOL = 1,000,000,000 lamports)
+);
+console.log(`${quote.inAmount} -> ${quote.outAmount}`);
+```
+
+### Execute a Swap (Wallet Required)
+
+Add the `taker` parameter to get a signable transaction, then sign and submit it.
+
+```javascript
+import { VersionedTransaction, Keypair } from '@solana/web3.js';
+import bs58 from 'bs58';
+
+async function executeSwap(inputMint, outputMint, amount, wallet) {
+  const walletAddress = wallet.publicKey.toBase58();
+
+  // 1. Get order with transaction
+  const params = new URLSearchParams({
+    inputMint,
+    outputMint,
+    amount: amount.toString(),
+    taker: walletAddress,
+  });
+  const order = await fetch(`https://lite-api.jup.ag/ultra/v1/order?${params}`).then(r => r.json());
+
+  if (order.errorCode) throw new Error(order.errorMessage);
+
+  // 2. Sign transaction
+  const tx = VersionedTransaction.deserialize(Buffer.from(order.transaction, 'base64'));
+  tx.sign([wallet]);
+  const signedTx = Buffer.from(tx.serialize()).toString('base64');
+
+  // 3. Submit to execute endpoint
+  const result = await fetch('https://lite-api.jup.ag/ultra/v1/execute', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ signedTransaction: signedTx, requestId: order.requestId }),
+  }).then(r => r.json());
+
+  return result;
+}
+
+// Example
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY));
+const result = await executeSwap(
+  'So11111111111111111111111111111111111111112',
+  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+  10000000,
+  wallet
+);
+
+if (result.status === 'Success') {
+  console.log(`Swap successful: ${JSON.stringify(result, null, 2)}`);
+} else {
+  console.error(`Swap failed: ${JSON.stringify(result, null, 2)}`);
+}
+```
+
+<Warning>Never hardcode private keys. Use environment variables or secure key management.</Warning>
+
+### Frontend: Using Wallet Adapter
+
+For browser-based apps, use a wallet adapter (e.g., Jupiter Wallet Extension) instead of a Keypair:
+
+```javascript
+import { VersionedTransaction } from '@solana/web3.js';
+import { useWallet } from '@solana/wallet-adapter-react';
+
+async function executeSwapWithWalletAdapter(inputMint, outputMint, amount, wallet) {
+  // wallet comes from useWallet() hook
+  const walletAddress = wallet.publicKey.toBase58();
+
+  // 1. Get order with transaction
+  const params = new URLSearchParams({
+    inputMint,
+    outputMint,
+    amount: amount.toString(),
+    taker: walletAddress,
+  });
+  const order = await fetch(`https://lite-api.jup.ag/ultra/v1/order?${params}`).then(r => r.json());
+
+  if (order.errorCode) throw new Error(order.errorMessage);
+
+  // 2. Sign transaction using wallet adapter
+  const tx = VersionedTransaction.deserialize(Buffer.from(order.transaction, 'base64'));
+  const signedTx = await wallet.signTransaction(tx);
+  const signedTxBase64 = Buffer.from(signedTx.serialize()).toString('base64');
+
+  // 3. Submit to execute endpoint
+  const result = await fetch('https://lite-api.jup.ag/ultra/v1/execute', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ signedTransaction: signedTxBase64, requestId: order.requestId }),
+  }).then(r => r.json());
+
+  return result;
+}
+
+// Usage in a React component
+function SwapButton() {
+  const wallet = useWallet();
+
+  const handleSwap = async () => {
+    if (!wallet.connected) return;
+    const result = await executeSwapWithWalletAdapter(
+      'So11111111111111111111111111111111111111112',
+      'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+      10000000,
+      wallet
+    );
+    console.log(result);
+  };
+
+  return <button onClick={handleSwap}>Swap</button>;
+}
+```
+
+<Info>
+Need to set up wallet connectivity? See [Jupiter Wallet Kit](/tool-kits/wallet-kit) for a plug-and-play solution supporting 20+ wallets.
+</Info>
+
+<Info>See [Ultra Swap API Reference](/api-reference/ultra) for full response schemas, error codes, and additional parameters.</Info>
+
+---
+
+## 4. All Functions Together
+
+Here are all the standalone functions you need. Each function is self-contained and can be used independently.
+
+```javascript expandable
+import { VersionedTransaction, Keypair } from '@solana/web3.js';
+import bs58 from 'bs58';
+
+// ============================================================
+// CONFIGURATION
+// ============================================================
+
+const API = {
+  TOKENS: 'https://lite-api.jup.ag/tokens/v2',
+  PRICE: 'https://lite-api.jup.ag/price/v3',
+  ULTRA: 'https://lite-api.jup.ag/ultra/v1',
+};
+
+const TOKENS = {
+  SOL: 'So11111111111111111111111111111111111111112',
+  USDC: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+  USDT: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+};
+
+// ============================================================
+// TOKEN DISCOVERY (Tokens V2 API)
+// ============================================================
+
+async function searchTokens(query) {
+  const response = await fetch(`${API.TOKENS}/search?query=${encodeURIComponent(query)}`);
+  return response.json();
+}
+
+async function getVerifiedTokens() {
+  const response = await fetch(`${API.TOKENS}/tag?query=verified`);
+  return response.json();
+}
+
+async function getTrendingTokens(interval = '1h') {
+  const response = await fetch(`${API.TOKENS}/toptrending/${interval}`);
+  return response.json();
+}
+
+// ============================================================
+// PRICE FETCHING (Price V3 API)
+// ============================================================
+
+async function getPrices(mints) {
+  const ids = Array.isArray(mints) ? mints.join(',') : mints;
+  const response = await fetch(`${API.PRICE}?ids=${ids}`);
+  return response.json();
+}
+
+// ============================================================
+// SWAP EXECUTION (Ultra API)
+// ============================================================
+
+async function getQuote(inputMint, outputMint, amount) {
+  const params = new URLSearchParams({ inputMint, outputMint, amount: amount.toString() });
+  const response = await fetch(`${API.ULTRA}/order?${params}`);
+  return response.json();
+}
+
+async function executeSwap(inputMint, outputMint, amount, wallet) {
+  const params = new URLSearchParams({
+    inputMint,
+    outputMint,
+    amount: amount.toString(),
+    taker: wallet.publicKey.toBase58(),
+  });
+
+  // Get order
+  const order = await fetch(`${API.ULTRA}/order?${params}`).then(r => r.json());
+  if (order.errorCode) throw new Error(order.errorMessage);
+
+  // Sign
+  const tx = VersionedTransaction.deserialize(Buffer.from(order.transaction, 'base64'));
+  tx.sign([wallet]);
+  const signedTx = Buffer.from(tx.serialize()).toString('base64');
+
+  // Execute
+  const result = await fetch(`${API.ULTRA}/execute`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ signedTransaction: signedTx, requestId: order.requestId }),
+  }).then(r => r.json());
+
+  return {
+    success: result.status === 'Success',
+    signature: result.signature,
+    explorerUrl: result.signature ? `https://solscan.io/tx/${result.signature}` : null,
+    error: result.error,
+  };
+}
+
+// ============================================================
+// USER DATA (Ultra API)
+// ============================================================
+
+async function getHoldings(walletAddress) {
+  const response = await fetch(`${API.ULTRA}/holdings/${walletAddress}`);
+  return response.json();
+}
+
+async function getTokenWarnings(mints) {
+  const mintList = Array.isArray(mints) ? mints.join(',') : mints;
+  const response = await fetch(`${API.ULTRA}/shield?mints=${mintList}`);
+  return response.json();
+}
+
+// ============================================================
+// USAGE
+// ============================================================
+
+// Search tokens
+const tokens = await searchTokens('bonk');
+
+// Get prices
+const prices = await getPrices([TOKENS.SOL, TOKENS.USDC]);
+
+// Get quote (no wallet)
+const quote = await getQuote(TOKENS.SOL, TOKENS.USDC, 10000000);
+
+// Execute swap (with wallet)
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY));
+const result = await executeSwap(TOKENS.SOL, TOKENS.USDC, 10000000, wallet);
+console.log(result.success ? result.explorerUrl : result.error);
+```
+
+### Function Reference
+
+| Function | API | Description |
+|:---------|:----|:------------|
+| `searchTokens(query)` | Tokens V2 | Search tokens by name, symbol, or mint |
+| `getVerifiedTokens()` | Tokens V2 | Get all verified tokens |
+| `getTrendingTokens(interval)` | Tokens V2 | Get trending tokens |
+| `getPrices(mints)` | Price V3 | Get USD prices for tokens |
+| `getQuote(input, output, amount)` | Ultra | Get swap quote (no wallet needed) |
+| `executeSwap(input, output, amount, wallet)` | Ultra | Execute a swap |
+| `getHoldings(walletAddress)` | Ultra | Get wallet token balances |
+| `getTokenWarnings(mints)` | Ultra | Get security warnings for tokens |
+
+---
+
+## Test with curl
+
+```bash
+# Search tokens
+curl "https://lite-api.jup.ag/tokens/v2/search?query=SOL" | jq '.[0].symbol'
+
+# Get price
+curl "https://lite-api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112" | jq
+
+# Get quote
+curl "https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=10000000" | jq '{inAmount, outAmount}'
+```
+
+---
+
+## Next Steps
+
+<Card title="API Reference">
+  <Card title="Ultra Swap" icon="bolt" href="/api-reference/ultra">
+    Full API docs with all parameters, response schemas, and error codes.
+  </Card>
+  <Card title="Tokens V2" icon="coins" href="/api-reference/tokens/v2">
+    All token discovery endpoints and response formats.
+  </Card>
+  <Card title="Price V3" icon="dollar-sign" href="/api-reference/price/v3">
+    Price API details and confidence levels.
+  </Card>
 </Card>
 
-## Quick Start
-
-### Build Your Own Trading Application
-1. [Core Liquidity APIs Guide](/get-started/core-liquidity-apis) - Combine Ultra Swap, Tokens, and Price APIs to build a swap widget
-2. [Plugin Integration](/tool-kits/plugin) - Add swap functionality in minutes - yes, as easy as that
-
-### Connect with Jupiter Mobile and Wallet Extension
-1. [Mobile Adapter](/tool-kits/wallet-kit/jupiter-mobile-adapter) - Connect with Jupiter's mobile ecosystem
-2. [Wallet Kit](/tool-kits/wallet-kit) - Comprehensive wallet integration solution
-
-### Learn the Basics
-1. [Environment Setup](/get-started/environment-setup) - Set up your development environment
-2. [Development Basics](/get-started/development-basics) - Quick summary of Solana and Jupiter fundamentals
+<Card title="Tool Kits">
+  <Card title="Jupiter Plugin" icon="puzzle-piece" href="/tool-kits/plugin">
+    Drop-in swap UI if you don't want to build your own.
+  </Card>
+  <Card title="Jupiter Wallet Kit" icon="wallet" href="/tool-kits/wallet-kit">
+    Unified wallet adapter for 20+ Solana wallets.
+  </Card>
+</Card>

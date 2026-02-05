@@ -1,0 +1,232 @@
+---
+title: "Position Data & History"
+description: "Query positions, orders, and transaction history to track your prediction market activity and P&L."
+llmsDescription: "GET /positions returns holdings with P&L. GET /orders lists orders with fill status. GET /history provides transaction history with event types: order_created, order_filled, order_failed, position_updated, position_lost, payout_claimed."
+---
+
+<Note>
+**BETA**
+
+The Prediction Market API is currently in beta and subject to breaking changes as we continue to improve the product. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
+</Note>
+
+This guide covers the data endpoints for querying positions, orders, and transaction history. Use these endpoints to build dashboards, track P&L, and maintain audit trails.
+
+## Prerequisite
+
+To query position data, you need:
+- An API key from the [Jupiter Portal](https://portal.jup.ag)
+
+<Tip>
+**API REFERENCE**
+
+For complete endpoint specifications, see the [Prediction API Reference](/api-reference/prediction).
+</Tip>
+
+---
+
+## Querying Positions
+
+Use `GET /positions` to retrieve position data with comprehensive P&L information.
+
+| Parameter | Type | Description |
+|:----------|:-----|:------------|
+| `ownerPubkey` | string | Wallet public key (required) |
+| `marketPubkey` | string | Filter by market account pubkey |
+| `marketId` | string | Filter by market ID |
+| `isYes` | boolean | Filter by position side |
+| `start` | number | Pagination start index |
+| `end` | number | Pagination end index |
+
+### PNL Fields
+
+Each position includes detailed P&L metrics:
+
+| Field | Description |
+|:------|:------------|
+| `totalCostUsd` | Total cost basis (entry cost) |
+| `avgPriceUsd` | Average price per contract |
+| `valueUsd` | Current mark-to-market value |
+| `markPriceUsd` | Current market price per contract |
+| `pnlUsd` | Unrealized profit/loss |
+| `pnlUsdPercent` | Unrealized P&L as percentage |
+| `pnlUsdAfterFees` | P&L after estimated fees |
+| `pnlUsdAfterFeesPercent` | P&L after fees as percentage |
+| `realizedPnlUsd` | Realized P&L from closed portions |
+| `feesPaidUsd` | Total fees paid |
+
+
+### Get All Positions
+
+```js
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/positions?' + new URLSearchParams({
+    ownerPubkey: wallet.publicKey.toString()
+  }),
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const positions = await response.json();
+```
+
+<Accordion title="Aggregating Portfolio P&L">
+```js
+const positions = await fetch(
+  'https://api.jup.ag/prediction/v1/positions?' + new URLSearchParams({
+    ownerPubkey: wallet.publicKey.toString()
+  }),
+  {
+    headers: { 'x-api-key': 'your-api-key' }
+  }
+).then(r => r.json());
+
+// Calculate totals
+let totalValue = 0;
+let totalCost = 0;
+let totalPnl = 0;
+
+for (const position of positions.data) {
+  totalValue += parseInt(position.valueUsd) || 0;
+  totalCost += parseInt(position.totalCostUsd) || 0;
+  totalPnl += parseInt(position.pnlUsd) || 0;
+}
+
+console.log('Portfolio Summary:');
+console.log(`Total Value: $${(totalValue / 1_000_000).toFixed(2)}`);
+console.log(`Total Cost: $${(totalCost / 1_000_000).toFixed(2)}`);
+console.log(`Total P&L: $${(totalPnl / 1_000_000).toFixed(2)}`);
+```
+</Accordion>
+
+### Get a Specific Position
+
+```js
+const positionPubkey = 'position-pubkey-789';
+const response = await fetch(
+  `https://api.jup.ag/prediction/v1/positions/${positionPubkey}`,
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const position = await response.json();
+```
+
+---
+
+## Querying Orders
+
+Use `GET /orders` to retrieve order history and fill details.
+
+| Parameter | Type | Description |
+|:----------|:-----|:------------|
+| `ownerPubkey` | string | Wallet public key |
+| `start` | number | Pagination start (or timestamp) |
+| `end` | number | Pagination end (or timestamp) |
+
+### Order Fill Details
+
+| Field | Description |
+|:------|:------------|
+| `status` | `pending`, `filled`, or `failed` |
+| `filledContracts` | Number of contracts executed |
+| `avgFillPriceUsd` | Average execution price |
+| `totalCostUsd` | Total cost of filled portion |
+| `feesPaidUsd` | Fees charged |
+| `createdAt` | Unix timestamp of order creation |
+| `filledAt` | Unix timestamp of fill completion |
+
+### Get All Orders
+
+```js
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/orders?' + new URLSearchParams({
+    ownerPubkey: wallet.publicKey.toString()
+  }),
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const orders = await response.json();
+```
+
+### Get Order Status
+
+Use `GET /orders/status/{orderPubkey}` for detailed status and event history.
+
+```js
+const orderPubkey = 'order-pubkey-123';
+const response = await fetch(
+  `https://api.jup.ag/prediction/v1/orders/status/${orderPubkey}`,
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const status = await response.json();
+```
+
+---
+
+## Transaction History
+
+Use `GET /history` to retrieve a complete audit trail of all prediction market activity.
+
+| Parameter | Type | Description |
+|:----------|:-----|:------------|
+| `ownerPubkey` | string | Wallet public key |
+| `positionPubkey` | string | Filter by specific position |
+| `start` | number | Start timestamp or index |
+| `end` | number | End timestamp or index |
+| `id` | string | Filter by specific event ID |
+
+### Event Types
+
+| Event Type | Description |
+|:-----------|:------------|
+| `order_created` | New order placed on-chain |
+| `order_filled` | Order matched and executed |
+| `order_failed` | Order could not be filled |
+| `position_updated` | Position modified by order fill |
+| `position_lost` | Market resolved against position |
+| `payout_claimed` | Winnings withdrawn |
+
+### Get Transaction History
+
+```js
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/history?' + new URLSearchParams({
+    ownerPubkey: wallet.publicKey.toString()
+  }),
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const history = await response.json();
+```
+
+---
+
+## What's Next
+
+Explore social features to view profiles, follow traders, and track leaderboards.
+
+<CardGroup>
+  <Card title="Social Features" href="/docs/prediction/social-features" icon="users" horizontal>
+    Profiles, following, leaderboards, and trade feeds
+  </Card>
+</CardGroup>

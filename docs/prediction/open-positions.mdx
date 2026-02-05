@@ -1,0 +1,223 @@
+---
+title: "Open Positions"
+description: "Create buy orders to open YES or NO positions in Jupiter Prediction Markets."
+llmsDescription: "POST /orders creates buy orders for YES/NO contracts. Required parameters: ownerPubkey, marketId, isYes, isBuy, contracts, maxBuyPriceUsd. Returns base64 transaction to sign and submit to Solana."
+---
+
+<Note>
+**BETA**
+
+The Prediction Market API is currently in beta and subject to breaking changes as we continue to improve the product. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
+</Note>
+
+This guide walks through creating a buy order to open a position in a prediction market. You'll learn how to construct the order request, sign the returned transaction, and submit it to the Solana network.
+
+## Prerequisite
+
+Before opening a position, ensure you have:
+- An API key from the [Jupiter Portal](https://portal.jup.ag)
+- A Solana wallet with funds (JupUSD or USDC)
+- Identified a market to trade (see [Events & Markets](/docs/prediction/events-and-markets))
+- Requires signing and transaction submission, [install `@solana/web3.js` npm library](/get-started/environment-setup)
+
+<Tip>
+**API REFERENCE**
+
+For the complete endpoint specification, see the [Create Order API Reference](/api-reference/prediction/create-order).
+</Tip>
+
+---
+
+## Create Buy Order
+
+Use `POST /orders` to create a buy order for YES or NO contracts.
+
+| Parameter | Type | Required | Description |
+|:----------|:-----|:---------|:------------|
+| `ownerPubkey` | string | Yes | Your wallet's public key |
+| `marketId` | string | Yes | The market identifier |
+| `isYes` | boolean | Yes | `true` for YES contracts, `false` for NO |
+| `isBuy` | boolean | Yes | `true` for buy orders |
+| `contracts` | string | No | Number of contracts to purchase |
+| `maxBuyPriceUsd` | string | No | Maximum price per contract in native token units |
+| `depositAmount` | string | Yes | Amount to deposit (in native token units) |
+| `depositMint` | string | Yes | Token mint for deposit |
+
+<Info>
+**Prices in native token units**
+
+The `maxBuyPriceUsd` parameter uses native token units where **1,000,000 native token units = \$1.00**.
+
+Examples:
+- `700000` = \$0.70 (700000 / 1000000 = \$0.70)
+- `500000` = \$0.50 (500000 / 1000000 = \$0.50)
+- `100000` = \$0.10 (100000 / 1000000 = \$0.10)
+</Info>
+
+Example: Create a buy order for 2 USD worth of contracts
+```js
+const response = await fetch('https://api.jup.ag/prediction/v1/orders', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'your-api-key'
+  },
+  body: JSON.stringify({
+    ownerPubkey: wallet.publicKey.toString(),
+    depositAmount: '2000000',
+    depositMint: 'JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD',
+    marketId: marketId,
+    isYes: true,
+    isBuy: true,
+  })
+});
+
+const orderResponse = await response.json();
+console.log(orderResponse);
+```
+
+## Understanding the Response
+
+| Field | Description |
+|:------|:------------|
+| `transaction` | Base64-encoded Solana transaction to sign and submit |
+| `order.pubkey` | The order's on-chain account address |
+| `order.positionPubkey` | The position's on-chain account address |
+| `order.contracts` | The number of contracts being purchased |
+
+
+## Sign and Submit the Transaction
+
+After receiving the order response, you need to:
+1. Deserialize the base64 transaction
+2. Sign it with your wallet
+3. Submit to the Solana network
+
+<Accordion title="Full Code Example">
+```js
+// Step 1: Create order
+const orderResponse = await fetch('https://api.jup.ag/prediction/v1/orders', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'your-api-key'
+  },
+  body: JSON.stringify({
+    ownerPubkey: wallet.publicKey.toString(),
+    depositAmount: '2000000',
+    depositMint: 'JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD',
+    marketId: marketId, // Get from events and markets guide
+    isYes: true,
+    isBuy: true,
+  })
+}).then(r => r.json());
+
+// Step 2: Deserialize and sign transaction
+const transaction = VersionedTransaction.deserialize(
+  Buffer.from(orderResponse.transaction, 'base64')
+);
+transaction.sign([wallet]);
+
+const transactionBinary = transaction.serialize();
+const blockhashInfo = await connection.getLatestBlockhashAndContext({ commitment: "confirmed" });
+
+// Step 3: Send the transaction and await status
+const signature = await connection.sendRawTransaction(transactionBinary, {
+  maxRetries: 0,
+  skipPreflight: true,
+  preflightCommitment: "confirmed",
+});
+
+console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
+  
+try {
+  const confirmation = await connection.confirmTransaction({
+    signature,
+    blockhash: blockhashInfo.value.blockhash,
+    lastValidBlockHeight: blockhashInfo.value.lastValidBlockHeight,
+  }, "confirmed");
+
+  if (confirmation.value.err) {
+    console.error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+    console.log(`Examine the failed transaction: https://solscan.io/tx/${signature}`);
+  } else {
+    console.log(`Transaction successful: https://solscan.io/tx/${signature}`);
+  }
+} catch (error) {
+  console.error(`Error confirming transaction: ${error}`);
+  console.log(`Examine the transaction status: https://solscan.io/tx/${signature}`);
+}
+```
+</Accordion>
+
+## Checking Order Status
+
+After submitting, the order enters the keeper network for matching and execution. Use `GET /orders/status/{orderPubkey}` to check the fill status.
+
+<Tip>
+**Order Flow**
+
+1. **Create Order**: You sign a transaction that creates an order account on-chain - this transaction only opens an order account and **does not** guarantee that the order will be filled.
+2. **Keeper Fills**: Jupiter's keeper network matches your order with the underlying prediction market
+3. **Position Updated**: Once filled, your position account reflects the new contracts
+4. **Order Closed**: The order account is closed after completion
+</Tip>
+
+<Tip>
+Polling immediately after submitting the transaction might return a `pending` status or a `no order history found` error. Wait for a few slots before polling again.
+</Tip>
+
+| Status | Description |
+|:-------|:------------|
+| `pending` | Order submitted, waiting to be filled |
+| `filled` | Order fully executed |
+| `failed` | Order could not be filled |
+
+```js
+const orderPubkey = orderResponse.order.pubkey;
+
+const statusResponse = await fetch(
+  `https://api.jup.ag/prediction/v1/orders/status/${orderPubkey}`,
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const status = await statusResponse.json();
+console.log(status);
+```
+
+{/* ## Cost Calculation
+
+The total cost of an order depends on:
+- **Contract price**: Current market price (capped by your `maxBuyPriceUsd`)
+- **Number of contracts**: How many you're buying
+- **Fees**: Platform and venue fees
+
+For example, buying 10 YES contracts at $0.65 each:
+- Contract cost: 10 x $0.65 = $6.50
+- Estimated fees: ~1% = $0.065
+- **Total**: ~$6.565
+
+<Warning>
+**Price Protection**
+
+If the market price exceeds your `maxBuyPriceUsd`, the order may be partially filled or fail. Set a reasonable max price based on current market conditions.
+</Warning> */}
+
+---
+
+## What's Next
+
+Once you have open positions, learn how to manage them - view your holdings, sell contracts, or cancel pending orders.
+
+<CardGroup>
+  <Card title="Manage Positions" href="/docs/prediction/manage-positions" icon="sliders" horizontal>
+    View, sell, and manage your positions
+  </Card>
+  <Card title="Position Data & History" href="/docs/prediction/position-data" icon="chart-line" horizontal>
+    Query positions, orders, and transaction history
+  </Card>
+</CardGroup>

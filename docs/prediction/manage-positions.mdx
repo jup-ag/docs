@@ -1,0 +1,315 @@
+---
+title: "Manage Positions"
+description: "View your prediction market positions, sell contracts to reduce exposure, and cancel pending orders."
+llmsDescription: "GET /positions lists holdings with P&L. DELETE /positions/{positionPubkey} closes entire position. POST /orders with isBuy=false sells partial. DELETE /orders cancels pending orders."
+---
+
+<Note>
+**BETA**
+
+The Prediction Market API is currently in beta and subject to breaking changes as we continue to improve the product. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
+</Note>
+
+This guide covers how to view your open positions, sell contracts to reduce or exit positions, and cancel pending orders.
+
+## Prerequisite
+
+Before managing positions, ensure you have:
+- An API key from the [Jupiter Portal](https://portal.jup.ag)
+- Open positions from [Opening Positions](/docs/prediction/open-positions)
+- Requires signing and transaction submission, [install `@solana/web3.js` npm library](/get-started/environment-setup)
+
+<Tip>
+**API REFERENCE**
+
+For complete endpoint specifications, see the [Prediction API Reference](/api-reference/prediction).
+</Tip>
+
+---
+
+## Viewing Your Positions
+
+See [Position Data & History](/docs/prediction/position-data) for full details on how to query, filter, and interpret your open positions, including all available parameters and data fields.
+
+Example: Fetch all your open positions
+```js
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/positions?' + new URLSearchParams({
+    ownerPubkey: wallet.publicKey.toString()
+  }),
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const positions = await response.json();
+console.log(positions);
+```
+
+<Info>
+For descriptions of all position fields, parameters, and how to aggregate P&L,
+see the [Position Data & History](/docs/prediction/position-data) guide.
+
+All USD values returned are denominated in native token units, where **1,000,000 units = $1.00**.
+</Info>
+
+---
+
+## Viewing Your Orders
+
+See [Position Data & History](/docs/prediction/position-data#querying-orders) for details on available parameters, order fields, and examples.
+
+Example: Fetch all your open orders
+```js
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/orders?' + new URLSearchParams({
+    ownerPubkey: wallet.publicKey.toString()
+  }),
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const orders = await response.json();
+```
+---
+
+## Selling Contracts
+
+You can sell contracts in two ways:
+1. **Close entire position** - Sell all contracts at once
+2. **Partial sell** - Sell a specific number of contracts
+
+### Close Entire Position
+
+Use `DELETE /positions/{positionPubkey}` to sell all contracts in a position.
+
+```js
+const positionPubkey = 'position-pubkey-789';
+
+const response = await fetch(
+  `https://api.jup.ag/prediction/v1/positions/${positionPubkey}`,
+  {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': 'your-api-key'
+    },
+    body: JSON.stringify({
+      ownerPubkey: wallet.publicKey.toString(),
+      minSellPriceUsd: '650000' // Minimum $0.65 per contract
+    })
+  }
+);
+
+const closeResponse = await response.json();
+// Sign and submit the transaction (see below)
+```
+
+### Partial Sell (Create Sell Order)
+
+Use `POST /orders` with `isBuy: false` to sell a specific number of contracts.
+
+```js
+const response = await fetch('https://api.jup.ag/prediction/v1/orders', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'your-api-key'
+  },
+  body: JSON.stringify({
+    ownerPubkey: wallet.publicKey.toString(),
+    positionPubkey: 'position-pubkey-789',
+    isBuy: false, // Sell order
+    contracts: '5', // Number of contracts to sell
+  })
+});
+
+const sellOrder = await response.json();
+// Sign and submit the transaction (see below)
+```
+
+### Sign and Submit the Transaction
+
+You'll receive a base64-encoded transaction. You need to sign and submit it to finalize the position closure on-chain.
+
+<Accordion title="Full Close Position Code Example">
+```js
+import {
+  Connection,
+  Keypair,
+  VersionedTransaction,
+} from '@solana/web3.js';
+import fs from 'fs';
+
+// Setup connection and wallet
+const connection = new Connection('YOUR_RPC_URL');
+const privateKey = JSON.parse(fs.readFileSync('/path/to/wallet.json', 'utf8'));
+const wallet = Keypair.fromSecretKey(new Uint8Array(privateKey));
+
+// Step 1: Initiate closing a position
+const positionPubkey = 'YOUR_POSITION_PUBKEY';
+
+const response = await fetch(
+  `https://api.jup.ag/prediction/v1/positions/${positionPubkey}`,
+  {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': 'your-api-key'
+    },
+    body: JSON.stringify({
+      ownerPubkey: wallet.publicKey.toString(),
+      minSellPriceUsd: '650000'
+    })
+  }
+);
+
+const closeResponse = await response.json();
+const base64Txn = closeResponse.transaction;
+
+// Step 2: Deserialize and sign transaction
+const transaction = VersionedTransaction.deserialize(
+  Buffer.from(base64Txn, 'base64')
+);
+transaction.sign([wallet]);
+
+const transactionBinary = transaction.serialize();
+const blockhashInfo = await connection.getLatestBlockhashAndContext({ commitment: "confirmed" });
+
+// Step 3: Send the transaction and await status
+const signature = await connection.sendRawTransaction(transactionBinary, {
+  maxRetries: 0,
+  skipPreflight: true,
+  preflightCommitment: "confirmed",
+});
+
+console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
+
+try {
+  const confirmation = await connection.confirmTransaction({
+    signature,
+    blockhash: blockhashInfo.value.blockhash,
+    lastValidBlockHeight: blockhashInfo.value.lastValidBlockHeight,
+  }, "confirmed");
+
+  if (confirmation.value.err) {
+    console.error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+    console.log(`Examine the failed transaction: https://solscan.io/tx/${signature}`);
+  } else {
+    console.log(`Position closed successfully: https://solscan.io/tx/${signature}`);
+  }
+} catch (error) {
+  console.error(`Error confirming transaction: ${error}`);
+  console.log(`Examine the transaction status: https://solscan.io/tx/${signature}`);
+}
+```
+</Accordion>
+
+{/* <!-- TO DO: Document behavior when minSellPriceUsd cannot be met --> */}
+{/* ### Price Protection with minSellPriceUsd
+
+The `minSellPriceUsd` parameter protects you from selling at unfavorable prices. If the market price falls below your minimum, the order may be partially filled or fail.
+
+<Warning>
+**Slippage Protection**
+
+Always set a reasonable `minSellPriceUsd` based on current market conditions. Check the position's `sellPriceUsd` field to see the current available sell price.
+</Warning> */}
+
+---
+
+## Canceling Pending Orders
+
+### Cancel a Single Order
+
+Use `DELETE /orders` with the order's pubkey.
+
+```js
+const response = await fetch('https://api.jup.ag/prediction/v1/orders', {
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'your-api-key'
+  },
+  body: JSON.stringify({
+    orderPubkey: 'order-pubkey-123'
+  })
+});
+
+const cancelResponse = await response.json();
+// Sign and submit the transaction (see above)
+```
+
+### Cancel All Pending Orders
+
+Use `DELETE /orders/close-all` to cancel multiple orders at once.
+
+```js
+const response = await fetch('https://api.jup.ag/prediction/v1/orders/close-all', {
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'your-api-key'
+  },
+  body: JSON.stringify({
+    ownerPubkey: wallet.publicKey.toString(),
+    statuses: ['pending'] // Only cancel pending orders
+  })
+});
+
+const cancelAllResponse = await response.json();
+// Sign and submit the transaction (see above)
+```
+
+---
+
+## Close All Positions
+
+Use `DELETE /positions` to close all your open positions at once. This is useful for quickly exiting all markets.
+
+```js
+const response = await fetch('https://api.jup.ag/prediction/v1/positions', {
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'your-api-key'
+  },
+  body: JSON.stringify({
+    ownerPubkey: wallet.publicKey.toString(),
+    minSellPriceSlippageBps: 100 // 1% slippage tolerance
+  })
+});
+
+const closeAllResponse = await response.json();
+// Sign and submit the transaction (see above)
+```
+
+<Info>
+**Slippage in Basis Points**
+
+The `minSellPriceSlippageBps` parameter specifies acceptable slippage in basis points (1 bps = 0.01%).
+
+- `100` = 1% slippage allowed
+- `50` = 0.5% slippage allowed
+- `500` = 5% slippage allowed
+</Info>
+
+---
+
+## What's Next
+
+Learn how to claim payouts when markets settle in your favor, or explore the data endpoints for tracking your activity.
+
+<CardGroup>
+  <Card title="Claim Payouts" href="/docs/prediction/claim-payouts" icon="hand-holding-dollar" horizontal>
+    Claim winnings after market settlement
+  </Card>
+  <Card title="Position Data & History" href="/docs/prediction/position-data" icon="chart-line" horizontal>
+    Query positions, orders, and transaction history
+  </Card>
+</CardGroup>

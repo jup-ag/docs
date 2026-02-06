@@ -2018,7 +2018,7 @@ paths:
         - Trading
       responses:
         "200":
-          description: Current Kalshi exchange trading status
+          description: Current Kalshi and Polymarket exchange trading status
           content:
             application/json:
               schema:
@@ -2031,10 +2031,10 @@ paths:
         - schema:
             type: string
             minLength: 1
-            description: Kalshi market identifier
+            description: Kalshi or Polymarket market identifier
             example: KXF1-25-LN
           required: true
-          description: Kalshi market identifier
+          description: Kalshi or Polymarket market identifier
           name: marketId
           in: path
       responses:

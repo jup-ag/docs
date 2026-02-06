@@ -210,16 +210,15 @@ try {
 ```
 </Accordion>
 
-{/* <!-- TO DO: Document behavior when minSellPriceUsd cannot be met --> */}
-{/* ### Price Protection with minSellPriceUsd
+### Price Protection When Closing Position
 
-The `minSellPriceUsd` parameter protects you from selling at unfavorable prices. If the market price falls below your minimum, the order may be partially filled or fail.
+The `minSellPriceUsd` and `minSellPriceSlippageBps` parameters protect you from selling at unfavorable prices. If the market price falls below your minimum, the order may be partially filled or fail.
 
 <Warning>
 **Slippage Protection**
 
-Always set a reasonable `minSellPriceUsd` based on current market conditions. Check the position's `sellPriceUsd` field to see the current available sell price.
-</Warning> */}
+Always set a reasonable `minSellPriceUsd` and `minSellPriceSlippageBps` based on current market conditions. Check the position's `sellPriceUsd` field to see the current available sell price.
+</Warning>
 
 ---
 

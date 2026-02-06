@@ -189,23 +189,19 @@ const status = await statusResponse.json();
 console.log(status);
 ```
 
-{/* ## Cost Calculation
+---
+
+## Cost Calculation
 
 The total cost of an order depends on:
-- **Contract price**: Current market price (capped by your `maxBuyPriceUsd`)
+- **Contract price**: Current market price
 - **Number of contracts**: How many you're buying
 - **Fees**: Platform and venue fees
 
-For example, buying 10 YES contracts at $0.65 each:
-- Contract cost: 10 x $0.65 = $6.50
-- Estimated fees: ~1% = $0.065
-- **Total**: ~$6.565
-
-<Warning>
-**Price Protection**
-
-If the market price exceeds your `maxBuyPriceUsd`, the order may be partially filled or fail. Set a reasonable max price based on current market conditions.
-</Warning> */}
+For example, buying 1 YES contract at $1 each:
+- Contract cost: 1 x $1 = $1
+- Estimated fees: ~1% = $0.01
+- **Total**: ~$1.01
 
 ---
 

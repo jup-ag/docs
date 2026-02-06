@@ -278,21 +278,23 @@ Use these fields to assess risk:
 
 ## Common questions
 
-### How do I get a token's logo?
+<AccordionGroup>
+  <Accordion title="How do I get a token's logo?">
+    The `icon` field contains a URL to the token's logo image. Always verify the URL is from a trusted domain before displaying.
+  </Accordion>
 
-The `icon` field contains a URL to the token's logo image. Always verify the URL is from a trusted domain before displaying.
+  <Accordion title="What does organic score mean?">
+    Organic score (0-100) measures real trading activity vs wash trading. Higher = more legitimate trading. See [Organic Score docs](/docs/tokens/organic-score) for methodology.
+  </Accordion>
 
-### What does organic score mean?
+  <Accordion title="How often is data updated?">
+    Token metadata updates continuously. Trading stats (`stats5m`, `stats1h`, etc.) reflect real-time market activity.
+  </Accordion>
 
-Organic score (0-100) measures real trading activity vs wash trading. Higher = more legitimate trading. See [Organic Score docs](/docs/tokens/organic-score) for methodology.
-
-### How often is data updated?
-
-Token metadata updates continuously. Trading stats (`stats5m`, `stats1h`, etc.) reflect real-time market activity.
-
-### Why is a token returning empty?
-
-The token either doesn't exist or hasn't had a pool created yet. Use the mint address directly to verify.
+  <Accordion title="Why is a token returning empty?">
+    The token either doesn't exist or hasn't had a pool created yet. Use the mint address directly to verify.
+  </Accordion>
+</AccordionGroup>
 
 ---
 

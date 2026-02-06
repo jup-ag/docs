@@ -1,0 +1,387 @@
+---
+title: "How to Build a Prediction Market App on Solana"
+sidebarTitle: "Prediction Markets"
+description: "Build prediction market features into your Solana app using Jupiter's Prediction API."
+llmsDescription: "Jupiter Prediction API: REST API for binary prediction markets on Solana. Trade YES/NO outcomes on real-world events (sports, crypto, politics). Base URL: https://api.jup.ag/prediction/v1. Supports Polymarket and Kalshi data. Returns unsigned transactions for order creation, position management, and payout claims."
+---
+
+## TL;DR
+
+Use Jupiter's Prediction API to let users trade on real-world event outcomes (sports, crypto, politics, etc.) directly on Solana. The API handles order matching, position tracking, and settlement. Base URL: `https://api.jup.ag/prediction/v1`
+
+---
+
+## Prerequisites
+
+1. Get an API key at [portal.jup.ag](https://portal.jup.ag)
+2. All requests require the `x-api-key` header
+3. Users need JupUSD (or USDC) to trade
+
+<Note>
+**BETA**
+
+The Prediction Market API is currently in beta and subject to breaking changes. If you have feedback, reach out in [Discord](https://discord.gg/jup).
+</Note>
+
+---
+
+## Quick start
+
+```bash
+# Get available prediction events
+curl -X GET "https://api.jup.ag/prediction/v1/events?category=crypto" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+---
+
+## When you need this
+
+You're building an app where users can:
+
+- **Trade on event outcomes** — "Will BTC hit $100k by end of 2026?"
+- **Bet on sports, politics, or crypto** — Binary YES/NO markets
+- **Build a prediction market frontend** — Custom UI for trading
+- **Add speculation features** — Let users put money on their predictions
+- **Track trading performance** — Leaderboards, P&L history, profiles
+
+Common searches that lead here:
+- "prediction market api solana"
+- "binary options solana"
+- "bet on events solana api"
+- "polymarket on solana"
+
+---
+
+## Why Jupiter
+
+Building prediction markets from scratch requires:
+- Liquidity sourcing and market making
+- Order matching infrastructure
+- Settlement and payout systems
+- Real-world event data feeds
+
+Jupiter handles all of this:
+
+- **Aggregates liquidity** from Polymarket and Kalshi
+- **Keeper network** matches and fills orders
+- **On-chain settlement** with guaranteed payouts
+- **No payout fees** — winners receive full $1 per contract
+
+You get prediction market functionality without building the infrastructure.
+
+---
+
+## How prediction markets work
+
+**Binary outcomes**: Every market is YES or NO. "Will X happen?" → YES or NO.
+
+**Contract pricing**: Prices range from $0.01 to $0.99. Price = implied probability.
+- 70¢ YES price = market thinks 70% chance of YES
+- If you buy YES at 70¢ and YES wins, you profit 30¢ per contract
+- Losing contracts expire worthless
+
+**Settlement**: When the event resolves, winning contracts pay out $1 each. No fees on payouts.
+
+---
+
+## API reference
+
+**Base URL:** `https://api.jup.ag/prediction/v1`
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /events` | List prediction events with filters |
+| `GET /events/search?query={term}` | Search events by keyword |
+| `GET /events/{eventId}` | Get event details |
+| `GET /markets/{marketId}` | Get market pricing and status |
+| `POST /orders` | Create order (returns unsigned tx) |
+| `GET /orders?ownerPubkey={pubkey}` | Get user's orders |
+| `GET /positions?ownerPubkey={pubkey}` | Get user's positions |
+| `POST /positions/{positionPubkey}/claim` | Claim winnings (returns unsigned tx) |
+
+---
+
+## Code examples
+
+### Browse available events
+
+<CodeGroup>
+```bash curl
+curl -X GET "https://api.jup.ag/prediction/v1/events?category=crypto&includeMarkets=true" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```javascript JavaScript
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/events?category=crypto&includeMarkets=true',
+  {
+    headers: { 'x-api-key': 'YOUR_API_KEY' }
+  }
+);
+const { data: events } = await response.json();
+
+// Each event contains markets with pricing
+events.forEach(event => {
+  console.log(`${event.metadata.title}`);
+  event.markets?.forEach(market => {
+    console.log(`  ${market.metadata.title}: YES ${market.pricing.buyYesPriceUsd}¢`);
+  });
+});
+```
+</CodeGroup>
+
+**Filter options:**
+- `category`: `all`, `crypto`, `sports`, `politics`, `esports`, `culture`, `economics`, `tech`
+- `filter`: `new` (last 24h), `live` (in progress), `trending`
+- `provider`: `polymarket` (default), `kalshi`
+
+### Search for specific events
+
+```javascript
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/events/search?query=bitcoin&limit=10',
+  {
+    headers: { 'x-api-key': 'YOUR_API_KEY' }
+  }
+);
+const { data: events } = await response.json();
+```
+
+### Create a buy order
+
+<CodeGroup>
+```bash curl
+curl -X POST "https://api.jup.ag/prediction/v1/orders" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ownerPubkey": "USER_WALLET_PUBKEY",
+    "marketId": "MARKET_ID",
+    "isYes": true,
+    "isBuy": true,
+    "contracts": "10",
+    "maxBuyPriceUsd": "700000"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.jup.ag/prediction/v1/orders', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    ownerPubkey: userWallet.publicKey.toString(),
+    marketId: 'MARKET_ID',
+    isYes: true,           // YES side (false for NO)
+    isBuy: true,           // Buy order (false to sell)
+    contracts: '10',       // Number of contracts
+    maxBuyPriceUsd: '700000'  // Max price in micro USD (70¢ = 700000)
+  })
+});
+
+const { transaction, txMeta } = await response.json();
+
+// Deserialize, sign, and send
+const tx = Transaction.from(Buffer.from(transaction, 'base64'));
+tx.recentBlockhash = txMeta.blockhash;
+const signed = await userWallet.signTransaction(tx);
+const signature = await connection.sendRawTransaction(signed.serialize());
+```
+</CodeGroup>
+
+**Price format**: Prices are in micro USD (1 USD = 1,000,000 micro USD)
+- 70¢ = 700,000 micro USD
+- Valid range: 10,000 ($0.01) to 999,999 ($0.99)
+
+### Get user positions
+
+```javascript
+const response = await fetch(
+  `https://api.jup.ag/prediction/v1/positions?ownerPubkey=${userPubkey}`,
+  {
+    headers: { 'x-api-key': 'YOUR_API_KEY' }
+  }
+);
+const { data: positions } = await response.json();
+
+positions.forEach(pos => {
+  const side = pos.isYes ? 'YES' : 'NO';
+  const pnl = pos.pnlUsd ? (parseInt(pos.pnlUsd) / 1_000_000).toFixed(2) : 'N/A';
+  console.log(`${pos.marketMetadata.title}: ${pos.contracts} ${side} contracts, P&L: $${pnl}`);
+});
+```
+
+### Claim winnings from a settled position
+
+```javascript
+// Check if position is claimable
+if (position.claimable) {
+  const response = await fetch(
+    `https://api.jup.ag/prediction/v1/positions/${position.pubkey}/claim`,
+    {
+      method: 'POST',
+      headers: {
+        'x-api-key': 'YOUR_API_KEY',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ownerPubkey: userPubkey
+      })
+    }
+  );
+
+  const { transaction, txMeta } = await response.json();
+  // Sign and send transaction to claim payout
+}
+```
+
+---
+
+## Response format
+
+### Event
+
+```typescript
+interface Event {
+  eventId: string;
+  category: 'crypto' | 'sports' | 'politics' | 'esports' | 'culture' | 'economics' | 'tech';
+  metadata: {
+    title: string;
+    subtitle: string;
+    imageUrl: string;
+    isLive: boolean;
+  };
+  markets: Market[];
+  tvlDollars: string;
+  volumeUsd: string;
+  closeCondition: string;
+}
+```
+
+### Market
+
+```typescript
+interface Market {
+  marketId: string;
+  status: 'open' | 'closed' | 'cancelled';
+  result: '' | 'pending' | 'yes' | 'no';
+  openTime: number;   // Unix timestamp
+  closeTime: number;  // Unix timestamp
+  metadata: {
+    title: string;
+    description: string;
+    isTradable: boolean;
+  };
+  pricing: {
+    buyYesPriceUsd: number | null;   // Price to buy YES
+    buyNoPriceUsd: number | null;    // Price to buy NO
+    sellYesPriceUsd: number | null;  // Price to sell YES
+    sellNoPriceUsd: number | null;   // Price to sell NO
+    volume24h: number;
+    liquidityDollars: number;
+  };
+}
+```
+
+### Position
+
+```typescript
+interface Position {
+  pubkey: string;              // Position account
+  ownerPubkey: string;         // User's wallet
+  marketId: string;
+  isYes: boolean;              // YES or NO side
+  contracts: string;           // Contracts held
+  avgPriceUsd: string;         // Average entry price (micro USD)
+  totalCostUsd: string;        // Cost basis (micro USD)
+  valueUsd: string | null;     // Current value (null if market closed)
+  pnlUsd: string | null;       // Unrealized P&L (micro USD)
+  pnlUsdPercent: number | null;
+  claimable: boolean;          // Can claim payout?
+  payoutUsd: string;           // Potential payout if wins
+  marketMetadata: MarketMetadata;
+}
+```
+
+### Create order response
+
+```typescript
+interface CreateOrderResponse {
+  transaction: string;  // Base64 encoded unsigned transaction
+  txMeta: {
+    blockhash: string;
+    lastValidBlockHeight: number;
+  };
+  order: {
+    orderPubkey: string;
+    positionPubkey: string;
+    contracts: string;
+    orderCostUsd: string;
+    estimatedTotalFeeUsd: string;
+  };
+}
+```
+
+---
+
+## Order lifecycle
+
+1. **Create order**: Call `POST /orders` → get unsigned transaction
+2. **Sign & submit**: User signs, you submit to Solana
+3. **Keeper fills**: Jupiter's keeper network matches the order
+4. **Position updates**: Position reflects new contracts
+5. **Market settles**: When event resolves, result is recorded
+6. **Claim payout**: If position won, call `/claim` to withdraw
+
+---
+
+## Common questions
+
+<AccordionGroup>
+  <Accordion title="What tokens can users deposit?">
+    JupUSD or USDC. Specify via `depositMint` parameter (defaults to USDC).
+  </Accordion>
+
+  <Accordion title="How do I know if a market is tradeable?">
+    Check `market.metadata.isTradable` and `market.status === 'open'`.
+  </Accordion>
+
+  <Accordion title="What happens if my order doesn't fill?">
+    Orders can be closed via `DELETE /orders`. Unfilled funds return to the user.
+  </Accordion>
+
+  <Accordion title="How do I calculate potential profit?">
+    ```javascript
+    const contracts = 10;
+    const buyPrice = 0.70;  // 70¢
+    const potentialProfit = contracts * (1 - buyPrice);  // $3.00 if wins
+    const potentialLoss = contracts * buyPrice;          // $7.00 if loses
+    ```
+  </Accordion>
+
+  <Accordion title="How do I handle the micro USD format?">
+    ```javascript
+    // Convert micro USD to USD for display
+    const displayPrice = (microUsd) => (parseInt(microUsd) / 1_000_000).toFixed(2);
+
+    // Convert USD to micro USD for API
+    const toMicroUsd = (usd) => Math.round(usd * 1_000_000).toString();
+    ```
+  </Accordion>
+
+  <Accordion title="Which data provider should I use?">
+    Polymarket (default) has more markets. Kalshi is US-regulated. Use the `provider` query param to switch.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+- **[Prediction API Reference](/api-reference/prediction)** — Full endpoint documentation
+- **[About Prediction Markets](/docs/prediction/index)** — Architecture and concepts
+- **[Jupiter Developer Portal](https://portal.jup.ag)** — Get your API key
+- **[Jupiter Dev Notifications](https://t.me/jup_dev)** — API updates and announcements

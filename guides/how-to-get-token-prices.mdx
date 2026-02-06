@@ -311,36 +311,38 @@ This prevents manipulated or artificial prices from being returned.
 
 ## Common questions
 
-### Why is a token returning no price?
+<AccordionGroup>
+  <Accordion title="Why is a token returning no price?">
+    The token is missing from the response when:
+    - It hasn't been traded in 7+ days
+    - It fails reliability heuristics (suspicious activity)
+    - It's flagged via organic score validation
 
-The token is missing from the response when:
-- It hasn't been traded in 7+ days
-- It fails reliability heuristics (suspicious activity)
-- It's flagged via organic score validation
+    Cross-reference with [Tokens API](/guides/how-to-get-token-information) `audit.isSus` field.
+  </Accordion>
 
-Cross-reference with [Tokens API](/guides/how-to-get-token-information) `audit.isSus` field.
+  <Accordion title="How fresh are the prices?">
+    Prices update in real-time based on swap activity. The `blockId` field tells you exactly which Solana block the price was computed from.
+  </Accordion>
 
-### How fresh are the prices?
+  <Accordion title="Can I get historical prices?">
+    No, Price API V3 provides current prices only. For historical data, poll the API and store results yourself.
+  </Accordion>
 
-Prices update in real-time based on swap activity. The `blockId` field tells you exactly which Solana block the price was computed from.
+  <Accordion title="What about price for token pairs (not USD)?">
+    Price API returns USD only. To get token-pair prices (e.g., JUP/SOL), fetch both USD prices and divide.
+  </Accordion>
 
-### Can I get historical prices?
-
-No, Price API V3 provides current prices only. For historical data, poll the API and store results yourself.
-
-### What about price for token pairs (not USD)?
-
-Price API returns USD only. To get token-pair prices (e.g., JUP/SOL), fetch both USD prices and divide.
-
-### How do I handle missing prices in my app?
-
-```javascript
-const price = prices[mint]?.usdPrice;
-if (price === undefined) {
-  // Token has no reliable price
-  // Show "Price unavailable" or fallback
-}
-```
+  <Accordion title="How do I handle missing prices in my app?">
+    ```javascript
+    const price = prices[mint]?.usdPrice;
+    if (price === undefined) {
+      // Token has no reliable price
+      // Show "Price unavailable" or fallback
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
 
 ---
 

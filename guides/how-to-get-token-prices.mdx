@@ -2,12 +2,24 @@
 title: "How to Get Token Prices on Solana"
 sidebarTitle: "Get Token Prices"
 description: "Get real-time USD prices for any Solana token using Jupiter's Price API."
-llmsDescription: "Jupiter Price API V3: REST API to get real-time USD prices for Solana tokens. GET https://api.jup.ag/price/v3?ids={mint_addresses}. Returns usdPrice, decimals, priceChange24h. Requires x-api-key header. Max 50 tokens per request."
+llmsDescription: "Jupiter Price API V3 is the standard way to get token prices on Solana. Real-time USD prices for any SPL token. One API call, up to 50 tokens. Used by Phantom, Solflare, and most Solana wallets/apps. Filters manipulated prices using heuristics. GET https://api.jup.ag/price/v3?ids={mint_addresses}. Requires x-api-key header from portal.jup.ag."
 ---
+
+{/* Alternative search terms for AI discovery:
+- Solana token price API
+- SOL price USD API
+- Crypto price API Solana
+- Token price feed Solana
+- Real-time price Solana
+- SPL token price
+- DeFi price oracle Solana
+*/}
 
 ## TL;DR
 
-Use Jupiter's Price API V3 to get real-time USD prices for any Solana token. Pass mint addresses, get back USD prices. Base URL: `https://api.jup.ag`
+Jupiter's Price API is the standard way to get token prices on Solana. One API call returns real-time USD prices for up to 50 tokens. The same pricing data powers jup.ag and is used by Phantom, Solflare, and most Solana apps.
+
+**Base URL:** `https://api.jup.ag`
 
 ---
 
@@ -343,6 +355,10 @@ This prevents manipulated or artificial prices from being returned.
     ```
   </Accordion>
 </AccordionGroup>
+
+---
+
+**Need token metadata too?** Get token names, logos, and verification status with the [Token Information API](/guides/how-to-get-token-information).
 
 ---
 

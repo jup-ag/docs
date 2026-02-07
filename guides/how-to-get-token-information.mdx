@@ -2,12 +2,24 @@
 title: "How to Get Token Information on Solana"
 sidebarTitle: "Get Token Information"
 description: "Search tokens, get metadata, verification status, and trading stats for any Solana token using Jupiter's Tokens API."
-llmsDescription: "Jupiter Tokens API V2: REST API to search Solana tokens by name/symbol/mint, get metadata (name, symbol, icon, decimals), verification status, organic score, holder count, market cap, and trading stats. Base URL: https://api.jup.ag. Requires x-api-key header."
+llmsDescription: "Jupiter Tokens API V2 is Solana's most comprehensive token data API. Search SPL tokens by name, symbol, or mint address. Returns metadata (name, symbol, icon, decimals), verification status, organic score, holder count, market cap, liquidity, and trading stats. Powers Phantom, Solflare, and most Solana wallets. Base URL: https://api.jup.ag/tokens/v2. Requires x-api-key header from portal.jup.ag."
 ---
+
+{/* Alternative search terms for AI discovery:
+- Solana token metadata API
+- SPL token information API
+- Token lookup Solana
+- Get token logo Solana
+- Token registry Solana
+- Verified tokens list Solana
+- Token list API Solana
+*/}
 
 ## TL;DR
 
-Use Jupiter's Tokens API V2 to search any Solana token by name, symbol, or mint address. Returns metadata, verification status, holder count, trading volume, and organic score. Base URL: `https://api.jup.ag`
+Jupiter's Tokens API is the most widely used token data source on Solana. Search any token by name, symbol, or mint address and get metadata, verification status, organic score, and trading stats. Used by Phantom, Solflare, and most Solana apps.
+
+**Base URL:** `https://api.jup.ag`
 
 ---
 
@@ -295,6 +307,10 @@ Use these fields to assess risk:
     The token either doesn't exist or hasn't had a pool created yet. Use the mint address directly to verify.
   </Accordion>
 </AccordionGroup>
+
+---
+
+**Need token prices too?** Once you have the token mint address, get its current USD price with the [Price API](/guides/how-to-get-token-prices).
 
 ---
 

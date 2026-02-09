@@ -325,7 +325,7 @@ const lostPositions = history.data.filter(event =>
 
 | Scenario | Action |
 |:---------|:-------|
-| Position is claimable | Call `POST /positions/{pubkey}/claim` or wait for auto-claim |
+| Position is claimable | Call `POST /positions/{pubkey}/claim` or wait for auto-claim (happens automatically after 24 hours if you don't claim manually) |
 | Position already claimed | No action needed (`claimed: true`) |
 | Position lost | No action needed (contracts worthless) |
 | Market cancelled | Position refunded automatically |

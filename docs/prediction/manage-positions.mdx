@@ -101,7 +101,6 @@ const response = await fetch(
     },
     body: JSON.stringify({
       ownerPubkey: wallet.publicKey.toString(),
-      minSellPriceUsd: '650000' // Minimum $0.65 per contract
     })
   }
 );
@@ -164,7 +163,6 @@ const response = await fetch(
     },
     body: JSON.stringify({
       ownerPubkey: wallet.publicKey.toString(),
-      minSellPriceUsd: '650000'
     })
   }
 );
@@ -280,23 +278,12 @@ const response = await fetch('https://api.jup.ag/prediction/v1/positions', {
   },
   body: JSON.stringify({
     ownerPubkey: wallet.publicKey.toString(),
-    minSellPriceSlippageBps: 100 // 1% slippage tolerance
   })
 });
 
 const closeAllResponse = await response.json();
 // Sign and submit the transaction (see above)
 ```
-
-<Info>
-**Slippage in Basis Points**
-
-The `minSellPriceSlippageBps` parameter specifies acceptable slippage in basis points (1 bps = 0.01%).
-
-- `100` = 1% slippage allowed
-- `50` = 0.5% slippage allowed
-- `500` = 5% slippage allowed
-</Info>
 
 ---
 

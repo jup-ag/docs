@@ -39,7 +39,7 @@ Typical flow of actions:
 2. **Markets are established** within events, each representing a binary outcome (YES or NO)
 3. **Users trade contracts** at dynamic prices that reflect market sentiment (prices range from \$0 to \$1 per contract)
 4. **Events resolve** based on predetermined rules when the outcome is known
-5. **Winners claim payouts** - each winning contract is worth $1 (no payout fees)
+5. **Winners claim payouts** - each winning contract is worth $1 (no claim fees)
 
 ## Geographical Restrictions
 
@@ -202,7 +202,7 @@ The settlement process resolves markets and enables winners to claim payouts.
 2. **Result Determined**: Authoritative source provides outcome
 3. **Market Settles**: Result recorded on-chain (`yes` or `no`)
 4. **Positions Become Claimable**: Winning positions can claim payouts
-5. **Users Claim**: Winners receive $1 per contract (no payout/claim fees)
+5. **Users Claim**: Winners receive $1 per contract (no claim fees)
 6. **Losing Positions**: Contracts become worthless
 
 **Settlement Guarantees:**
@@ -233,7 +233,7 @@ Each contract represents a claim to **$1 if correct**:
 Market prices reflect implied probability:
 - 70¢ YES price ≈ 70% probability of YES outcome
 - 30¢ NO price ≈ 30% probability of NO outcome
-- YES price + NO price ≈ $1.00 (minus spread and fees)
+- YES price + NO price ≈ $1.00
 
 ### Position Management
 
@@ -245,12 +245,44 @@ Users can actively manage positions:
 
 ### Fees
 
-The system charges fees on certain trading activity:
-- **Platform Fees**: Underlying protocol fee
-- **Total Fee**: Displayed before order execution
-- **Payout Fees**: No payout/claim fees
+These are the breakdown of fees:
+- Fees are only charged on executed trades - buying or selling of contracts.
+- There are no fees when claiming payouts.
+- Fees are charged in whichever mint is used to purchase the contracts.
+- Fees are always rounded up to the nearest cent.
+- Fees are taken only on executed trades (Orders that do not fill immediately, you pay no trading fee until it later executes).
 
-### Account Structure (Solana)
+Your trading fees depend on three factors:
+- The price of the contract
+- How many contracts you trade (Bigger trades = higher fees)
+- How uncertain the outcome is (More uncertainty = higher fees)
+    - Trades priced closer to \$0.50 are more uncertain, so they have slightly higher fees.
+    - Trades priced closer to \$0.00 or \$1.00 are more certain, so fees are lower.
+
+Here's what fees look like for common prices:
+| Price per Contract | Fee (1 Contract) | Fee (100 Contracts) |
+|:------------------:|:----------------:|:-------------------:|
+| $0.01              | $0.01            | $0.07               |
+| $0.05              | $0.01            | $0.34               |
+| $0.10              | $0.01            | $0.63               |
+| $0.15              | $0.01            | $0.90               |
+| $0.20              | $0.02            | $1.12               |
+| $0.25              | $0.02            | $1.32               |
+| $0.30              | $0.02            | $1.47               |
+| $0.35              | $0.02            | $1.60               |
+| $0.40              | $0.02            | $1.68               |
+
+Example:
+- If you buy 100 contracts at $0.25:
+- Total cost: \$25.00
+- Trading fee: \$1.32
+
+Why Fees Work This Way:
+- Keeps fees low for high-confidence outcomes.
+- Scales fairly with trade size.
+- Encourages liquidity by not charging resting orders.
+
+### Account Structure
 
 There are a few accounts involved in the prediction market system:
 1. **Position Account**: Represents a user's position in a market.

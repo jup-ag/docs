@@ -1,7 +1,7 @@
 ---
 title: "Open Positions"
 description: "Create buy orders to open YES or NO positions in Jupiter Prediction Markets."
-llmsDescription: "POST /orders creates buy orders for YES/NO contracts. Required parameters: ownerPubkey, marketId, isYes, isBuy, contracts, maxBuyPriceUsd. Returns base64 transaction to sign and submit to Solana."
+llmsDescription: "POST /orders creates buy orders for YES/NO contracts. Required parameters: ownerPubkey, marketId, isYes, isBuy. Returns base64 transaction to sign and submit to Solana."
 ---
 
 <Note>
@@ -10,7 +10,7 @@ llmsDescription: "POST /orders creates buy orders for YES/NO contracts. Required
 The Prediction Market API is currently in beta and subject to breaking changes as we continue to improve the product. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
 </Note>
 
-This guide walks through creating a buy order to open a position in a prediction market. You'll learn how to construct the order request, sign the returned transaction, and submit it to the Solana network.
+This doc walks through creating a buy order to open a position in a prediction market. You'll learn how to construct the order request, sign the returned transaction, and submit it to the Solana network.
 
 ## Prerequisite
 
@@ -39,20 +39,8 @@ Use `POST /orders` to create a buy order for YES or NO contracts.
 | `isYes` | boolean | Yes | `true` for YES contracts, `false` for NO |
 | `isBuy` | boolean | Yes | `true` for buy orders |
 | `contracts` | string | No | Number of contracts to purchase |
-| `maxBuyPriceUsd` | string | No | Maximum price per contract in native token units |
-| `depositAmount` | string | Yes | Amount to deposit (in native token units) |
-| `depositMint` | string | Yes | Token mint for deposit |
-
-<Info>
-**Prices in native token units**
-
-The `maxBuyPriceUsd` parameter uses native token units where **1,000,000 native token units = \$1.00**.
-
-Examples:
-- `700000` = \$0.70 (700000 / 1000000 = \$0.70)
-- `500000` = \$0.50 (500000 / 1000000 = \$0.50)
-- `100000` = \$0.10 (100000 / 1000000 = \$0.10)
-</Info>
+| `depositAmount` | string | Yes | Amount to deposit (in native token units of JupUSD or USDC) |
+| `depositMint` | string | Yes | Token mint for deposit (JupUSD or USDC) |
 
 Example: Create a buy order for 2 USD worth of contracts
 ```js

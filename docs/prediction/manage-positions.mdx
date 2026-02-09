@@ -10,7 +10,7 @@ llmsDescription: "GET /positions lists holdings with P&L. DELETE /positions/{pos
 The Prediction Market API is currently in beta and subject to breaking changes as we continue to improve the product. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
 </Note>
 
-This guide covers how to view your open positions, sell contracts to reduce or exit positions, and cancel pending orders.
+This doc covers how to view your open positions, sell contracts to reduce or exit positions, and cancel pending orders.
 
 ## Prerequisite
 
@@ -50,9 +50,9 @@ console.log(positions);
 
 <Info>
 For descriptions of all position fields, parameters, and how to aggregate P&L,
-see the [Position Data & History](/docs/prediction/position-data) guide.
+see the [Position Data & History](/docs/prediction/position-data) doc.
 
-All USD values returned are denominated in native token units, where **1,000,000 units = $1.00**.
+All USD values returned are denominated in native token units of JupUSD or USDC, where **1,000,000 units = $1.00**.
 </Info>
 
 ---
@@ -207,16 +207,6 @@ try {
 }
 ```
 </Accordion>
-
-### Price Protection When Closing Position
-
-The `minSellPriceUsd` and `minSellPriceSlippageBps` parameters protect you from selling at unfavorable prices. If the market price falls below your minimum, the order may be partially filled or fail.
-
-<Warning>
-**Slippage Protection**
-
-Always set a reasonable `minSellPriceUsd` and `minSellPriceSlippageBps` based on current market conditions. Check the position's `sellPriceUsd` field to see the current available sell price.
-</Warning>
 
 ---
 

@@ -10,18 +10,19 @@ llmsDescription: "GET /events lists events with filters. GET /events/search sear
 The Prediction Market API is currently in beta and subject to breaking changes as we continue to improve the product. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
 </Note>
 
-This guide covers how to discover prediction market events, search for specific topics, and retrieve detailed market information including pricing data.
+This doc covers how to discover prediction market events, search for specific topics, and retrieve detailed market information including pricing data.
 
 For conceptual background on how events, markets, and pricing work, see the [Prediction Market Overview](/docs/prediction).
 
 ## Prerequisite
 
-To use the Prediction Market API, you'll need a free API key from the [Jupiter Portal](https://portal.jup.ag).
+To query events and markets data, you need:
+- An API key from the [Jupiter Portal](https://portal.jup.ag)
 
 <Tip>
 **API REFERENCE**
 
-To fully utilize the Prediction Market API, check out the [Prediction API Reference](/api-reference/prediction).
+For complete endpoint specifications, see the [Prediction API Reference](/api-reference/prediction).
 </Tip>
 
 ---
@@ -178,14 +179,14 @@ Example response:
 ### Understanding Prices
 
 <Info>
-**Prices are in native token units**
+**Prices are in JupUSD or USDC native token units**
 
-All prices in the API are denominated in native token units where **1,000,000 native token units = \$1.00**.
+All prices in the API are denominated in native token units where **1,000,000 native token units for JupUSD or USDC = \$1.00**.
 
 For example:
-- `650000` = \$0.65 (650000 / 1000000 = \$0.65)
-- `380000` = \$0.38 (380000 / 1000000 = \$0.38)
-- `10000` = \$0.01 (10000 / 1000000 = \$0.01)
+- `650000` = \$0.65 (650000 / 1,000,000 = \$0.65)
+- `380000` = \$0.38 (380000 / 1,000,000 = \$0.38)
+- `10000` = \$0.01 (10000 / 1,000,000 = \$0.01)
 </Info>
 
 The market response includes four price fields:

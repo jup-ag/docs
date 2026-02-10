@@ -114,13 +114,11 @@ components:
           enum:
             - open
             - closed
-            - cancelled
           description: Current market status
         result:
           type: string
           enum:
-            - ""
-            - pending
+            - null
             - yes
             - no
           description: Current market result
@@ -617,33 +615,6 @@ components:
         - computeUnits
         - orderPubkey
         - accounts
-    CloseOrderRequest:
-      type: object
-      properties:
-        ownerPubkey:
-          type: string
-          minLength: 32
-          description: Order owner public key
-        orderPubkey:
-          type: string
-          minLength: 32
-      required:
-        - orderPubkey
-    CloseAllOrdersRequest:
-      type: object
-      properties:
-        ownerPubkey:
-          type: string
-          minLength: 32
-          description: Order owner public key
-        statuses:
-          type: array
-          items:
-            type: string
-            enum:
-              - pending
-              - filled
-              - failed
     Position:
       type: object
       properties:
@@ -1467,34 +1438,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-    delete:
-      tags:
-        - Orders
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CloseOrderRequest"
-      responses:
-        "200":
-          description: Unsigned transaction for closing an order
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CloseOrderResponse"
-        "400":
-          description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Order not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
   /orders/{orderPubkey}:
     get:
       tags:
@@ -1603,36 +1546,6 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Order history not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  /orders/close-all:
-    delete:
-      tags:
-        - Orders
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CloseAllOrdersRequest"
-      responses:
-        "200":
-          description: Unsigned transactions to close all pending orders
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/CloseOrderResponse"
-                required:
-                  - data
-        "400":
-          description: Unable to build close order transactions
           content:
             application/json:
               schema:

@@ -80,9 +80,7 @@ const orders = await response.json();
 
 ## Selling Contracts
 
-You can sell contracts in two ways:
-1. **Close entire position** - Sell all contracts at once
-2. **Partial sell** - Sell a specific number of contracts
+You can sell contracts by closing entire position.
 
 ### Close Entire Position
 
@@ -109,27 +107,24 @@ const closeResponse = await response.json();
 // Sign and submit the transaction (see below)
 ```
 
-### Partial Sell (Create Sell Order)
+### Close All Positions
 
-Use `POST /orders` with `isBuy: false` to sell a specific number of contracts.
+Use `DELETE /positions` to close all your open positions at once. This is useful for quickly exiting all markets.
 
 ```js
-const response = await fetch('https://api.jup.ag/prediction/v1/orders', {
-  method: 'POST',
+const response = await fetch('https://api.jup.ag/prediction/v1/positions', {
+  method: 'DELETE',
   headers: {
     'Content-Type': 'application/json',
     'x-api-key': 'your-api-key'
   },
   body: JSON.stringify({
     ownerPubkey: wallet.publicKey.toString(),
-    positionPubkey: 'position-pubkey-789',
-    isBuy: false, // Sell order
-    contracts: '5', // Number of contracts to sell
   })
 });
 
-const sellOrder = await response.json();
-// Sign and submit the transaction (see below)
+const closeAllResponse = await response.json();
+// Sign and submit the transaction (see above)
 ```
 
 ### Sign and Submit the Transaction
@@ -207,73 +202,6 @@ try {
 }
 ```
 </Accordion>
-
----
-
-## Canceling Pending Orders
-
-### Cancel a Single Order
-
-Use `DELETE /orders` with the order's pubkey.
-
-```js
-const response = await fetch('https://api.jup.ag/prediction/v1/orders', {
-  method: 'DELETE',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'your-api-key'
-  },
-  body: JSON.stringify({
-    orderPubkey: 'order-pubkey-123'
-  })
-});
-
-const cancelResponse = await response.json();
-// Sign and submit the transaction (see above)
-```
-
-### Cancel All Pending Orders
-
-Use `DELETE /orders/close-all` to cancel multiple orders at once.
-
-```js
-const response = await fetch('https://api.jup.ag/prediction/v1/orders/close-all', {
-  method: 'DELETE',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'your-api-key'
-  },
-  body: JSON.stringify({
-    ownerPubkey: wallet.publicKey.toString(),
-    statuses: ['pending'] // Only cancel pending orders
-  })
-});
-
-const cancelAllResponse = await response.json();
-// Sign and submit the transaction (see above)
-```
-
----
-
-## Close All Positions
-
-Use `DELETE /positions` to close all your open positions at once. This is useful for quickly exiting all markets.
-
-```js
-const response = await fetch('https://api.jup.ag/prediction/v1/positions', {
-  method: 'DELETE',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'your-api-key'
-  },
-  body: JSON.stringify({
-    ownerPubkey: wallet.publicKey.toString(),
-  })
-});
-
-const closeAllResponse = await response.json();
-// Sign and submit the transaction (see above)
-```
 
 ---
 

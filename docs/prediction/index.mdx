@@ -43,7 +43,7 @@ Typical flow of actions:
 
 ## Geographical Restrictions
 
-- We have restricted US IPs from accessing the Prediction Market API.
+- We have restricted United States and South Korea IPs from accessing the Prediction Market API.
 - If you have any questions, please reach out to us in Discord/Telegram.
 
 ## Architectural Components
@@ -74,16 +74,14 @@ Markets are binary prediction markets within an event, representing specific YES
 
 **Market Properties:**
 - **Market ID**: Unique identifier derived as a PDA (Program Derived Address)
-- **Status**: `open`, `closed`, or `cancelled`
-- **Result**: Empty string (unresolved), `pending`, `yes`, or `no`
+- **Status**: `open`, `closed`
+- **Result**: `null` (not yet resolved), `yes`, or `no`
 - **Pricing Data**: Buy/sell prices for YES and NO sides, volume, open interest, liquidity
 - **Metadata**: Title, description, trading rules, resolution criteria
 
 **Market States:**
 1. **Open**: Market is actively trading, users can create orders
 2. **Closed**: Trading has stopped, awaiting settlement
-3. **Settled**: Result has been determined, winners can claim payouts
-4. **Cancelled**: Market voided, positions returned
 
 **Pricing Model:**
 - Prices are quoted in USD (stored as micro USD on-chain)
@@ -239,8 +237,7 @@ Market prices reflect implied probability:
 
 Users can actively manage positions:
 - **Buy more**: Increase exposure to an outcome
-- **Sell partial**: Take profits or reduce risk
-- **Close entirely**: Exit the market completely
+- **Close position**: Exit the market completely
 - **Hold to settlement**: Wait for final payout
 
 ### Fees

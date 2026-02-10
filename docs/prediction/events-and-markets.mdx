@@ -1,0 +1,314 @@
+---
+title: "Events & Markets"
+description: "Discover prediction market events, search by keywords, and get market details with pricing information."
+llmsDescription: "GET /events lists events with filters. GET /events/search searches by keyword. GET /markets/{marketId} returns market details with pricing in micro USD. GET /orderbook/{marketId} provides bid/ask depth."
+---
+
+<Note>
+**BETA**
+
+The Prediction Market API is currently in beta and subject to breaking changes as we continue to improve the product. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
+</Note>
+
+This doc covers how to discover prediction market events, search for specific topics, and retrieve detailed market information including pricing data.
+
+For conceptual background on how events, markets, and pricing work, see the [Prediction Market Overview](/docs/prediction).
+
+## Prerequisite
+
+To query events and markets data, you need:
+- An API key from the [Jupiter Portal](https://portal.jup.ag)
+
+<Tip>
+**API REFERENCE**
+
+For complete endpoint specifications, see the [Prediction API Reference](/api-reference/prediction).
+</Tip>
+
+---
+
+## List Events
+
+Use `GET /events` to retrieve a paginated list of prediction market events. You can filter by category, provider, and status.
+
+| Parameter | Type | Description |
+|:----------|:-----|:------------|
+| `category` | string | Filter by category: `crypto`, `sports`, `politics`, `esports`, `culture`, `economics`, `tech` |
+| `subcategory` | string | Filter by subcategory within the category |
+| `filter` | string | Filter by status: `new`, `live`, `trending` |
+| `sortBy` | string | Sort field |
+| `sortDirection` | string | Sort direction: `asc` or `desc` |
+| `includeMarkets` | boolean | Include nested markets in response |
+| `start` | number | Pagination start index |
+| `end` | number | Pagination end index |
+
+Example: List Trending Crypto Events
+
+```js
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/events?' + new URLSearchParams({
+    category: 'crypto',
+    filter: 'trending',
+    includeMarkets: 'true'
+  }),
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const events = await response.json();
+console.log(events);
+```
+
+---
+
+## Search Events
+
+Use `GET /events/search` to find events by keyword.
+
+| Parameter | Type | Description |
+|:----------|:-----|:------------|
+| `query` | string | Search term |
+| `limit` | number | Maximum results to return |
+
+```js
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/events/search?' + new URLSearchParams({
+    query: 'nba',
+    limit: '10'
+  }),
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const searchResults = await response.json();
+```
+
+---
+
+## Get Event Details
+
+Use `GET /events/{eventId}` to retrieve full details for a specific event, including all its markets.
+
+```js
+const eventId = 'event-123';
+const response = await fetch(
+  `https://api.jup.ag/prediction/v1/events/${eventId}`,
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const event = await response.json();
+```
+
+---
+
+## Get Suggested Events
+
+Use `GET /events/suggested/{pubkey}` to get personalized event recommendations based on a user's trading history.
+
+```js
+const userPubkey = 'YOUR_WALLET_PUBLIC_KEY';
+const response = await fetch(
+  `https://api.jup.ag/prediction/v1/events/suggested/${userPubkey}`,
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const suggestedEvents = await response.json();
+```
+
+---
+
+## Get Market Details
+
+Use `GET /markets/{marketId}` to retrieve detailed information about a specific market, including current pricing.
+
+<Note>
+There can be multiple markets for the same event.
+</Note>
+
+```js
+const marketId = 'market-456';
+const response = await fetch(
+  `https://api.jup.ag/prediction/v1/markets/${marketId}`,
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const market = await response.json();
+console.log(market);
+```
+
+Example response:
+
+```json expandable
+{
+  "marketId": "market-456",
+  "eventId": "event-123",
+  "title": "SOL $500 by Q2 2026",
+  "description": "Will Solana reach $500 USD...",
+  "status": "open",
+  "result": "",
+  "openTime": 1704067200,
+  "closeTime": 1719792000,
+  "buyYesPriceUsd": "650000",
+  "sellYesPriceUsd": "620000",
+  "buyNoPriceUsd": "380000",
+  "sellNoPriceUsd": "350000",
+  "volumeUsd": "450000",
+  "openInterest": "1250",
+  "liquidityUsd": "85000"
+}
+```
+
+### Understanding Prices
+
+<Info>
+**Prices are in JupUSD or USDC native token units**
+
+All prices in the API are denominated in native token units where **1,000,000 native token units for JupUSD or USDC = \$1.00**.
+
+For example:
+- `650000` = \$0.65 (650000 / 1,000,000 = \$0.65)
+- `380000` = \$0.38 (380000 / 1,000,000 = \$0.38)
+- `10000` = \$0.01 (10000 / 1,000,000 = \$0.01)
+</Info>
+
+The market response includes four price fields:
+
+| Field | Description |
+|:------|:------------|
+| `buyYesPriceUsd` | Cost to buy a YES contract |
+| `sellYesPriceUsd` | Amount received when selling a YES contract |
+| `buyNoPriceUsd` | Cost to buy a NO contract |
+| `sellNoPriceUsd` | Amount received when selling a NO contract |
+
+<Tip>
+**Price as Probability**
+
+Market prices reflect the implied probability of an outcome. A `buyYesPriceUsd` of `650000` (\$0.65) suggests the market believes there's roughly a 65% chance of YES being the outcome.
+</Tip>
+
+### Market Status
+
+| Status | Description |
+|:-------|:------------|
+| `open` | Market is actively trading |
+| `closed` | Trading has stopped, awaiting settlement |
+| `cancelled` | Market voided, positions returned |
+
+### Market Result
+
+| Result | Description |
+|:-------|:------------|
+| `""` (empty) | Market not yet resolved |
+| `pending` | Resolution in progress |
+| `yes` | YES outcome confirmed |
+| `no` | NO outcome confirmed |
+
+---
+
+## Get Orderbook Data
+
+Use `GET /orderbook/{marketId}` to retrieve the current orderbook with bid/ask depth.
+
+The response has four arrays. Each entry is a `[price, quantity]` pair:
+
+| Field | Description |
+|:------|:------------|
+| `yes` | YES bids: `[price_cents, quantity]`. Price is in cents (e.g. `1` = $0.01). |
+| `no` | NO bids: `[price_cents, quantity]`. Same format as `yes`. |
+| `yes_dollars` | YES bids with price as decimal string: `["0.0100", quantity]`. |
+| `no_dollars` | NO bids with price as decimal string. Same format as `yes_dollars`. |
+
+Quantities are in base units (e.g. contract size). Arrays are ordered by price (typically best bid first).
+
+Example: Get orderbook data for a specific market
+
+```js
+const marketId = 'market-456';
+const response = await fetch(
+  `https://api.jup.ag/prediction/v1/orderbook/${marketId}`,
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const orderbook = await response.json();
+```
+
+**Example response:**
+
+```json expandable
+{
+  "yes": [
+    [1, 346014],
+    [2, 10568],
+    [3, 12300]
+  ],
+  "no": [
+    [1, 219],
+    [2, 14],
+    [3, 4400]
+  ],
+  "yes_dollars": [
+    ["0.0100", 346014],
+    ["0.0200", 10568],
+    ["0.0300", 12300]
+  ],
+  "no_dollars": [
+    ["0.0100", 219],
+    ["0.0200", 14],
+    ["0.0300", 4400]
+  ]
+}
+```
+
+---
+
+## Check Trading Status
+
+Use `GET /trading-status` to verify if the exchange is actively trading. This is useful for conditional logic before placing orders.
+
+```js
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/trading-status',
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const status = await response.json();
+console.log('Trading active:', status.trading_active);
+```
+
+---
+
+## What's Next
+
+Now that you know how to discover events and markets, you're ready to open positions.
+
+<CardGroup>
+  <Card title="Open Positions" href="/docs/prediction/open-positions" icon="circle-plus" horizontal>
+    Create buy orders for YES or NO contracts
+  </Card>
+</CardGroup>

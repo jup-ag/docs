@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Prediction Market API
+  title: Jupiter Prediction Market API
   version: 1.0.0
   description: Jupiter Prediction Market API Schema
 
@@ -114,13 +114,11 @@ components:
           enum:
             - open
             - closed
-            - cancelled
           description: Current market status
         result:
           type: string
           enum:
-            - ""
-            - pending
+            - null
             - yes
             - no
           description: Current market result
@@ -526,9 +524,6 @@ components:
         ownerPubkey:
           type: string
           description: Order owner public key
-        userPubkey:
-          type: string
-          description: Order owner public key (deprecated alias; use ownerPubkey)
         marketId:
           type: string
           minLength: 1
@@ -545,16 +540,7 @@ components:
           anyOf:
             - type: string
             - type: number
-        maxBuyPriceUsd:
-          anyOf:
-            - type: string
-            - type: number
-          description: Must be between 10000 ($0.01) to 999999 ($0.99)
-        minSellPriceUsd:
-          anyOf:
-            - type: string
-            - type: number
-          description: Must be between 10000 ($0.01) to 999999 ($0.99)
+          description: Number of contracts to sell (only applicable when `isBuy` is `false`)
         depositAmount:
           anyOf:
             - type: string
@@ -629,41 +615,6 @@ components:
         - computeUnits
         - orderPubkey
         - accounts
-    CloseOrderRequest:
-      type: object
-      properties:
-        ownerPubkey:
-          type: string
-          minLength: 32
-          description: Order owner public key
-        userPubkey:
-          type: string
-          minLength: 32
-          description: Order owner public key (deprecated alias; use ownerPubkey)
-        orderPubkey:
-          type: string
-          minLength: 32
-      required:
-        - orderPubkey
-    CloseAllOrdersRequest:
-      type: object
-      properties:
-        ownerPubkey:
-          type: string
-          minLength: 32
-          description: Order owner public key
-        userPubkey:
-          type: string
-          minLength: 32
-          description: Order owner public key (deprecated alias; use ownerPubkey)
-        statuses:
-          type: array
-          items:
-            type: string
-            enum:
-              - pending
-              - filled
-              - failed
     Position:
       type: object
       properties:
@@ -849,16 +800,6 @@ components:
           type: string
           minLength: 32
           description: Position owner public key
-        userPubkey:
-          type: string
-          minLength: 32
-          description: Position owner public key (deprecated alias; use ownerPubkey)
-        minSellPriceUsd:
-          anyOf:
-            - type: string
-            - type: number
-      required:
-        - minSellPriceUsd
     ClaimPositionResponse:
       type: object
       properties:
@@ -918,17 +859,6 @@ components:
           type: string
           minLength: 32
           description: Position owner public key
-        userPubkey:
-          type: string
-          minLength: 32
-          description: Position owner public key (deprecated alias; use ownerPubkey)
-        minSellPriceSlippageBps:
-          type: integer
-          nullable: true
-          minimum: 0
-          maximum: 10000
-      required:
-        - minSellPriceSlippageBps
     ClaimPositionRequest:
       type: object
       properties:
@@ -936,10 +866,6 @@ components:
           type: string
           minLength: 32
           description: Position owner public key
-        userPubkey:
-          type: string
-          minLength: 32
-          description: Position owner public key (deprecated alias; use ownerPubkey)
     HistoryEvent:
       type: object
       properties:
@@ -1450,14 +1376,6 @@ paths:
           required: false
           name: ownerPubkey
           in: query
-        - schema:
-            type: string
-            minLength: 1
-            description: Order owner public key (deprecated alias; use ownerPubkey)
-          required: false
-          description: Order owner public key (deprecated alias; use ownerPubkey)
-          name: userPubkey
-          in: query
       responses:
         "200":
           description: List of all orders registered on-chain
@@ -1516,34 +1434,6 @@ paths:
                 $ref: "#/components/schemas/CreateOrderResponse"
         "400":
           description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-    delete:
-      tags:
-        - Orders
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CloseOrderRequest"
-      responses:
-        "200":
-          description: Unsigned transaction for closing an order
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CloseOrderResponse"
-        "400":
-          description: Invalid request parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Order not found
           content:
             application/json:
               schema:
@@ -1660,36 +1550,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /orders/close-all:
-    delete:
-      tags:
-        - Orders
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CloseAllOrdersRequest"
-      responses:
-        "200":
-          description: Unsigned transactions to close all pending orders
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/CloseOrderResponse"
-                required:
-                  - data
-        "400":
-          description: Unable to build close order transactions
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
   /positions:
     get:
       tags:
@@ -1716,14 +1576,6 @@ paths:
           required: false
           description: Position owner public key
           name: ownerPubkey
-          in: query
-        - schema:
-            type: string
-            minLength: 1
-            description: Position owner public key (deprecated alias; use ownerPubkey)
-          required: false
-          description: Position owner public key (deprecated alias; use ownerPubkey)
-          name: userPubkey
           in: query
         - schema:
             type: string
@@ -1954,14 +1806,6 @@ paths:
           name: ownerPubkey
           in: query
         - schema:
-            type: string
-            minLength: 32
-            description: History owner public key (deprecated alias; use ownerPubkey)
-          required: false
-          description: History owner public key (deprecated alias; use ownerPubkey)
-          name: userPubkey
-          in: query
-        - schema:
             type: integer
             minimum: 1
             description: History event ID
@@ -2159,212 +2003,6 @@ paths:
                 required:
                   - ownerPubkey
                   - history
-  /follow/{ownerPubkey}:
-    post:
-      tags:
-        - Following
-      parameters:
-        - schema:
-            type: string
-          required: true
-          name: ownerPubkey
-          in: path
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                followerPubkey:
-                  type: string
-              required:
-                - followerPubkey
-      responses:
-        "201":
-          description: Successfully followed user
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  followerPubkey:
-                    type: string
-                  followingPubkey:
-                    type: string
-                  createdAt:
-                    type: string
-                required:
-                  - followerPubkey
-                  - followingPubkey
-                  - createdAt
-        "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                  - error
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                  - error
-        "409":
-          description: Already following
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                  - error
-  /unfollow/{ownerPubkey}:
-    delete:
-      tags:
-        - Following
-      parameters:
-        - schema:
-            type: string
-          required: true
-          name: ownerPubkey
-          in: path
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                followerPubkey:
-                  type: string
-              required:
-                - followerPubkey
-      responses:
-        "200":
-          description: Successfully unfollowed user
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                required:
-                  - success
-        "404":
-          description: Follow relationship not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                  - error
-  /followers/{ownerPubkey}:
-    get:
-      tags:
-        - Following
-      parameters:
-        - schema:
-            type: string
-          required: true
-          name: ownerPubkey
-          in: path
-      responses:
-        "200":
-          description: List of followers
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  followers:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        pubkey:
-                          type: string
-                        createdAt:
-                          type: string
-                      required:
-                        - pubkey
-                        - createdAt
-                  count:
-                    type: number
-                required:
-                  - followers
-                  - count
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                  - error
-  /following/{ownerPubkey}:
-    get:
-      tags:
-        - Following
-      parameters:
-        - schema:
-            type: string
-          required: true
-          name: ownerPubkey
-          in: path
-      responses:
-        "200":
-          description: List of users being followed
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  following:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        pubkey:
-                          type: string
-                        createdAt:
-                          type: string
-                      required:
-                        - pubkey
-                        - createdAt
-                  count:
-                    type: number
-                required:
-                  - following
-                  - count
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                  - error
   /trades:
     get:
       tags:

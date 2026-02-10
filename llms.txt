@@ -19,7 +19,8 @@
 
 Setup guides for environment, tooling, and first API calls.
 
-- [Get Started](https://dev.jup.ag/get-started/index.md): Jupiter developer documentation hub: explore the full product suite (Ultra Swap, Perps, Lend, Trigger, Recurring, Price, Tokens, Send, Studio, Lock) and find quick start paths for your integration.
+- [Get Started](https://dev.jup.ag/get-started/index.md): This tutorial provides step-by-step guidance for building a token swap widget using Jupiter's core liquidity APIs. Learn to use the Ultra Swap API (for swap quotes and execution), Tokens V2 API (for token discovery and metadata), and Price V3 API (for real-time USD token prices) in standalone functions. Requires no API keys, blockchain RPC, credentials, or upfront payments, making integration fast and accessible for developers and LLM agents.
+- [Overview](https://dev.jup.ag/get-started/overview.md): This is the master overview for all Jupiter developer documentation: discover the full suite of products, integration options, quickstarts, API references, SDKs, and learning resources available for builders on Jupiter.
 - [Environment Setup](https://dev.jup.ag/get-started/environment-setup.md): Install Solana web3.js and spl-token libraries, configure an RPC connection, and set up a development wallet to build with the Jupiter API.
 - [Development Basics](https://dev.jup.ag/get-started/development-basics.md): Solana fundamentals for Jupiter developers: accounts, programs, instructions, transactions, priority fees, compute units, slippage, and how Ultra Swap API simplifies it all.
 
@@ -68,6 +69,23 @@ Core product documentation covering each Jupiter API with usage guides and code 
 - [Requote with Lower Max Accounts](https://dev.jup.ag/docs/swap/requote-with-lower-max-accounts.md): Reduce the maxAccounts quote parameter when adding custom instructions causes the swap transaction to exceed Solana's 1232-byte size limit. Includes retry logic to find the right account count.
 - [Common Errors](https://dev.jup.ag/docs/swap/common-errors.md): Reference for Metis Swap API errors: Jupiter program errors (slippage, insufficient funds), Solana and DEX program errors, routing errors, and swap transaction composing errors with debug tips.
 
+### Tokens
+
+- [Token Verification and Listing](https://dev.jup.ag/docs/tokens/index.md): Jupiter's token verification system, listing process, and search APIs. Use the V2 API for programmatic token discovery and metadata.
+
+#### V2
+
+- [Tokens API V2](https://dev.jup.ag/docs/tokens/v2/token-information.md): GET /tokens/v2 endpoints for retrieving token metadata by mint address, symbol search, tag, category, or recency. Returns name, symbol, icon, organic score, holder count, and trading stats.
+- [Content API (BETA)](https://dev.jup.ag/docs/tokens/v2/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD. Pro tier only.
+
+- [Organic Score](https://dev.jup.ag/docs/tokens/organic-score.md): Organic Score measures the genuine activity and health of a token using real user wallet data, including holder count, trading volume, and liquidity — filtering out bot and wash-trade activity.
+- [Token Tag Standard](https://dev.jup.ag/docs/tokens/token-tag-standard.md): Token tags categorize tokens in the Jupiter Tokens API (e.g., Verified, LST). Projects can apply for custom tags by providing a public CSV endpoint of mint addresses.
+
+### Price
+
+- [Jupiter Price API Overview](https://dev.jup.ag/docs/price/index.md): Heuristics-based token pricing from Jupiter's routing engine. Single source of truth for all Jupiter UIs.
+- [Price API V3](https://dev.jup.ag/docs/price/v3.md): GET /price/v3?ids={mints} returns heuristics-based USD prices for up to 50 token mint addresses per request, using last-swapped price validated against liquidity and trading metrics.
+
 ### Lend
 
 - [Jupiter Lend Overview](https://dev.jup.ag/docs/lend/index.md): Jupiter's lending protocol for earning yield on token deposits. Program IDs: Earn (jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9), Borrow (jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi).
@@ -76,6 +94,16 @@ Core product documentation covering each Jupiter API with usage guides and code 
 - [Borrow (Soon)](https://dev.jup.ag/docs/lend/borrow.md): Jupiter Lend Borrow API for collateralized borrowing with up to 95% LTV. Work-in-progress — documentation coming soon.
 - [Lend SDK](https://dev.jup.ag/docs/lend/sdk.md): The @jup-ag/lend SDK provides TypeScript functions for deposit, withdraw, and CPI context accounts to integrate with the Jupiter Lend Earn protocol.
 - [Liquidation](https://dev.jup.ag/docs/lend/liquidation.md): Build a liquidation bot for Jupiter Lend using the @jup-ag/lend SDK. Covers fetching available liquidations, flash borrowing, executing liquidation instructions, and swapping collateral via Jupiter Swap.
+
+### Prediction
+
+- [About Prediction](https://dev.jup.ag/docs/prediction/index.md): Overview of Jupiter Prediction Market
+- [Events & Markets](https://dev.jup.ag/docs/prediction/events-and-markets.md): GET /events lists events with filters. GET /events/search searches by keyword. GET /markets/{marketId} returns market details with pricing in micro USD. GET /orderbook/{marketId} provides bid/ask depth.
+- [Open Positions](https://dev.jup.ag/docs/prediction/open-positions.md): POST /orders creates buy orders for YES/NO contracts. Required parameters: ownerPubkey, marketId, isYes, isBuy, contracts, maxBuyPriceUsd. Returns base64 transaction to sign and submit to Solana.
+- [Manage Positions](https://dev.jup.ag/docs/prediction/manage-positions.md): GET /positions lists holdings with P&L. DELETE /positions/{positionPubkey} closes entire position. POST /orders with isBuy=false sells partial. DELETE /orders cancels pending orders.
+- [Claim Payouts](https://dev.jup.ag/docs/prediction/claim-payouts.md): POST /positions/{positionPubkey}/claim creates payout transaction for winning positions. Check position.claimable=true to verify eligibility. No claim fees - winning contracts pay $1 each.
+- [Position Data & History](https://dev.jup.ag/docs/prediction/position-data.md): GET /positions returns holdings with P&L. GET /orders lists orders with fill status. GET /history provides transaction history with event types: order_created, order_filled, order_failed, position_updated, position_lost, payout_claimed.
+- [Social Features](https://dev.jup.ag/docs/prediction/social-features.md): GET /profiles/{pubkey} returns user stats. POST /follow and DELETE /unfollow manage relationships. GET /leaderboards returns rankings by pnl/volume/win_rate. GET /trades provides global trade feed.
 
 ### Perps
 
@@ -104,23 +132,6 @@ Core product documentation covering each Jupiter API with usage guides and code 
 - [Withdraw Price Order](https://dev.jup.ag/docs/recurring/withdraw-price-order.md): DEPRECATED: POST /recurring/v1/priceWithdraw withdraws funds from a price-based recurring order. Use time-based orders instead.
 - [Get Recurring Orders](https://dev.jup.ag/docs/recurring/get-recurring-orders.md): GET /recurring/v1/getRecurringOrders returns active and historical DCA orders filtered by wallet or status.
 - [Best Practices](https://dev.jup.ag/docs/recurring/best-practices.md): Guidelines for recurring order minimum amounts, cycle requirements, and token compatibility (Token-2022 not supported).
-
-### Tokens
-
-- [Token Verification and Listing](https://dev.jup.ag/docs/tokens/index.md): Jupiter's token verification system, listing process, and search APIs. Use the V2 API for programmatic token discovery and metadata.
-
-#### V2
-
-- [Tokens API V2 (BETA)](https://dev.jup.ag/docs/tokens/v2/token-information.md): GET /tokens/v2 endpoints for retrieving token metadata by mint address, symbol search, tag, category, or recency. Returns name, symbol, icon, organic score, holder count, and trading stats.
-- [Content API (BETA)](https://dev.jup.ag/docs/tokens/v2/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD. Pro tier only.
-
-- [Organic Score](https://dev.jup.ag/docs/tokens/organic-score.md): Organic Score measures the genuine activity and health of a token using real user wallet data, including holder count, trading volume, and liquidity — filtering out bot and wash-trade activity.
-- [Token Tag Standard](https://dev.jup.ag/docs/tokens/token-tag-standard.md): Token tags categorize tokens in the Jupiter Tokens API (e.g., Verified, LST). Projects can apply for custom tags by providing a public CSV endpoint of mint addresses.
-
-### Price
-
-- [Jupiter Price API Overview](https://dev.jup.ag/docs/price/index.md): Heuristics-based token pricing from Jupiter's routing engine. Single source of truth for all Jupiter UIs.
-- [Price API V3 (Beta)](https://dev.jup.ag/docs/price/v3.md): GET /price/v3?ids={mints} returns heuristics-based USD prices for up to 50 token mint addresses per request, using last-swapped price validated against liquidity and trading metrics.
 
 ### Portfolio
 
@@ -159,11 +170,12 @@ OpenAPI specifications for every Jupiter endpoint.
 
 - [Jupiter Ultra Swap API](https://dev.jup.ag/openapi-spec/ultra/ultra.yaml): Jupiter Ultra Swap API Schema
 - [Metis Swap API](https://dev.jup.ag/openapi-spec/swap/swap.yaml): Metis Swap API Schema
-- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
-- [Jupiter Trigger Order API](https://dev.jup.ag/openapi-spec/trigger/trigger.yaml): Jupiter Trigger Order API Schema
-- [Jupiter Recurring Order API](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Jupiter Recurring Order API Schema
 - [Jupiter Tokens API V2](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Jupiter Tokens API V2 Schema
 - [Jupiter Price API V3](https://dev.jup.ag/openapi-spec/price/v3/price.yaml): Jupiter Price API V3 Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Trigger Order API](https://dev.jup.ag/openapi-spec/trigger/trigger.yaml): Jupiter Trigger Order API Schema
+- [Jupiter Recurring Order API](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Jupiter Recurring Order API Schema
 - [Jupiter Portfolio API](https://dev.jup.ag/openapi-spec/portfolio/portfolio.yaml): Jupiter Portfolio API Schema
 - [Jupiter Send API](https://dev.jup.ag/openapi-spec/send/send.yaml): Jupiter Send API Schema
 - [Jupiter Studio API](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Jupiter Studio API Schema

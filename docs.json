@@ -211,8 +211,22 @@
                 "pages": ["docs/prediction/index"]
               },
               {
-                "group": "API Guides Coming Soon",
-                "pages": ["docs/prediction/coming-soon"]
+                "group": "Trading Guides",
+                "tag": "BETA",
+                "pages": [
+                  "docs/prediction/events-and-markets",
+                  "docs/prediction/open-positions",
+                  "docs/prediction/manage-positions",
+                  "docs/prediction/claim-payouts"
+                ]
+              },
+              {
+                "group": "Data & Analytics",
+                "tag": "BETA",
+                "pages": [
+                  "docs/prediction/position-data",
+                  "docs/prediction/social-features"
+                ]
               }
             ]
           },
@@ -523,9 +537,7 @@
                       "api-reference/prediction/get-orders",
                       "api-reference/prediction/get-order",
                       "api-reference/prediction/get-order-status",
-                      "api-reference/prediction/create-order",
-                      "api-reference/prediction/close-order",
-                      "api-reference/prediction/close-all-orders"
+                      "api-reference/prediction/create-order"
                     ]
                   },
                   {
@@ -552,11 +564,7 @@
                       "api-reference/prediction/get-profile",
                       "api-reference/prediction/get-pnl-history",
                       "api-reference/prediction/get-trades",
-                      "api-reference/prediction/get-leaderboards",
-                      "api-reference/prediction/follow-user",
-                      "api-reference/prediction/unfollow-user",
-                      "api-reference/prediction/get-followers",
-                      "api-reference/prediction/get-following"
+                      "api-reference/prediction/get-leaderboards"
                     ]
                   },
                   {

@@ -98,9 +98,8 @@ Orders represent user intentions to buy or sell contracts in a market.
 - **Owner**: User's public key
 - **Market**: Target market identifier
 - **Side**: YES or NO position
-- **Direction**: Buy (increase exposure) or Sell (decrease exposure)
+- **Direction**: Buy
 - **Contracts**: Number of contracts to trade
-- **Price Limits**: `maxBuyPriceUsd` or `minSellPriceUsd`
 - **Status**: `pending`, `filled`, or `failed`
 - **Fill Details**: Filled contracts, average fill price, fees paid
 
@@ -111,11 +110,6 @@ Orders represent user intentions to buy or sell contracts in a market.
 4. Keeper network matches and fills the order
 5. Order status updates reflect fill progress
 6. Settled orders update associated positions
-
-**Order Types:**
-- **Buy Orders**: Acquire new contracts or increase position size
-- **Sell Orders**: Reduce position size or exit entirely
-- **Limit Orders**: Execute only at specified price or better
 
 ### Positions
 

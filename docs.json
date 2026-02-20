@@ -673,13 +673,32 @@
         ]
       },
       {
+        "tab": "AI",
+        "groups": [
+          {
+            "group": " ",
+            "pages": [
+              "ai/index"
+            ]
+          },
+          {
+            "group": "AI Resources",
+            "pages": [
+              "ai/skills",
+              "ai/llms-txt",
+              "ai/mcp",
+              "ai/ecosystem"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Resources",
         "groups": [
           {
             "group": "Resources",
             "pages": [
               "resources/support",
-              "resources/ai-workflow",
               "resources/brand-kit",
               "resources/stats",
               "resources/audits",
@@ -1047,6 +1066,10 @@
     {
       "source": "/docs/tokens/v2",
       "destination": "/docs/tokens/v2/token-information"
+    },
+    {
+      "source": "/resources/ai-workflow",
+      "destination": "/ai"
     }
   ]
 }

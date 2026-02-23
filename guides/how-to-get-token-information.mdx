@@ -37,6 +37,26 @@ curl -X GET "https://api.jup.ag/tokens/v2/search?query=JUP" \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
+Response (array of matching tokens):
+```json
+[
+  {
+    "id": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+    "name": "Jupiter",
+    "symbol": "JUP",
+    "icon": "https://static.jup.ag/jup/icon.png",
+    "decimals": 6,
+    "isVerified": true,
+    "organicScore": 98.08,
+    "organicScoreLabel": "high",
+    "usdPrice": 0.1424,
+    "mcap": 461995714.68,
+    "holderCount": 857247,
+    "tags": ["verified", "community", "strict"]
+  }
+]
+```
+
 ---
 
 ## When you need this
@@ -191,32 +211,84 @@ Returns tokens ordered by first pool creation time (not mint time).
 
 ### TypeScript types
 
-```typescript
+```typescript expandable
 interface TokenInfo {
+  // Identity
   id: string;                    // Mint address
   name: string;
   symbol: string;
-  icon: string;                  // Logo URL
+  icon: string | null;           // Logo URL
   decimals: number;
-  isVerified: boolean;
+  tokenProgram: string;          // SPL Token or Token-2022 program address
+  createdAt: string;             // Token creation timestamp
+
+  // Social (optional, varies per token)
+  twitter?: string;
+  website?: string;
+  discord?: string;
+  instagram?: string;
+  tiktok?: string;
+  otherUrl?: string;
+  dev?: string;                  // Developer wallet address
+
+  // Supply
+  circSupply: number | null;
+  totalSupply: number | null;
+
+  // Market data
+  fdv: number | null;            // Fully diluted valuation
+  mcap: number | null;           // Market cap in USD
+  usdPrice: number | null;
+  priceBlockId: number | null;   // Solana block for price recency
+  liquidity: number | null;      // Total liquidity in USD
+  holderCount: number | null;
+  fees: number | null;           // Trading fees in USD
+  apy?: { jupEarn: number };     // APY from Jupiter Lend's Earn (only present for listed assets)
+
+  // Quality & verification
   organicScore: number;          // 0-100
   organicScoreLabel: 'high' | 'medium' | 'low';
-  holderCount: number;
-  mcap: number;                  // Market cap in USD
-  liquidity: number;             // Total liquidity in USD
-  usdPrice: number;
+  isVerified: boolean | null;
+  tags: string[] | null;         // e.g., ["verified", "community", "strict"]
+
+  // Audit (all fields conditional — present based on token characteristics)
   audit: {
-    mintAuthorityDisabled: boolean;
-    freezeAuthorityDisabled: boolean;
-    isSus: boolean;              // Flagged as suspicious
-  };
-  tags: string[];                // e.g., ["verified", "community"]
-  stats24h: {
-    priceChange: number;         // Percentage
-    buyVolume: number;
-    sellVolume: number;
-    numTraders: number;
-  };
+    isSus?: boolean;                   // Flagged as suspicious (only present when true)
+    mintAuthorityDisabled?: boolean;
+    freezeAuthorityDisabled?: boolean;
+    topHoldersPercentage?: number;     // % held by top holders
+    devBalancePercentage?: number;     // % held by developer
+    devMints?: number;                 // Number of developer mints
+  } | null;
+
+  // Launch info (conditional)
+  firstPool?: { id: string; createdAt: string } | null;
+
+  // Trading stats (each window has the same shape)
+  stats5m?: SwapStats | null;
+  stats1h?: SwapStats | null;
+  stats6h?: SwapStats | null;
+  stats24h?: SwapStats | null;
+  stats7d?: SwapStats | null;    // Typically just priceChange, but may include volume
+  stats30d?: SwapStats | null;
+
+  updatedAt: string;             // Last data update timestamp
+}
+
+interface SwapStats {
+  priceChange?: number;          // Percentage
+  holderChange?: number;
+  liquidityChange?: number;
+  volumeChange?: number;
+  buyVolume?: number;
+  sellVolume?: number;
+  buyOrganicVolume?: number;
+  sellOrganicVolume?: number;
+  numBuys?: number;
+  numSells?: number;
+  numTraders?: number;
+  numOrganicBuyers?: number;
+  numNetBuyers?: number;
 }
 ```
 
@@ -229,25 +301,51 @@ interface TokenInfo {
   "symbol": "JUP",
   "icon": "https://static.jup.ag/jup/icon.png",
   "decimals": 6,
-  "isVerified": true,
-  "organicScore": 95.2,
-  "organicScoreLabel": "high",
-  "holderCount": 523000,
-  "mcap": 1234567890,
-  "liquidity": 45000000,
-  "usdPrice": 0.85,
+  "twitter": "https://twitter.com/JupiterExchange",
+  "website": "https://jup.ag",
+  "dev": "JUPhop9E8ZfdJ5FNHhxQt4uAih822Vs4QpqsWcewFbq",
+  "circSupply": 3243891294.88,
+  "totalSupply": 6863982654.38,
+  "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "firstPool": {
+    "id": "2pspvjWWaf3dNgt3jsgSzFCNvMGPb7t8FrEYvLGjvcCe",
+    "createdAt": "2024-01-29T17:33:29Z"
+  },
+  "holderCount": 857247,
   "audit": {
     "mintAuthorityDisabled": true,
     "freezeAuthorityDisabled": true,
-    "isSus": false
+    "topHoldersPercentage": 15.45
   },
-  "tags": ["verified", "community"],
+  "organicScore": 98.08,
+  "organicScoreLabel": "high",
+  "isVerified": true,
+  "tags": ["birdeye-trending", "community", "strict", "verified"],
+  "createdAt": "2024-06-07T10:56:42.584Z",
+  "fdv": 977569925.64,
+  "mcap": 461995714.68,
+  "usdPrice": 0.1424,
+  "priceBlockId": 402109205,
+  "liquidity": 3002636.41,
   "stats24h": {
-    "priceChange": 2.5,
-    "buyVolume": 15000000,
-    "sellVolume": 14500000,
-    "numTraders": 8500
-  }
+    "priceChange": -7.82,
+    "holderChange": -0.03,
+    "liquidityChange": -7.09,
+    "volumeChange": 29.09,
+    "buyVolume": 1811347.33,
+    "sellVolume": 1997486.55,
+    "buyOrganicVolume": 173368.01,
+    "sellOrganicVolume": 611999.99,
+    "numBuys": 34025,
+    "numSells": 31278,
+    "numTraders": 5200,
+    "numOrganicBuyers": 291,
+    "numNetBuyers": 1201
+  },
+  "stats7d": { "priceChange": -12.21 },
+  "stats30d": { "priceChange": -27.43 },
+  "fees": 53.51,
+  "updatedAt": "2026-02-23T03:54:14.460Z"
 }
 ```
 
@@ -261,14 +359,15 @@ interface TokenInfo {
 **Invalid API key (401):**
 ```json
 {
-  "error": "Unauthorized"
+  "code": 401,
+  "message": "Unauthorized"
 }
 ```
 
 **Rate limited (429):**
 ```json
 {
-  "error": "Rate limit exceeded"
+  "message": "Rate limit exceeded"
 }
 ```
 
@@ -284,7 +383,11 @@ Use these fields to assess risk:
 | `organicScoreLabel` | `"high"` | `"low"` |
 | `audit.mintAuthorityDisabled` | `true` | `false` (can mint more) |
 | `audit.freezeAuthorityDisabled` | `true` | `false` (can freeze) |
-| `audit.isSus` | `false` | `true` |
+| `audit.isSus` | absent (not flagged) | `true` (flagged) |
+| `audit.topHoldersPercentage` | Low (e.g., < 20%) | High concentration |
+| `audit.devBalancePercentage` | Low | High (dev holds large supply) |
+
+Note: `audit` fields are conditional. `isSus` is only present when the token is flagged as suspicious — not all risky tokens will have this flag.
 
 ---
 
@@ -321,3 +424,4 @@ Use these fields to assess risk:
 - **[Get Token Prices](/guides/how-to-get-token-price)** — USD prices for tokens
 - **[Jupiter Developer Portal](https://portal.jup.ag)** — Get your API key
 - **[Jupiter Dev Notifications](https://t.me/jup_dev)** — API updates and announcements
+- **[Run this as an agent skill →](https://github.com/jup-ag/agent-skills/tree/main/skills/get-token-info)**

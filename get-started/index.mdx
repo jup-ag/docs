@@ -78,12 +78,136 @@ const tokens = await searchTokens('usdc');
 console.log(tokens[0]); // { id, name, symbol, icon, decimals, usdPrice, ... }
 ```
 
+<Accordion title="Example Response">
+```bash
+curl --request GET \
+  --url 'https://lite-api.jup.ag/tokens/v2/search?query=JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN' \
+```
+
+```json expandable
+[
+  {
+    "id": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+    "name": "Jupiter",
+    "symbol": "JUP",
+    "icon": "https://static.jup.ag/jup/icon.png",
+    "decimals": 6,
+    "twitter": "https://twitter.com/JupiterExchange",
+    "website": "https://jup.ag",
+    "dev": "JUPhop9E8ZfdJ5FNHhxQt4uAih822Vs4QpqsWcewFbq",
+    "circSupply": 3243891294.88,
+    "totalSupply": 6863982812.191499,
+    "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "firstPool": {
+      "id": "2pspvjWWaf3dNgt3jsgSzFCNvMGPb7t8FrEYvLGjvcCe",
+      "createdAt": "2024-01-29T17:33:29Z"
+    },
+    "holderCount": 863626,
+    "audit": {
+      "mintAuthorityDisabled": true,
+      "freezeAuthorityDisabled": true,
+      "topHoldersPercentage": 15.598836011643503,
+      "devMints": 1
+    },
+    "organicScore": 93.70008826827798,
+    "organicScoreLabel": "high",
+    "ctLikes": 397,
+    "smartCtLikes": 177,
+    "isVerified": true,
+    "tags": [
+      "birdeye-trending",
+      "community",
+      "moonshot-verified",
+      "strict",
+      "verified"
+    ],
+    "createdAt": "2024-06-07T10:56:42.584Z",
+    "fdv": 1295436289.723886,
+    "mcap": 612218098.1926562,
+    "usdPrice": 0.18872953577666163,
+    "priceBlockId": 398168601,
+    "liquidity": 3254134.0851675714,
+    "stats5m": {
+      "priceChange": 0.0691969260910124,
+      "holderChange": -0.004978759223730387,
+      "liquidityChange": 0.02070855283903766,
+      "volumeChange": -41.51635943714493,
+      "buyVolume": 2270.977598883256,
+      "sellVolume": 2478.787204926521,
+      "buyOrganicVolume": 28.559384829973588,
+      "sellOrganicVolume": 1096.398129121432,
+      "numBuys": 106,
+      "numSells": 109,
+      "numTraders": 90,
+      "numOrganicBuyers": 5,
+      "numNetBuyers": 10
+    },
+    "stats1h": {
+      "priceChange": 0.8963569095373793,
+      "holderChange": -0.006946969153141303,
+      "liquidityChange": -0.05742533895109799,
+      "volumeChange": 20.224060261481398,
+      "buyVolume": 202057.32343858018,
+      "sellVolume": 130910.04513282242,
+      "buyOrganicVolume": 1960.702323688371,
+      "sellOrganicVolume": 4982.587060762151,
+      "numBuys": 2909,
+      "numSells": 2625,
+      "numTraders": 532,
+      "numOrganicBuyers": 28,
+      "numNetBuyers": 84
+    },
+    "stats6h": {
+      "priceChange": 0.806881917998056,
+      "holderChange": -0.012156562633505107,
+      "liquidityChange": -1.0655669333935223,
+      "volumeChange": -39.39506877948361,
+      "buyVolume": 891754.7845159877,
+      "sellVolume": 784178.1759400497,
+      "buyOrganicVolume": 24167.93357749837,
+      "sellOrganicVolume": 76699.82817775776,
+      "numBuys": 15506,
+      "numSells": 14778,
+      "numTraders": 2137,
+      "numOrganicBuyers": 80,
+      "numNetBuyers": 364
+    },
+    "stats24h": {
+      "priceChange": -1.8984104107182198,
+      "holderChange": -0.03622940971526925,
+      "liquidityChange": 3.1091858514428834,
+      "volumeChange": -28.058201035408803,
+      "buyVolume": 4387366.5045432765,
+      "sellVolume": 3863094.110430575,
+      "buyOrganicVolume": 209341.30678184459,
+      "sellOrganicVolume": 460153.90469366894,
+      "numBuys": 57708,
+      "numSells": 55589,
+      "numTraders": 6871,
+      "numOrganicBuyers": 297,
+      "numNetBuyers": 1254
+    },
+    "stats7d": {
+      "priceChange": -10.154560928102246
+    },
+    "stats30d": {
+      "priceChange": -19.827864392815485
+    },
+    "fees": 30.154901056001673,
+    "updatedAt": "2026-02-05T06:41:33.565118194Z"
+  }
+]
+```
+</Accordion>
+
+<Info>
 **Other useful endpoints:**
 - `GET /tag?query=verified` - Get all verified tokens
 - `GET /toptrending/1h` - Get trending tokens
 - `GET /recent` - Get recently listed tokens
 
-<Info>See [Tokens V2 API Reference](/api-reference/tokens/v2) for full response schema and all endpoints.</Info>
+See [Tokens V2 API Reference](/api-reference/tokens/v2) for full response schema and all endpoints.
+</Info>
 
 ---
 
@@ -109,6 +233,34 @@ const prices = await getPrices([SOL, USDC]);
 console.log(prices[SOL]?.usdPrice);
 console.log(prices[USDC]?.usdPrice);
 ```
+
+<Accordion title="Example Response">
+```bash
+curl --request GET \
+  --url 'https://lite-api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' \
+```
+
+```json expandable
+{
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": {
+    "createdAt": "2024-06-05T08:55:25.527Z",
+    "liquidity": 553293282.885745,
+    "usdPrice": 0.999703698400303,
+    "blockId": 398169360,
+    "decimals": 6,
+    "priceChange24h": 0.00805935613443642
+  },
+  "So11111111111111111111111111111111111111112": {
+    "createdAt": "2024-06-05T08:55:25.527Z",
+    "liquidity": 417389086.2293,
+    "usdPrice": 90.2300739643588,
+    "blockId": 398169359,
+    "decimals": 9,
+    "priceChange24h": -8.41905976959318
+  }
+}
+```
+</Accordion>
 
 <Info>See [Price V3 API Reference](/api-reference/price/v3) for full response schema.</Info>
 
@@ -142,6 +294,91 @@ const quote = await getQuote(
 );
 console.log(`${quote.inAmount} -> ${quote.outAmount}`);
 ```
+
+<Accordion title="Example Response">
+```bash
+curl --request GET \
+  --url 'https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=10000000' \
+```
+
+```json expandable
+{
+  "swapType": "aggregator",
+  "inAmount": "10000000",
+  "outAmount": "896516",
+  "otherAmountThreshold": "896516",
+  "swapMode": "ExactIn",
+  "slippageBps": 0,
+  "priceImpactPct": "-0.0006953032312137218",
+  "routePlan": [
+    {
+      "percent": 100,
+      "bps": 10000,
+      "usdValue": 0.896317433732353,
+      "swapInfo": {
+        "ammKey": "CKc2gypi1feWLboi7PWRgNTCi6NWhkYaGU4v6rhnZDDJ",
+        "label": "BisonFi",
+        "inputMint": "So11111111111111111111111111111111111111112",
+        "outputMint": "USD1ttGY1N17NEEHLmELoaybftRBUSErhqYiQzvEmuB",
+        "inAmount": "10000000",
+        "outAmount": "897075"
+      }
+    },
+    {
+      "percent": 100,
+      "bps": 10000,
+      "usdValue": 0.896317433732353,
+      "swapInfo": {
+        "ammKey": "G94idxkpL1yrzz1Gv7sdh136dQ4N77KqvntyBLQAXyHu",
+        "label": "Stabble Stable Swap",
+        "inputMint": "USD1ttGY1N17NEEHLmELoaybftRBUSErhqYiQzvEmuB",
+        "outputMint": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+        "inAmount": "897075",
+        "outAmount": "896769"
+      }
+    },
+    {
+      "percent": 100,
+      "bps": 10000,
+      "usdValue": 0.896317433732353,
+      "swapInfo": {
+        "ammKey": "2o4369ha3bENAhJDan8mdRNJjNo6qQ9P5KhUS4QZUVgi",
+        "label": "AlphaQ",
+        "inputMint": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+        "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "inAmount": "896769",
+        "outAmount": "896695"
+      }
+    }
+  ],
+  "feeMint": "So11111111111111111111111111111111111111112",
+  "feeBps": 2,
+  "platformFee": {
+    "feeBps": 2,
+    "feeMint": "So11111111111111111111111111111111111111112"
+  },
+  "signatureFeeLamports": 0,
+  "signatureFeePayer": null,
+  "prioritizationFeeLamports": 0,
+  "prioritizationFeePayer": null,
+  "rentFeeLamports": 0,
+  "rentFeePayer": null,
+  "transaction": null,
+  "gasless": false,
+  "taker": null,
+  "inputMint": "So11111111111111111111111111111111111111112",
+  "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "router": "iris",
+  "requestId": "019c2c8f-640c-779e-bedb-8b5231bb822d",
+  "inUsdValue": 0.896941079763321,
+  "outUsdValue": 0.896317433732353,
+  "swapUsdValue": 0.896317433732353,
+  "priceImpact": -0.0695303231213722,
+  "mode": "ultra",
+  "totalTime": 192
+}
+```
+</Accordion>
 
 ### Execute a Swap (Wallet Required)
 
@@ -196,6 +433,94 @@ if (result.status === 'Success') {
 }
 ```
 
+<Accordion title="Example Response">
+```bash Get quote with taker
+curl --request GET \
+  --url 'https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=10000000&taker=<takerAddress>' \
+```
+
+```json expandable
+{
+  "swapType": "aggregator",
+  "inAmount": "10000000",
+  "outAmount": "899038",
+  "otherAmountThreshold": "896079",
+  "swapMode": "ExactIn",
+  "slippageBps": 34,
+  "priceImpactPct": "0.00014199853479733988",
+  "routePlan": [
+    {
+      "percent": 100,
+      "bps": 10000,
+      "usdValue": 0.898772147475964,
+      "swapInfo": {
+        "ammKey": "CNC5TaeNQEoSPfQKZ7GgfM4R8WYAJRKRSHFCHkf2H7ko",
+        "label": "Aquifer",
+        "inputMint": "So11111111111111111111111111111111111111112",
+        "outputMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "inAmount": "10000000",
+        "outAmount": "900836"
+      }
+    },
+    {
+      "percent": 100,
+      "bps": 10000,
+      "usdValue": 0.898772147475964,
+      "swapInfo": {
+        "ammKey": "Pi9nzTjPxD8DsRfRBGfKYzmefJoJM8TcXu2jyaQjSHm",
+        "label": "AlphaQ",
+        "inputMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "inAmount": "900836",
+        "outAmount": "899316"
+      }
+    }
+  ],
+  "feeMint": "So11111111111111111111111111111111111111112",
+  "feeBps": 2,
+  "platformFee": {
+    "feeBps": 2,
+    "feeMint": "So11111111111111111111111111111111111111112"
+  },
+  "taker": "takerAddress",
+  "gasless": false,
+  "signatureFeeLamports": 5000,
+  "signatureFeePayer": "takerAddress",
+  "prioritizationFeeLamports": 5430,
+  "prioritizationFeePayer": "takerAddress",
+  "rentFeeLamports": 0,
+  "rentFeePayer": "takerAddress",
+  "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAFC4YR20D+54htxFQ2bC0qfXLam23ZYIpI+7fA2zhGD3nON8hLG3d38b9HH3IkjaUQdG9cF40kO3hx28YXMylj8uhb/uZhG24W3P+aJ/zSWSCIsehf3YAzOSmPh1TV30Ipo4SDDlg+ml46crsvOOdxVpk3d5x8J1aTfyOPHit7eiyYhtWfPgeJJbk/OEPgfJ5LHxDDhjdC/6XbIhitzqc3IiEM/lYBOPzoCtJvqP0yxZmjcMdMwzTW8CRoM5Non0xeTQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAADa3bZMjlYUsVEBNt6LmsOxgXaRSJHQ1gO4aTdN2Wi7GAR51VvyMcBu7nTFbs5oFQf9sbLeo/SOUQKxzaJWvBOPBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKl8W63+nScizyapq4fTCDOwcsw8E6q6WfVWFKAQihdOIAYHAAUCpF8DAAcACQPuXwAAAAAAAAYCAAEMAgAAAHC0twAAAAAACQUBABoKBgmT8Xtk9ISudv8JLRYAAQ4PBRoYCgoXCQ4VHhYKBBwKDhoTDAgUAgMLDRsWHRAEDxIREhERCh4JGS7RmFOTfP7Y6QyAlpgAAAAAAEG4DQAAAAAAIgACAAAAAgAAAGAQJwABaAEQJwECCgMBAAABCQMnGPEHmohRnOv3vOPzPU9mvJdqmRgKYRDLQ5AH3IXj/gO+ub0DbsLFKb+VBypPvwTfcXWT5zi8zCEnKBXCRxqA2fn1VbDUhCUCJDUFDwAoARfiTz4qllcehnay2i5IVBAMTSdPPOjIS+Dc4oaPyRqp7QMBBAYEApwAAw==",
+  "inputMint": "So11111111111111111111111111111111111111112",
+  "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "router": "iris",
+  "requestId": "019c2c91-96a8-713e-bd53-9969874cdb87",
+  "inUsdValue": 0.898644541267801,
+  "outUsdValue": 0.898772147475964,
+  "swapUsdValue": 0.898772147475964,
+  "priceImpact": 0.014199853479734,
+  "mode": "ultra",
+  "totalTime": 175
+}
+```
+
+```bash Execute after signing transaction
+curl --request POST \
+  --url 'https://lite-api.jup.ag/ultra/v1/execute' \
+  --header 'Content-Type: application/json' \
+  --data '{"signedTransaction": "signedTransaction", "requestId": "requestId"}' \
+```
+
+```json expandable
+</Accordion>
+```json expandable
+{
+  "signature": "signature",
+  "status": "Success"
+}
+```
+</Accordion>
+
 <Warning>Never hardcode private keys. Use environment variables or secure key management.</Warning>
 
 ### Frontend: Using Wallet Adapter
@@ -222,9 +547,7 @@ async function executeSwapWithWalletAdapter(inputMint, outputMint, amount, walle
   if (order.errorCode) throw new Error(order.errorMessage);
 
   // 2. Sign transaction using wallet adapter
-  const tx = VersionedTransaction.deserialize(Buffer.from(order.transaction, 'base64'));
-  const signedTx = await wallet.signTransaction(tx);
-  const signedTxBase64 = Buffer.from(signedTx.serialize()).toString('base64');
+  // ...
 
   // 3. Submit to execute endpoint
   const result = await fetch('https://lite-api.jup.ag/ultra/v1/execute', {
@@ -411,13 +734,13 @@ console.log(result.success ? result.explorerUrl : result.error);
 
 ```bash
 # Search tokens
-curl "https://lite-api.jup.ag/tokens/v2/search?query=SOL" | jq '.[0].symbol'
+curl "https://lite-api.jup.ag/tokens/v2/search?query=SOL" | jq
 
 # Get price
 curl "https://lite-api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112" | jq
 
 # Get quote
-curl "https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=10000000" | jq '{inAmount, outAmount}'
+curl "https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=10000000" | jq
 ```
 
 ---

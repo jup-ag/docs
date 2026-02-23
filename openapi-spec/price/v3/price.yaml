@@ -21,7 +21,7 @@ paths:
     get:
       summary: price
       description: |
-        Returns prices of specified tokens.
+        Get USD prices for up to 50 tokens per request. Tokens without a reliable price are omitted from the response.
       security:
         - ApiKeyAuth: []
       parameters:
@@ -43,53 +43,49 @@ paths:
                   description: Token addresses as keys
                   type: object
                   properties:
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: When the token was minted or created (fixed date for legacy tokens like SOL/USDC that predate the API)
+                    liquidity:
+                      type: number
+                      description: Total liquidity in USD across all pools
+                    usdPrice:
+                      type: number
+                      description: Current USD price
                     blockId:
                       type: integer
                       nullable: true
+                      description: Solana block ID when price was computed
                     decimals:
                       type: integer
-                    usdPrice:
-                      type: number
+                      description: Token decimal places
                     priceChange24h:
                       type: number
                       nullable: true
+                      description: 24-hour price change as a percentage
                   required:
-                    - decimals
+                    - createdAt
+                    - liquidity
                     - usdPrice
+                    - blockId
+                    - decimals
+                    - priceChange24h
               example:
-                data:
-                  So11111111111111111111111111111111111111112:
-                    id: "So11111111111111111111111111111111111111112"
-                    type: "derivedPrice"
-                    price: "171.340000000"
-                    extraInfo:
-                      lastSwappedPrice:
-                        lastJupiterSellAt: 1710000000
-                        lastJupiterSellPrice: "171.34"
-                        lastJupiterBuyAt: 1710000001
-                        lastJupiterBuyPrice: "171.35"
-                      quotedPrice:
-                        buyPrice: "171.35"
-                        buyAt: 1710000001
-                        sellPrice: "171.34"
-                        sellAt: 1710000000
-                      confidenceLevel: "high"
-                      depth:
-                        buyPriceImpactRatio:
-                          depth:
-                            "10": 0.001
-                            "100": 0.005
-                            "1000": 0.012
-                        sellPriceImpactRatio:
-                          depth:
-                            "10": 0.001
-                            "100": 0.004
-                            "1000": 0.011
-                  EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:
-                    id: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-                    type: "derivedPrice"
-                    price: "1.000000000"
-                timeTaken: 0.005
+                So11111111111111111111111111111111111111112:
+                  createdAt: "2024-06-05T08:55:25.527Z"
+                  liquidity: 621679197.67
+                  usdPrice: 147.48
+                  blockId: 348004023
+                  decimals: 9
+                  priceChange24h: 1.29
+                EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:
+                  createdAt: "2024-06-05T08:55:25.527Z"
+                  liquidity: 522175174.66
+                  usdPrice: 0.9999
+                  blockId: 348004025
+                  decimals: 6
+                  priceChange24h: -0.003
         '400':
           description: Bad request
         '500':

@@ -41,7 +41,10 @@ Response:
 ```json
 {
   "So11111111111111111111111111111111111111112": {
+    "createdAt": "2024-06-05T08:55:25.527Z",
+    "liquidity": 621679197.67,
     "usdPrice": 147.48,
+    "blockId": 348004023,
     "decimals": 9,
     "priceChange24h": 1.29
   }
@@ -209,7 +212,7 @@ async function getPortfolioValue(holdings) {
 
   let totalValue = 0;
   for (const [mint, amount] of Object.entries(holdings)) {
-    const price = prices[mint]?.usdPrice || 0;
+    const price = prices[mint]?.usdPrice ?? 0;
     totalValue += amount * price;
   }
 
@@ -233,10 +236,12 @@ console.log(`Portfolio: $${value.toFixed(2)}`);
 ```typescript
 interface PriceResponse {
   [mintAddress: string]: {
+    createdAt: string;      // When the token was minted/created (fixed date for legacy tokens like SOL, USDC)
+    liquidity: number;      // Total liquidity in USD
     usdPrice: number;
+    blockId: number;        // Solana block when price was computed
     decimals: number;
-    priceChange24h: number;
-    blockId: number;  // Solana block when price was computed
+    priceChange24h: number; // 24h change as percentage
   };
 }
 ```
@@ -246,12 +251,16 @@ interface PriceResponse {
 ```json
 {
   "So11111111111111111111111111111111111111112": {
+    "createdAt": "2024-06-05T08:55:25.527Z",
+    "liquidity": 621679197.67,
     "usdPrice": 147.48,
     "blockId": 348004023,
     "decimals": 9,
     "priceChange24h": 1.29
   },
   "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN": {
+    "createdAt": "2024-06-07T10:56:42.584Z",
+    "liquidity": 3036749.38,
     "usdPrice": 0.85,
     "blockId": 348004026,
     "decimals": 6,
@@ -261,10 +270,12 @@ interface PriceResponse {
 ```
 
 **Fields:**
+- `createdAt` — When the token was minted or created (fixed date for legacy tokens like SOL, USDC that predate the API)
+- `liquidity` — Total liquidity in USD across all pools
 - `usdPrice` — Current price in USD
+- `blockId` — Solana block ID (verify price recency)
 - `decimals` — Token decimals (for display formatting)
 - `priceChange24h` — 24h price change as percentage
-- `blockId` — Solana block ID (verify price recency)
 
 ### Error responses
 
@@ -272,7 +283,10 @@ interface PriceResponse {
 ```json
 {
   "So11111111111111111111111111111111111111112": {
+    "createdAt": "2024-06-05T08:55:25.527Z",
+    "liquidity": 621679197.67,
     "usdPrice": 147.48,
+    "blockId": 348004023,
     "decimals": 9,
     "priceChange24h": 1.29
   }
@@ -283,14 +297,15 @@ interface PriceResponse {
 **Invalid API key (401):**
 ```json
 {
-  "error": "Unauthorized"
+  "code": 401,
+  "message": "Unauthorized"
 }
 ```
 
 **Rate limited (429):**
 ```json
 {
-  "error": "Rate limit exceeded"
+  "message": "Rate limit exceeded"
 }
 ```
 
@@ -368,3 +383,4 @@ This prevents manipulated or artificial prices from being returned.
 - **[Get Token Information](/guides/how-to-get-token-information)** — Metadata, verification, organic score
 - **[Jupiter Developer Portal](https://portal.jup.ag)** — Get your API key
 - **[Jupiter Dev Notifications](https://t.me/jup_dev)** — API updates and announcements
+- **[Run this as an agent skill →](https://github.com/jup-ag/agent-skills/tree/main/skills/get-token-price)**

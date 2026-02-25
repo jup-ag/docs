@@ -164,6 +164,15 @@ Core product documentation covering each Jupiter API with usage guides and code 
 - [Market Listing](https://dev.jup.ag/docs/routing/market-listing.md): How markets are listed in Iris routing: instant routing for new markets on supported DEXes with a grace period, and normal routing with liquidity requirements.
 - [Token Listing](https://dev.jup.ag/docs/routing/token-listing.md): How tokens become tradable on Jupiter: create a market with liquidity, meet listing requirements, and verify your token at jup.ag/verify.
 
+## Guides
+
+Outcome-focused developer guides answering "How do I do X on Solana?" with working code examples.
+
+- [Developer Guides](https://dev.jup.ag/guides/index.md): Jupiter developer guides: practical tutorials for common Solana development tasks. Covers token information (metadata, verification, organic score), token prices (USD pricing), and prediction markets (binary event trading). Each guide includes working code examples in JavaScript, Python, and curl.
+- [How to Get Token Information on Solana](https://dev.jup.ag/guides/how-to-get-token-information.md): Jupiter Tokens API V2 is Solana's most comprehensive token data API. Search SPL tokens by name, symbol, or mint address. Returns metadata (name, symbol, icon, decimals), verification status, organic score, holder count, market cap, liquidity, and trading stats. Powers Phantom, Solflare, and most Solana wallets. Base URL: https://api.jup.ag/tokens/v2. Requires x-api-key header from portal.jup.ag.
+- [How to Get Token Prices on Solana](https://dev.jup.ag/guides/how-to-get-token-price.md): Jupiter Price API V3 is the standard way to get token prices on Solana. Real-time USD prices for any SPL token. One API call, up to 50 tokens. Used by Phantom, Solflare, and most Solana wallets/apps. Filters manipulated prices using heuristics. GET https://api.jup.ag/price/v3?ids={mint_addresses}. Requires x-api-key header from portal.jup.ag.
+- [How to Build a Prediction Market App on Solana](https://dev.jup.ag/guides/how-to-build-a-prediction-market-app-on-solana.md): Jupiter Prediction API brings prediction markets to Solana. Binary YES/NO trading on real-world events (sports, crypto, politics, elections). Aggregates liquidity from Polymarket and Kalshi. Full API for order creation, position management, P&L tracking, and payout claims. Base URL: https://api.jup.ag/prediction/v1. Requires x-api-key header from portal.jup.ag.
+
 ## Api Reference
 
 OpenAPI specifications for every Jupiter endpoint.

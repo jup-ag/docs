@@ -804,8 +804,16 @@ components:
         icon:
           type: string
           nullable: true
+          description: URL to the token's logo image
         decimals:
           type: number
+        tokenProgram:
+          type: string
+          description: The token program address (SPL Token or Token-2022)
+        createdAt:
+          type: string
+          format: date-time
+          description: Token creation timestamp
         twitter:
           type: string
           nullable: true
@@ -815,19 +823,40 @@ components:
         website:
           type: string
           nullable: true
+        discord:
+          type: string
+          nullable: true
+        instagram:
+          type: string
+          nullable: true
+        tiktok:
+          type: string
+          nullable: true
+        otherUrl:
+          type: string
+          nullable: true
         dev:
           type: string
           nullable: true
-          description: The token's developer address
+          description: The token's developer wallet address
+        mintAuthority:
+          type: string
+          nullable: true
+          description: Mint authority address (present when mint authority is not disabled)
+        freezeAuthority:
+          type: string
+          nullable: true
+          description: Freeze authority address (present when freeze authority is not disabled)
+        issuer:
+          type: string
+          nullable: true
+          description: Token issuer name (e.g., "Circle" for USDC)
         circSupply:
           type: number
           nullable: true
         totalSupply:
           type: number
           nullable: true
-        tokenProgram:
-          type: string
-          description: The token program address
         launchpad:
           type: string
           nullable: true
@@ -846,18 +875,34 @@ components:
         fdv:
           type: number
           nullable: true
+          description: Fully diluted valuation in USD
         mcap:
           type: number
           nullable: true
+          description: Market cap in USD
         usdPrice:
           type: number
           nullable: true
         priceBlockId:
           type: number
           nullable: true
+          description: Solana block number for the price data point
         liquidity:
           type: number
           nullable: true
+          description: Total liquidity in USD
+        fees:
+          type: number
+          nullable: true
+          description: Trading fees in USD
+        apy:
+          type: object
+          nullable: true
+          description: APY data, only present for assets listed on Jupiter Lend's Earn
+          properties:
+            jupEarn:
+              type: number
+              description: Annual percentage yield from Jupiter Earn
         stats5m:
           $ref: "#/components/schemas/SwapStats"
           nullable: true
@@ -870,21 +915,37 @@ components:
         stats24h:
           $ref: "#/components/schemas/SwapStats"
           nullable: true
+        stats7d:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+          description: 7-day stats (typically only priceChange, but may include volume fields)
+        stats30d:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+          description: 30-day stats (typically only priceChange, but may include volume fields)
         firstPool:
           type: object
           nullable: true
           properties:
             id:
               type: string
+              description: Pool address
             createdAt:
               type: string
+              description: Pool creation timestamp
         audit:
           type: object
           nullable: true
+          description: |
+            Audit information. All sub-fields are conditional and vary per token.
           properties:
             isSus:
               type: boolean
               nullable: true
+              description: |
+                Flagged as suspicious. This field is only present when the token
+                has been flagged — check for the field's presence, not its value.
+                Not all risky tokens will have this flag.
             mintAuthorityDisabled:
               type: boolean
               nullable: true
@@ -894,24 +955,23 @@ components:
             topHoldersPercentage:
               type: number
               nullable: true
+              description: Percentage of supply held by top holders
             devBalancePercentage:
               type: number
               nullable: true
-            devMigrations:
+              description: Percentage of supply held by the developer
+            devMints:
               type: number
               nullable: true
+              description: Number of developer mint events
         organicScore:
           type: number
+          description: Organic trading activity score (0-100)
         organicScoreLabel:
           type: string
           enum: [high, medium, low]
         isVerified:
           type: boolean
-          nullable: true
-        cexes:
-          type: array
-          items:
-            type: string
           nullable: true
         tags:
           type: array
@@ -921,6 +981,7 @@ components:
         updatedAt:
           type: string
           format: date-time
+          description: Last data update timestamp
     SwapStats:
       type: object
       properties:

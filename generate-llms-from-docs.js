@@ -15,6 +15,7 @@ const baseFolder = __dirname;
 const folders = [
   'get-started',
   'portal',
+  'guides',
   'docs',
   'openapi-spec',
   'tool-kits',
@@ -26,6 +27,7 @@ const folders = [
 const SECTION_SUMMARIES = {
   'get-started': 'Setup guides for environment, tooling, and first API calls.',
   'portal': 'API key management, rate limits, tiers, and billing at portal.jup.ag.',
+  'guides': 'Outcome-focused developer guides answering "How do I do X on Solana?" with working code examples.',
   'docs': 'Core product documentation covering each Jupiter API with usage guides and code examples.',
   'api-reference': 'OpenAPI specifications for every Jupiter endpoint.',
   'tool-kits': 'Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.',

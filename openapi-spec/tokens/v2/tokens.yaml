@@ -37,22 +37,55 @@ paths:
                 items:
                   $ref: "#/components/schemas/MintInformation"
               example:
-                - id: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-                  name: "USD Coin"
-                  symbol: "USDC"
-                  icon: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
+                - id: "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN"
+                  name: "Jupiter"
+                  symbol: "JUP"
+                  icon: "https://static.jup.ag/jup/icon.png"
                   decimals: 6
-                  holderCount: 2500000
-                  fdv: 45000000000
-                  mcap: 45000000000
-                  usdPrice: 1.0
-                  liquidity: 50000000
-                  organicScore: 95
+                  tokenProgram: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                  createdAt: "2024-06-07T10:56:42.584Z"
+                  twitter: "https://twitter.com/JupiterExchange"
+                  website: "https://jup.ag"
+                  dev: "JUPhop9E8ZfdJ5FNHhxQt4uAih822Vs4QpqsWcewFbq"
+                  circSupply: 3243891294.88
+                  totalSupply: 6863982654.38
+                  firstPool:
+                    id: "2pspvjWWaf3dNgt3jsgSzFCNvMGPb7t8FrEYvLGjvcCe"
+                    createdAt: "2024-01-29T17:33:29Z"
+                  holderCount: 857254
+                  audit:
+                    mintAuthorityDisabled: true
+                    freezeAuthorityDisabled: true
+                    topHoldersPercentage: 15.45
+                    devMints: 1
+                  organicScore: 97.98
                   organicScoreLabel: "high"
                   isVerified: true
                   tags:
-                    - "verified"
                     - "community"
+                    - "strict"
+                    - "verified"
+                  fdv: 971593450.82
+                  mcap: 459171256.10
+                  usdPrice: 0.1415
+                  priceBlockId: 402118601
+                  liquidity: 2992387.89
+                  fees: 53.54
+                  stats24h:
+                    priceChange: -8.27
+                    holderChange: -0.03
+                    liquidityChange: -6.96
+                    volumeChange: 30.39
+                    buyVolume: 1821969.64
+                    sellVolume: 2016195.15
+                    numBuys: 33979
+                    numSells: 31608
+                    numTraders: 5174
+                  stats7d:
+                    priceChange: -12.52
+                  stats30d:
+                    priceChange: -28.11
+                  updatedAt: "2026-02-23T04:55:12.461Z"
         '400':
           description: Bad request
           content:
@@ -283,8 +316,16 @@ components:
         icon:
           type: string
           nullable: true
+          description: URL to the token's logo image
         decimals:
           type: number
+        tokenProgram:
+          type: string
+          description: The token program address (SPL Token or Token-2022)
+        createdAt:
+          type: string
+          format: date-time
+          description: Token creation timestamp
         twitter:
           type: string
           nullable: true
@@ -294,19 +335,40 @@ components:
         website:
           type: string
           nullable: true
+        discord:
+          type: string
+          nullable: true
+        instagram:
+          type: string
+          nullable: true
+        tiktok:
+          type: string
+          nullable: true
+        otherUrl:
+          type: string
+          nullable: true
         dev:
           type: string
           nullable: true
-          description: The token's developer address
+          description: The token's developer wallet address
+        mintAuthority:
+          type: string
+          nullable: true
+          description: Mint authority address (present when mint authority is not disabled)
+        freezeAuthority:
+          type: string
+          nullable: true
+          description: Freeze authority address (present when freeze authority is not disabled)
+        issuer:
+          type: string
+          nullable: true
+          description: Token issuer name (e.g., "Circle" for USDC)
         circSupply:
           type: number
           nullable: true
         totalSupply:
           type: number
           nullable: true
-        tokenProgram:
-          type: string
-          description: The token program address
         launchpad:
           type: string
           nullable: true
@@ -325,18 +387,34 @@ components:
         fdv:
           type: number
           nullable: true
+          description: Fully diluted valuation in USD
         mcap:
           type: number
           nullable: true
+          description: Market cap in USD
         usdPrice:
           type: number
           nullable: true
         priceBlockId:
           type: number
           nullable: true
+          description: Solana block number for the price data point
         liquidity:
           type: number
           nullable: true
+          description: Total liquidity in USD
+        fees:
+          type: number
+          nullable: true
+          description: Trading fees in USD
+        apy:
+          type: object
+          nullable: true
+          description: APY data, only present for assets listed on Jupiter Lend's Earn
+          properties:
+            jupEarn:
+              type: number
+              description: Annual percentage yield from Jupiter Earn
         stats5m:
           $ref: "#/components/schemas/SwapStats"
           nullable: true
@@ -349,21 +427,37 @@ components:
         stats24h:
           $ref: "#/components/schemas/SwapStats"
           nullable: true
+        stats7d:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+          description: 7-day stats (typically only priceChange, but may include volume fields)
+        stats30d:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+          description: 30-day stats (typically only priceChange, but may include volume fields)
         firstPool:
           type: object
           nullable: true
           properties:
             id:
               type: string
+              description: Pool address
             createdAt:
               type: string
+              description: Pool creation timestamp
         audit:
           type: object
           nullable: true
+          description: |
+            Audit information. All sub-fields are conditional and vary per token.
           properties:
             isSus:
               type: boolean
               nullable: true
+              description: |
+                Flagged as suspicious. This field is only present when the token
+                has been flagged — check for the field's presence, not its value.
+                Not all risky tokens will have this flag.
             mintAuthorityDisabled:
               type: boolean
               nullable: true
@@ -373,24 +467,23 @@ components:
             topHoldersPercentage:
               type: number
               nullable: true
+              description: Percentage of supply held by top holders
             devBalancePercentage:
               type: number
               nullable: true
-            devMigrations:
+              description: Percentage of supply held by the developer
+            devMints:
               type: number
               nullable: true
+              description: Number of developer mint events
         organicScore:
           type: number
+          description: Organic trading activity score (0-100)
         organicScoreLabel:
           type: string
           enum: [high, medium, low]
         isVerified:
           type: boolean
-          nullable: true
-        cexes:
-          type: array
-          items:
-            type: string
           nullable: true
         tags:
           type: array
@@ -400,6 +493,7 @@ components:
         updatedAt:
           type: string
           format: date-time
+          description: Last data update timestamp
     SwapStats:
       type: object
       properties:

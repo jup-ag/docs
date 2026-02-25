@@ -212,12 +212,21 @@ Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.
 
 - [Referral Program](https://dev.jup.ag/tool-kits/referral-program.md): The open-source Referral Program SDK enables developers to earn on-chain fees via Jupiter APIs (Ultra Swap, Swap, Trigger, Plugin) and can be integrated by any Solana program.
 
+## Ai
+
+AI-first developer experience — AI-friendly docs, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.
+
+- [AI](https://dev.jup.ag/ai/index.md): Landing page for Jupiter's AI developer resources. Jupiter provides AI-optimized documentation through llms.txt (structured index), llms-full.txt (complete context), native MCP server, pre-built agent skills, and raw markdown export. All APIs are designed to be AI-agent friendly: no RPC required, no API key required for basic usage, and simple REST interfaces that LLMs can call directly.
+- [Skills](https://dev.jup.ag/ai/skills.md): Jupiter Skills are pre-built, structured action definitions that AI agents and frameworks can use to interact with Jupiter APIs. Each skill defines an API capability (e.g., swap tokens, check price, search tokens) with input/output schemas, making it easy for agent frameworks like LangChain, CrewAI, Vercel AI SDK, and others to integrate Jupiter. The Jupiter Skills Repository on GitHub provides ready-to-use skill definitions and example implementations.
+- [llms.txt](https://dev.jup.ag/ai/llms-txt.md): Jupiter provides two LLM-optimized documentation files: llms.txt (the perfect entrypoint for LLMs and AI agents to get started), structured Markdown index of all APIs, guides, and resources with titles and descriptions) and llms-full.txt (the complete documentation site content including all code examples). Both follow the llmstxt.org standard. Additionally, any documentation page can be accessed as raw markdown by appending .md to the URL or using the Accept: text/markdown header.
+- [MCP](https://dev.jup.ag/ai/mcp.md): Jupiter supports the Model Context Protocol (MCP) through Mintlify's native MCP server at https://dev.jup.ag/mcp. This enables AI tools like Claude Code, Cursor, Windsurf, and other MCP-compatible editors to query Jupiter documentation and OpenAPI specifications in-context. The MCP server allows AI assistants to look up API endpoints, read documentation pages, scaffold API calls, and debug errors against the real specification without leaving the editor.
+- [Ecosystem](https://dev.jup.ag/ai/ecosystem.md): Curated list of non-Jupiter Solana AI ecosystem resources including agent frameworks, AI coding skills, developer tools, and the Solana Foundation's awesome-solana-ai repository. These tools complement Jupiter's APIs and skills for building AI agents on Solana.
+
 ## Resources
 
 Support channels and community resources.
 
 - [Support](https://dev.jup.ag/resources/support.md): Technical and customer support platforms for Jupiter
-- [AI Workflow](https://dev.jup.ag/resources/ai-workflow.md): How to use Jupiter docs with AI tools
 - [Brand Kit](https://dev.jup.ag/resources/brand-kit.md): Logos, labelling guidelines, and brand assets for Jupiter integrations.
 - [Stats](https://dev.jup.ag/resources/stats.md): Jupiter product metrics, revenue, and usage statistics on Dune.
 - [Audits](https://dev.jup.ag/resources/audits.md): Formal audit reports for Jupiter programs

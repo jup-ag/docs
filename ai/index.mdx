@@ -1,0 +1,62 @@
+---
+title: "AI"
+sidebarTitle: "Overview"
+description: "Jupiter's AI-first developer experience — structured docs, MCP integration, pre-built skills, and everything AI agents need to build on Jupiter."
+llmsDescription: "Landing page for Jupiter's AI developer resources. Jupiter provides AI-optimized documentation through llms.txt (structured index), llms-full.txt (complete context), native MCP server, pre-built agent skills, and raw markdown export. All APIs are designed to be AI-agent friendly: no RPC required, no API key required for basic usage, and simple REST interfaces that LLMs can call directly."
+---
+
+Jupiter is built for AI agents from the ground up. Most APIs are RPC-less, requires no upfront credentials, and returns clean JSON that LLMs can parse and act on immediately.
+
+## Why Jupiter for AI
+
+<CardGroup cols={3}>
+  <Card title="No RPC Required" icon="server">
+    All blockchain interactions handled server-side. Agents don't need Solana RPC nodes.
+  </Card>
+  <Card title="No API Key Required" icon="key">
+    Start building immediately. API keys are optional (for higher rate limits via [Portal](https://portal.jup.ag)).
+  </Card>
+  <Card title="Simple REST APIs" icon="code">
+    Clean JSON request/response. Prefers APIs, not SDKs, better maintainability for AI agents.
+  </Card>
+</CardGroup>
+
+## AI Resources
+
+<Card title="Skills" icon="wand-magic-sparkles" href="/ai/skills">
+  Pre-built agent skills and Jupiter's open-source skill repository for AI frameworks.
+</Card>
+<Card title="llms.txt" icon="file-lines" href="/ai/llms-txt">
+  Structured documentation index optimized for LLM consumption — both summary and full-context versions.
+</Card>
+<Card title="MCP" icon="plug" href="/ai/mcp">
+  Model Context Protocol integration — query Jupiter docs and APIs directly from your AI editor.
+</Card>
+<Card title="Ecosystem" icon="globe" href="/ai/ecosystem">
+  Jupiter's ecosystem of tools and resources for AI agents.
+</Card>
+
+## Quick Start for AI Agents
+
+An AI agent can execute a token swap in four API calls, fastest and easiest in the industry:
+
+```bash
+# 1. Search for a token
+curl "https://lite-api.jup.ag/tokens/v2/search?query=SOL"
+
+# 2. Get a price
+curl "https://lite-api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112"
+
+# 3. Get a swap quote
+curl "https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=10000000&taker=yourWalletAddress"
+
+# 4. Sign and execute swap quote
+curl "https://lite-api.jup.ag/ultra/v1/execute" \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"signedTransaction": "signedTransaction", "requestId": "requestId"}'
+```
+
+<Card title="Full Quickstart" icon="rocket" href="/get-started">
+  Complete walkthrough combining Ultra Swap, Tokens V2, and Price V3 APIs with code examples.
+</Card>

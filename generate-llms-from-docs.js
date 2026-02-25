@@ -19,6 +19,7 @@ const folders = [
   'docs',
   'openapi-spec',
   'tool-kits',
+  'ai',
   'resources',
   'updates',
 ];
@@ -30,6 +31,7 @@ const SECTION_SUMMARIES = {
   'docs': 'Core product documentation covering each Jupiter API with usage guides and code examples.',
   'api-reference': 'OpenAPI specifications for every Jupiter endpoint.',
   'tool-kits': 'Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.',
+  'ai': 'AI-first developer experience — AI-friendly docs, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.',
   'resources': 'Support channels and community resources.',
   'updates': 'Changelog and release notes.',
 };

@@ -92,23 +92,12 @@ components:
           nullable: true
         volume:
           type: number
-        openInterest:
-          type: number
-        volume24h:
-          type: number
-        liquidityDollars:
-          type: number
-        notionalValueDollars:
-          type: number
     Market:
       type: object
       properties:
         marketId:
           type: string
           description: Market identifier
-        event:
-          type: string
-          description: Associated event identifier
         status:
           type: string
           enum:
@@ -137,7 +126,6 @@ components:
           $ref: "#/components/schemas/MarketPricing"
       required:
         - marketId
-        - event
         - status
         - result
         - openTime
@@ -1848,8 +1836,10 @@ paths:
           content:
             application/json:
               schema:
+                type: object
                 nullable: true
-                description: Forecast response payload
+                description: Forecast response payload. Shape varies by provider; common fields listed below.
+                additionalProperties: true
         "502":
           description: Failed to fetch forecast data
           content:
@@ -1883,14 +1873,36 @@ paths:
           in: path
       responses:
         "200":
-          description: Orderbook data from price service
+          description: Orderbook depth for the given market
           content:
             application/json:
               schema:
+                type: object
                 nullable: true
-                description: Forecast response payload
+                properties:
+                  yes:
+                    type: array
+                    description: YES-side levels sorted by price descending. Each entry is a [price_cents, size] tuple.
+                    items:
+                      type: array
+                      items:
+                        type: number
+                      minItems: 2
+                      maxItems: 2
+                  no:
+                    type: array
+                    description: NO-side levels sorted by price descending. Each entry is a [price_cents, size] tuple.
+                    items:
+                      type: array
+                      items:
+                        type: number
+                      minItems: 2
+                      maxItems: 2
+                required:
+                  - yes
+                  - no
         "502":
-          description: Failed to fetch forecast data
+          description: Failed to fetch orderbook data
           content:
             application/json:
               schema:

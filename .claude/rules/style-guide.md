@@ -5,35 +5,28 @@ Update this file whenever a style decision is made or a pattern is established.
 
 ## Voice
 
-<!-- PLACEHOLDER: Refine these to match your preferred voice -->
 - **Direct.** Lead with what the developer needs. Skip throat-clearing intros.
 - **Precise.** Use exact terms. Don't say "send a request" when you mean "POST to /ultra/v1/execute".
 - **Confident.** State things plainly. "Ultra Swap handles slippage automatically" not "Ultra Swap can help manage slippage".
 - **Respectful of time.** Assume the reader is mid-build and wants to get back to their code.
+- **AI-friendly.** Clear, unambiguous sentence structure so both humans and AI systems can parse content correctly.
 
-### Tone Spectrum
+### Tone
 
-```
-Marketing copy ←——————————————→ Academic paper
-                    ↑
-              We live here.
-              Technical but human.
-```
+Technical but approachable. Professional and precise, not cold or overly formal. Aim for the voice of a knowledgeable colleague explaining something clearly, not a marketing page or an academic paper.
 
 ## Terminology
 
 ### Always Use (Canonical Names)
 
-| ✅ Use this           | ❌ Not this                              | Notes                                    |
+| ✅ Use this           | ❌ Not this                               | Notes                                    |
 |-----------------------|------------------------------------------|------------------------------------------|
 | Ultra Swap API        | Ultra API, Ultra Swap                    | Full product name in first mention, then "Ultra" is OK |
-| Metis Swap API        | Metis API, Legacy API, v6 API            | Don't call it "legacy" in docs — still supported |
+| Metis Swap API        | Metis API, Metis Swap                    | Don't call it "legacy" in docs — still supported |
 | Jupiter               | Jup, jup.ag                              | Always "Jupiter" in prose. "jup.ag" only for URLs |
 | Developer Portal      | Portal, Dev Portal, Dashboard            | Full name first, then "Portal" is OK     |
 | API key               | api key, API Key, apiKey                  | Lowercase "key" in prose, camelCase only in code |
 | Solana                | SOL (when referring to the chain)         | "SOL" only for the token                 |
-
-<!-- PLACEHOLDER: Add more terms as you encounter inconsistencies -->
 
 ### Product-Specific Terms
 
@@ -59,6 +52,7 @@ Marketing copy ←——————————————→ Academic paper
 | it should be noted    | (just state the thing)      | Filler                                   |
 | as mentioned above    | (link to the section)       | Pages are non-linear — readers jump in   |
 | click here            | (use descriptive link text) | Bad for accessibility and scanning       |
+| em dash for asides    | comma, period, or restructure | Em dashes read as AI-generated; prefer cleaner sentence structure |
 
 ## Formatting Conventions
 
@@ -122,7 +116,7 @@ Use sparingly. If everything is a callout, nothing is.
 - `<Info>` — Background context, not critical
 
 **Rule of thumb:** Max 2 callouts per page. If you need more, the content
-structure needs rethinking.
+structure needs rethinking or ask human for permission.
 
 ### Links
 
@@ -169,16 +163,14 @@ Before considering any page done:
 - A developer with no Jupiter context can understand what the page is about from the title + first paragraph
 - Every code example can be copied and run (with their own API key / wallet)
 - The `description` frontmatter field is a real sentence, not just the title repeated
+- The `llmDescription` frontmatter field is a descriptive and detailed sentence, not just the description repeated
 - No acronyms used without definition on first use per page (RTSE, RFQ, MEV, etc.)
 - The page answers "what", "why", and "how" — even if briefly
 
 ## Decisions Log
 
-Record style decisions as they come up so we stay consistent:
+Record style decisions as they come up so we stay consistent.
 
-<!-- 
-Format:
-- [YYYY-MM-DD] Decision: rationale
-Example:
-- [2025-01-15] Always show Lite API URL as default, Dynamic as secondary: most developers start with Lite
--->
+Format: `- [YYYY-MM-DD] Decision: rationale`
+
+- [2026-02-26] Tone set to "technical but approachable": professional and precise, not cold or overly formal. No em dashes for asides.

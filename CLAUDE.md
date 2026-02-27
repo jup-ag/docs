@@ -128,7 +128,9 @@ For larger tasks (4+ pages), present a structured breakdown with clear scope per
 
 ### 3. Track
 
-Create a Linear issue for the work:
+Create a Linear issue for the work using the Linear MCP tools:
+- **Project:** `Claude Docs` (ID: `claude-docs-06e0a5a0fec6`)
+- **Team:** `Developer Platform`
 - **Title:** Action-oriented, specific — `[Area] Verb + what`
   - ✅ `[Ultra] Rewrite get-order page with complete code example`
   - ❌ `Update Ultra docs`
@@ -140,10 +142,23 @@ Create a Linear issue for the work:
 - **Labels** from this taxonomy:
   - Area: `ultra`, `swap`, `tokens`, `price`, `routing`, `toolkits`, `portal`, `platform`, `ai`, `guides`, `get-started`
   - Type: `content-new`, `content-update`, `restructure`, `cleanup`, `config`
+- **Initial status:** `Todo` (work is planned but not yet actively being worked on)
 
 If the work breaks down into distinct, self-contained pieces, create sub-issues
 under the parent. Each sub-issue should be independently completable — a clear
 description of what needs to be done, which files to touch, and when it's done.
+
+**Linear issue lifecycle — follow this exactly:**
+
+| Status        | When                                                  |
+|---------------|-------------------------------------------------------|
+| `Todo`        | Issue created, work is planned                        |
+| `In Progress` | Actively working on the code changes                  |
+| `In Review`   | PR is open and waiting for human review               |
+| `Done`        | PR is approved, merged, and deployed                  |
+
+Never mark an issue as `Done` until the PR is merged. The issue status must
+reflect the actual state of the work, not the state of the code.
 
 ### 4. Write & Review
 
@@ -156,7 +171,9 @@ Do the work following the Writing and Reviewing guidelines below. After writing:
 Once the work is ready:
 - Run through the Reviewing and Pre-Commit checklists
 - Create the branch, commit, and open a PR via `gh` CLI
-- Update the Linear issue status accordingly
+- Reference the Linear issue in the PR body with a link: `Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX)`
+- Update the Linear issue to `In Review`
+- Once the PR is approved and merged, update the Linear issue to `Done`
 
 ---
 
@@ -363,9 +380,9 @@ gh pr diff
 {Brief list of what was added, modified, or removed}
 
 ## Linear Issues
-{Link each issue using closing keywords so merging auto-closes them}
-- Fixes DOCS-XX — {issue title}
-- Fixes DOCS-XX — {issue title}
+{Link each issue with its Linear URL}
+- Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX) — {issue title}
+- Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX) — {issue title}
 
 ## Checklist
 - [ ] `node generate-llms-from-docs.js` run

@@ -128,6 +128,9 @@ For larger tasks (4+ pages), present a structured breakdown with clear scope per
 
 ### 3. Track
 
+**Every task gets a Linear issue — no exceptions, regardless of size.**
+Before creating a new issue, search existing issues to avoid duplicates.
+
 Create a Linear issue for the work using the Linear MCP tools:
 - **Project:** `Claude Docs` (ID: `claude-docs-06e0a5a0fec6`)
 - **Team:** `Developer Platform`
@@ -160,20 +163,46 @@ description of what needs to be done, which files to touch, and when it's done.
 Never mark an issue as `Done` until the PR is merged. The issue status must
 reflect the actual state of the work, not the state of the code.
 
-### 4. Write & Review
+- If a PR is rejected or needs changes, move the issue back to `In Progress`.
+- Keep it 1:1 — one issue per PR. If scope expands during a task, update the
+  existing issue rather than creating a second issue on the same PR. If the work
+  is truly separate, it should be a separate PR.
+
+### 4. Branch
+
+**Always create the branch before making any code changes.** This prevents
+dirty working tree issues when switching branches.
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b {type}/{short-description}
+```
+
+If you're already on a dirty working tree and need to switch branches,
+stash first: `git stash && git checkout main && git pull origin main && git stash pop`.
+But avoid this — create the branch first.
+
+### 5. Write & Review
 
 Do the work following the Writing and Reviewing guidelines below. After writing:
 - Self-review against the Reviewing checklist
 - Ensure all acceptance criteria from the Linear issue are met
 
-### 5. Ship
+### 6. Ship
 
 Once the work is ready:
 - Run through the Reviewing and Pre-Commit checklists
-- Create the branch, commit, and open a PR via `gh` CLI
+- Commit and push the branch
+- Open a PR via `gh` CLI
 - Reference the Linear issue in the PR body with a link: `Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX)`
 - Update the Linear issue to `In Review`
-- Once the PR is approved and merged, update the Linear issue to `Done`
+
+After PR is merged:
+- If the PR was already merged (by a human or CI), check if the Linear issue
+  is marked as `Done` — if not, update it
+- Return to main and pull: `git checkout main && git pull origin main`
+- Update the Linear issue to `Done`
 
 ---
 

@@ -163,6 +163,11 @@ description of what needs to be done, which files to touch, and when it's done.
 Never mark an issue as `Done` until the PR is merged. The issue status must
 reflect the actual state of the work, not the state of the code.
 
+- If a PR is rejected or needs changes, move the issue back to `In Progress`.
+- Keep it 1:1 — one issue per PR. If scope expands during a task, update the
+  existing issue rather than creating a second issue on the same PR. If the work
+  is truly separate, it should be a separate PR.
+
 ### 4. Branch
 
 **Always create the branch before making any code changes.** This prevents
@@ -192,7 +197,12 @@ Once the work is ready:
 - Open a PR via `gh` CLI
 - Reference the Linear issue in the PR body with a link: `Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX)`
 - Update the Linear issue to `In Review`
-- Once the PR is approved and merged, update the Linear issue to `Done`
+
+After PR is merged:
+- If the PR was already merged (by a human or CI), check if the Linear issue
+  is marked as `Done` — if not, update it
+- Return to main and pull: `git checkout main && git pull origin main`
+- Update the Linear issue to `Done`
 
 ---
 

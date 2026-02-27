@@ -44,7 +44,7 @@ jup-ag/docs/
 │
 └── .claude/
     └── rules/             # Permanent context — auto-loaded every session
-        ├── ia-decisions.md
+        ├── decisions.md
         ├── product-learning.md
         └── style-guide.md
 ```
@@ -92,7 +92,7 @@ jup-ag/docs/
 
 Auto-loaded every session. Three files:
 - **`style-guide.md`** — Voice, terminology, formatting conventions, page patterns
-- **`ia-decisions.md`** — Information architecture decisions with rationale and migration notes
+- **`decisions.md`** — Information architecture decisions with rationale and migration notes
 - **`product-learning.md`** — All product-specific knowledge in one file: undocumented behavior,
   ambiguities, known issues, open questions. Organized by product with `# Product Name` headings.
   Add entries here whenever you discover something non-obvious that a future session would
@@ -391,7 +391,7 @@ references, bookmarks, and indexed search results. The cost is always higher tha
   1. Add a redirect in `docs.json` (under the `redirects` array)
   2. Update all internal links repo-wide (`grep` for the old path)
   3. Run `mint broken-links` and confirm zero breakage
-  4. Note the redirect in `.claude/rules/ia-decisions.md` under the Redirect Log
+  4. Note the redirect in `.claude/rules/decisions.md` under the Redirect Log
 - If you're unsure whether a rename is worth it, **don't do it** — ask the user.
 
 ## Do NOT

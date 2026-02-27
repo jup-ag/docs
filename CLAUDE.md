@@ -396,7 +396,7 @@ gh pr diff
 
 - Branch naming: `{type}/{short-description}` (e.g., `feat/ultra-rate-limits`, `fix/swap-api-example`)
 - Commit messages: Conventional commits (`feat:`, `fix:`, `chore:`, `docs:`), with action-oriented descriptions that mirror the Linear issue title format. Example: `feat: [ultra] rewrite get-order page with complete code example`
-- Merge strategy: Regular merge commits (no squash).
+- Merge strategy: Squash merge (`--squash`).
 
 ## Path Changes — Minimize at All Costs
 

@@ -128,6 +128,9 @@ For larger tasks (4+ pages), present a structured breakdown with clear scope per
 
 ### 3. Track
 
+**Every task gets a Linear issue — no exceptions, regardless of size.**
+Before creating a new issue, search existing issues to avoid duplicates.
+
 Create a Linear issue for the work using the Linear MCP tools:
 - **Project:** `Claude Docs` (ID: `claude-docs-06e0a5a0fec6`)
 - **Team:** `Developer Platform`

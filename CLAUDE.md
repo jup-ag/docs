@@ -163,17 +163,33 @@ description of what needs to be done, which files to touch, and when it's done.
 Never mark an issue as `Done` until the PR is merged. The issue status must
 reflect the actual state of the work, not the state of the code.
 
-### 4. Write & Review
+### 4. Branch
+
+**Always create the branch before making any code changes.** This prevents
+dirty working tree issues when switching branches.
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b {type}/{short-description}
+```
+
+If you're already on a dirty working tree and need to switch branches,
+stash first: `git stash && git checkout main && git pull origin main && git stash pop`.
+But avoid this — create the branch first.
+
+### 5. Write & Review
 
 Do the work following the Writing and Reviewing guidelines below. After writing:
 - Self-review against the Reviewing checklist
 - Ensure all acceptance criteria from the Linear issue are met
 
-### 5. Ship
+### 6. Ship
 
 Once the work is ready:
 - Run through the Reviewing and Pre-Commit checklists
-- Create the branch, commit, and open a PR via `gh` CLI
+- Commit and push the branch
+- Open a PR via `gh` CLI
 - Reference the Linear issue in the PR body with a link: `Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX)`
 - Update the Linear issue to `In Review`
 - Once the PR is approved and merged, update the Linear issue to `Done`

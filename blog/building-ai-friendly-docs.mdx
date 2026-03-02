@@ -14,6 +14,13 @@ We asked ourselves: what if we built our developer resources for AI from day one
 
 This is what we did.
 
+**A few terms you'll see throughout this post:**
+
+- **LLM (Large Language Model):** the AI models powering tools like ChatGPT, Claude, and Cursor
+- **RAG (Retrieval-Augmented Generation):** a pattern where AI tools fetch relevant documents before generating a response, improving accuracy
+- **MCP (Model Context Protocol):** an open protocol that lets AI editors query external data sources directly
+- **MEV (Maximal Extractable Value):** profit extracted by reordering, inserting, or censoring transactions on-chain, often at the expense of regular users
+
 ---
 
 ## llms.txt: Giving AI a Map
@@ -57,7 +64,7 @@ The `llmsDescription` field is for AI. It's longer, more technical, and includes
 
 The [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) lets AI editors query external data sources in-context. Jupiter's docs expose a native MCP server at:
 
-```
+```bash
 https://dev.jup.ag/mcp
 ```
 
@@ -83,10 +90,10 @@ Jupiter publishes [`skill.md`](https://dev.jup.ag/skill.md) following the [agent
 
 We also open-sourced the [Jupiter Skills Repository](https://github.com/jup-ag/agent-skills) with ready-to-use skill definitions for popular frameworks:
 
-- **Claude / OpenAI** — function calling with tool definitions
-- **Vercel AI SDK** — Zod-typed tool schemas
-- **LangChain** — `@tool` decorated functions
-- **CrewAI** — plug-and-play skill adapters
+- **Claude / OpenAI:** function calling with tool definitions
+- **Vercel AI SDK:** Zod-typed tool schemas
+- **LangChain:** `@tool` decorated functions
+- **CrewAI:** plug-and-play skill adapters
 
 The repository includes an intent router that maps developer intent (like "swap tokens" or "check price") to the right API family and first action.
 
@@ -152,7 +159,12 @@ Both return clean markdown that an AI tool can parse directly. Combined with `ll
 
 ## Docs as the Source of Truth
 
-Every AI resource mentioned above, `llms.txt`, `llms-full.txt`, `skill.md`, the MCP server, markdown export, is derived from the same place: the docs repo.
+Every AI resource mentioned above is derived from the same place: the docs repo.
+
+- `llms.txt` and `llms-full.txt`
+- `skill.md`
+- The MCP server
+- Markdown export
 
 We don't maintain a separate set of "AI docs." The documentation itself is the source of truth, and AI entry points are generated or served directly from it:
 

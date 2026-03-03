@@ -37,6 +37,7 @@ jup-ag/docs/
 ├── portal/                # Developer Portal docs (portal.jup.ag)
 ├── ai/                    # AI-first developer experience
 ├── guide/                 # Guides and tutorials
+├── blog/                  # Developer blog posts
 ├── resources/             # Support, brand kit, and community resources
 ├── updates/               # Changelog / developer updates
 ├── snippets/              # Reusable MDX snippet components
@@ -133,7 +134,7 @@ Before creating a new issue, search existing issues to avoid duplicates.
 
 Create a Linear issue for the work using the Linear MCP tools:
 - **Project:** `Claude Docs` (ID: `claude-docs-06e0a5a0fec6`)
-- **Team:** `Developer Platform`
+- **Team:** `DevRel`
 - **Title:** Action-oriented, specific — `[Area] Verb + what`
   - ✅ `[Ultra] Rewrite get-order page with complete code example`
   - ❌ `Update Ultra docs`
@@ -218,13 +219,13 @@ Every page MUST include these frontmatter fields:
 ---
 title: "{Clear, action-oriented title}"
 description: "{Short, UI-friendly description — displayed on cards and nav}"
-llmDescription: "{Detailed, LLM-optimized description — used in llms.txt for AI consumption. Be thorough: explain what this page covers, what APIs/concepts are involved, what a developer will learn, and when they need this page. 1-3 sentences.}"
+llmsDescription: "{Detailed, LLM-optimized description — used in llms.txt for AI consumption. Be thorough: explain what this page covers, what APIs/concepts are involved, what a developer will learn, and when they need this page. 1-3 sentences.}"
 ---
 ```
 
-**`description` vs `llmDescription`:**
+**`description` vs `llmsDescription`:**
 - `description` is for humans scanning the UI — keep it concise and scannable (< 120 chars ideal)
-- `llmDescription` is for AI systems consuming llms.txt — be verbose, specific, and keyword-rich.
+- `llmsDescription` is for AI systems consuming llms.txt — be verbose, specific, and keyword-rich.
   Think: "If an AI agent is deciding whether to read this page, what would it need to know?"
 
 **Example:**
@@ -232,7 +233,7 @@ llmDescription: "{Detailed, LLM-optimized description — used in llms.txt for A
 ---
 title: "Get Order"
 description: "Request a swap order from Ultra API"
-llmDescription: "How to request a swap order from Jupiter's Ultra Swap API using the GET /ultra/v1/order endpoint. Covers required parameters (inputMint, outputMint, amount, taker), optional parameters (referralAccount, slippageBps), response fields including swapType, routePlan, and the base64-encoded transaction. Includes complete TypeScript code example with error handling."
+llmsDescription: "How to request a swap order from Jupiter's Ultra Swap API using the GET /ultra/v1/order endpoint. Covers required parameters (inputMint, outputMint, amount, taker), optional parameters (referralAccount, slippageBps), response fields including swapType, routePlan, and the base64-encoded transaction. Includes complete TypeScript code example with error handling."
 ---
 ```
 
@@ -253,7 +254,7 @@ Every page should follow this pattern:
 ---
 title: "{Clear, action-oriented title}"
 description: "{UI-friendly, concise}"
-llmDescription: "{LLM-optimized, detailed}"
+llmsDescription: "{LLM-optimized, detailed}"
 ---
 
 {Optional: callout/note if there's a prerequisite or important context}
@@ -275,7 +276,7 @@ llmDescription: "{LLM-optimized, detailed}"
 
 Since we're optimizing for AI consumption:
 
-- Every page MUST have `title`, `description`, AND `llmDescription` in frontmatter
+- Every page MUST have `title`, `description`, AND `llmsDescription` in frontmatter
 - Use descriptive headings (not "Overview" — say what the overview is about)
 - Include complete, runnable code examples — not pseudocode
 - Define parameters and types explicitly in tables or structured lists
@@ -311,8 +312,8 @@ Prefer these Mintlify components where appropriate:
 When reviewing or cleaning up content, run through these checklists:
 
 ### Content Quality
-- [ ] Frontmatter has `title`, `description`, AND `llmDescription` — all accurate
-- [ ] `llmDescription` is detailed enough for an AI to understand the page's purpose
+- [ ] Frontmatter has `title`, `description`, AND `llmsDescription` — all accurate
+- [ ] `llmsDescription` is detailed enough for an AI to understand the page's purpose
 - [ ] No stale API endpoints or deprecated parameters
 - [ ] Code examples are complete and runnable (not just fragments)
 - [ ] No broken internal links (`[[link]]` or relative paths resolve correctly)
@@ -340,18 +341,18 @@ When reviewing or cleaning up content, run through these checklists:
 node generate-llms-from-docs.js
 ```
 
-This script regenerates `llms.txt` from the frontmatter (`title` + `llmDescription`)
+This script regenerates `llms.txt` from the frontmatter (`title` + `llmsDescription`)
 of every page in the repo. We do this because Mintlify's auto-generated llms.txt
 is poor quality — our script produces a much better, more descriptive version.
 
 **Workflow:**
-1. Write or update content (including `llmDescription` in frontmatter)
+1. Write or update content (including `llmsDescription` in frontmatter)
 2. Run `node generate-llms-from-docs.js`
 3. Commit the updated `llms.txt` alongside your content changes
 4. Never edit `llms.txt` manually — it will be overwritten
 
-If `llmDescription` is missing from a page, the script may fall back to `description`
-or produce a poor entry. Always ensure `llmDescription` is present.
+If `llmsDescription` is missing from a page, the script may fall back to `description`
+or produce a poor entry. Always ensure `llmsDescription` is present.
 
 ## Mintlify Config
 
@@ -371,7 +372,7 @@ Always run/check before committing:
 2. `mint broken-links` — check for broken links
 3. `docs.json` is valid JSON
 4. Any new pages are added to `docs.json` navigation
-5. All new/updated pages have `title`, `description`, AND `llmDescription`
+5. All new/updated pages have `title`, `description`, AND `llmsDescription`
 6. No placeholder text like "TODO" or "Lorem ipsum" left in content
 7. OpenAPI spec changes in `openapi-spec/` are reflected in `api-reference/` pages
 8. Images/assets added to `static/` are actually referenced somewhere
@@ -416,7 +417,7 @@ gh pr diff
 ## Checklist
 - [ ] `node generate-llms-from-docs.js` run
 - [ ] `mint broken-links` passes
-- [ ] All pages have `title`, `description`, `llmDescription`
+- [ ] All pages have `title`, `description`, `llmsDescription`
 - [ ] `docs.json` navigation updated (if applicable)
 - [ ] Redirects added (if paths changed)
 ```

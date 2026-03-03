@@ -42,16 +42,20 @@ The simplest way to add a swap widget — a single HTML file:
 </head>
 <body>
   <h1>My App</h1>
+  <div id="jupiter-plugin"></div>
   <script>
     window.onload = function() {
-      window.Jupiter.init({ displayMode: "widget" });
+      window.Jupiter.init({
+        displayMode: "integrated",
+        integratedTargetId: "jupiter-plugin",
+      });
     };
   </script>
 </body>
 </html>
 ```
 
-Open this in a browser and you have a floating swap widget. That's it.
+Open this in a browser and you have a swap widget embedded in your page. That's it.
 
 <Accordion title="New to coding? Follow these steps">
 You don't need any development tools. Just a browser and a text editor.

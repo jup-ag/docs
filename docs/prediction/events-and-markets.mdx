@@ -159,20 +159,29 @@ Example response:
 ```json expandable
 {
   "marketId": "market-456",
-  "eventId": "event-123",
-  "title": "SOL $500 by Q2 2026",
-  "description": "Will Solana reach $500 USD...",
   "status": "open",
-  "result": "",
+  "result": null,
   "openTime": 1704067200,
   "closeTime": 1719792000,
-  "buyYesPriceUsd": "650000",
-  "sellYesPriceUsd": "620000",
-  "buyNoPriceUsd": "380000",
-  "sellNoPriceUsd": "350000",
-  "volumeUsd": "450000",
-  "openInterest": "1250",
-  "liquidityUsd": "85000"
+  "resolveAt": null,
+  "marketResultPubkey": null,
+  "metadata": {
+    "marketId": "market-456",
+    "title": "SOL $500 by Q2 2026",
+    "status": "open",
+    "result": "",
+    "closeTime": 1719792000,
+    "openTime": 1704067200,
+    "isTeamMarket": false,
+    "rulesPrimary": "Resolves YES if SOL reaches $500..."
+  },
+  "pricing": {
+    "buyYesPriceUsd": 650000,
+    "buyNoPriceUsd": 380000,
+    "sellYesPriceUsd": 620000,
+    "sellNoPriceUsd": 350000,
+    "volume": 450000
+  }
 }
 ```
 

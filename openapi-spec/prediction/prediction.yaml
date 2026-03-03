@@ -38,6 +38,13 @@ components:
           type: string
         subtitle:
           type: string
+        slug:
+          type: string
+        series:
+          type: string
+        closeTime:
+          type: string
+          description: ISO 8601 formatted close time
         imageUrl:
           type: string
           format: uri
@@ -52,10 +59,6 @@ components:
           type: string
         title:
           type: string
-        subtitle:
-          type: string
-        description:
-          type: string
         status:
           type: string
         result:
@@ -64,9 +67,7 @@ components:
           type: number
         openTime:
           type: number
-        settlementTime:
-          type: number
-        isTradable:
+        isTeamMarket:
           type: boolean
         rulesPrimary:
           type: string
@@ -74,7 +75,6 @@ components:
           type: string
       required:
         - marketId
-        - isTradable
     MarketPricing:
       type: object
       properties:
@@ -103,6 +103,7 @@ components:
           enum:
             - open
             - closed
+            - cancelled
           description: Current market status
         result:
           type: string
@@ -117,9 +118,14 @@ components:
         closeTime:
           type: number
           description: Unix timestamp (seconds) when the market closes
-        settlementTime:
+        resolveAt:
           type: number
-          description: Unix timestamp (seconds) when the market settled (0 if pending)
+          nullable: true
+          description: Unix timestamp (seconds) when the market resolved (null if pending)
+        marketResultPubkey:
+          type: string
+          nullable: true
+          description: Public key of the market result account
         metadata:
           $ref: "#/components/schemas/MarketMetadata"
         pricing:
@@ -130,34 +136,19 @@ components:
         - result
         - openTime
         - closeTime
-        - settlementTime
+        - resolveAt
     Event:
       type: object
       properties:
         eventId:
           type: string
           description: Application-level identifier
-        series:
-          type: string
-          description: Series-level identifier
-        winner:
-          type: string
-          description: Winning market public key (empty string when unresolved)
-        multipleWinners:
-          type: boolean
-          description: Whether the event allows multiple winning markets
         isActive:
           type: boolean
           description: Whether the event is active (listed on events)
         isLive:
           type: boolean
           description: Whether the event is currently live
-        isTrending:
-          type: boolean
-          description: Whether the event is trending in the current response context
-        isRecommended:
-          type: boolean
-          description: Whether the event is recommended in the current response context
         category:
           type: string
           description: "The category for the event, allowed values: all, crypto, sports,
@@ -165,15 +156,17 @@ components:
         subcategory:
           type: string
           description: The subcategory for the event
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags associated with the event
         metadata:
           $ref: "#/components/schemas/EventMetadata"
         markets:
           type: array
           items:
             $ref: "#/components/schemas/Market"
-        tvlDollars:
-          type: string
-          description: Formatted TVL in USD (no currency symbol)
         volumeUsd:
           type: string
           description: Total volume for the event
@@ -189,16 +182,10 @@ components:
           description: Document to full rules for the event
       required:
         - eventId
-        - series
-        - winner
-        - multipleWinners
         - isActive
         - isLive
-        - isTrending
-        - isRecommended
         - category
         - subcategory
-        - tvlDollars
         - volumeUsd
         - closeCondition
         - beginAt
@@ -339,10 +326,6 @@ components:
                   type: string
                 title:
                   type: string
-                subtitle:
-                  type: string
-                description:
-                  type: string
                 status:
                   type: string
                 result:
@@ -351,9 +334,7 @@ components:
                   type: number
                 openTime:
                   type: number
-                settlementTime:
-                  type: number
-                isTradable:
+                isTeamMarket:
                   type: boolean
         externalOrderId:
           type: string
@@ -723,10 +704,6 @@ components:
                   type: string
                 title:
                   type: string
-                subtitle:
-                  type: string
-                description:
-                  type: string
                 status:
                   type: string
                 result:
@@ -735,9 +712,7 @@ components:
                   type: number
                 openTime:
                   type: number
-                settlementTime:
-                  type: number
-                isTradable:
+                isTeamMarket:
                   type: boolean
         settlementDate:
           type: integer
@@ -942,10 +917,6 @@ components:
                   type: string
                 title:
                   type: string
-                subtitle:
-                  type: string
-                description:
-                  type: string
                 status:
                   type: string
                 result:
@@ -954,9 +925,7 @@ components:
                   type: number
                 openTime:
                   type: number
-                settlementTime:
-                  type: number
-                isTradable:
+                isTeamMarket:
                   type: boolean
         eventMetadata:
           $ref: "#/components/schemas/EventMetadata"

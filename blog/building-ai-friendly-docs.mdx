@@ -66,9 +66,9 @@ they solve different problems: a RAG pipeline wants to ingest your entire site
 as a single file, an MCP client wants to query specific pages in real time,
 an agent framework wants structured action definitions with input/output
 schemas, and a build script just wants to curl one page as raw markdown.
-Optimising for one doesn't help the others. It is not a one size fit all
-solution, instead, there's a landscape of consumption patterns, and it's
-going to keep evolving.
+Optimising for one doesn't help the others. It's not a one-size-fits-all
+problem — there's a landscape of consumption patterns, and it's going to
+keep evolving.
 
 **What AI reads needs to stay current.** This is a well-known problem in
 software engineering — it's why OpenAPI generates from code, why JSDoc
@@ -99,21 +99,20 @@ This isn't an AI-specific design decision, but it's the foundation that makes
 everything else possible. Any agent that can make HTTP calls can interact with 
 Jupiter. No SDK installation, no blockchain node setup, no binary dependencies.
 
-With that foundation in place, the next layer is the documentation itself.
-The goal: enrich existing pages with just enough machine-readable metadata
-that every AI consumption path can be generated from the same source.
+With that foundation in place, the goal is to adapt and enrich the existing source 
+to meet the needs of every AI consumption path.
 
-#### llms.txt
+### llms.txt
 [`llms.txt`](https://dev.jup.ag/llms.txt) is auto-generated from page
-frontmatter and navigation config, following the
-[llmstxt.org](https://llmstxt.org) standard. It's a structured Markdown
-index of every API, guide, and reference page with its `llmsDescription`. For
-RAG pipelines that need complete content,
-[`llms-full.txt`](https://dev.jup.ag/llms-full.txt) concatenates the entire
-site into a single file.
+frontmatter and navigation config, following the [llmstxt.org](https://llmstxt.org) 
+standard. It's a structured Markdown index of every API, guide, and reference page 
+with its `llmsDescription`. For RAG pipelines that need complete content, 
+[`llms-full.txt`](https://dev.jup.ag/llms-full.txt) concatenates the entire site 
+into a single file.
 
-The `llmsDescription` is a new frontmatter field, we have added to every page 
-alongside the existing human-facing `description`, the change is small yet effective.
+The `llmsDescription` is a new frontmatter field we've added to every page
+alongside the existing human-facing `description`. The change is small yet
+effective.
 
 ```yaml
 ---
@@ -131,7 +130,7 @@ llmsDescription: "Jupiter Ultra Swap API provides a managed swap execution
 key capabilities, what the API actually does and how to call it. Both live on the
 same page. One update to the source, and both descriptions are current.
 
-#### skill.md
+### skill.md
 Most agent "skills" or "tools" in the ecosystem are individual function
 definitions — one tool per API call. Give an agent 50 endpoint definitions
 and it has to figure out which one matches the developer's intent. That means
@@ -140,8 +139,8 @@ picks the right one. It works for simple integrations, but a protocol with
 dozens of endpoints across multiple products needs something more intentional.
 
 [`skill.md`](https://dev.jup.ag/skill.md) follows the
-[agentskills.io](https://agentskills.io) specification, but takes a different
-approach: intent routing. Instead of one tool per endpoint, it organises
+[agentskills.io](https://agentskills.io) specification with an intent-routing
+approach. Instead of one tool per endpoint, it organises
 Jupiter's capabilities by what a developer actually wants to do. An agent
 that receives "swap tokens" gets routed to the Ultra API family and its first
 action. "Check price" gets routed to the Price API. The agent doesn't need to
@@ -161,7 +160,7 @@ ships framework-specific definitions ready to drop in:
 - **Vercel AI SDK:** Zod-typed tool schemas
 - **LangChain:** `@tool` decorated functions
 
-#### MCP
+### MCP
 Most AI tools today get their context from web searches. The problem is that
 search results are cached and indexed — not live. When an API changes, search
 engines may not reflect it for days or weeks. AI assistants confidently
@@ -175,26 +174,25 @@ the documentation source directly — the same source that generates `llms.txt`
 and `skill.md`. No caching layer. No indexing delay. The context your AI
 reads is always the context that's currently live.
 
-#### Markdown Export
-Markdown export renders the same pages in a different format. Append `.md`
-to any documentation URL or set the `Accept: text/markdown` header.
+### Markdown Export and OpenAPI Specs
+Every page in the docs — including rendered OpenAPI references — can be
+accessed as raw markdown by appending `.md` to the URL or setting the
+`Accept: text/markdown` header. OpenAPI specs themselves live in the docs
+repo and feed both human-readable API references and machine-readable
+schemas.
 
-#### OpenAPI Specs
-OpenAPI specs live in the docs repo and feed both human-readable API
-references and machine-readable schemas.
-
-Every path reads from the same source. Update the source or page's frontmatter, and the
-change propagates through `llms.txt`, gets picked up by MCP queries, flows
-into skill definitions, and reflects in any tool that processes the page. One
-input, many outputs.
+Every path reads from the same source. Update a page — its content,
+frontmatter, or the OpenAPI spec it references — and the change propagates
+through `llms.txt`, gets picked up by MCP queries, flows into skill
+definitions, and reflects in any tool that processes it. One input, many
+outputs.
 
 ---
 
 ## Wherever Your AI Already Works
 
 This is where the two principles converge. AI tooling is fragmented — not
-because the ecosystem can't agree on a standard, but because they are  different 
-tools solving different problems. Each one is its own entrypoint into our docs.
+because the ecosystem can't agree on a standard, but because they are different tools solving different problems. Each one is its own entrypoint into our docs.
 
 Because everything is derived from one source, meeting each of these doesn't mean 
 maintaining separate systems — it means adding another output from the same source.
@@ -212,14 +210,15 @@ maintaining separate systems — it means adding another output from the same so
 The principle: don't force AI into one consumption pattern. Meet it wherever
 it already works.
 
-The landscape is ever shifting. New standards will emerge, new consumption
+The landscape is still forming. New standards will emerge, new consumption
 patterns will appear, and the way AI tools read documentation will keep
-evolving. We will continue to ensure adaptability, and keep our docs 
-the single source of truth for both humans and AI, and meeting AI tools wherever 
-they already work.
+evolving. The single-source architecture means each new pattern is another
+output to add, not another system to build. We're watching how developers and
+their AI tools actually use these resources, and adapting accordingly.
 
 If you're building on Jupiter with AI, or building AI-friendly docs for your
-own project, we'd love to hear what's working and what isn't. Reach out on us.
+own project, we'd love to hear what's working and what isn't. Reach out on
+[Discord](https://discord.gg/jup) or [X](https://x.com/JupiterDevRel).
 
 ---
 

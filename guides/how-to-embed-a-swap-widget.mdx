@@ -189,41 +189,13 @@ export default function SwapPage() {
 ```
 </CodeGroup>
 
-<Accordion title="TypeScript support">
-Create a `plugin.d.ts` file in your project:
+For a full step-by-step walkthrough with TypeScript support and project setup:
 
-```typescript
-declare global {
-  interface Window {
-    Jupiter: {
-      init: (props: {
-        displayMode?: "modal" | "integrated" | "widget";
-        integratedTargetId?: string;
-        widgetStyle?: {
-          position?: "bottom-left" | "bottom-right" | "top-left" | "top-right";
-          size?: "sm" | "default";
-        };
-        formProps?: {
-          initialInputMint?: string;
-          initialOutputMint?: string;
-          fixedAmount?: boolean;
-          fixedMint?: string;
-          initialAmount?: string;
-          referralAccount?: string;
-          referralFee?: number;
-        };
-        enableWalletPassthrough?: boolean;
-      }) => void;
-      close: () => void;
-      resume: () => void;
-    };
-  }
-}
-export {};
-```
-
-For the full type declaration, see the [plugin repository](https://github.com/jup-ag/plugin/blob/main/src/types/index.d.ts).
-</Accordion>
+<CardGroup cols={3}>
+  <Card href="/tool-kits/plugin/nextjs-app-example" icon="N" horizontal title="Next.js" />
+  <Card href="/tool-kits/plugin/react-app-example" icon="react" horizontal title="React" />
+  <Card href="/tool-kits/plugin/html-app-example" icon="html5" horizontal title="HTML" />
+</CardGroup>
 
 ---
 
@@ -381,16 +353,33 @@ window.Jupiter.init({
 
 ---
 
-## Plugin Playground
+## Try it yourself
 
-The [Plugin Playground](https://plugin.jup.ag/) lets you configure and preview the widget in real time. You can:
+The [Plugin Playground](https://plugin.jup.ag/) is a live sandbox where you can configure every aspect of the widget and see the results instantly. Switch display modes, set token defaults, tweak colours to match your brand, and copy the generated code straight into your project.
 
-- Switch between display modes (integrated, widget, modal)
-- Set form props like initial tokens and fixed mints
-- Customise the colour theme to match your brand
-- Copy the generated configuration code directly into your project
-
-Use it to experiment before writing any code, or to fine-tune your configuration visually.
+<Frame>
+  <a href="https://plugin.jup.ag/" target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
+    <img
+      src="/static/images/plugin-playground.png"
+      alt="Plugin Playground"
+      noZoom
+      style={{
+        cursor: 'pointer',
+        transition: 'opacity 0.2s ease-in-out, border 0.2s ease-in-out',
+        border: '2px solid transparent',
+        borderRadius: '10px'
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.opacity = '1';
+        e.target.style.border = '2px solid #C8F284';
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.opacity = '1';
+        e.target.style.border = '2px solid transparent';
+      }}
+    />
+  </a>
+</Frame>
 
 ---
 

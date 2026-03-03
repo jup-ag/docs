@@ -55,11 +55,11 @@ The simplest way to add a swap widget — a single HTML file:
 </html>
 ```
 
-Save this as `swap.html` and serve it over HTTP (e.g. `npx http-server`), then open `http://localhost:8080/swap.html`. You have a working swap widget. That's it.
+Save this as `swap.html`, serve it locally, and open it in your browser:
 
-<Note>
-Wallet extensions like Phantom and Backpack require an HTTP origin to connect. Opening the file directly (`file://`) will load the widget but wallets won't be able to connect. Always serve over `http://` or `https://`.
-</Note>
+```bash
+npx http-server -o /swap.html
+```
 
 ### Try it yourself
 

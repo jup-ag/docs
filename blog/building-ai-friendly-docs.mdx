@@ -134,16 +134,41 @@ RAG pipelines that need complete content,
 site into a single file.
 
 #### skill.md
+Most agent "skills" or "tools" in the ecosystem are individual function
+definitions — one tool per API call. That works for simple integrations, but
+a protocol with dozens of endpoints across multiple products needs something
+higher-level.
+
 [`skill.md`](https://dev.jup.ag/skill.md) is auto-generated from the
 documentation structure and OpenAPI specs, following the
 [agentskills.io](https://agentskills.io) specification. Where `llms.txt`
 tells an agent what's available, `skill.md` tells it exactly how to act —
 input/output schemas, API endpoints, trigger keywords, and example payloads.
+But rather than exposing every endpoint as a separate action, it routes by
+intent: an agent that receives "swap tokens" or "check price" gets directed
+to the right API family and first action, without needing to know the full
+API surface upfront.
+
+The open-source [Skills Repository](https://github.com/jup-ag/agent-skills)
+extends this with framework-specific definitions ready to drop in:
+
+- **Claude / OpenAI:** function calling with tool definitions
+- **Vercel AI SDK:** Zod-typed tool schemas
+- **LangChain:** `@tool` decorated functions
 
 #### MCP
-The [MCP server](https://dev.jup.ag/mcp) serves documentation content
-directly via the [Model Context Protocol](https://modelcontextprotocol.io/).
-AI editors query it in real time — no crawling, no caching, no stale results.
+Most AI tools today get their context from web searches. The problem is that
+search results are cached and indexed — not live. When an API changes, search
+engines may not reflect it for days or weeks. AI assistants confidently
+generate code against outdated endpoints, deprecated parameters, and stale
+examples. The developer gets working-looking code that breaks against the
+current API.
+
+The [MCP server](https://dev.jup.ag/mcp) sidesteps this entirely. Via the
+[Model Context Protocol](https://modelcontextprotocol.io/), AI editors query
+the documentation source directly — the same source that generates `llms.txt`
+and `skill.md`. No caching layer. No indexing delay. The context your AI
+reads is always the context that's currently live.
 
 #### Markdown Export
 Markdown export renders the same pages in a different format. Append `.md`
@@ -184,40 +209,6 @@ same source.
 | **Single page fetch** | `.md` suffix on any URL |
 | **API schema** | OpenAPI specs for every product |
 | **LLMs friendly description** | `llmsDescription` frontmatter on every page |
-
-Most AI tools today get their context from web searches. The problem is that
-search results are cached and indexed — not live. When an API changes, search
-engines may not reflect that for days or weeks. This is already a widespread
-issue: AI assistants confidently generate code against outdated endpoints,
-deprecated parameters, and stale examples. The developer gets working-looking
-code that breaks against the current API.
-
-MCP sidesteps this entirely. Instead of searching the web for Jupiter docs,
-an MCP-connected editor queries the documentation source directly — the same
-source that generates `llms.txt` and `skill.md`. No caching layer. No
-indexing delay. The context your AI reads is always the context that's
-currently live.
-
-Most agent "skills" or "tools" in the ecosystem are individual function
-definitions — one tool per API call. That works for simple integrations, but
-Jupiter has dozens of endpoints across multiple products. Handing an agent 50
-function definitions and hoping it picks the right one isn't practical.
-
-The [Skills Repository](https://github.com/jup-ag/agent-skills) takes a
-different approach: intent routing. Instead of defining every API call as a
-separate tool, it maps developer intent to the right API family and first
-action. An agent that receives "swap tokens" or "check price" gets routed to
-the correct product and endpoint — without needing to know Jupiter's full API
-surface upfront.
-
-The repository ships with framework-specific definitions ready to drop in:
-
-- **Claude / OpenAI:** function calling with tool definitions
-- **Vercel AI SDK:** Zod-typed tool schemas
-- **LangChain:** `@tool` decorated functions
-
-Define the skill once, and any LLM with function calling can execute swaps,
-fetch prices, and manage positions.
 
 The principle: don't force AI into one consumption pattern. Meet it wherever
 it already works.

@@ -61,19 +61,33 @@ Save this as `swap.html` and serve it over HTTP (e.g. `npx http-server`), then o
 Wallet extensions like Phantom and Backpack require an HTTP origin to connect. Opening the file directly (`file://`) will load the widget but wallets won't be able to connect. Always serve over `http://` or `https://`.
 </Note>
 
-<Accordion title="New to coding? Follow these steps">
-You need Node.js installed from [nodejs.org](https://nodejs.org) to run a local server.
+### Try it yourself
 
-1. Open any text editor (Notepad on Windows, TextEdit on Mac — switch to plain text mode first)
-2. Copy the HTML code above and paste it into the editor
-3. Save the file as `swap.html` (make sure it ends in `.html`, not `.txt`)
-4. Open a terminal (Terminal on Mac, Command Prompt on Windows) and navigate to the folder where you saved the file
-5. Run `npx http-server` — this starts a local web server
-6. Open `http://localhost:8080/swap.html` in your browser
-7. You should see a swap widget embedded in the page
+Not ready to write code? The [Plugin Playground](https://plugin.jup.ag/) lets you experience the full swap widget live in your browser. Switch display modes, set token defaults, tweak colours, and copy the generated code when you're ready to integrate.
 
-That's a working swap widget running locally on your machine. To put it on the internet, upload the file to any web hosting service.
-</Accordion>
+<Frame>
+  <a href="https://plugin.jup.ag/" target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
+    <img
+      src="/static/images/plugin-playground.png"
+      alt="Plugin Playground"
+      noZoom
+      style={{
+        cursor: 'pointer',
+        transition: 'opacity 0.2s ease-in-out, border 0.2s ease-in-out',
+        border: '2px solid transparent',
+        borderRadius: '10px'
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.opacity = '1';
+        e.target.style.border = '2px solid #C8F284';
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.opacity = '1';
+        e.target.style.border = '2px solid transparent';
+      }}
+    />
+  </a>
+</Frame>
 
 ---
 
@@ -356,36 +370,6 @@ window.Jupiter.init({
   },
 });
 ```
-
----
-
-## Try it yourself
-
-The [Plugin Playground](https://plugin.jup.ag/) is a live sandbox where you can configure every aspect of the widget and see the results instantly. Switch display modes, set token defaults, tweak colours to match your brand, and copy the generated code straight into your project.
-
-<Frame>
-  <a href="https://plugin.jup.ag/" target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
-    <img
-      src="/static/images/plugin-playground.png"
-      alt="Plugin Playground"
-      noZoom
-      style={{
-        cursor: 'pointer',
-        transition: 'opacity 0.2s ease-in-out, border 0.2s ease-in-out',
-        border: '2px solid transparent',
-        borderRadius: '10px'
-      }}
-      onMouseEnter={(e) => {
-        e.target.style.opacity = '1';
-        e.target.style.border = '2px solid #C8F284';
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.opacity = '1';
-        e.target.style.border = '2px solid transparent';
-      }}
-    />
-  </a>
-</Frame>
 
 ---
 

@@ -175,11 +175,10 @@ and `skill.md`. No caching layer. No indexing delay. The context your AI
 reads is always the context that's currently live.
 
 ### Markdown Export and OpenAPI Specs
-Every page in the docs — including rendered OpenAPI references — can be
-accessed as raw markdown by appending `.md` to the URL or setting the
-`Accept: text/markdown` header. OpenAPI specs themselves live in the docs
-repo and feed both human-readable API references and machine-readable
-schemas.
+Every page in the docs can be accessed as raw markdown by appending `.md` to
+the URL or setting the `Accept: text/markdown` header. OpenAPI specs are
+accessible directly as YAML (e.g. `dev.jup.ag/openapi-spec/swap/swap.yaml`)
+and feed both human-readable API references and machine-readable schemas.
 
 Every path reads from the same source. Update a page — its content,
 frontmatter, or the OpenAPI spec it references — and the change propagates
@@ -199,12 +198,12 @@ maintaining separate systems — it means adding another output from the same so
 
 | How AI consumes docs | Jupiter resource |
 |:---|:---|
-| **High-level discovery** | `llms.txt` — structured index of all docs |
-| **Full-context ingestion** | `llms-full.txt` — complete site content |
-| **In-editor queries** | MCP server at `dev.jup.ag/mcp` |
-| **Agent capabilities** | `skill.md` + [Skills Repository](https://github.com/jup-ag/agent-skills) |
-| **Single page fetch** | `.md` suffix on any URL |
-| **API schema** | OpenAPI specs for every product |
+| **High-level discovery** | [`llms.txt`](https://dev.jup.ag/llms.txt) — structured index of all docs |
+| **Full-context ingestion** | [`llms-full.txt`](https://dev.jup.ag/llms-full.txt) — complete site content |
+| **In-editor queries** | [MCP server](https://dev.jup.ag/mcp) |
+| **Agent capabilities** | [`skill.md`](https://dev.jup.ag/skill.md) + [Skills Repository](https://github.com/jup-ag/agent-skills) |
+| **Single page fetch** | Add `.md` to any URL to get raw markdown |
+| **API schema** | [OpenAPI specs](https://dev.jup.ag/api-reference) for every product |
 | **LLMs friendly description** | `llmsDescription` frontmatter on every page |
 
 The principle: don't force AI into one consumption pattern. Meet it wherever

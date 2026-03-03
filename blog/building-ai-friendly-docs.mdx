@@ -99,10 +99,21 @@ This isn't an AI-specific design decision, but it's the foundation that makes
 everything else possible. Any agent that can make HTTP calls can interact with 
 Jupiter. No SDK installation, no blockchain node setup, no binary dependencies.
 
-### Enriching the Source
+With that foundation in place, the next layer is the documentation itself.
+The goal: enrich existing pages with just enough machine-readable metadata
+that every AI consumption path can be generated from the same source.
 
-`llmsDescription` is a new frontmatter field added to every page alongside the 
-existing human-facing `description`, the change is small yet effective.
+#### llms.txt
+[`llms.txt`](https://dev.jup.ag/llms.txt) is auto-generated from page
+frontmatter and navigation config, following the
+[llmstxt.org](https://llmstxt.org) standard. It's a structured Markdown
+index of every API, guide, and reference page with its `llmsDescription`. For
+RAG pipelines that need complete content,
+[`llms-full.txt`](https://dev.jup.ag/llms-full.txt) concatenates the entire
+site into a single file.
+
+The `llmsDescription` is a new frontmatter field, we have added to every page 
+alongside the existing human-facing `description`, the change is small yet effective.
 
 ```yaml
 ---
@@ -120,37 +131,31 @@ llmsDescription: "Jupiter Ultra Swap API provides a managed swap execution
 key capabilities, what the API actually does and how to call it. Both live on the
 same page. One update to the source, and both descriptions are current.
 
-### Deriving the Outputs
-
-From this enriched source, everything else is derived.
-
-#### llms.txt
-[`llms.txt`](https://dev.jup.ag/llms.txt) is auto-generated from page
-frontmatter and navigation config, following the
-[llmstxt.org](https://llmstxt.org) standard. It's a structured Markdown
-index of every API, guide, and reference page with its `llmsDescription`. For
-RAG pipelines that need complete content,
-[`llms-full.txt`](https://dev.jup.ag/llms-full.txt) concatenates the entire
-site into a single file.
-
 #### skill.md
 Most agent "skills" or "tools" in the ecosystem are individual function
-definitions — one tool per API call. That works for simple integrations, but
-a protocol with dozens of endpoints across multiple products needs something
-higher-level.
+definitions — one tool per API call. Give an agent 50 endpoint definitions
+and it has to figure out which one matches the developer's intent. That means
+loading every tool into context, parsing each schema, and hoping the LLM
+picks the right one. It works for simple integrations, but a protocol with
+dozens of endpoints across multiple products needs something more intentional.
 
-[`skill.md`](https://dev.jup.ag/skill.md) is auto-generated from the
-documentation structure and OpenAPI specs, following the
-[agentskills.io](https://agentskills.io) specification. Where `llms.txt`
-tells an agent what's available, `skill.md` tells it exactly how to act —
-input/output schemas, API endpoints, trigger keywords, and example payloads.
-But rather than exposing every endpoint as a separate action, it routes by
-intent: an agent that receives "swap tokens" or "check price" gets directed
-to the right API family and first action, without needing to know the full
-API surface upfront.
+[`skill.md`](https://dev.jup.ag/skill.md) follows the
+[agentskills.io](https://agentskills.io) specification, but takes a different
+approach: intent routing. Instead of one tool per endpoint, it organises
+Jupiter's capabilities by what a developer actually wants to do. An agent
+that receives "swap tokens" gets routed to the Ultra API family and its first
+action. "Check price" gets routed to the Price API. The agent doesn't need to
+know Jupiter's full API surface — it expresses intent, and the skill handles
+the mapping.
 
-The open-source [Skills Repository](https://github.com/jup-ag/agent-skills)
-extends this with framework-specific definitions ready to drop in:
+This is more robust than a flat list of tools. If endpoints are added or APIs
+are restructured, the intent categories stay stable. It's also more
+token-efficient: instead of 50 tool schemas in context, the agent loads one
+skill definition with intent categories and lets the router resolve the rest.
+
+`skill.md` is sourced directly from the open-source
+[Skills Repository](https://github.com/jup-ag/agent-skills), which also
+ships framework-specific definitions ready to drop in:
 
 - **Claude / OpenAI:** function calling with tool definitions
 - **Vercel AI SDK:** Zod-typed tool schemas
@@ -188,17 +193,11 @@ input, many outputs.
 ## Wherever Your AI Already Works
 
 This is where the two principles converge. AI tooling is fragmented — not
-because the ecosystem can't agree on a standard, but because different tools
-have genuinely different architectures. A RAG-powered assistant needs to
-ingest bulk content. An editor plugin needs to query live documentation. An
-agent framework needs structured action definitions it can execute. A CI
-script needs to fetch a single page as raw text. These aren't competing
-standards. They're different tools solving different problems, and each one
-needs its own entrypoint into your docs.
+because the ecosystem can't agree on a standard, but because they are  different 
+tools solving different problems. Each one is its own entrypoint into our docs.
 
-Because everything is derived from one source, meeting each of these doesn't
-mean maintaining separate systems — it means adding another output from the
-same source.
+Because everything is derived from one source, meeting each of these doesn't mean 
+maintaining separate systems — it means adding another output from the same source.
 
 | How AI consumes docs | Jupiter resource |
 |:---|:---|
@@ -213,22 +212,20 @@ same source.
 The principle: don't force AI into one consumption pattern. Meet it wherever
 it already works.
 
-The landscape is still moving. New standards will emerge, new consumption
+The landscape is ever shifting. New standards will emerge, new consumption
 patterns will appear, and the way AI tools read documentation will keep
-evolving. The single-source architecture means adapting is low-cost — each
-new standard is another output, not another system to maintain. We're
-watching how developers and their AI tools actually use these resources, and
-building accordingly.
+evolving. We will continue to ensure adaptability, and keep our docs 
+the single source of truth for both humans and AI, and meeting AI tools wherever 
+they already work.
 
 If you're building on Jupiter with AI, or building AI-friendly docs for your
-own project, we'd love to hear what's working and what isn't. Reach out on
-[Discord](https://discord.gg/jup) or [X](https://x.com/JupiterDevRel).
+own project, we'd love to hear what's working and what isn't. Reach out on us.
 
 ---
 
 ## Start Here
 
-Everything described in this post is live and documented:
+Everything described in this post is live and documented.
 
 <CardGroup cols={2}>
   <Card title="AI Overview" icon="robot" href="/ai">

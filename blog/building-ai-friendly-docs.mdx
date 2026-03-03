@@ -162,14 +162,18 @@ input, many outputs.
 
 ## Wherever Your AI Already Works
 
-This is where the two principles converge. Because everything is derived from
-one source, supporting a new AI consumption pattern doesn't mean building a
-new system — it means adding another entrypoint to the same source. When
-[agentskills.io](https://agentskills.io) emerged as a standard, we didn't
-create a separate content pipeline for it. We added a generation step that
-reads the same docs and OpenAPI specs. When MCP adoption grew, we pointed an
-MCP server at the same content. The source stays the same; each new standard
-just adds another way to read it.
+This is where the two principles converge. AI tooling is fragmented — not
+because the ecosystem can't agree on a standard, but because different tools
+have genuinely different architectures. A RAG-powered assistant needs to
+ingest bulk content. An editor plugin needs to query live documentation. An
+agent framework needs structured action definitions it can execute. A CI
+script needs to fetch a single page as raw text. These aren't competing
+standards. They're different tools solving different problems, and each one
+needs its own entrypoint into your docs.
+
+Because everything is derived from one source, meeting each of these doesn't
+mean maintaining separate systems — it means adding another output from the
+same source.
 
 | How AI consumes docs | Jupiter resource |
 |:---|:---|

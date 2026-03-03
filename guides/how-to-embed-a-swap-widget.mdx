@@ -55,16 +55,22 @@ The simplest way to add a swap widget — a single HTML file:
 </html>
 ```
 
-Open this in a browser and you have a swap widget embedded in your page. That's it.
+Save this as `swap.html` and serve it over HTTP (e.g. `npx http-server`), then open `http://localhost:8080/swap.html`. You have a working swap widget. That's it.
+
+<Note>
+Wallet extensions like Phantom and Backpack require an HTTP origin to connect. Opening the file directly (`file://`) will load the widget but wallets won't be able to connect. Always serve over `http://` or `https://`.
+</Note>
 
 <Accordion title="New to coding? Follow these steps">
-You don't need any development tools. Just a browser and a text editor.
+You need Node.js installed from [nodejs.org](https://nodejs.org) to run a local server.
 
 1. Open any text editor (Notepad on Windows, TextEdit on Mac — switch to plain text mode first)
 2. Copy the HTML code above and paste it into the editor
 3. Save the file as `swap.html` (make sure it ends in `.html`, not `.txt`)
-4. Find the file on your computer and double-click it — it opens in your browser
-5. You should see a floating swap widget in the corner of the page
+4. Open a terminal (Terminal on Mac, Command Prompt on Windows) and navigate to the folder where you saved the file
+5. Run `npx http-server` — this starts a local web server
+6. Open `http://localhost:8080/swap.html` in your browser
+7. You should see a swap widget embedded in the page
 
 That's a working swap widget running locally on your machine. To put it on the internet, upload the file to any web hosting service.
 </Accordion>

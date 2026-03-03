@@ -13,9 +13,11 @@ llmsDescription: "Blog post detailing how Jupiter built AI-friendly developer do
 
 We built docs that developers loved. Then we watched AI agents try to use them, and learned that good and navigable are not the same thing.
 
-When developers integrate a new protocol today, their first move is increasingly to hand the docs to an AI agent and say "figure it out." The agent doesn't browse. It doesn't scan headings or follow sidebar links. It needs structured, machine-readable paths to the right information — and the reality is that different agents need fundamentally different paths.
+Your documentation has a new first reader. When developers integrate a new protocol today, their first move is increasingly to hand the docs to an AI agent and say "figure it out." The AI reads your docs, interprets them, and writes code the developer ships. If it gets it right, the developer has a working integration in minutes. If it gets it wrong, they get confidently broken code — and may not catch it until something fails in production.
 
-This post explores the two principles behind Jupiter's approach to AI-friendly documentation: making your docs the single source of truth for both humans and AI, and meeting AI tools wherever they already work. These aren't separate initiatives. They're one architecture that serves every consumption pattern without maintaining anything in parallel.
+This is the multiplier effect. Good docs have always mattered, but now they compound. Every improvement in structure and clarity is amplified across every AI tool that reads your pages. Every gap and ambiguity is amplified too.
+
+This post explores how Jupiter responded to that shift — with two principles: making docs the single source of truth for both humans and AI, and meeting AI tools wherever they already work.
 
 **A few terms used in this post:**
 
@@ -25,15 +27,19 @@ This post explores the two principles behind Jupiter's approach to AI-friendly d
 
 ---
 
-## The Problem with "AI-Friendly"
+## Your Docs Have a New First Reader
 
-The typical approach to making docs AI-friendly is to bolt something on. Publish an `llms.txt`. Train a chatbot on your content. Write a set of "machine-optimised" descriptions. Each of these is useful in isolation, but none of them solve the underlying problem. When we started building AI support into our docs, we ran into two things that changed how we thought about it.
+The immediate instinct is to bolt something on. Publish an `llms.txt`. Train a chatbot. Write "machine-optimised" descriptions. Each helps in isolation, but they don't address the deeper shift: AI is no longer a secondary consumer of your documentation. It's the primary one. And the way it reads — and fails — is fundamentally different from humans.
 
-**AI tools don't all consume docs the same way.** This isn't a theoretical concern — you can see it in how the standards have emerged independently. [llmstxt.org](https://llmstxt.org) defines a structured index for LLM discovery. [Model Context Protocol](https://modelcontextprotocol.io/) defines a live query interface for AI editors. [agentskills.io](https://agentskills.io) defines action schemas for agent frameworks. These standards exist because they solve different problems: a RAG pipeline wants to ingest your entire site as a single file, an MCP client wants to query specific pages in real time, an agent framework wants structured action definitions with input/output schemas, and a build script just wants to curl one page as raw markdown. Optimising for one doesn't help the others. There's no single "AI-friendly" format — there's a landscape of consumption patterns, and it's still evolving.
+A human reads a confusing paragraph and asks for clarification. An AI reads it and generates code that looks right but isn't. The failure mode isn't confusion — it's confidence. That raises the stakes on everything downstream: what your AI reads, how it reads it, and whether what it reads is current.
 
-**Separate AI resources drift.** This is a well-known problem in software engineering — it's why OpenAPI generates from code, why JSDoc generates from source, why every team that's maintained parallel documentation has eventually watched one version go stale. The same principle applies here. The moment you maintain an "AI version" of your docs alongside the human version, you've created a synchronisation problem. Content diverges. Specs go stale. The LLM index says one thing; the actual endpoint does another. Most teams haven't maintained parallel AI resources long enough to feel this pain yet, but the pattern is predictable. AI tools don't flag stale content — they use it confidently.
+When we started building AI support into our docs, two things sharpened this for us.
 
-So the question we kept coming back to: how do you serve every AI consumption pattern without maintaining separate systems that will inevitably drift?
+**AI tools don't all read the same way.** This isn't a theoretical concern — you can see it in how the standards have emerged independently. [llmstxt.org](https://llmstxt.org) defines a structured index for LLM discovery. [Model Context Protocol](https://modelcontextprotocol.io/) defines a live query interface for AI editors. [agentskills.io](https://agentskills.io) defines action schemas for agent frameworks. These standards exist because they solve different problems: a RAG pipeline wants to ingest your entire site as a single file, an MCP client wants to query specific pages in real time, an agent framework wants structured action definitions with input/output schemas, and a build script just wants to curl one page as raw markdown. Optimising for one doesn't help the others. There's no single "AI-friendly" format — there's a landscape of consumption patterns, and it's still evolving.
+
+**What AI reads needs to stay current.** This is a well-known problem in software engineering — it's why OpenAPI generates from code, why JSDoc generates from source, why every team that's maintained parallel documentation has eventually watched one version go stale. The same principle applies here. The moment you maintain an "AI version" of your docs alongside the human version, you've created a synchronisation problem. Content diverges. Specs go stale. The LLM index says one thing; the actual endpoint does another. Most teams haven't maintained parallel AI resources long enough to feel this pain yet, but the pattern is predictable. And when AI is the first reader, stale content doesn't just confuse — it generates wrong code at scale.
+
+So the question we kept coming back to: if AI is the first reader, how do you make sure it reads well — across every tool, every workflow, every time?
 
 ---
 

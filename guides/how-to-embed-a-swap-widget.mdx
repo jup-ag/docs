@@ -1,0 +1,454 @@
+---
+title: "How to Embed a Swap Widget in Your App"
+sidebarTitle: "Embed Swap Widget"
+description: "Add a full-featured token swap to your app with one script tag. No RPC, no wallet infrastructure, no UI to build."
+llmsDescription: "Jupiter Plugin embeds a complete swap widget into any web app. One script tag + window.Jupiter.init(). No RPC node, no wallet adapter, no UI to build. Powered by Ultra — handles routing, slippage, MEV protection, and transaction sending. Three display modes: integrated (inline), widget (floating), modal (popup). Supports wallet passthrough, referral fees, fixed token/amount for payments, and full colour theming. Works with HTML, React, and Next.js."
+---
+
+{/* Alternative search terms for AI discovery:
+- Embed swap widget Solana
+- Add token swap to website
+- Jupiter Plugin integration
+- Drop-in swap widget
+- Swap widget no RPC
+- Jupiter swap embed
+- Token swap iframe alternative Solana
+- Buy token widget Solana
+*/}
+
+## TL;DR
+
+Jupiter Plugin gives you the same swap experience as [jup.ag](https://jup.ag) — embedded directly in your app. One script tag, one function call. No RPC node, no wallet adapter code, no UI to build. Powered by [Ultra](/docs/ultra/index), which handles routing, slippage, MEV protection, and transaction sending.
+
+---
+
+## Prerequisites
+
+No API key or RPC node required. Jupiter Plugin handles all infrastructure.
+
+For framework-based apps, you need **Node.js and npm** installed from [nodejs.org](https://nodejs.org). For plain HTML, you just need a browser.
+
+---
+
+## Quick start
+
+The simplest way to add a swap widget — a single HTML file:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
+</head>
+<body>
+  <h1>My App</h1>
+  <script>
+    window.onload = function() {
+      window.Jupiter.init({ displayMode: "widget" });
+    };
+  </script>
+</body>
+</html>
+```
+
+Open this in a browser and you have a floating swap widget. That's it.
+
+---
+
+## When you need this
+
+You want to add swap functionality to your app without building any of it yourself:
+
+- **dApp with swap** — Your app needs token swaps but you don't want to build the UI, handle transactions, or run an RPC node
+- **Community token site** — Force users to buy your token by locking the output mint with `fixedMint`
+- **Existing app with a wallet** — Your app already has a wallet provider — Plugin supports wallet passthrough, so no extra wallet infrastructure needed
+- **Payment flow** — Accept a specific token at a fixed amount using `fixedAmount` and `fixedMint`
+- **Quick swap access** — Add a floating widget to any page for convenient swapping
+
+Common searches that lead here:
+- "embed swap widget solana"
+- "add token swap to my website"
+- "jupiter plugin integration"
+- "buy token widget solana"
+
+---
+
+## Why Jupiter Plugin
+
+Building a swap interface from scratch means:
+- Running an RPC node
+- Integrating a wallet adapter
+- Building the swap UI
+- Handling quoting, routing, slippage, and MEV protection
+- Managing transaction errors and retries
+
+Jupiter Plugin handles all of this. You get the full [jup.ag](https://jup.ag) swap experience as a drop-in component:
+
+- **No RPC** — Powered by Ultra, which handles all transaction sending
+- **No wallet code** — Plugin provides wallet connection out of the box (users connect their existing browser wallet like Phantom or Backpack)
+- **No UI to build** — Complete swap interface with token search, price display, and transaction status
+- **No error handling** — Plugin manages slippage, retries, and transaction failures
+
+---
+
+## Code examples
+
+### HTML
+
+The minimal approach — no build tools, no dependencies:
+
+```html expandable
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jupiter Plugin Demo</title>
+    <script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
+</head>
+<body>
+    <h1>Jupiter Plugin Demo</h1>
+    <div id="jupiter-plugin"></div>
+
+    <script>
+        window.onload = function() {
+            window.Jupiter.init({
+                displayMode: "integrated",
+                integratedTargetId: "jupiter-plugin",
+            });
+        };
+    </script>
+</body>
+</html>
+```
+
+Serve with any static file server (e.g. `npx http-server`).
+
+### React
+
+```tsx expandable
+import { useEffect } from "react";
+
+export default function App() {
+  useEffect(() => {
+    window.Jupiter.init({
+      displayMode: "integrated",
+      integratedTargetId: "jupiter-plugin",
+    });
+  }, []);
+
+  return (
+    <div>
+      <h1>Jupiter Plugin Demo</h1>
+      <div id="jupiter-plugin" />
+    </div>
+  );
+}
+```
+
+Add the plugin script to your `public/index.html`:
+
+```html
+<script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
+```
+
+<Accordion title="TypeScript support">
+Create a `plugin.d.ts` file in your project:
+
+```typescript
+declare global {
+  interface Window {
+    Jupiter: {
+      init: (props: {
+        displayMode?: "modal" | "integrated" | "widget";
+        integratedTargetId?: string;
+        widgetStyle?: {
+          position?: "bottom-left" | "bottom-right" | "top-left" | "top-right";
+          size?: "sm" | "default";
+        };
+        formProps?: {
+          initialInputMint?: string;
+          initialOutputMint?: string;
+          fixedAmount?: boolean;
+          fixedMint?: string;
+          initialAmount?: string;
+          referralAccount?: string;
+          referralFee?: number;
+        };
+        enableWalletPassthrough?: boolean;
+      }) => void;
+      close: () => void;
+      resume: () => void;
+    };
+  }
+}
+export {};
+```
+
+For the full type declaration, see the [plugin repository](https://github.com/jup-ag/plugin/blob/main/src/types/index.d.ts).
+</Accordion>
+
+### Next.js
+
+```tsx expandable
+"use client";
+import { useEffect } from "react";
+import Script from "next/script";
+
+export default function SwapPage() {
+  useEffect(() => {
+    if (window.Jupiter) {
+      window.Jupiter.init({
+        displayMode: "integrated",
+        integratedTargetId: "jupiter-plugin",
+      });
+    }
+  }, []);
+
+  return (
+    <>
+      <Script
+        src="https://plugin.jup.ag/plugin-v1.js"
+        data-preload
+        strategy="afterInteractive"
+        onReady={() => {
+          window.Jupiter.init({
+            displayMode: "integrated",
+            integratedTargetId: "jupiter-plugin",
+          });
+        }}
+      />
+      <h1>Jupiter Plugin Demo</h1>
+      <div id="jupiter-plugin" />
+    </>
+  );
+}
+```
+
+<Info>
+Next.js requires `"use client"` for components that use `window` or `useEffect`. The `Script` component with `onReady` ensures the plugin initialises after the script loads.
+</Info>
+
+### Alternative: npm package
+
+You can also install the plugin as an npm package instead of using the script tag:
+
+```bash
+npm install @jup-ag/plugin
+```
+
+```tsx
+import { useEffect } from "react";
+import "@jup-ag/plugin/css";
+
+export default function App() {
+  useEffect(() => {
+    import("@jup-ag/plugin").then((mod) => {
+      mod.init({
+        displayMode: "integrated",
+        integratedTargetId: "jupiter-plugin",
+      });
+    });
+  }, []);
+
+  return <div id="jupiter-plugin" />;
+}
+```
+
+<Warning>
+Using the npm package means you maintain its dependencies and update it manually. The script tag always loads the latest version.
+</Warning>
+
+---
+
+## Configuration
+
+### Display modes
+
+Jupiter Plugin offers three display modes:
+
+| Mode | Description | Use case |
+|------|-------------|----------|
+| `integrated` | Embeds directly in your page layout | Dedicated swap page or section |
+| `widget` | Floating button that expands to a swap form | Quick access on any page |
+| `modal` | Popup overlay triggered by your app | On-demand swap without layout changes |
+
+```javascript
+// Integrated — renders inside a target element
+window.Jupiter.init({
+  displayMode: "integrated",
+  integratedTargetId: "jupiter-plugin", // ID of your container div
+});
+
+// Widget — floating in a corner
+window.Jupiter.init({
+  displayMode: "widget",
+  widgetStyle: {
+    position: "bottom-right", // bottom-left, bottom-right, top-left, top-right
+    size: "default",          // sm, default
+  },
+});
+
+// Modal — popup overlay
+window.Jupiter.init({
+  displayMode: "modal",
+});
+```
+
+### Form props
+
+Pre-configure the swap form with `formProps`:
+
+```javascript
+window.Jupiter.init({
+  displayMode: "integrated",
+  integratedTargetId: "jupiter-plugin",
+  formProps: {
+    initialInputMint: "So11111111111111111111111111111111111111112",  // SOL
+    initialOutputMint: "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", // JUP
+    initialAmount: "1",
+    fixedMint: "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", // Lock output to JUP
+    fixedAmount: false,
+  },
+});
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `initialInputMint` | `string` | Pre-select the input token (mint address) |
+| `initialOutputMint` | `string` | Pre-select the output token (mint address) |
+| `initialAmount` | `string` | Pre-fill the swap amount |
+| `fixedMint` | `string` | Lock one side of the swap to a specific token |
+| `fixedAmount` | `boolean` | Prevent users from changing the amount |
+| `swapMode` | `string` | `"ExactIn"`, `"ExactOut"`, or `"ExactInOrOut"` (default) |
+
+**Community token site example** — force users to buy your token:
+
+```javascript
+window.Jupiter.init({
+  displayMode: "integrated",
+  integratedTargetId: "jupiter-plugin",
+  formProps: {
+    initialOutputMint: "YOUR_TOKEN_MINT_ADDRESS",
+    fixedMint: "YOUR_TOKEN_MINT_ADDRESS",
+  },
+});
+```
+
+### Wallet passthrough
+
+If your app already has a wallet provider (e.g. via `@solana/wallet-adapter`), you can pass the wallet state through to Plugin instead of having users connect twice:
+
+```javascript
+window.Jupiter.init({
+  displayMode: "integrated",
+  integratedTargetId: "jupiter-plugin",
+  enableWalletPassthrough: true,
+});
+
+// Sync wallet state when it changes
+window.Jupiter.syncProps({
+  passthroughWalletContextState: walletContextState,
+});
+```
+
+If you don't enable passthrough, Plugin provides its own wallet connection — users simply connect their browser wallet (Phantom, Backpack, etc.) directly through the widget.
+
+### Referral fees
+
+Earn fees on swaps through the [Jupiter Referral Program](/tool-kits/referral-program):
+
+```javascript
+window.Jupiter.init({
+  displayMode: "widget",
+  formProps: {
+    referralAccount: "YOUR_REFERRAL_ACCOUNT",
+    referralFee: 50, // Basis points (50 = 0.5%)
+  },
+});
+```
+
+### Branding
+
+Add your logo and name to the Plugin:
+
+```javascript
+window.Jupiter.init({
+  displayMode: "widget",
+  branding: {
+    logoUri: "https://your-app.com/logo.png",
+    name: "Your App",
+  },
+});
+```
+
+### Colour theme
+
+Customise colours via CSS variables in your global stylesheet:
+
+```css
+:root {
+  --jupiter-plugin-primary: 199, 242, 132;
+  --jupiter-plugin-background: 0, 0, 0;
+  --jupiter-plugin-primaryText: 232, 249, 255;
+  --jupiter-plugin-warning: 251, 191, 36;
+  --jupiter-plugin-interactive: 33, 42, 54;
+  --jupiter-plugin-module: 16, 23, 31;
+}
+```
+
+### Event handling
+
+Track swap results in your app:
+
+```javascript
+window.Jupiter.init({
+  displayMode: "widget",
+  onSuccess: ({ txid, swapResult, quoteResponseMeta }) => {
+    console.log("Swap successful:", txid);
+  },
+  onSwapError: ({ error, quoteResponseMeta }) => {
+    console.error("Swap failed:", error);
+  },
+});
+```
+
+---
+
+## Common questions
+
+<AccordionGroup>
+  <Accordion title="Do I need an API key or RPC node?">
+    No. Jupiter Plugin handles all infrastructure through Ultra. No API key, no RPC node, no backend required.
+  </Accordion>
+
+  <Accordion title="Can I lock the swap to a specific token?">
+    Yes. Use `formProps.fixedMint` to lock one side of the swap to a specific token mint address. Combine with `fixedAmount` to also lock the amount (useful for payment flows).
+  </Accordion>
+
+  <Accordion title="How do users connect their wallet?">
+    Plugin provides wallet connection out of the box. Users click the connect button in the widget and select their browser wallet (Phantom, Backpack, etc.). If your app already has a wallet provider, use `enableWalletPassthrough` to avoid a double connection.
+  </Accordion>
+
+  <Accordion title="How do I test before deploying?">
+    Use the [Plugin Playground](https://plugin.jup.ag/) to experiment with display modes, form props, and colour themes. It generates the configuration code for you.
+  </Accordion>
+
+  <Accordion title="Why does integrated mode have no height?">
+    The integrated mode container needs a fixed height. Set it on your target div:
+
+    ```html
+    <div id="jupiter-plugin" style="height: 600px;"></div>
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+- **[Plugin Playground](https://plugin.jup.ag/)** — Experiment with configuration and get code snippets
+- **[Customisation Reference](/tool-kits/plugin/customization)** — Full configuration options and TypeScript types
+- **[Framework Walkthroughs](/tool-kits/plugin/nextjs-app-example)** — Step-by-step guides for Next.js, React, and HTML
+- **[Referral Program](/tool-kits/referral-program)** — Earn fees on swaps through your integration
+- **[Jupiter Dev Notifications](https://t.me/jup_dev)** — Plugin updates and announcements

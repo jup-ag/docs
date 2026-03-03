@@ -20,23 +20,33 @@ llmsDescription: "Blog post detailing how Jupiter built AI-friendly developer
 
 ![Building the Most AI-Friendly Developer Resource](/static/blog/building-ai-friendly-docs/ai-blog.png)
 
-We built docs that developers loved. Then we watched AI agents try to use them,
-and learned that good and navigable are not the same thing.
+It started with a bet. Our DevRel team wanted to see how close AI was to
+replacing us. So we handed an agent our docs and told it to build a demo app
+using a few Jupiter APIs.
 
-Your documentation has a new first reader. When developers integrate a new
-protocol today, their first move is increasingly to hand the docs to an AI
-agent and say "figure it out." The AI reads your docs, interprets them, and
-writes code the developer ships. If it gets it right, the developer has a
-working integration in minutes. If it gets it wrong, they get confidently
-broken code — and may not catch it until something fails in production.
+It got there. Eventually. But only with our Mintlify MCP server installed in
+the IDE, and even then it took a dozen prompts of back-and-forth to reach
+working code. Without the MCP? The agent wrote integrations against endpoints
+that didn't exist, mixed up parameter formats, and produced code that looked
+right but broke the moment you ran it.
 
-This is the multiplier effect. Good docs have always mattered, but now they
-compound. Every improvement in structure and clarity is amplified across every
-AI tool that reads your pages. Every gap and ambiguity is amplified too.
+That was the wake-up call. When developers integrate a protocol today, their
+first move is increasingly to hand the docs to an AI agent and say "figure it
+out." If the agent gets it right, the developer has a working integration in
+minutes. If it gets it wrong, they get plausible but broken code, and may not
+catch it until production.
 
-This post explores how we responded to that shift — with two principles:
-making docs the single source of truth for both humans and AI, and meeting
-AI tools wherever they already work.
+Good docs have always mattered, but now they compound. Every improvement in
+clarity gets amplified across every AI tool that reads your pages. Every gap
+gets amplified too.
+
+There's a saying in the AI space: if the output is slop, it's because the input
+was slop. The quality and richness of what you feed an agent, and whether it's
+in a form the agent can actually ingest, determines what comes out the other
+side. That's on you now.
+
+This post is about how we responded: make docs the single source of truth for
+both humans and AI, and meet AI tools wherever they already work.
 
 ---
 
@@ -44,75 +54,72 @@ AI tools wherever they already work.
 
 The immediate instinct is to bolt something on. Publish an `llms.txt`. Train
 a chatbot. Write "machine-optimised" descriptions. Each helps in isolation,
-but they don't address the deeper shift: AI is no longer a secondary consumer
-of your documentation. It's the primary one. And the way it reads, and fails,
-is fundamentally different from humans.
+but they miss the bigger shift: AI is the primary consumer of your
+documentation now. And the way it fails is different from humans.
 
 A human reads a confusing paragraph and asks for clarification. An AI reads
-it and generates code that looks right but isn't. The failure mode isn't
-confusion or misunderstanding, it's confidently wrong. That raises the stakes
-on everything downstream: what your AI reads, how it reads it, and whether
-what it reads is current.
+it and generates code that looks right but isn't. And it does this with
+complete conviction.
 
-When we started building AI support into our docs, two things sharpened this for us.
+Two things became clear early on.
 
-**AI tools don't all read the same way.** This isn't a theoretical concern —
-you can see it in how the standards have emerged independently.
-[llmstxt.org](https://llmstxt.org) defines a structured index for LLM
-discovery. [Model Context Protocol](https://modelcontextprotocol.io/) defines
-a live query interface for AI editors. [agentskills.io](https://agentskills.io)
-defines action schemas for agent frameworks. These standards exist because
-they solve different problems: a RAG pipeline wants to ingest your entire site
-as a single file, an MCP client wants to query specific pages in real time,
-an agent framework wants structured action definitions with input/output
-schemas, and a build script just wants to curl one page as raw markdown.
-Optimising for one doesn't help the others. It's not a one-size-fits-all
-problem — there's a landscape of consumption patterns, and it's going to
-keep evolving.
+**AI tools don't all read the same way.**
+[llmstxt.org](https://llmstxt.org) is a structured index for LLM discovery,
+[MCP](https://modelcontextprotocol.io/) is a live query interface for AI
+editors, [agentskills.io](https://agentskills.io) is an action schema spec for
+agent frameworks. A RAG pipeline wants your entire site as a single file, an
+MCP client wants to query pages in real time, an agent framework wants
+structured tool definitions, and a build script just wants to curl one page as
+markdown. Optimising for one doesn't help the others.
 
-**What AI reads needs to stay current.** This is a well-known problem in
-software engineering — it's why OpenAPI generates from code, why JSDoc
-generates from source, why every team that's maintained parallel
-documentation has eventually watched one version go stale. The same principle
-applies here. The moment you maintain an "AI version" of your docs or resource 
-alongside the human version, you've created a synchronisation problem. Content 
-diverges. Specs go stale. The LLM index says one thing; the actual endpoint does 
-another. We haven't maintained parallel AI resources long enough to feel this
-pain yet, but the pattern is predictable. And when AI is the first reader,
-stale content doesn't just confuse — it generates wrong code confidently at 
-scale.
-
-So the question we kept coming back to: if AI is the first reader, how do you
-make sure it reads well — across every tool, every workflow, every time?
+**What AI reads needs to stay current.** This is why OpenAPI generates from
+code, why JSDoc generates from source, why every team that's maintained
+parallel documentation has eventually watched one version go stale. The moment
+you maintain an "AI version" of your docs alongside the human version, you've
+created a sync problem. Content diverges. Specs go stale. The LLM index says
+one thing; the actual endpoint does another. We haven't been doing this long
+enough to feel the pain yet, but the pattern is predictable. And when AI is
+the first reader, stale content doesn't just confuse people, it generates wrong
+code at scale.
 
 ---
 
 ## One Source, Many Outputs
 
-The approach we took: make the documentation itself the single source from
-which every AI entry point is derived. No separation of content. No parallel
-maintenance. Enrich the existing source, then generate the paths.
+Make the documentation the single source from which every AI entry point is
+derived. Don't separate content. Don't maintain parallel versions. Enrich
+what's already there, then generate outputs from it.
 
-It starts with the API layer. Jupiter's APIs are developer experience first — 
-API-first, no RPC required, no mandatory API keys, clean JSON in and JSON out. 
-This isn't an AI-specific design decision, but it's the foundation that makes 
-everything else possible. Any agent that can make HTTP calls can interact with 
-Jupiter. No SDK installation, no blockchain node setup, no binary dependencies.
+One of the first things we learned was that our docs were serving HTML pages.
+Humans don't care; browsers render them fine. But AI agents parse markdown far
+more reliably than raw HTML. It took us a while to realise that the format
+mattered as much as the content. Not a massive change on its own, but these
+small fixes add up. That was the first one, and it set the direction for
+everything after.
 
-With that foundation in place, the goal is to adapt and enrich the existing source 
-to meet the needs of every AI consumption path.
+Jupiter's APIs are designed around developer experience: REST-first, no RPC
+required, no mandatory API keys, clean JSON in and JSON out. That's not an
+AI-specific decision, but it's what makes everything else work. Any agent that
+can make HTTP calls can interact with Jupiter without installing an SDK, setting
+up a blockchain node, or managing binary dependencies.
+
+From there, the goal was to enrich the existing docs to serve every AI
+consumption path.
 
 ### llms.txt
 [`llms.txt`](https://dev.jup.ag/llms.txt) is auto-generated from page
-frontmatter and navigation config, following the [llmstxt.org](https://llmstxt.org) 
-standard. It's a structured Markdown index of every API, guide, and reference page 
-with its `llmsDescription`. For RAG pipelines that need complete content, 
-[`llms-full.txt`](https://dev.jup.ag/llms-full.txt) concatenates the entire site 
-into a single file.
+frontmatter and navigation config, following the [llmstxt.org](https://llmstxt.org)
+standard. It's a structured Markdown index of every API, guide, and reference
+page with its `llmsDescription`. For RAG pipelines that need complete content,
+[`llms-full.txt`](https://dev.jup.ag/llms-full.txt) concatenates the entire
+site into a single file.
 
-The `llmsDescription` is a new frontmatter field we've added to every page
-alongside the existing human-facing `description`. The change is small yet
-effective.
+The `llmsDescription` is a frontmatter field we've added to every page
+alongside the existing human-facing `description`. We didn't start here. It
+took a few rounds of discussion on the team to land on dual descriptions. What
+an LLM reads efficiently (endpoint paths, parameter names, concrete behaviour)
+isn't always what a human wants to scan on a docs page. Trying to serve both
+audiences with one description means compromising for each.
 
 ```yaml
 ---
@@ -126,13 +133,13 @@ llmsDescription: "Jupiter Ultra Swap API provides a managed swap execution
 ```
 
 - `description` is short and scannable: written for a human browsing the site.
-- `llmsDescription` is descriptive and detailed, more technical: specific endpoints,
-key capabilities, what the API actually does and how to call it. Both live on the
-same page. One update to the source, and both descriptions are current.
+- `llmsDescription` is specific and technical: endpoints, key capabilities,
+what the API actually does and how to call it. Both live on the same page.
+Update one, and both stay current.
 
 ### skill.md
 Most agent "skills" or "tools" in the ecosystem are individual function
-definitions — one tool per API call. Give an agent 50 endpoint definitions
+definitions, one tool per API call. Give an agent 50 endpoint definitions
 and it has to figure out which one matches the developer's intent. That means
 loading every tool into context, parsing each schema, and hoping the LLM
 picks the right one. It works for simple integrations, but a protocol with
@@ -140,14 +147,13 @@ dozens of endpoints across multiple products needs something more intentional.
 
 [`skill.md`](https://dev.jup.ag/skill.md) follows the
 [agentskills.io](https://agentskills.io) specification with an intent-routing
-approach. Instead of one tool per endpoint, it organises
-Jupiter's capabilities by what a developer actually wants to do. An agent
-that receives "swap tokens" gets routed to the Ultra API family and its first
-action. "Check price" gets routed to the Price API. The agent doesn't need to
-know Jupiter's full API surface — it expresses intent, and the skill handles
-the mapping.
+approach. Instead of one tool per endpoint, it organises Jupiter's capabilities
+by what a developer actually wants to do. An agent that receives "swap tokens"
+gets routed to the Ultra API family and its first action. "Check price" gets
+routed to the Price API. The agent doesn't need to know Jupiter's full API
+surface; it expresses intent, and the skill handles the mapping.
 
-This is more robust than a flat list of tools. If endpoints are added or APIs
+This works better than a flat list of tools. If endpoints are added or APIs
 are restructured, the intent categories stay stable. It's also more
 token-efficient: instead of 50 tool schemas in context, the agent loads one
 skill definition with intent categories and lets the router resolve the rest.
@@ -161,40 +167,38 @@ ships framework-specific definitions ready to drop in:
 - **LangChain:** `@tool` decorated functions
 
 ### MCP
-Most AI tools today get their context from web searches. The problem is that
-search results are cached and indexed — not live. When an API changes, search
-engines may not reflect it for days or weeks. AI assistants confidently
-generate code against outdated endpoints, deprecated parameters, and stale
-examples. The developer gets working-looking code that breaks against the
-current API.
+Most AI tools today get their context from web searches. Search results are
+cached and indexed, not live. When an API changes, search engines may not
+reflect it for days or weeks. AI assistants generate code against outdated
+endpoints, deprecated parameters, and stale examples. The developer gets
+working-looking code that breaks against the current API.
 
-The [MCP server](https://dev.jup.ag/mcp) sidesteps this entirely. Via the
+The [MCP server](https://dev.jup.ag/mcp) avoids this. Via the
 [Model Context Protocol](https://modelcontextprotocol.io/), AI editors query
-the documentation source directly — the same source that generates `llms.txt`
-and `skill.md`. No caching layer. No indexing delay. The context your AI
-reads is always the context that's currently live.
+the documentation source directly, the same source that generates `llms.txt`
+and `skill.md`. No caching layer, no indexing delay. The context your AI reads
+is the context that's currently live.
 
 ### Markdown Export and OpenAPI Specs
-Every page in the docs can be accessed as raw markdown by appending `.md` to
+Remember the HTML problem from earlier? This is where that fix landed. Every
+page in the docs can now be accessed as raw markdown by appending `.md` to
 the URL or setting the `Accept: text/markdown` header. OpenAPI specs are
 accessible directly as YAML (e.g. `dev.jup.ag/openapi-spec/swap/swap.yaml`)
 and feed both human-readable API references and machine-readable schemas.
 
-Every path reads from the same source. Update a page — its content,
-frontmatter, or the OpenAPI spec it references — and the change propagates
-through `llms.txt`, gets picked up by MCP queries, flows into skill
-definitions, and reflects in any tool that processes it. One input, many
-outputs.
+Update a page, its content, frontmatter, or the OpenAPI spec it references,
+and the change propagates through `llms.txt`, gets picked up by MCP queries,
+flows into skill definitions, and shows up in any tool that processes it.
 
 ---
 
 ## Wherever Your AI Already Works
 
-This is where the two principles converge. AI tooling is fragmented — not
-because the ecosystem can't agree on a standard, but because they are different tools solving different problems. Each one is its own entrypoint into our docs.
+AI tooling is fragmented because these are different tools solving different
+problems. Each one is its own way into your docs.
 
-Because everything is derived from one source, meeting each of these doesn't mean 
-maintaining separate systems — it means adding another output from the same source.
+Because everything derives from one source, supporting each of them doesn't
+mean maintaining separate systems. It means adding another output.
 
 | How AI consumes docs | Jupiter resource |
 |:---|:---|
@@ -204,20 +208,29 @@ maintaining separate systems — it means adding another output from the same so
 | **Agent capabilities** | [`skill.md`](https://dev.jup.ag/skill.md) + [Skills Repository](https://github.com/jup-ag/agent-skills) |
 | **Single page fetch** | Add `.md` to any URL to get raw markdown |
 | **API schema** | [OpenAPI specs](https://dev.jup.ag/api-reference) for every product |
-| **LLMs friendly description** | `llmsDescription` frontmatter on every page |
+| **LLM-friendly description** | `llmsDescription` frontmatter on every page |
 
-The principle: don't force AI into one consumption pattern. Meet it wherever
-it already works.
+Don't force AI into one consumption pattern. Meet it wherever it already works.
 
-The landscape is still forming. New standards will emerge, new consumption
-patterns will appear, and the way AI tools read documentation will keep
-evolving. The single-source architecture means each new pattern is another
-output to add, not another system to build. We're watching how developers and
-their AI tools actually use these resources, and adapting accordingly.
+Since shipping these changes, the one-shotability (giving an agent a single
+prompt and getting working code back) has improved across the board. Jupiter
+was already the most recommended DeFi API in crypto, but now agents can
+actually use it without hand-holding.
+
+Our biggest open problem is versioning. Jupiter's APIs have been live for a
+while, and we've had deprecations. Agents don't always pick up that an endpoint
+has been superseded, and stale docs from old versions still float around the
+internet. One lesson from this: deprecate less often, and when you do, avoid
+breaking changes. It's not just annoying for developers, it's stale information
+that agents will keep serving long after you've moved on.
+
+New standards will come, consumption patterns will shift, and the way AI reads
+docs will keep changing. The single-source approach means each new pattern is
+another output to generate, not another system to maintain.
 
 If you're building on Jupiter with AI, or building AI-friendly docs for your
 own project, we'd love to hear what's working and what isn't. Reach out on
-[Discord](https://discord.gg/jup) or [X](https://x.com/JupiterDevRel).
+[Discord](https://discord.gg/jup) or [X](https://x.com/jupdevrel).
 
 ---
 
@@ -243,5 +256,3 @@ Everything described in this post is live and documented.
     Repository.
   </Card>
 </CardGroup>
-
-Just integrate Jupiter with confidence. But, let your AI do it with ease.

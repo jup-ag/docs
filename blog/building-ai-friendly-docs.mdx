@@ -11,36 +11,37 @@ llmsDescription: "Blog post detailing how Jupiter built AI-friendly developer do
 
 ![Building the Most AI-Friendly Developer Resource](/static/blog/building-ai-friendly-docs/ai-blog.png)
 
-Developers are shipping with AI. Whether it's Claude Code scaffolding an integration, Cursor autocompleting an API call, or a fully autonomous agent executing swaps, AI is reading your docs before your users do.
+We built docs that developers loved. Then we watched AI agents try to use them, and learned that good and navigable are not the same thing.
 
-We asked ourselves: what if we built our developer resources for AI from day one?
+Jupiter's developer docs cover every API, endpoint, and workflow. Our APIs are designed for simplicity from the start: no RPC nodes required, no mandatory API keys, clean REST with JSON in and JSON out. But AI agents don't browse docs the way humans do. They don't scan headings or click through navigation. They need structured paths to the right information.
 
-This is what we did.
+So we built those paths. This post walks through what's available to you and your AI tools when building on Jupiter.
 
 **A few terms you'll see throughout this post:**
 
 - **LLM (Large Language Model):** the AI models powering tools like ChatGPT, Claude, and Cursor
 - **RAG (Retrieval-Augmented Generation):** a pattern where AI tools fetch relevant documents before generating a response, improving accuracy
 - **MCP (Model Context Protocol):** an open protocol that lets AI editors query external data sources directly
-- **MEV (Maximal Extractable Value):** profit extracted by reordering, inserting, or censoring transactions on-chain, often at the expense of regular users
 
 ---
 
-## llms.txt: Giving AI a Map
+## Your AI Gets an Index
 
-The [llmstxt.org](https://llmstxt.org) standard defines a structured Markdown file that gives LLMs a high-level index of your documentation. We adopted it early.
+When your AI tool needs to integrate Jupiter, it doesn't have to crawl the entire docs site. It reads one file.
 
-Jupiter's [`llms.txt`](https://dev.jup.ag/llms.txt) is a curated index of every API, guide, and reference page with titles and descriptions. An AI agent can read this single file and understand what Jupiter offers, where to find it, and what each page covers.
+Jupiter's [`llms.txt`](https://dev.jup.ag/llms.txt) follows the [llmstxt.org](https://llmstxt.org) standard: a structured Markdown file with a curated index of every API, guide, and reference page, each with a title and description. Your AI agent can read this single file and understand what Jupiter offers, where to find it, and what each page covers.
 
 But an index alone isn't enough. We also generate [`llms-full.txt`](https://dev.jup.ag/llms-full.txt), the entire documentation site as a single file, for teams building RAG pipelines or needing complete context.
 
 Both files are auto-generated from our docs structure. Every time we ship a new page, the index updates. No manual curation required.
 
-**What this unlocks:** An AI agent can go from "I need to integrate Jupiter" to "here's the exact API endpoint" in one file read.
+**What this means for you:** Your AI agent can go from "I need to integrate Jupiter" to "here's the exact API endpoint" in one file read.
 
 ---
 
-## Dual Descriptions: Writing for Humans and Machines
+## Every Page Speaks Two Languages
+
+When your AI tool lands on a page, it gets context written specifically for it.
 
 Every page in our docs has two descriptions in its frontmatter:
 
@@ -59,11 +60,13 @@ The `description` field is for humans browsing the site. Short, scannable, writt
 
 The `llmsDescription` field is for AI. It's longer, more technical, and includes specific endpoints, key capabilities, and outcomes. When an AI tool reads our `llms.txt` or processes our frontmatter, it gets a description optimised for its needs.
 
-**What this unlocks:** AI tools get richer, more actionable context for every page without cluttering the human-facing description.
+**What this means for you:** Your AI tools get richer, more actionable context for every page without cluttering the human-facing description.
 
 ---
 
-## MCP: Docs Inside Your AI Editor
+## Docs Inside Your Editor
+
+You shouldn't have to leave your editor to look things up. Neither should your AI assistant.
 
 The [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) lets AI editors query external data sources in-context. Jupiter's docs expose a native MCP server at:
 
@@ -81,13 +84,13 @@ claude mcp add --scope user --transport http jupiter https://dev.jup.ag/mcp
 
 From there, your AI assistant can look up endpoints, read parameter schemas, scaffold API calls, and debug errors against the real specification.
 
-**What this unlocks:** Developers get Jupiter context directly in their AI workflow. No tab-switching, no copy-pasting from docs.
+**What this means for you:** Jupiter context directly in your AI workflow. No tab-switching, no copy-pasting from docs.
 
 ---
 
-## Agent Skills: Machine-Readable Capabilities
+## Pre-Built Actions for Agent Frameworks
 
-AI agents need more than documentation. They need structured action definitions they can discover and execute.
+Your agent doesn't need to figure out how to call Jupiter's APIs from scratch. The actions are already defined.
 
 Jupiter publishes [`skill.md`](https://dev.jup.ag/skill.md) following the [agentskills.io](https://agentskills.io) specification. This file describes every Jupiter capability with input/output schemas, API endpoints, trigger keywords, and example payloads. An agent framework can read this file and know exactly how to interact with Jupiter.
 
@@ -100,47 +103,13 @@ We also open-sourced the [Jupiter Skills Repository](https://github.com/jup-ag/a
 
 The repository includes an intent router that maps developer intent (like "swap tokens" or "check price") to the right API family and first action.
 
-**What this unlocks:** Agent frameworks can integrate Jupiter without custom code. Define the skill once, and any LLM with function calling can execute swaps, fetch prices, and manage positions.
+**What this means for you:** Agent frameworks can integrate Jupiter without custom code. Define the skill once, and any LLM with function calling can execute swaps, fetch prices, and manage positions.
 
 ---
 
-## REST-First, RPC-Less: APIs Built for Agents
+## Every Page, AI-Readable
 
-Most Solana integrations require developers to manage RPC connections, construct transactions, and handle blockchain complexity. AI agents shouldn't need to.
-
-Jupiter's APIs are designed differently:
-
-- **No RPC required.** All blockchain interactions happen server-side. Agents don't need Solana nodes.
-- **No API key required.** Start making API calls immediately. Keys are optional, for higher rate limits via [Developer Portal](https://portal.jup.ag).
-- **Clean REST interfaces.** JSON in, JSON out. No SDKs to install, no binary dependencies.
-
-An AI agent can execute a token swap in four HTTP calls:
-
-```bash
-# 1. Search for a token
-curl "https://lite-api.jup.ag/tokens/v2/search?query=SOL"
-
-# 2. Get a price
-curl "https://lite-api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112"
-
-# 3. Get a swap quote
-curl "https://lite-api.jup.ag/ultra/v1/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=10000000&taker=yourWalletAddress"
-
-# 4. Execute the swap
-curl -X POST "https://lite-api.jup.ag/ultra/v1/execute" \
-  -H "Content-Type: application/json" \
-  -d '{"signedTransaction": "signedTransaction", "requestId": "requestId"}'
-```
-
-This is the fastest path from intent to execution in Solana DeFi.
-
-**What this unlocks:** Any AI agent that can make HTTP calls can interact with Jupiter. No blockchain expertise required.
-
----
-
-## Markdown Export: Every Page is AI-Readable
-
-Sometimes an agent needs one specific page, not the whole index. Any Jupiter documentation page can be accessed as raw markdown:
+Sometimes your agent needs one specific page, not the whole index. Any Jupiter documentation page is accessible as raw markdown:
 
 **Append `.md` to any URL:**
 
@@ -154,44 +123,27 @@ curl https://dev.jup.ag/docs/ultra.md
 curl -H "Accept: text/markdown" https://dev.jup.ag/docs/ultra
 ```
 
-Both return clean markdown that an AI tool can parse directly. Combined with `llms.txt` for discovery and MCP for in-editor access, this gives AI agents multiple paths to get the information they need.
+Both return clean markdown your AI tool can parse directly. Combined with `llms.txt` for discovery and MCP for in-editor access, your agents have multiple paths to the information they need.
 
-**What this unlocks:** AI tools can fetch exactly the page they need in a format they can parse. No HTML stripping required.
+**What this means for you:** Your AI tools can fetch exactly the page they need in a parseable format. No HTML stripping required.
 
 ---
 
-## Docs as the Source of Truth
+## One Source, Many Paths
 
-Every AI resource mentioned above is derived from the same place: the docs repo.
+Here's what ties it all together: every path leads back to the same source.
 
-- `llms.txt` and `llms-full.txt`
-- `skill.md`
-- The MCP server
-- Markdown export
-
-We don't maintain a separate set of "AI docs." The documentation itself is the source of truth, and AI entry points are generated or served directly from it:
+`llms.txt`, `skill.md`, MCP, markdown export, OpenAPI specs: all derived from or served directly from the docs repo. There's no separate "AI version" that drifts out of sync. When a page's frontmatter is updated, the change flows into `llms.txt`, gets picked up by MCP queries, and enriches any tool that processes the page. One input, many outputs.
 
 - `llms.txt` is auto-generated from frontmatter and navigation config
 - `skill.md` is auto-generated from documentation structure and OpenAPI specs
 - The MCP server serves docs content directly
 - Markdown export renders the same pages in a different format
-- OpenAPI specs live in the docs repo and feed both human-readable API references and machine-readable schemas
+- OpenAPI specs feed both human-readable API references and machine-readable schemas
 
-Update a doc page once, and every AI entry point reflects the change. No drift. No separate system to keep in sync.
+Adding `llmsDescription` to a page takes 30 seconds. From there, it propagates everywhere. That's what makes the approach sustainable at scale.
 
-This is what makes the approach sustainable. Adding `llmsDescription` to a page's frontmatter takes 30 seconds. From there, it flows into `llms.txt`, gets picked up by MCP queries, and enriches any tool that processes the page. One input, many outputs.
-
-The alternative, maintaining separate AI documentation alongside human documentation, doesn't scale. Content drifts. Specs go stale. Teams stop updating the "other" version. By making docs the single source, we removed that failure mode entirely.
-
-**What this unlocks:** A documentation workflow that stays AI-friendly by default, not as an afterthought that requires separate maintenance.
-
----
-
-## Meeting AI Where It Is
-
-There's no single way AI tools consume documentation. Some use RAG pipelines. Some query MCP servers. Some parse skill definitions. Some fetch raw markdown.
-
-We built for all of them:
+There's no single way AI tools consume documentation. Some use RAG pipelines. Some query MCP servers. Some parse skill definitions. Some fetch raw markdown. Jupiter supports all of them:
 
 | AI consumption pattern | Jupiter resource |
 |:---|:---|
@@ -207,20 +159,23 @@ The principle: don't force AI into one consumption pattern. Meet it wherever it 
 
 ---
 
-## What We Learned
+## Start Here
 
-Building AI-friendly docs isn't a separate project. It's a set of decisions layered into your existing documentation workflow.
+Everything in this post is live and documented:
 
-**Write two descriptions.** The human-facing description and the AI-optimised description serve different purposes. Maintaining both is low effort with high payoff.
-
-**Auto-generate everything you can.** Our `llms.txt` is generated from frontmatter and navigation config. No manual index to maintain. When docs change, the AI index changes.
-
-**Expose structured data, not prose alone.** OpenAPI specs, skill definitions, and intent routers give AI tools deterministic paths to the right information. Prose is great for humans. Structured data is what AI can act on.
-
-**Make APIs AI-native from the start.** RPC-less, key-optional, REST-first. Every design decision that reduces integration friction for humans reduces it even more for AI.
-
-**Provide multiple entry points.** RAG, MCP, skills, markdown export, OpenAPI. Different AI tools work differently. Cover the major patterns and you cover most use cases.
-
-We're still iterating. AI tooling moves fast and so do we. Everything mentioned here is live at [dev.jup.ag](https://dev.jup.ag) and the [AI section](/ai) of our docs.
+<CardGroup cols={2}>
+  <Card title="AI Overview" icon="robot" href="/ai">
+    Why Jupiter is built for AI agents, and the quickstart for getting an agent from zero to swap in four API calls.
+  </Card>
+  <Card title="llms.txt" icon="file-lines" href="/ai/llms-txt">
+    Structured documentation index for LLM consumption. Summary and full-context versions.
+  </Card>
+  <Card title="MCP" icon="plug" href="/ai/mcp">
+    Connect your AI editor to Jupiter docs and APIs via Model Context Protocol.
+  </Card>
+  <Card title="Skills" icon="wand-magic-sparkles" href="/ai/skills">
+    Pre-built agent skills and the open-source Jupiter Skills Repository.
+  </Card>
+</CardGroup>
 
 Build with Jupiter. Let your AI build with Jupiter too.

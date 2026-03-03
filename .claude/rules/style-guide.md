@@ -53,6 +53,7 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 | as mentioned above    | (link to the section)       | Pages are non-linear — readers jump in   |
 | click here            | (use descriptive link text) | Bad for accessibility and scanning       |
 | em dash for asides    | comma, period, or restructure | Em dashes read as AI-generated; prefer cleaner sentence structure |
+| dApp, dapp, DApp      | app, application, website     | Avoid web3 jargon — use plain language   |
 
 ## Formatting Conventions
 

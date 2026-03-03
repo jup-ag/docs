@@ -53,16 +53,26 @@ The simplest way to add a swap widget — a single HTML file:
 
 Open this in a browser and you have a floating swap widget. That's it.
 
+<Accordion title="New to coding? Follow these steps">
+You don't need any development tools. Just a browser and a text editor.
+
+1. Open any text editor (Notepad on Windows, TextEdit on Mac — switch to plain text mode first)
+2. Copy the HTML code above and paste it into the editor
+3. Save the file as `swap.html` (make sure it ends in `.html`, not `.txt`)
+4. Find the file on your computer and double-click it — it opens in your browser
+5. You should see a floating swap widget in the corner of the page
+
+That's a working swap widget running locally on your machine. To put it on the internet, upload the file to any web hosting service.
+</Accordion>
+
 ---
 
 ## When you need this
 
-You want to add swap functionality to your app without building any of it yourself:
+You want to add swap functionality to your app or website without building any of it yourself:
 
-- **dApp with swap** — Your app needs token swaps but you don't want to build the UI, handle transactions, or run an RPC node
-- **Community token site** — Force users to buy your token by locking the output mint with `fixedMint`
-- **Existing app with a wallet** — Your app already has a wallet provider — Plugin supports wallet passthrough, so no extra wallet infrastructure needed
-- **Payment flow** — Accept a specific token at a fixed amount using `fixedAmount` and `fixedMint`
+- **App with swap** — Your app needs token swaps but you don't want to build the UI, handle transactions, or run an RPC node
+- **Community token site** — Let your community buy your token directly on your website by locking the output mint with `fixedMint`
 - **Quick swap access** — Add a floating widget to any page for convenient swapping
 
 Common searches that lead here:
@@ -70,6 +80,10 @@ Common searches that lead here:
 - "add token swap to my website"
 - "jupiter plugin integration"
 - "buy token widget solana"
+- "solana swap widget no backend"
+- "drop-in swap component solana"
+- "add jupiter swap to react app"
+- "token swap widget html"
 
 ---
 
@@ -93,11 +107,10 @@ Jupiter Plugin handles all of this. You get the full [jup.ag](https://jup.ag) sw
 
 ## Code examples
 
-### HTML
+Add the plugin script to your page, then call `window.Jupiter.init()`. Here's a complete working example for each framework:
 
-The minimal approach — no build tools, no dependencies:
-
-```html expandable
+<CodeGroup>
+```html HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,12 +135,11 @@ The minimal approach — no build tools, no dependencies:
 </html>
 ```
 
-Serve with any static file server (e.g. `npx http-server`).
-
-### React
-
-```tsx expandable
+```tsx React
 import { useEffect } from "react";
+
+// Add to public/index.html <head>:
+// <script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
 
 export default function App() {
   useEffect(() => {
@@ -146,11 +158,32 @@ export default function App() {
 }
 ```
 
-Add the plugin script to your `public/index.html`:
+```tsx Next.js
+"use client";
+import { useEffect } from "react";
+import Script from "next/script";
 
-```html
-<script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
+export default function SwapPage() {
+  return (
+    <>
+      <Script
+        src="https://plugin.jup.ag/plugin-v1.js"
+        data-preload
+        strategy="afterInteractive"
+        onReady={() => {
+          window.Jupiter.init({
+            displayMode: "integrated",
+            integratedTargetId: "jupiter-plugin",
+          });
+        }}
+      />
+      <h1>Jupiter Plugin Demo</h1>
+      <div id="jupiter-plugin" />
+    </>
+  );
+}
 ```
+</CodeGroup>
 
 <Accordion title="TypeScript support">
 Create a `plugin.d.ts` file in your project:
@@ -187,77 +220,6 @@ export {};
 
 For the full type declaration, see the [plugin repository](https://github.com/jup-ag/plugin/blob/main/src/types/index.d.ts).
 </Accordion>
-
-### Next.js
-
-```tsx expandable
-"use client";
-import { useEffect } from "react";
-import Script from "next/script";
-
-export default function SwapPage() {
-  useEffect(() => {
-    if (window.Jupiter) {
-      window.Jupiter.init({
-        displayMode: "integrated",
-        integratedTargetId: "jupiter-plugin",
-      });
-    }
-  }, []);
-
-  return (
-    <>
-      <Script
-        src="https://plugin.jup.ag/plugin-v1.js"
-        data-preload
-        strategy="afterInteractive"
-        onReady={() => {
-          window.Jupiter.init({
-            displayMode: "integrated",
-            integratedTargetId: "jupiter-plugin",
-          });
-        }}
-      />
-      <h1>Jupiter Plugin Demo</h1>
-      <div id="jupiter-plugin" />
-    </>
-  );
-}
-```
-
-<Info>
-Next.js requires `"use client"` for components that use `window` or `useEffect`. The `Script` component with `onReady` ensures the plugin initialises after the script loads.
-</Info>
-
-### Alternative: npm package
-
-You can also install the plugin as an npm package instead of using the script tag:
-
-```bash
-npm install @jup-ag/plugin
-```
-
-```tsx
-import { useEffect } from "react";
-import "@jup-ag/plugin/css";
-
-export default function App() {
-  useEffect(() => {
-    import("@jup-ag/plugin").then((mod) => {
-      mod.init({
-        displayMode: "integrated",
-        integratedTargetId: "jupiter-plugin",
-      });
-    });
-  }, []);
-
-  return <div id="jupiter-plugin" />;
-}
-```
-
-<Warning>
-Using the npm package means you maintain its dependencies and update it manually. The script tag always loads the latest version.
-</Warning>
 
 ---
 
@@ -322,7 +284,7 @@ window.Jupiter.init({
 | `fixedAmount` | `boolean` | Prevent users from changing the amount |
 | `swapMode` | `string` | `"ExactIn"`, `"ExactOut"`, or `"ExactInOrOut"` (default) |
 
-**Community token site example** — force users to buy your token:
+**Community token site example** — let your community buy your token directly:
 
 ```javascript
 window.Jupiter.init({
@@ -412,6 +374,19 @@ window.Jupiter.init({
   },
 });
 ```
+
+---
+
+## Plugin Playground
+
+The [Plugin Playground](https://plugin.jup.ag/) lets you configure and preview the widget in real time. You can:
+
+- Switch between display modes (integrated, widget, modal)
+- Set form props like initial tokens and fixed mints
+- Customise the colour theme to match your brand
+- Copy the generated configuration code directly into your project
+
+Use it to experiment before writing any code, or to fine-tune your configuration visually.
 
 ---
 

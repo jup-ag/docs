@@ -37,24 +37,24 @@ minutes. If it gets it wrong, they get plausible but broken code, and may not
 catch it until production.
 
 Good docs have always mattered, but now they compound. Every improvement in
-clarity gets amplified across every AI tool that reads your pages. Every gap
+clarity gets amplified across every AI tool that reads our pages. Every gap
 gets amplified too.
 
 There's a saying in the AI space: if the output is slop, it's because the input
-was slop. The quality and richness of what you feed an agent, and whether it's
+was slop. The quality and richness of what we feed an agent, and whether it's
 in a form the agent can actually ingest, determines what comes out the other
-side. That's on you now.
+side. That was on us.
 
 This post is about how we responded: make docs the single source of truth for
 both humans and AI, and meet AI tools wherever they already work.
 
 ---
 
-## Your Docs Have a New First Reader
+## Docs Have a New First Reader
 
 The immediate instinct is to bolt something on. Publish an `llms.txt`. Train
 a chatbot. Write "machine-optimised" descriptions. Each helps in isolation,
-but they miss the bigger shift: AI is the primary consumer of your
+but they miss the bigger shift: AI is the primary consumer of our
 documentation now. And the way it fails is different from humans.
 
 A human reads a confusing paragraph and asks for clarification. An AI reads
@@ -67,7 +67,7 @@ Two things became clear early on.
 [llmstxt.org](https://llmstxt.org) is a structured index for LLM discovery,
 [MCP](https://modelcontextprotocol.io/) is a live query interface for AI
 editors, [agentskills.io](https://agentskills.io) is an action schema spec for
-agent frameworks. A RAG pipeline wants your entire site as a single file, an
+agent frameworks. A RAG pipeline wants the entire site as a single file, an
 MCP client wants to query pages in real time, an agent framework wants
 structured tool definitions, and a build script just wants to curl one page as
 markdown. Optimising for one doesn't help the others.
@@ -75,7 +75,7 @@ markdown. Optimising for one doesn't help the others.
 **What AI reads needs to stay current.** This is why OpenAPI generates from
 code, why JSDoc generates from source, why every team that's maintained
 parallel documentation has eventually watched one version go stale. The moment
-you maintain an "AI version" of your docs alongside the human version, you've
+we maintain an "AI version" of our docs alongside the human version, we've
 created a sync problem. Content diverges. Specs go stale. The LLM index says
 one thing; the actual endpoint does another. We haven't been doing this long
 enough to feel the pain yet, but the pattern is predictable. And when AI is
@@ -86,8 +86,8 @@ code at scale.
 
 ## One Source, Many Outputs
 
-Make the documentation the single source from which every AI entry point is
-derived. Don't separate content. Don't maintain parallel versions. Enrich
+Our approach: make the documentation the single source from which every AI
+entry point is derived. No separate content, no parallel versions. Enrich
 what's already there, then generate outputs from it.
 
 One of the first things we learned was that our docs were serving HTML pages.
@@ -159,8 +159,8 @@ token-efficient: instead of 50 tool schemas in context, the agent loads one
 skill definition with intent categories and lets the router resolve the rest.
 
 `skill.md` is sourced directly from the open-source
-[Skills Repository](https://github.com/jup-ag/agent-skills), which also
-ships framework-specific definitions ready to drop in:
+[Jupiter Skills Repository](https://github.com/jup-ag/agent-skills), which
+also ships framework-specific definitions ready to drop in:
 
 - **Claude / OpenAI:** function calling with tool definitions
 - **Vercel AI SDK:** Zod-typed tool schemas
@@ -176,7 +176,7 @@ working-looking code that breaks against the current API.
 The [MCP server](https://dev.jup.ag/mcp) avoids this. Via the
 [Model Context Protocol](https://modelcontextprotocol.io/), AI editors query
 the documentation source directly, the same source that generates `llms.txt`
-and `skill.md`. No caching layer, no indexing delay. The context your AI reads
+and `skill.md`. No caching layer, no indexing delay. The context an AI reads
 is the context that's currently live.
 
 ### Markdown Export and OpenAPI Specs
@@ -192,25 +192,25 @@ flows into skill definitions, and shows up in any tool that processes it.
 
 ---
 
-## Wherever Your AI Already Works
+## Meeting AI Where It Already Works
 
 AI tooling is fragmented because these are different tools solving different
-problems. Each one is its own way into your docs.
+problems. Each one is its own way into our docs.
 
 Because everything derives from one source, supporting each of them doesn't
 mean maintaining separate systems. It means adding another output.
 
 | How AI consumes docs | Jupiter resource |
 |:---|:---|
-| **High-level discovery** | [`llms.txt`](https://dev.jup.ag/llms.txt) — structured index of all docs |
-| **Full-context ingestion** | [`llms-full.txt`](https://dev.jup.ag/llms-full.txt) — complete site content |
+| **High-level discovery** | [`llms.txt`](https://dev.jup.ag/llms.txt): structured index of all docs |
+| **Full-context ingestion** | [`llms-full.txt`](https://dev.jup.ag/llms-full.txt): complete site content |
 | **In-editor queries** | [MCP server](https://dev.jup.ag/mcp) |
 | **Agent capabilities** | [`skill.md`](https://dev.jup.ag/skill.md) + [Skills Repository](https://github.com/jup-ag/agent-skills) |
 | **Single page fetch** | Add `.md` to any URL to get raw markdown |
 | **API schema** | [OpenAPI specs](https://dev.jup.ag/api-reference) for every product |
 | **LLM-friendly description** | `llmsDescription` frontmatter on every page |
 
-Don't force AI into one consumption pattern. Meet it wherever it already works.
+We didn't force AI into one consumption pattern. We met it wherever it already works.
 
 Since shipping these changes, the one-shotability (giving an agent a single
 prompt and getting working code back) has improved across the board. Jupiter
@@ -222,7 +222,7 @@ while, and we've had deprecations. Agents don't always pick up that an endpoint
 has been superseded, and stale docs from old versions still float around the
 internet. One lesson from this: deprecate less often, and when you do, avoid
 breaking changes. It's not just annoying for developers, it's stale information
-that agents will keep serving long after you've moved on.
+that agents will keep serving long after we've moved on.
 
 New standards will come, consumption patterns will shift, and the way AI reads
 docs will keep changing. The single-source approach means each new pattern is

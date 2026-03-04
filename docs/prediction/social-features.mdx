@@ -51,10 +51,10 @@ Example response:
   "ownerPubkey": "TRADER_WALLET_PUBLIC_KEY",
   "realizedPnlUsd": "15000000",
   "totalVolumeUsd": "250000000",
-  "predictionsCount": 45,
-  "correctPredictions": 28,
-  "wrongPredictions": 17,
-  "totalActiveContracts": 150,
+  "predictionsCount": "45",
+  "correctPredictions": "28",
+  "wrongPredictions": "17",
+  "totalActiveContracts": "150",
   "totalPositionsValueUsd": "85000000"
 }
 ```
@@ -102,7 +102,8 @@ Example response:
 
 ```json expandable
 {
-  "data": [
+  "ownerPubkey": "TRADER_WALLET_PUBLIC_KEY",
+  "history": [
     { "timestamp": 1704067200, "realizedPnlUsd": "5000000" },
     { "timestamp": 1704672000, "realizedPnlUsd": "7500000" },
     { "timestamp": 1705276800, "realizedPnlUsd": "6800000" },
@@ -137,32 +138,34 @@ Example response:
 {
   "data": [
     {
+      "id": 425993,
       "ownerPubkey": "trader-pubkey-1",
-      "eventId": "event-123",
       "marketId": "market-456",
+      "message": "trader-pubkey-1 bought Yes for SOL $500 by Q2 2026 at $0.72 ($18.00)",
+      "timestamp": 1704067260,
       "action": "buy",
       "side": "yes",
-      "contracts": "25",
-      "priceUsd": "720000",
-      "amountUsd": "18000000",
-      "timestamp": 1704067260,
       "eventTitle": "Will SOL reach $500?",
       "marketTitle": "SOL $500 by Q2 2026",
-      "eventImageUrl": "https://..."
+      "amountUsd": "18000000",
+      "priceUsd": "720000",
+      "eventImageUrl": "https://...",
+      "eventId": "event-123"
     },
     {
+      "id": 425992,
       "ownerPubkey": "trader-pubkey-2",
-      "eventId": "event-789",
       "marketId": "market-012",
+      "message": "trader-pubkey-2 sold No for BTC halving before April 2024 at $0.45 ($4.50)",
+      "timestamp": 1704067200,
       "action": "sell",
       "side": "no",
-      "contracts": "10",
-      "priceUsd": "450000",
-      "amountUsd": "4500000",
-      "timestamp": 1704067200,
       "eventTitle": "Bitcoin halving date",
       "marketTitle": "BTC halving before April 2024",
-      "eventImageUrl": "https://..."
+      "amountUsd": "4500000",
+      "priceUsd": "450000",
+      "eventImageUrl": "https://...",
+      "eventId": "event-789"
     }
   ]
 }
@@ -170,10 +173,11 @@ Example response:
 
 | Field | Description |
 |:------|:------------|
+| `id` | Unique trade identifier |
 | `ownerPubkey` | Trader's wallet address |
+| `message` | Human-readable trade summary |
 | `action` | `buy` or `sell` |
 | `side` | `yes` or `no` |
-| `contracts` | Number of contracts traded |
 | `priceUsd` | Execution price in micro USD |
 | `amountUsd` | Total trade value in micro USD |
 | `eventTitle` | Parent event title |
@@ -214,25 +218,43 @@ Example response:
 {
   "data": [
     {
-      "rank": 1,
       "ownerPubkey": "top-trader-pubkey",
       "realizedPnlUsd": "50000000",
       "totalVolumeUsd": "500000000",
-      "winRatePct": "72.5",
-      "predictionsCount": 40
+      "predictionsCount": 40,
+      "correctPredictions": 30,
+      "wrongPredictions": 10,
+      "winRatePct": "75.00",
+      "period": "weekly",
+      "periodStart": "2026-02-24",
+      "periodEnd": "2026-03-03"
     },
     {
-      "rank": 2,
       "ownerPubkey": "second-trader-pubkey",
       "realizedPnlUsd": "35000000",
       "totalVolumeUsd": "400000000",
-      "winRatePct": "68.2",
-      "predictionsCount": 55
+      "predictionsCount": 55,
+      "correctPredictions": 37,
+      "wrongPredictions": 18,
+      "winRatePct": "67.27",
+      "period": "weekly",
+      "periodStart": "2026-02-24",
+      "periodEnd": "2026-03-03"
     }
   ],
   "summary": {
-    "totalVolume": "2500000000",
-    "totalPredictions": 1250
+    "all_time": {
+      "totalVolumeUsd": "7009708479895",
+      "predictionsCount": 31202
+    },
+    "weekly": {
+      "totalVolumeUsd": "186403707003",
+      "predictionsCount": 971
+    },
+    "monthly": {
+      "totalVolumeUsd": "269887658105",
+      "predictionsCount": 1743
+    }
   }
 }
 ```
@@ -269,7 +291,7 @@ const topTraderHistory = await fetch(
   { headers: { 'x-api-key': 'your-api-key' } }
 ).then(r => r.json());
 
-console.log('Top trader weekly P&L trend:', topTraderHistory.data);
+console.log('Top trader weekly P&L trend:', topTraderHistory.history);
 ```
 
 ## Summary

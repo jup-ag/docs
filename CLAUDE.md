@@ -133,7 +133,7 @@ For larger tasks (4+ pages), present a structured breakdown with clear scope per
 Before creating a new issue, search existing issues to avoid duplicates.
 
 Create a Linear issue for the work using the Linear MCP tools:
-- **Project:** `Claude Docs` (ID: `claude-docs-06e0a5a0fec6`)
+- **Project:** `Docs` (ID: `docs-18ccf0a02c86`)
 - **Team:** `DevRel`
 - **Title:** Action-oriented, specific — `[Area] Verb + what`
   - ✅ `[Ultra] Rewrite get-order page with complete code example`
@@ -159,10 +159,12 @@ description of what needs to be done, which files to touch, and when it's done.
 | `Todo`        | Issue created, work is planned                        |
 | `In Progress` | Actively working on the code changes                  |
 | `In Review`   | PR is open and waiting for human review               |
-| `Done`        | PR is approved, merged, and deployed                  |
+| `Content`     | PR merged, but there's a content/marketing opportunity (video, blog, tweet) |
+| `Done`        | All follow-up content is shipped, or no content needed |
 
-Never mark an issue as `Done` until the PR is merged. The issue status must
-reflect the actual state of the work, not the state of the code.
+Never mark an issue as `Done` until any content follow-up is complete (or
+explicitly not needed). The issue status must reflect the actual state of
+the work, not just the state of the code.
 
 - If a PR is rejected or needs changes, move the issue back to `In Progress`.
 - Keep it 1:1 — one issue per PR. If scope expands during a task, update the
@@ -200,10 +202,11 @@ Once the work is ready:
 - Update the Linear issue to `In Review`
 
 After PR is merged:
-- If the PR was already merged (by a human or CI), check if the Linear issue
-  is marked as `Done` — if not, update it
 - Return to main and pull: `git checkout main && git pull origin main`
-- Update the Linear issue to `Done`
+- Move the Linear issue to `Content` if the work creates a content opportunity
+  (video walkthrough, blog post, tweet, etc.). Most docs work does.
+- Only move to `Done` if there is genuinely no content follow-up needed
+  (e.g. typo fixes, config changes)
 
 ---
 

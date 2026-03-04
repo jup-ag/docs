@@ -4,15 +4,15 @@ description: "Technical deep dives into Jupiter products, team's research and le
 mode: "wide"
 ---
 
-<Card title="Ultra vs Metis: Execution Engine or Routing Primitive" href="/blog/ultra-vs-metis" img="/static/blog/ultra-vs-metis/ultra-vs-metis.png">
-	Should you integrate Ultra or Metis? A technical comparison between Jupiter's Swap APIs offering 
-	both execution engine or routing primitive options. Find out which one is right for you.
+<Card title="Building the Most AI-Friendly Developer Resource" href="/blog/building-ai-friendly-docs" img="/static/blog/building-ai-friendly-docs/ai-blog.png">
+	How Jupiter built developer docs that AI agents can actually use. llms.txt, MCP, agent skills,
+	dual descriptions, and REST-first APIs.
 
 	<div className="flex items-center gap-2 mb-3">
 		<span className="px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded flex items-center gap-1">
-			Swap
+			AI
 		</span>
-		<span className="text-sm text-gray-400">Jan 16, 2026</span>
+		<span className="text-sm text-gray-400">Mar 2, 2026</span>
 	</div>
 </Card>
 
@@ -22,6 +22,18 @@ mode: "wide"
 </div>
 
 <Columns cols={2}>
+	<Card title="Ultra vs Metis: Execution Engine or Routing Primitive" href="/blog/ultra-vs-metis" img="/static/blog/ultra-vs-metis/ultra-vs-metis.png">
+		Should you integrate Ultra or Metis? A technical comparison between Jupiter's Swap APIs offering
+		both execution engine or routing primitive options. Find out which one is right for you.
+
+		<div className="flex items-center gap-2 mb-3">
+			<span className="px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded flex items-center gap-1">
+				Swap
+			</span>
+			<span className="text-sm text-gray-400">Jan 16, 2026</span>
+		</div>
+	</Card>
+
 	<Card title="600 Lines of Code Nobody Asked For" href="/blog/why-ultra-v3" img="/static/blog/why-ultra-v3/mintlifyblogbanner.jpg">
 		Better execution, zero infrastructure, faster shipping. Why teams should just use Ultra V3.
 
@@ -32,11 +44,13 @@ mode: "wide"
 			<span className="text-sm text-gray-400">Nov 12, 2025</span>
 		</div>
 	</Card>
+</Columns>
 
+<Columns cols={2}>
 	<Card title="Ultra V3: The Ultimate Trading Engine" href="/blog/ultra-v3" img="/static/blog/ultra-v3/ultra-v3.png">
-		A technical deep dive into Jupiter's most comprehensive trading engine, Ultra V3, 
-		featuring exclusive new capabilities: Iris, Jupiter Beam, and Predictive Execution. 
-		Learn how it redefines swap execution and brings major improvements across every 
+		A technical deep dive into Jupiter's most comprehensive trading engine, Ultra V3,
+		featuring exclusive new capabilities: Iris, Jupiter Beam, and Predictive Execution.
+		Learn how it redefines swap execution and brings major improvements across every
 		aspect that matters.
 
 		<div className="flex items-center gap-2 mb-3">
@@ -46,13 +60,11 @@ mode: "wide"
 			<span className="text-sm text-gray-400">Oct 15, 2025</span>
 		</div>
 	</Card>
-</Columns>
 
-<Columns cols={2}>
 	<Card title="Metis v7" href="/blog/metis-v7" img="/static/blog/metis-v7/metis-v7.png">
-		Metis is now an independent public good at metis.builders with a new access model for v7. This separation 
-		establishes Metis as a standalone instruction-level swap primitive for builders who need full control 
-		over transaction execution. Additionally, Metis Binary moving forward will require authenticated access 
+		Metis is now an independent public good at metis.builders with a new access model for v7. This separation
+		establishes Metis as a standalone instruction-level swap primitive for builders who need full control
+		over transaction execution. Additionally, Metis Binary moving forward will require authenticated access
 		with a staked JUP requirement.
 
 		<div className="flex items-center gap-2 mb-3">
@@ -61,9 +73,5 @@ mode: "wide"
 			</span>
 			<span className="text-sm text-gray-400">Nov 17, 2025</span>
 		</div>
-	</Card>
-
-	<Card title="More Articles Coming Soon" href="/resources/support" img="/static/blog/stay-tuned.png">
-		Stay tuned for more technical insights and updates from Jupiter
 	</Card>
 </Columns>

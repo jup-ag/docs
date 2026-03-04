@@ -52,7 +52,7 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 | it should be noted    | (just state the thing)      | Filler                                   |
 | as mentioned above    | (link to the section)       | Pages are non-linear — readers jump in   |
 | click here            | (use descriptive link text) | Bad for accessibility and scanning       |
-| em dash for asides    | comma, period, or restructure | Em dashes read as AI-generated; prefer cleaner sentence structure |
+| em dash (—)           | colon, comma, period, or restructure | **Never use em dashes.** They read as AI-generated. Use a colon for explanations, a comma for light pauses, a period for separate thoughts, or restructure the sentence. |
 | dApp, dapp, DApp      | app, application, website     | Avoid web3 jargon — use plain language   |
 
 ## Formatting Conventions

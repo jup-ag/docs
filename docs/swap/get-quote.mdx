@@ -100,7 +100,13 @@ Example response:
     }
   ],
   "contextSlot": 299283763,
-  "timeTaken": 0.015257836
+  "timeTaken": 0.015257836,
+  "mostReliableAmmsQuoteReport": {
+    "info": {
+      "BZtgQEyS6eXUXicYPHecYQ7PybqodXQMvkjUbP4R8mUU": "16195832",
+      "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE": "16190214"
+    }
+  }
 }
 ```
 
@@ -116,6 +122,12 @@ Now, you are able to get a quote, next steps is to submit a transaction to execu
 
 
 ## Additional Resources
+
+### Route Debugging with mostReliableAmmsQuoteReport
+
+The quote response includes `mostReliableAmmsQuoteReport`, which shows what the most reliable AMMs would have quoted for the same token pair. Each key in the `info` object is an AMM account address, and the value is the quoted output amount as a string.
+
+This is useful for verifying that the routing engine selected the best path. Compare the reliable AMM quotes with the chosen route's `outAmount` to understand routing decisions. You can map AMM addresses to DEX labels using the [`/program-id-to-label`](/api-reference/swap/program-id-to-label) endpoint.
 
 ### Restrict Intermediate Tokens
 

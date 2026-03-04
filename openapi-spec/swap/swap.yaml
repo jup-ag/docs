@@ -278,6 +278,18 @@ components:
           format: uint64
         timeTaken:
           type: number
+        mostReliableAmmsQuoteReport:
+          type: object
+          nullable: true
+          description: |
+            - Quotes from the most reliable AMMs for the same token pair
+            - Useful for debugging and verifying route decisions
+            - Each key is an AMM account address, each value is the quoted output amount
+          properties:
+            info:
+              type: object
+              additionalProperties:
+                type: string
 
     SwapMode:
       type: string

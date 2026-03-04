@@ -32,7 +32,7 @@ For framework-based apps, you need **Node.js and npm** installed from [nodejs.or
 
 ## Quick start
 
-The simplest way to add a swap widget. A single HTML file:
+The simplest way to add a swap widget: a single HTML file:
 
 ```html
 <!DOCTYPE html>
@@ -95,9 +95,9 @@ Not ready to write code? The [Plugin Playground](https://plugin.jup.ag/) lets yo
 
 You want to add swap functionality to your app or website without building any of it yourself:
 
-- **App with swap.** Your app needs token swaps but you don't want to build the UI, handle transactions, or run an RPC node.
-- **Community token site.** Let your community buy your token directly on your website by locking the output mint with `fixedMint`.
-- **Quick swap access.** Add a floating widget to any page for convenient swapping.
+- **App with swap:** Your app needs token swaps but you don't want to build the UI, handle transactions, or run an RPC node.
+- **Community token site:** Let your community buy your token directly on your website by locking the output mint with `fixedMint`.
+- **Quick swap access:** Add a floating widget to any page for convenient swapping.
 
 Common searches that lead here:
 - "embed swap widget solana"
@@ -122,10 +122,10 @@ Building a swap interface from scratch means:
 
 Jupiter Plugin handles all of this. You get the full [jup.ag](https://jup.ag) swap experience as a drop-in component:
 
-- **No RPC.** Powered by Ultra, which handles all transaction sending.
-- **No wallet code.** Plugin provides wallet connection out of the box (users connect their existing browser wallet like Phantom or Backpack).
-- **No UI to build.** Complete swap interface with token search, price display, and transaction status.
-- **No error handling.** Plugin manages slippage, retries, and transaction failures.
+- **No RPC:** Powered by Ultra, which handles all transaction sending.
+- **No wallet code:** Plugin provides wallet connection out of the box (users connect their existing browser wallet like Phantom or Backpack).
+- **No UI to build:** Complete swap interface with token search, price display, and transaction status.
+- **No error handling:** Plugin manages slippage, retries, and transaction failures.
 
 ---
 
@@ -280,7 +280,7 @@ window.Jupiter.init({
 | `fixedAmount` | `boolean` | Prevent users from changing the amount |
 | `swapMode` | `string` | `"ExactIn"`, `"ExactOut"`, or `"ExactInOrOut"` (default) |
 
-**Community token site example.** Let your community buy your token directly:
+**Community token site example:** Let your community buy your token directly:
 
 ```javascript
 window.Jupiter.init({
@@ -405,8 +405,8 @@ window.Jupiter.init({
 
 ## Next steps
 
-- **[Plugin Playground](https://plugin.jup.ag/).** Experiment with configuration and get code snippets.
-- **[Customisation Reference](/tool-kits/plugin/customization).** Full configuration options and TypeScript types.
-- **[Framework Walkthroughs](/tool-kits/plugin/nextjs-app-example).** Step-by-step guides for Next.js, React, and HTML.
-- **[Referral Program](/tool-kits/referral-program).** Earn fees on swaps through your integration.
-- **[Jupiter Dev Notifications](https://t.me/jup_dev).** Plugin updates and announcements.
+- **[Plugin Playground](https://plugin.jup.ag/):** Experiment with configuration and get code snippets.
+- **[Customisation Reference](/tool-kits/plugin/customization):** Full configuration options and TypeScript types.
+- **[Framework Walkthroughs](/tool-kits/plugin/nextjs-app-example):** Step-by-step guides for Next.js, React, and HTML.
+- **[Referral Program](/tool-kits/referral-program):** Earn fees on swaps through your integration.
+- **[Jupiter Dev Notifications](https://t.me/jup_dev):** Plugin updates and announcements.

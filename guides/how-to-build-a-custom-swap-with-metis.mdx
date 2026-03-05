@@ -472,70 +472,73 @@ async function swap(inputMint, outputMint, amount, slippageBps) {
     inputMint, outputMint, amount, slippageBps: slippageBps.toString(), instructionVersion: 'V2',
   });
 
-  try {
-    // 1. Quote
-    const quoteResponse = await (await fetch(quoteUrl, {
-      headers: { 'x-api-key': 'YOUR_API_KEY' },
-    })).json();
+  // 1. Quote
+  const quoteResponse = await (await fetch(quoteUrl, {
+    headers: { 'x-api-key': 'YOUR_API_KEY' },
+  })).json();
 
-    if (quoteResponse.error) {
-      console.error('Quote failed:', { url: quoteUrl, response: quoteResponse });
-      throw new Error(quoteResponse.error);
-    }
+  console.log('Quote:', { url: quoteUrl, response: quoteResponse });
 
-    // 2. Build transaction
-    const swapPayload = {
-      quoteResponse,
-      userPublicKey: wallet.publicKey.toString(),
-      dynamicComputeUnitLimit: true,
-      prioritizationFeeLamports: {
-        priorityLevelWithMaxLamports: { priorityLevel: 'veryHigh', maxLamports: 1000000 },
-      },
-    };
-
-    const swapResponse = await (await fetch('https://api.jup.ag/swap/v1/swap', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY' },
-      body: JSON.stringify(swapPayload),
-    })).json();
-
-    if (swapResponse.error) {
-      console.error('Swap build failed:', { quoteUrl, swapPayload, response: swapResponse });
-      throw new Error(swapResponse.error);
-    }
-
-    // 3. Sign and send -- always submit on-chain rather than simulating locally.
-    //    On-chain transactions are logged by block explorers, which capture account
-    //    state and make debugging far easier than a local simulation error.
-    const transaction = VersionedTransaction.deserialize(
-      Buffer.from(swapResponse.swapTransaction, 'base64')
-    );
-    transaction.sign([wallet]);
-
-    const signature = await connection.sendRawTransaction(transaction.serialize(), {
-      maxRetries: 0,
-      skipPreflight: true,
-    });
-
-    console.log(`Sent: https://solscan.io/tx/${signature}`);
-
-    const confirmation = await connection.confirmTransaction({ signature }, 'finalized');
-    if (confirmation.value.err) {
-      console.error('Transaction failed on-chain:', {
-        signature,
-        error: confirmation.value.err,
-        quoteUrl,
-        quoteResponse,
-        swapTransaction: swapResponse.swapTransaction,
-      });
-      throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
-    }
-
-    return signature;
-  } catch (error) {
-    console.error('Swap error:', { quoteUrl, error: error.message });
-    throw error;
+  if (quoteResponse.error) {
+    throw new Error(`Quote failed: ${quoteResponse.error}`);
   }
+
+  // 2. Build transaction
+  const swapPayload = {
+    quoteResponse,
+    userPublicKey: wallet.publicKey.toString(),
+    dynamicComputeUnitLimit: true,
+    prioritizationFeeLamports: {
+      priorityLevelWithMaxLamports: { priorityLevel: 'veryHigh', maxLamports: 1000000 },
+    },
+  };
+
+  const swapResponse = await (await fetch('https://api.jup.ag/swap/v1/swap', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY' },
+    body: JSON.stringify(swapPayload),
+  })).json();
+
+  console.log('Swap:', { payload: swapPayload, response: swapResponse });
+
+  if (swapResponse.error) {
+    throw new Error(`Swap build failed: ${swapResponse.error}`);
+  }
+
+  // 3. Sign and send -- always submit on-chain rather than simulating locally.
+  //    On-chain transactions are logged by block explorers, which capture account
+  //    state and make debugging far easier than a local simulation error.
+  const transaction = VersionedTransaction.deserialize(
+    Buffer.from(swapResponse.swapTransaction, 'base64')
+  );
+  transaction.sign([wallet]);
+
+  const signature = await connection.sendRawTransaction(transaction.serialize(), {
+    maxRetries: 0,
+    skipPreflight: true,
+  });
+
+  console.log('Sent:', {
+    signature,
+    explorer: `https://solscan.io/tx/${signature}`,
+  });
+
+  const confirmation = await connection.confirmTransaction({ signature }, 'finalized');
+
+  if (confirmation.value.err) {
+    // Log everything needed to debug a failed on-chain transaction
+    console.error('Transaction failed on-chain:', {
+      signature,
+      error: confirmation.value.err,
+      quoteUrl,
+      quoteResponse,
+      swapTransaction: swapResponse.swapTransaction,
+    });
+    throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+  }
+
+  console.log('Swap confirmed:', signature);
+  return signature;
 }
 ```
 

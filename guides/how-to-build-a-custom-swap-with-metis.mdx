@@ -554,12 +554,14 @@ pub fn jupiter_swap_cpi(
 ```
 </CodeGroup>
 
-### CPI considerations
+<Note>
+**CPI considerations**
 
 - **Only use `swapInstruction`** from `/swap-instructions`. The `computeBudgetInstructions` are sized for a standalone swap, not your program. Set your own compute budget based on your full transaction.
 - **`setupInstructions` and `cleanupInstruction`** handle token account creation and SOL unwrapping. Include these as separate instructions in the outer transaction if needed, not inside the CPI.
 - **Priority fees** should be calculated based on your full transaction, not just the swap.
 - **CPI account limit:** Solana currently supports up to **128 accounts** in CPI calls. A future upgrade ([SIMD-0339](https://github.com/solana-foundation/solana-improvement-documents/blob/main/proposals/0339-increase-the-account-limit-per-transaction.md)) will raise the limit to 255.
+</Note>
 
 <Tip>
 For complete CPI examples, see [jup-ag/jupiter-cpi-swap-example](https://github.com/jup-ag/jupiter-cpi-swap-example) and [jup-ag/sol-swap-cpi](https://github.com/jup-ag/sol-swap-cpi). For the `jupiter-cpi` Rust crate, see [jup-ag/jupiter-cpi](https://github.com/jup-ag/jupiter-cpi).

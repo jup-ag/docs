@@ -175,11 +175,11 @@ Always pass `instructionVersion=V2`. V2 instructions support `nativeDestinationA
 
 | Field | What it means |
 |-------|---------------|
-| `outAmount` | Best output amount from routing (before slippage) |
-| `otherAmountThreshold` | Minimum output after applying `slippageBps` |
+| `outAmount` | Best output amount after deducting AMM fees and platform fees |
+| `otherAmountThreshold` | Minimum acceptable output — `outAmount` minus `slippageBps` tolerance |
 | `routePlan` | Route breakdown: which DEXes, percentage split, amounts |
 | `priceImpactPct` | Price impact as a decimal string (0 to 1, not a percentage). Multiply by 100 to get the percentage. A value of `1` means 100% price impact (total loss). |
-| `mostReliableAmmsQuoteReport` | Quotes from the most reliable AMMs for the same pair. Useful for [route debugging](#route-debugging) |
+| `mostReliableAmmsQuoteReport` | Markets that would have quoted for this pair. Useful for [route debugging](#route-debugging) |
 
 ### Step 2: Build the transaction
 
@@ -465,7 +465,7 @@ Setting `maxAccounts` too low reduces available DEXes and gives worse routes. St
 
 ### Route debugging
 
-The quote response includes `mostReliableAmmsQuoteReport`: what the most reliable AMMs would have quoted for the same pair.
+The quote response includes `mostReliableAmmsQuoteReport`: the markets that would have quoted for this pair.
 
 ```json
 "mostReliableAmmsQuoteReport": {

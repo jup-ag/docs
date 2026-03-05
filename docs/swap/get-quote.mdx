@@ -126,9 +126,9 @@ Now, you are able to get a quote, next steps is to submit a transaction to execu
 
 ### Route Debugging with mostReliableAmmsQuoteReport
 
-The quote response includes `mostReliableAmmsQuoteReport`, which shows what the most reliable AMMs would have quoted for the same token pair. Each key in the `info` object is an AMM account address, and the value is the quoted output amount as a string.
+The quote response includes `mostReliableAmmsQuoteReport`, which returns the markets that would have quoted for this pair. Each key in the `info` object is an AMM account address, and the value is the quoted output amount as a string.
 
-This is useful for verifying that the routing engine selected the best path. Compare the reliable AMM quotes with the chosen route's `outAmount` to understand routing decisions. You can map AMM addresses to DEX labels using the [`/program-id-to-label`](/api-reference/swap/program-id-to-label) endpoint.
+This is useful for verifying that the routing engine selected the best path. Compare these quotes with the chosen route's `outAmount` to understand routing decisions. You can map AMM addresses to DEX labels using the [`/program-id-to-label`](/api-reference/swap/program-id-to-label) endpoint.
 
 ### Restrict Intermediate Tokens
 

@@ -177,7 +177,7 @@ Always pass `instructionVersion=V2`. V2 instructions support `nativeDestinationA
 | Field | What it means |
 |-------|---------------|
 | `outAmount` | Best output amount after deducting AMM fees and platform fees |
-| `otherAmountThreshold` | Minimum acceptable output — `outAmount` minus `slippageBps` tolerance |
+| `otherAmountThreshold` | Minimum acceptable output, which is `outAmount` after applying `slippageBps` tolerance |
 | `routePlan` | Route breakdown: which DEXes, percentage split, amounts |
 | `priceImpactPct` | Price impact as a decimal string (0 to 1, not a percentage). Multiply by 100 to get the percentage. A value of `1` means 100% price impact (total loss). |
 | `mostReliableAmmsQuoteReport` | Markets that would have quoted for this pair. Useful for [route debugging](#route-debugging) |
@@ -265,7 +265,7 @@ swap_response = requests.post(
 | `wrapAndUnwrapSol` | `true` | Automatically wrap/unwrap SOL. Set to `false` if you manage wSOL yourself |
 | `useSharedAccounts` | `true` | Use shared intermediate token accounts. Essential for complex routing. May fail on some new low-liquidity AMMs |
 | `dynamicComputeUnitLimit` | `false` | Simulates the swap to provide an accurate compute unit limit. Recommended for all normal flows |
-| `dynamicSlippage` | `false` | Estimates and applies slippage automatically, overriding `slippageBps` from the quote. No longer maintained — use [Ultra](/docs/ultra/index) for RTSE |
+| `dynamicSlippage` | `false` | Estimates and applies slippage automatically, overriding `slippageBps` from the quote. No longer maintained; use [Ultra](/docs/ultra/index) for RTSE |
 | `prioritizationFeeLamports` | auto | Priority fee config. See below |
 | `computeUnitPriceMicroLamports` | none | Exact compute unit price for priority fee calculation. Prefer `prioritizationFeeLamports` with `dynamicComputeUnitLimit` instead |
 | `feeAccount` | none | Token account for platform fees. Required if `platformFeeBps` was set in `/quote` |
@@ -424,49 +424,49 @@ That's the entire integration.
 
 ## Error handling
 
-Errors can surface at every stage of the swap flow. Handle them accordingly.
+Errors can surface at every stage of the swap flow.
 
-### During quoting
+<AccordionGroup>
+  <Accordion title="During quoting">
+    | Error | What happened | What to do |
+    |-------|---------------|------------|
+    | `NO_ROUTES_FOUND` / `COULD_NOT_FIND_ANY_ROUTE` | No liquidity path exists | Check if the token is tradeable on [jup.ag](https://jup.ag). See [Market Listing](/docs/routing/market-listing) for the grace period criteria |
+    | `TOKEN_NOT_TRADABLE` | Token mint not available for trading | Verify the token has sufficient liquidity on supported DEXes |
+    | `ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT` | Route cannot process the full input amount | Reduce input amount for a better output |
+    | Invalid parameters | Bad `amount`, `slippageBps`, or mint address | Validate inputs before calling `/quote` |
+    | High `priceImpactPct` | Low liquidity or large trade relative to pool size | Not an error, but worth flagging. Reduce swap amount or split across multiple swaps |
+  </Accordion>
 
-| Error | What happened | What to do |
-|-------|---------------|------------|
-| `NO_ROUTES_FOUND` / `COULD_NOT_FIND_ANY_ROUTE` | No liquidity path exists | Check if the token is tradeable on [jup.ag](https://jup.ag). See [Market Listing](/docs/routing/market-listing) for the grace period criteria |
-| `TOKEN_NOT_TRADABLE` | Token mint not available for trading | Verify the token has sufficient liquidity on supported DEXes |
-| `ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT` | Route cannot process the full input amount | Reduce input amount for a better output |
-| Invalid parameters | Bad `amount`, `slippageBps`, or mint address | Validate inputs before calling `/quote` |
-| High `priceImpactPct` | Low liquidity or large trade relative to pool size | Not an error, but worth flagging. Reduce swap amount or split across multiple swaps |
+  <Accordion title="During transaction building">
+    | Error | What happened | What to do |
+    |-------|---------------|------------|
+    | `INVALID_COMPUTE_UNIT_PRICE_AND_PRIORITIZATION_FEE` | Both compute unit price and prioritisation fee specified | Use one or the other, not both |
+    | `MAX_ACCOUNT_GREATER_THAN_MAX` | Too many accounts in the transaction | Reduce `maxAccounts` in `/quote` |
+    | `FAILED_TO_GET_SWAP_AND_ACCOUNT_METAS` | Failed to generate the swap transaction | Check the error message for details |
+    | Invalid `quoteResponse` | Stale or malformed quote passed to `/swap` | Always pass the full, unmodified quote response. Re-quote if expired |
+  </Accordion>
 
-### During transaction building
+  <Accordion title="During transaction execution">
+    Transaction landing depends heavily on your execution pipeline: RPC quality, priority fee/tip calibration, and network conditions all play a role.
 
-| Error | What happened | What to do |
-|-------|---------------|------------|
-| `INVALID_COMPUTE_UNIT_PRICE_AND_PRIORITIZATION_FEE` | Both compute unit price and prioritisation fee specified | Use one or the other, not both |
-| `MAX_ACCOUNT_GREATER_THAN_MAX` | Too many accounts in the transaction | Reduce `maxAccounts` in `/quote` |
-| `FAILED_TO_GET_SWAP_AND_ACCOUNT_METAS` | Failed to generate the swap transaction | Check the error message for details |
-| Invalid `quoteResponse` | Stale or malformed quote passed to `/swap` | Always pass the full, unmodified quote response. Re-quote if expired |
+    | Error | What happened | What to do |
+    |-------|---------------|------------|
+    | Transaction expired | Blockhash expired before landing | Re-quote and send faster. Consider `blockhashSlotsToExpiry` for tighter control |
+    | `SlippageToleranceExceeded` (6001) | Price moved beyond `slippageBps` | Re-quote with fresh prices and retry |
+    | `InsufficientFunds` (6024) | Not enough tokens for swap amount, transaction fees, or rent | Check balance before quoting |
+    | `InvalidTokenAccount` (6025) | Token account is uninitialised or unexpected | Verify all token accounts are correctly initialised |
+    | `IncorrectTokenProgramID` (6014) | Attempted platform fees on a Token2022 token without `instructionVersion=V2` | Pass `instructionVersion=V2` in `/quote` |
+    | DEX program errors | A CPI-ed AMM returned an error during the swap. Each AMM in the route is invoked via CPI, so errors can come from any program along the path | If the AMM's IDL is public, decode the error code on a block explorer like [Solscan](https://solscan.io). If the error is obscure, reach out on [Jupiter Discord](https://discord.gg/jup) |
 
-### During transaction execution
+    Jupiter swap program error codes come from the <a href="https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#programIdl">Anchor IDL on Solscan</a>. For the full error reference, see [Common Errors](/docs/swap/common-errors).
+  </Accordion>
+</AccordionGroup>
 
-Transaction landing depends heavily on your execution pipeline — RPC quality, priority fee/tip calibration, and network conditions all play a role.
+### Debugging
 
-| Error | What happened | What to do |
-|-------|---------------|------------|
-| Transaction expired | Blockhash expired before landing | Re-quote and send faster. Consider `blockhashSlotsToExpiry` for tighter control |
-| `SlippageToleranceExceeded` (6001) | Price moved beyond `slippageBps` | Re-quote with fresh prices and retry |
-| `InsufficientFunds` (6024) | Not enough tokens for swap amount, transaction fees, or rent | Check balance before quoting |
-| `InvalidTokenAccount` (6025) | Token account is uninitialised or unexpected | Verify all token accounts are correctly initialised |
-| `IncorrectTokenProgramID` (6014) | Attempted platform fees on a Token2022 token without `instructionVersion=V2` | Pass `instructionVersion=V2` in `/quote` |
-| DEX program errors | A CPI-ed AMM returned an error during the swap | If the AMM's IDL is public, decode the error code on a block explorer like [Solscan](https://solscan.io). If the error is obscure, reach out on [Jupiter Discord](https://discord.gg/jup) |
+When something fails, log the end-to-end flow: the URL and parameters used, the API responses, and the transaction signature. This makes issues reproducible.
 
-<Note>
-Jupiter swap program error codes come from the <a href="https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#programIdl">Anchor IDL on Solscan</a>. For the full error reference, see [Common Errors](/docs/swap/common-errors).
-</Note>
-
-### Debugging tips
-
-When something fails, log the entire flow so you can reproduce and diagnose the issue:
-
-```javascript
+```javascript expandable
 async function swap(inputMint, outputMint, amount, slippageBps) {
   const quoteUrl = `https://api.jup.ag/swap/v1/quote?` + new URLSearchParams({
     inputMint, outputMint, amount, slippageBps: slippageBps.toString(), instructionVersion: 'V2',
@@ -504,7 +504,7 @@ async function swap(inputMint, outputMint, amount, slippageBps) {
       throw new Error(swapResponse.error);
     }
 
-    // 3. Sign and send — always submit on-chain rather than simulating locally.
+    // 3. Sign and send -- always submit on-chain rather than simulating locally.
     //    On-chain transactions are logged by block explorers, which capture account
     //    state and make debugging far easier than a local simulation error.
     const transaction = VersionedTransaction.deserialize(
@@ -540,21 +540,36 @@ async function swap(inputMint, outputMint, amount, slippageBps) {
 ```
 
 <Tip>
-If a transaction fails during local simulation (preflight), log the base64-encoded `swapTransaction` for debugging. But prefer submitting on-chain with `skipPreflight: true` — block explorers like [Solscan](https://solscan.io) capture account state on failed transactions, which is far more useful for diagnosis.
+Always submit transactions on-chain with `skipPreflight: true` rather than simulating locally. Block explorers like [Solscan](https://solscan.io) capture account state on failed transactions, which is far more useful for debugging. If you do simulate locally and it fails, log the base64-encoded `swapTransaction` so you can inspect it later.
 </Tip>
 
-### Retrying
+If a swap fails, re-quote and try again. Quotes go stale quickly, so never reuse a previous quote response.
 
-If a swap fails, re-quote and try again. Quotes go stale quickly — never reuse a previous quote.
+### Route debugging
 
-```javascript
-// On failure, simply re-quote and retry
-const signature = await swap(inputMint, outputMint, amount, slippageBps);
+The quote response includes `mostReliableAmmsQuoteReport`: the markets that would have quoted for this pair.
+
+```json
+"mostReliableAmmsQuoteReport": {
+  "info": {
+    "BZtgQEyS6eXUXicYPHecYQ7PybqodXQMvkjUbP4R8mUU": "8729031",
+    "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE": "8724328"
+  }
+}
 ```
+
+Each key is an AMM address, each value is the quoted output amount. Compare with the chosen route's `outAmount` to verify routing decisions. Map AMM addresses to DEX names with `GET /program-id-to-label`.
 
 ---
 
 ## Optimise execution
+
+Priority fees, compute units, slippage, and your RPC setup all affect whether transactions land. These are covered in detail in the [Send Swap Transaction](/docs/swap/send-swap-transaction) guide, but the essentials are:
+
+- **`dynamicComputeUnitLimit: true`** in `/swap` or `/swap-instructions` to simulate and set an accurate compute unit limit, which reduces the priority fee needed
+- **`prioritizationFeeLamports`** with `priorityLevelWithMaxLamports` to set a fee level with a cap, or `jitoTipLamports` for Jito bundle tips (requires a Jito RPC)
+- **`slippageBps`** should match the volatility of the token pair. Too tight and transactions fail; too loose and you lose value
+- **RPC quality matters.** A fast, well-connected RPC with stake-weighted connections will land transactions more reliably. Bad RPCs or poor fee calibration lead to delayed, expired, or dropped transactions
 
 ### Transaction size with maxAccounts
 
@@ -577,21 +592,6 @@ const quoteResponse = await fetch(
 <Warning>
 Setting `maxAccounts` too low reduces available DEXes and gives worse routes. Start at 64, only reduce if you hit size limits.
 </Warning>
-
-### Route debugging
-
-The quote response includes `mostReliableAmmsQuoteReport`: the markets that would have quoted for this pair.
-
-```json
-"mostReliableAmmsQuoteReport": {
-  "info": {
-    "BZtgQEyS6eXUXicYPHecYQ7PybqodXQMvkjUbP4R8mUU": "8729031",
-    "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE": "8724328"
-  }
-}
-```
-
-Each key is an AMM address, each value is the quoted output amount. Compare with the chosen route's `outAmount` to verify routing decisions. Map AMM addresses to DEX names with `GET /program-id-to-label`.
 
 ---
 

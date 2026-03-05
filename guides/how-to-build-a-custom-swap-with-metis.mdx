@@ -535,10 +535,31 @@ Each key is an AMM address, each value is the quoted output amount. Compare with
 
 Priority fees, compute units, slippage, and your RPC setup all affect whether transactions land. For the full deep dive, see [Send Swap Transaction](/docs/swap/send-swap-transaction).
 
-- **Priority fees.** Use `prioritizationFeeLamports` with `priorityLevelWithMaxLamports` to set a fee level (`medium`, `high`, `veryHigh`) with a cap to prevent overpaying. Alternatively, use `jitoTipLamports` for Jito bundle tips (requires a Jito RPC). You cannot use both in the same `/swap` call. See [how Jupiter estimates priority fees](/docs/swap/send-swap-transaction#how-jupiter-estimates-priority-fee).
-- **Compute units.** Always pass `dynamicComputeUnitLimit: true` in `/swap` or `/swap-instructions`. This simulates the swap to set an accurate compute unit limit, which directly reduces the priority fee you pay since fees are proportional to the compute budget requested. See [how Jupiter estimates compute unit limit](/docs/swap/send-swap-transaction#how-jupiter-estimates-compute-unit-limit).
-- **Slippage.** `slippageBps` should match the volatility of the token pair. Too tight and transactions fail with `SlippageToleranceExceeded`; too loose and you lose value. See [how Jupiter estimates slippage](/docs/swap/send-swap-transaction#how-jupiter-estimates-slippage).
-- **RPC and broadcasting.** A fast, well-connected RPC with stake-weighted connections will land transactions more reliably. Bad RPCs or poor fee calibration lead to delayed, expired, or dropped transactions. See [how Jupiter broadcasts transactions](/docs/swap/send-swap-transaction#how-jupiter-broadcast-transactions) for alternative approaches.
+<AccordionGroup>
+  <Accordion title="Priority fees">
+    Use `prioritizationFeeLamports` with `priorityLevelWithMaxLamports` to set a fee level (`medium`, `high`, `veryHigh`) with a cap to prevent overpaying. Alternatively, use `jitoTipLamports` for Jito bundle tips (requires a Jito RPC). You cannot use both in the same `/swap` call.
+
+    See [how Jupiter estimates priority fees](/docs/swap/send-swap-transaction#how-jupiter-estimates-priority-fee).
+  </Accordion>
+
+  <Accordion title="Compute units">
+    Always pass `dynamicComputeUnitLimit: true` in `/swap` or `/swap-instructions`. This simulates the swap to set an accurate compute unit limit, which directly reduces the priority fee you pay since fees are proportional to the compute budget requested.
+
+    See [how Jupiter estimates compute unit limit](/docs/swap/send-swap-transaction#how-jupiter-estimates-compute-unit-limit).
+  </Accordion>
+
+  <Accordion title="Slippage">
+    `slippageBps` should match the volatility of the token pair. Too tight and transactions fail with `SlippageToleranceExceeded`; too loose and you lose value.
+
+    See [how Jupiter estimates slippage](/docs/swap/send-swap-transaction#how-jupiter-estimates-slippage).
+  </Accordion>
+
+  <Accordion title="RPC and broadcasting">
+    A fast, well-connected RPC with stake-weighted connections will land transactions more reliably. Bad RPCs or poor fee calibration lead to delayed, expired, or dropped transactions.
+
+    See [how Jupiter broadcasts transactions](/docs/swap/send-swap-transaction#how-jupiter-broadcast-transactions).
+  </Accordion>
+</AccordionGroup>
 
 
 ---

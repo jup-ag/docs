@@ -71,7 +71,8 @@ async function getQuote(maxAccounts) {
         outputMint: 'insert-mint',
         amount: '1000000',
         slippageBps: '100',
-        maxAccounts: maxAccounts.toString()
+        maxAccounts: maxAccounts.toString(),
+        instructionVersion: 'V2'
     });
 
     const url = `https://api.jup.ag/swap/v1/quote?${params}`;

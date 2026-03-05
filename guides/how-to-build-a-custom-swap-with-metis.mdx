@@ -55,7 +55,7 @@ Metis and Ultra are not mutually exclusive. Use Ultra for simple swaps, Metis fo
 
 ```bash
 # Get a quote for 1 SOL → USDC
-curl -X GET "https://api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&slippageBps=50" \
+curl -X GET "https://api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&slippageBps=50&instructionVersion=V2" \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
@@ -106,7 +106,7 @@ Three steps: get a quote, build the transaction, sign and send.
 
 <CodeGroup>
 ```bash curl
-curl -X GET "https://api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&slippageBps=50" \
+curl -X GET "https://api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&slippageBps=50&instructionVersion=V2" \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
@@ -118,6 +118,7 @@ const quoteResponse = await (
       outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
       amount: '100000000',
       slippageBps: '50',
+      instructionVersion: 'V2',
     }),
     { headers: { 'x-api-key': 'YOUR_API_KEY' } }
   )
@@ -139,6 +140,7 @@ response = requests.get(
         'outputMint': 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
         'amount': '100000000',
         'slippageBps': '50',
+        'instructionVersion': 'V2',
     },
     headers={'x-api-key': 'YOUR_API_KEY'},
 )
@@ -163,9 +165,10 @@ print(f"Price impact: {float(quote['priceImpactPct']) * 100:.4f}%")
 | `maxAccounts` | No | Limit accounts in the swap instruction. Default: 64. Lower it when composing with custom instructions |
 | `dexes` | No | Comma-separated DEXes to route through exclusively |
 | `excludeDexes` | No | Comma-separated DEXes to exclude from routing |
+| `instructionVersion` | No | Always pass `V2`. Enables native SOL output, Token-2022 fees, and future features. Default: `V1` |
 
 <Note>
-Always pass `instructionVersion=V2` unless you have a specific reason not to. V2 instructions support features like `nativeDestinationAccount` for receiving native SOL.
+Always pass `instructionVersion=V2`. V2 instructions support `nativeDestinationAccount` for receiving native SOL, platform fees on Token-2022 swap pairs, and all future features. All examples in this guide use V2.
 </Note>
 
 **What you get back:**
@@ -339,7 +342,7 @@ async function swap(inputMint, outputMint, amount, slippageBps) {
   const quoteResponse = await (
     await fetch(
       `${API_BASE}/quote?` + new URLSearchParams({
-        inputMint, outputMint, amount, slippageBps: slippageBps.toString(),
+        inputMint, outputMint, amount, slippageBps: slippageBps.toString(), instructionVersion: 'V2',
       }),
       { headers: { 'x-api-key': API_KEY } }
     )
@@ -450,6 +453,7 @@ const quoteResponse = await fetch(
     amount: '100000000',
     slippageBps: '50',
     maxAccounts: '40',
+    instructionVersion: 'V2',
   }),
   { headers: { 'x-api-key': 'YOUR_API_KEY' } }
 );
@@ -687,6 +691,7 @@ const quoteResponse = await (
       amount: '100000000',
       slippageBps: '50',
       platformFeeBps: '50', // 0.5% fee
+      instructionVersion: 'V2',
     }),
     { headers: { 'x-api-key': 'YOUR_API_KEY' } }
   )

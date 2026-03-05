@@ -100,7 +100,7 @@ Full schema at [API Reference](/api-reference/swap).
 
 Three steps: get a quote, build the transaction, sign and send.
 
-### Get a quote
+### Step 1: Get a quote
 
 `GET /quote` takes the token pair, amount, and slippage. It returns the best route across 74+ DEXes.
 
@@ -173,7 +173,7 @@ Always pass `instructionVersion=V2` unless you have a specific reason not to. V2
 | `priceImpactPct` | Price impact as a percentage string |
 | `mostReliableAmmsQuoteReport` | Quotes from the most reliable AMMs for the same pair. Useful for [route debugging](#route-debugging) |
 
-### Build the transaction
+### Step 2: Build the transaction
 
 `POST /swap` takes the quote and returns a serialised transaction ready to sign.
 
@@ -276,7 +276,7 @@ prioritizationFeeLamports: {
 You cannot use both `priorityLevelWithMaxLamports` and `jitoTipLamports` in the same `/swap` call. If you need both, use `/swap-instructions` to compose the transaction yourself.
 </Note>
 
-### Sign and send
+### Step 3: Sign and send
 
 The response contains a base64-encoded serialised transaction. Deserialise, sign, send via your RPC.
 

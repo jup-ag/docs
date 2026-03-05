@@ -267,30 +267,7 @@ swap_response = requests.post(
 | `prioritizationFeeLamports` | auto | Priority fee config. See below |
 | `feeAccount` | none | Token account for platform fees. Required if `platformFeeBps` was set in `/quote` |
 
-For the full list of parameters (`destinationTokenAccount`, `nativeDestinationAccount`, `trackingAccount`, `asLegacyTransaction`, `blockhashSlotsToExpiry`, and more), see the [Swap API Reference](/api-reference/swap/swap).
-
-**Priority fees.** Jupiter estimates fees from the local fee market. Set a level and cap:
-
-```javascript
-prioritizationFeeLamports: {
-  priorityLevelWithMaxLamports: {
-    priorityLevel: 'veryHigh', // medium (25th %), high (50th %), veryHigh (75th %)
-    maxLamports: 1000000,      // Cap to prevent overpaying
-  },
-}
-```
-
-For Jito bundle tips instead:
-
-```javascript
-prioritizationFeeLamports: {
-  jitoTipLamports: 1000000, // Fixed tip (not a cap). Must use Jito RPC.
-}
-```
-
-<Note>
-You cannot use both `priorityLevelWithMaxLamports` and `jitoTipLamports` in the same `/swap` call. If you need both, use `/swap-instructions` to compose the transaction yourself.
-</Note>
+For the full list of parameters, see the [Swap API Reference](/api-reference/swap/swap).
 
 ### Step 3: Sign and send
 

@@ -114,7 +114,7 @@ Example response:
 <Tip>
   **TIP**
 
-  `outAmount` refers to the best possible output amount based on the route at time of quote, this means that `slippageBps` does not affect.
+  `outAmount` is the best output amount after deducting AMM fees and platform fees. It does not account for slippage — `otherAmountThreshold` is the minimum acceptable output after applying `slippageBps` tolerance on `outAmount`.
 </Tip>
 
 ## What’s Next

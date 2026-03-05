@@ -251,12 +251,12 @@ components:
         outAmount:
           type: string
           description: |
-            - Calculated output amount from routing engine
-            - The value includes platform fees and DEX fees, excluding slippage
+            - Best output amount after deducting AMM fees and platform fees
+            - Does not account for slippage
         otherAmountThreshold:
           type: string
           description: |
-            - Calculated minimum output amount after accounting for `slippageBps` on the `outAmount` value
+            - Minimum acceptable output amount — `outAmount` after applying `slippageBps` tolerance
             - Not used by `/swap` endpoint to build transaction
         swapMode:
           $ref: '#/components/schemas/SwapMode'

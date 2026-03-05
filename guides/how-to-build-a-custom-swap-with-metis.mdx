@@ -123,8 +123,10 @@ const quoteResponse = await (
   )
 ).json();
 
-console.log(`Route: ${quoteResponse.routePlan.map(r => r.swapInfo.label).join(' → ')}`);
-console.log(`Output: ${quoteResponse.outAmount} (min: ${quoteResponse.otherAmountThreshold})`);
+console.log(JSON.stringify(quoteResponse, null, 2));
+console.log(`${quoteResponse.inputMint}: ${quoteResponse.inAmount}`);
+console.log(`${quoteResponse.outputMint}: ${quoteResponse.outAmount}`);
+console.log(`Price impact: ${(Number(quoteResponse.priceImpactPct) * 100).toFixed(4)}%`);
 ```
 
 ```python Python
@@ -142,7 +144,10 @@ response = requests.get(
 )
 response.raise_for_status()
 quote = response.json()
-print(f"Output: {quote['outAmount']} via {quote['routePlan'][0]['swapInfo']['label']}")
+print(quote)
+print(f"{quote['inputMint']}: {quote['inAmount']}")
+print(f"{quote['outputMint']}: {quote['outAmount']}")
+print(f"Price impact: {float(quote['priceImpactPct']) * 100:.4f}%")
 ```
 </CodeGroup>
 
@@ -170,7 +175,7 @@ Always pass `instructionVersion=V2` unless you have a specific reason not to. V2
 | `outAmount` | Best output amount from routing (before slippage) |
 | `otherAmountThreshold` | Minimum output after applying `slippageBps` |
 | `routePlan` | Route breakdown: which DEXes, percentage split, amounts |
-| `priceImpactPct` | Price impact as a percentage string |
+| `priceImpactPct` | Price impact as a decimal string (0 to 1, not a percentage). Multiply by 100 to get the percentage. A value of `1` means 100% price impact (total loss). |
 | `mostReliableAmmsQuoteReport` | Quotes from the most reliable AMMs for the same pair. Useful for [route debugging](#route-debugging) |
 
 ### Step 2: Build the transaction
@@ -342,8 +347,10 @@ async function swap(inputMint, outputMint, amount, slippageBps) {
 
   if (quoteResponse.error) throw new Error(`Quote failed: ${quoteResponse.error}`);
 
-  console.log(`Route: ${quoteResponse.routePlan.map(r => r.swapInfo.label).join(' → ')}`);
-  console.log(`Output: ${quoteResponse.outAmount} (min: ${quoteResponse.otherAmountThreshold})`);
+  console.log(JSON.stringify(quoteResponse, null, 2));
+  console.log(`${quoteResponse.inputMint}: ${quoteResponse.inAmount}`);
+  console.log(`${quoteResponse.outputMint}: ${quoteResponse.outAmount}`);
+  console.log(`Price impact: ${(Number(quoteResponse.priceImpactPct) * 100).toFixed(4)}%`);
 
   // Build transaction
   const swapResponse = await (
@@ -404,6 +411,7 @@ That's the entire integration.
 | `SLIPPAGE_TOLERANCE_EXCEEDED` | Price moved beyond `slippageBps` | Re-quote and retry |
 | `Transaction expired` | Blockhash expired | Re-quote immediately, send faster |
 | `No route found` | No liquidity path | Check if the token is tradeable (see [Market Listing](/docs/routing/market-listing)) |
+| High `priceImpactPct` | Low liquidity or large trade relative to pool size | Reduce the swap amount, or split across multiple swaps |
 
 **Retry pattern:**
 
@@ -709,6 +717,10 @@ Full setup walkthrough: [Add Fees to Swap](/docs/swap/add-fees-to-swap).
 <AccordionGroup>
   <Accordion title="Why is there no route found for this token?">
     Jupiter routes through 74+ DEXes, but not every token has a routable market. New markets on supported DEXes get instant routing with a grace period based on token age (up to 30 days). After the grace period, the market must meet liquidity criteria. If no route is found, the token may not have graduated from its bonding curve, or its market doesn't meet the requirements. See [Market Listing](/docs/routing/market-listing) for the full criteria.
+  </Accordion>
+
+  <Accordion title="What does priceImpactPct mean and when should I block swaps?">
+    `priceImpactPct` is a decimal from 0 to 1, not a percentage. Multiply by 100 to get the actual percentage. A value of `0.01` means 1% price impact. A value of `1` means 100% price impact, meaning the user would lose their entire input value. Always check this value before executing. If price impact exceeds your threshold (e.g. 5-10%), warn the user or block the swap entirely.
   </Accordion>
 
   <Accordion title="Why is my transaction failing with slippage errors?">

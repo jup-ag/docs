@@ -299,10 +299,6 @@ if (confirmation.value.err) {
 }
 ```
 
-<Tip>
-Set `skipPreflight: true` to skip the extra RPC round-trip. Jupiter already simulates the transaction when building the swap.
-</Tip>
-
 ---
 
 ## Full working example
@@ -537,12 +533,12 @@ Each key is an AMM address, each value is the quoted output amount. Compare with
 
 ## Optimise execution
 
-Priority fees, compute units, slippage, and your RPC setup all affect whether transactions land. These are covered in detail in the [Send Swap Transaction](/docs/swap/send-swap-transaction) guide, but the essentials are:
+Priority fees, compute units, slippage, and your RPC setup all affect whether transactions land. For the full deep dive, see [Send Swap Transaction](/docs/swap/send-swap-transaction).
 
-- **`dynamicComputeUnitLimit: true`** in `/swap` or `/swap-instructions` to simulate and set an accurate compute unit limit, which reduces the priority fee needed
-- **`prioritizationFeeLamports`** with `priorityLevelWithMaxLamports` to set a fee level with a cap, or `jitoTipLamports` for Jito bundle tips (requires a Jito RPC)
-- **`slippageBps`** should match the volatility of the token pair. Too tight and transactions fail; too loose and you lose value
-- **RPC quality matters.** A fast, well-connected RPC with stake-weighted connections will land transactions more reliably. Bad RPCs or poor fee calibration lead to delayed, expired, or dropped transactions
+- **Priority fees.** Use `prioritizationFeeLamports` with `priorityLevelWithMaxLamports` to set a fee level (`medium`, `high`, `veryHigh`) with a cap to prevent overpaying. Alternatively, use `jitoTipLamports` for Jito bundle tips (requires a Jito RPC). You cannot use both in the same `/swap` call. See [how Jupiter estimates priority fees](/docs/swap/send-swap-transaction#how-jupiter-estimates-priority-fee).
+- **Compute units.** Always pass `dynamicComputeUnitLimit: true` in `/swap` or `/swap-instructions`. This simulates the swap to set an accurate compute unit limit, which directly reduces the priority fee you pay since fees are proportional to the compute budget requested. See [how Jupiter estimates compute unit limit](/docs/swap/send-swap-transaction#how-jupiter-estimates-compute-unit-limit).
+- **Slippage.** `slippageBps` should match the volatility of the token pair. Too tight and transactions fail with `SlippageToleranceExceeded`; too loose and you lose value. See [how Jupiter estimates slippage](/docs/swap/send-swap-transaction#how-jupiter-estimates-slippage).
+- **RPC and broadcasting.** A fast, well-connected RPC with stake-weighted connections will land transactions more reliably. Bad RPCs or poor fee calibration lead to delayed, expired, or dropped transactions. See [how Jupiter broadcasts transactions](/docs/swap/send-swap-transaction#how-jupiter-broadcast-transactions) for alternative approaches.
 
 
 ---
@@ -579,8 +575,6 @@ Priority fees, compute units, slippage, and your RPC setup all affect whether tr
 
 ## Next steps
 
-- **[Send Swap Transaction](/docs/swap/send-swap-transaction).** Deep dive into priority fees, compute units, and transaction broadcasting.
-- **[Common Errors](/docs/swap/common-errors).** Full error reference for the Metis Swap API and swap program.
 - **[Add Fees to Swap](/docs/swap/add-fees-to-swap).** Collect platform fees on swaps through your integration.
 - **[Swap API Reference](/api-reference/swap).** Full endpoint schema and playground.
 - **[Market Listing](/docs/routing/market-listing).** How tokens and markets get listed in Jupiter's routing engine.

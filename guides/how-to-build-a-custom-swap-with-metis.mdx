@@ -424,15 +424,49 @@ That's the entire integration.
 
 ## Error handling
 
+Errors can surface at every stage of the swap flow. Handle them accordingly.
+
+### During quoting
+
 | Error | What happened | What to do |
 |-------|---------------|------------|
-| `INSUFFICIENT_FUNDS` | Not enough input tokens | Check balance before quoting |
-| `SLIPPAGE_TOLERANCE_EXCEEDED` | Price moved beyond `slippageBps` | Re-quote and retry |
-| `Transaction expired` | Blockhash expired | Re-quote immediately, send faster |
-| `No route found` | No liquidity path | Check if the token is tradeable (see [Market Listing](/docs/routing/market-listing)) |
-| High `priceImpactPct` | Low liquidity or large trade relative to pool size | Reduce the swap amount, or split across multiple swaps |
+| `NO_ROUTES_FOUND` / `COULD_NOT_FIND_ANY_ROUTE` | No liquidity path exists | Check if the token is tradeable on [jup.ag](https://jup.ag). See [Market Listing](/docs/routing/market-listing) for the grace period criteria |
+| `TOKEN_NOT_TRADABLE` | Token mint not available for trading | Verify the token has sufficient liquidity on supported DEXes |
+| `ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT` | Route cannot process the full input amount | Reduce input amount for a better output |
+| Invalid parameters | Bad `amount`, `slippageBps`, or mint address | Validate inputs before calling `/quote` |
+| High `priceImpactPct` | Low liquidity or large trade relative to pool size | Not an error, but worth flagging. Reduce swap amount or split across multiple swaps |
 
-**Retry pattern:**
+### During transaction building
+
+| Error | What happened | What to do |
+|-------|---------------|------------|
+| `INVALID_COMPUTE_UNIT_PRICE_AND_PRIORITIZATION_FEE` | Both compute unit price and prioritisation fee specified | Use one or the other, not both |
+| `MAX_ACCOUNT_GREATER_THAN_MAX` | Too many accounts in the transaction | Reduce `maxAccounts` in `/quote` |
+| `FAILED_TO_GET_SWAP_AND_ACCOUNT_METAS` | Failed to generate the swap transaction | Check the error message for details |
+| Invalid `quoteResponse` | Stale or malformed quote passed to `/swap` | Always pass the full, unmodified quote response. Re-quote if expired |
+
+### During transaction execution
+
+Transaction landing depends heavily on your execution pipeline — RPC quality, priority fee/tip calibration, and network conditions all play a role.
+
+| Error | What happened | What to do |
+|-------|---------------|------------|
+| Transaction expired | Blockhash expired before landing | Re-quote and send faster. Consider `blockhashSlotsToExpiry` for tighter control |
+| `SlippageToleranceExceeded` (6001) | Price moved beyond `slippageBps` | Re-quote with fresh prices and retry |
+| `InsufficientFunds` (6024) | Not enough tokens for swap amount, transaction fees, or rent | Check balance before quoting |
+| `InvalidTokenAccount` (6025) | Token account is uninitialised or unexpected | Verify all token accounts are correctly initialised |
+| `IncorrectTokenProgramID` (6014) | Attempted platform fees on a Token2022 token without `instructionVersion=V2` | Pass `instructionVersion=V2` in `/quote` |
+| DEX program errors | A CPI-ed AMM returned an error during the swap | If the AMM's IDL is public, decode the error code on a block explorer like [Solscan](https://solscan.io). If the error is obscure, reach out on [Jupiter Discord](https://discord.gg/jup) |
+
+<Note>
+Jupiter swap program error codes come from the <a href="https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#programIdl">Anchor IDL on Solscan</a>. For the full error reference, see [Common Errors](/docs/swap/common-errors).
+</Note>
+
+### Retry pattern
+
+<Warning>
+Always re-quote before retrying. Reusing a stale quote leads to slippage failures or expired transactions.
+</Warning>
 
 ```javascript
 async function swapWithRetry(maxRetries = 3) {
@@ -448,10 +482,6 @@ async function swapWithRetry(maxRetries = 3) {
   }
 }
 ```
-
-<Warning>
-Always re-quote before retrying. Reusing a stale quote leads to slippage failures.
-</Warning>
 
 ---
 

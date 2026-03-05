@@ -88,7 +88,7 @@ Send the signed transaction with retry settings:
 
 ```js
 const signature = await connection.sendRawTransaction(transactionBinary, {
-    maxRetries: 2,
+    maxRetries: 0,
     skipPreflight: true
 });
 ```

@@ -260,11 +260,21 @@ swap_response = requests.post(
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
+| `quoteResponse` | required | The full quote response object from `/quote` |
 | `userPublicKey` | required | Wallet public key that will sign the transaction |
 | `wrapAndUnwrapSol` | `true` | Automatically wrap/unwrap SOL. Set to `false` if you manage wSOL yourself |
+| `useSharedAccounts` | `true` | Use shared intermediate token accounts. Essential for complex routing. May fail on some new low-liquidity AMMs |
 | `dynamicComputeUnitLimit` | `false` | Simulates the swap to provide an accurate compute unit limit. Recommended for all normal flows |
+| `dynamicSlippage` | `false` | Estimates and applies slippage automatically, overriding `slippageBps` from the quote. No longer maintained — use [Ultra](/docs/ultra/index) for RTSE |
 | `prioritizationFeeLamports` | auto | Priority fee config. See below |
+| `computeUnitPriceMicroLamports` | none | Exact compute unit price for priority fee calculation. Prefer `prioritizationFeeLamports` with `dynamicComputeUnitLimit` instead |
 | `feeAccount` | none | Token account for platform fees. Required if `platformFeeBps` was set in `/quote` |
+| `destinationTokenAccount` | signer's ATA | Pre-initialised token account to receive the output token |
+| `nativeDestinationAccount` | none | Account to receive native SOL (output must be SOL, requires `instructionVersion=V2`) |
+| `trackingAccount` | none | Any public key you own, used to track swap transactions via block explorers or analytics |
+| `asLegacyTransaction` | `false` | Build a legacy transaction instead of versioned. Pair with `asLegacyTransaction` in `/quote` |
+| `skipUserAccountsRpcCalls` | `false` | Skip RPC checks for required accounts. The transaction will still attempt to create them |
+| `blockhashSlotsToExpiry` | none | Number of slots before the transaction expires (each slot ≈ 400 ms) |
 
 **Priority fees.** Jupiter estimates fees from the local fee market. Set a level and cap:
 
@@ -306,7 +316,7 @@ transaction.sign([wallet]);
 
 // Send
 const signature = await connection.sendRawTransaction(transaction.serialize(), {
-  maxRetries: 2,
+  maxRetries: 0,
   skipPreflight: true,
 });
 
@@ -386,7 +396,7 @@ async function swap(inputMint, outputMint, amount, slippageBps) {
   transaction.sign([wallet]);
 
   const signature = await connection.sendRawTransaction(transaction.serialize(), {
-    maxRetries: 2,
+    maxRetries: 0,
     skipPreflight: true,
   });
 

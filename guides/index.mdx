@@ -2,7 +2,7 @@
 title: "Developer Guides"
 sidebarTitle: "Overview"
 description: "How-to guides for building on Solana with Jupiter."
-llmsDescription: "Jupiter developer guides: practical tutorials for common Solana development tasks. Covers token information (metadata, verification, organic score), token prices (USD pricing), and prediction markets (binary event trading). Each guide includes working code examples in JavaScript, Python, and curl."
+llmsDescription: "Jupiter developer guides: practical tutorials for common Solana development tasks. Covers token swaps with Ultra (recommended, two API calls, no RPC needed), token information (metadata, verification, organic score), token prices (USD pricing), swap widget embedding (Plugin), custom swaps with Metis (routing, CPI, custom instructions), and prediction markets (binary event trading). Each guide includes working code examples in JavaScript, Python, and curl."
 ---
 
 ## What are these guides?
@@ -30,6 +30,9 @@ Each guide walks through a real problem you'll hit while building, which API to 
   <Card title="Embed Swap Widget" icon="puzzle-piece" href="/guides/how-to-embed-a-swap-widget">
     Drop a full swap interface into your app. No RPC, no wallet code, no UI to build.
   </Card>
+  <Card title="Custom Swap with Metis" icon="arrow-right-arrow-left" href="/guides/how-to-build-a-custom-swap-with-metis">
+    Build composable swaps with full control over routing, fees, custom instructions, and CPI.
+  </Card>
   <Card title="Prediction Markets" icon="chart-line" href="/guides/how-to-build-a-prediction-market-app-on-solana">
     Let users trade on real-world event outcomes. Sports, crypto, politics, and more.
   </Card>
@@ -38,6 +41,8 @@ Each guide walks through a real problem you'll hit while building, which API to 
 ---
 
 ## Quick reference
+
+### Tokens and prices
 
 | I want to... | Use this guide |
 |--------------|----------------|
@@ -49,15 +54,28 @@ Each guide walks through a real problem you'll hit while building, which API to 
 | Find trending or new tokens | [Get Token Information](/guides/how-to-get-token-information) |
 | Get current token prices in USD | [Get Token Prices](/guides/how-to-get-token-price) |
 | Calculate portfolio value | [Get Token Prices](/guides/how-to-get-token-price) |
-| Let users bet on event outcomes | [Prediction Markets](/guides/how-to-build-a-prediction-market-app-on-solana) |
-| Build a prediction market app | [Prediction Markets](/guides/how-to-build-a-prediction-market-app-on-solana) |
+
+### Swapping
+
+| I want to... | Use this guide |
+|--------------|----------------|
 | Embed a swap widget in my app | [Embed Swap Widget](/guides/how-to-embed-a-swap-widget) |
 | Add token swap to my website | [Embed Swap Widget](/guides/how-to-embed-a-swap-widget) |
 | Let users buy my token on my site | [Embed Swap Widget](/guides/how-to-embed-a-swap-widget) |
+| Build a swap with custom logic | [Custom Swap with Metis](/guides/how-to-build-a-custom-swap-with-metis) |
+| Call Jupiter swap from my program (CPI) | [Custom Swap with Metis](/guides/how-to-build-a-custom-swap-with-metis) |
+| Add custom instructions to a swap | [Custom Swap with Metis](/guides/how-to-build-a-custom-swap-with-metis) |
+
+### Trading
+
+| I want to... | Use this guide |
+|--------------|----------------|
+| Let users bet on event outcomes | [Prediction Markets](/guides/how-to-build-a-prediction-market-app-on-solana) |
+| Build a prediction market app | [Prediction Markets](/guides/how-to-build-a-prediction-market-app-on-solana) |
 
 ---
 
 ## Stay updated
 
-- **[Jupiter Developer Portal](https://portal.jup.ag)** — API keys and usage dashboard
-- **[Jupiter Dev Notifications](https://t.me/jup_dev)** — API updates and announcements
+- **[Jupiter Developer Portal](https://portal.jup.ag)**: API keys and usage dashboard
+- **[Jupiter Dev Notifications](https://t.me/jup_dev)**: API updates and announcements

@@ -251,12 +251,12 @@ components:
         outAmount:
           type: string
           description: |
-            - Calculated output amount from routing engine
-            - The value includes platform fees and DEX fees, excluding slippage
+            - Best output amount after deducting AMM fees and platform fees
+            - Does not account for slippage
         otherAmountThreshold:
           type: string
           description: |
-            - Calculated minimum output amount after accounting for `slippageBps` on the `outAmount` value
+            - Minimum acceptable output amount — `outAmount` after applying `slippageBps` tolerance
             - Not used by `/swap` endpoint to build transaction
         swapMode:
           $ref: '#/components/schemas/SwapMode'
@@ -278,6 +278,18 @@ components:
           format: uint64
         timeTaken:
           type: number
+        mostReliableAmmsQuoteReport:
+          type: object
+          nullable: true
+          description: |
+            - Markets that would have quoted for this pair
+            - Useful for debugging and verifying route decisions
+            - Each key is an AMM account address, each value is the quoted output amount
+          properties:
+            info:
+              type: object
+              additionalProperties:
+                type: string
 
     SwapMode:
       type: string
@@ -417,9 +429,9 @@ components:
           type: string
         dynamicComputeUnitLimit:
           description: |
-            - When enabled, it will do a swap simulation to get the compute unit used and set it in ComputeBudget's compute unit limit
-            - This incurs one extra RPC call to simulate this
-            - We recommend to enable this to estimate compute unit correctly and reduce priority fees needed or have higher chance to be included in a block
+            - When enabled, simulates the swap to provide an accurate compute unit limit in the transaction
+            - This incurs one extra RPC call to simulate
+            - Recommended for all normal flows — reduces priority fees needed and improves transaction landing
           type: boolean
           default: false
         skipUserAccountsRpcCalls:

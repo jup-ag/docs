@@ -1,0 +1,602 @@
+---
+title: "How to Swap Tokens with Custom Logic Using Metis"
+sidebarTitle: "Custom Swap with Metis"
+description: "Build composable, production-ready token swaps with full control over routing, fees, and transaction execution."
+llmsDescription: "End-to-end guide for building custom token swaps using Jupiter's Metis Swap API. Covers the full flow: GET /swap/v1/quote for routing, POST /swap/v1/swap for transaction building, signing and sending with priority fees and Jito tips. Explains when to use Metis vs Ultra, error handling across quoting/building/execution, execution debugging, route debugging with mostReliableAmmsQuoteReport, and optimising transaction landing."
+---
+
+{/* Alternative search terms for AI discovery:
+- Jupiter swap API tutorial
+- Metis swap integration guide
+- How to swap tokens on Solana
+- Jupiter quote and swap endpoint
+- Build swap transaction Solana
+- Jupiter priority fees compute unit
+- Jupiter swap error handling debugging
+- Jupiter route debugging mostReliableAmmsQuoteReport
+- Jupiter swap slippage price impact
+- Token swap API Solana example
+*/}
+
+## TL;DR
+
+Metis is Jupiter's routing engine, powering every swap on [jup.ag](https://jup.ag). Get a quote, build a transaction, sign and send. Three API calls for a complete swap with full control over routing, fees, and execution.
+
+**Base URL:** `https://api.jup.ag/swap/v1`
+
+---
+
+## When to use Metis
+
+[Ultra](/docs/ultra/index) handles everything for you: routing, slippage, MEV protection, and transaction sending. No RPC node required.
+
+Metis gives you full control. Use Metis when you need:
+
+- **Custom instructions** in the same transaction (token transfers, program calls, memos)
+- **CPI from your Solana program** to call Jupiter's swap on-chain
+- **Your own transaction broadcasting** via your RPC or Jito
+- **Full control over fees** including priority fees, compute budget, and platform fees
+- **Route filtering** to include or exclude specific DEXes
+
+Metis and Ultra are not mutually exclusive. Use Ultra for simple swaps, Metis for flows that need composability.
+
+---
+
+## Prerequisites
+
+1. Get an API key at [portal.jup.ag](https://portal.jup.ag) (free)
+2. All requests need the `x-api-key` header
+3. Install `@solana/web3.js` for transaction signing and sending
+4. Have an RPC endpoint (Helius, Triton, or similar)
+
+---
+
+## Quick start
+
+```bash
+# Get a quote for 1 SOL → USDC
+curl -X GET "https://api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&slippageBps=50&instructionVersion=V2" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+You get back a quote with routing details. Pass it to `/swap` to build a transaction:
+
+```bash
+curl -X POST "https://api.jup.ag/swap/v1/swap" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "quoteResponse": { ... },
+    "userPublicKey": "YOUR_WALLET_ADDRESS",
+    "dynamicComputeUnitLimit": true,
+    "prioritizationFeeLamports": {
+      "priorityLevelWithMaxLamports": {
+        "priorityLevel": "veryHigh",
+        "maxLamports": 1000000
+      }
+    }
+  }'
+```
+
+You get back a `swapTransaction` (base64 unsigned). Deserialise, sign, send via your RPC.
+
+---
+
+## API reference
+
+**Base URL:** `https://api.jup.ag/swap/v1`
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /quote` | Get a swap route quote from the Metis routing engine |
+| `POST /swap` | Build a serialised swap transaction from a quote |
+| `POST /swap-instructions` | Get individual swap instructions for custom transaction composition |
+| `GET /program-id-to-label` | Map program IDs to DEX labels |
+
+Full schema at [API Reference](/api-reference/swap).
+
+---
+
+## The swap flow
+
+Three steps: get a quote, build the transaction, sign and send.
+
+### Step 1: Get a quote
+
+`GET /quote` takes the token pair, amount, and slippage. It returns the best route across 74+ DEXes.
+
+<CodeGroup>
+```bash curl
+curl -X GET "https://api.jup.ag/swap/v1/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000&slippageBps=50&instructionVersion=V2" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```javascript JavaScript
+const quoteResponse = await (
+  await fetch(
+    'https://api.jup.ag/swap/v1/quote?' + new URLSearchParams({
+      inputMint: 'So11111111111111111111111111111111111111112',
+      outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+      amount: '100000000',
+      slippageBps: '50',
+      instructionVersion: 'V2',
+    }),
+    { headers: { 'x-api-key': 'YOUR_API_KEY' } }
+  )
+).json();
+
+console.log(JSON.stringify(quoteResponse, null, 2));
+console.log(`${quoteResponse.inputMint}: ${quoteResponse.inAmount}`);
+console.log(`${quoteResponse.outputMint}: ${quoteResponse.outAmount}`);
+console.log(`Price impact: ${(Number(quoteResponse.priceImpactPct) * 100).toFixed(4)}%`);
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://api.jup.ag/swap/v1/quote',
+    params={
+        'inputMint': 'So11111111111111111111111111111111111111112',
+        'outputMint': 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+        'amount': '100000000',
+        'slippageBps': '50',
+        'instructionVersion': 'V2',
+    },
+    headers={'x-api-key': 'YOUR_API_KEY'},
+)
+response.raise_for_status()
+quote = response.json()
+print(quote)
+print(f"{quote['inputMint']}: {quote['inAmount']}")
+print(f"{quote['outputMint']}: {quote['outAmount']}")
+print(f"Price impact: {float(quote['priceImpactPct']) * 100:.4f}%")
+```
+</CodeGroup>
+
+**Parameters:**
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `inputMint` | Yes | Token mint address to swap from |
+| `outputMint` | Yes | Token mint address to swap to |
+| `amount` | Yes | Raw amount in smallest units (lamports for SOL) |
+| `slippageBps` | Yes | Maximum slippage in basis points (50 = 0.5%) |
+| `platformFeeBps` | No | Basis points to charge as a platform fee. Requires `feeAccount` in `/swap` |
+| `maxAccounts` | No | Limit accounts in the swap instruction. Default: 64. Lower it when composing with custom instructions |
+| `dexes` | No | Comma-separated DEXes to route through exclusively |
+| `excludeDexes` | No | Comma-separated DEXes to exclude from routing |
+| `instructionVersion` | No | Always pass `V2`. Enables native SOL output, Token-2022 fees, and future features. Default: `V1` |
+
+<Note>
+Always pass `instructionVersion=V2`. V2 instructions support `nativeDestinationAccount` for receiving native SOL, platform fees on Token-2022 swap pairs, and all future features. All examples in this guide use V2.
+</Note>
+
+**What you get back:**
+
+| Field | What it means |
+|-------|---------------|
+| `outAmount` | Best output amount after deducting AMM fees and platform fees |
+| `otherAmountThreshold` | Minimum acceptable output, which is `outAmount` after applying `slippageBps` tolerance |
+| `routePlan` | Route breakdown: which DEXes, percentage split, amounts |
+| `priceImpactPct` | Price impact as a decimal string (0 to 1, not a percentage). Multiply by 100 to get the percentage. A value of `1` means 100% price impact (total loss). |
+| `mostReliableAmmsQuoteReport` | Markets that would have quoted for this pair. Useful for [route debugging](#route-debugging) |
+
+### Step 2: Build the transaction
+
+`POST /swap` takes the quote and returns a serialised transaction ready to sign.
+
+<CodeGroup>
+```bash curl
+curl -X POST "https://api.jup.ag/swap/v1/swap" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "quoteResponse": { ... },
+    "userPublicKey": "YOUR_WALLET_ADDRESS",
+    "wrapAndUnwrapSol": true,
+    "dynamicComputeUnitLimit": true,
+    "prioritizationFeeLamports": {
+      "priorityLevelWithMaxLamports": {
+        "priorityLevel": "veryHigh",
+        "maxLamports": 1000000
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const swapResponse = await (
+  await fetch('https://api.jup.ag/swap/v1/swap', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': 'YOUR_API_KEY',
+    },
+    body: JSON.stringify({
+      quoteResponse,
+      userPublicKey: wallet.publicKey.toString(),
+      wrapAndUnwrapSol: true,
+      dynamicComputeUnitLimit: true,
+      prioritizationFeeLamports: {
+        priorityLevelWithMaxLamports: {
+          priorityLevel: 'veryHigh',
+          maxLamports: 1000000,
+        },
+      },
+    }),
+  })
+).json();
+
+console.log(`Priority fee: ${swapResponse.prioritizationFeeLamports} lamports`);
+```
+
+```python Python
+import requests
+
+swap_response = requests.post(
+    'https://api.jup.ag/swap/v1/swap',
+    headers={
+        'x-api-key': 'YOUR_API_KEY',
+        'Content-Type': 'application/json',
+    },
+    json={
+        'quoteResponse': quote,
+        'userPublicKey': 'YOUR_WALLET_ADDRESS',
+        'wrapAndUnwrapSol': True,
+        'dynamicComputeUnitLimit': True,
+        'prioritizationFeeLamports': {
+            'priorityLevelWithMaxLamports': {
+                'priorityLevel': 'veryHigh',
+                'maxLamports': 1000000,
+            },
+        },
+    },
+).json()
+```
+</CodeGroup>
+
+**Parameters:**
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `quoteResponse` | required | The full quote response object from `/quote` |
+| `userPublicKey` | required | Wallet public key that will sign the transaction |
+| `wrapAndUnwrapSol` | `true` | Automatically wrap/unwrap SOL. Set to `false` if you manage wSOL yourself |
+| `dynamicComputeUnitLimit` | `false` | Simulates the swap to provide an accurate compute unit limit. Recommended for all normal flows |
+| `prioritizationFeeLamports` | auto | Priority fee config. See [Optimise execution](#optimise-execution) |
+| `feeAccount` | none | Token account for platform fees. Required if `platformFeeBps` was set in `/quote` |
+
+For the full list of parameters, see the [Swap API Reference](/api-reference/swap/swap).
+
+### Step 3: Sign and send
+
+The response contains a base64-encoded serialised transaction. Deserialise, sign, send via your RPC.
+
+```javascript
+import { Connection, VersionedTransaction } from '@solana/web3.js';
+
+const connection = new Connection('YOUR_RPC_ENDPOINT');
+
+// Deserialise and sign
+const transaction = VersionedTransaction.deserialize(
+  Buffer.from(swapResponse.swapTransaction, 'base64')
+);
+transaction.sign([wallet]);
+
+// Send
+const signature = await connection.sendRawTransaction(transaction.serialize(), {
+  maxRetries: 0,
+  skipPreflight: true,
+});
+
+console.log(`Sent: https://solscan.io/tx/${signature}`);
+
+// Confirm
+const confirmation = await connection.confirmTransaction({ signature }, 'finalized');
+if (confirmation.value.err) {
+  throw new Error(`Failed: ${JSON.stringify(confirmation.value.err)}`);
+}
+```
+
+---
+
+## Full working example
+
+End-to-end: swap 1 SOL to USDC, from scratch.
+
+```javascript expandable
+import { Connection, Keypair, VersionedTransaction } from '@solana/web3.js';
+import fs from 'fs';
+
+const API_KEY = 'YOUR_API_KEY';
+const RPC_ENDPOINT = 'YOUR_RPC_ENDPOINT';
+const API_BASE = 'https://api.jup.ag/swap/v1';
+
+const wallet = Keypair.fromSecretKey(
+  new Uint8Array(JSON.parse(fs.readFileSync('wallet.json', 'utf8')))
+);
+const connection = new Connection(RPC_ENDPOINT);
+
+async function swap(inputMint, outputMint, amount, slippageBps) {
+  // Get quote
+  const quoteResponse = await (
+    await fetch(
+      `${API_BASE}/quote?` + new URLSearchParams({
+        inputMint, outputMint, amount, slippageBps: slippageBps.toString(), instructionVersion: 'V2',
+      }),
+      { headers: { 'x-api-key': API_KEY } }
+    )
+  ).json();
+
+  if (quoteResponse.error) throw new Error(`Quote failed: ${quoteResponse.error}`);
+
+  console.log(JSON.stringify(quoteResponse, null, 2));
+  console.log(`${quoteResponse.inputMint}: ${quoteResponse.inAmount}`);
+  console.log(`${quoteResponse.outputMint}: ${quoteResponse.outAmount}`);
+  console.log(`Price impact: ${(Number(quoteResponse.priceImpactPct) * 100).toFixed(4)}%`);
+
+  // Build transaction
+  const swapResponse = await (
+    await fetch(`${API_BASE}/swap`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
+      body: JSON.stringify({
+        quoteResponse,
+        userPublicKey: wallet.publicKey.toString(),
+        wrapAndUnwrapSol: true,
+        dynamicComputeUnitLimit: true,
+        prioritizationFeeLamports: {
+          priorityLevelWithMaxLamports: { priorityLevel: 'veryHigh', maxLamports: 1000000 },
+        },
+      }),
+    })
+  ).json();
+
+  if (swapResponse.error) throw new Error(`Swap failed: ${swapResponse.error}`);
+
+  // Sign and send
+  const transaction = VersionedTransaction.deserialize(
+    Buffer.from(swapResponse.swapTransaction, 'base64')
+  );
+  transaction.sign([wallet]);
+
+  const signature = await connection.sendRawTransaction(transaction.serialize(), {
+    maxRetries: 0,
+    skipPreflight: true,
+  });
+
+  console.log(`Sent: https://solscan.io/tx/${signature}`);
+
+  const confirmation = await connection.confirmTransaction({ signature }, 'finalized');
+  if (confirmation.value.err) throw new Error(`Failed: ${JSON.stringify(confirmation.value.err)}`);
+
+  console.log('Swap confirmed.');
+  return signature;
+}
+
+// Swap 1 SOL → USDC
+swap(
+  'So11111111111111111111111111111111111111112',
+  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+  '100000000',
+  50
+).catch(console.error);
+```
+
+That's the entire integration.
+
+---
+
+## Error handling
+
+Errors can surface at every stage of the swap flow.
+
+<AccordionGroup>
+  <Accordion title="During quoting">
+    | Error | What happened | What to do |
+    |-------|---------------|------------|
+    | `NO_ROUTES_FOUND` / `COULD_NOT_FIND_ANY_ROUTE` | No liquidity path exists | Check if the token is tradeable on [jup.ag](https://jup.ag). See [Market Listing](/docs/routing/market-listing) for the grace period criteria |
+    | `TOKEN_NOT_TRADABLE` | Token mint not available for trading | Verify the token has sufficient liquidity on supported DEXes |
+    | `ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT` | Route cannot process the full input amount | Reduce input amount for a better output |
+    | Invalid parameters | Bad `amount`, `slippageBps`, or mint address | Validate inputs before calling `/quote` |
+    | High `priceImpactPct` | Low liquidity or large trade relative to pool size | Not an error, but worth flagging. Reduce swap amount or split across multiple swaps |
+  </Accordion>
+
+  <Accordion title="During transaction building">
+    | Error | What happened | What to do |
+    |-------|---------------|------------|
+    | `INVALID_COMPUTE_UNIT_PRICE_AND_PRIORITIZATION_FEE` | Both compute unit price and prioritisation fee specified | Use one or the other, not both |
+    | `MAX_ACCOUNT_GREATER_THAN_MAX` | Too many accounts in the transaction | Reduce `maxAccounts` in `/quote` |
+    | `FAILED_TO_GET_SWAP_AND_ACCOUNT_METAS` | Failed to generate the swap transaction | Check the error message for details |
+    | Invalid `quoteResponse` | Stale or malformed quote passed to `/swap` | Always pass the full, unmodified quote response. Re-quote if expired |
+  </Accordion>
+
+  <Accordion title="During transaction execution">
+    Transaction landing depends heavily on your execution pipeline: RPC quality, priority fee/tip calibration, and network conditions all play a role.
+
+    | Error | What happened | What to do |
+    |-------|---------------|------------|
+    | Transaction expired | Blockhash expired before landing | Re-quote and send faster. Consider `blockhashSlotsToExpiry` for tighter control |
+    | `SlippageToleranceExceeded` (6001) | Price moved beyond `slippageBps` | Re-quote with fresh prices and retry |
+    | `InsufficientFunds` (6024) | Not enough tokens for swap amount, transaction fees, or rent | Check balance before quoting |
+    | `InvalidTokenAccount` (6025) | Token account is uninitialised or unexpected | Verify all token accounts are correctly initialised |
+    | `IncorrectTokenProgramID` (6014) | Attempted platform fees on a Token2022 token without `instructionVersion=V2` | Pass `instructionVersion=V2` in `/quote` |
+    | DEX program errors | A CPI-ed AMM returned an error during the swap. Each AMM in the route is invoked via CPI, so errors can come from any program along the path | If the AMM's IDL is public, decode the error code on a block explorer like [Solscan](https://solscan.io). If the error is obscure, reach out on [Jupiter Discord](https://discord.gg/jup) |
+
+    Jupiter swap program error codes come from the <a href="https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#programIdl">Anchor IDL on Solscan</a>. For the full error reference, see [Common Errors](/docs/swap/common-errors).
+  </Accordion>
+</AccordionGroup>
+
+### Execution debugging
+
+When something fails, log the end-to-end flow: the URL and parameters used, the API responses, and the transaction signature. This makes issues reproducible.
+
+```javascript expandable
+async function swap(inputMint, outputMint, amount, slippageBps) {
+  const quoteUrl = `https://api.jup.ag/swap/v1/quote?` + new URLSearchParams({
+    inputMint, outputMint, amount, slippageBps: slippageBps.toString(), instructionVersion: 'V2',
+  });
+
+  // 1. Quote
+  const quoteResponse = await (await fetch(quoteUrl, {
+    headers: { 'x-api-key': 'YOUR_API_KEY' },
+  })).json();
+
+  console.log('Quote:', { url: quoteUrl, response: quoteResponse });
+
+  if (quoteResponse.error) {
+    throw new Error(`Quote failed: ${quoteResponse.error}`);
+  }
+
+  // 2. Build transaction
+  const swapPayload = {
+    quoteResponse,
+    userPublicKey: wallet.publicKey.toString(),
+    dynamicComputeUnitLimit: true,
+    prioritizationFeeLamports: {
+      priorityLevelWithMaxLamports: { priorityLevel: 'veryHigh', maxLamports: 1000000 },
+    },
+  };
+
+  const swapResponse = await (await fetch('https://api.jup.ag/swap/v1/swap', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY' },
+    body: JSON.stringify(swapPayload),
+  })).json();
+
+  console.log('Swap:', { payload: swapPayload, response: swapResponse });
+
+  if (swapResponse.error) {
+    throw new Error(`Swap build failed: ${swapResponse.error}`);
+  }
+
+  // 3. Sign and send -- always submit on-chain rather than simulating locally.
+  //    On-chain transactions are logged by block explorers, which capture account
+  //    state and make debugging far easier than a local simulation error.
+  const transaction = VersionedTransaction.deserialize(
+    Buffer.from(swapResponse.swapTransaction, 'base64')
+  );
+  transaction.sign([wallet]);
+
+  const signature = await connection.sendRawTransaction(transaction.serialize(), {
+    maxRetries: 0,
+    skipPreflight: true,
+  });
+
+  console.log('Sent:', {
+    signature,
+    explorer: `https://solscan.io/tx/${signature}`,
+  });
+
+  const confirmation = await connection.confirmTransaction({ signature }, 'finalized');
+
+  if (confirmation.value.err) {
+    // Log everything needed to debug a failed on-chain transaction
+    console.error('Transaction failed on-chain:', {
+      signature,
+      error: confirmation.value.err,
+      quoteUrl,
+      quoteResponse,
+      swapTransaction: swapResponse.swapTransaction,
+    });
+    throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+  }
+
+  console.log('Swap confirmed:', signature);
+  return signature;
+}
+```
+
+<Tip>
+Always submit transactions on-chain with `skipPreflight: true` rather than simulating locally. Block explorers like [Solscan](https://solscan.io) capture account state on failed transactions, which is far more useful for debugging. If you do simulate locally and it fails, log the base64-encoded `swapTransaction` so you can inspect it later.
+</Tip>
+
+If a swap fails, re-quote and try again. Quotes go stale quickly, so never reuse a previous quote response.
+
+### Route debugging
+
+The quote response includes `mostReliableAmmsQuoteReport`: the markets that would have quoted for this pair.
+
+```json
+"mostReliableAmmsQuoteReport": {
+  "info": {
+    "BZtgQEyS6eXUXicYPHecYQ7PybqodXQMvkjUbP4R8mUU": "8729031",
+    "Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE": "8724328"
+  }
+}
+```
+
+Each key is an AMM address, each value is the quoted output amount. Compare with the chosen route's `outAmount` to verify routing decisions. Map AMM addresses to DEX names with `GET /program-id-to-label`.
+
+---
+
+## Optimise execution
+
+Priority fees, compute units, slippage, and your RPC setup all affect whether transactions land. For the full deep dive, see [Send Swap Transaction](/docs/swap/send-swap-transaction).
+
+<AccordionGroup>
+  <Accordion title="Priority fees">
+    Use `prioritizationFeeLamports` with `priorityLevelWithMaxLamports` to set a fee level (`medium`, `high`, `veryHigh`) with a cap to prevent overpaying. Alternatively, use `jitoTipLamports` for Jito bundle tips (requires a Jito RPC). You cannot use both in the same `/swap` call.
+
+    See [how Jupiter estimates priority fees](/docs/swap/send-swap-transaction#how-jupiter-estimates-priority-fee).
+  </Accordion>
+
+  <Accordion title="Compute units">
+    Always pass `dynamicComputeUnitLimit: true` in `/swap` or `/swap-instructions`. This simulates the swap to set an accurate compute unit limit, which directly reduces the priority fee you pay since fees are proportional to the compute budget requested.
+
+    See [how Jupiter estimates compute unit limit](/docs/swap/send-swap-transaction#how-jupiter-estimates-compute-unit-limit).
+  </Accordion>
+
+  <Accordion title="Slippage">
+    `slippageBps` should match the volatility of the token pair. Too tight and transactions fail with `SlippageToleranceExceeded`; too loose and you lose value.
+
+    See [how Jupiter estimates slippage](/docs/swap/send-swap-transaction#how-jupiter-estimates-slippage).
+  </Accordion>
+
+  <Accordion title="RPC and broadcasting">
+    A fast, well-connected RPC with stake-weighted connections will land transactions more reliably. Bad RPCs or poor fee calibration lead to delayed, expired, or dropped transactions.
+
+    See [how Jupiter broadcasts transactions](/docs/swap/send-swap-transaction#how-jupiter-broadcast-transactions).
+  </Accordion>
+</AccordionGroup>
+
+
+---
+
+## Common questions
+
+<AccordionGroup>
+  <Accordion title="Why is there no route found for this token?">
+    Jupiter routes through 74+ DEXes, but not every token has a routable market. New markets on supported DEXes get instant routing with a grace period based on token age (up to 30 days). After the grace period, the market must meet liquidity criteria. If no route is found, the token may not have graduated from its bonding curve, or its market doesn't meet the requirements. See [Market Listing](/docs/routing/market-listing) for the full criteria.
+  </Accordion>
+
+  <Accordion title="What does priceImpactPct mean and when should I block swaps?">
+    `priceImpactPct` is a decimal from 0 to 1, not a percentage. Multiply by 100 to get the actual percentage. A value of `0.01` means 1% price impact. A value of `1` means 100% price impact, meaning the user would lose their entire input value. Always check this value before executing. If price impact exceeds your threshold (e.g. 5-10%), warn the user or block the swap entirely.
+  </Accordion>
+
+  <Accordion title="Why is my transaction failing with slippage errors?">
+    Price moved between quote and landing. Re-quote with fresh pricing and send faster. For volatile tokens, increase `slippageBps`.
+  </Accordion>
+
+  <Accordion title="Can I use Metis and Ultra together?">
+    Yes. They access the same liquidity. Use Ultra for simple swaps, Metis for flows that need custom instructions, CPI, or full transaction control.
+  </Accordion>
+
+  <Accordion title="How do I filter which DEXes are used?">
+    Use `dexes` to restrict to specific DEXes, or `excludeDexes` to block them. Get the full list from `GET /program-id-to-label`.
+  </Accordion>
+
+  <Accordion title="What's the difference between /swap and /swap-instructions?">
+    `/swap` returns a complete serialised transaction. `/swap-instructions` returns individual instructions you compose into your own transaction. Use `/swap` for standard swaps; `/swap-instructions` when you need custom instructions or CPI.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+- **[Add Fees to Swap](/docs/swap/add-fees-to-swap).** Collect platform fees on swaps through your integration.
+- **[Swap API Reference](/api-reference/swap).** Full endpoint schema and playground.
+- **[Market Listing](/docs/routing/market-listing).** How tokens and markets get listed in Jupiter's routing engine.
+- **[Ultra Swap API](/docs/ultra/index).** Want simpler? Ultra handles everything for you.

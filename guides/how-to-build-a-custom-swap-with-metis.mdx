@@ -68,6 +68,7 @@ curl -X POST "https://api.jup.ag/swap/v1/swap" \
   -d '{
     "quoteResponse": { ... },
     "userPublicKey": "YOUR_WALLET_ADDRESS",
+    "dynamicComputeUnitLimit": true,
     "prioritizationFeeLamports": {
       "priorityLevelWithMaxLamports": {
         "priorityLevel": "veryHigh",
@@ -194,6 +195,7 @@ curl -X POST "https://api.jup.ag/swap/v1/swap" \
     "quoteResponse": { ... },
     "userPublicKey": "YOUR_WALLET_ADDRESS",
     "wrapAndUnwrapSol": true,
+    "dynamicComputeUnitLimit": true,
     "prioritizationFeeLamports": {
       "priorityLevelWithMaxLamports": {
         "priorityLevel": "veryHigh",
@@ -215,6 +217,7 @@ const swapResponse = await (
       quoteResponse,
       userPublicKey: wallet.publicKey.toString(),
       wrapAndUnwrapSol: true,
+      dynamicComputeUnitLimit: true,
       prioritizationFeeLamports: {
         priorityLevelWithMaxLamports: {
           priorityLevel: 'veryHigh',
@@ -241,6 +244,7 @@ swap_response = requests.post(
         'quoteResponse': quote,
         'userPublicKey': 'YOUR_WALLET_ADDRESS',
         'wrapAndUnwrapSol': True,
+        'dynamicComputeUnitLimit': True,
         'prioritizationFeeLamports': {
             'priorityLevelWithMaxLamports': {
                 'priorityLevel': 'veryHigh',
@@ -258,6 +262,7 @@ swap_response = requests.post(
 |-----------|---------|-------------|
 | `userPublicKey` | required | Wallet public key that will sign the transaction |
 | `wrapAndUnwrapSol` | `true` | Automatically wrap/unwrap SOL. Set to `false` if you manage wSOL yourself |
+| `dynamicComputeUnitLimit` | `false` | Simulates the swap to provide an accurate compute unit limit. Recommended for all normal flows |
 | `prioritizationFeeLamports` | auto | Priority fee config. See below |
 | `feeAccount` | none | Token account for platform fees. Required if `platformFeeBps` was set in `/quote` |
 
@@ -364,6 +369,7 @@ async function swap(inputMint, outputMint, amount, slippageBps) {
         quoteResponse,
         userPublicKey: wallet.publicKey.toString(),
         wrapAndUnwrapSol: true,
+        dynamicComputeUnitLimit: true,
         prioritizationFeeLamports: {
           priorityLevelWithMaxLamports: { priorityLevel: 'veryHigh', maxLamports: 1000000 },
         },
@@ -495,6 +501,7 @@ const instructionsResponse = await (
     body: JSON.stringify({
       quoteResponse,
       userPublicKey: wallet.publicKey.toString(),
+      dynamicComputeUnitLimit: true,
     }),
   })
 ).json();
@@ -705,6 +712,7 @@ const swapResponse = await (
     body: JSON.stringify({
       quoteResponse,
       userPublicKey: wallet.publicKey.toString(),
+      dynamicComputeUnitLimit: true,
       feeAccount: 'YOUR_FEE_TOKEN_ACCOUNT', // Token account for input or output mint
     }),
   })

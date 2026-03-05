@@ -164,9 +164,9 @@ const swapResponse = await (
 
 ### How Jupiter Estimates Compute Unit Limit?
 
-You can pass in `dynamicComputeUnitLimit` to Metis Swap API where our backend will estimate the Compute Unit Limit for you.
+You can pass in `dynamicComputeUnitLimit` to the Metis Swap API, which simulates the swap to provide an accurate compute unit limit in the transaction.
 
-When `true`, it allows the transaction to utilize a dynamic compute unit rather than using incorrect compute units which can be detrimental to transaction prioritization. Additionally, the amount of compute unit used and the compute unit limit requested to be used are correlated to the amount of priority fees you pay.
+When `true`, it ensures the transaction uses the correct compute unit limit rather than a default value. This is recommended for all normal flows — an accurate limit reduces the priority fees needed and improves the chance of your transaction landing in a block.
 
 <Card title="Read more about Compute Budget, Compute Unit, etc here." href="https://solana.com/docs/core/fees#compute-budget" icon="book-open" horizontal/>
 

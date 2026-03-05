@@ -69,9 +69,7 @@ npm install @solana/web3.js
 
 ---
 
-## Core flow
-
-### Step 1: Get a quote
+## Get a quote
 
 `GET https://api.jup.ag/swap/v1/quote` returns the best route for a token pair. The quote response is passed directly to `/swap` or `/swap-instructions` in the next step.
 
@@ -113,7 +111,7 @@ const quoteResponse = await (
 Always pass `instructionVersion=V2` unless you have a specific reason not to. V2 instructions support features like `nativeDestinationAccount` for receiving native SOL.
 </Note>
 
-**Understanding the response:**
+**Example response:**
 
 ```json expandable
 {
@@ -155,9 +153,11 @@ Key fields:
 - `otherAmountThreshold`: Minimum output after applying `slippageBps`
 - `routePlan`: The route breakdown showing which DEXes are used and the percentage split
 - `priceImpactPct`: Price impact as a percentage string
-- `mostReliableAmmsQuoteReport`: Quotes from the most reliable AMMs for the same pair, useful for debugging route decisions (see [Optimise execution](#route-debugging-with-mostreliableammsquotereport))
+- `mostReliableAmmsQuoteReport`: Quotes from the most reliable AMMs for the same pair, useful for debugging route decisions (see [Route debugging](#route-debugging-with-mostreliableammsquotereport))
 
-### Step 2: Build the transaction
+---
+
+## Build the swap transaction
 
 `POST https://api.jup.ag/swap/v1/swap` takes the quote response and returns a serialised transaction ready for signing.
 
@@ -193,7 +193,7 @@ const swapResponse = await (
 | `prioritizationFeeLamports` | auto | Priority fee configuration. Use `priorityLevelWithMaxLamports` for estimated fees with a cap, or `jitoTipLamports` for Jito bundle tips |
 | `feeAccount` | none | Token account to receive platform fees. Required if `platformFeeBps` was set in `/quote` |
 
-#### Priority fees
+### Priority fees
 
 Jupiter estimates priority fees using the local fee market across recent slots. You set a `priorityLevel` and a `maxLamports` cap to prevent overpaying:
 
@@ -218,7 +218,9 @@ prioritizationFeeLamports: {
 You cannot use both `priorityLevelWithMaxLamports` and `jitoTipLamports` in the same `/swap` call. If you need both priority fees and Jito tips, use `/swap-instructions` to compose the transaction yourself.
 </Note>
 
-### Step 3: Sign and send
+---
+
+## Sign and send
 
 The `/swap` response contains a base64-encoded serialised transaction. Deserialise it, sign with your wallet, and send to the network.
 
@@ -263,7 +265,9 @@ if (confirmation.value.err) {
 Set `skipPreflight: true` to avoid the extra RPC round-trip for preflight simulation. The transaction has already been simulated by Jupiter's backend when building the swap.
 </Tip>
 
-### Step 4: Handle errors
+---
+
+## Handle errors
 
 Common swap errors and how to handle them:
 
@@ -300,7 +304,7 @@ Always re-quote before retrying. Reusing a stale quote can lead to slippage fail
 
 ## Optimise execution
 
-### Transaction size management with maxAccounts
+### Transaction size with maxAccounts
 
 When composing transactions with additional instructions (custom logic, memos, token transfers), you may exceed the transaction size limit. Use `maxAccounts` in `/quote` to constrain the swap instruction:
 
@@ -340,9 +344,7 @@ You can map AMM keys to DEX labels using `GET https://api.jup.ag/swap/v1/program
 
 ---
 
-## Advanced use cases
-
-### Add custom instructions with /swap-instructions
+## Custom instructions
 
 Use `POST https://api.jup.ag/swap/v1/swap-instructions` instead of `/swap` when you need to compose the swap with your own instructions. The endpoint returns individual instructions rather than a serialised transaction:
 
@@ -386,7 +388,7 @@ const {
 
 Build the transaction with your custom instructions mixed in:
 
-```ts
+```ts expandable
 import {
   Connection,
   PublicKey,
@@ -467,91 +469,53 @@ await connection.sendRawTransaction(transaction.serialize(), { skipPreflight: tr
 When adding custom instructions, use `maxAccounts` in `/quote` to leave room in the transaction. If your transaction exceeds the size limit, lower `maxAccounts` and re-quote.
 </Note>
 
-### CPI from your Solana program
+---
+
+## CPI from your Solana program
 
 You can call Jupiter's swap from your own on-chain program via Cross-Program Invocation (CPI). The flow: get a quote client-side, fetch `/swap-instructions`, extract the `swapInstruction`, and wrap it in a CPI call.
 
-#### Client side
+<CodeGroup>
+```ts Client (TypeScript)
+// 1. Get quote and swap instructions (same as above)
+const quoteResponse = await getQuote();
+const { swapInstruction, addressLookupTableAddresses } = await getSwapInstructions(quoteResponse);
 
-```ts
-// 1. Get quote
-const quoteResponse = await (
-  await fetch(
-    'https://api.jup.ag/swap/v1/quote?' + new URLSearchParams({
-      inputMint: 'So11111111111111111111111111111111111111112',
-      outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-      amount: '100000000',
-      slippageBps: '50',
-    }),
-    { headers: { 'x-api-key': 'YOUR_API_KEY' } }
-  )
-).json();
-
-// 2. Get swap instructions
-const swapInstructionsResponse = await (
-  await fetch('https://api.jup.ag/swap/v1/swap-instructions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': 'YOUR_API_KEY',
-    },
-    body: JSON.stringify({
-      quoteResponse,
-      userPublicKey: wallet.publicKey.toString(),
-    }),
-  })
-).json();
-
-// 3. Build your CPI instruction wrapping Jupiter's swap
-const jupiterSwapIx = swapInstructionsResponse.swapInstruction;
-const jupiterProgramId = new PublicKey(jupiterSwapIx.programId);
-const jupiterData = Buffer.from(jupiterSwapIx.data, 'base64');
-const jupiterAccounts = jupiterSwapIx.accounts.map((acc: any) => ({
+// 2. Extract Jupiter instruction details
+const jupiterProgramId = new PublicKey(swapInstruction.programId);
+const jupiterData = Buffer.from(swapInstruction.data, 'base64');
+const jupiterAccounts = swapInstruction.accounts.map((acc: any) => ({
   pubkey: new PublicKey(acc.pubkey),
   isSigner: acc.isSigner,
   isWritable: acc.isWritable,
 }));
 
-// Your instruction data: [discriminator] [jupiter_program_id: 32 bytes] [jupiter_data]
-const cpiInstructionData = Buffer.concat([
-  Buffer.from([2]), // Your program's discriminator for "swap via Jupiter"
-  jupiterProgramId.toBytes(),
-  jupiterData,
-]);
-
+// 3. Build CPI instruction: [discriminator] [jupiter_program_id] [jupiter_data]
 const cpiInstruction = new TransactionInstruction({
   programId: YOUR_PROGRAM_ID,
   keys: jupiterAccounts,
-  data: cpiInstructionData,
+  data: Buffer.concat([
+    Buffer.from([2]),                    // Your program's discriminator
+    jupiterProgramId.toBytes(),          // 32 bytes
+    jupiterData,                         // Variable length
+  ]),
 });
 
-// 4. Build transaction
-const lookupTableAccounts = await getAddressLookupTableAccounts(
-  swapInstructionsResponse.addressLookupTableAddresses
-);
-
+// 4. Build and send transaction
+const lookupTables = await getAddressLookupTableAccounts(addressLookupTableAddresses);
 const { blockhash } = await connection.getLatestBlockhash();
-const messageV0 = new TransactionMessage({
+const message = new TransactionMessage({
   payerKey: wallet.publicKey,
   recentBlockhash: blockhash,
-  instructions: [
-    // Compute budget (set your own based on your program's needs)
-    // Setup instructions (optional, include as separate instructions if needed)
-    cpiInstruction,
-    // Cleanup instruction (optional, include as separate instruction if needed)
-  ],
-}).compileToV0Message(lookupTableAccounts);
+  instructions: [cpiInstruction],
+}).compileToV0Message(lookupTables);
 
-const transaction = new VersionedTransaction(messageV0);
-transaction.sign([wallet]);
-await connection.sendRawTransaction(transaction.serialize(), { skipPreflight: true });
+const tx = new VersionedTransaction(message);
+tx.sign([wallet]);
+await connection.sendRawTransaction(tx.serialize(), { skipPreflight: true });
 ```
 
-#### On-chain program (Rust)
-
-Your program receives the instruction data, extracts the Jupiter program ID and instruction data, then calls `invoke()`:
-
-```rust
+```rust On-chain program (Rust)
 use solana_program::{
     account_info::AccountInfo,
     entrypoint::ProgramResult,
@@ -563,38 +527,34 @@ use solana_program::{
 pub fn jupiter_swap_cpi(
     _program_id: &Pubkey,
     accounts: &[AccountInfo],
-    instruction_data: &[u8],
+    instruction_data: &[u8], // [jupiter_program_id: 32] [jupiter_data: rest]
 ) -> ProgramResult {
-    // Parse: [jupiter_program_id: 32 bytes] [jupiter_instruction_data: remaining]
     let jupiter_program_id = Pubkey::new_from_array(
         instruction_data[..32].try_into().unwrap()
     );
     let jupiter_data = &instruction_data[32..];
 
-    // Build account metas from the provided accounts
-    let account_metas: Vec<AccountMeta> = accounts
-        .iter()
-        .map(|acc| {
-            if acc.is_writable {
-                AccountMeta::new(*acc.key, acc.is_signer)
-            } else {
-                AccountMeta::new_readonly(*acc.key, acc.is_signer)
-            }
-        })
-        .collect();
+    let account_metas: Vec<AccountMeta> = accounts.iter().map(|acc| {
+        if acc.is_writable {
+            AccountMeta::new(*acc.key, acc.is_signer)
+        } else {
+            AccountMeta::new_readonly(*acc.key, acc.is_signer)
+        }
+    }).collect();
 
-    // CPI into Jupiter
-    let ix = Instruction {
-        program_id: jupiter_program_id,
-        accounts: account_metas,
-        data: jupiter_data.to_vec(),
-    };
-
-    invoke(&ix, accounts)
+    invoke(
+        &Instruction {
+            program_id: jupiter_program_id,
+            accounts: account_metas,
+            data: jupiter_data.to_vec(),
+        },
+        accounts,
+    )
 }
 ```
+</CodeGroup>
 
-#### CPI considerations
+### CPI considerations
 
 - **Only use `swapInstruction`** from `/swap-instructions`. The `computeBudgetInstructions` are sized for a standalone swap, not your program. Set your own compute budget based on your full transaction.
 - **`setupInstructions` and `cleanupInstruction`** handle token account creation and SOL unwrapping. Include these as separate instructions in the outer transaction if needed, not inside the CPI.
@@ -605,7 +565,9 @@ pub fn jupiter_swap_cpi(
 For complete CPI examples, see [jup-ag/jupiter-cpi-swap-example](https://github.com/jup-ag/jupiter-cpi-swap-example) and [jup-ag/sol-swap-cpi](https://github.com/jup-ag/sol-swap-cpi). For the `jupiter-cpi` Rust crate, see [jup-ag/jupiter-cpi](https://github.com/jup-ag/jupiter-cpi).
 </Tip>
 
-### Collect platform fees
+---
+
+## Platform fees
 
 Charge a fee on swaps through your integration. Pass `platformFeeBps` in the quote and `feeAccount` in the swap:
 
@@ -653,7 +615,7 @@ For detailed fee setup including creating the token account, see [Add Fees to Sw
 
 A full, runnable script that swaps 1 SOL to USDC:
 
-```ts
+```ts expandable
 import {
   Connection,
   Keypair,
@@ -678,7 +640,7 @@ async function swap(
   amount: string,
   slippageBps: number
 ) {
-  // Step 1: Get quote
+  // Get quote
   const quoteResponse = await (
     await fetch(
       `${API_BASE}/quote?` + new URLSearchParams({
@@ -698,7 +660,7 @@ async function swap(
   console.log(`Route: ${quoteResponse.routePlan.map((r: any) => r.swapInfo.label).join(' → ')}`);
   console.log(`Output: ${quoteResponse.outAmount} (min: ${quoteResponse.otherAmountThreshold})`);
 
-  // Step 2: Build transaction
+  // Build transaction
   const swapResponse = await (
     await fetch(`${API_BASE}/swap`, {
       method: 'POST',
@@ -724,7 +686,7 @@ async function swap(
     throw new Error(`Swap failed: ${swapResponse.error}`);
   }
 
-  // Step 3: Sign and send
+  // Sign and send
   const transaction = VersionedTransaction.deserialize(
     Buffer.from(swapResponse.swapTransaction, 'base64')
   );
@@ -737,7 +699,7 @@ async function swap(
 
   console.log(`Sent: https://solscan.io/tx/${signature}`);
 
-  // Step 4: Confirm
+  // Confirm
   const confirmation = await connection.confirmTransaction(
     { signature },
     'finalized'
@@ -766,7 +728,7 @@ swap(
 
 <AccordionGroup>
   <Accordion title="Why is there no route found for this token?">
-    Jupiter routes through 74+ DEXes on Solana. If no route is found, the token may not have liquidity on any supported DEX, or the token pair may not have a viable path. Check if the token is listed on a DEX and has sufficient liquidity.
+    Jupiter routes through 74+ DEXes on Solana, but not every token has a routable market. New markets on supported DEXes get instant routing with a grace period based on token age (up to 30 days). After the grace period, the market must meet liquidity criteria to remain in routing. If no route is found, the token's market may not have graduated from its bonding curve, or it may not meet the liquidity requirements. See [Market Listing](/docs/routing/market-listing) for the full criteria.
   </Accordion>
 
   <Accordion title="Why is my transaction failing with slippage errors?">

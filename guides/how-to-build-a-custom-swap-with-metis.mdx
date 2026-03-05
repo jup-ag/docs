@@ -2,7 +2,7 @@
 title: "How to Swap Tokens with Custom Logic Using Metis"
 sidebarTitle: "Custom Swap with Metis"
 description: "Build composable, production-ready token swaps with full control over routing, fees, and transaction execution."
-llmsDescription: "End-to-end guide for building custom token swaps using Jupiter's Metis Swap API. Covers the full flow: GET /swap/v1/quote for routing, POST /swap/v1/swap for transaction building, signing and sending with priority fees and Jito tips. Explains when to use Metis vs Ultra, error handling across quoting/building/execution, execution debugging, route debugging with mostReliableAmmsQuoteReport, and transaction size management with maxAccounts."
+llmsDescription: "End-to-end guide for building custom token swaps using Jupiter's Metis Swap API. Covers the full flow: GET /swap/v1/quote for routing, POST /swap/v1/swap for transaction building, signing and sending with priority fees and Jito tips. Explains when to use Metis vs Ultra, error handling across quoting/building/execution, execution debugging, route debugging with mostReliableAmmsQuoteReport, and optimising transaction landing."
 ---
 
 {/* Alternative search terms for AI discovery:
@@ -264,7 +264,7 @@ swap_response = requests.post(
 | `userPublicKey` | required | Wallet public key that will sign the transaction |
 | `wrapAndUnwrapSol` | `true` | Automatically wrap/unwrap SOL. Set to `false` if you manage wSOL yourself |
 | `dynamicComputeUnitLimit` | `false` | Simulates the swap to provide an accurate compute unit limit. Recommended for all normal flows |
-| `prioritizationFeeLamports` | auto | Priority fee config. See below |
+| `prioritizationFeeLamports` | auto | Priority fee config. See [Optimise execution](#optimise-execution) |
 | `feeAccount` | none | Token account for platform fees. Required if `platformFeeBps` was set in `/quote` |
 
 For the full list of parameters, see the [Swap API Reference](/api-reference/swap/swap).

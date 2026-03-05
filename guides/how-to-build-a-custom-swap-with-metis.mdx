@@ -462,25 +462,94 @@ Transaction landing depends heavily on your execution pipeline — RPC quality, 
 Jupiter swap program error codes come from the <a href="https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#programIdl">Anchor IDL on Solscan</a>. For the full error reference, see [Common Errors](/docs/swap/common-errors).
 </Note>
 
-### Retry pattern
+### Debugging tips
 
-<Warning>
-Always re-quote before retrying. Reusing a stale quote leads to slippage failures or expired transactions.
-</Warning>
+When something fails, log the entire flow so you can reproduce and diagnose the issue:
 
 ```javascript
-async function swapWithRetry(maxRetries = 3) {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const quoteResponse = await getQuote();  // Always re-quote
-      const swapResponse = await buildSwap(quoteResponse);
-      return await signAndSend(swapResponse);
-    } catch (error) {
-      if (attempt === maxRetries) throw error;
-      console.log(`Attempt ${attempt} failed, retrying...`);
+async function swap(inputMint, outputMint, amount, slippageBps) {
+  const quoteUrl = `https://api.jup.ag/swap/v1/quote?` + new URLSearchParams({
+    inputMint, outputMint, amount, slippageBps: slippageBps.toString(), instructionVersion: 'V2',
+  });
+
+  try {
+    // 1. Quote
+    const quoteResponse = await (await fetch(quoteUrl, {
+      headers: { 'x-api-key': 'YOUR_API_KEY' },
+    })).json();
+
+    if (quoteResponse.error) {
+      console.error('Quote failed:', { url: quoteUrl, response: quoteResponse });
+      throw new Error(quoteResponse.error);
     }
+
+    // 2. Build transaction
+    const swapPayload = {
+      quoteResponse,
+      userPublicKey: wallet.publicKey.toString(),
+      dynamicComputeUnitLimit: true,
+      prioritizationFeeLamports: {
+        priorityLevelWithMaxLamports: { priorityLevel: 'veryHigh', maxLamports: 1000000 },
+      },
+    };
+
+    const swapResponse = await (await fetch('https://api.jup.ag/swap/v1/swap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': 'YOUR_API_KEY' },
+      body: JSON.stringify(swapPayload),
+    })).json();
+
+    if (swapResponse.error) {
+      console.error('Swap build failed:', { quoteUrl, swapPayload, response: swapResponse });
+      throw new Error(swapResponse.error);
+    }
+
+    // 3. Sign and send — always submit on-chain rather than simulating locally.
+    //    On-chain transactions are logged by block explorers, which capture account
+    //    state and make debugging far easier than a local simulation error.
+    const transaction = VersionedTransaction.deserialize(
+      Buffer.from(swapResponse.swapTransaction, 'base64')
+    );
+    transaction.sign([wallet]);
+
+    const signature = await connection.sendRawTransaction(transaction.serialize(), {
+      maxRetries: 0,
+      skipPreflight: true,
+    });
+
+    console.log(`Sent: https://solscan.io/tx/${signature}`);
+
+    const confirmation = await connection.confirmTransaction({ signature }, 'finalized');
+    if (confirmation.value.err) {
+      console.error('Transaction failed on-chain:', {
+        signature,
+        error: confirmation.value.err,
+        quoteUrl,
+        quoteResponse,
+        swapTransaction: swapResponse.swapTransaction,
+      });
+      throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+    }
+
+    return signature;
+  } catch (error) {
+    console.error('Swap error:', { quoteUrl, error: error.message });
+    throw error;
   }
 }
+```
+
+<Tip>
+If a transaction fails during local simulation (preflight), log the base64-encoded `swapTransaction` for debugging. But prefer submitting on-chain with `skipPreflight: true` — block explorers like [Solscan](https://solscan.io) capture account state on failed transactions, which is far more useful for diagnosis.
+</Tip>
+
+### Retrying
+
+If a swap fails, re-quote and try again. Quotes go stale quickly — never reuse a previous quote.
+
+```javascript
+// On failure, simply re-quote and retry
+const signature = await swap(inputMint, outputMint, amount, slippageBps);
 ```
 
 ---

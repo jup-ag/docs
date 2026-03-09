@@ -94,7 +94,7 @@ Core product documentation covering each Jupiter API with usage guides and code 
 
 #### Earn
 
-- [Earn Overview](https://dev.jup.ag/docs/lend/earn/overview.md): Technical overview of Jupiter Earn vaults. Covers the unified liquidity layer, lending account structure (mint, fTokenMint, exchange prices, rewards rate model), key data structures in Rust/TypeScript/JSON, and links to deposit/withdraw operations and user position reading.
+- [Earn Overview](https://dev.jup.ag/docs/lend/earn/index.md): Technical overview of Jupiter Earn vaults. Covers the unified liquidity layer, lending account structure (mint, fTokenMint, exchange prices, rewards rate model), key data structures in Rust/TypeScript/JSON, and links to deposit/withdraw operations and user position reading.
 - [Earn API (Beta)](https://dev.jup.ag/docs/lend/earn/api.md): Jupiter Lend Earn API for depositing and withdrawing assets. Supports deposit/withdraw by amount and mint/redeem by share count, with both transaction and instruction endpoints.
 - [Deposit to Earn](https://dev.jup.ag/docs/lend/earn/deposit.md): Deposit assets into Jupiter Earn vaults using the @jup-ag/lend SDK. Covers getDepositIxs for building deposit instructions, getMintIxs for depositing by vault shares, complete transaction flow with signing and sending, and full TypeScript code example.
 - [Withdraw from Earn](https://dev.jup.ag/docs/lend/earn/withdraw.md): Withdraw assets from Jupiter Earn vaults using the @jup-ag/lend SDK. Covers getWithdrawIxs for withdrawing by underlying amount, getRedeemIxs for withdrawing by vault shares, max withdraw/redeem patterns, complete transaction flow, and full TypeScript code example.
@@ -102,7 +102,7 @@ Core product documentation covering each Jupiter API with usage guides and code 
 
 #### Borrow
 
-- [Borrow Overview](https://dev.jup.ag/docs/lend/borrow/overview.md): Introduction to Jupiter Borrow, the collateralised borrowing side of Jupiter Lend. Covers the vault and position model (NFT-based positions, tick-based pricing), key TypeScript data structures (VaultConfig, UserPosition, NftPosition), and links to borrow operations and vault data reading via the Read SDK.
+- [Borrow Overview](https://dev.jup.ag/docs/lend/borrow/index.md): Introduction to Jupiter Borrow, the collateralised borrowing side of Jupiter Lend. Covers the vault and position model (NFT-based positions, tick-based pricing), key TypeScript data structures (VaultConfig, UserPosition, NftPosition), and links to borrow operations and vault data reading via the Read SDK.
 - [Borrow API (Soon)](https://dev.jup.ag/docs/lend/borrow/api.md): Jupiter Lend Borrow API for collateralized borrowing with up to 95% LTV. Work-in-progress — documentation coming soon.
 - [Create Position](https://dev.jup.ag/docs/lend/borrow/create-position.md): Create a new borrow position (NFT) in a Jupiter Lend vault using getInitPositionIx from @jup-ag/lend/borrow. Required before depositing collateral or borrowing. Covers legacy transaction building, position ID usage, and option to batch create + deposit in one transaction.
 - [Deposit Collateral](https://dev.jup.ag/docs/lend/borrow/deposit.md): Deposit collateral into a Jupiter Lend borrow position using getOperateIx with positive colAmount and zero debtAmount. Covers versioned (v0) transaction building with address lookup tables, positionId 0 for batch create + deposit, operate parameters table, and full TypeScript code example.

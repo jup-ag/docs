@@ -1,0 +1,139 @@
+---
+title: "Earn Overview"
+description: "Jupiter Earn vault mechanics, data structures, and integration overview."
+llmsDescription: "Technical overview of Jupiter Earn vaults. Covers the unified liquidity layer, lending account structure (mint, fTokenMint, exchange prices, rewards rate model), key data structures in Rust/TypeScript/JSON, and links to deposit/withdraw operations and user position reading."
+---
+
+Jupiter Earn is the deposit-and-earn side of Jupiter Lend. Integrating Jupiter Earn lets users supply tokens to earn yield on Solana. Deposits go into Jupiter Lend's unified liquidity layer and earn the best available rate from lending markets. Interest from borrowers becomes yield for depositors, and positions are tracked in the Jupiter Lend program. Users deposit, view their position in the app, and withdraw when ready. Withdrawals are smoothed via an automated debt ceiling. There are no supply limits and no fees for using Earn.
+
+---
+
+## Key components of Earn integration
+
+<CardGroup cols={2}>
+  <Card icon="box" href="/docs/lend/deposit-earn" title="Earn Operations">
+    Get deposit and withdraw as raw instructions or as account context for CPI. Use the instructions to build and send transactions, or pass the context into your Anchor program.
+  </Card>
+  <Card icon="chart-line" href="/docs/lend/user-position" title="Yield tracking">
+    Get all lending tokens, token details (supply rate, rewards rate, totals, conversion multipliers), and a user's position by asset (shares, underlying assets, wallet balance) using SDK.
+  </Card>
+</CardGroup>
+
+<Note>
+  For complete examples of all Earn operations, see [**Deposit**](/docs/lend/deposit-earn) and [**Withdraw**](/docs/lend/withdraw-earn).
+</Note>
+
+---
+
+## Ways to fetch data
+
+<CardGroup cols={2}>
+  <Card icon="globe" href="https://dev.jup.ag/api-reference/lend/earn" title="Public API">
+    Tokens, positions, and earnings endpoints for pool metrics and user data.
+  </Card>
+  <Card icon="code" href="/docs/lend/user-position" title="SDK (Earn data)">
+    Get instructions for all operations; read lending tokens, token details, and Earn user positions by asset.
+  </Card>
+</CardGroup>
+
+---
+
+## Key data structures
+
+<CodeGroup>
+
+```rust Rust
+pub struct Lending {
+    pub mint: Pubkey,
+    pub f_token_mint: Pubkey,
+    pub lending_id: u16,
+    pub decimals: u8,
+    pub rewards_rate_model: Pubkey,
+    pub liquidity_exchange_price: u64,
+    pub token_exchange_price: u64,
+    pub last_update_timestamp: u64,
+    pub token_reserves_liquidity: Pubkey,
+    pub supply_position_on_liquidity: Pubkey,
+    pub bump: u8,
+}
+```
+
+
+```typescript Typescript
+class Lending {
+  mint: PublicKey
+  fTokenMint: PublicKey
+  lendingId: number
+  decimals: number
+  rewardsRateModel: PublicKey
+  liquidityExchangePrice: BN
+  tokenExchangePrice: BN
+  lastUpdateTimestamp: BN
+  tokenReservesLiquidity: PublicKey
+  supplyPositionOnLiquidity: PublicKey
+  bump: number
+}
+```
+
+
+```json JSON
+{ // Example Account data from onchain
+  "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "f_token_mint": "9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D",
+  "lending_id": "2",
+  "decimals": 6,
+  "rewards_rate_model": "5xSPBiD3TibamAnwHDhZABdB4z4F9dcj5PnbteroBTTd",
+  "liquidity_exchange_price": "1019794837147",
+  "token_exchange_price": "1033646672772",
+  "last_update_timestamp": "1771494415",
+  "token_reserves_liquidity": "94vK29npVbyRHXH63rRcTiSr26SFhrQTzbpNJuhQEDu",
+  "supply_position_on_liquidity": "Hf9gtkM4dpVBahVSzEXSVCAPpKzBsBcns3s8As3z77oF",
+  "bump": 255
+}
+```
+
+</CodeGroup>
+
+## Lending Account
+
+The **Lending** account represents the per-asset state for Jupiter Lend Earn.
+
+There is one Lending account per supported underlying token mint.\
+It links the Earn vault layer to the underlying liquidity layer and tracks pricing, reward configuration, and liquidity positions.
+
+---
+
+### Account structure
+
+| Field                          | Type   | Description                                                                                 |
+| ------------------------------ | ------ | ------------------------------------------------------------------------------------------- |
+| `mint`                         | Pubkey | Underlying SPL token mint accepted by this lending market (e.g. USDC).                      |
+| `f_token_mint`                 | Pubkey | Mint address for receipt/shares tokens (jlTokens) representing user deposit balances.       |
+| `lending_id`                   | u16    | Unique identifier for this lending market.                                                  |
+| `decimals`                     | u8     | Number of decimals for the underlying asset and jlToken (same as underlying mint).          |
+| `rewards_rate_model`           | Pubkey | PDA of the rewards rate model used to calculate reward accrual.                             |
+| `liquidity_exchange_price`     | u64    | Exchange price in the liquidity layer (excluding rewards), scaled (e.g. 1e12).              |
+| `token_exchange_price`         | u64    | Exchange price between jlToken and underlying asset (including rewards), scaled (e.g. 1e12). |
+| `last_update_timestamp`        | u64    | Unix timestamp of the most recent exchange price update.                                    |
+| `token_reserves_liquidity`     | Pubkey | PDA of the liquidity program's token reserve account for this asset.                        |
+| `supply_position_on_liquidity` | Pubkey | PDA of the lending program's supply position in the liquidity layer.                        |
+| `bump`                         | u8     | PDA bump seed for this Lending account.                                                     |
+
+---
+
+### Notes
+
+- `liquidity_exchange_price` reflects base liquidity yield without rewards.
+- `token_exchange_price` includes reward accrual and determines the value of jlTokens.
+- All prices are scaled integers and must be descaled using the appropriate precision.
+
+## Relevant links
+
+<CardGroup cols={2}>
+  <Card icon="github" href="https://github.com/jup-ag/jupiter-lend" title="Jupiter Lend SDK repository">
+    Explore the TypeScript SDK source code, examples, and integration patterns.
+  </Card>
+  <Card icon="box" href="https://www.npmjs.com/package/@jup-ag/lend" title="NPM package">
+    Install the TypeScript SDK to integrate deposit, withdraw, mint, and redeem flows.
+  </Card>
+</CardGroup>

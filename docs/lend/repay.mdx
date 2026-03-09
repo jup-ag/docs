@@ -1,0 +1,227 @@
+---
+title: "Repay"
+description: "Repay borrowed debt"
+llmsDescription: "Repay borrowed debt on a Jupiter Lend borrow position using getOperateIx with zero colAmount and negative debtAmount. Covers partial and full repay, MAX_REPAY_AMOUNT sentinel for full debt repayment, versioned (v0) transaction building, and full TypeScript code example."
+---
+
+Repay debt on a Jupiter Lend borrow position. The SDK builds operate instructions with zero collateral change and a negative debt amount. You must hold the borrow token in your wallet. Transactions use versioned (v0) format with address lookup tables.
+
+---
+
+## Repay
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    Import the required packages for Solana RPC, Jupiter Lend borrow SDK, and versioned transaction building.
+
+    ```typescript
+    import {
+      Connection,
+      Keypair,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getOperateIx } from "@jup-ag/lend/borrow";
+    import fs from "fs";
+    import path from "path";
+    ```
+
+    <Note>
+      Repay uses `getOperateIx` with zero `colAmount` and negative `debtAmount`. The repay amount is taken from your wallet and reduces your position's debt.
+    </Note>
+  </Step>
+  <Step titleSize="h2" title="Load Keypair and Initialize Connection">
+    Load the signer and create the RPC connection. Set vault ID, position ID, and repay amount (positive number; the script passes it as negative to the SDK).
+
+    ```typescript
+    const KEYPAIR_PATH = "/path/to/your/keypair.json";
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const VAULT_ID = 1;
+    const POSITION_ID = 0; // nftId from Create Position
+    const REPAY_AMOUNT = new BN(100_000); // Debt to repay in base units (e.g. 0.1 borrow token)
+
+    function loadKeypair(keypairPath: string): Keypair {
+      const fullPath = path.resolve(keypairPath);
+      const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      return Keypair.fromSecretKey(new Uint8Array(secret));
+    }
+
+    const userKeypair = loadKeypair(KEYPAIR_PATH);
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
+    ```
+
+    <Warning>
+      You must hold at least `REPAY_AMOUNT` of the borrow token in your wallet (or associated token account). Partial repay is supported; use an amount up to your current debt.
+    </Warning>
+  </Step>
+  <Step titleSize="h2" title="Build Repay Instructions">
+    Build operate instructions with no collateral change and negative debt amount.
+
+    ```typescript
+    const { ixs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId: POSITION_ID,
+      colAmount: new BN(0),
+      debtAmount: REPAY_AMOUNT.neg(),
+      connection,
+      signer,
+    });
+
+    if (!ixs?.length) {
+      throw new Error("No repay instructions returned by Jupiter Lend SDK.");
+    }
+    ```
+
+    <Info>
+      Repay is operate with `colAmount` = 0 and `debtAmount` \< 0. Use `.neg()` so the SDK receives a negative BN. Repaying reduces debt and improves your LTV.
+    </Info>
+  </Step>
+  <Step titleSize="h2" title="Build and Sign Transaction">
+    Build a v0 message with the instructions and address lookup tables, then sign.
+
+    ```typescript
+    const latestBlockhash = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: latestBlockhash.blockhash,
+      instructions: ixs,
+    }).compileToV0Message(addressLookupTableAccounts ?? []);
+
+    const transaction = new VersionedTransaction(message);
+    transaction.sign([userKeypair]);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Send and Confirm Transaction">
+    Send the transaction and confirm.
+
+    ```typescript
+    const signature = await connection.sendTransaction(transaction, {
+      skipPreflight: false,
+      maxRetries: 3,
+      preflightCommitment: "confirmed",
+    });
+    await connection.confirmTransaction(
+      { signature, ...latestBlockhash },
+      "confirmed"
+    );
+
+    console.log("Repay successful! Signature:", signature);
+    ```
+
+    <Info>
+      Repaying reduces your debt and interest accrual. Full repay uses your total debt amount (you may need to leave a tiny dust amount depending on the protocol).
+    </Info>
+  </Step>
+</Steps>
+
+## Operate parameters
+
+`getOperateIx` accepts the following parameters:
+
+| Parameter     | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `vaultId`     | `number`    | Target vault (market) ID. |
+| `positionId`  | `number`    | Position NFT ID. |
+| `colAmount`   | `BN`        | Signed collateral amount in base units. **Positive** = deposit. **Negative** = withdraw. Use `new BN(0)` for repay-only. |
+| `debtAmount`  | `BN`        | Signed debt amount in base units. **Positive** = borrow. **Negative** = repay (reduce debt). Pass a negative BN, e.g. `REPAY_AMOUNT.neg()`. |
+| `connection`  | `Connection`| Solana RPC connection. |
+| `signer`      | `PublicKey` | Wallet that signs the transaction (position owner). Must hold the borrow token. |
+
+For **repay**: `colAmount` = 0, `debtAmount` < 0 (negative).
+
+<AccordionGroup>
+  <Accordion title="Partial vs full repay">
+    You can repay any amount up to your current debt. Partial repay reduces debt by that amount. For full repay, use your position's total debt (check vault APIs or UI for the exact value).
+  </Accordion>
+  <Accordion title="Max repay (repay all debt)">
+    To repay **all** debt in one go, use `MAX_REPAY_AMOUNT` from the SDK as `debtAmount`. The protocol treats this sentinel as "repay full debt":
+
+    ```typescript
+    import { getOperateIx, MAX_REPAY_AMOUNT } from "@jup-ag/lend/borrow";
+
+    const { ixs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId: POSITION_ID,
+      colAmount: new BN(0),
+      debtAmount: MAX_REPAY_AMOUNT,
+      connection,
+      signer,
+    });
+    ```
+
+    You must hold enough borrow token to cover the full debt; the protocol will take what is needed.
+  </Accordion>
+</AccordionGroup>
+
+## Full code example
+
+```typescript expandable
+import {
+    Connection,
+    Keypair,
+    TransactionMessage,
+    VersionedTransaction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { getOperateIx } from "@jup-ag/lend/borrow";
+import fs from "fs";
+import path from "path";
+
+const KEYPAIR_PATH = "/path/to/your/keypair.json"; // Path to your local keypair file (update this path)
+const RPC_URL = "https://api.mainnet-beta.solana.com"; // RPC endpoint
+const VAULT_ID = 1; // Target vault (market)
+const POSITION_ID = 0; // nftId from Create Position script
+const REPAY_AMOUNT = new BN(100_000); // Debt to repay, in smallest units (borrow token base units)
+
+function loadKeypair(keypairPath: string): Keypair {
+    const fullPath = path.resolve(keypairPath);
+    const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+    return Keypair.fromSecretKey(new Uint8Array(secret));
+}
+
+// 1. Load user keypair and establish connection
+const userKeypair = loadKeypair(KEYPAIR_PATH);
+const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+const signer = userKeypair.publicKey;
+
+// 2. Get repay instructions from SDK (operate with zero colAmount, negative debtAmount)
+const { ixs, addressLookupTableAccounts } = await getOperateIx({
+    vaultId: VAULT_ID,
+    positionId: POSITION_ID,
+    colAmount: new BN(0),
+    debtAmount: REPAY_AMOUNT.neg(),
+    connection,
+    signer,
+});
+
+if (!ixs?.length) {
+    throw new Error("No repay instructions returned by Jupiter Lend SDK.");
+}
+
+// 3. Build the transaction with latest blockhash and add repay instructions
+// Versioned (v0) transaction with address lookup tables; ready to be signed and sent
+const latestBlockhash = await connection.getLatestBlockhash();
+const message = new TransactionMessage({
+    payerKey: signer,
+    recentBlockhash: latestBlockhash.blockhash,
+    instructions: ixs,
+}).compileToV0Message(addressLookupTableAccounts ?? []);
+
+const transaction = new VersionedTransaction(message);
+transaction.sign([userKeypair]);
+
+// 4. Send and confirm the transaction
+const signature = await connection.sendTransaction(transaction, {
+    skipPreflight: false,
+    maxRetries: 3,
+    preflightCommitment: "confirmed",
+});
+await connection.confirmTransaction(
+    { signature, ...latestBlockhash },
+    "confirmed"
+);
+
+console.log("Repay successful! Signature:", signature);
+```

@@ -1,0 +1,190 @@
+---
+title: "Withdraw"
+description: "Withdraw assets from Jupiter Earn vaults."
+llmsDescription: "Withdraw assets from Jupiter Earn vaults using the @jup-ag/lend SDK. Covers getWithdrawIxs for withdrawing by underlying amount, getRedeemIxs for withdrawing by vault shares, max withdraw/redeem patterns, complete transaction flow, and full TypeScript code example."
+---
+
+Withdraw from Jupiter Earn to redeem your shares for the underlying tokens. The Jupiter Lend SDK handles transaction building and vault interaction.
+
+---
+
+## Getting Started
+
+Import the required packages for Solana RPC and Jupiter Earn SDK operations.
+
+<Steps>
+  <Step iconType="regular" titleSize="h2" title="Import Dependencies">
+    Import the packages you need for Solana RPC and Jupiter Lend (Earn) SDK operations.
+
+    ```typescript
+    import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getDepositIxs, getMintIxs } from "@jup-ag/lend/earn";
+    ```
+  </Step>
+  <Step iconType="regular" titleSize="h2" title="Build instructions">
+    Use the Jupiter Earn SDK to generate withdraw instructions.
+
+    ```typescript
+    const { ixs: withdrawIxs } = await getWithdrawIxs({
+        new Connection("https://api.mainnet-beta.solana.com"),
+        new PublicKey("9a7qBeHBtjKk46YhfPJmBQG5zPmk4TcqpYbdJmJqcMup"),
+        asset: new PublicKey("9a7qBeHBtjKk46YhfPJmBQG5zPmk4TcqpYbdJmJqcMup"), // USDC Mint
+        amount: new BN(10_000_000), // 10 USDC (6 decimals)
+    });
+
+    console.log('Withdraw Instructions:', withdrawIxs);
+    ```
+
+    <Info>
+      **Important**
+
+      - `amount` = underlying token amount (e.g. USDC)
+      - Not vault shares
+      - To withdraw by vault shares, use `getRedeemIxs`
+
+    </Info>
+  </Step>
+</Steps>
+
+<Accordion title="Max withdraw or redeem all">
+  To withdraw **all** of your position (full underlying amount), fetch the user's position with `getUserLendingPositionByAsset` from `@jup-ag/lend/earn`, then pass `userPosition.underlyingAssets` as `amount` to `getWithdrawIxs`. To **redeem all shares** (burn all jlTokens for underlying), use `getRedeemIxs` with `userPosition.lendingTokenShares` as `shares`.
+</Accordion>
+
+## Complete Flow
+
+This example builds, signs, and sends a withdraw transaction.
+
+<Steps>
+  <Step iconType="regular" titleSize="h2" title="Import Dependencies">
+    Import the packages you need for Solana RPC and Jupiter Lend (Earn) SDK operations.
+
+    ```typescript
+    import {
+     Connection,
+     Keypair,
+     PublicKey,
+     Transaction,
+     sendAndConfirmTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getWithdrawIxs } from "@jup-ag/lend/earn";
+    import fs from "fs";
+    import path from "path";
+    ```
+  </Step>
+  <Step iconType="regular" titleSize="h2" title="Set up connection and withdraw parameters">
+    Set your RPC, signer, asset mint, and withdraw amount.
+
+    ```typescript
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const userKeypair = Keypair.generate(); // <-- Replace this with your wallet
+    const ASSET_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"); // Asset mint to withdraw (USDC for example)
+    const WITHDRAW_AMOUNT = new BN(10_000_000); // Amount of asset to withdraw, in smallest units (e.g., 1 USDC = 1_000_000)
+    ```
+
+    If your signer is stored as a local JSON keypair file, you can load it using the helper function below.
+
+    ```typescript
+    function loadKeypair(keypairPath: string): Keypair {
+      const fullPath = path.resolve(keypairPath);
+      const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      return Keypair.fromSecretKey(new Uint8Array(secret));
+    }
+    ```
+
+    Then initialize your signer:
+
+    ```
+    const userKeypair = loadKeypair("/path/to/your/keypair.json");
+    ```
+  </Step>
+  <Step iconType="regular" titleSize="h2" title="Build withdraw instructions">
+    Build a transaction from the withdraw instructions, set blockhash and fee payer, then sign with the user keypair and send the transaction.
+
+    ```typescript
+    const { ixs: withdrawIxs } = await getWithdrawIxs({
+        connection,
+        signer,
+        asset: ASSET_MINT,
+        amount: WITHDRAW_AMOUNT,
+    });
+    ```
+  </Step>
+  <Step iconType="regular" titleSize="h2" title="Build and send transaction">
+    Build a transaction from the withdraw instructions, set blockhash and fee payer, then sign with the user keypair and send the transaction.
+
+    ```typescript
+    const latestBlockhash = await connection.getLatestBlockhash();
+    const transaction = new Transaction({
+        feePayer: signer,
+        ...latestBlockhash,
+    });
+    transaction.add(...withdrawIxs);
+    const signature = await sendAndConfirmTransaction(connection, transaction, [userKeypair]);
+    console.log("Withdraw successful! Signature:", signature);
+    ```
+
+    <Check>
+      You have successfully withdrawn your assets from Jupiter Earn vaults.
+    </Check>
+  </Step>
+</Steps>
+
+## Full code example
+
+```typescript expandable
+import {
+    Connection,
+    Keypair,
+    PublicKey,
+    Transaction,
+    sendAndConfirmTransaction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { getWithdrawIxs } from "@jup-ag/lend/earn";
+import fs from "fs";
+import path from "path";
+
+const KEYPAIR_PATH = "/path/to/your/keypair.json"; // Path to your local keypair file (update this path)
+const ASSET_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"); // Asset mint to withdraw (USDC for example)
+const WITHDRAW_AMOUNT = new BN(10_000_000); // Amount to withdraw, in smallest units (e.g., 1 USDC = 1_000_000)
+const RPC_URL = "https://api.mainnet-beta.solana.com"; // RPC endpoint
+
+function loadKeypair(keypairPath: string): Keypair {
+    const fullPath = path.resolve(keypairPath);
+    const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+    return Keypair.fromSecretKey(new Uint8Array(secret));
+}
+
+// 1. Load user keypair and establish connection
+const userKeypair = loadKeypair(KEYPAIR_PATH);
+const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+const signer = userKeypair.publicKey;
+
+// 2. Get withdraw instructions from SDK
+const { ixs: withdrawIxs } = await getWithdrawIxs({
+    connection,
+    signer,
+    asset: ASSET_MINT,
+    amount: WITHDRAW_AMOUNT,
+});
+
+if (!withdrawIxs?.length) {
+    throw new Error("No withdraw instructions returned by Jupiter Lend SDK.");
+}
+
+// 3. Build the transaction with latest blockhash and add withdraw instructions
+const latestBlockhash = await connection.getLatestBlockhash();
+const transaction = new Transaction({
+    feePayer: signer,
+    ...latestBlockhash,
+});
+transaction.add(...withdrawIxs);
+transaction.sign(userKeypair);
+
+
+// 4. Sign and send the transaction
+const signature = await sendAndConfirmTransaction(connection, transaction, [userKeypair]);
+console.log("Withdraw successful! Signature:", signature);
+```

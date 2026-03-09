@@ -1,0 +1,137 @@
+---
+title: "API vs SDK"
+description: "Choose between the REST API and SDKs for data and transactions."
+llmsDescription: "Comparison of Jupiter Lend integration options: REST API for language-agnostic HTTP access to Earn endpoints, @jup-ag/lend-read Read SDK for on-chain Earn and Borrow data, and @jup-ag/lend Lend SDK for instruction building. Includes capability matrix, code examples, and recommended usage table."
+---
+
+Access data and build transactions through the API. Use the Read SDK for on-chain data and the Lend SDK for transaction building.
+
+## Overview
+
+Jupiter Lend provides multiple integration options:
+
+| Option | Description |
+| ------ | ----------- |
+| **REST API** | HTTPS endpoints for data, positions, earnings, and unsigned transactions. Language-agnostic. |
+| **Read SDK** (`@jup-ag/lend-read`) | On-chain reads for Earn and Borrow. Lending tokens, token details, user positions, vaults, and vault positions. TypeScript only. |
+| **Lend SDK** (`@jup-ag/lend`) | Instruction builders for deposit, withdraw, mint, redeem, and transaction flows. TypeScript only. |
+
+## Core differences
+
+| Capability | REST API | Read SDK | Lend SDK |
+| ---------- | -------- | -------- | -------- |
+| Earn tokens and pool details | `tokens` endpoint | `getAllJlTokens`, `getJlTokenDetails`, `getAllJlTokenDetails` | — |
+| Earn user positions | `positions` endpoint | `getUserPosition`, `getUserPositions` | — |
+| Earnings data | `earnings` endpoint | — | — |
+| Vault config and state | — | `getAllVaults`, `getVaultByVaultId` | — |
+| Borrow user positions | Coming soon | `getAllUserPositions`, `getPositionByVaultId` | — |
+| Earn transactions (deposit, withdraw, mint, redeem) | `deposit`, `withdraw`, `mint`, `redeem` or `*-instructions` | — | `getDepositIxs`, `getWithdrawIxs`, `getMintIxs`, `getRedeemIxs` |
+| Borrow transactions | Coming soon | — | `getInitPositionIx`, `getOperateIx`, etc. |
+| Language | Any (HTTP) | TypeScript/JavaScript | TypeScript/JavaScript |
+
+## Data and analytics
+
+### Earn tokens and positions
+
+**REST API** — Fetch available tokens, positions, and earnings via HTTP. See the [Earn API reference](https://dev.jup.ag/api-reference/lend/earn) for endpoints (`tokens`, `positions`, `earnings`), and request formats.
+
+**Read SDK** — Read tokens and positions directly from chain:
+
+```typescript
+import { Client } from "@jup-ag/lend-read";
+import { PublicKey } from "@solana/web3.js";
+
+const client = new Client(connection);
+
+// All token details
+const allDetails = await client.lending.getAllJlTokenDetails();
+
+// User positions
+const user = new PublicKey("YOUR_WALLET");
+const positions = await client.lending.getUserPositions(user);
+```
+
+### Vault and Borrow data
+
+**Read SDK** — Vault and position reads:
+
+```typescript
+// All vaults
+const vaults = await client.vault.getAllVaults();
+
+// All positions for a user across vaults
+const positions = await client.vault.getAllUserPositions(user);
+
+// Single position by vault and NFT id
+const { userPosition, vaultData } = await client.vault.getPositionByVaultId(vaultId, nftId);
+```
+
+<Info>
+  Borrow API endpoints (vaults, positions, transactions) are coming soon. Use the Read SDK for vault and position data today.
+</Info>
+
+## On-chain transactions
+
+### Earn deposit and withdraw
+
+**REST API** — Request unsigned transactions or instructions for deposit, withdraw, mint, and redeem. See the [Earn API reference](https://dev.jup.ag/api-reference/lend/earn) for `deposit`, `withdraw`, `mint`, `redeem` and `deposit-instructions`, `withdraw-instructions`, `mint-instructions`, `redeem-instructions` endpoints.
+
+**Lend SDK** — Build instructions directly:
+
+```typescript
+import { getDepositIxs, getWithdrawIxs } from "@jup-ag/lend/earn";
+import BN from "bn.js";
+
+const { ixs: depositIxs } = await getDepositIxs({
+  connection,
+  signer: userPublicKey,
+  asset: usdcMint,
+  amount: new BN(1_000_000), // 1 USDC
+});
+
+const { ixs: withdrawIxs } = await getWithdrawIxs({
+  connection,
+  signer: userPublicKey,
+  asset: usdcMint,
+  amount: new BN(1_000_000),
+});
+```
+
+### Borrow operations
+
+Borrow API and SDK flows for create-position, deposit, borrow, repay, withdraw, and liquidate are documented in the [Borrow operations](/docs/lend/borrow-overview) pages. Borrow API endpoints are coming soon.
+
+## Recommended usage
+
+| Use case | Best option |
+| -------- | ----------- |
+| Earn token list and pool details | API or Read SDK |
+| Earn user positions | API or Read SDK |
+| Earn earnings | API |
+| Vault list and config | Read SDK |
+| Borrow user positions | Read SDK |
+| Earn transactions (deposit, withdraw, mint, redeem) | API or Lend SDK |
+| Borrow transactions | Lend SDK |
+| Non-JS backend | API |
+| On-chain reads and tx building (no API) | Read SDK + Lend SDK |
+
+## Summary
+
+Use the **REST API** for quick integration, earnings data, and unsigned transactions from any backend. Use the **Read SDK** for on-chain Earn and Borrow data (tokens, positions, vaults). Use the **Lend SDK** for transaction instruction building and full control over transaction flow.
+
+## Relevant links
+
+<CardGroup cols={2}>
+  <Card title="API reference (Earn)" icon="globe" href="https://dev.jup.ag/api-reference/lend/earn">
+    Deposit, withdraw, mint, redeem, tokens, positions, earnings
+  </Card>
+  <Card title="Read SDK" icon="box" href="https://www.npmjs.com/package/@jup-ag/lend-read">
+    On-chain Earn and Vault data
+  </Card>
+  <Card title="Lend SDK" icon="box" href="https://www.npmjs.com/package/@jup-ag/lend">
+    Instruction builders for Earn and Borrow
+  </Card>
+  <Card title="Contracts" icon="github" href="https://github.com/Instadapp/fluid-solana-programs/">
+    Jupiter Lend on-chain programs
+  </Card>
+</CardGroup>

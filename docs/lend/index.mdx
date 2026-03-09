@@ -2,78 +2,132 @@
 title: "Jupiter Lend Overview"
 sidebarTitle: "About Lend"
 description: "Jupiter's lending protocol for earning yield on deposits and borrowing against collateral."
-llmsDescription: "Jupiter's lending protocol for earning yield on token deposits. Program IDs: Earn (jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9), Borrow (jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi)."
+llmsDescription: "Overview of Jupiter Lend, covering Earn (deposit-and-earn yield) and Borrow (collateralised borrowing) on Solana. Includes installation of @jup-ag/lend and @solana/web3.js, RPC setup, wallet creation, and links to Earn vaults and Borrow markets documentation."
 ---
 
-The Jupiter Lend API is built on top of Jupiter Lend Program.
+The Jupiter Lend API and SDK give you access to Earn (deposit-and-earn) and Borrow (collateralised borrowing) on Solana.
 
-## About Earn
+Deposit into Earn vaults to earn yield, or use assets as collateral in Borrow markets to take out loans. The SDK and API provide deposits, withdrawals, borrows, and repayments as ready-made transactions or as raw instructions for CPI and custom flows.
 
-<AccordionGroup>
+---
 
-<Accordion title="What is the Jupiter Earn Protocol?">
-The Earn Protocol is the 'Deposit and Earn' side of Jupiter Lend. Simply deposit assets to the Jupiter Earn and earn yield.
-</Accordion>
+## Integrate Jupiter Earn / Borrow
 
-<Accordion title="Why is this separate from borrowing?">
+<CardGroup cols={2}>
+  <Card icon="code" href="https://www.npmjs.com/package/@jup-ag/lend" title="TypeScript SDK">
+    Compose on-chain flows for Jupiter Earn and Borrow. The SDK returns raw instructions so you can build transactions, sign, send, or use them in CPI and custom flows.
+  </Card>
+  <Card icon="globe" href="https://dev.jup.ag/api-reference/lend/earn" title="REST API">
+    REST API for Earn: deposit, withdraw, mint, and redeem as unsigned base64 transactions or as raw instructions; read endpoints for vault tokens, user positions, and earnings. Borrow API coming soon.
+  </Card>
+</CardGroup>
 
-  Jupiter Lend uses a unified liquidity layer where both Earn (lending) and Borrow (vault) protocol can source liquidity from. For depositors this means you earn the best possible rate at all times without having to migrate your funds when new protocols are launched on Jupiter Lend. You can supply once and earn the most up to date yield from the Jupiter Lend protocol.
-</Accordion>
+## Jupiter Lend Products
 
-<Accordion title="Are there supply or withdraw limits?">
+<CardGroup cols={2}>
+  <Card icon="chart-line" href="/docs/lend/earn-overview" title="Jupiter Earn vaults">
+    Deposit assets into Jupiter Earn vaults and generate yield.
+  </Card>
+  <Card icon="coins" href="/docs/lend/borrow-overview" title="Borrow markets">
+    Borrow assets against collateral in Jupiter markets.
+  </Card>
+</CardGroup>
 
-  There is no limits on supplying funds to the Earn Protocol. Withdrawals from Jupiter Lend utilize an Automated Debt Ceiling. Withdrawals increase every block creating a smoothing curve for withdrawals preventing any sudden large movements.
+## Getting Started
 
-</Accordion>
+Set up your development environment:
 
-<Accordion title="What are the risk?">
+<Steps>
+  <Step iconType="regular" titleSize="h2" title="Install Dependencies">
+    Add the Jupiter Lend TypeScript SDK and Solana web3.js to your dependencies.
 
-  Jupiter Lend is a novel protocol and like all DeFi protocols contains smart contract risk, market risk and other factors which can cause loss of user funds.
-</Accordion>
+    ```shellscript
+    npm i @jup-ag/lend @solana/web3.js
+    ```
 
-<Accordion title="What are the fees for the Earn Protocol?">
+    <Note>
+      Jupiter Lend SDK is built on top of **@solana/web3.js** for RPC communication and transaction construction.
+    </Note>
+  </Step>
+  <Step iconType="regular" titleSize="h2" title="Setup the RPC">
+    ```typescript
+    import { Connection } from "@solana/web3.js";
 
-  There are no fees to use the Earn Protocol on Jupiter Lend.
-</Accordion>
+    const connection = new Connection(
+      "https://api.mainnet-beta.solana.com",
+      {
+        commitment: "confirmed",
+      }
+    );
+    ```
 
-</AccordionGroup>
+    <Note>
+      Public RPC endpoints are rate-limited and not recommended for production use.
 
-## About Borrow
+      Use a dedicated RPC provider such as [Helius](https://www.helius.dev), [Triton](https://triton.one), or [Alchemy](https://www.alchemy.com/solana) for improved reliability and performance.
+    </Note>
+  </Step>
+  <Step iconType="regular" titleSize="h2" title="Create or Import Wallet">
+    Choose a method to create or import a wallet for signing transactions.
 
-<AccordionGroup>
+    <Note>
+      Alternatively, create a wallet using a browser wallet provider like [Jupiter Wallet](https://chromewebstore.google.com/detail/jupiter-wallet/iledlaeogohbilgbfhmbgkgmpplbfboh)
+    </Note>
+    <Accordion title="Create Wallet with Solana CLI">
+      Use the Solana CLI to generate a new keypair file.
 
-<Accordion title="What is Jupiter Borrow Protocol?">
+      ```shellscript
+      solana-keygen new -o wallet.json
+      ```
+    </Accordion>
+    <Accordion title="Generate Keypair Programmatically">
+      Generate a new keypair programmatically using the Solana web3.js.
 
-  Borrow Vaults are a known standard mechanism for locking collateral and borrowing debt. Jupiter Lend utilizes this familiar single asset - single debt vault approach. Jupiter Lend takes borrow vaults to the next level by being the most capital efficient and optimized protocol enabling up to 95% LTV on collateral.
-</Accordion>
+      ```typescript
+      import { Keypair } from "@solana/web3.js";
 
-<Accordion title="How does Jupiter Lend achieve such high LTV?">
+      const keypair = Keypair.generate();
+      console.log("Public Key:", keypair.publicKey.toBase58());
+      ```
+    </Accordion>
+    <Accordion title="Load Wallet from Local Keypair File">
+      Import a wallet from an existing keypair file.
 
-  Jupiter borrow vaults has the most advanced liquidation mechanisms, and are able to provide the highest LTVs in the market, the protocol easily removes bad debt and enables the most gas efficient liquidation mechanism in DeFi.
-</Accordion>
+      ```typescript
+      import { Keypair } from "@solana/web3.js";
+      import fs from "fs";
+      import path from "path";
 
-<Accordion title="What happens if I am liquidated?">
+      function loadKeypair(filePath: string): Keypair {
+        const resolvedPath = path.resolve(filePath);
+        const secret = JSON.parse(fs.readFileSync(resolvedPath, "utf8"));
+        return Keypair.fromSecretKey(new Uint8Array(secret));
+      }
 
-  When your NFT or position is liquidated, a portion of your collateral is sold to repay your debt and return your position to a safe state. In addition to selling a part of your collateral, a liquidation penalty is also charged.
-</Accordion>
+      const userKeypair = loadKeypair("/path/to/wallet.json");
+      console.log("Public Key:", userKeypair.publicKey.toBase58());
+      ```
+    </Accordion>
+    <Accordion title="Import Private Key">
+      Import a private key from an existing browser wallet.
 
-<Accordion title="What is the Max Liquidation Threshold?">
+      ```typescript
+      import { Keypair } from "@solana/web3.js";
+      import fs from "fs";
+      import path from "path";
 
-  While the Liquidation Threshold determines when a vault can be liquidated, the protocol also has a 'hard' ceiling for liquidation. When a vault passes the max liquidation threshold it is entirely (100%) liquidated automatically.
-</Accordion>
+      function loadKeypair(filePath: string): Keypair {
+        const resolvedPath = path.resolve(filePath);
+        const secret = JSON.parse(fs.readFileSync(resolvedPath, "utf8"));
+        return Keypair.fromSecretKey(new Uint8Array(secret));
+      }
 
-<Accordion title="My vault passed the liquidation threshold but is not liquidated, will I be liquidated?">
-
-  **Yes your position is still at risk of being liquidated!** Once your position passes the threshold it can be liquidated, but it may not happen immediately. If your position is still at risk you can take the time now to unwind/reduce your risk ratio to make your position safe and prevent a liquidation event.
-</Accordion>
-</AccordionGroup>
-
-## Program ID
-
-| Program | Address |
-|:--------|:--------|
-| **Jupiter Lend Earn** | [`jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9`](https://solscan.io/account/jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9) |
-| **Jupiter Lend Borrow** | [`jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi`](https://solscan.io/account/jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi) |
-| **Jupiter Lend Earn Rewards** | [`jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar`](https://solscan.io/account/jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar) |
-| **Jupiter Lend Liquidity** | [`jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC`](https://solscan.io/account/jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC) |
-| **Jupiter Lend Borrow Oracle** | [`jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc`](https://solscan.io/account/jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) |
+      const userKeypair = loadKeypair("/path/to/wallet.json");
+      console.log("Public Key:", userKeypair.publicKey.toBase58());
+      ```
+    </Accordion>
+    <Danger>
+      Never expose or commit private keys to version control. Use secure key management in production environments.
+    </Danger>
+  </Step>
+</Steps>

@@ -1,0 +1,222 @@
+---
+title: "Withdraw"
+description: "Withdraw collateral from a Jupiter Lend borrow position."
+llmsDescription: "Withdraw collateral from a Jupiter Lend borrow position using getOperateIx with negative colAmount and zero debtAmount. Covers LTV constraints, MAX_WITHDRAW_AMOUNT sentinel for full withdrawal, versioned (v0) transaction building, and full TypeScript code example."
+---
+
+Withdraw collateral (supply assets) from an existing Jupiter Lend borrow position. The SDK builds operate instructions with a negative collateral amount and zero debt change. You can only withdraw up to the amount that keeps your position within the vault's LTV limits. Transactions use versioned (v0) format with address lookup tables.
+
+## Withdraw
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    Import the required packages for Solana RPC, Jupiter Lend borrow SDK, and versioned transaction building.
+
+    ```typescript
+    import {
+      Connection,
+      Keypair,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getOperateIx } from "@jup-ag/lend/borrow";
+    import fs from "fs";
+    import path from "path";
+    ```
+
+    <Note>
+      Withdraw uses `getOperateIx` with negative `colAmount` and zero `debtAmount`. The withdrawn collateral is sent back to your wallet.
+    </Note>
+  </Step>
+  <Step titleSize="h2" title="Load Keypair and Initialize Connection">
+    Load the signer and create the RPC connection. Set vault ID, position ID, and withdraw amount (positive number; the script passes it as negative to the SDK).
+
+    ```typescript
+    const KEYPAIR_PATH = "/path/to/your/keypair.json";
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const VAULT_ID = 1;
+    const POSITION_ID = 0; // nftId from Create Position
+    const WITHDRAW_AMOUNT = new BN(500_000); // Collateral to withdraw (base units)
+
+    function loadKeypair(keypairPath: string): Keypair {
+      const fullPath = path.resolve(keypairPath);
+      const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      return Keypair.fromSecretKey(new Uint8Array(secret));
+    }
+
+    const userKeypair = loadKeypair(KEYPAIR_PATH);
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
+    ```
+
+    <Warning>
+      Withdrawing collateral increases your LTV. Ensure you stay below the liquidation threshold; repay debt first if needed.
+    </Warning>
+  </Step>
+  <Step titleSize="h2" title="Build Withdraw Instructions">
+    Build operate instructions with negative collateral amount and no debt change.
+
+    ```typescript
+    const { ixs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId: POSITION_ID,
+      colAmount: WITHDRAW_AMOUNT.neg(),
+      debtAmount: new BN(0),
+      connection,
+      signer,
+    });
+
+    if (!ixs?.length) {
+      throw new Error("No withdraw instructions returned by Jupiter Lend SDK.");
+    }
+    ```
+
+    <Info>
+      Withdraw is operate with `colAmount` \< 0 and `debtAmount` = 0. Use `.neg()` so the SDK receives a negative BN. The vault may reject if the withdrawal would breach LTV limits.
+    </Info>
+  </Step>
+  <Step titleSize="h2" title="Build and Sign Transaction">
+    Build a v0 message with the instructions and address lookup tables, then sign.
+
+    ```typescript
+    const latestBlockhash = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: latestBlockhash.blockhash,
+      instructions: ixs,
+    }).compileToV0Message(addressLookupTableAccounts ?? []);
+
+    const transaction = new VersionedTransaction(message);
+    transaction.sign([userKeypair]);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Send and Confirm Transaction">
+    Send the transaction and confirm.
+
+    ```typescript
+    const signature = await connection.sendTransaction(transaction, {
+      skipPreflight: false,
+      maxRetries: 3,
+      preflightCommitment: "confirmed",
+    });
+    await connection.confirmTransaction(signature, "confirmed");
+
+    console.log("Withdraw successful! Signature:", signature);
+    ```
+
+    <Info>
+      Withdrawing reduces your collateral and borrowing capacity. Repay debt first if you are near the LTV limit.
+    </Info>
+  </Step>
+</Steps>
+
+## Operate parameters
+
+`getOperateIx` accepts the following parameters:
+
+| Parameter     | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `vaultId`     | `number`    | Target vault (market) ID. |
+| `positionId`  | `number`    | Position NFT ID. |
+| `colAmount`   | `BN`        | Signed collateral amount in base units. **Positive** = deposit. **Negative** = withdraw (reduce collateral). Pass a negative BN, e.g. `WITHDRAW_AMOUNT.neg()`. |
+| `debtAmount`  | `BN`        | Signed debt amount in base units. **Positive** = borrow. **Negative** = repay. Use `new BN(0)` for withdraw-only. |
+| `connection`  | `Connection`| Solana RPC connection. |
+| `signer`      | `PublicKey` | Wallet that signs the transaction (position owner). |
+
+For **withdraw**: `colAmount` < 0 (negative), `debtAmount` = 0.
+
+<AccordionGroup>
+  <Accordion title="When can I withdraw?">
+    You can withdraw collateral as long as the resulting position stays within the vault's LTV rules. If you have outstanding debt, the protocol may limit how much you can withdraw until you repay.
+  </Accordion>
+  <Accordion title="Max withdraw (withdraw all collateral)">
+    To withdraw **all** collateral in one go, use `MAX_WITHDRAW_AMOUNT` from the SDK as `colAmount`. The protocol treats this sentinel as "withdraw all collateral":
+
+    ```typescript
+    import { getOperateIx, MAX_WITHDRAW_AMOUNT } from "@jup-ag/lend/borrow";
+
+    const { ixs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId: POSITION_ID,
+      colAmount: MAX_WITHDRAW_AMOUNT,
+      debtAmount: new BN(0),
+      connection,
+      signer,
+    });
+    ```
+
+    This only succeeds if the resulting position stays within LTV (e.g. you have no debt, or you repay first). Otherwise the vault will reject the transaction.
+  </Accordion>
+</AccordionGroup>
+
+## Full code example
+
+```typescript expandable
+import {
+    Connection,
+    Keypair,
+    TransactionMessage,
+    VersionedTransaction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { getOperateIx } from "@jup-ag/lend/borrow";
+import fs from "fs";
+import path from "path";
+
+const KEYPAIR_PATH = "/path/to/your/keypair.json"; // Path to your local keypair file (update this path)
+const RPC_URL = "https://api.mainnet-beta.solana.com"; // RPC endpoint
+const VAULT_ID = 1; // Target vault (market)
+const POSITION_ID = 0; // nftId from Create Position script
+const WITHDRAW_AMOUNT = new BN(500_000); // Collateral to withdraw, in smallest units (supply token base units)
+
+function loadKeypair(keypairPath: string): Keypair {
+    const fullPath = path.resolve(keypairPath);
+    const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+    return Keypair.fromSecretKey(new Uint8Array(secret));
+}
+
+// 1. Load user keypair and establish connection
+const userKeypair = loadKeypair(KEYPAIR_PATH);
+const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+const signer = userKeypair.publicKey;
+
+// 2. Get withdraw instructions from SDK (operate with negative colAmount, zero debtAmount)
+const { ixs, addressLookupTableAccounts } = await getOperateIx({
+    vaultId: VAULT_ID,
+    positionId: POSITION_ID,
+    colAmount: WITHDRAW_AMOUNT.neg(),
+    debtAmount: new BN(0),
+    connection,
+    signer,
+});
+
+if (!ixs?.length) {
+    throw new Error("No withdraw instructions returned by Jupiter Lend SDK.");
+}
+
+// 3. Build the transaction with latest blockhash and add withdraw instructions
+// Versioned (v0) transaction with address lookup tables; ready to be signed and sent
+const latestBlockhash = await connection.getLatestBlockhash();
+const message = new TransactionMessage({
+    payerKey: signer,
+    recentBlockhash: latestBlockhash.blockhash,
+    instructions: ixs,
+}).compileToV0Message(addressLookupTableAccounts ?? []);
+
+const transaction = new VersionedTransaction(message);
+transaction.sign([userKeypair]);
+
+// 4. Send and confirm the transaction
+const signature = await connection.sendTransaction(transaction, {
+    skipPreflight: false,
+    maxRetries: 3,
+    preflightCommitment: "confirmed",
+});
+await connection.confirmTransaction(
+    { signature, ...latestBlockhash },
+    "confirmed"
+);
+
+console.log("Withdraw successful! Signature:", signature);
+```

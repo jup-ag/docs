@@ -1,0 +1,189 @@
+---
+title: "Deposit"
+description: "Deposit assets into Jupiter Earn vaults to start earning yield."
+llmsDescription: "Deposit assets into Jupiter Earn vaults using the @jup-ag/lend SDK. Covers getDepositIxs for building deposit instructions, getMintIxs for depositing by vault shares, complete transaction flow with signing and sending, and full TypeScript code example."
+---
+
+Deposit assets into Jupiter Earn vaults using the SDK.\
+The SDK generates transaction instructions that you can add to your own transaction flow.
+
+---
+
+## Getting Started
+
+Import the required packages for Solana RPC and Jupiter Earn SDK operations.
+
+<Steps>
+  <Step iconType="regular" titleSize="h2" title="Import Dependencies">
+    Import the packages you need for Solana RPC and Jupiter Lend (Earn) SDK operations.
+
+    ```typescript
+    import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getDepositIxs, getMintIxs } from "@jup-ag/lend/earn";
+    ```
+  </Step>
+  <Step iconType="regular" titleSize="h2" title="Build Instructions">
+    Use the Jupiter Earn SDK to generate deposit instructions.
+
+    ```typescript
+    const { ixs: depositIxs } = await getDepositIxs({
+        new Connection("https://api.mainnet-beta.solana.com"),
+        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"), // signer
+        asset: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"), // USDC Mint
+        amount: new BN(10_000_000), // 10 USDC (6 decimals)
+      });
+
+    console.log('Deposit Instructions:', depositIxs);
+    ```
+
+    <Info>
+    **Important**
+
+    - `amount` = underlying asset amount being deposited (e.g. USDC)
+    - Not vault shares
+    - To deposit by specifying the number of vault shares to receive, use `getMintIxs`
+
+    </Info>
+  </Step>
+</Steps>
+
+## Complete Flow
+
+This example builds, signs, and sends a deposit transaction.
+
+<Steps>
+  <Step iconType="regular" titleSize="h2" title="Import Dependencies">
+    Import the packages you need for Solana RPC and Jupiter Lend (Earn) SDK operations.
+
+    ```typescript
+    import {
+     Connection,
+     Keypair,
+     PublicKey,
+     Transaction,
+     sendAndConfirmTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getDepositIxs } from "@jup-ag/lend/earn";
+    import fs from "fs";
+    import path from "path";
+    ```
+  </Step>
+  <Step iconType="regular" titleSize="h2" title="Set up connection and deposit parameters">
+    Set your RPC, signer, asset mint, and deposit amount.
+
+    ```typescript
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const userKeypair = Keypair.generate(); // <-- Replace this with your wallet
+    const ASSET_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    const DEPOSIT_AMOUNT = new BN(10_000_000);
+    ```
+
+    If your signer is stored as a local JSON keypair file, you can load it using the helper function below.
+
+    ```typescript
+    function loadKeypair(keypairPath: string): Keypair {
+      const fullPath = path.resolve(keypairPath);
+      const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      return Keypair.fromSecretKey(new Uint8Array(secret));
+    }
+    ```
+
+    Then initialize your signer:
+
+    ```
+    const userKeypair = loadKeypair("/path/to/your/keypair.json");
+    ```
+  </Step>
+  <Step iconType="regular" titleSize="h2" title="Build Deposit Instructions">
+    Build a transaction from the deposit instructions, set blockhash and fee payer, then sign with the user keypair and send the transaction.
+
+    ```typescript
+    const { ixs: depositIxs } = await getDepositIxs({
+        connection,
+        signer,
+        asset: ASSET_MINT,
+        amount: DEPOSIT_AMOUNT,
+    });
+    ```
+  </Step>
+  <Step iconType="regular" titleSize="h2" title="Build and send transaction">
+    Build a transaction from the deposit instructions, set blockhash and fee payer, then sign with the user keypair and send the transaction.
+
+    ```typescript
+    const latestBlockhash = await connection.getLatestBlockhash();
+    const transaction = new Transaction({
+        feePayer: signer,
+        ...latestBlockhash,
+    });
+    transaction.add(...depositIxs);
+
+    const signature = await sendAndConfirmTransaction(connection, transaction, [userKeypair]);
+    console.log("Deposit successful! Signature:", signature);
+    ```
+
+    <Check>
+      You have successfully deposited your assets into Jupiter Earn Vaults. Your assets are now earning yield.
+    </Check>
+  </Step>
+</Steps>
+
+## Full code example
+
+```typescript expandable
+import {
+    Connection,
+    Keypair,
+    PublicKey,
+    Transaction,
+    sendAndConfirmTransaction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { getDepositIxs } from "@jup-ag/lend/earn";
+import fs from "fs";
+import path from "path";
+
+
+const KEYPAIR_PATH = "/path/to/your/keypair.json"; // Path to your local keypair file (update this path)
+const ASSET_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"); // Asset mint to deposit (USDC for example)
+const DEPOSIT_AMOUNT = new BN(10_000_000); // Amount to deposit, in smallest units (e.g., 1 USDC = 1_000_000)
+const RPC_URL = "https://api.mainnet-beta.solana.com"; // RPC endpoint
+
+function loadKeypair(keypairPath: string): Keypair {
+    const fullPath = path.resolve(keypairPath);
+    const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+    return Keypair.fromSecretKey(new Uint8Array(secret));
+}
+
+// 1. Load user keypair and establish connection
+const userKeypair = loadKeypair(KEYPAIR_PATH);
+const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+const signer = userKeypair.publicKey;
+
+// 2. Get deposit instructions from SDK
+const { ixs: depositIxs } = await getDepositIxs({
+    connection,
+    signer,
+    asset: ASSET_MINT,
+    amount: DEPOSIT_AMOUNT,
+});
+
+if (!depositIxs?.length) {
+    throw new Error("No deposit instructions returned by Jupiter Lend SDK.");
+}
+
+// 3. Build the transaction with latest blockhash and add deposit instructions
+// This prepares the transaction ready to be signed and sent
+const latestBlockhash = await connection.getLatestBlockhash();
+const transaction = new Transaction({
+    feePayer: signer,
+    ...latestBlockhash,
+});
+transaction.add(...depositIxs);
+transaction.sign(userKeypair);
+
+// 4. Sign and send the transaction
+const signature = await sendAndConfirmTransaction(connection, transaction, [userKeypair]);
+console.log("Deposit successful! Signature:", signature);
+```

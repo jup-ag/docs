@@ -1,0 +1,253 @@
+---
+title: "Combined operations"
+description: "Run create, deposit, borrow, repay, and withdraw in a single transaction using getOperateIx."
+llmsDescription: "Combine multiple Jupiter Lend borrow operations (create position, deposit, borrow, repay, withdraw) into a single transaction using multiple getOperateIx calls. Covers positionId 0 for auto-creation, instruction merging, address lookup table deduplication, and full TypeScript code example."
+---
+
+Combine multiple borrow operations into one transaction. Pass both `colAmount` and `debtAmount` in a single `getOperateIx` call to batch operations (e.g. deposit + borrow, or repay + withdraw). When `positionId` is `0`, the first call creates a new position and returns `positionId` for use in the second call. Transactions use versioned (v0) format with address lookup tables.
+
+---
+
+## Combined operations
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    Import the required packages for Solana RPC, Jupiter Lend borrow SDK, and versioned transaction building.
+
+    ```typescript
+    import {
+      Connection,
+      Keypair,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getOperateIx } from "@jup-ag/lend/borrow";
+    import fs from "fs";
+    import path from "path";
+    ```
+
+    <Note>
+      Combined operations use multiple `getOperateIx` calls. Pass both `colAmount` and `debtAmount` in one call to batch deposit + borrow or repay + withdraw.
+    </Note>
+  </Step>
+  <Step titleSize="h2" title="Load Keypair and Initialize Connection">
+    Load the signer and create the RPC connection. Set vault ID and amounts for each operation.
+
+    ```typescript
+    const KEYPAIR_PATH = "/path/to/your/keypair.json";
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const VAULT_ID = 1;
+
+    // Amounts in base units (e.g. USDC 6 decimals: 1_000_000 = 1 USDC)
+    const DEPOSIT_AMOUNT = new BN(1_000_000);
+    const BORROW_AMOUNT = new BN(500_000);
+    const REPAY_AMOUNT = new BN(100_000);
+    const WITHDRAW_AMOUNT = new BN(200_000);
+
+    function loadKeypair(keypairPath: string): Keypair {
+      const fullPath = path.resolve(keypairPath);
+      const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      return Keypair.fromSecretKey(new Uint8Array(secret));
+    }
+
+    const userKeypair = loadKeypair(KEYPAIR_PATH);
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
+    ```
+  </Step>
+  <Step titleSize="h2" title="Build Operate Instructions">
+    Call `getOperateIx` twice: once with `positionId: 0` to create a position and deposit + borrow; once with the returned `positionId` to repay + withdraw. Then merge instructions and address lookup tables.
+
+    ```typescript
+    // 1. Create position + Deposit + Borrow (positionId 0 creates new position)
+    const { ixs: depositBorrowIxs, addressLookupTableAccounts: depositBorrowAlts, positionId } = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId: 0,
+      colAmount: DEPOSIT_AMOUNT,
+      debtAmount: BORROW_AMOUNT,
+      connection,
+      signer,
+    });
+
+    // 2. Repay + Withdraw (use positionId from first call)
+    const repayWithdrawResult = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId: positionId!,
+      colAmount: WITHDRAW_AMOUNT.neg(),
+      debtAmount: REPAY_AMOUNT.neg(),
+      connection,
+      signer,
+    });
+
+    // Merge instructions and address lookup tables
+    const allIxs = [
+      ...(depositBorrowIxs ?? []),
+      ...(repayWithdrawResult.ixs ?? []),
+    ];
+
+    const allAlts = [
+      ...(depositBorrowAlts ?? []),
+      ...(repayWithdrawResult.addressLookupTableAccounts ?? []),
+    ];
+    const seenKeys = new Set<string>();
+    const mergedAlts = allAlts.filter((alt) => {
+      const k = alt.key.toString();
+      if (seenKeys.has(k)) return false;
+      seenKeys.add(k);
+      return true;
+    });
+
+    if (!allIxs.length) {
+      throw new Error("No instructions returned.");
+    }
+    ```
+
+    <Info>
+      When `positionId` is `0`, the SDK creates a new position and returns `positionId`. Use that `positionId` in the second call. Deduplicate address lookup tables by key when merging.
+    </Info>
+  </Step>
+  <Step titleSize="h2" title="Build and Sign Transaction">
+    Build a v0 message with the merged instructions and address lookup tables, then sign.
+
+    ```typescript
+    const latestBlockhash = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: latestBlockhash.blockhash,
+      instructions: allIxs,
+    }).compileToV0Message(mergedAlts);
+
+    const transaction = new VersionedTransaction(message);
+    transaction.sign([userKeypair]);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Send and Confirm Transaction">
+    Send the transaction and confirm.
+
+    ```typescript
+    const signature = await connection.sendTransaction(transaction, {
+      skipPreflight: false,
+      maxRetries: 3,
+      preflightCommitment: "confirmed",
+    });
+    await connection.confirmTransaction({ signature, ...latestBlockhash }, "confirmed");
+
+    console.log("Combined operate successful! Signature:", signature);
+    ```
+  </Step>
+</Steps>
+
+## Operate parameters
+
+`getOperateIx` accepts the following parameters:
+
+| Parameter     | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `vaultId`     | `number`    | Target vault (market) ID. |
+| `positionId`  | `number`    | Position NFT ID. Use `0` to create a new position and operate in one transaction. |
+| `colAmount`   | `BN`        | Signed collateral amount in base units. **Positive** = deposit. **Negative** = withdraw. Use `new BN(0)` for borrow/repay-only. |
+| `debtAmount`  | `BN`        | Signed debt amount in base units. **Positive** = borrow. **Negative** = repay. Use `new BN(0)` for deposit/withdraw-only. |
+| `connection`  | `Connection`| Solana RPC connection. |
+| `signer`      | `PublicKey` | Wallet that signs the transaction (position owner). |
+
+Combine operations by passing both `colAmount` and `debtAmount` in one call (e.g. deposit + borrow: both positive; repay + withdraw: both negative).
+
+<AccordionGroup>
+  <Accordion title="Combining operations">
+    Pass both `colAmount` and `debtAmount` in a single `getOperateIx` call to batch two operations. Deposit + borrow: `colAmount` > 0, `debtAmount` > 0. Repay + withdraw: `colAmount` < 0, `debtAmount` < 0.
+  </Accordion>
+  <Accordion title="Using an existing position">
+    If you already have a position, use its `positionId` instead of `0` in the first call and skip the create step. Or use `positionId: positionId` for both calls when doing repay + withdraw only.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Full code example
+
+```typescript expandable
+import {
+  Connection,
+  Keypair,
+  TransactionMessage,
+  VersionedTransaction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { getOperateIx } from "@jup-ag/lend/borrow";
+import fs from "fs";
+import path from "path";
+
+const KEYPAIR_PATH = "/path/to/your/keypair.json";
+const RPC_URL = "https://api.mainnet-beta.solana.com";
+const VAULT_ID = 1;
+
+const DEPOSIT_AMOUNT = new BN(1_000_000);
+const BORROW_AMOUNT = new BN(500_000);
+const REPAY_AMOUNT = new BN(100_000);
+const WITHDRAW_AMOUNT = new BN(200_000);
+
+function loadKeypair(keypairPath: string): Keypair {
+  const fullPath = path.resolve(keypairPath);
+  const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+  return Keypair.fromSecretKey(new Uint8Array(secret));
+}
+
+const userKeypair = loadKeypair(KEYPAIR_PATH);
+const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+const signer = userKeypair.publicKey;
+
+// 1. Create position + Deposit + Borrow
+const { ixs: depositBorrowIxs, addressLookupTableAccounts: depositBorrowAlts, positionId } = await getOperateIx({
+  vaultId: VAULT_ID,
+  positionId: 0,
+  colAmount: DEPOSIT_AMOUNT,
+  debtAmount: BORROW_AMOUNT,
+  connection,
+  signer,
+});
+
+// 2. Repay + Withdraw
+const repayWithdrawResult = await getOperateIx({
+  vaultId: VAULT_ID,
+  positionId: positionId!,
+  colAmount: WITHDRAW_AMOUNT.neg(),
+  debtAmount: REPAY_AMOUNT.neg(),
+  connection,
+  signer,
+});
+
+const allIxs = [...(depositBorrowIxs ?? []), ...(repayWithdrawResult.ixs ?? [])];
+const allAlts = [
+  ...(depositBorrowAlts ?? []),
+  ...(repayWithdrawResult.addressLookupTableAccounts ?? []),
+];
+const seenKeys = new Set<string>();
+const mergedAlts = allAlts.filter((alt) => {
+  const k = alt.key.toString();
+  if (seenKeys.has(k)) return false;
+  seenKeys.add(k);
+  return true;
+});
+
+if (!allIxs.length) throw new Error("No instructions returned.");
+
+const latestBlockhash = await connection.getLatestBlockhash();
+const message = new TransactionMessage({
+  payerKey: signer,
+  recentBlockhash: latestBlockhash.blockhash,
+  instructions: allIxs,
+}).compileToV0Message(mergedAlts);
+
+const transaction = new VersionedTransaction(message);
+transaction.sign([userKeypair]);
+
+const signature = await connection.sendTransaction(transaction, {
+  skipPreflight: false,
+  maxRetries: 3,
+  preflightCommitment: "confirmed",
+});
+await connection.confirmTransaction({ signature, ...latestBlockhash }, "confirmed");
+
+console.log("Combined operate successful! Signature:", signature);
+```

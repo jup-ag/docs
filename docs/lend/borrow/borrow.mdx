@@ -1,12 +1,14 @@
 ---
-title: "Deposit"
-description: "Deposit assets as collateral or liquidity"
-llmsDescription: "Deposit collateral into a Jupiter Lend borrow position using getOperateIx with positive colAmount and zero debtAmount. Covers versioned (v0) transaction building with address lookup tables, positionId 0 for batch create + deposit, operate parameters table, and full TypeScript code example."
+title: "Borrow Assets"
+description: "Borrow assets against your collateral"
+llmsDescription: "Borrow assets from a Jupiter Lend vault against deposited collateral using getOperateIx with zero colAmount and positive debtAmount. Covers versioned (v0) transaction building, operate parameters, LTV and interest mechanics, and full TypeScript code example."
 ---
 
-Deposit collateral (supply assets) into an existing Jupiter Lend borrow position. The SDK builds operate instructions with a positive collateral amount and zero debt change. Transactions use versioned (v0) format with address lookup tables.
+Borrow assets from a Jupiter Lend vault against your deposited collateral. The SDK builds operate instructions with zero collateral change and a positive debt amount. Transactions use versioned (v0) format with address lookup tables.
 
-## Deposit
+---
+
+## Borrow
 
 <Steps>
   <Step titleSize="h2" title="Import Dependencies">
@@ -26,18 +28,18 @@ Deposit collateral (supply assets) into an existing Jupiter Lend borrow position
     ```
 
     <Note>
-      Deposit uses `getOperateIx` with positive `colAmount` and zero `debtAmount`. Versioned transactions and address lookup tables are required.
+      Borrow uses `getOperateIx` with zero `colAmount` and positive `debtAmount`. The borrowed asset is sent to your wallet.
     </Note>
   </Step>
   <Step titleSize="h2" title="Load Keypair and Initialize Connection">
-    Load the signer and create the RPC connection. Set vault ID, position ID, and deposit amount.
+    Load the signer and create the RPC connection. Set vault ID, position ID, and borrow amount.
 
     ```typescript
     const KEYPAIR_PATH = "/path/to/your/keypair.json";
     const RPC_URL = "https://api.mainnet-beta.solana.com";
     const VAULT_ID = 1;
-    const POSITION_ID = 0; // Use 0 to create position + deposit in one tx; or nftId from Create Position
-    const DEPOSIT_AMOUNT = new BN(1_000_000); // Collateral in base units (e.g. 1 USDC = 1_000_000)
+    const POSITION_ID = 0; // nftId from Create Position
+    const BORROW_AMOUNT = new BN(100_000); // Borrow token base units (e.g. 0.1 USDT)
 
     function loadKeypair(keypairPath: string): Keypair {
       const fullPath = path.resolve(keypairPath);
@@ -50,38 +52,33 @@ Deposit collateral (supply assets) into an existing Jupiter Lend borrow position
     const signer = userKeypair.publicKey;
     ```
 
-    <Info>
-      Pass `positionId: 0` to batch **init position + deposit** in one transaction. The SDK returns `nftId` (your new position ID) for future operations. If you already have a position, use its `nftId` instead.
-    </Info>
+    <Warning>
+      You must have an existing position with deposited collateral. Your borrow capacity depends on collateral value and the vault's LTV limits.
+    </Warning>
   </Step>
-  <Step titleSize="h2" title="Build Deposit Instructions">
-    Build operate instructions with positive collateral amount and no debt change.
+  <Step titleSize="h2" title="Build Borrow Instructions">
+    Build operate instructions with no collateral change and positive debt amount.
 
     ```typescript
-    const { ixs, addressLookupTableAccounts, nftId } = await getOperateIx({
+    const { ixs, addressLookupTableAccounts } = await getOperateIx({
       vaultId: VAULT_ID,
       positionId: POSITION_ID,
-      colAmount: DEPOSIT_AMOUNT,
-      debtAmount: new BN(0),
+      colAmount: new BN(0),
+      debtAmount: BORROW_AMOUNT,
       connection,
       signer,
     });
 
-    // When positionId is 0, nftId is the new position ID
-    if (POSITION_ID === 0) console.log("New position ID (nftId):", nftId);
-
     if (!ixs?.length) {
-      throw new Error("No deposit instructions returned by Jupiter Lend SDK.");
+      throw new Error("No borrow instructions returned by Jupiter Lend SDK.");
     }
     ```
 
     <Info>
-      Deposit is operate with `colAmount` \> 0 and `debtAmount` = 0. Your supplied tokens are locked as collateral and increase your borrowing capacity.
+      Borrow is operate with `colAmount` = 0 and `debtAmount` \> 0. The borrow token is sent to your wallet; you accrue interest until you **Repay**.
     </Info>
   </Step>
-  <Step>
-    ### Build and Sign Transaction
-
+  <Step titleSize="h2" title="Build and Sign Transaction">
     Build a v0 message with the instructions and address lookup tables, then sign.
 
     ```typescript
@@ -107,11 +104,11 @@ Deposit collateral (supply assets) into an existing Jupiter Lend borrow position
     });
     await connection.confirmTransaction(signature, "confirmed");
 
-    console.log("Deposit successful! Signature:", signature);
+    console.log("Borrow successful! Signature:", signature);
     ```
 
     <Info>
-      After depositing, you can **Borrow** against this collateral. Monitor your LTV to avoid liquidation.
+      Borrowing increases your debt and LTV. Repay with the **Repay** flow to reduce debt and improve position health.
     </Info>
   </Step>
 </Steps>
@@ -123,17 +120,20 @@ Deposit collateral (supply assets) into an existing Jupiter Lend borrow position
 | Parameter     | Type        | Description |
 | ------------- | ----------- | ----------- |
 | `vaultId`     | `number`    | Target vault (market) ID. |
-| `positionId`  | `number`    | Position NFT ID. Use `0` to create a new position and deposit in one transaction. |
-| `colAmount`   | `BN`        | Signed collateral amount in base units. **Positive** = deposit (add collateral). **Negative** = withdraw. Use `new BN(0)` for borrow/repay-only. |
+| `positionId`  | `number`    | Position NFT ID (from Create Position or a previous deposit). |
+| `colAmount`   | `BN`        | Signed collateral amount in base units. **Positive** = deposit. **Negative** = withdraw. Use `new BN(0)` for borrow-only. |
 | `debtAmount`  | `BN`        | Signed debt amount in base units. **Positive** = borrow (add debt). **Negative** = repay (reduce debt). Use `new BN(0)` for deposit/withdraw-only. |
 | `connection`  | `Connection`| Solana RPC connection. |
 | `signer`      | `PublicKey` | Wallet that signs the transaction (position owner). |
 
-For **deposit**: `colAmount` > 0, `debtAmount` = 0.
+For **borrow**: `colAmount` = 0, `debtAmount` > 0.
 
 <AccordionGroup>
-  <Accordion title="Deposit vs Borrow">
-    **Deposit** adds collateral (supply token) to your position. **Borrow** withdraws the borrow token from the vault to your wallet and increases your debt. Deposit first, then borrow.
+  <Accordion title="How much can you borrow?">
+    Your maximum borrow depends on your collateral value, the vault's loan-to-value (LTV) limits, and current borrows. Keep LTV below the liquidation threshold. The SDK does not provide a "max borrow" sentinel—compute the maximum from your position (e.g. `getCurrentPosition` or `getFinalPosition`) and the vault's LTV, or use your app/API for the limit.
+  </Accordion>
+  <Accordion title="Interest">
+    Borrowed amounts accrue interest over time. Repay to reduce debt and stop interest on the repaid portion.
   </Accordion>
 </AccordionGroup>
 
@@ -156,8 +156,8 @@ import path from "path";
 const KEYPAIR_PATH = "/path/to/your/keypair.json"; // Path to your local keypair file (update this path)
 const RPC_URL = "https://api.mainnet-beta.solana.com"; // RPC endpoint
 const VAULT_ID = 1; // Target vault (market)
-const POSITION_ID = 0; // 0 = create + deposit in one tx; or nftId from existing position
-const DEPOSIT_AMOUNT = new BN(1_000_000); // Collateral to deposit, in smallest units (supply token base units)
+const POSITION_ID = 0; // nftId from Create Position script
+const BORROW_AMOUNT = new BN(100_000); // Amount to borrow, in smallest units (borrow token base units)
 
 function loadKeypair(keypairPath: string): Keypair {
     const fullPath = path.resolve(keypairPath);
@@ -170,22 +170,21 @@ const userKeypair = loadKeypair(KEYPAIR_PATH);
 const connection = new Connection(RPC_URL, { commitment: "confirmed" });
 const signer = userKeypair.publicKey;
 
-// 2. Get deposit instructions from SDK (operate with positive colAmount, zero debtAmount)
-// Pass positionId: 0 to batch init position + deposit in one transaction
-const { ixs, addressLookupTableAccounts, nftId } = await getOperateIx({
+// 2. Get borrow instructions from SDK (operate with zero colAmount, positive debtAmount)
+const { ixs, addressLookupTableAccounts } = await getOperateIx({
     vaultId: VAULT_ID,
     positionId: POSITION_ID,
-    colAmount: DEPOSIT_AMOUNT,
-    debtAmount: new BN(0),
+    colAmount: new BN(0),
+    debtAmount: BORROW_AMOUNT,
     connection,
     signer,
 });
 
 if (!ixs?.length) {
-    throw new Error("No deposit instructions returned by Jupiter Lend SDK.");
+    throw new Error("No borrow instructions returned by Jupiter Lend SDK.");
 }
 
-// 3. Build the transaction with latest blockhash and add deposit instructions
+// 3. Build the transaction with latest blockhash and add borrow instructions
 // Versioned (v0) transaction with address lookup tables; ready to be signed and sent
 const latestBlockhash = await connection.getLatestBlockhash();
 const message = new TransactionMessage({
@@ -208,5 +207,5 @@ await connection.confirmTransaction(
     "confirmed"
 );
 
-console.log("Deposit successful! Signature:", signature);
+console.log("Borrow successful! Signature:", signature);
 ```

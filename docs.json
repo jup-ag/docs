@@ -201,14 +201,14 @@
               {
                 "group": "Earn",
                 "pages": [
-                  "docs/lend/earn-overview",
-                  "docs/lend/earn",
+                  "docs/lend/earn/overview",
+                  "docs/lend/earn/api",
                   {
                     "group": "Earn SDK",
                     "pages": [
-                      "docs/lend/deposit-earn",
-                      "docs/lend/withdraw-earn",
-                      "docs/lend/user-position"
+                      "docs/lend/earn/deposit",
+                      "docs/lend/earn/withdraw",
+                      "docs/lend/earn/read-data"
                     ]
                   }
                 ]
@@ -216,20 +216,20 @@
               {
                 "group": "Borrow",
                 "pages": [
-                  "docs/lend/borrow-overview",
-                  "docs/lend/borrow",
+                  "docs/lend/borrow/overview",
+                  "docs/lend/borrow/api",
                   {
                     "group": "Borrow SDK",
                     "pages": [
-                      "docs/lend/create-position",
-                      "docs/lend/deposit-borrow",
-                      "docs/lend/borrow-sdk",
-                      "docs/lend/repay",
-                      "docs/lend/withdraw-borrow",
-                      "docs/lend/operate-combined",
-                      "docs/lend/liquidation",
-                      "docs/lend/vault-data",
-                      "docs/lend/user-position-borrow"
+                      "docs/lend/borrow/create-position",
+                      "docs/lend/borrow/deposit",
+                      "docs/lend/borrow/borrow",
+                      "docs/lend/borrow/repay",
+                      "docs/lend/borrow/withdraw",
+                      "docs/lend/borrow/combined",
+                      "docs/lend/borrow/liquidation",
+                      "docs/lend/borrow/read-vault-data",
+                      "docs/lend/borrow/read-position-data"
                     ]
                   }
                 ]
@@ -1169,6 +1169,14 @@
     {
       "source": "/docs/lend/sdk",
       "destination": "/docs/lend/api-vs-sdk"
+    },
+    {
+      "source": "/docs/lend/earn",
+      "destination": "/docs/lend/earn/api"
+    },
+    {
+      "source": "/docs/lend/borrow",
+      "destination": "/docs/lend/borrow/api"
     }
   ]
 }

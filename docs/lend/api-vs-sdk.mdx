@@ -33,7 +33,7 @@ Jupiter Lend provides multiple integration options:
 
 ### Earn tokens and positions
 
-**REST API** — Fetch available tokens, positions, and earnings via HTTP. See the [Earn API reference](https://dev.jup.ag/api-reference/lend/earn) for endpoints (`tokens`, `positions`, `earnings`), and request formats.
+**REST API** — Fetch available tokens, positions, and earnings via HTTP. See the [Earn API reference](/api-reference/lend/earn) for endpoints (`tokens`, `positions`, `earnings`), and request formats.
 
 **Read SDK** — Read tokens and positions directly from chain:
 
@@ -74,7 +74,7 @@ const { userPosition, vaultData } = await client.vault.getPositionByVaultId(vaul
 
 ### Earn deposit and withdraw
 
-**REST API** — Request unsigned transactions or instructions for deposit, withdraw, mint, and redeem. See the [Earn API reference](https://dev.jup.ag/api-reference/lend/earn) for `deposit`, `withdraw`, `mint`, `redeem` and `deposit-instructions`, `withdraw-instructions`, `mint-instructions`, `redeem-instructions` endpoints.
+**REST API** — Request unsigned transactions or instructions for deposit, withdraw, mint, and redeem. See the [Earn API reference](/api-reference/lend/earn) for `deposit`, `withdraw`, `mint`, `redeem` and `deposit-instructions`, `withdraw-instructions`, `mint-instructions`, `redeem-instructions` endpoints.
 
 **Lend SDK** — Build instructions directly:
 
@@ -99,7 +99,7 @@ const { ixs: withdrawIxs } = await getWithdrawIxs({
 
 ### Borrow operations
 
-Borrow API and SDK flows for create-position, deposit, borrow, repay, withdraw, and liquidate are documented in the [Borrow operations](/docs/lend/borrow-overview) pages. Borrow API endpoints are coming soon.
+Borrow API and SDK flows for create-position, deposit, borrow, repay, withdraw, and liquidate are documented in the [Borrow operations](/docs/lend/borrow/overview) pages. Borrow API endpoints are coming soon.
 
 ## Recommended usage
 
@@ -122,7 +122,7 @@ Use the **REST API** for quick integration, earnings data, and unsigned transact
 ## Relevant links
 
 <CardGroup cols={2}>
-  <Card title="API reference (Earn)" icon="globe" href="https://dev.jup.ag/api-reference/lend/earn">
+  <Card title="API reference (Earn)" icon="globe" href="/api-reference/lend/earn">
     Deposit, withdraw, mint, redeem, tokens, positions, earnings
   </Card>
   <Card title="Read SDK" icon="box" href="https://www.npmjs.com/package/@jup-ag/lend-read">
@@ -131,7 +131,7 @@ Use the **REST API** for quick integration, earnings data, and unsigned transact
   <Card title="Lend SDK" icon="box" href="https://www.npmjs.com/package/@jup-ag/lend">
     Instruction builders for Earn and Borrow
   </Card>
-  <Card title="Contracts" icon="github" href="https://github.com/Instadapp/fluid-solana-programs/">
+  <Card title="Jupiter Lend Programs" icon="github" href="https://github.com/Instadapp/fluid-solana-programs/">
     Jupiter Lend on-chain programs
   </Card>
 </CardGroup>

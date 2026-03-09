@@ -1,14 +1,12 @@
 ---
-title: "Borrow"
-description: "Borrow assets against your collateral"
-llmsDescription: "Borrow assets from a Jupiter Lend vault against deposited collateral using getOperateIx with zero colAmount and positive debtAmount. Covers versioned (v0) transaction building, operate parameters, LTV and interest mechanics, and full TypeScript code example."
+title: "Withdraw Collateral"
+description: "Withdraw collateral from a Jupiter Lend borrow position."
+llmsDescription: "Withdraw collateral from a Jupiter Lend borrow position using getOperateIx with negative colAmount and zero debtAmount. Covers LTV constraints, MAX_WITHDRAW_AMOUNT sentinel for full withdrawal, versioned (v0) transaction building, and full TypeScript code example."
 ---
 
-Borrow assets from a Jupiter Lend vault against your deposited collateral. The SDK builds operate instructions with zero collateral change and a positive debt amount. Transactions use versioned (v0) format with address lookup tables.
+Withdraw collateral (supply assets) from an existing Jupiter Lend borrow position. The SDK builds operate instructions with a negative collateral amount and zero debt change. You can only withdraw up to the amount that keeps your position within the vault's LTV limits. Transactions use versioned (v0) format with address lookup tables.
 
----
-
-## Borrow
+## Withdraw
 
 <Steps>
   <Step titleSize="h2" title="Import Dependencies">
@@ -28,18 +26,18 @@ Borrow assets from a Jupiter Lend vault against your deposited collateral. The S
     ```
 
     <Note>
-      Borrow uses `getOperateIx` with zero `colAmount` and positive `debtAmount`. The borrowed asset is sent to your wallet.
+      Withdraw uses `getOperateIx` with negative `colAmount` and zero `debtAmount`. The withdrawn collateral is sent back to your wallet.
     </Note>
   </Step>
   <Step titleSize="h2" title="Load Keypair and Initialize Connection">
-    Load the signer and create the RPC connection. Set vault ID, position ID, and borrow amount.
+    Load the signer and create the RPC connection. Set vault ID, position ID, and withdraw amount (positive number; the script passes it as negative to the SDK).
 
     ```typescript
     const KEYPAIR_PATH = "/path/to/your/keypair.json";
     const RPC_URL = "https://api.mainnet-beta.solana.com";
     const VAULT_ID = 1;
     const POSITION_ID = 0; // nftId from Create Position
-    const BORROW_AMOUNT = new BN(100_000); // Borrow token base units (e.g. 0.1 USDT)
+    const WITHDRAW_AMOUNT = new BN(500_000); // Collateral to withdraw (base units)
 
     function loadKeypair(keypairPath: string): Keypair {
       const fullPath = path.resolve(keypairPath);
@@ -53,29 +51,29 @@ Borrow assets from a Jupiter Lend vault against your deposited collateral. The S
     ```
 
     <Warning>
-      You must have an existing position with deposited collateral. Your borrow capacity depends on collateral value and the vault's LTV limits.
+      Withdrawing collateral increases your LTV. Ensure you stay below the liquidation threshold; repay debt first if needed.
     </Warning>
   </Step>
-  <Step titleSize="h2" title="Build Borrow Instructions">
-    Build operate instructions with no collateral change and positive debt amount.
+  <Step titleSize="h2" title="Build Withdraw Instructions">
+    Build operate instructions with negative collateral amount and no debt change.
 
     ```typescript
     const { ixs, addressLookupTableAccounts } = await getOperateIx({
       vaultId: VAULT_ID,
       positionId: POSITION_ID,
-      colAmount: new BN(0),
-      debtAmount: BORROW_AMOUNT,
+      colAmount: WITHDRAW_AMOUNT.neg(),
+      debtAmount: new BN(0),
       connection,
       signer,
     });
 
     if (!ixs?.length) {
-      throw new Error("No borrow instructions returned by Jupiter Lend SDK.");
+      throw new Error("No withdraw instructions returned by Jupiter Lend SDK.");
     }
     ```
 
     <Info>
-      Borrow is operate with `colAmount` = 0 and `debtAmount` \> 0. The borrow token is sent to your wallet; you accrue interest until you **Repay**.
+      Withdraw is operate with `colAmount` \< 0 and `debtAmount` = 0. Use `.neg()` so the SDK receives a negative BN. The vault may reject if the withdrawal would breach LTV limits.
     </Info>
   </Step>
   <Step titleSize="h2" title="Build and Sign Transaction">
@@ -104,11 +102,11 @@ Borrow assets from a Jupiter Lend vault against your deposited collateral. The S
     });
     await connection.confirmTransaction(signature, "confirmed");
 
-    console.log("Borrow successful! Signature:", signature);
+    console.log("Withdraw successful! Signature:", signature);
     ```
 
     <Info>
-      Borrowing increases your debt and LTV. Repay with the **Repay** flow to reduce debt and improve position health.
+      Withdrawing reduces your collateral and borrowing capacity. Repay debt first if you are near the LTV limit.
     </Info>
   </Step>
 </Steps>
@@ -120,24 +118,37 @@ Borrow assets from a Jupiter Lend vault against your deposited collateral. The S
 | Parameter     | Type        | Description |
 | ------------- | ----------- | ----------- |
 | `vaultId`     | `number`    | Target vault (market) ID. |
-| `positionId`  | `number`    | Position NFT ID (from Create Position or a previous deposit). |
-| `colAmount`   | `BN`        | Signed collateral amount in base units. **Positive** = deposit. **Negative** = withdraw. Use `new BN(0)` for borrow-only. |
-| `debtAmount`  | `BN`        | Signed debt amount in base units. **Positive** = borrow (add debt). **Negative** = repay (reduce debt). Use `new BN(0)` for deposit/withdraw-only. |
+| `positionId`  | `number`    | Position NFT ID. |
+| `colAmount`   | `BN`        | Signed collateral amount in base units. **Positive** = deposit. **Negative** = withdraw (reduce collateral). Pass a negative BN, e.g. `WITHDRAW_AMOUNT.neg()`. |
+| `debtAmount`  | `BN`        | Signed debt amount in base units. **Positive** = borrow. **Negative** = repay. Use `new BN(0)` for withdraw-only. |
 | `connection`  | `Connection`| Solana RPC connection. |
 | `signer`      | `PublicKey` | Wallet that signs the transaction (position owner). |
 
-For **borrow**: `colAmount` = 0, `debtAmount` > 0.
+For **withdraw**: `colAmount` < 0 (negative), `debtAmount` = 0.
 
 <AccordionGroup>
-  <Accordion title="How much can you borrow?">
-    Your maximum borrow depends on your collateral value, the vault's loan-to-value (LTV) limits, and current borrows. Keep LTV below the liquidation threshold. The SDK does not provide a "max borrow" sentinel—compute the maximum from your position (e.g. `getCurrentPosition` or `getFinalPosition`) and the vault's LTV, or use your app/API for the limit.
+  <Accordion title="When can I withdraw?">
+    You can withdraw collateral as long as the resulting position stays within the vault's LTV rules. If you have outstanding debt, the protocol may limit how much you can withdraw until you repay.
   </Accordion>
-  <Accordion title="Interest">
-    Borrowed amounts accrue interest over time. Repay to reduce debt and stop interest on the repaid portion.
+  <Accordion title="Max withdraw (withdraw all collateral)">
+    To withdraw **all** collateral in one go, use `MAX_WITHDRAW_AMOUNT` from the SDK as `colAmount`. The protocol treats this sentinel as "withdraw all collateral":
+
+    ```typescript
+    import { getOperateIx, MAX_WITHDRAW_AMOUNT } from "@jup-ag/lend/borrow";
+
+    const { ixs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId: POSITION_ID,
+      colAmount: MAX_WITHDRAW_AMOUNT,
+      debtAmount: new BN(0),
+      connection,
+      signer,
+    });
+    ```
+
+    This only succeeds if the resulting position stays within LTV (e.g. you have no debt, or you repay first). Otherwise the vault will reject the transaction.
   </Accordion>
 </AccordionGroup>
-
----
 
 ## Full code example
 
@@ -157,7 +168,7 @@ const KEYPAIR_PATH = "/path/to/your/keypair.json"; // Path to your local keypair
 const RPC_URL = "https://api.mainnet-beta.solana.com"; // RPC endpoint
 const VAULT_ID = 1; // Target vault (market)
 const POSITION_ID = 0; // nftId from Create Position script
-const BORROW_AMOUNT = new BN(100_000); // Amount to borrow, in smallest units (borrow token base units)
+const WITHDRAW_AMOUNT = new BN(500_000); // Collateral to withdraw, in smallest units (supply token base units)
 
 function loadKeypair(keypairPath: string): Keypair {
     const fullPath = path.resolve(keypairPath);
@@ -170,21 +181,21 @@ const userKeypair = loadKeypair(KEYPAIR_PATH);
 const connection = new Connection(RPC_URL, { commitment: "confirmed" });
 const signer = userKeypair.publicKey;
 
-// 2. Get borrow instructions from SDK (operate with zero colAmount, positive debtAmount)
+// 2. Get withdraw instructions from SDK (operate with negative colAmount, zero debtAmount)
 const { ixs, addressLookupTableAccounts } = await getOperateIx({
     vaultId: VAULT_ID,
     positionId: POSITION_ID,
-    colAmount: new BN(0),
-    debtAmount: BORROW_AMOUNT,
+    colAmount: WITHDRAW_AMOUNT.neg(),
+    debtAmount: new BN(0),
     connection,
     signer,
 });
 
 if (!ixs?.length) {
-    throw new Error("No borrow instructions returned by Jupiter Lend SDK.");
+    throw new Error("No withdraw instructions returned by Jupiter Lend SDK.");
 }
 
-// 3. Build the transaction with latest blockhash and add borrow instructions
+// 3. Build the transaction with latest blockhash and add withdraw instructions
 // Versioned (v0) transaction with address lookup tables; ready to be signed and sent
 const latestBlockhash = await connection.getLatestBlockhash();
 const message = new TransactionMessage({
@@ -207,5 +218,5 @@ await connection.confirmTransaction(
     "confirmed"
 );
 
-console.log("Borrow successful! Signature:", signature);
+console.log("Withdraw successful! Signature:", signature);
 ```

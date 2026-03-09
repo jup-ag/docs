@@ -1,5 +1,5 @@
 ---
-title: "Overview"
+title: "Borrow Overview"
 description: "Introduction to Jupiter Borrow and the Read SDK."
 llmsDescription: "Introduction to Jupiter Borrow, the collateralised borrowing side of Jupiter Lend. Covers the vault and position model (NFT-based positions, tick-based pricing), key TypeScript data structures (VaultConfig, UserPosition, NftPosition), and links to borrow operations and vault data reading via the Read SDK."
 ---
@@ -11,16 +11,16 @@ Jupiter Borrow is the collateralized borrowing side of Jupiter Lend. Users creat
 ## Key components of Borrow integration
 
 <CardGroup cols={2}>
-  <Card icon="box" href="/docs/lend/create-position" title="Borrow Operations">
+  <Card icon="box" href="/docs/lend/borrow/create-position" title="Borrow Operations">
     Create position, deposit collateral, borrow, repay, withdraw collateral, and liquidate. Use the operations pages for transaction building and CPI context.
   </Card>
-  <Card icon="chart-line" href="/docs/lend/vault-data" title="Vault and position data">
+  <Card icon="chart-line" href="/docs/lend/borrow/read-vault-data" title="Vault and position data">
     Read vault config, state, and user positions (collateral, debt, liquidation status) using the Read SDK. Get all positions for a user across vaults, or a single position by vault and NFT id.
   </Card>
 </CardGroup>
 
 <Note>
-  For complete examples of operations, see [**Create position**](/docs/lend/create-position), [**Deposit**](/docs/lend/deposit-borrow), [**Borrow**](/docs/lend/borrow-sdk), [**Repay**](/docs/lend/repay), [**Withdraw**](/docs/lend/withdraw-borrow), and [**Liquidate**](/docs/lend/liquidation).
+  For complete examples of operations, see [**Create position**](/docs/lend/borrow/create-position), [**Deposit**](/docs/lend/borrow/deposit), [**Borrow**](/docs/lend/borrow/borrow), [**Repay**](/docs/lend/borrow/repay), [**Withdraw**](/docs/lend/borrow/withdraw), and [**Liquidate**](/docs/lend/borrow/liquidation).
 </Note>
 
 ---
@@ -28,10 +28,10 @@ Jupiter Borrow is the collateralized borrowing side of Jupiter Lend. Users creat
 ## Ways to fetch data
 
 <CardGroup cols={2}>
-  <Card icon="globe" href="https://dev.jup.ag/docs/lend/borrow" title="Public API">
+  <Card icon="globe" href="/docs/lend/borrow/api" title="Public API">
     Vault and position endpoints for pool metrics and user data. (Coming Soon)
   </Card>
-  <Card icon="code" href="/docs/lend/vault-data" title="SDK (Vault data)">
+  <Card icon="code" href="/docs/lend/borrow/read-vault-data" title="SDK (Vault data)">
     Read vault config, state, and user positions using `@jup-ag/lend-read`.
   </Card>
 </CardGroup>

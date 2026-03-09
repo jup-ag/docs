@@ -103,7 +103,7 @@ Create a new borrow position in a Jupiter Lend vault. You must create a position
     A position is an NFT that represents your borrow account in one vault. One position holds collateral (supply) and debt (borrow) in that vault. You need one position per vault before you can deposit or borrow.
   </Accordion>
   <Accordion title="Create and deposit in one transaction">
-    You can skip a separate Create Position step by using `getOperateIx` with `positionId: 0`. The SDK batches init position and the first operate (deposit or borrow) in a single transaction. The returned `nftId` is your new position ID for future operations. See [**Deposit**](/docs/lend/deposit-borrow) for an example.
+    You can skip a separate Create Position step by using `getOperateIx` with `positionId: 0`. The SDK batches init position and the first operate (deposit or borrow) in a single transaction. The returned `nftId` is your new position ID for future operations. See [**Deposit**](/docs/lend/borrow/deposit) for an example.
   </Accordion>
   <Accordion title="Next steps">
     After creating a position, **Deposit** collateral, then **Borrow**. Use **Withdraw** to remove collateral and **Repay** to reduce debt.

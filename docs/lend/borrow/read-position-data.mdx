@@ -1,10 +1,10 @@
 ---
-title: "User position"
+title: "Read Position Data"
 description: "Read Borrow (vault) position state—collateral, debt, liquidation status—using the Jupiter Lend SDK."
 llmsDescription: "Read Borrow position state (collateral, debt, tick, liquidation status) using getCurrentPosition and getFinalPosition from @jup-ag/lend/borrow. Covers raw amount scaling (1e12 precision), position state structure fields (colRaw, debtRaw, isSupplyOnlyPosition, userLiquidationStatus), preview operations, and optional getVaultsProgram for advanced Anchor usage."
 ---
 
-This page covers **Borrow** position data: vault positions (collateral, debt, tick, liquidation status). You need a `vaultId` and `positionId` (the NFT id from [Create position](/docs/lend/create-position)). For **Earn** position data (supply/shares per asset), see [User position (Earn)](/docs/lend/user-position).
+This page covers **Borrow** position data: vault positions (collateral, debt, tick, liquidation status). You need a `vaultId` and `positionId` (the NFT id from [Create position](/docs/lend/borrow/create-position)). For **Earn** position data (supply/shares per asset), see [Read Earn Data](/docs/lend/earn/read-data).
 
 <Note>
   All position data here is derived from on-chain accounts using the Borrow SDK (`@jup-ag/lend/borrow`). Amounts are returned in **raw** form (internal precision); scale by the vault's exchange prices (e.g. 1e12) for human-readable collateral and debt.

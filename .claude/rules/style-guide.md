@@ -175,3 +175,5 @@ Record style decisions as they come up so we stay consistent.
 Format: `- [YYYY-MM-DD] Decision: rationale`
 
 - [2026-02-26] Tone set to "technical but approachable": professional and precise, not cold or overly formal. No em dashes for asides.
+- [2026-03-09] API guide code examples should cover the full lifecycle (e.g. quote → build → sign → send) and include error handling at each stage, not just the happy path. Developers copy code from guides directly.
+- [2026-03-09] When documenting API response schemas, always verify examples against the live API. OpenAPI specs can drift from actual responses, especially for newer APIs.

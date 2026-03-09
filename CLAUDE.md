@@ -208,6 +208,51 @@ After PR is merged:
 - Only move to `Done` if there is genuinely no content follow-up needed
   (e.g. typo fixes, config changes)
 
+### 7. Changelog
+
+If your changes affect a public API or product, add a changelog entry to `updates/index.mdx`.
+
+**When to add an entry:**
+- New API endpoints or products
+- Breaking changes or deprecations
+- Behavioural changes to existing endpoints
+- New SDK releases or major version bumps
+- Migration deadlines or sunset dates
+
+**When NOT needed:**
+- Typo fixes, formatting, or docs-only restructuring
+- Internal refactors with no user-facing change
+- Adding guides or blog posts (these are content, not changelog)
+
+**Format:** Use the existing `<Update>` component, grouped by month (newest first):
+
+```mdx
+<Update label="March 2026" description="">
+## Feature or Change Title
+
+Brief description of what changed and what developers need to do.
+
+- Key detail or migration step
+- Link to relevant docs page
+</Update>
+```
+
+Within a month, order entries by importance. Use clear headings that describe the change.
+
+### 8. Learn
+
+After shipping, reflect on whether the work surfaced anything a future session should know.
+Update `.claude/rules/` if any of these apply:
+
+| File | Update when... |
+|------|----------------|
+| `product-learning.md` | You discovered undocumented API behaviour, gotchas, corrections, or open questions |
+| `decisions.md` | You made an IA decision, added redirects, or chose between structural alternatives |
+| `style-guide.md` | You established a new terminology convention, formatting pattern, or content rule |
+
+This is not optional busywork. These files are loaded every session and prevent
+repeating mistakes. If you learned something non-obvious while working, write it down.
+
 ---
 
 ## Writing
@@ -379,6 +424,8 @@ Always run/check before committing:
 6. No placeholder text like "TODO" or "Lorem ipsum" left in content
 7. OpenAPI spec changes in `openapi-spec/` are reflected in `api-reference/` pages
 8. Images/assets added to `static/` are actually referenced somewhere
+9. Changelog entry in `updates/index.mdx` if changes affect a public API or product
+10. `.claude/rules/` updated if you discovered product behaviour, made IA decisions, or established conventions
 
 ## Pull Requests
 
@@ -423,6 +470,8 @@ gh pr diff
 - [ ] All pages have `title`, `description`, `llmsDescription`
 - [ ] `docs.json` navigation updated (if applicable)
 - [ ] Redirects added (if paths changed)
+- [ ] Changelog entry added to `updates/index.mdx` (if API/product change)
+- [ ] `.claude/rules/` updated with any learnings or decisions
 ```
 
 ### Conventions

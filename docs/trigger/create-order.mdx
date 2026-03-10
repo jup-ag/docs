@@ -9,29 +9,37 @@ Creating an order in V2 is a two-step process: craft and sign a deposit transact
 ## End-to-End Flow
 
 ```
-1. Register vault     →  GET /v2/vault/register (first time only)
+1. Get vault          →  GET /v2/vault (or /v2/vault/register on first use)
 2. Craft deposit      →  POST /v2/deposit/craft
 3. Sign deposit tx    →  (client-side)
 4. Create order       →  POST /v2/orders/price (with signed tx)
 ```
 
-## Step 1: Register a Vault
+## Step 1: Get Your Vault
 
-On first use, register a vault for your wallet. This creates a Privy-managed custodial account that holds deposits for your orders.
+Retrieve your vault, or register one if this is your first time. The vault is a Privy-managed custodial account that holds deposits for your orders.
 
 ```typescript
-const vaultResponse = await fetch('https://api.jup.ag/trigger/v2/vault/register', {
+let vaultResponse = await fetch('https://api.jup.ag/trigger/v2/vault', {
   headers: {
     'x-api-key': 'your-api-key',
     'Authorization': `Bearer ${token}`,
   },
 });
 
+// First time user — register a new vault
+if (!vaultResponse.ok) {
+  vaultResponse = await fetch('https://api.jup.ag/trigger/v2/vault/register', {
+    headers: {
+      'x-api-key': 'your-api-key',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+}
+
 const vault = await vaultResponse.json();
 // { userPubkey: "...", vaultPubkey: "...", privyVaultId: "..." }
 ```
-
-If you already have a vault, use `GET /v2/vault` to retrieve it.
 
 ## Step 2: Craft a Deposit Transaction
 
@@ -75,9 +83,13 @@ The vault address is automatically resolved from your JWT. You do not specify it
 ## Step 3: Sign the Deposit Transaction
 
 ```typescript
-const transaction = deserializeTransaction(deposit.transaction);
+import { VersionedTransaction } from '@solana/web3.js';
+
+const transaction = VersionedTransaction.deserialize(
+  Buffer.from(deposit.transaction, 'base64')
+);
 const signedTransaction = await wallet.signTransaction(transaction);
-const depositSignedTx = base64Encode(signedTransaction.serialize());
+const depositSignedTx = Buffer.from(signedTransaction.serialize()).toString('base64');
 ```
 
 ## Step 4: Create the Order

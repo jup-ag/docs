@@ -316,8 +316,8 @@ paths:
         - ApiKeyAuth: []
           BearerAuth: []
       responses:
-        '200':
-          description: Vault details
+        '201':
+          description: Vault created
           content:
             application/json:
               schema:
@@ -333,6 +333,8 @@ paths:
                   - userPubkey
                   - vaultPubkey
                   - privyVaultId
+        '409':
+          description: Vault already exists
 
   /deposit/craft:
     post:

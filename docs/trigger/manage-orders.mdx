@@ -71,6 +71,8 @@ Cancellation is a two-step process. The first step returns a withdrawal transact
 
 ### Step 1: Initiate Cancellation
 
+This immediately moves the order from `open` to `ready_to_cancel`. The order will no longer be filled, even if step 2 has not yet completed. This prevents a race condition where the order could still execute while you are signing the withdrawal transaction.
+
 ```typescript
 const cancelResponse = await fetch(
   `https://api.jup.ag/trigger/v2/orders/price/cancel/${orderId}`,

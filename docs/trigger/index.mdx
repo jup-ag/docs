@@ -48,3 +48,41 @@ https://api.jup.ag/trigger/v2
 All endpoints require an API key via the `x-api-key` header. Authenticated endpoints additionally require a JWT token via the `Authorization: Bearer <token>` header.
 
 <Card title="Get an API key" href="https://portal.jup.ag" icon="key" iconType="solid" horizontal/>
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="What happens to my funds if an order expires?">
+Funds remain in the vault. To retrieve them, use the same two-step cancel flow: initiate cancellation on the expired order, sign the withdrawal transaction, and confirm. See [Expired Order Withdrawal](/docs/trigger/manage-orders#expired-order-withdrawal).
+</Accordion>
+
+<Accordion title="Can I edit an order after creating it?">
+Yes. You can update trigger prices and slippage in-place without cancelling and recreating the order. See [Update an Order](/docs/trigger/manage-orders#update-an-order).
+</Accordion>
+
+<Accordion title="Why is the output amount not guaranteed?">
+V2 uses USD price triggers rather than pool rate triggers. When the price condition is met, the order executes a swap at the current market rate via Jupiter routing. The actual output depends on liquidity and slippage at execution time.
+</Accordion>
+
+<Accordion title="What is the minimum order size?">
+1 USD equivalent.
+</Accordion>
+
+<Accordion title="What happens if my JWT expires while I have open orders?">
+Open orders continue to be monitored and will execute normally. The JWT is only required for API calls (creating, editing, cancelling orders). When your token expires, re-authenticate to manage your orders.
+</Accordion>
+
+<Accordion title="What is an OCO order?">
+A One-Cancels-Other order creates a take-profit and stop-loss pair that share one deposit. When one side fills, the other cancels automatically, returning unused funds to the vault.
+</Accordion>
+
+<Accordion title="What is an OTOCO order?">
+A One-Triggers-One-Cancels-Other order has a parent trigger that executes first. Once the parent fills, it automatically activates a TP/SL pair (OCO) on the output tokens. If the parent expires or fails, the child orders are never created.
+</Accordion>
+
+<Accordion title="What is the default slippage?">
+Take-profit and buy-below orders use auto slippage via RTSE (Real-Time Slippage Estimator). Stop-loss and buy-above orders default to 20% (2000 bps) because execution certainty is more important when cutting losses. You can always set a custom slippage.
+</Accordion>
+
+</AccordionGroup>

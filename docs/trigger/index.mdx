@@ -28,7 +28,7 @@ V2 introduces vault-based architecture with JWT authentication, new order types 
 | Type | Description | Use case |
 | :--- | :--- | :--- |
 | **Single** | Triggers when USD price or market cap crosses above or below a threshold | Standard limit orders, stop-loss |
-| **OCO** | Two orders sharing one deposit: one take-profit, one stop-loss. When one fills, the other cancels automatically | Risk management with TP/SL brackets (e.g. sell SOL at $300 TP or $200 SL while market is $250) |
+| **OCO** | Two orders sharing one deposit: one take-profit, one stop-loss. When one fills, the other cancels automatically | Risk management with TP/SL brackets (e.g. sell SOL at \$300 TP or \$200 SL while market is \$250) |
 | **OTOCO** | A parent order triggers first, then activates a TP/SL pair (OCO) on the output | Conditional entry with automatic exit strategy |
 
 ## How It Works

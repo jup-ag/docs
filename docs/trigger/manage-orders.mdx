@@ -1,0 +1,140 @@
+---
+title: "Manage Orders"
+description: "Update order parameters, cancel orders with two-step withdrawal, and withdraw funds from your vault."
+llmsDescription: "PATCH /trigger/v2/orders/price/{orderId} updates order parameters. POST /trigger/v2/orders/price/cancel/{orderId} initiates cancellation and returns a withdrawal transaction. POST /trigger/v2/orders/price/confirm-cancel/{orderId} confirms with the signed withdrawal transaction."
+---
+
+## Update an Order
+
+Modify the trigger price or slippage of an existing order without cancelling and recreating it.
+
+```typescript
+const updateResponse = await fetch(`https://api.jup.ag/trigger/v2/orders/price/${orderId}`, {
+  method: 'PATCH',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'your-api-key',
+    'Authorization': `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+    orderType: 'single',
+    triggerPriceUsd: 210.00,
+    slippageBps: 150,
+  }),
+});
+
+const result = await updateResponse.json();
+// { id: "order-uuid" }
+```
+
+### Update Fields by Order Type
+
+**Single:**
+```json
+{
+  "orderType": "single",
+  "triggerPriceUsd": 210.00,
+  "slippageBps": 150
+}
+```
+
+**OCO:**
+```json
+{
+  "orderType": "oco",
+  "tpPriceUsd": 260.00,
+  "slPriceUsd": 145.00
+}
+```
+
+**OTOCO:**
+```json
+{
+  "orderType": "otoco",
+  "triggerPriceUsd": 185.00,
+  "tpPriceUsd": 230.00,
+  "slPriceUsd": 155.00
+}
+```
+
+## Cancel an Order
+
+Cancellation is a two-step process. The first step returns a withdrawal transaction that moves funds from the vault back to your wallet. You sign and submit it in the second step.
+
+### Step 1: Initiate Cancellation
+
+```typescript
+const cancelResponse = await fetch(
+  `https://api.jup.ag/trigger/v2/orders/price/cancel/${orderId}`,
+  {
+    method: 'POST',
+    headers: {
+      'x-api-key': 'your-api-key',
+      'Authorization': `Bearer ${token}`,
+    },
+  }
+);
+
+const cancelData = await cancelResponse.json();
+```
+
+**Response:**
+```json
+{
+  "id": "order-uuid",
+  "transaction": "Base64EncodedUnsignedWithdrawalTransaction...",
+  "requestId": "cancel-request-uuid"
+}
+```
+
+### Step 2: Sign and Confirm
+
+Sign the withdrawal transaction and submit it to complete the cancellation.
+
+```typescript
+const transaction = deserializeTransaction(cancelData.transaction);
+const signedTransaction = await wallet.signTransaction(transaction);
+
+const confirmResponse = await fetch(
+  `https://api.jup.ag/trigger/v2/orders/price/confirm-cancel/${orderId}`,
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': 'your-api-key',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      signedTransaction: base64Encode(signedTransaction.serialize()),
+      cancelRequestId: cancelData.requestId,
+    }),
+  }
+);
+
+const result = await confirmResponse.json();
+// { id: "order-uuid", txSignature: "..." }
+```
+
+<Note>
+The two-step cancellation ensures funds are securely withdrawn from the vault back to your wallet. The order transitions to `pending_withdraw` after step 1, and `cancelled` after step 2 confirms on-chain.
+</Note>
+
+## Why Two Steps?
+
+V2 orders hold funds in a vault account, not in an on-chain program account like V1. Cancelling requires an explicit withdrawal transaction to move tokens back to your wallet:
+
+1. **Initiate**: The server marks the order for cancellation and crafts a withdrawal transaction
+2. **Confirm**: You sign the withdrawal (proving you own the wallet), and the server broadcasts it
+
+This design keeps vault operations secure: only the wallet owner can authorise withdrawals.
+
+## Error Handling
+
+| Status | Meaning |
+| :--- | :--- |
+| `400` | Invalid order ID, order not in a cancellable state, or validation error |
+| `401` | JWT expired or invalid |
+| `403` | Order belongs to a different wallet |
+| `404` | Order not found |
+
+If step 2 fails (transaction doesn't land), you can retry by calling the confirm endpoint again with the same `cancelRequestId`. The order remains in `pending_withdraw` state until the withdrawal confirms.

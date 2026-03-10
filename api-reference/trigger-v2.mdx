@@ -1,0 +1,24 @@
+---
+title: "Trigger Order V2 API Reference"
+description: "API reference for the Jupiter Trigger Order API V2 with vault-based deposits and JWT authentication."
+llmsDescription: "Jupiter Trigger Order API V2 endpoints: auth (challenge/verify), vault management, deposit crafting, order CRUD (single/OCO/OTOCO), and order history. Base URL: https://api.jup.ag/trigger/v2"
+---
+
+The Trigger Order V2 API introduces vault-based architecture with JWT authentication, advanced order types, and a two-step cancellation flow.
+
+**Base URL:** `https://api.jup.ag/trigger/v2`
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key">
+    Challenge-response JWT flow for wallet authentication
+  </Card>
+  <Card title="Vault & Deposits" icon="vault">
+    Vault management and deposit transaction crafting
+  </Card>
+  <Card title="Orders" icon="bullseye">
+    Create, update, and cancel single/OCO/OTOCO orders
+  </Card>
+  <Card title="History" icon="clock-rotate-left">
+    Query order history with filtering and pagination
+  </Card>
+</CardGroup>

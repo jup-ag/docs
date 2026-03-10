@@ -15,6 +15,14 @@ The Trigger Order API V2 uses a challenge-response flow to authenticate users. Y
 4. Use JWT              →  Authorization: Bearer <token>
 ```
 
+## Prerequisites
+
+Signing challenges and transactions requires `@solana/web3.js` and `bs58`:
+
+```bash
+npm install @solana/web3.js bs58
+```
+
 ## Step 1: Request a Challenge
 
 Request a challenge for your wallet. Choose `message` for standard wallets or `transaction` for hardware wallets that only support transaction signing.

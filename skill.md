@@ -2,8 +2,10 @@
 
 > Agent skills for integrating with the Jupiter ecosystem on Solana. Each skill provides structured guidance, code examples, and API references for AI coding agents.
 
-- Docs: https://dev.jup.ag
 - GitHub: https://github.com/jup-ag/agent-skills
+- Docs: https://dev.jup.ag
+- [llms.txt](https://dev.jup.ag/llms.txt): Full documentation index for LLM context
+- [MCP Server](https://dev.jup.ag/ai/mcp.md): Jupiter MCP server for tool-calling agents
 
 ## Skills
 
@@ -23,7 +25,3 @@ npx skills add jup-ag/agent-skills --skill "integrating-jupiter"
 npx skills add jup-ag/agent-skills --skill "jupiter-lend"
 ```
 
-## Related
-
-- [llms.txt](https://dev.jup.ag/llms.txt): Full documentation index for LLM context
-- [MCP Server](https://dev.jup.ag/ai/mcp.md): Jupiter MCP server for tool-calling agents

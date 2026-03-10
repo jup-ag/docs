@@ -14,7 +14,7 @@ V2 introduces vault-based architecture with JWT authentication, new order types 
 | Feature | V1 | V2 |
 | :--- | :--- | :--- |
 | **Trigger type** | Pool rate only (e.g. "1 Fartcoin = 0.00025 SOL") | USD price or market cap |
-| **Order direction** | Buy below only (no stop-loss) | Buy above, buy below, sell above, sell below |
+| **Order direction** | Buy below, sell above | Buy above, buy below, sell above, sell below |
 | **TP/SL** | Not supported | Take-profit and stop-loss with OCO bundling |
 | **Edit orders** | Must cancel and recreate | Edit trigger price and slippage in-place |
 | **Partial fills** | Not supported | Orders fill partially for optimal execution prices |
@@ -33,9 +33,17 @@ V2 introduces vault-based architecture with JWT authentication, new order types 
 
 ## How It Works
 
+```
+Your Wallet ──→ Vault (1 per wallet) ──→ Order A
+                                    ──→ Order B
+                                    ──→ Order C
+```
+
+Each wallet gets a single vault (a Privy-managed custodial account). When you create orders, tokens are deposited from your wallet into your vault. The vault holds funds for all your active orders.
+
 1. [**Authenticate**](/docs/trigger/authentication): Sign a challenge with your wallet to receive a JWT token
-2. **Register a vault**: A Privy-managed wallet is created to hold your deposits
-3. [**Create an order**](/docs/trigger/create-order): Craft a deposit transaction, sign it, and submit with your order parameters
+2. [**Get your vault**](/docs/trigger/create-order#step-1-get-your-vault): Retrieve your vault, or register one on first use
+3. [**Create an order**](/docs/trigger/create-order): Deposit tokens into your vault and submit order parameters
 4. **Monitor**: Track order state and history via the [history endpoint](/docs/trigger/order-history)
 5. [**Manage**](/docs/trigger/manage-orders): Update order parameters, or cancel with a two-step withdrawal flow
 

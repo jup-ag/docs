@@ -253,7 +253,7 @@ paths:
       description: Check if a JWT token is still valid without making an authenticated request.
       security:
         - ApiKeyAuth: []
-        - BearerAuth: []
+          BearerAuth: []
       requestBody:
         required: true
         content:
@@ -277,7 +277,7 @@ paths:
       description: Retrieve the vault associated with your authenticated wallet.
       security:
         - ApiKeyAuth: []
-        - BearerAuth: []
+          BearerAuth: []
       responses:
         '200':
           description: Vault details
@@ -314,7 +314,7 @@ paths:
         Call this once per wallet. Subsequent calls return the existing vault.
       security:
         - ApiKeyAuth: []
-        - BearerAuth: []
+          BearerAuth: []
       responses:
         '201':
           description: Vault created
@@ -344,7 +344,7 @@ paths:
         The vault address is automatically resolved from your JWT token.
       security:
         - ApiKeyAuth: []
-        - BearerAuth: []
+          BearerAuth: []
       requestBody:
         required: true
         content:
@@ -431,7 +431,7 @@ paths:
         - `otoco`: parent trigger activates a TP/SL pair on fill
       security:
         - ApiKeyAuth: []
-        - BearerAuth: []
+          BearerAuth: []
       requestBody:
         required: true
         content:
@@ -530,7 +530,7 @@ paths:
       description: Update trigger price or slippage of an existing order.
       security:
         - ApiKeyAuth: []
-        - BearerAuth: []
+          BearerAuth: []
       parameters:
         - name: orderId
           in: path
@@ -595,7 +595,7 @@ paths:
         that must be signed and submitted via the confirm-cancel endpoint.
       security:
         - ApiKeyAuth: []
-        - BearerAuth: []
+          BearerAuth: []
       parameters:
         - name: orderId
           in: path
@@ -641,7 +641,7 @@ paths:
         to complete the cancellation and return funds to your wallet.
       security:
         - ApiKeyAuth: []
-        - BearerAuth: []
+          BearerAuth: []
       parameters:
         - name: orderId
           in: path
@@ -688,7 +688,7 @@ paths:
         Filter by state, mint, and sort order.
       security:
         - ApiKeyAuth: []
-        - BearerAuth: []
+          BearerAuth: []
       parameters:
         - name: state
           in: query

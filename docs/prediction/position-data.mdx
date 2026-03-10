@@ -38,6 +38,15 @@ Use `GET /positions` to retrieve position data with comprehensive P&L informatio
 | `start` | number | Pagination start index |
 | `end` | number | Pagination end index |
 
+List endpoints (`/positions`, `/orders`, `/history`) return a `pagination` object alongside `data`:
+
+| Field | Type | Description |
+|:------|:-----|:------------|
+| `start` | integer | Start index of the current page |
+| `end` | integer | End index of the current page |
+| `total` | integer | Total number of results available |
+| `hasNext` | boolean | `true` if more results exist beyond the current page |
+
 ### Position Fields
 
 Each position includes identity, state, and P&L fields. All USD values are in micro USD (1,000,000 = $1.00).
@@ -82,8 +91,8 @@ Each position includes identity, state, and P&L fields. All USD values are in mi
 
 | Field | Type | Description |
 |:------|:-----|:------------|
-| `eventMetadata` | object | Parent event metadata: `title`, `subtitle`, `imageUrl`, `isLive`, `slug`, `series`, `closeTime` (ISO 8601) |
-| `marketMetadata` | object | Market metadata: `title`, `status`, `result`, `closeTime` (Unix), `openTime`, `rulesPrimary`, `rulesSecondary`, `isTeamMarket` |
+| `eventMetadata` | object | Parent event metadata: `eventId`, `title`, `subtitle`, `imageUrl`, `isLive`, `isActive`, `category`, `subcategory`, `beginAt`, `closeCondition` |
+| `marketMetadata` | object | Market metadata: `marketId`, `eventId`, `title`, `subtitle`, `description`, `status`, `result`, `openTime`, `closeTime` |
 
 
 ### Get All Positions

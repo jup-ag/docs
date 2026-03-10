@@ -309,11 +309,10 @@ interface Market {
   closeTime: number;                         // Unix timestamp
   resolveAt: number | null;                  // Unix timestamp when market resolved
   marketResultPubkey: string | null;         // Market result account public key
+  imageUrl: string;                          // Market image URL
   metadata: {
-    marketId: string;
     title: string;
     status: string;
-    result: string;
     openTime: number;
     closeTime: number;
     isTeamMarket: boolean;                   // Whether this is a team market

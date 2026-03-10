@@ -127,6 +127,11 @@ components:
           type: string
           nullable: true
           description: Public key of the market result account
+        imageUrl:
+          type: string
+          nullable: true
+          format: uri
+          description: Market image URL
         metadata:
           $ref: "#/components/schemas/MarketMetadata"
         pricing:

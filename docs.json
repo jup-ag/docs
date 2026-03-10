@@ -604,31 +604,37 @@
                 ]
               },
               {
-                "group": "Trigger V2",
-                "pages": [
-                  "api-reference/trigger-v2",
-                  "api-reference/trigger-v2/challenge",
-                  "api-reference/trigger-v2/verify",
-                  "api-reference/trigger-v2/verify-token",
-                  "api-reference/trigger-v2/vault",
-                  "api-reference/trigger-v2/vault-register",
-                  "api-reference/trigger-v2/deposit-craft",
-                  "api-reference/trigger-v2/create-order",
-                  "api-reference/trigger-v2/update-order",
-                  "api-reference/trigger-v2/cancel-order",
-                  "api-reference/trigger-v2/confirm-cancel",
-                  "api-reference/trigger-v2/order-history"
-                ]
-              },
-              {
-                "group": "Trigger V1",
+                "group": "Trigger",
                 "pages": [
                   "api-reference/trigger",
-                  "api-reference/trigger/create-order",
-                  "api-reference/trigger/execute",
-                  "api-reference/trigger/cancel-order",
-                  "api-reference/trigger/cancel-orders",
-                  "api-reference/trigger/get-trigger-orders"
+                  {
+                    "group": "V2",
+                    "pages": [
+                      "api-reference/trigger/v2",
+                      "api-reference/trigger/v2/challenge",
+                      "api-reference/trigger/v2/verify",
+                      "api-reference/trigger/v2/verify-token",
+                      "api-reference/trigger/v2/vault",
+                      "api-reference/trigger/v2/vault-register",
+                      "api-reference/trigger/v2/deposit-craft",
+                      "api-reference/trigger/v2/create-order",
+                      "api-reference/trigger/v2/update-order",
+                      "api-reference/trigger/v2/cancel-order",
+                      "api-reference/trigger/v2/confirm-cancel",
+                      "api-reference/trigger/v2/order-history"
+                    ]
+                  },
+                  {
+                    "group": "V1",
+                    "pages": [
+                      "api-reference/trigger/v1",
+                      "api-reference/trigger/v1/create-order",
+                      "api-reference/trigger/v1/execute",
+                      "api-reference/trigger/v1/cancel-order",
+                      "api-reference/trigger/v1/cancel-orders",
+                      "api-reference/trigger/v1/get-trigger-orders"
+                    ]
+                  }
                 ]
               },
               {
@@ -912,6 +918,34 @@
     {
       "source": "/docs/api/trigger-api/:slug*",
       "destination": "/api-reference/trigger/:slug*"
+    },
+    {
+      "source": "/api-reference/trigger-v2/:slug*",
+      "destination": "/api-reference/trigger/v2/:slug*"
+    },
+    {
+      "source": "/api-reference/trigger-v2",
+      "destination": "/api-reference/trigger/v2"
+    },
+    {
+      "source": "/api-reference/trigger/create-order",
+      "destination": "/api-reference/trigger/v1/create-order"
+    },
+    {
+      "source": "/api-reference/trigger/execute",
+      "destination": "/api-reference/trigger/v1/execute"
+    },
+    {
+      "source": "/api-reference/trigger/cancel-order",
+      "destination": "/api-reference/trigger/v1/cancel-order"
+    },
+    {
+      "source": "/api-reference/trigger/cancel-orders",
+      "destination": "/api-reference/trigger/v1/cancel-orders"
+    },
+    {
+      "source": "/api-reference/trigger/get-trigger-orders",
+      "destination": "/api-reference/trigger/v1/get-trigger-orders"
     },
     {
       "source": "/docs/api/token-api/:slug*",

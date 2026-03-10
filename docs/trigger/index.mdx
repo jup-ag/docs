@@ -13,19 +13,22 @@ V2 introduces vault-based architecture with JWT authentication, new order types 
 
 | Feature | V1 | V2 |
 | :--- | :--- | :--- |
+| **Trigger type** | Pool rate only (e.g. "1 Fartcoin = 0.00025 SOL") | USD price or market cap |
+| **Order direction** | Buy below only (no stop-loss) | Buy above, buy below, sell above, sell below |
+| **TP/SL** | Not supported | Take-profit and stop-loss with OCO bundling |
+| **Edit orders** | Must cancel and recreate | Edit trigger price and slippage in-place |
+| **Partial fills** | Not supported | Orders fill partially for optimal execution prices |
+| **Output amount** | Guaranteed (fixed pool rate) | Not guaranteed (prioritises trigger execution, pool price may vary) |
 | **Authentication** | API key only | Challenge-response JWT + API key |
-| **Deposits** | Direct on-chain | Vault accounts (custodial) |
-| **Order types** | Single limit | Single, OCO (TP/SL), OTOCO |
-| **Cancellation** | Single step | Two-step (initiate + confirm withdrawal) |
-| **Order states** | Basic (Open/Completed/Cancelled) | Rich state machine (pending, open, executing, filled, cancelled, expired, failed) |
+| **Deposits** | Program-derived address (PDA) order accounts | Vault accounts (custodial) by Privy |
 | **Route prefix** | `/trigger/v1` | `/trigger/v2` |
 
 ## Order Types
 
 | Type | Description | Use case |
 | :--- | :--- | :--- |
-| **Single** | Triggers when price crosses above or below a threshold | Standard limit orders |
-| **OCO** | Two orders sharing one deposit: one take-profit, one stop-loss. When one fills, the other cancels automatically | Risk management with TP/SL brackets |
+| **Single** | Triggers when USD price or market cap crosses above or below a threshold | Standard limit orders, stop-loss |
+| **OCO** | Two orders sharing one deposit: one take-profit, one stop-loss. When one fills, the other cancels automatically | Risk management with TP/SL brackets (e.g. sell SOL at $300 TP or $200 SL while market is $250) |
 | **OTOCO** | A parent order triggers first, then activates a TP/SL pair (OCO) on the output | Conditional entry with automatic exit strategy |
 
 ## How It Works

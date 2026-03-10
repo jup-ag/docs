@@ -4,6 +4,14 @@ description: "Update order parameters, cancel orders with two-step withdrawal, a
 llmsDescription: "PATCH /trigger/v2/orders/price/{orderId} updates order parameters. POST /trigger/v2/orders/price/cancel/{orderId} initiates cancellation and returns a withdrawal transaction. POST /trigger/v2/orders/price/confirm-cancel/{orderId} confirms with the signed withdrawal transaction."
 ---
 
+## Prerequisites
+
+Signing withdrawal transactions requires `@solana/web3.js`:
+
+```bash
+npm install @solana/web3.js
+```
+
 ## Update an Order
 
 Modify the trigger price or slippage of an existing order without cancelling and recreating it.
@@ -92,7 +100,11 @@ const cancelData = await cancelResponse.json();
 Sign the withdrawal transaction and submit it to complete the cancellation.
 
 ```typescript
-const transaction = deserializeTransaction(cancelData.transaction);
+import { VersionedTransaction } from '@solana/web3.js';
+
+const transaction = VersionedTransaction.deserialize(
+  Buffer.from(cancelData.transaction, 'base64')
+);
 const signedTransaction = await wallet.signTransaction(transaction);
 
 const confirmResponse = await fetch(
@@ -105,7 +117,7 @@ const confirmResponse = await fetch(
       'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({
-      signedTransaction: base64Encode(signedTransaction.serialize()),
+      signedTransaction: Buffer.from(signedTransaction.serialize()).toString('base64'),
       cancelRequestId: cancelData.requestId,
     }),
   }

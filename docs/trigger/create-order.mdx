@@ -6,6 +6,14 @@ llmsDescription: "POST /trigger/v2/deposit/craft builds a deposit transaction. P
 
 Creating an order in V2 is a two-step process: craft and sign a deposit transaction, then submit it alongside your order parameters.
 
+## Prerequisites
+
+Signing deposit transactions requires `@solana/web3.js`:
+
+```bash
+npm install @solana/web3.js
+```
+
 ## End-to-End Flow
 
 ```

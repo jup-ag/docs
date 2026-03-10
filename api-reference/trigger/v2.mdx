@@ -1,24 +1,59 @@
 ---
-title: "Trigger Order V2 API Reference"
+title: "Trigger API V2"
+sidebarTitle: "Overview"
 description: "API reference for the Jupiter Trigger Order API V2 with vault-based deposits and JWT authentication."
 llmsDescription: "Jupiter Trigger Order API V2 endpoints: auth (challenge/verify), vault management, deposit crafting, order CRUD (single/OCO/OTOCO), and order history. Base URL: https://api.jup.ag/trigger/v2"
 ---
 
-The Trigger Order V2 API introduces vault-based architecture with JWT authentication, advanced order types, and a two-step cancellation flow.
+## Authentication
 
-**Base URL:** `https://api.jup.ag/trigger/v2`
+<CardGroup>
+  <Card title="Request Challenge" href="/api-reference/trigger/v2/challenge" icon="file-lines" horizontal>
+    Request a message or transaction challenge for wallet authentication
+  </Card>
+  <Card title="Verify Challenge" href="/api-reference/trigger/v2/verify" icon="file-lines" horizontal>
+    Submit a signed challenge to receive a JWT token
+  </Card>
+  <Card title="Verify Token" href="/api-reference/trigger/v2/verify-token" icon="file-lines" horizontal>
+    Check if a JWT token is still valid
+  </Card>
+</CardGroup>
 
-<CardGroup cols={2}>
-  <Card title="Authentication" icon="key">
-    Challenge-response JWT flow for wallet authentication
+## Vault & Deposits
+
+<CardGroup>
+  <Card title="Get Vault" href="/api-reference/trigger/v2/vault" icon="file-lines" horizontal>
+    Retrieve the vault associated with your wallet
   </Card>
-  <Card title="Vault & Deposits" icon="vault">
-    Vault management and deposit transaction crafting
+  <Card title="Register Vault" href="/api-reference/trigger/v2/vault-register" icon="file-lines" horizontal>
+    Register a new Privy-managed vault for your wallet
   </Card>
-  <Card title="Orders" icon="bullseye">
-    Create, update, and cancel single/OCO/OTOCO orders
+  <Card title="Craft Deposit" href="/api-reference/trigger/v2/deposit-craft" icon="file-lines" horizontal>
+    Build an unsigned deposit transaction to fund an order
   </Card>
-  <Card title="History" icon="clock-rotate-left">
-    Query order history with filtering and pagination
+</CardGroup>
+
+## Orders
+
+<CardGroup>
+  <Card title="Create Order" href="/api-reference/trigger/v2/create-order" icon="file-lines" horizontal>
+    Create a single, OCO, or OTOCO order with a signed deposit transaction
+  </Card>
+  <Card title="Update Order" href="/api-reference/trigger/v2/update-order" icon="file-lines" horizontal>
+    Update trigger price or slippage of an existing order
+  </Card>
+  <Card title="Cancel Order" href="/api-reference/trigger/v2/cancel-order" icon="file-lines" horizontal>
+    Initiate cancellation and receive a withdrawal transaction
+  </Card>
+  <Card title="Confirm Cancel" href="/api-reference/trigger/v2/confirm-cancel" icon="file-lines" horizontal>
+    Submit the signed withdrawal transaction to complete cancellation
+  </Card>
+</CardGroup>
+
+## History
+
+<CardGroup>
+  <Card title="Get Order History" href="/api-reference/trigger/v2/order-history" icon="file-lines" horizontal>
+    Query order history with filtering by state, mint, and pagination
   </Card>
 </CardGroup>

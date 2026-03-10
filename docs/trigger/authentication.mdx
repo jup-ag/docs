@@ -69,6 +69,8 @@ Sign the challenge with your wallet, then submit the signature to receive a JWT 
 
 **For message signing:**
 ```typescript
+import bs58 from 'bs58';
+
 // Sign the challenge message with your wallet
 const encodedMessage = new TextEncoder().encode(challenge.challenge);
 const signature = await wallet.signMessage(encodedMessage);
@@ -92,8 +94,10 @@ const { token } = await verifyResponse.json();
 
 **For transaction signing (hardware wallets):**
 ```typescript
+import { VersionedTransaction } from '@solana/web3.js';
+
 const signedTx = await wallet.signTransaction(
-  deserializeTransaction(challenge.transaction)
+  VersionedTransaction.deserialize(Buffer.from(challenge.transaction, 'base64'))
 );
 
 const verifyResponse = await fetch('https://api.jup.ag/trigger/v2/auth/verify', {

@@ -275,16 +275,26 @@ if (position.claimable) {
 ```typescript
 interface Event {
   eventId: string;
+  isActive: boolean;                       // Whether the event is listed
+  isLive: boolean;                         // Whether the event is currently live
   category: 'crypto' | 'sports' | 'politics' | 'esports' | 'culture' | 'economics' | 'tech';
+  subcategory: string;                     // Subcategory within the category
+  tags: string[];                          // Tags associated with the event
   metadata: {
+    eventId: string;
     title: string;
     subtitle: string;
+    slug: string;                          // URL-friendly identifier
+    series: string;                        // Groups related events (e.g., "NFL Week 1")
+    closeTime: string;                     // ISO 8601 formatted close time
     imageUrl: string;
     isLive: boolean;
   };
   markets: Market[];
-  volumeUsd: string;
+  volumeUsd: string;                       // Total volume (micro USD)
   closeCondition: string;
+  beginAt: string | null;                  // When the event begins
+  rulesPdf: string;                        // URL to full rules document
 }
 ```
 
@@ -295,22 +305,27 @@ interface Market {
   marketId: string;
   status: 'open' | 'closed' | 'cancelled';
   result: null | 'yes' | 'no';
-  openTime: number;   // Unix timestamp
-  closeTime: number;  // Unix timestamp
+  openTime: number;                          // Unix timestamp
+  closeTime: number;                         // Unix timestamp
+  resolveAt: number | null;                  // Unix timestamp when market resolved
+  marketResultPubkey: string | null;         // Market result account public key
   metadata: {
+    marketId: string;
     title: string;
     status: string;
+    result: string;
     openTime: number;
     closeTime: number;
+    isTeamMarket: boolean;                   // Whether this is a team market
     rulesPrimary: string;
     rulesSecondary: string;
   };
   pricing: {
-    buyYesPriceUsd: number | null;   // Price to buy YES
-    buyNoPriceUsd: number | null;    // Price to buy NO
-    sellYesPriceUsd: number | null;  // Price to sell YES
-    sellNoPriceUsd: number | null;   // Price to sell NO
-    volume: number;
+    buyYesPriceUsd: number | null;           // Price to buy YES (micro USD)
+    buyNoPriceUsd: number | null;            // Price to buy NO (micro USD)
+    sellYesPriceUsd: number | null;          // Price to sell YES (micro USD)
+    sellNoPriceUsd: number | null;           // Price to sell NO (micro USD)
+    volume: number;                          // Trading volume for this market
   };
 }
 ```
@@ -319,18 +334,33 @@ interface Market {
 
 ```typescript
 interface Position {
-  pubkey: string;              // Position account
-  ownerPubkey: string;         // User's wallet
+  pubkey: string;                            // Position account
+  ownerPubkey: string;                       // User's wallet
   marketId: string;
-  isYes: boolean;              // YES or NO side
-  contracts: string;           // Contracts held
-  avgPriceUsd: string;         // Average entry price (micro USD)
-  totalCostUsd: string;        // Cost basis (micro USD)
-  valueUsd: string | null;     // Current value (null if market closed)
-  pnlUsd: string | null;       // Unrealized P&L (micro USD)
+  isYes: boolean;                            // YES or NO side
+  contracts: string;                         // Contracts held (u64 as string)
+  avgPriceUsd: string;                       // Average entry price (micro USD)
+  totalCostUsd: string;                      // Cost basis (micro USD)
+  sizeUsd: string;                           // Alias of totalCostUsd (micro USD)
+  valueUsd: string | null;                   // Mark-to-market value (null if market closed)
+  markPriceUsd: string | null;               // Current mark price (null if market closed)
+  sellPriceUsd: string | null;               // Best exit price (null if unavailable)
+  pnlUsd: string | null;                     // Unrealized P&L (micro USD)
   pnlUsdPercent: number | null;
-  claimable: boolean;          // Can claim payout?
-  payoutUsd: string;           // Potential payout if wins
+  pnlUsdAfterFees: string | null;            // P&L after fees (micro USD)
+  pnlUsdAfterFeesPercent: number | null;
+  realizedPnlUsd: number;                    // Realized P&L (micro USD)
+  feesPaidUsd: string;                       // Total fees paid (micro USD)
+  payoutUsd: string;                         // Payout if position wins (contracts x $1)
+  claimable: boolean;                        // Can claim payout?
+  claimed: boolean;                          // Has payout been claimed?
+  claimedUsd: string;                        // Amount claimed (micro USD)
+  openOrders: number;                        // Number of open orders
+  openedAt: number;                          // Unix timestamp when position opened
+  updatedAt: number;                         // Unix timestamp of last update
+  claimableAt: number | null;                // When position becomes claimable
+  settlementDate: number | null;             // When market settles
+  eventMetadata: EventMetadata;
   marketMetadata: MarketMetadata;
 }
 ```
@@ -351,6 +381,47 @@ interface CreateOrderResponse {
     orderCostUsd: string;
     estimatedTotalFeeUsd: string;
   };
+}
+```
+
+### History event
+
+```typescript
+interface HistoryEvent {
+  id: number;                                // Unique event identifier
+  eventType: 'order_created' | 'order_filled' | 'order_failed'
+    | 'payout_claimed' | 'position_updated' | 'position_lost';
+  signature: string;                         // Solana transaction signature
+  slot: string;                              // Solana slot number
+  timestamp: number;                         // Unix timestamp (seconds)
+  orderPubkey: string;                       // Associated order account
+  positionPubkey: string;                    // Associated position account
+  marketId: string;
+  ownerPubkey: string;
+  keeperPubkey: string;                      // Keeper that processed the tx
+  externalOrderId: string;                   // Client-provided order ID
+  orderId: string;                           // Venue order ID
+  isBuy: boolean;                            // Buy or sell
+  isYes: boolean;                            // YES or NO side
+  contracts: string;                         // Contracts in the order
+  filledContracts: string;                   // Contracts filled
+  contractsSettled: string;                  // Contracts settled
+  avgFillPriceUsd: string;                   // Average fill price (micro USD)
+  maxFillPriceUsd: string;                   // Max fill price (micro USD)
+  maxBuyPriceUsd: string | null;             // Buyer max price (micro USD)
+  minSellPriceUsd: string | null;            // Seller min price (micro USD)
+  depositAmountUsd: string;                  // Deposit amount (micro USD)
+  totalCostUsd: string;                      // Total cost (micro USD)
+  feeUsd: string | null;                     // Fee charged (micro USD)
+  grossProceedsUsd: string;                  // Gross proceeds (micro USD)
+  netProceedsUsd: string;                    // Net proceeds (micro USD)
+  transferAmountToken: string | null;        // Token amount transferred
+  realizedPnl: string | null;                // Realized P&L (micro USD)
+  realizedPnlBeforeFees: string | null;      // Realized P&L before fees (micro USD)
+  payoutAmountUsd: string;                   // Payout amount (micro USD)
+  eventId: string;
+  marketMetadata: MarketMetadata;
+  eventMetadata: EventMetadata;
 }
 ```
 

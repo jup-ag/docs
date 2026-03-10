@@ -92,6 +92,7 @@ components:
           nullable: true
         volume:
           type: number
+          description: Trading volume for this market
     Market:
       type: object
       properties:
@@ -834,6 +835,7 @@ components:
       properties:
         id:
           type: integer
+          description: Unique history event identifier
         eventType:
           type: string
           enum:
@@ -843,70 +845,102 @@ components:
             - payout_claimed
             - position_updated
             - position_lost
+          description: Type of history event
         signature:
           type: string
+          description: Solana transaction signature
         slot:
           type: string
+          description: Solana slot number (u64 as string)
         timestamp:
           type: integer
+          description: Unix timestamp (seconds) when the event occurred
         orderPubkey:
           type: string
+          description: Associated order account public key
         positionPubkey:
           type: string
+          description: Associated position account public key
         marketId:
           type: string
+          description: External market identifier
         ownerPubkey:
           type: string
+          description: Position or order owner public key
         keeperPubkey:
           type: string
+          description: Keeper that processed the transaction
         externalOrderId:
           type: string
+          description: Client-provided order identifier
         orderId:
           type: string
+          description: External order identifier from the venue
         isBuy:
           type: boolean
+          description: True when the event relates to a buy order
         isYes:
           type: boolean
+          description: True when the event relates to the YES side
         contracts:
           type: string
+          description: Number of contracts in the order (u64 as string)
         filledContracts:
           type: string
+          description: Number of contracts filled (u64 as string)
         contractsSettled:
           type: string
+          description: Number of contracts settled in this event (u64 as string)
         maxFillPriceUsd:
           type: string
+          description: Maximum fill price in micro USD (u64 as string)
         avgFillPriceUsd:
           type: string
+          description: Average fill price in micro USD (u64 as string)
         maxBuyPriceUsd:
           type: string
           nullable: true
+          description: Buyer-specified max fill price in micro USD (u64 as string)
         minSellPriceUsd:
           type: string
           nullable: true
+          description: Seller-specified min fill price in micro USD (u64 as string)
         depositAmountUsd:
           type: string
+          description: Amount deposited for this order in micro USD (u64 as string)
         totalCostUsd:
           type: string
+          description: Total cost of the order in micro USD (u64 as string)
         feeUsd:
           type: string
           nullable: true
+          description: Fee charged for this event in micro USD (u64 as string)
         grossProceedsUsd:
           type: string
+          description: Gross proceeds before fees in micro USD (u64 as string)
         netProceedsUsd:
           type: string
+          description: Net proceeds after fees in micro USD (u64 as string)
         transferAmountToken:
           type: string
           nullable: true
+          description: Token amount transferred in this event (native token units as
+            string)
         realizedPnl:
           type: string
           nullable: true
+          description: Realized PnL from this event in micro USD (i64 as string)
         realizedPnlBeforeFees:
           type: string
           nullable: true
+          description: Realized PnL before fees in micro USD (i64 as string)
         payoutAmountUsd:
           type: string
+          description: Payout amount in micro USD (u64 as string), populated for
+            payout_claimed events
         eventId:
           type: string
+          description: External event identifier
         marketMetadata:
           allOf:
             - $ref: "#/components/schemas/MarketMetadata"
@@ -927,8 +961,10 @@ components:
                   type: number
                 isTeamMarket:
                   type: boolean
+          description: Metadata for the associated market
         eventMetadata:
           $ref: "#/components/schemas/EventMetadata"
+          description: Metadata for the parent event
       required:
         - id
         - eventType
@@ -1867,9 +1903,25 @@ paths:
                         type: number
                       minItems: 2
                       maxItems: 2
+                  yes_dollars:
+                    type: array
+                    description: "YES-side levels with price as decimal dollar string. Each entry is a [price_string, size] tuple, e.g. [\"0.0100\", 346014]."
+                    items:
+                      type: array
+                      minItems: 2
+                      maxItems: 2
+                  no_dollars:
+                    type: array
+                    description: "NO-side levels with price as decimal dollar string. Each entry is a [price_string, size] tuple, e.g. [\"0.0100\", 219]."
+                    items:
+                      type: array
+                      minItems: 2
+                      maxItems: 2
                 required:
                   - yes
                   - no
+                  - yes_dollars
+                  - no_dollars
         "502":
           description: Failed to fetch orderbook data
           content:

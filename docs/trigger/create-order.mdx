@@ -228,6 +228,17 @@ const orderResponse = await fetch('https://api.jup.ag/trigger/v2/orders/price', 
 | `tpSlippageBps` | `number` | No | Take-profit slippage |
 | `slSlippageBps` | `number` | No | Stop-loss slippage |
 
+## Default Slippage
+
+If slippage is not specified, defaults vary by order type and trigger condition:
+
+| Order side | Default slippage |
+| :--- | :--- |
+| **Take-profit / buy below** (buying into strength) | Auto slippage via RTSE (Real-Time Slippage Estimator) |
+| **Stop-loss / buy above** (selling into weakness) | 20% (2000 bps) |
+
+Stop-loss orders use a higher default because execution certainty is more important than price precision when cutting losses.
+
 ## Validation Rules
 
 - Minimum order size: 1 USD

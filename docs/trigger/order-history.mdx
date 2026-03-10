@@ -85,6 +85,12 @@ Orders that have been fully or partially filled include extra fields:
 | `inputUsed` | Total input tokens consumed |
 | `fillPercent` | Fill ratio (1.0 = fully filled) |
 
+### Execution Attempts
+
+Order history includes execution attempts for each order. When an order fails to execute (due to slippage, quote generation failure, or other reasons), the attempt is recorded in the history. The reason for failure is not included in the response.
+
+Users can adjust slippage settings via the [update endpoint](/docs/trigger/manage-orders) if execution keeps failing due to slippage.
+
 ### Event Types
 
 Each order includes an `events` array tracking its lifecycle:

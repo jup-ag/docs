@@ -128,6 +128,10 @@ V2 orders hold funds in a vault account, not in an on-chain program account like
 
 This design keeps vault operations secure: only the wallet owner can authorise withdrawals.
 
+## Expired Order Withdrawal
+
+If an order expires before execution, the funds remain in the vault. To retrieve them, use the same two-step cancel flow: initiate cancellation on the expired order, sign the withdrawal transaction, and confirm. The order transitions through `ready_to_cancel` and then to `cancelled` once the withdrawal confirms on-chain.
+
 ## Error Handling
 
 | Status | Meaning |

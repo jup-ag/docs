@@ -138,6 +138,20 @@ When a token expires, repeat the challenge-response flow to obtain a new one. Th
 - The JWT is tied to the wallet public key. Do not reuse tokens across wallets
 </Warning>
 
+### What Happens if a JWT is Leaked
+
+The JWT grants limited access. An attacker with a leaked token can:
+
+- **Cancel orders**: This transitions the order from `open` to `ready_to_cancel`, but does **not** withdraw funds. Withdrawal requires signing a transaction with the wallet private key.
+- **Edit order parameters**: Updating trigger prices or slippage does not require transaction signing.
+
+An attacker **cannot**:
+
+- **Withdraw funds**: All withdrawal operations require the wallet owner to sign a transaction. The vault's funds remain secure.
+- **Create new orders**: Depositing tokens requires signing a deposit transaction with the wallet.
+
+In short, a leaked JWT can cause inconvenience (cancelled or modified orders) but cannot result in loss of funds.
+
 ## Verify Token (Optional)
 
 To check if a token is still valid without making an authenticated request:

@@ -131,7 +131,6 @@ const response = await fetch('https://api.jup.ag/trigger/v2/vault', {
 | :--- | :--- |
 | **Challenge TTL** | 5 minutes |
 | **JWT TTL** | 24 hours |
-| **Algorithm** | HS256 |
 
 When a token expires, repeat the challenge-response flow to obtain a new one. There is no refresh endpoint.
 
@@ -158,7 +157,7 @@ An attacker **cannot**:
 - **Withdraw funds**: All withdrawal operations require the wallet owner to sign a transaction. The vault's funds remain secure.
 - **Create new orders**: Depositing tokens requires signing a deposit transaction with the wallet.
 
-In short, a leaked JWT can cause inconvenience (cancelled or modified orders) but cannot result in loss of funds.
+All operations involving funds (deposits, withdrawals) require the wallet owner to sign a transaction. A leaked JWT alone cannot result in loss of funds. However, if the wallet private key is also compromised, an attacker could sign transactions and withdraw funds from the vault.
 
 ## Verify Token (Optional)
 

@@ -129,18 +129,7 @@ const result = await confirmResponse.json();
 // { id: "order-uuid", txSignature: "..." }
 ```
 
-<Note>
-The two-step cancellation ensures funds are securely withdrawn from the vault back to your wallet. The order transitions to `pending_withdraw` after step 1, and `cancelled` after step 2 confirms on-chain.
-</Note>
-
-## Why Two Steps?
-
-V2 orders hold funds in a vault account, not in an on-chain program account like V1. Cancelling requires an explicit withdrawal transaction to move tokens back to your wallet:
-
-1. **Initiate**: The server marks the order for cancellation and crafts a withdrawal transaction
-2. **Confirm**: You sign the withdrawal (proving you own the wallet), and the server broadcasts it
-
-This design keeps vault operations secure: only the wallet owner can authorise withdrawals.
+If step 2 fails (the transaction doesn't land), you can retry by calling the confirm endpoint again with the same `cancelRequestId`. The order remains in `ready_to_cancel` state until the withdrawal confirms.
 
 ## Expired Order Withdrawal
 
@@ -151,8 +140,7 @@ If an order expires before execution, the funds remain in the vault. To retrieve
 | Status | Meaning |
 | :--- | :--- |
 | `400` | Invalid order ID, order not in a cancellable state, or validation error |
-| `401` | JWT expired or invalid |
+| `401` | Invalid API key, or JWT expired/invalid |
 | `403` | Order belongs to a different wallet |
 | `404` | Order not found |
 
-If step 2 fails (transaction doesn't land), you can retry by calling the confirm endpoint again with the same `cancelRequestId`. The order remains in `pending_withdraw` state until the withdrawal confirms.

@@ -124,8 +124,10 @@ Orders follow a state machine from creation to completion. The `orderState` fiel
 
 ```
 pending ──→ open ──→ executing ──→ filled
-              │                      │
-              ├──→ expired           └──→ failed
+              │          │
+              │          └──→ failed
+              │
+              ├──→ expired
               │
               └──→ pending_withdraw ──→ cancelled
 ```

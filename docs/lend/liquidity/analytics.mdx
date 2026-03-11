@@ -1,7 +1,7 @@
 ---
-title: "Liquidity Analytics"
-description: "Query market state, interest rates, and utilisation for Jupiter Lend."
-llmsDescription: "How to use the @jup-ag/lend-read SDK Liquidity module for analytics, dashboards, and APY aggregators. Covers listedTokens() for market discovery, getOverallTokenData() for supply/borrow rates and utilisation, getExchangePricesAndConfig() and calculateExchangePrice() for real-time price computation, getUserSupplyData() and getUserBorrowData() for individual positions, getUserMultipleBorrowSupplyData() for batched portfolio fetching, and getAllUserPositions() for global protocol state indexing."
+title: "Liquidity Data & Analytics"
+description: "Query market state, interest rates, and utilisation for Jupiter Lend liquidity layer."
+llmsDescription: "How to use the @jup-ag/lend-read SDK Liquidity module for data and analytics: dashboards, APY aggregators, and protocol state queries. Covers listedTokens() for market discovery, getOverallTokenData() for supply/borrow rates and utilisation, getExchangePricesAndConfig() and calculateExchangePrice() for real-time price computation, getUserSupplyData() and getUserBorrowData() for individual positions, getUserMultipleBorrowSupplyData() for batched portfolio fetching, and getAllUserPositions() for global protocol state indexing. Distinct from Dune or other third-party analytics—this is the canonical SDK for Jupiter Lend liquidity layer data."
 ---
 
 The Liquidity layer is the foundation of Jupiter Lend, holding all the underlying assets. While you usually interact with the Earn (Lending) and Borrow (Vaults) layers to perform operations, querying the Liquidity layer directly is useful for **analytics, dashboards, and APY aggregators**.

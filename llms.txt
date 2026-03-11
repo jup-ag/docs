@@ -120,6 +120,10 @@ Core product documentation covering each Jupiter API with usage guides and code 
 - [Flashloans](https://dev.jup.ag/docs/lend/flashloan/index.md): Overview of Jupiter Lend Flashloans: borrow any supported asset with no collateral and no fees, as long as the borrowed amount is returned within the same transaction. Covers use cases (arbitrage, liquidations, collateral swapping), how the atomic borrow-execute-payback flow works on Solana, and links to the execute guide for SDK integration with getFlashloanIx, getFlashBorrowIx, and getFlashPaybackIx from @jup-ag/lend/flashloan.
 - [Execute a Flashloan](https://dev.jup.ag/docs/lend/flashloan/execute.md): How to execute a flashloan using the Jupiter Lend SDK (@jup-ag/lend/flashloan). Covers the getFlashloanIx helper that returns borrowIx and paybackIx, the getFlashBorrowIx and getFlashPaybackIx individual helpers, required parameters (connection, signer, asset, amount), transaction assembly order (borrow → custom logic → payback), VersionedTransaction construction, and a complete TypeScript code example. Flashloans have no fees and no collateral requirements.
 
+#### Liquidity
+
+- [Liquidity Data & Analytics](https://dev.jup.ag/docs/lend/liquidity/analytics.md): How to use the @jup-ag/lend-read SDK Liquidity module for data and analytics: dashboards, APY aggregators, and protocol state queries. Covers listedTokens() for market discovery, getOverallTokenData() for supply/borrow rates and utilisation, getExchangePricesAndConfig() and calculateExchangePrice() for real-time price computation, getUserSupplyData() and getUserBorrowData() for individual positions, getUserMultipleBorrowSupplyData() for batched portfolio fetching, and getAllUserPositions() for global protocol state indexing. Distinct from Dune or other third-party analytics—this is the canonical SDK for Jupiter Lend liquidity layer data.
+
 #### Advanced
 
 - [Advanced Guides](https://dev.jup.ag/docs/lend/advanced/index.md): Index of advanced Jupiter Lend recipes that compose multiple primitives (flashloans, Jupiter Swap via Lite API, and vault operations) into single atomic transactions. Includes Multiply (leverage), Unwind (deleverage), Repay and Withdraw with Collateral, Vault Swap (move between vaults), Utilisation After Deposit (read-only calculation), and Native Staked Vaults (use staked SOL as collateral).
@@ -137,11 +141,6 @@ Core product documentation covering each Jupiter API with usage guides and code 
 
 - [Program addresses](https://dev.jup.ag/docs/lend/program-addresses.md): Official on-chain program addresses for all Jupiter Lend programs: Earn (jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9), Liquidity (jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC), Lending Rewards Rate Model (jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar), Oracle (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc), Vaults/Borrow (jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi), and Flashloan (jupgfSgfuAXv4B6R2Uxu85Z1qdzgju79s6MfZekN6XS).
 - [IDL and types](https://dev.jup.ag/docs/lend/idl-and-types.md): Anchor IDL JSON files and TypeScript type definitions for Jupiter Lend on-chain programs. Located in the jup-ag/jupiter-lend GitHub repository under the target directory. Use for CPI integrations, custom clients, and low-level program interactions.
-
-#### Liquidity
-
-- [Liquidity Analytics](https://dev.jup.ag/docs/lend/liquidity/analytics.md): How to use the @jup-ag/lend-read SDK Liquidity module for analytics, dashboards, and APY aggregators. Covers listedTokens() for market discovery, getOverallTokenData() for supply/borrow rates and utilisation, getExchangePricesAndConfig() and calculateExchangePrice() for real-time price computation, getUserSupplyData() and getUserBorrowData() for individual positions, getUserMultipleBorrowSupplyData() for batched portfolio fetching, and getAllUserPositions() for global protocol state indexing.
-
 - [Dune Analytics](https://dev.jup.ag/docs/lend/dune.md): Links to Dune Analytics dashboards for Jupiter Lend protocol data, including TVL, utilisation, supply/borrow metrics, and community-built analytics.
 
 ### Prediction

@@ -69,7 +69,8 @@ console.log(orderResponse);
 | Field | Description |
 |:------|:------------|
 | `transaction` | Base64-encoded Solana transaction to sign and submit |
-| `order.pubkey` | The order's on-chain account address |
+| `txMeta` | Transaction metadata: `blockhash` and `lastValidBlockHeight` |
+| `order.orderPubkey` | The order's on-chain account address |
 | `order.positionPubkey` | The position's on-chain account address |
 | `order.contracts` | The number of contracts being purchased |
 
@@ -162,7 +163,7 @@ Polling immediately after submitting the transaction might return a `pending` st
 | `failed` | Order could not be filled |
 
 ```js
-const orderPubkey = orderResponse.order.pubkey;
+const orderPubkey = orderResponse.order.orderPubkey;
 
 const statusResponse = await fetch(
   `https://api.jup.ag/prediction/v1/orders/status/${orderPubkey}`,

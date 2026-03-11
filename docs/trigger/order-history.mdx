@@ -113,6 +113,14 @@ Each event includes `type`, `timestamp`, and `state`. Events that involve token 
 | `mint` | Token mint address |
 | `amount` | Token amount (in smallest unit) |
 
+Fill events include additional fields:
+
+| Field | Description |
+| :--- | :--- |
+| `outputMint` | Output token mint address |
+| `outputAmount` | Output amount received |
+| `orderContext` | Semantic order type: `take_profit`, `stop_loss`, `buy_above`, or `buy_below` |
+
 ## Order States
 
 Orders follow a state machine from creation to completion. The `orderState` field provides a human-friendly state, while `rawState` shows the exact internal state.
@@ -147,7 +155,7 @@ The `rawState` field exposes the internal processing state. Multiple raw states 
 | `executing` | `ready_withdraw_output` | Output ready to withdraw to wallet |
 | `executing` | `withdrawing` | Withdrawal transaction in flight |
 | `filled` | `fill_success` | Order fully filled and output withdrawn |
-| `filled` | `partial_fill_success` | Order partially filled |
+| `executing` | `partial_fill_success` | Order partially filled, may continue filling |
 | `pending_withdraw` | `ready_to_cancel` | Cancellation initiated, awaiting signed withdrawal |
 | `cancelled` | `cancelled` | User cancelled the order |
 | `cancelled` | `oco_cancelled` | Automatically cancelled because the other side of an OCO pair filled |

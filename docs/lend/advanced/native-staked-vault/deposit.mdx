@@ -1,0 +1,118 @@
+---
+title: "Deposit Staked SOL"
+description: "Deposit stake into Single Pool, receive pool tokens, then deposit them into a vault as collateral."
+llmsDescription: "How to deposit staked SOL into a Jupiter Lend Native Staked Vault. Covers the three-step flow: split stake via StakeProgram.split, deposit into Single Pool via SinglePoolProgram.deposit from @solana/spl-single-pool-classic to receive pool tokens, then deposit pool tokens into the corresponding vault via getOperateIx from @jup-ag/lend/borrow. Includes vault discovery using client.vault.getAllVaults() and matching supplyToken to pool mint. Complete TypeScript code example with VersionedTransaction."
+---
+
+<Info>
+  These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
+</Info>
+
+Deposit your stake account into a Single Pool, receive pool tokens, then deposit those tokens into the corresponding Native Staked Vault (nsHELIUS, nsJUPITER, etc.) as collateral.
+
+**Flow:**
+1. Split stake into a new account
+2. Deposit the new stake into Single Pool → receive pool tokens
+3. Deposit pool tokens into vault via `getOperateIx`
+
+---
+
+## Deposit
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    ```bash
+    npm install @solana/web3.js @solana/spl-token @solana/spl-single-pool-classic bn.js @jup-ag/lend @jup-ag/lend-read
+    ```
+
+    ```typescript
+    import {
+      SinglePoolProgram,
+      findPoolAddress,
+      findPoolMintAddress,
+    } from "@solana/spl-single-pool-classic";
+    import {
+      Connection, Keypair, PublicKey, StakeProgram,
+      TransactionMessage, VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import {
+      createAssociatedTokenAccountInstruction,
+      getAccount, getAssociatedTokenAddressSync,
+    } from "@solana/spl-token";
+    import { getOperateIx } from "@jup-ag/lend/borrow";
+    import { Client } from "@jup-ag/lend-read";
+    ```
+  </Step>
+  <Step titleSize="h2" title="Split Stake and Deposit into Single Pool">
+    Use `StakeProgram.split` and `SinglePoolProgram.deposit` from `@solana/spl-single-pool-classic`.
+
+    ```typescript
+    const SINGLE_POOL_PROGRAM_ID = new PublicKey("SVSPxpvHdN29nkVg9rPapPNDddN5DipNLRUFhyjFThE");
+    const pool = await findPoolAddress(SINGLE_POOL_PROGRAM_ID, voteAccount);
+    const newStakeAccount = Keypair.generate();
+    const stakeRent = await connection.getMinimumBalanceForRentExemption(StakeProgram.space);
+
+    const { instructions: splitInstructions } = StakeProgram.split(
+      { stakePubkey: userStakeAccount, authorizedPubkey: signer, splitStakePubkey: newStakeAccount.publicKey, lamports: lamportAmount.toNumber() },
+      stakeRent
+    );
+    instructions.push(...splitInstructions);
+
+    const mint = await findPoolMintAddress(SINGLE_POOL_PROGRAM_ID, pool);
+    const userAta = getAssociatedTokenAddressSync(new PublicKey(mint), signer);
+    try { await getAccount(connection, userAta); } catch {
+      instructions.push(createAssociatedTokenAccountInstruction(signer, userAta, signer, new PublicKey(mint)));
+    }
+
+    const depositIxs = await SinglePoolProgram.deposit({
+      connection, userWallet: signer, pool, userStakeAccount: newStakeAccount.publicKey,
+    });
+    instructions.push(...depositIxs.instructions);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Deposit Pool Tokens into Vault">
+    Find the vault by `supplyToken` = pool mint, then use `getOperateIx`.
+
+    ```typescript
+    const client = new Client(connection);
+    const allVaults = await client.vault.getAllVaults();
+    const vault = allVaults.find((v) => v.constantViews.supplyToken.equals(poolMint));
+    if (!vault) throw new Error("Vault not found");
+
+    const { ixs: operateIxs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId: vault.constantViews.vaultId,
+      positionId: 0,
+      colAmount: poolTokenAmount,
+      debtAmount: new BN(0),
+      connection,
+      signer,
+    });
+    instructions.push(...operateIxs);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Assemble and Execute the Transaction">
+    Build a v0 message with all instructions and address lookup tables, sign with the user keypair and new stake account keypair.
+
+    ```typescript
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: blockhash,
+      instructions,
+    }).compileToV0Message(addressLookupTableAccounts ?? []);
+
+    const tx = new VersionedTransaction(message);
+    tx.sign([userKeypair, newStakeAccount]);
+
+    const signature = await connection.sendTransaction(tx, {
+      skipPreflight: false, maxRetries: 3, preflightCommitment: "confirmed",
+    });
+    console.log("Deposit successful:", signature);
+    ```
+  </Step>
+</Steps>
+
+<Info>
+  If the user already holds pool tokens, skip the Single Pool steps and only call `getOperateIx` to deposit into the vault.
+</Info>

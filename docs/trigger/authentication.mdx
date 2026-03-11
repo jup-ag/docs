@@ -109,7 +109,7 @@ const verifyResponse = await fetch('https://api.jup.ag/trigger/v2/auth/verify', 
   body: JSON.stringify({
     type: 'transaction',
     walletPubkey: walletAddress,
-    signedTransaction: base64Encode(signedTx.serialize()),
+    signedTransaction: Buffer.from(signedTx.serialize()).toString('base64'),
   }),
 });
 

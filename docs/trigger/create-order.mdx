@@ -1,7 +1,7 @@
 ---
 title: "Create Order"
 description: "Create trigger orders with vault-based deposits. Supports single limit orders, OCO (take-profit/stop-loss), and OTOCO (conditional chains)."
-llmsDescription: "POST /trigger/v2/deposit/craft builds a deposit transaction. POST /trigger/v2/orders/price creates single, OCO, or OTOCO orders with the signed deposit. Requires JWT authentication. Minimum order: 1 USD."
+llmsDescription: "POST /trigger/v2/deposit/craft builds a deposit transaction. POST /trigger/v2/orders/price creates single, OCO, or OTOCO orders with the signed deposit. Requires JWT authentication. Minimum order: 10 USD."
 ---
 
 Creating an order in V2 is a two-step process: craft and sign a deposit transaction, then submit it alongside your order parameters.
@@ -261,7 +261,7 @@ Stop-loss orders use a higher default because execution certainty is more import
 
 ## Validation Rules
 
-- Minimum order size: 1 USD
+- Minimum order size: 10 USD
 - Input and output mints must be different
 - Slippage: 0-10000 basis points
 - `expiresAt` must be a future timestamp (milliseconds)

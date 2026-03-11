@@ -1,0 +1,216 @@
+---
+title: "Execute a Flashloan"
+description: "Build and send a flashloan transaction using the Jupiter Lend SDK."
+llmsDescription: "How to execute a flashloan using the Jupiter Lend SDK (@jup-ag/lend/flashloan). Covers the getFlashloanIx helper that returns borrowIx and paybackIx, the getFlashBorrowIx and getFlashPaybackIx individual helpers, required parameters (connection, signer, asset, amount), transaction assembly order (borrow → custom logic → payback), VersionedTransaction construction, and a complete TypeScript code example. Flashloans have no fees and no collateral requirements."
+---
+
+<Info>
+  If your custom logic is compute-heavy, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
+</Info>
+
+The `@jup-ag/lend` SDK provides helper functions to retrieve the instructions needed to execute a flashloan.
+
+To perform a flashloan, construct a transaction where the **borrow** instruction occurs first, followed by your **custom logic** (which uses the borrowed funds), and ending with the **payback** instruction.
+
+<Accordion title="Transaction Atomicity">
+  Solana processes the entire list of instructions atomically. If your custom logic fails to return the borrowed amount via `paybackIx`, the entire transaction reverts and you only pay network fees.
+</Accordion>
+
+## Parameters
+
+`getFlashloanIx` accepts the following parameters:
+
+| Parameter     | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `connection`  | `Connection`| Solana RPC connection. |
+| `signer`      | `PublicKey` | Wallet that signs the transaction and executes the flashloan. |
+| `asset`       | `PublicKey` | The mint address of the token you want to borrow. |
+| `amount`      | `BN`        | The amount of tokens to borrow in base units. |
+
+
+## Execute Flashloan
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    Import the required packages for Solana RPC, Jupiter Lend flashloan SDK, and versioned transaction building.
+
+    ```typescript
+    import {
+      Connection,
+      Keypair,
+      PublicKey,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getFlashloanIx } from "@jup-ag/lend/flashloan";
+    import fs from "fs";
+    import path from "path";
+    ```
+  </Step>
+  <Step titleSize="h2" title="Load Keypair and Initialise Connection">
+    Load the signer and create the RPC connection. Define the asset and borrow amount.
+
+    ```typescript
+    const KEYPAIR_PATH = "/path/to/your/keypair.json";
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const ASSET = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"); // USDC
+    const BORROW_AMOUNT = new BN(100_000_000); // Amount in base units (e.g. 100 USDC = 100_000_000)
+
+    function loadKeypair(keypairPath: string): Keypair {
+      const fullPath = path.resolve(keypairPath);
+      const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      return Keypair.fromSecretKey(new Uint8Array(secret));
+    }
+
+    const userKeypair = loadKeypair(KEYPAIR_PATH);
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
+    ```
+  </Step>
+  <Step titleSize="h2" title="Get Flashloan Instructions">
+    Fetch the borrow and payback instructions from the SDK. You borrow and return the same amount with no flashloan fees.
+
+    ```typescript
+    const { borrowIx, paybackIx } = await getFlashloanIx({
+      connection,
+      signer,
+      asset: ASSET,
+      amount: BORROW_AMOUNT,
+    });
+    ```
+
+    <Info>
+      You can also use `getFlashBorrowIx` and `getFlashPaybackIx` separately if you need to fetch the instructions independently.
+    </Info>
+  </Step>
+  <Step titleSize="h2" title="Define Custom Logic">
+    Define the instructions that use the borrowed funds. This could be trades, clearing bad debt, collateral swapping, or any custom flashloan logic.
+
+    ```typescript
+    const customIxs = [
+      // ... your custom instructions here
+    ];
+    ```
+  </Step>
+  <Step titleSize="h2" title="Build and Sign Transaction">
+    Assemble the transaction. **Order is critical:** your custom logic must be placed exactly between the borrow and payback instructions.
+
+    ```typescript
+    const instructions = [
+      borrowIx,
+      ...customIxs,
+      paybackIx
+    ];
+
+    const latestBlockhash = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: latestBlockhash.blockhash,
+      instructions,
+    }).compileToV0Message(); // Include ALTs here if your custom instructions need them
+
+    const transaction = new VersionedTransaction(message);
+    transaction.sign([userKeypair]);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Send and Confirm Transaction">
+    Send the transaction to the network.
+
+    ```typescript
+    const signature = await connection.sendTransaction(transaction, {
+      skipPreflight: false,
+      maxRetries: 3,
+      preflightCommitment: "confirmed",
+    });
+    await connection.confirmTransaction(
+      { signature, ...latestBlockhash },
+      "confirmed"
+    );
+
+    console.log("Flashloan successful! Signature:", signature);
+    ```
+  </Step>
+</Steps>
+
+
+## Full code example
+
+```typescript expandable
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  TransactionMessage,
+  VersionedTransaction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { getFlashloanIx } from "@jup-ag/lend/flashloan";
+import fs from "fs";
+import path from "path";
+
+const KEYPAIR_PATH = "/path/to/your/keypair.json";
+const RPC_URL = "https://api.mainnet-beta.solana.com";
+const ASSET = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"); // USDC
+const BORROW_AMOUNT = new BN(100_000_000); // 100 USDC
+
+function loadKeypair(keypairPath: string): Keypair {
+  const fullPath = path.resolve(keypairPath);
+  const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+  return Keypair.fromSecretKey(new Uint8Array(secret));
+}
+
+async function main() {
+  // 1. Load user keypair and establish connection
+  const userKeypair = loadKeypair(KEYPAIR_PATH);
+  const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+  const signer = userKeypair.publicKey;
+
+  // 2. Get the borrow and payback instructions
+  const { borrowIx, paybackIx } = await getFlashloanIx({
+    connection,
+    signer,
+    asset: ASSET,
+    amount: BORROW_AMOUNT,
+  });
+
+  // 3. Define custom instructions that utilise the borrowed funds
+  const customIxs = [
+    // ... insert your custom logic here
+  ];
+
+  // 4. Assemble the transaction: Borrow -> Custom Logic -> Payback
+  const instructions = [
+    borrowIx,
+    ...customIxs,
+    paybackIx
+  ];
+
+  // 5. Build and sign transaction
+  const latestBlockhash = await connection.getLatestBlockhash();
+  const message = new TransactionMessage({
+    payerKey: signer,
+    recentBlockhash: latestBlockhash.blockhash,
+    instructions,
+  }).compileToV0Message(); // If your custom logic uses ALTs, pass them here
+
+  const transaction = new VersionedTransaction(message);
+  transaction.sign([userKeypair]);
+
+  // 6. Send and confirm the transaction
+  const signature = await connection.sendTransaction(transaction, {
+    skipPreflight: false,
+    maxRetries: 3,
+    preflightCommitment: "confirmed",
+  });
+
+  await connection.confirmTransaction(
+    { signature, ...latestBlockhash },
+    "confirmed"
+  );
+
+  console.log("Flashloan successful! Signature:", signature);
+}
+
+main().catch(console.error);
+```

@@ -1,5 +1,5 @@
 ---
-title: "Repay & Withdraw with Collateral"
+title: "Repay with Collateral and Max Withdraw"
 description: "Close a position when you hold only the collateral token."
 llmsDescription: "How to close a Jupiter Lend borrow position when you only hold the collateral token (e.g. SOL, not USDC). Uses a flashloan to borrow the debt asset, repay full debt and withdraw full collateral with getOperateIx using MAX_REPAY_AMOUNT and MAX_WITHDRAW_AMOUNT, swap collateral to debt via Jupiter Lite API, then payback the flashloan. All in a single atomic Solana transaction. Includes complete TypeScript code example."
 ---
@@ -20,7 +20,7 @@ All of this happens atomically in one transaction.
 
 ---
 
-## Repay & Withdraw
+## Repay with Collateral and Max Withdraw
 
 <Steps>
   <Step titleSize="h2" title="Import Dependencies">

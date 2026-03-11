@@ -210,7 +210,8 @@
                       "docs/lend/earn/withdraw",
                       "docs/lend/earn/read-data"
                     ]
-                  }
+                  },
+                  "docs/lend/earn/cpi"
                 ]
               },
               {
@@ -230,6 +231,33 @@
                       "docs/lend/borrow/liquidation",
                       "docs/lend/borrow/read-vault-data"
                     ]
+                  },
+                  "docs/lend/borrow/cpi"
+                ]
+              },
+              {
+                "group": "Flashloan",
+                "pages": [
+                  "docs/lend/flashloan/index",
+                  "docs/lend/flashloan/execute"
+                ]
+              },
+              {
+                "group": "Advanced",
+                "pages": [
+                  "docs/lend/advanced/index",
+                  "docs/lend/advanced/multiply",
+                  "docs/lend/advanced/unwind",
+                  "docs/lend/advanced/repay-withdraw-collateral",
+                  "docs/lend/advanced/vault-swap",
+                  "docs/lend/advanced/utilization-after-deposit",
+                  {
+                    "group": "Native Staked Vaults",
+                    "pages": [
+                      "docs/lend/advanced/native-staked-vault/index",
+                      "docs/lend/advanced/native-staked-vault/deposit",
+                      "docs/lend/advanced/native-staked-vault/withdraw"
+                    ]
                   }
                 ]
               },
@@ -237,7 +265,9 @@
                 "group": "Resources",
                 "pages": [
                   "docs/lend/program-addresses",
-                  "docs/lend/idl-and-types"
+                  "docs/lend/idl-and-types",
+                  "docs/lend/liquidity/analytics",
+                  "docs/lend/dune"
                 ]
               }
             ]

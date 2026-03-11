@@ -30,7 +30,7 @@ For example, to derive the JUPSOL/SOL rate, the system combines JUPSOL/USD and S
 | StakePool   | SPL Stake Pool (Jito, Marinade, etc.)                              | 1                                           |
 | MsolPool    | Marinade mSOL pool state                                           | 1                                           |
 | SinglePool  | SPL Single Pool (Helius, Jupiter, Nansen, Emerald, Shift, Kiln)    | 3 (stake, mint, stake program)              |
-| JupLend     | JupLend fToken exchange rate                                       | 4(Lending,TokenReserve,RateModel,FTokenMint)|
+| JupLend     | JupLend fToken exchange rate                                       | 4 (Lending, TokenReserve, RateModel, FTokenMint) |
 
 
 This design enables the system to:
@@ -42,10 +42,10 @@ This design enables the system to:
 
 ### Freshness
 
-| Operation type                                    | Max age                |
-|---------------------------------------------------|------------------------|
-| User operations (supply, borrow, repay, withdraw) | 600 seconds(10 minutes)|
-| Liquidations                                      | 7200 seconds (2 hours) |
+| Operation type                                    | Max age                 |
+|---------------------------------------------------|-------------------------|
+| User operations (supply, borrow, repay, withdraw)  | 600 seconds (10 minutes)|
+| Liquidations                                      | 7200 seconds (2 hours)  |
 
 Pyth and Redstone use Unix timestamp freshness. Chainlink uses slot-based freshness (≈400 ms per slot).
 
@@ -64,13 +64,13 @@ Only Pyth validates confidence. Other sources (Chainlink, Redstone, StakePool, M
 
 | Provider       | Source    | Use case                                                                 |
 |----------------|-----------|--------------------------------------------------------------------------|
-| Pyth           | Pyth      | Spot prices (SOL, ETH, BTC, JLP, etc.)                                   |
-| Chainlink      | Chainlink | SOL/USD, WBTC/USD, EURC/USD                                              |
-| Redstone       | Redstone  | Additional price feeds                                                   |
-| Marinade       | MsolPool  | mSOL/SOL                                                                 |
-| Jito           | StakePool | JITOSOL/SOL                                                              |
-| SPL Single Pool| SinglePool| Staked SOL (Helius, Jupiter, Nansen, Emerald, Shift, Kiln)               |
-| JupLend        | JupLend   | fToken exchange rates (e.g., JUPUSD)                                     |
+| Pyth           | Pyth      | Spot prices (SOL, ETH, BTC, JLP, etc.)                                  |
+| Chainlink      | Chainlink | SOL/USD, WBTC/USD, EURC/USD                                             |
+| Redstone       | Redstone  | Additional price feeds                                                  |
+| Marinade       | MsolPool  | mSOL/SOL                                                                |
+| Jito           | StakePool | JITOSOL/SOL                                                             |
+| SPL Single Pool| SinglePool| Staked SOL (Helius, Jupiter, Nansen, Emerald, Shift, Kiln)              |
+| JupLend        | JupLend   | fToken exchange rates (e.g., JUPUSD)                                    |
 
 ## Oracle Verification Script
 

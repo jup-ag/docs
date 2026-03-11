@@ -1,0 +1,182 @@
+---
+title: "Core Architecture"
+description: "Jupiter Lend architecture: how Liquidity, Lending (Earn), and Vaults (Borrow) interact."
+llmsDescription: "Jupiter Lend core architecture: three-program design with Liquidity as the core layer, Lending (Earn) for deposit-and-earn, and Vaults (Borrow) for collateralized borrowing. Covers CPI flow, shared state, TokenReserve, UserSupplyPosition, UserBorrowPosition, tick-based pricing, and program IDs."
+---
+
+Jupiter Lend is built on three core programs: **Liquidity** (the shared lending engine), **Lending** (Earn), and **Vaults** (Borrow). Lending and Vaults do not hold tokens directly. They CPI into Liquidity, which holds all underlying assets and tracks supply and borrow positions.
+
+## Three-program design
+
+| Program   | Purpose                                                                           | Program ID                                    |
+|-----------|-----------------------------------------------------------------------------------|-----------------------------------------------|
+| Liquidity | Core layer: token vaults, exchange prices, utilization, rates                     | `jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC` |
+| Lending   | Earn: deposit assets, mint jltokens, supply into Liquidity                        | `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9` |
+| Vaults    | Borrow: collateralize, borrow, liquidate, supply/borrow via Liquidity             | `jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi` |
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                         USERS                                    │
+└──────────────┬──────────────────────────────────┬────────────────┘
+               │                                  │
+               ▼                                  ▼
+┌──────────────────────────────┐    ┌──────────────────────────────┐
+│  Lending (Earn)              │    │  Vaults (Borrow)             │
+│  deposit / withdraw / redeem │    │  deposit / borrow / repay    │
+│  mint jltokens               │    │  liquidate / rebalance       │
+└──────────────┬───────────────┘    └──────────────┬───────────────┘
+               │                                   │
+               │         CPI (operate)             │
+               └──────────────────┬────────────────┘
+                                  ▼
+               ┌───────────────────────────────────┐
+               │  Liquidity (core)                 │
+               │  TokenReserve, UserSupplyPosition │
+               │  UserBorrowPosition, exchange     │
+               │  prices, interest accrual         │
+               └───────────────────────────────────┘
+```
+
+---
+
+## Liquidity (core layer)
+
+Liquidity is the foundation. It owns the token vaults and holds all supplied and borrowed assets. No user-facing protocol touches tokens directly; they CPI Liquidity for every supply and borrow.
+
+### Key state
+
+| Account            | Purpose                                                                 |
+|--------------------|-------------------------------------------------------------------------|
+| TokenReserve       | Per-mint: vault, exchange prices, totals, utilization, rate config      |
+| UserSupplyPosition | Per (mint, protocol): supply amount, withdrawal limit, status           |
+| UserBorrowPosition | Per (mint, protocol): borrow amount, debt ceiling, status               |
+| RateModel          | Interest rate curve driven by utilization                               |
+
+### Protocol registration
+
+Protocols (Lending, Vaults) must be registered via `init_new_protocol(supply_mint, borrow_mint, protocol)`:
+
+- **Lending:** supply mint only (Earn supplies into Liquidity, no borrow)
+- **Vaults:** supply mint (collateral) and borrow mint (debt)
+
+### Operate flow
+
+1. **pre_operate(mint)** — marks the interacting protocol and timestamp on `TokenReserve`
+2. Caller moves tokens into the Liquidity vault (via SPL transfer)
+3. **operate(supply_amount, borrow_amount, withdraw_to, borrow_to, transfer_type)** — updates exchange prices, UserSupplyPosition/UserBorrowPosition, TokenReserve totals, and performs transfers
+
+Exchange prices and rates are updated during `operate`, so interest accrues on every interaction.
+
+---
+
+## Lending (Earn)
+
+Earn lets users deposit assets and receive jltokens (shares). Deposits are supplied into Liquidity; jltokens represent a share of the pool with accrued interest and rewards.
+
+### Key state
+
+| Account      | Purpose                                                                 |
+|--------------|-------------------------------------------------------------------------|
+| LendingAdmin | Factory: authority, `liquidity_program`, rebalancer, auths              |
+| Lending      | Per-mint pool: mint, `jl_token_mint`, `token_reserves_liquidity`, `supply_position_on_liquidity`, exchange prices |
+
+### User flow
+
+- **Deposit:** User transfers tokens → Lending CPIs Liquidity `pre_operate` + `operate(supply)` → mints jltokens
+- **Withdraw/Redeem:** Burns jltokens → CPIs Liquidity `operate(withdraw)` → user receives underlying
+
+The protocol signer for Liquidity CPI is the **Lending PDA** (not the user). Each Lending pool has a single `UserSupplyPosition` on Liquidity for that mint. The rewards rate model (separate program) adjusts the jltoken exchange price to include rewards on top of base yield.
+
+### CPI summary
+
+| Caller   | Signer      | Supply position           | Borrow position |
+|----------|-------------|---------------------------|-----------------|
+| Lending  | Lending PDA | Lending PDA (1 per mint)  | None            |
+
+---
+
+## Vaults (Borrow)
+
+Borrow vaults are collateralized lending markets. Each vault has a **supply token** (collateral) and a **borrow token** (debt). Users deposit collateral, borrow against it, and can be liquidated if collateral falls below the liquidation threshold. Positions are represented as NFTs.
+
+### Key state
+
+| Account     | Purpose                                                                                          |
+|-------------|--------------------------------------------------------------------------------------------------|
+| VaultConfig | Params: supply_token, borrow_token, oracle, collateral_factor, liquidation_threshold, rebalancer |
+| VaultState  | Runtime: total_supply, total_borrow, topmost_tick, absorbed debt/collateral                      |
+| Position    | User position: vault_id, tick, supply_amount, debt, liquidation status                           |
+| Branch      | Liquidation structure: minima tick, debt factor, status                                          |
+| Tick        | Price-ratio ticks for collateralization                                                          |
+
+### Tick-based pricing
+
+Vaults use **tick-based** pricing: collateralization is computed from a price-ratio tick rather than a simple LTV. Collateral factor is derived from tick ratio. Branches track liquidation state and merge positions when liquidated.
+
+### User flow
+
+- **init_position** — create Position + position mint NFT
+- **operate** — deposit/withdraw collateral, borrow/repay debt
+- **liquidate** — liquidate undercollateralized positions
+- **rebalance** — rebalancer supplies/borrows on Liquidity to match vault demand
+
+The protocol signer for Liquidity CPI is the **VaultConfig PDA**. Each vault has both a `UserSupplyPosition` (collateral) and a `UserBorrowPosition` (debt) on Liquidity. The Oracle program provides prices for collateral valuation and liquidation checks.
+
+### CPI summary
+
+| Caller  | Signer          | Supply position | Borrow position   |
+|---------|-----------------|-----------------|-------------------|
+| Vaults  | VaultConfig PDA | VaultConfig PDA | VaultConfig PDA   |
+
+---
+
+## Shared data flow
+
+Both Lending and Vaults share the same Liquidity layer:
+
+| Shared account     | Used by  | Role                                   |
+|--------------------|----------|----------------------------------------|
+| TokenReserve       | Both     | Aggregated supply/borrow per mint      |
+| UserSupplyPosition | Both     | Per-protocol supply                    |
+| UserBorrowPosition | Vaults   | Per-protocol borrow                    |
+| Vault (ATA)        | Both     | Liquidity holds all tokens             |
+| RateModel          | Both     | Interest rate parameters               |
+
+### Deposit (Earn)
+
+```
+User → Lending.deposit() → transfer tokens to Liquidity vault
+                         → pre_operate (Lending PDA)
+                         → operate(supply, borrow=0)
+                         → mint jltokens
+```
+
+### Borrow (Vaults)
+
+```
+User → Vaults.operate() → transfer collateral to vault
+                        → pre_operate (VaultConfig PDA)
+                        → operate(supply=collateral, borrow=debt)
+                        → update Position / Branch / Tick
+```
+
+---
+
+## Dependency graph
+
+| Program   | Depends on                                                  |
+|-----------|-------------------------------------------------------------|
+| Lending   | Liquidity (CPI), Lending Rewards Rate Model                 |
+| Vaults    | Liquidity (CPI), Oracle                                     |
+| Liquidity | Standalone                                                  |
+| Oracle    | Standalone                                                  |
+
+---
+
+## Related docs
+
+- [Earn Overview](/docs/lend/earn/index) — deposit/withdraw mechanics
+- [Borrow Overview](/docs/lend/borrow/index) — vaults, positions, liquidations
+- [Liquidity analytics](/docs/lend/liquidity/analytics) — market data, utilization, exchange prices
+- [Oracles](/docs/lend/architecture/oracles) — price feeds for vaults
+- [Program addresses](/docs/lend/program-addresses) — program IDs and IDL

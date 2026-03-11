@@ -61,6 +61,8 @@ const history = await historyResponse.json();
           "type": "deposit",
           "timestamp": 1704000000000,
           "txSignature": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d...",
+          "mint": "So11111111111111111111111111111111111111112",
+          "amount": "1000000000",
           "state": "success"
         }
       ]
@@ -103,6 +105,14 @@ Each order includes an `events` array tracking its lifecycle:
 | `cancelled` | Order cancelled by user |
 | `expired` | Order expired |
 
+Each event includes `type`, `timestamp`, and `state`. Events that involve token movement (`deposit`, `fill`, `withdrawal`) also include:
+
+| Field | Description |
+| :--- | :--- |
+| `txSignature` | On-chain transaction signature |
+| `mint` | Token mint address |
+| `amount` | Token amount (in smallest unit) |
+
 ## Order States
 
 Orders follow a state machine from creation to completion. The `orderState` field provides a human-friendly state, while `rawState` shows the exact internal state.
@@ -120,14 +130,25 @@ Orders follow a state machine from creation to completion. The `orderState` fiel
 | `expired` | Order expired before execution |
 | `failed` | Execution failed |
 
+### Raw States
+
+The `rawState` field provides more granular detail than `orderState`:
+
+| `orderState` | `rawState` | Meaning |
+| :--- | :--- | :--- |
+| `failed` | `deposit_failed` | Deposit transaction failed on-chain (e.g. insufficient balance) |
+| `cancelled` | `oco_cancelled` | Automatically cancelled because the other side of an OCO pair filled |
+
+All other raw states match their display state (e.g. `rawState: "open"` maps to `orderState: "open"`).
+
 ### State Flow
 
 ```
 pending ──→ open ──→ executing ──→ filled
-              │          │
-              │          └──→ failed
-              │
-              ├──→ expired
+   │          │          │
+   │          │          └──→ failed
+   └──→ failed│
+   (deposit)  ├──→ expired
               │
               └──→ pending_withdraw ──→ cancelled
 ```

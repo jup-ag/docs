@@ -132,14 +132,29 @@ Orders follow a state machine from creation to completion. The `orderState` fiel
 
 ### Raw States
 
-The `rawState` field provides more granular detail than `orderState`:
+The `rawState` field exposes the internal processing state. Multiple raw states map to each display state:
 
 | `orderState` | `rawState` | Meaning |
 | :--- | :--- | :--- |
-| `failed` | `deposit_failed` | Deposit transaction failed on-chain (e.g. insufficient balance) |
+| `pending` | `pending_deposit` | Deposit transaction not yet submitted |
+| `pending` | `depositing` | Deposit transaction submitted, awaiting confirmation |
+| `open` | `open` | Active and monitoring price |
+| `executing` | `ready_execute` | Price condition met, preparing swap |
+| `executing` | `ready_expire` | Order expiry detected, processing |
+| `executing` | `executing` | Swap transaction in flight |
+| `executing` | `execute_success` | Swap landed, validating output |
+| `executing` | `execute_failed` | Swap attempt failed, may retry |
+| `executing` | `ready_withdraw_output` | Output ready to withdraw to wallet |
+| `executing` | `withdrawing` | Withdrawal transaction in flight |
+| `filled` | `fill_success` | Order fully filled and output withdrawn |
+| `filled` | `partial_fill_success` | Order partially filled |
+| `pending_withdraw` | `ready_to_cancel` | Cancellation initiated, awaiting signed withdrawal |
+| `cancelled` | `cancelled` | User cancelled the order |
 | `cancelled` | `oco_cancelled` | Automatically cancelled because the other side of an OCO pair filled |
-
-All other raw states match their display state (e.g. `rawState: "open"` maps to `orderState: "open"`).
+| `expired` | `expired` | Order expired before execution |
+| `failed` | `deposit_failed` | Deposit transaction failed on-chain (e.g. insufficient balance) |
+| `failed` | `withdraw_failed` | Output withdrawal failed after execution |
+| `failed` | `fill_failed` | Fill validation failed after execution |
 
 ### State Flow
 

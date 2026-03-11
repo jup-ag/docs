@@ -27,7 +27,9 @@ components:
         error:
           type: string
         details:
-          type: string
+          type: object
+          additionalProperties:
+            type: string
       required:
         - error
     OrderResponse:
@@ -110,6 +112,21 @@ components:
               state:
                 type: string
                 enum: [success, failed, pending]
+              mint:
+                type: string
+                description: Token mint address (present on deposit/withdrawal events)
+              amount:
+                type: string
+                description: Token amount in smallest unit (present on deposit/withdrawal events)
+              outputMint:
+                type: string
+                description: Output token mint address (present on fill events)
+              outputAmount:
+                type: string
+                description: Output token amount in smallest unit (present on fill events)
+              orderContext:
+                type: string
+                description: Order context identifier (present on fill events)
       required:
         - id
         - orderType
@@ -274,6 +291,17 @@ paths:
       responses:
         '200':
           description: Token is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isValid:
+                    type: boolean
+                required:
+                  - isValid
+              example:
+                isValid: true
         '400':
           description: Invalid request
           content:
@@ -347,6 +375,10 @@ paths:
                   - privyVaultId
         '409':
           description: Vault already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /deposit/craft:
     post:

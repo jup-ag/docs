@@ -1,0 +1,112 @@
+---
+title: "Repay & Withdraw with Collateral"
+description: "Close a position when you hold only the collateral token."
+llmsDescription: "How to close a Jupiter Lend borrow position when you only hold the collateral token (e.g. SOL, not USDC). Uses a flashloan to borrow the debt asset, repay full debt and withdraw full collateral with getOperateIx using MAX_REPAY_AMOUNT and MAX_WITHDRAW_AMOUNT, swap collateral to debt via Jupiter Lite API, then payback the flashloan. All in a single atomic Solana transaction. Includes complete TypeScript code example."
+---
+
+<Info>
+  These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
+</Info>
+
+Close a borrow position when you hold only the **collateral token** (e.g. SOL), not the debt token (e.g. USDC). Use Jupiter **Lite API** for swap quotes and instructions.
+
+**Flow:**
+1. Flashloan debt asset (USDC) from Jupiter Lend
+2. Repay full debt and withdraw full collateral
+3. Swap collateral → debt (enough to cover the flashloan)
+4. Pay back the flashloan
+
+All of this happens atomically in one transaction.
+
+---
+
+## Repay & Withdraw
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    ```typescript
+    import {
+      AddressLookupTableAccount,
+      Connection,
+      Keypair,
+      PublicKey,
+      TransactionInstruction,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getFlashBorrowIx, getFlashPaybackIx } from "@jup-ag/lend/flashloan";
+    import { getOperateIx, MAX_REPAY_AMOUNT, MAX_WITHDRAW_AMOUNT } from "@jup-ag/lend/borrow";
+    ```
+  </Step>
+  <Step titleSize="h2" title="Set Parameters">
+    Hardcode `VAULT_ID`, `positionId` (NFT ID of your position), `debtAmount`, and `collateralSupply` (collateral to swap, in base units).
+
+    ```typescript
+    const VAULT_ID = 1;
+    const positionId = 7360; // NFT ID of your position
+    const debtAmount = new BN(20_000_100); // debt to repay (e.g. USDC 6 decimals)
+    const collateralSupply = new BN(1_000_000_059); // collateral to swap (e.g. SOL lamports)
+    ```
+  </Step>
+  <Step titleSize="h2" title="Get Flashloan Instructions">
+    Flashloan the **debt asset** (e.g. USDC).
+
+    ```typescript
+    const flashParams = { connection, signer, asset: usdcMint, amount: debtAmount };
+    const flashBorrowIx = await getFlashBorrowIx(flashParams);
+    const flashPaybackIx = await getFlashPaybackIx(flashParams);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Get Vault Operations (Repay + Withdraw)">
+    Use `getOperateIx` with `MAX_REPAY_AMOUNT` and `MAX_WITHDRAW_AMOUNT` to fully close the position.
+
+    ```typescript
+    const { ixs: operateIxs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId,
+      colAmount: MAX_WITHDRAW_AMOUNT,
+      debtAmount: MAX_REPAY_AMOUNT,
+      connection,
+      signer,
+    });
+    ```
+  </Step>
+  <Step titleSize="h2" title="Get Quote and Swap Instructions (Jupiter Lite API)">
+    Fetch a quote (swap collateral → debt). Ensure the swap output yields at least `debtAmount` of the debt token (account for slippage).
+
+    ```typescript
+    const LITE_API = "https://lite-api.jup.ag/swap/v1";
+    const quoteResponse = await fetch(
+      `${LITE_API}/quote?inputMint=${solMint.toBase58()}&outputMint=${usdcMint.toBase58()}&amount=${collateralSupply.toString()}&slippageBps=100`
+    ).then((r) => r.json());
+
+    const swapRes = await fetch(`${LITE_API}/swap-instructions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quoteResponse, userPublicKey: signer.toBase58() }),
+    }).then((r) => r.json());
+    const swapIx = jupIxToTransactionInstruction(swapRes.swapInstruction);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Assemble and Execute the Transaction">
+    **Order:** Flashloan Borrow (debt) → Repay + Withdraw → Swap (collateral → debt) → Flashloan Payback
+
+    ```typescript
+    const swapAlts = await getAddressLookupTableAccounts(connection, swapRes.addressLookupTableAddresses ?? []);
+    const allAlts = [...(addressLookupTableAccounts ?? []), ...swapAlts];
+
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: blockhash,
+      instructions: [flashBorrowIx, ...operateIxs, swapIx, flashPaybackIx],
+    }).compileToV0Message(allAlts);
+
+    const tx = new VersionedTransaction(message);
+    tx.sign([userKeypair]);
+    const signature = await connection.sendTransaction(tx, { skipPreflight: false, maxRetries: 3 });
+    console.log("Repay & Withdraw successful:", signature);
+    ```
+  </Step>
+</Steps>

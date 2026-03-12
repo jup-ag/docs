@@ -60,6 +60,10 @@ All of this happens atomically in a single Solana transaction.
     const userKeypair = loadKeypair(KEYPAIR_PATH);
     const connection = new Connection(RPC_URL, { commitment: "confirmed" });
     const signer = userKeypair.publicKey;
+
+    const solMint = new PublicKey("So11111111111111111111111111111111111111112");
+    const usdcMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    const initialCollateral = new BN(1_000_000_000); // 1 SOL @ 9 decimals
     ```
   </Step>
   <Step titleSize="h2" title="Get Flashloan Instructions">
@@ -90,6 +94,26 @@ All of this happens atomically in a single Solana transaction.
     if (swapRes.error) throw new Error(swapRes.error ?? "No swap instructions");
     const swapIx = jupIxToTransactionInstruction(swapRes.swapInstruction);
     ```
+
+    The `jupIxToTransactionInstruction` helper converts the JSON instruction from the API into a Solana `TransactionInstruction`:
+
+    ```typescript
+    function jupIxToTransactionInstruction(ix: {
+      programId: string;
+      accounts: Array<{ pubkey: string; isSigner: boolean; isWritable: boolean }>;
+      data: string;
+    }): TransactionInstruction {
+      return new TransactionInstruction({
+        programId: new PublicKey(ix.programId),
+        keys: ix.accounts.map((a) => ({
+          pubkey: new PublicKey(a.pubkey),
+          isSigner: a.isSigner,
+          isWritable: a.isWritable,
+        })),
+        data: Buffer.from(ix.data, "base64"),
+      });
+    }
+    ```
   </Step>
 
   <Step titleSize="h2" title="Get Vault Operations">
@@ -115,9 +139,30 @@ All of this happens atomically in a single Solana transaction.
 
     **Order:** Flashloan Borrow → Swap (USDC→SOL) → Vault Operate (deposit + borrow) → Flashloan Payback
 
+    The `getAddressLookupTableAccounts` helper resolves lookup table addresses into account objects:
+
+    ```typescript
+    async function getAddressLookupTableAccounts(
+      connection: Connection,
+      keys: string[]
+    ): Promise<AddressLookupTableAccount[]> {
+      if (!keys?.length) return [];
+      const infos = await connection.getMultipleAccountsInfo(keys.map((k) => new PublicKey(k)));
+      return infos.reduce((acc, info, i) => {
+        if (info) {
+          acc.push(new AddressLookupTableAccount({
+            key: new PublicKey(keys[i]),
+            state: AddressLookupTableAccount.deserialize(info.data),
+          }));
+        }
+        return acc;
+      }, [] as AddressLookupTableAccount[]);
+    }
+    ```
+
     ```typescript
     const swapAlts = await getAddressLookupTableAccounts(connection, swapRes.addressLookupTableAddresses ?? []);
-    const allAlts = [...addressLookupTableAccounts, ...swapAlts];
+    const allAlts = [...(addressLookupTableAccounts ?? []), ...swapAlts];
 
     const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
     const message = new TransactionMessage({

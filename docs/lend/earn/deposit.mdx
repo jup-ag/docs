@@ -27,9 +27,12 @@ Import the required packages for Solana RPC and Jupiter Earn SDK operations.
     Use the Jupiter Earn SDK to generate deposit instructions.
 
     ```typescript
+    const connection = new Connection("https://api.mainnet-beta.solana.com");
+    const signer = new PublicKey("YOUR_WALLET_ADDRESS");
+
     const { ixs: depositIxs } = await getDepositIxs({
-        new Connection("https://api.mainnet-beta.solana.com"),
-        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"), // signer
+        connection,
+        signer,
         asset: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"), // USDC Mint
         amount: new BN(10_000_000), // 10 USDC (6 decimals)
       });

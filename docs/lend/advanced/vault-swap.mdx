@@ -40,12 +40,26 @@ A vault swap moves your position from one vault to another atomically. Use Jupit
     import BN from "bn.js";
     import { getFlashBorrowIx, getFlashPaybackIx } from "@jup-ag/lend/flashloan";
     import { getOperateIx, MAX_REPAY_AMOUNT, MAX_WITHDRAW_AMOUNT } from "@jup-ag/lend/borrow";
+    import fs from "fs";
+    import path from "path";
     ```
   </Step>
   <Step titleSize="h2" title="Set Parameters">
     Hardcode vault IDs, `positionId` (NFT ID in vault 1), `debtAmount`, `collateralSupply`, and a borrow buffer (e.g. 2 USDC) for slippage.
 
     ```typescript
+    const KEYPAIR_PATH = "/path/to/your/keypair.json";
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    function loadKeypair(p: string): Keypair {
+      return Keypair.fromSecretKey(new Uint8Array(JSON.parse(fs.readFileSync(path.resolve(p), "utf8"))));
+    }
+    const userKeypair = loadKeypair(KEYPAIR_PATH);
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
+
+    const usdcMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    const usdtMint = new PublicKey("Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB");
+
     const VAULT_1_ID = 1; // SOL/USDC
     const VAULT_2_ID = 2; // SOL/USDT
     const positionId = 7360; // NFT ID of position in vault 1
@@ -106,9 +120,50 @@ A vault swap moves your position from one vault to another atomically. Use Jupit
     }).then((r) => r.json());
     const swapIx = jupIxToTransactionInstruction(swapRes.swapInstruction);
     ```
+
+    The `jupIxToTransactionInstruction` helper converts the JSON instruction from the API into a Solana `TransactionInstruction`:
+
+    ```typescript
+    function jupIxToTransactionInstruction(ix: {
+      programId: string;
+      accounts: Array<{ pubkey: string; isSigner: boolean; isWritable: boolean }>;
+      data: string;
+    }): TransactionInstruction {
+      return new TransactionInstruction({
+        programId: new PublicKey(ix.programId),
+        keys: ix.accounts.map((a) => ({
+          pubkey: new PublicKey(a.pubkey),
+          isSigner: a.isSigner,
+          isWritable: a.isWritable,
+        })),
+        data: Buffer.from(ix.data, "base64"),
+      });
+    }
+    ```
   </Step>
   <Step titleSize="h2" title="Assemble and Execute the Transaction">
     **Order:** Flashloan Borrow → Vault 1 Operate (repay + withdraw) → Vault 2 Operate (deposit + borrow) → Swap (new debt → USDC) → Flashloan Payback
+
+    The `getAddressLookupTableAccounts` helper resolves lookup table addresses into account objects:
+
+    ```typescript
+    async function getAddressLookupTableAccounts(
+      connection: Connection,
+      keys: string[]
+    ): Promise<AddressLookupTableAccount[]> {
+      if (!keys?.length) return [];
+      const infos = await connection.getMultipleAccountsInfo(keys.map((k) => new PublicKey(k)));
+      return infos.reduce((acc, info, i) => {
+        if (info) {
+          acc.push(new AddressLookupTableAccount({
+            key: new PublicKey(keys[i]),
+            state: AddressLookupTableAccount.deserialize(info.data),
+          }));
+        }
+        return acc;
+      }, [] as AddressLookupTableAccount[]);
+    }
+    ```
 
     ```typescript
     const swapAlts = await getAddressLookupTableAccounts(connection, swapRes.addressLookupTableAddresses ?? []);

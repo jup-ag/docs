@@ -1,0 +1,185 @@
+---
+title: "Withdraw from Earn with Privy"
+description: "Withdraw assets from Jupiter Earn vaults using Privy embedded wallets."
+llmsDescription: "How to withdraw from Jupiter Earn vaults using Privy embedded wallets. Covers PrivyClient setup, getWithdrawIxs from @jup-ag/lend/earn, optional getUserPosition from @jup-ag/lend-read for max withdraw, building VersionedTransaction, signing via privy.wallets().solana().signTransaction, and sending the transaction. Complete flow for keyless Earn withdrawals."
+---
+
+Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can redeem their yield-earning position without managing their own private keys.
+
+---
+
+## Withdraw from Earn with Privy
+
+<Steps>
+  <Step>
+    ### Import Dependencies
+
+    Import the required packages for Privy client, Solana RPC, Jupiter Lend Earn SDK, and Read SDK for position data.
+
+    ```typescript
+    import { PrivyClient } from "@privy-io/node";
+    import {
+      Connection,
+      PublicKey,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getWithdrawIxs } from "@jup-ag/lend/earn";
+    import { Client } from "@jup-ag/lend-read";
+    ```
+  </Step>
+
+  <Step>
+    ### Configure Privy and Initialize Client
+
+    Set up your Privy credentials and Solana connection.
+
+    ```typescript
+    const PRIVY_APP_ID = "put-your-privy-app-id-here";
+    const PRIVY_APP_SECRET = "put-your-privy-app-secret-here";
+    const RPC_ENDPOINT = "https://api.mainnet-beta.solana.com";
+    const ASSET_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC
+    const WITHDRAW_AMOUNT = new BN(10_000_000); // 10 USDC (6 decimals)
+    const AUTH_KEY_PRIVATE = "put-your-auth-key-private-here";
+    const WALLET_ID = "put-your-wallet-id-here";
+
+    const privy = new PrivyClient({
+      appId: PRIVY_APP_ID,
+      appSecret: PRIVY_APP_SECRET,
+    });
+
+    const connection = new Connection(RPC_ENDPOINT);
+    const readClient = new Client(connection);
+    ```
+
+    <Note>
+      Update the configuration values with your Privy app credentials.
+    </Note>
+  </Step>
+
+  <Step>
+    ### Get Wallet and Withdraw Amount
+
+    Retrieve the Privy wallet and optionally fetch the user's position to withdraw all or a specific amount.
+
+    ```typescript
+    const wallet = await privy.wallets().get(WALLET_ID);
+    const signer = new PublicKey(wallet.address);
+
+    // For max withdraw: fetch position and use underlyingAssets
+    const position = await readClient.lending.getUserPosition(
+      new PublicKey(ASSET_MINT),
+      signer
+    );
+    const withdrawAmount = WITHDRAW_AMOUNT; // or position.underlyingAssets for full withdraw
+
+    if (position.underlyingAssets.isZero()) {
+      throw new Error("No Earn position to withdraw");
+    }
+    ```
+
+    <Info>
+      Use `position.underlyingAssets` to withdraw the full position. Use a specific `BN` amount to withdraw a partial amount.
+    </Info>
+  </Step>
+
+  <Step>
+    ### Build Withdraw Instructions
+
+    Use the Jupiter Lend Earn SDK to generate withdraw instructions.
+
+    ```typescript
+    const { ixs: withdrawIxs } = await getWithdrawIxs({
+      connection,
+      signer,
+      asset: new PublicKey(ASSET_MINT),
+      amount: withdrawAmount,
+    });
+
+    if (!withdrawIxs?.length) {
+      throw new Error("No withdraw instructions returned by Jupiter Lend SDK");
+    }
+    ```
+  </Step>
+
+  <Step>
+    ### Build Transaction Message
+
+    Build an unsigned transaction that Privy will sign.
+
+    ```typescript
+    const { blockhash, lastValidBlockHeight } =
+      await connection.getLatestBlockhash("finalized");
+
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: blockhash,
+      instructions: withdrawIxs,
+    }).compileToV0Message();
+
+    const transaction = new VersionedTransaction(message);
+    const serializedTx = Buffer.from(transaction.serialize()).toString("base64");
+    ```
+  </Step>
+
+  <Step>
+    ### Sign Transaction with Privy
+
+    Send the serialized transaction to Privy for signing.
+
+    ```typescript
+    const signResponse = await privy
+      .wallets()
+      .solana()
+      .signTransaction(WALLET_ID, {
+        transaction: serializedTx,
+        authorization_context: {
+          authorization_private_keys: [AUTH_KEY_PRIVATE],
+        },
+      });
+    ```
+
+    <Info>
+      Privy signs the transaction on behalf of the embedded wallet. The private key never leaves Privy's infrastructure.
+    </Info>
+  </Step>
+
+  <Step>
+    ### Send Transaction
+
+    Submit the signed transaction to the Solana network.
+
+    ```typescript
+    const signedTxBytes = Buffer.from(
+      signResponse.signed_transaction as string,
+      "base64"
+    );
+    const signature = await connection.sendRawTransaction(signedTxBytes, {
+      skipPreflight: true,
+    });
+    await connection.confirmTransaction(
+      { signature, blockhash, lastValidBlockHeight },
+      "confirmed"
+    );
+    console.log("Withdrawal successful! Signature:", signature);
+    ```
+
+    <Check>
+      The withdrawal is complete. The user's vault shares have been redeemed for underlying tokens (e.g. USDC) in their Privy wallet.
+    </Check>
+  </Step>
+</Steps>
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Deposit to Earn with Privy" icon="wallet" href="/docs/lend/earn/privy-deposit">
+    Deposit into Earn using Privy wallets
+  </Card>
+  <Card title="Withdraw from Earn" icon="arrow-right-from-bracket" href="/docs/lend/earn/withdraw">
+    Standard Earn withdraw with keypair signing
+  </Card>
+</CardGroup>

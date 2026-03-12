@@ -46,7 +46,8 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @privy-io/node
     const RPC_ENDPOINT = "https://api.mainnet-beta.solana.com";
     const ASSET_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC
     const DEPOSIT_AMOUNT = new BN(10_000_000); // 10 USDC (6 decimals)
-    const AUTH_KEY_PRIVATE = "put-your-auth-key-private-here";
+    const AUTH_KEY_ID = "put-your-auth-key-id-here"; // from Privy dashboard or REST API
+    const AUTH_KEY_PRIVATE = "put-your-auth-key-private-here"; // P-256 private key
     const WALLET_ID = "put-your-wallet-id-here";
 
     const privy = new PrivyClient({
@@ -58,7 +59,9 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @privy-io/node
     ```
 
     <Note>
-      Update the configuration values with your Privy app credentials. Ensure the Privy wallet holds SOL (for fees) and USDC (for deposit). Generate an authorization key via the [Privy dashboard](https://docs.privy.io/controls/authorization-keys/keys/create/key) or `generateP256KeyPair()` from `@privy-io/node`.
+      Update the configuration values with your Privy app credentials. Ensure the Privy wallet holds SOL (for fees) and USDC (for deposit).
+
+      **Authorization keys:** Generate a P-256 key pair via the [Privy dashboard](https://docs.privy.io/controls/authorization-keys/keys/create/key), `generateP256KeyPair()` from `@privy-io/node`, or OpenSSL. The dashboard/API returns a **key ID** (`AUTH_KEY_ID`) used to identify the key when configuring wallet ownership. The **private key** (`AUTH_KEY_PRIVATE`) is used in the `authorization_context` when signing transactions. See the [Privy authorization keys docs](https://docs.privy.io/controls/authorization-keys/owners/overview) for details.
     </Note>
   </Step>
 

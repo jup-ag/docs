@@ -120,6 +120,7 @@ Core product documentation covering each Jupiter API with usage guides and code 
 - [Create Order](https://dev.jup.ag/docs/trigger/create-order.md): POST /trigger/v2/deposit/craft builds a deposit transaction. POST /trigger/v2/orders/price creates single, OCO, or OTOCO orders with the signed deposit. Requires JWT authentication. Minimum order: 10 USD.
 - [Manage Orders](https://dev.jup.ag/docs/trigger/manage-orders.md): PATCH /trigger/v2/orders/price/{orderId} updates order parameters. POST /trigger/v2/orders/price/cancel/{orderId} initiates cancellation and returns a withdrawal transaction. POST /trigger/v2/orders/price/confirm-cancel/{orderId} confirms with the signed withdrawal transaction.
 - [Order History](https://dev.jup.ag/docs/trigger/order-history.md): GET /trigger/v2/orders/history returns paginated order history with state, events, and fill details. Filter by state (active/past), mint, and sort by updated_at/created_at/expires_at.
+- [Best Practices](https://dev.jup.ag/docs/trigger/best-practices.md): Best practices for Trigger Order V2 integrations: order expiry is required (TTL improves execution quality), slippage recommendations by order type, error handling patterns, reference jup.ag frontend for implementation guidance.
 
 #### V1
 

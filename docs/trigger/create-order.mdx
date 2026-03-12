@@ -1,10 +1,15 @@
 ---
 title: "Create Order"
+tag: "Beta"
 description: "Create trigger orders with vault-based deposits. Supports single limit orders, OCO (take-profit/stop-loss), and OTOCO (conditional chains)."
 llmsDescription: "POST /trigger/v2/deposit/craft builds a deposit transaction. POST /trigger/v2/orders/price creates single, OCO, or OTOCO orders with the signed deposit. Requires JWT authentication. Minimum order: 10 USD."
 ---
 
 Creating an order in V2 is a two-step process: craft and sign a deposit transaction, then submit it alongside your order parameters.
+
+<Tip>
+For a working reference of the full order creation flow, see how [jup.ag](https://jup.ag) handles it. The frontend implements the same API with validation, error handling, and UX patterns you can use as a guide.
+</Tip>
 
 ## Prerequisites
 
@@ -217,7 +222,7 @@ const orderResponse = await fetch('https://api.jup.ag/trigger/v2/orders/price', 
 | `inputAmount` | `string` | Yes | Amount in smallest unit (lamports, etc.) |
 | `outputMint` | `string` | Yes | Mint address of the token to buy |
 | `triggerMint` | `string` | Yes | Mint address to monitor for price trigger |
-| `expiresAt` | `number` | No | Expiration timestamp in milliseconds |
+| `expiresAt` | `number` | Yes | Expiration timestamp in milliseconds |
 
 ### Single Order Fields
 
@@ -264,8 +269,12 @@ Stop-loss orders use a higher default because execution certainty is more import
 - Minimum order size: 10 USD
 - Input and output mints must be different
 - Slippage: 0-10000 basis points
-- `expiresAt` must be a future timestamp (milliseconds)
+- `expiresAt` is required and must be a future timestamp (milliseconds)
 - OCO/OTOCO: take-profit price must be greater than stop-loss price
+
+<Note>
+Unlike V1 where orders could exist indefinitely, V2 requires an expiration on every order. Adding a TTL allows the system to prune orders that are unlikely to fill, improving execution quality for active orders. For long-lived orders, use a far-future timestamp (e.g. 30 days).
+</Note>
 
 ## Response
 

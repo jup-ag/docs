@@ -36,6 +36,7 @@ paths:
         - $ref: '#/components/parameters/MaxAccountsParameter'
         - $ref: '#/components/parameters/InstructionVersion'
         - $ref: '#/components/parameters/DynamicSlippage'
+        - $ref: '#/components/parameters/ForJitoBundle'
       responses:
         '200':
           description: "Successful response to be used in `/swap`"
@@ -742,6 +743,14 @@ components:
       name: dynamicSlippage
       description: |
         - No longer applicable, only required to pass in via `/swap` endpoint
+      in: query
+      schema:
+        type: boolean
+        default: false
+    ForJitoBundle:
+      name: forJitoBundle
+      description: |
+        Set to `true` if the quote will be used in a Jito bundle. This excludes DEXes that are incompatible with Jito bundles (e.g. HumidiFi).
       in: query
       schema:
         type: boolean

@@ -258,22 +258,32 @@
                 "pages": ["docs/trigger/index"]
               },
               {
-                "group": "Trigger API",
+                "group": "Trigger Order API",
+                "tag": "BETA",
                 "pages": [
+                  "docs/trigger/authentication",
                   "docs/trigger/create-order",
-                  "docs/trigger/execute-order"
+                  "docs/trigger/manage-orders",
+                  "docs/trigger/order-history",
+                  "docs/trigger/best-practices"
                 ]
               },
               {
-                "group": "Order Management",
+                "group": " ",
                 "pages": [
-                  "docs/trigger/cancel-order",
-                  "docs/trigger/get-trigger-orders"
+                  {
+                    "group": "Trigger Order API V1",
+                    "expanded": false,
+                    "pages": [
+                      "docs/trigger/v1/index",
+                      "docs/trigger/v1/create-order",
+                      "docs/trigger/v1/execute-order",
+                      "docs/trigger/v1/cancel-order",
+                      "docs/trigger/v1/get-trigger-orders",
+                      "docs/trigger/v1/best-practices"
+                    ]
+                  }
                 ]
-              },
-              {
-                "group": "Debugging",
-                "pages": ["docs/trigger/best-practices"]
               }
             ]
           },
@@ -599,11 +609,35 @@
                 "group": "Trigger",
                 "pages": [
                   "api-reference/trigger",
-                  "api-reference/trigger/create-order",
-                  "api-reference/trigger/execute",
-                  "api-reference/trigger/cancel-order",
-                  "api-reference/trigger/cancel-orders",
-                  "api-reference/trigger/get-trigger-orders"
+                  {
+                    "group": "V2",
+                    "tag": "BETA",
+                    "pages": [
+                      "api-reference/trigger/v2",
+                      "api-reference/trigger/v2/challenge",
+                      "api-reference/trigger/v2/verify",
+                      "api-reference/trigger/v2/verify-token",
+                      "api-reference/trigger/v2/vault",
+                      "api-reference/trigger/v2/vault-register",
+                      "api-reference/trigger/v2/deposit-craft",
+                      "api-reference/trigger/v2/create-order",
+                      "api-reference/trigger/v2/update-order",
+                      "api-reference/trigger/v2/cancel-order",
+                      "api-reference/trigger/v2/confirm-cancel",
+                      "api-reference/trigger/v2/order-history"
+                    ]
+                  },
+                  {
+                    "group": "V1",
+                    "pages": [
+                      "api-reference/trigger/v1",
+                      "api-reference/trigger/v1/create-order",
+                      "api-reference/trigger/v1/execute",
+                      "api-reference/trigger/v1/cancel-order",
+                      "api-reference/trigger/v1/cancel-orders",
+                      "api-reference/trigger/v1/get-trigger-orders"
+                    ]
+                  }
                 ]
               },
               {
@@ -887,6 +921,26 @@
     {
       "source": "/docs/api/trigger-api/:slug*",
       "destination": "/api-reference/trigger/:slug*"
+    },
+    {
+      "source": "/api-reference/trigger/create-order",
+      "destination": "/api-reference/trigger/v1/create-order"
+    },
+    {
+      "source": "/api-reference/trigger/execute",
+      "destination": "/api-reference/trigger/v1/execute"
+    },
+    {
+      "source": "/api-reference/trigger/cancel-order",
+      "destination": "/api-reference/trigger/v1/cancel-order"
+    },
+    {
+      "source": "/api-reference/trigger/cancel-orders",
+      "destination": "/api-reference/trigger/v1/cancel-orders"
+    },
+    {
+      "source": "/api-reference/trigger/get-trigger-orders",
+      "destination": "/api-reference/trigger/v1/get-trigger-orders"
     },
     {
       "source": "/docs/api/token-api/:slug*",

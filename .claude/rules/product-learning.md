@@ -125,4 +125,33 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 ---
 
+# Trigger Order API
+
+## Architecture
+
+- [2026-03-10] V2 uses vault-based architecture with Privy-managed custodial wallets. Deposits go into vault accounts, not PDA order accounts like V1.
+- [2026-03-10] JWT authentication via challenge-response flow. Challenge types: `message` (standard wallets) or `transaction` (hardware wallets). Challenge TTL: 5 min, JWT TTL: 24h.
+- [2026-03-10] All fund operations (deposits, withdrawals) require wallet signature. A leaked JWT can cancel/edit orders but cannot move funds.
+- [2026-03-10] Cancellation is two-step: initiate (order moves to `ready_to_cancel`, preventing fills) then sign withdrawal tx and confirm.
+
+## Order Types
+
+- [2026-03-10] Three order types: `single` (price limit), `oco` (one-cancels-other TP/SL pair sharing one deposit), `otoco` (parent trigger activates OCO on fill).
+- [2026-03-10] Default slippage: TP/buy-below uses RTSE auto slippage, SL/buy-above defaults to 20% (2000 bps) for execution certainty.
+- [2026-03-10] V2 triggers on USD price (not pool rate like V1). Output amount is not guaranteed.
+
+## Source Code
+
+- [2026-03-10] V2 API source: `Documents/Projects/trigger-order/api-v2/` — Hono.js on Cloudflare Workers with Zod OpenAPI validation.
+- [2026-03-10] Vault register returns 200 on success, 409 if vault already exists (not 201 despite the source returning 200 — user confirmed 201 is the intended documented behaviour).
+- [2026-03-10] DCA order routes exist in source (`/orders/dca/`) but are intentionally excluded from docs.
+- [2026-03-10] Vault link routes (`/vault/link`) exist but are hidden/internal.
+
+## Open Questions
+
+- [2026-03-10] Vault register: source returns 200 but docs say 201. Which is correct?
+- [2026-03-10] Are `/vault/link` endpoints needed in public docs?
+
+---
+
 <!-- Please add sections for the other APIs or products when necessary -->

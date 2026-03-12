@@ -1,12 +1,74 @@
 ---
 title: "Best Practices"
-description: "Guidelines for trigger order minimum amounts, price validation, slippage settings, and token compatibility."
+description: "Guidelines for order expiry, slippage, error handling, and integration patterns for the Trigger Order V2 API."
+llmsDescription: "Best practices for Trigger Order V2 integrations: order expiry is required (TTL improves execution quality), slippage recommendations by order type, error handling patterns, reference jup.ag frontend for implementation guidance."
 ---
 
-| Item                                                                                                  | Recommendation                                                                                                                                                                                                                                                                                                                                                                                |
-| :---------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The program will accept any value to create an order.                                                 | On jup.ag, our frontend enforces a minimum of 5 USD per order to be created, this will ensure our keepers can accommodate for no loss in transaction fees coverage. However, programmatically, if you do not enforce this, the user can still create an order.                                                                                                                                |
-| The program does not check the price or rate of the order, and the keeper will execute as instructed. | On our frontend, when user attempts to set the rate to buy above market price, we provide warnings and disable the execution if above 5%. If the order is created with such rates, the keeper will execute as instructed. For example, if user sets to Sell 1000 USDC to Buy 1 SOL at the rate of 1000 SOL/USDC, the keeper will execute as instructed and the additional funds will be lost. |
-| Tokens with transfer tax extension are disabled.                                                      | Our frontend informs the user if the token has transfer tax.                                                                                                                                                                                                                                                                                                                                  |
-| Token2022 tokens with transfer tax extension are disabled.                                            | Our frontend informs the user if the token has transfer tax.                                                                                                                                                                                                                                                                                                                                  |
-| Trigger orders with slippage.                                                                         | By nature, trigger orders execute with 0 slippage. However, you can add slippage to the order to ensure the order is filled but at the cost of slippage.                                                                                                                                                                                                                                      |
+<Info>
+The Trigger Order V2 API is in **beta** and under active development. Behaviour, endpoints, and response formats may change as we iterate based on integrator feedback. Pin to specific response schemas and handle unknown fields gracefully.
+</Info>
+
+## Reference Implementation
+
+The [jup.ag](https://jup.ag) frontend is the canonical reference for how to interact with the V2 API. When in doubt about edge cases, validation logic, or UX patterns, refer to how jup.ag handles it. This includes:
+
+- Order creation flows and parameter validation
+- Price and slippage presentation
+- Error handling and retry logic
+- Order state management and polling
+
+## Order Expiry
+
+Every order requires an `expiresAt` timestamp. Unlike V1 where orders could exist indefinitely, V2 enforces expiry on all orders. This allows the system to prune stale orders, improving execution quality for active orders.
+
+| Use case | Recommended expiry |
+| :--- | :--- |
+| Short-term trades | 1-7 days |
+| Swing trades | 7-30 days |
+| Long-duration positions | 30 days, with periodic renewal |
+
+For long-lived orders, set a 30-day expiry and renew by updating the order before it expires via the [update endpoint](/docs/trigger/manage-orders#update-an-order). There is no "no expiry" option by design.
+
+## Slippage
+
+| Order type | Default | Recommendation |
+| :--- | :--- | :--- |
+| Take-profit / buy below | Auto (RTSE) | Use the default unless you have specific requirements |
+| Stop-loss / buy above | 20% (2000 bps) | Keep high for execution certainty -- tighten only if you accept missed fills |
+| Parent (OTOCO) | Auto (RTSE) | Use the default |
+
+Stop-loss orders use a higher default because execution certainty matters more than price precision when cutting losses. If you lower stop-loss slippage, the order may not fill during volatile conditions.
+
+## Error Handling
+
+- **Validation errors** (400) include a `details` object with per-field messages. Parse these to surface specific issues to users.
+- **Authentication errors** (401) mean the JWT has expired. Re-authenticate with a new challenge-response flow rather than retrying the same token.
+- **Minimum order size** is 10 USD. Enforce this client-side to avoid unnecessary API calls.
+- Handle unknown fields in responses gracefully. As the API evolves during beta, new fields may be added to response objects.
+
+## Order Summary
+
+The API does not validate whether your trigger price makes economic sense. If a user sets a buy order above market price or a sell order below market price, the keeper will execute as instructed and the difference is lost.
+
+Display a human-readable summary of what the order will do before the user confirms. On [jup.ag](https://jup.ag), the confirmation shows a plain-language description like:
+
+> Buy SOL with 15 USDC when price goes below $76.37 (-10% from market). If triggered, automatically set TP for SOL at $84.01.
+
+This helps users catch mistakes before submitting. For OCO and OTOCO orders, include both the trigger conditions and the child order parameters in the summary.
+
+## Token Compatibility
+
+- Tokens with transfer tax extensions (Token-2022) are not supported
+- Input and output mints must be different
+
+## Order Lifecycle
+
+Poll the [history endpoint](/docs/trigger/order-history) to track order state. Key states to handle:
+
+| State | Meaning | Action |
+| :--- | :--- | :--- |
+| `open` | Active, waiting for trigger | No action needed |
+| `filled` | Fully executed | Show completion to user |
+| `cancelled` | Cancelled by user | Confirm funds returned to vault |
+| `expired` | Past `expiresAt` | Prompt user to withdraw funds or recreate |
+| `failed` | Execution failed | Show error, suggest retry with adjusted parameters |

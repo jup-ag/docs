@@ -177,3 +177,8 @@ Format: `- [YYYY-MM-DD] Decision: rationale`
 - [2026-02-26] Tone set to "technical but approachable": professional and precise, not cold or overly formal. No em dashes for asides.
 - [2026-03-09] API guide code examples should cover the full lifecycle (e.g. quote → build → sign → send) and include error handling at each stage, not just the happy path. Developers copy code from guides directly.
 - [2026-03-09] When documenting API response schemas, always verify examples against the live API. OpenAPI specs can drift from actual responses, especially for newer APIs.
+- [2026-03-10] Dollar signs in Mintlify must be escaped as `\$` to prevent math/LaTeX rendering (e.g. `\$300` not `$300`).
+- [2026-03-10] OpenAPI security schemes: separate array items = OR, same object = AND. For endpoints requiring both API key and Bearer auth, use `- ApiKeyAuth: []\n  BearerAuth: []` (same item), not separate items.
+- [2026-03-10] V1 collapsed dropdown pattern: use `"expanded": false` on the group in `docs.json` nav (same pattern as Metis Swap in Ultra docs).
+- [2026-03-10] API reference overview pages should list endpoints grouped by category with `<CardGroup>` cards linking to each endpoint (see Prediction API as reference pattern).
+- [2026-03-10] Code examples for transaction signing should use actual imports (`VersionedTransaction` from `@solana/web3.js`, `bs58`) not placeholder functions like `deserializeTransaction()`.

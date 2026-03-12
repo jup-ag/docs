@@ -115,12 +115,21 @@ Core product documentation covering each Jupiter API with usage guides and code 
 
 ### Trigger
 
-- [Trigger (Limit Orders) API Overview](https://dev.jup.ag/docs/trigger/index.md): Create limit orders that execute automatically when the target price is reached. Supports any token pair, custom fees, and order expiry.
-- [Create Order](https://dev.jup.ag/docs/trigger/create-order.md): POST /trigger/v1/createOrder builds a limit order transaction. Required params: inputMint, outputMint, maker, payer, makingAmount, takingAmount.
-- [Execute Order](https://dev.jup.ag/docs/trigger/execute-order.md): POST /trigger/v1/execute submits a filled trigger order. Jupiter automatically monitors and executes orders when the target price is reached.
-- [Cancel Order](https://dev.jup.ag/docs/trigger/cancel-order.md): POST /trigger/v1/cancelOrder cancels an open trigger order and returns unfilled tokens to the maker.
-- [Get Trigger Orders](https://dev.jup.ag/docs/trigger/get-trigger-orders.md): GET /trigger/v1/getTriggerOrders returns open and historical trigger orders filtered by wallet, status, or token pair.
-- [Best Practices](https://dev.jup.ag/docs/trigger/best-practices.md): Guidelines for trigger order minimum amounts, price validation, slippage settings, and token compatibility.
+- [Trigger Order API Overview](https://dev.jup.ag/docs/trigger/index.md): Jupiter Trigger Order API V2 enables vault-based limit orders on Solana. Supports single price orders, OCO (one-cancels-other for TP/SL), and OTOCO (one-triggers-OCO) order types. Requires JWT authentication via challenge-response flow. Deposits go into vault accounts managed by Privy.
+- [Authentication](https://dev.jup.ag/docs/trigger/authentication.md): POST /trigger/v2/auth/challenge requests a challenge (message or transaction). POST /trigger/v2/auth/verify submits the signed challenge and returns a JWT token (24h TTL). Use the JWT in Authorization: Bearer header for all authenticated endpoints.
+- [Create Order](https://dev.jup.ag/docs/trigger/create-order.md): POST /trigger/v2/deposit/craft builds a deposit transaction. POST /trigger/v2/orders/price creates single, OCO, or OTOCO orders with the signed deposit. Requires JWT authentication. Minimum order: 10 USD.
+- [Manage Orders](https://dev.jup.ag/docs/trigger/manage-orders.md): PATCH /trigger/v2/orders/price/{orderId} updates order parameters. POST /trigger/v2/orders/price/cancel/{orderId} initiates cancellation and returns a withdrawal transaction. POST /trigger/v2/orders/price/confirm-cancel/{orderId} confirms with the signed withdrawal transaction.
+- [Order History](https://dev.jup.ag/docs/trigger/order-history.md): GET /trigger/v2/orders/history returns paginated order history with state, events, and fill details. Filter by state (active/past), mint, and sort by updated_at/created_at/expires_at.
+- [Best Practices](https://dev.jup.ag/docs/trigger/best-practices.md): Best practices for Trigger Order V2 integrations: order expiry is required (TTL improves execution quality), slippage recommendations by order type, error handling patterns, reference jup.ag frontend for implementation guidance.
+
+#### V1
+
+- [Trigger (Limit Orders) API Overview](https://dev.jup.ag/docs/trigger/v1/index.md): Create limit orders that execute automatically when the target price is reached. Supports any token pair, custom fees, and order expiry.
+- [Create Order](https://dev.jup.ag/docs/trigger/v1/create-order.md): POST /trigger/v1/createOrder builds a limit order transaction. Required params: inputMint, outputMint, maker, payer, makingAmount, takingAmount.
+- [Execute Order](https://dev.jup.ag/docs/trigger/v1/execute-order.md): POST /trigger/v1/execute submits a filled trigger order. Jupiter automatically monitors and executes orders when the target price is reached.
+- [Cancel Order](https://dev.jup.ag/docs/trigger/v1/cancel-order.md): POST /trigger/v1/cancelOrder cancels an open trigger order and returns unfilled tokens to the maker.
+- [Get Trigger Orders](https://dev.jup.ag/docs/trigger/v1/get-trigger-orders.md): GET /trigger/v1/getTriggerOrders returns open and historical trigger orders filtered by wallet, status, or token pair.
+- [Best Practices](https://dev.jup.ag/docs/trigger/v1/best-practices.md): Guidelines for trigger order minimum amounts, price validation, slippage settings, and token compatibility.
 
 ### Recurring
 
@@ -186,7 +195,7 @@ OpenAPI specifications for every Jupiter endpoint.
 - [Jupiter Price API V3](https://dev.jup.ag/openapi-spec/price/v3/price.yaml): Jupiter Price API V3 Schema
 - [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
 - [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
-- [Jupiter Trigger Order API](https://dev.jup.ag/openapi-spec/trigger/trigger.yaml): Jupiter Trigger Order API Schema
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
 - [Jupiter Recurring Order API](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Jupiter Recurring Order API Schema
 - [Jupiter Portfolio API](https://dev.jup.ag/openapi-spec/portfolio/portfolio.yaml): Jupiter Portfolio API Schema
 - [Jupiter Send API](https://dev.jup.ag/openapi-spec/send/send.yaml): Jupiter Send API Schema

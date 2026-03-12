@@ -24,6 +24,17 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-03-09] Extract sub-guides from comprehensive guides
+**Status:** accepted
+**Scope:** folder-structure
+**Files affected:** `guides/` section
+**Linear issue:** DEVREL-56 (spawned DEVREL-68, DEVREL-69)
+
+**Context:** The Metis Swap guide (DEVREL-56) grew to cover quoting, building, signing, sending, error handling, route debugging, and execution optimisation. Cramming it all into one page made it too long and hard to navigate.
+**Decision:** When a guide exceeds ~200 lines or covers 3+ distinct topics, extract focused sub-guides into separate Linear issues.
+**Rationale:** Shorter, focused pages are easier to find, link to, and maintain. Each sub-guide can be reviewed independently.
+**Alternatives considered:** Keep everything in one long page with anchor links. Rejected because it makes navigation and updates harder.
+
 ### [2026-03-10] Restructure Trigger API reference and docs for V2
 **Status:** implemented
 **Scope:** folder-structure | navigation | redirect

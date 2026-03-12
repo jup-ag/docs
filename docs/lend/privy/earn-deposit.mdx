@@ -4,7 +4,7 @@ description: "Deposit assets into Jupiter Earn vaults using Privy embedded walle
 llmsDescription: "How to deposit into Jupiter Earn vaults using Privy embedded wallets. Covers PrivyClient setup, wallet creation, getDepositIxs from @jup-ag/lend/earn to build deposit instructions, building VersionedTransaction for Privy signing, signing via privy.wallets().solana().signTransaction, and sending the transaction. Complete flow for keyless Earn deposits."
 ---
 
-Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can earn yield without managing their own private keys.
+Deposit assets into Jupiter Earn vaults using Privy embedded wallets, allowing your users to earn yield without managing their own private keys.
 
 ## Prerequisites
 
@@ -164,9 +164,7 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @privy-io/node
     console.log("Deposit successful! Signature:", signature);
     ```
 
-    <Tip>
-      The deposit is complete. The user's funds are now earning yield in Jupiter Earn via their Privy embedded wallet.
-    </Tip>
+    The deposit is complete. The funds are now earning yield in Jupiter Earn via the Privy embedded wallet.
   </Step>
 </Steps>
 

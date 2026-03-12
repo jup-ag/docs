@@ -4,12 +4,12 @@ description: "Withdraw assets from Jupiter Earn vaults using Privy embedded wall
 llmsDescription: "How to withdraw from Jupiter Earn vaults using Privy embedded wallets. Covers PrivyClient setup, getWithdrawIxs from @jup-ag/lend/earn, optional getUserPosition from @jup-ag/lend-read for max withdraw, building VersionedTransaction, signing via privy.wallets().solana().signTransaction, and sending the transaction. Complete flow for keyless Earn withdrawals."
 ---
 
-Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can redeem their yield-earning position without managing their own private keys.
+Withdraw assets from Jupiter Earn vaults using Privy embedded wallets, allowing your users to redeem their yield-earning position without managing their own private keys.
 
 ## Prerequisites
 
 ```bash
-npm install @solana/web3.js@1 bn.js @jup-ag/lend @privy-io/node
+npm install @solana/web3.js@1 bn.js @jup-ag/lend @jup-ag/lend-read @privy-io/node
 ```
 
 ---
@@ -184,9 +184,7 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @privy-io/node
     console.log("Withdrawal successful! Signature:", signature);
     ```
 
-    <Tip>
-      The withdrawal is complete. The user's vault shares have been redeemed for underlying tokens (e.g. USDC) in their Privy wallet.
-    </Tip>
+    The withdrawal is complete. The vault shares have been redeemed for underlying tokens (e.g. USDC) in the Privy wallet.
   </Step>
 </Steps>
 

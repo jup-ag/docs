@@ -1,7 +1,7 @@
 ---
 title: "Borrow with Privy"
 description: "Create a position, deposit collateral, and borrow assets using Privy embedded wallets."
-llmsDescription: "How to create a borrow position, deposit collateral, and borrow assets from Jupiter Lend vaults using Privy embedded wallets. Covers PrivyClient setup, getInitPositionIx and getOperateIx from @jup-ag/lend/borrow, versioned transactions with address lookup tables, Privy signing via privy.wallets().solana().signTransaction, and the full create-deposit-borrow flow. Complete guide for keyless borrowing."
+llmsDescription: "How to create a borrow position, deposit collateral, and borrow assets from Jupiter Lend vaults using Privy embedded wallets. Covers PrivyClient setup, getOperateIx from @jup-ag/lend/borrow with positionId 0 for batched create-and-deposit, versioned transactions with address lookup tables, Privy signing via privy.wallets().solana().signTransaction, and the full create-deposit-borrow flow. Complete guide for keyless borrowing."
 ---
 
 Create a borrow position, deposit collateral, and borrow assets from Jupiter Lend vaults using Privy embedded wallets. The full flow uses two transactions: one to create a position and deposit collateral, and one to borrow.
@@ -95,9 +95,7 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @privy-io/node
     }
     ```
 
-    <Info>
-      Save `nftId` for subsequent operations (borrow, repay, withdraw). With `positionId: 0`, the SDK batches position creation and collateral deposit into one transaction.
-    </Info>
+    Save `nftId` for subsequent operations (borrow, repay, withdraw). With `positionId: 0`, the SDK batches position creation and collateral deposit into one transaction.
   </Step>
 
   <Step>
@@ -237,9 +235,7 @@ Once you have a position with deposited collateral, borrow assets against it.
     console.log("Borrow successful! Signature:", borrowSig);
     ```
 
-    <Tip>
-      The borrowed tokens are now in the Privy wallet. Repay with the standard [Repay](/docs/lend/borrow/repay) flow using the same `positionId`.
-    </Tip>
+    The borrowed tokens are now in the Privy wallet. Repay with the standard [Repay](/docs/lend/borrow/repay) flow using the same `positionId`.
   </Step>
 </Steps>
 

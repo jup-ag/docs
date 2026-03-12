@@ -6,6 +6,12 @@ llmsDescription: "How to deposit into Jupiter Earn vaults using Privy embedded w
 
 Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can earn yield without managing their own private keys.
 
+## Prerequisites
+
+```bash
+npm install @solana/web3.js@1 bn.js @jup-ag/lend @privy-io/node
+```
+
 ---
 
 ## Deposit to Earn with Privy
@@ -30,7 +36,7 @@ Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can 
   </Step>
 
   <Step>
-    ### Configure Privy and Initialize Client
+    ### Configure Privy and Initialise Client
 
     Set up your Privy credentials and Solana connection.
 
@@ -40,7 +46,6 @@ Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can 
     const RPC_ENDPOINT = "https://api.mainnet-beta.solana.com";
     const ASSET_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC
     const DEPOSIT_AMOUNT = new BN(10_000_000); // 10 USDC (6 decimals)
-    const AUTH_KEY_ID = "put-your-auth-key-id-here";
     const AUTH_KEY_PRIVATE = "put-your-auth-key-private-here";
     const WALLET_ID = "put-your-wallet-id-here";
 
@@ -53,7 +58,7 @@ Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can 
     ```
 
     <Note>
-      Update the configuration values with your Privy app credentials. Ensure the Privy wallet holds SOL (for fees) and USDC (for deposit).
+      Update the configuration values with your Privy app credentials. Ensure the Privy wallet holds SOL (for fees) and USDC (for deposit). Generate an authorization key via the [Privy dashboard](https://docs.privy.io/controls/authorization-keys/keys/create/key) or `generateP256KeyPair()` from `@privy-io/node`.
     </Note>
   </Step>
 
@@ -64,6 +69,9 @@ Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can 
 
     ```typescript
     const wallet = await privy.wallets().get(WALLET_ID);
+    if (!wallet) {
+      throw new Error(`Wallet ${WALLET_ID} not found`);
+    }
     const signer = new PublicKey(wallet.address);
     ```
   </Step>
@@ -94,7 +102,7 @@ Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can 
 
     ```typescript
     const { blockhash, lastValidBlockHeight } =
-      await connection.getLatestBlockhash("finalized");
+      await connection.getLatestBlockhash();
 
     const message = new TransactionMessage({
       payerKey: signer,
@@ -122,6 +130,10 @@ Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can 
           authorization_private_keys: [AUTH_KEY_PRIVATE],
         },
       });
+
+    if (!signResponse?.signed_transaction) {
+      throw new Error("Privy signing failed: no signed transaction returned");
+    }
     ```
 
     <Info>
@@ -140,7 +152,7 @@ Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can 
       "base64"
     );
     const signature = await connection.sendRawTransaction(signedTxBytes, {
-      skipPreflight: true,
+      skipPreflight: false,
     });
     await connection.confirmTransaction(
       { signature, blockhash, lastValidBlockHeight },
@@ -149,9 +161,9 @@ Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can 
     console.log("Deposit successful! Signature:", signature);
     ```
 
-    <Check>
+    <Tip>
       The deposit is complete. The user's funds are now earning yield in Jupiter Earn via their Privy embedded wallet.
-    </Check>
+    </Tip>
   </Step>
 </Steps>
 

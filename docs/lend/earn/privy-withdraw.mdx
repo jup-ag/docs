@@ -6,6 +6,12 @@ llmsDescription: "How to withdraw from Jupiter Earn vaults using Privy embedded 
 
 Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can redeem their yield-earning position without managing their own private keys.
 
+## Prerequisites
+
+```bash
+npm install @solana/web3.js@1 bn.js @jup-ag/lend @jup-ag/lend-read @privy-io/node
+```
+
 ---
 
 ## Withdraw from Earn with Privy
@@ -14,7 +20,7 @@ Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can
   <Step>
     ### Import Dependencies
 
-    Import the required packages for Privy client, Solana RPC, Jupiter Lend Earn SDK, and Read SDK for position data.
+    Import the required packages for Privy client, Solana RPC, and Jupiter Lend Earn SDK.
 
     ```typescript
     import { PrivyClient } from "@privy-io/node";
@@ -26,12 +32,11 @@ Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can
     } from "@solana/web3.js";
     import BN from "bn.js";
     import { getWithdrawIxs } from "@jup-ag/lend/earn";
-    import { Client } from "@jup-ag/lend-read";
     ```
   </Step>
 
   <Step>
-    ### Configure Privy and Initialize Client
+    ### Configure Privy and Initialise Client
 
     Set up your Privy credentials and Solana connection.
 
@@ -50,7 +55,6 @@ Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can
     });
 
     const connection = new Connection(RPC_ENDPOINT);
-    const readClient = new Client(connection);
     ```
 
     <Note>
@@ -59,29 +63,39 @@ Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can
   </Step>
 
   <Step>
-    ### Get Wallet and Withdraw Amount
+    ### Get Wallet Address
 
-    Retrieve the Privy wallet and optionally fetch the user's position to withdraw all or a specific amount.
+    Retrieve the Privy wallet to obtain the signer public key.
 
     ```typescript
     const wallet = await privy.wallets().get(WALLET_ID);
-    const signer = new PublicKey(wallet.address);
-
-    // For max withdraw: fetch position and use underlyingAssets
-    const position = await readClient.lending.getUserPosition(
-      new PublicKey(ASSET_MINT),
-      signer
-    );
-    const withdrawAmount = WITHDRAW_AMOUNT; // or position.underlyingAssets for full withdraw
-
-    if (position.underlyingAssets.isZero()) {
-      throw new Error("No Earn position to withdraw");
+    if (!wallet) {
+      throw new Error(`Wallet ${WALLET_ID} not found`);
     }
+    const signer = new PublicKey(wallet.address);
     ```
 
-    <Info>
-      Use `position.underlyingAssets` to withdraw the full position. Use a specific `BN` amount to withdraw a partial amount.
-    </Info>
+    <Accordion title="Withdraw full position">
+      To withdraw the entire balance instead of a fixed amount, use the Read SDK to fetch the position:
+
+      ```typescript
+      import { Client } from "@jup-ag/lend-read";
+
+      const readClient = new Client(connection);
+      const position = await readClient.lending.getUserPosition(
+        new PublicKey(ASSET_MINT),
+        signer
+      );
+
+      if (position.underlyingAssets.isZero()) {
+        throw new Error("No Earn position to withdraw");
+      }
+
+      const WITHDRAW_AMOUNT = position.underlyingAssets;
+      ```
+
+      This requires `@jup-ag/lend-read`: `npm install @jup-ag/lend-read`
+    </Accordion>
   </Step>
 
   <Step>
@@ -94,7 +108,7 @@ Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can
       connection,
       signer,
       asset: new PublicKey(ASSET_MINT),
-      amount: withdrawAmount,
+      amount: WITHDRAW_AMOUNT,
     });
 
     if (!withdrawIxs?.length) {
@@ -110,7 +124,7 @@ Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can
 
     ```typescript
     const { blockhash, lastValidBlockHeight } =
-      await connection.getLatestBlockhash("finalized");
+      await connection.getLatestBlockhash();
 
     const message = new TransactionMessage({
       payerKey: signer,
@@ -138,6 +152,10 @@ Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can
           authorization_private_keys: [AUTH_KEY_PRIVATE],
         },
       });
+
+    if (!signResponse?.signed_transaction) {
+      throw new Error("Privy signing failed: no signed transaction returned");
+    }
     ```
 
     <Info>
@@ -156,7 +174,7 @@ Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can
       "base64"
     );
     const signature = await connection.sendRawTransaction(signedTxBytes, {
-      skipPreflight: true,
+      skipPreflight: false,
     });
     await connection.confirmTransaction(
       { signature, blockhash, lastValidBlockHeight },
@@ -165,9 +183,9 @@ Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can
     console.log("Withdrawal successful! Signature:", signature);
     ```
 
-    <Check>
+    <Tip>
       The withdrawal is complete. The user's vault shares have been redeemed for underlying tokens (e.g. USDC) in their Privy wallet.
-    </Check>
+    </Tip>
   </Step>
 </Steps>
 

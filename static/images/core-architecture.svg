@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 440" fill="none">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #e4e4e7; }
+    .box { rx: 6; stroke: #27272a; stroke-width: 1.5; fill: #18181b; }
+    .box-core { rx: 6; stroke: #3f3f46; stroke-width: 1.5; fill: #1c1c22; }
+    .label { font-size: 13px; font-weight: 600; }
+    .sublabel { font-size: 10.5px; fill: #a1a1aa; }
+    .arrow { stroke: #3f3f46; stroke-width: 1.5; marker-end: url(#arrowhead); }
+    .arrow-cpi { stroke: #52525b; stroke-width: 1; stroke-dasharray: 4 3; }
+    .cpi-label { font-size: 9.5px; fill: #71717a; }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#3f3f46"/>
+    </marker>
+  </defs>
+
+  <!-- Users -->
+  <rect class="box" x="190" y="16" width="140" height="36"/>
+  <text class="label" x="260" y="39" text-anchor="middle">Users</text>
+
+  <!-- Arrows from Users -->
+  <line class="arrow" x1="225" y1="52" x2="130" y2="90"/>
+  <line class="arrow" x1="295" y1="52" x2="390" y2="90"/>
+
+  <!-- Lending (Earn) -->
+  <rect class="box" x="30" y="90" width="200" height="68"/>
+  <text class="label" x="130" y="113" text-anchor="middle">Lending (Earn)</text>
+  <text class="sublabel" x="130" y="128" text-anchor="middle">deposit / withdraw / redeem</text>
+  <text class="sublabel" x="130" y="142" text-anchor="middle">mint jlTokens</text>
+
+  <!-- Vaults (Borrow) -->
+  <rect class="box" x="290" y="90" width="200" height="68"/>
+  <text class="label" x="390" y="113" text-anchor="middle">Vaults (Borrow)</text>
+  <text class="sublabel" x="390" y="128" text-anchor="middle">deposit / borrow / repay</text>
+  <text class="sublabel" x="390" y="142" text-anchor="middle">liquidate / rebalance</text>
+
+  <!-- CPI arrows -->
+  <line class="arrow" x1="130" y1="158" x2="215" y2="210"/>
+  <line class="arrow" x1="390" y1="158" x2="305" y2="210"/>
+  <text class="cpi-label" x="260" y="190" text-anchor="middle">CPI (operate)</text>
+
+  <!-- Liquidity (Core) -->
+  <rect class="box-core" x="80" y="210" width="360" height="88"/>
+  <text class="label" x="260" y="237" text-anchor="middle">Liquidity (Core)</text>
+  <text class="sublabel" x="260" y="255" text-anchor="middle">TokenReserve · UserSupplyPosition · UserBorrowPosition</text>
+  <text class="sublabel" x="260" y="270" text-anchor="middle">exchange prices · interest accrual · rate models</text>
+  <text class="sublabel" x="260" y="285" text-anchor="middle">all token vaults held here</text>
+
+  <!-- Oracle + Flashloan row -->
+  <line class="arrow" x1="170" y1="298" x2="170" y2="340"/>
+  <line class="arrow" x1="350" y1="298" x2="350" y2="340"/>
+
+  <!-- Oracle -->
+  <rect class="box" x="80" y="340" width="180" height="36"/>
+  <text class="label" x="170" y="363" text-anchor="middle">Oracle</text>
+
+  <!-- Flashloan -->
+  <rect class="box" x="310" y="340" width="180" height="36"/>
+  <text class="label" x="400" y="363" text-anchor="middle">Flashloan</text>
+
+  <!-- Dependency labels -->
+  <text class="cpi-label" x="145" y="325" text-anchor="middle">price feeds</text>
+  <text class="cpi-label" x="375" y="325" text-anchor="middle">atomic loans</text>
+</svg>

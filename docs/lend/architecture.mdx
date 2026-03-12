@@ -14,34 +14,13 @@ Jupiter Lend is built on three core programs: **Liquidity** (the shared lending 
 | Lending   | Earn: deposit assets, mint jlTokens, supply into Liquidity                        | `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9` |
 | Vaults    | Borrow: collateralize, borrow, liquidate, supply/borrow via Liquidity             | `jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi` |
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         USERS                                    │
-└──────────────┬──────────────────────────────────┬────────────────┘
-               │                                  │
-               ▼                                  ▼
-┌──────────────────────────────┐    ┌──────────────────────────────┐
-│  Lending (Earn)              │    │  Vaults (Borrow)             │
-│  deposit / withdraw / redeem │    │  deposit / borrow / repay    │
-│  mint jlTokens               │    │  liquidate / rebalance       │
-└──────────────┬───────────────┘    └──────────────┬───────────────┘
-               │                                   │
-               │         CPI (operate)             │
-               └──────────────────┬────────────────┘
-                                  ▼
-               ┌───────────────────────────────────┐
-               │  Liquidity (core)                 │
-               │  TokenReserve, UserSupplyPosition │
-               │  UserBorrowPosition, exchange     │
-               │  prices, interest accrual         │
-               └───────────────────────────────────┘
-```
+<img src="/static/images/core-architecture.svg" alt="Core architecture: Users → Lending (Earn) and Vaults (Borrow) → CPI → Operate → Liquidity Layer (Core)" />
 
 ---
 
 ## Liquidity (core layer)
 
-Liquidity is the foundation. It owns the token vaults and holds all supplied and borrowed assets. No user-facing protocol touches tokens directly; they CPI Liquidity for every supply and borrow.
+Liquidity serves as the foundational layer, owning all token vaults and custodying every deposited and borrowed asset. User-facing protocols never interact with tokens directly; they always make CPI calls into Liquidity to handle supply and borrow operations.
 
 ### Key state
 
@@ -71,7 +50,7 @@ Exchange prices and rates are updated during `operate`, so interest accrues on e
 
 ## Lending (Earn)
 
-Earn lets users deposit assets and receive jlTokens (shares). Deposits are supplied into Liquidity; jlTokens represent a share of the pool with accrued interest and rewards.
+Earn lets users deposit assets and receive jlTokens (shares). Deposits are supplied into Liquidity, and jlTokens represent a share of the pool with accrued interest and rewards.
 
 ### Key state
 

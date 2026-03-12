@@ -1,0 +1,298 @@
+---
+title: "Read Vault Data"
+description: "Read vault config, state, and user positions (Borrow) using the Jupiter Lend Read SDK."
+llmsDescription: "Read vault configuration, state, and user positions for Jupiter Lend Borrow using the @jup-ag/lend-read Read SDK. Covers Client setup, getAllVaults, getVaultByVaultId, getVaultConfig, getVaultState, getAllUserPositions, getPositionByVaultId, getUserPosition, getCurrentPositionState, getFinalPosition, getAllPositionIdsForVault, getAllPositionsWithRiskRatio, getNftOwner. Includes SDK type definitions for NftPosition, UserPosition, VaultConfig, VaultState."
+---
+
+<Note>
+  All vault and position data here is read from on-chain accounts using the **Jupiter Lend Read SDK**. No API calls are required.
+</Note>
+
+<Info title="Data scaling">
+  Exchange prices are in **1e12** decimals. Balances are in **1e9** decimals.
+</Info>
+
+---
+
+## Reading vault data with the SDK
+
+Use the Read SDK to list vaults, read vault config and state, and get user positions (collateral, debt, liquidation status). The SDK uses your RPC to read the Vault program accounts.
+
+<Steps>
+  <Step title="Create a client">
+    Create a `Client` with an RPC URL or a Solana `Connection`. Use `client.vault` for all vault and position reads.
+
+    ```typescript
+    import { Client } from "@jup-ag/lend-read";
+    import { Connection } from "@solana/web3.js";
+
+    const connection = new Connection("https://api.mainnet-beta.solana.com");
+    const client = new Client(connection);
+    ```
+  </Step>
+
+  <Step title="Get all vaults">
+    Fetch full data for every vault in one call: config, state, exchange prices, limits, and availability. Use `getAllVaults()` for listing markets or building a vault selector.
+
+    ```typescript
+    const allVaults = await client.vault.getAllVaults();
+
+    allVaults.forEach((v) => {
+      console.log(
+        `Vault ${v.constantViews.vaultId}:`,
+        v.constantViews.supplyToken.toBase58(),
+        "/",
+        v.constantViews.borrowToken.toBase58()
+      );
+    });
+    ```
+  </Step>
+
+  <Step title="Get vault by ID">
+    Fetch full vault data for a single vault: config, state, exchange prices, limits, and availability. Use `getVaultByVaultId(vaultId)` when you know the vault ID.
+
+    ```typescript
+    const vaultId = 1;
+    const vaultData = await client.vault.getVaultByVaultId(vaultId);
+
+    console.log({
+      configs: vaultData.configs,
+      vaultState: vaultData.vaultState,
+      limitsAndAvailability: vaultData.limitsAndAvailability,
+    });
+    ```
+  </Step>
+
+  <Step title="Get vault config">
+    Fetch only the vault configuration: supply and borrow token mints, oracle, rebalancer, and risk parameters (collateral factor, liquidation threshold, fees).
+
+    ```typescript
+    const config = await client.vault.getVaultConfig(vaultId);
+
+    console.log({
+      supplyToken: config.supplyToken.toBase58(),
+      borrowToken: config.borrowToken.toBase58(),
+      oracle: config.oracle.toBase58(),
+      collateralFactor: config.collateralFactor,
+      liquidationThreshold: config.liquidationThreshold,
+    });
+    ```
+  </Step>
+
+  <Step title="Get vault state">
+    Fetch the vault's current state: total supply, total borrow, exchange prices, branch info, and next position ID.
+
+    ```typescript
+    const state = await client.vault.getVaultState(vaultId);
+
+    console.log({
+      totalSupply: state.totalSupply.toString(),
+      totalBorrow: state.totalBorrow.toString(),
+      totalPositions: state.totalPositions,
+      nextPositionId: state.nextPositionId,
+    });
+    ```
+  </Step>
+
+  <Step title="Get all user positions">
+    Get all positions owned by a user across all vaults. Returns decoded `NftPosition` objects with supply, borrow, tick, liquidation status, and owner. Use this for dashboards or portfolio views.
+
+    ```typescript
+    import { PublicKey } from "@solana/web3.js";
+
+    const user = new PublicKey("YourUserWalletPublicKey");
+    const positions = await client.vault.getAllUserPositions(user);
+
+    positions.forEach((p) => {
+      console.log({
+        nftId: p.nftId,
+        owner: p.owner.toBase58(),
+        supply: p.supply.toString(),
+        borrow: p.borrow.toString(),
+        tick: p.tick,
+        isLiquidated: p.isLiquidated,
+      });
+    });
+    ```
+  </Step>
+
+  <Step title="Get position by vault and NFT id">
+    Get a single position by vault ID and position (NFT) id. Returns decoded position plus full vault data. Use `getPositionByVaultId(vaultId, nftId)` when you have both IDs.
+
+    ```typescript
+    const vaultId = 1;
+    const nftId = 5;
+
+    const { userPosition, vaultData } = await client.vault.getPositionByVaultId(vaultId, nftId);
+
+    console.log({
+      owner: userPosition.owner.toBase58(),
+      supply: userPosition.supply.toString(),
+      borrow: userPosition.borrow.toString(),
+      dustBorrow: userPosition.dustBorrow.toString(),
+      tick: userPosition.tick,
+      tickId: userPosition.tickId,
+      isLiquidated: userPosition.isLiquidated,
+    });
+    ```
+  </Step>
+
+  <Step title="Get raw user position">
+    Fetch the raw position account by `vaultId` and `positionId`. Returns the on-chain account or `null`. Use when you need the low-level position without decoded state.
+
+    ```typescript
+    const position = await client.vault.getUserPosition({ vaultId, positionId: nftId });
+
+    if (position) {
+      console.log({
+        positionMint: position.positionMint.toBase58(),
+        tick: position.tick,
+        supplyAmount: position.supplyAmount.toString(),
+        isSupplyOnlyPosition: position.isSupplyOnlyPosition,
+      });
+    }
+    ```
+  </Step>
+
+  <Step title="Get current position state">
+    From a raw position, get the computed state: collateral (colRaw), debt (debtRaw), dust, and whether the position is liquidated. Pass the result of `getUserPosition`.
+
+    ```typescript
+    const position = await client.vault.getUserPosition({ vaultId, positionId: nftId });
+    if (!position) return;
+
+    const currentState = await client.vault.getCurrentPositionState({ vaultId, position });
+
+    console.log({
+      colRaw: currentState.colRaw.toString(),
+      debtRaw: currentState.debtRaw.toString(),
+      dustDebtRaw: currentState.dustDebtRaw.toString(),
+      isSupplyOnlyPosition: currentState.isSupplyOnlyPosition,
+      userLiquidationStatus: currentState.userLiquidationStatus,
+    });
+    ```
+  </Step>
+
+  <Step title="Preview final position">
+    Preview how a position would look after adding collateral or debt (without sending a transaction). Pass optional `newColAmount` and `newDebtAmount` as `BN`; use zero for no change.
+
+    ```typescript
+    import { BN } from "bn.js";
+
+    const finalPosition = await client.vault.getFinalPosition({
+      vaultId,
+      positionId: nftId,
+      newColAmount: new BN(0),
+      newDebtAmount: new BN(100_000),
+    });
+
+    console.log({
+      colRaw: finalPosition.colRaw.toString(),
+      debtRaw: finalPosition.debtRaw.toString(),
+      finalAmount: finalPosition.finalAmount.toString(),
+    });
+    ```
+  </Step>
+
+  <Step title="Get all position IDs for a vault">
+    Get the list of all position IDs (1 to totalPositions) for a vault. Use this with `batchGetUserPositions` when you need to iterate over every position in a vault.
+
+    ```typescript
+    const positionIds = await client.vault.getAllPositionIdsForVault(vaultId);
+
+    const positions = await client.vault.batchGetUserPositions(
+      positionIds.map((positionId) => ({ vaultId, positionId }))
+    );
+    ```
+  </Step>
+
+  <Step title="Get all positions with risk ratio">
+    For a vault, fetch all positions with a computed risk ratio (borrow/supply). Useful for dashboards or liquidation-risk views.
+
+    ```typescript
+    const positionsWithRisk = await client.vault.getAllPositionsWithRiskRatio(vaultId);
+
+    positionsWithRisk.forEach((p) => {
+      console.log({
+        nftId: p.nftId,
+        owner: p.owner.toBase58(),
+        supply: p.supply.toString(),
+        borrow: p.borrow.toString(),
+        riskRatio: p.riskRatio,
+        isLiquidated: p.isLiquidated,
+      });
+    });
+    ```
+  </Step>
+
+  <Step title="Get position NFT owner">
+    Resolve the owner of a position NFT (position mint). Use when you have the position mint and need the wallet that owns the position.
+
+    ```typescript
+    const positionMint = new PublicKey("PositionNftMintAddress");
+    const owner = await client.vault.getNftOwner(positionMint);
+    console.log("Position owner:", owner.toBase58());
+    ```
+  </Step>
+</Steps>
+
+---
+
+## SDK types
+
+### NftPosition
+
+Returned by `getAllUserPositions` and `getPositionByVaultId`:
+
+| Field            | Type      | Description                      |
+| ---------------- | --------- | -------------------------------- |
+| `nftId`          | number    | Position / NFT id                |
+| `owner`          | PublicKey | Owner wallet                     |
+| `isSupplyPosition` | boolean | True if supply-only              |
+| `supply`         | BN        | Collateral (with exchange price) |
+| `borrow`         | BN        | Debt (with exchange price)       |
+| `dustBorrow`     | BN        | Dust borrow amount               |
+| `tick`           | number    | Price tick                       |
+| `tickId`         | number    | Tick id                          |
+| `isLiquidated`   | boolean   | True if position is liquidated   |
+
+### User position (raw)
+
+Returned by `getUserPosition`:
+
+| Field                 | Type      | Description                                |
+| --------------------- | --------- | ------------------------------------------ |
+| `vaultId`             | number    | Vault ID                                   |
+| `nftId`               | number    | Position / NFT id                          |
+| `positionMint`        | PublicKey | Position NFT mint address                  |
+| `isSupplyOnlyPosition`| number/boolean | 1 if supply-only, 0 if borrow position |
+| `tick`                | number    | Price tick                                 |
+| `supplyAmount`        | BN        | Collateral (raw)                           |
+| `dustDebtAmount`      | BN        | Dust debt amount                           |
+
+### Vault config
+
+Returned by `getVaultConfig` and inside `getVaultByVaultId`:
+
+| Field                  | Type      | Description              |
+| ---------------------- | --------- | ------------------------ |
+| `vaultId`              | number    | Vault ID                 |
+| `supplyToken`          | PublicKey | Supply (collateral) mint |
+| `borrowToken`          | PublicKey | Borrow token mint        |
+| `oracle`               | PublicKey | Oracle account           |
+| `collateralFactor`     | number    | Collateral factor        |
+| `liquidationThreshold` | number    | Liquidation threshold    |
+| `liquidationPenalty`   | number    | Liquidation penalty      |
+| `borrowFee`            | number    | Borrow fee               |
+
+### Vault state
+
+Returned by `getVaultState` and inside vault data:
+
+| Field                      | Type   | Description            |
+| -------------------------- | ------ | ---------------------- |
+| `totalSupply`              | BN     | Total supply in vault  |
+| `totalBorrow`              | BN     | Total borrow in vault  |
+| `totalPositions`           | number | Number of positions    |
+| `nextPositionId`           | number | Next position id       |
+

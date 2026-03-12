@@ -1,0 +1,173 @@
+---
+title: "Unwind (Deleverage)"
+description: "Close or reduce leveraged positions by combining flashloans, Jupiter Swap, and vault operations."
+llmsDescription: "How to close or reduce a leveraged position on Jupiter Lend using a single atomic transaction. Combines getFlashBorrowIx/getFlashPaybackIx for flashloaning the collateral asset, Jupiter Lite API for swapping collateral to debt, and getOperateIx with MAX_REPAY_AMOUNT/MAX_WITHDRAW_AMOUNT for full unwind or negative signed amounts for partial unwind. Covers full and partial deleverage flows with complete TypeScript code example."
+---
+
+<Info>
+  These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
+</Info>
+
+"Unwind" (deleverage) is the process of closing or reducing a leveraged position. Use Jupiter **Lite API** for swap quotes and instructions. Build your own transaction, do not use a pre-built swap transaction.
+
+For example, to unwind a SOL/USDC position:
+1. Flashloan collateral (SOL) from Jupiter Lend.
+2. Swap SOL → USDC using Jupiter Lite API (you need USDC to repay debt).
+3. Use `getOperateIx` to repay debt and withdraw collateral.
+4. Pay back the flashloan with the withdrawn SOL.
+
+All of this happens atomically in a single Solana transaction.
+
+---
+
+## Unwind
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    ```typescript
+    import {
+      AddressLookupTableAccount,
+      Connection,
+      Keypair,
+      PublicKey,
+      TransactionInstruction,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getFlashBorrowIx, getFlashPaybackIx } from "@jup-ag/lend/flashloan";
+    import { getOperateIx, MAX_REPAY_AMOUNT, MAX_WITHDRAW_AMOUNT } from "@jup-ag/lend/borrow";
+    import fs from "fs";
+    import path from "path";
+    ```
+  </Step>
+  <Step titleSize="h2" title="Load Keypair and Initialise Connection">
+    Set `positionId` (NFT ID from your multiply position) and `withdrawAmount` (collateral to unwind in base units). For full unwind, use `MAX_REPAY_AMOUNT` and `MAX_WITHDRAW_AMOUNT`.
+
+    ```typescript
+    const KEYPAIR_PATH = "/path/to/your/keypair.json";
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    function loadKeypair(p: string): Keypair {
+      return Keypair.fromSecretKey(new Uint8Array(JSON.parse(fs.readFileSync(path.resolve(p), "utf8"))));
+    }
+    const userKeypair = loadKeypair(KEYPAIR_PATH);
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
+
+    const solMint = new PublicKey("So11111111111111111111111111111111111111112");
+    const usdcMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+
+    const POSITION_ID = 7360; // NFT ID of your position
+    const WITHDRAW_AMOUNT = new BN(1_179_026_156); // collateral to withdraw (base units)
+    const FULL_UNWIND = true;
+    ```
+  </Step>
+  <Step titleSize="h2" title="Get Flashloan Instructions">
+    Use `getFlashBorrowIx` and `getFlashPaybackIx` to flashloan the **collateral asset** (e.g. SOL).
+
+    ```typescript
+    const flashParams = { connection, signer, asset: solMint, amount: withdrawAmount };
+    const flashBorrowIx = await getFlashBorrowIx(flashParams);
+    const flashPaybackIx = await getFlashPaybackIx(flashParams);
+    ```
+  </Step>
+
+  <Step titleSize="h2" title="Get Quote and Swap Instructions (Jupiter Lite API)">
+    Fetch a quote from Jupiter Lite API (swap collateral → debt), then POST to `swap-instructions`. Use `otherAmountThreshold` from the quote as the repay amount for partial unwind.
+
+    ```typescript
+    const LITE_API = "https://lite-api.jup.ag/swap/v1";
+    const quoteResponse = await fetch(
+      `${LITE_API}/quote?inputMint=${solMint.toBase58()}&outputMint=${usdcMint.toBase58()}&amount=${withdrawAmount.toString()}&slippageBps=100`
+    ).then((r) => r.json());
+
+    const swapRes = await fetch(`${LITE_API}/swap-instructions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quoteResponse, userPublicKey: signer.toBase58() }),
+    }).then((r) => r.json());
+    const swapIx = jupIxToTransactionInstruction(swapRes.swapInstruction);
+    ```
+
+    The `jupIxToTransactionInstruction` helper converts the JSON instruction from the API into a Solana `TransactionInstruction`:
+
+    ```typescript
+    function jupIxToTransactionInstruction(ix: {
+      programId: string;
+      accounts: Array<{ pubkey: string; isSigner: boolean; isWritable: boolean }>;
+      data: string;
+    }): TransactionInstruction {
+      return new TransactionInstruction({
+        programId: new PublicKey(ix.programId),
+        keys: ix.accounts.map((a) => ({
+          pubkey: new PublicKey(a.pubkey),
+          isSigner: a.isSigner,
+          isWritable: a.isWritable,
+        })),
+        data: Buffer.from(ix.data, "base64"),
+      });
+    }
+    ```
+  </Step>
+
+  <Step titleSize="h2" title="Get Vault Operations (Repay + Withdraw)">
+    Use `getOperateIx` with negative amounts. For full unwind use `MAX_WITHDRAW_AMOUNT` and `MAX_REPAY_AMOUNT`. For partial, use `withdrawAmount.neg()` and `repayAmount.neg()` where `repayAmount = new BN(quoteResponse.otherAmountThreshold)`.
+
+    ```typescript
+    const repayAmount = new BN(quoteResponse.otherAmountThreshold);
+    const colAmount = FULL_UNWIND ? MAX_WITHDRAW_AMOUNT : withdrawAmount.neg();
+    const debtAmount = FULL_UNWIND ? MAX_REPAY_AMOUNT : repayAmount.neg();
+
+    const { ixs: operateIxs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId: 1,
+      positionId: POSITION_ID,
+      colAmount,
+      debtAmount,
+      connection,
+      signer,
+    });
+    ```
+  </Step>
+
+  <Step titleSize="h2" title="Assemble and Execute the Transaction">
+    **Order:** Flashloan Borrow (collateral) → Swap (collateral → debt) → Vault Operate (repay + withdraw) → Flashloan Payback
+
+    The `getAddressLookupTableAccounts` helper resolves lookup table addresses into account objects:
+
+    ```typescript
+    async function getAddressLookupTableAccounts(
+      connection: Connection,
+      keys: string[]
+    ): Promise<AddressLookupTableAccount[]> {
+      if (!keys?.length) return [];
+      const infos = await connection.getMultipleAccountsInfo(keys.map((k) => new PublicKey(k)));
+      return infos.reduce((acc, info, i) => {
+        if (info) {
+          acc.push(new AddressLookupTableAccount({
+            key: new PublicKey(keys[i]),
+            state: AddressLookupTableAccount.deserialize(info.data),
+          }));
+        }
+        return acc;
+      }, [] as AddressLookupTableAccount[]);
+    }
+    ```
+
+    ```typescript
+    const swapAlts = await getAddressLookupTableAccounts(connection, swapRes.addressLookupTableAddresses ?? []);
+    const allAlts = [...(addressLookupTableAccounts ?? []), ...swapAlts];
+
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: blockhash,
+      instructions: [flashBorrowIx, swapIx, ...operateIxs, flashPaybackIx],
+    }).compileToV0Message(allAlts);
+
+    const tx = new VersionedTransaction(message);
+    tx.sign([userKeypair]);
+    const signature = await connection.sendTransaction(tx, { skipPreflight: false, maxRetries: 3 });
+    console.log("Unwind successful:", signature);
+    ```
+  </Step>
+</Steps>

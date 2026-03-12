@@ -182,3 +182,6 @@ Format: `- [YYYY-MM-DD] Decision: rationale`
 - [2026-03-10] V1 collapsed dropdown pattern: use `"expanded": false` on the group in `docs.json` nav (same pattern as Metis Swap in Ultra docs).
 - [2026-03-10] API reference overview pages should list endpoints grouped by category with `<CardGroup>` cards linking to each endpoint (see Prediction API as reference pattern).
 - [2026-03-10] Code examples for transaction signing should use actual imports (`VersionedTransaction` from `@solana/web3.js`, `bs58`) not placeholder functions like `deserializeTransaction()`.
+- [2026-03-12] Lend terminology: use "Earn" (not "Supply" or "Lending") for the deposit side, "Borrow" for the vault/debt side. Matches product UI naming.
+- [2026-03-12] SDK named parameters: when documenting SDK functions, always show the named-parameter form (`{ connection, signer, asset, amount }`) not positional args. Positional forms are error-prone and not how the SDK is designed.
+- [2026-03-12] Import Private Key pattern: use base58 decode (`bs58.decode(privateKey)` with `Keypair.fromSecretKey`), not file-read from JSON. Browser wallets export base58 strings.

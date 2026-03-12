@@ -1,0 +1,180 @@
+---
+title: "Liquidate"
+description: "Liquidate an underwater borrow position"
+llmsDescription: "Liquidate underwater borrow positions in Jupiter Lend using getLiquidateIx from @jup-ag/lend/borrow. Covers liquidation threshold mechanics, optional parameters (to, absorb, colPerUnitDebt), versioned (v0) transaction building with address lookup tables, and full TypeScript code example."
+---
+
+Liquidate a position that has exceeded the protocol's liquidation threshold. You pay the borrow token (or absorb) and receive collateral. The SDK returns instructions that use address lookup tables; the transaction is built as a versioned (v0) transaction.
+
+## Liquidate
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    Import web3.js for connection and versioned transactions, the borrow SDK, and BN for the debt amount.
+
+    ```typescript
+    import {
+      Connection,
+      Keypair,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getLiquidateIx } from "@jup-ag/lend/borrow";
+    import fs from "fs";
+    import path from "path";
+    ```
+
+    <Note>
+      `getLiquidateIx` returns instructions and address lookup table accounts. Optional params: `colPerUnitDebt`, `absorb`, `to` (recipient of collateral).
+    </Note>
+  </Step>
+  <Step titleSize="h2" title="Load keypair and set parameters">
+    Load the signer and create the connection. Set the vault and the amount of debt to liquidate.
+
+    ```typescript
+    const KEYPAIR_PATH = "/path/to/your/keypair.json";
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const VAULT_ID = 1;
+    const DEBT_AMOUNT = new BN(100_000); // Debt to liquidate (borrow token base units)
+
+    function loadKeypair(keypairPath: string): Keypair {
+      const fullPath = path.resolve(keypairPath);
+      const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      return Keypair.fromSecretKey(new Uint8Array(secret));
+    }
+
+    const userKeypair = loadKeypair(KEYPAIR_PATH);
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
+    ```
+
+    <Warning>
+      Only positions that are liquidatable (e.g. LTV above threshold) can be liquidated. The liquidator typically receives collateral; ensure you have the borrow token to pay the debt if required by the vault.
+    </Warning>
+  </Step>
+  <Step titleSize="h2" title="Build liquidate instructions">
+    Get the liquidate instructions and address lookup table accounts.
+
+    ```typescript
+    const { ixs, addressLookupTableAccounts } = await getLiquidateIx({
+      vaultId: VAULT_ID,
+      debtAmount: DEBT_AMOUNT,
+      connection,
+      signer,
+    });
+
+    if (!ixs?.length) {
+      throw new Error("No liquidate instructions returned by Jupiter Lend SDK.");
+    }
+    ```
+
+    <Info>
+      You can pass optional `to` (PublicKey) for the collateral recipient, `absorb` (boolean), and `colPerUnitDebt` (BN) for pricing. Omit them to use defaults (e.g. signer as recipient).
+    </Info>
+  </Step>
+  <Step titleSize="h2" title="Build versioned transaction and send">
+    Build the v0 message with instructions and lookup tables, sign, send, and confirm.
+
+    ```typescript
+    const latestBlockhash = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: latestBlockhash.blockhash,
+      instructions: ixs,
+    }).compileToV0Message(addressLookupTableAccounts ?? []);
+
+    const transaction = new VersionedTransaction(message);
+    transaction.sign([userKeypair]);
+
+    const signature = await connection.sendTransaction(transaction, {
+      skipPreflight: false,
+      maxRetries: 3,
+      preflightCommitment: "confirmed",
+    });
+    await connection.confirmTransaction(signature, "confirmed");
+
+    console.log("Liquidate successful! Signature:", signature);
+    ```
+
+    <Info>
+      Liquidation improves protocol health by closing underwater positions. The liquidator is incentivized with a discount on collateral or similar mechanism per vault design.
+    </Info>
+  </Step>
+</Steps>
+
+<AccordionGroup>
+  <Accordion title="When can a position be liquidated?">
+    When the position's loan-to-value (LTV) or health factor crosses the vault's liquidation threshold. The exact rules and incentives are vault-specific.
+  </Accordion>
+  <Accordion title="Liquidator flow">
+    As liquidator you typically supply the borrow token (or use absorb) and receive collateral. Check the vault's liquidation docs for exact parameters and rewards.
+  </Accordion>
+</AccordionGroup>
+
+## Full code example
+
+```typescript expandable
+import {
+    Connection,
+    Keypair,
+    TransactionMessage,
+    VersionedTransaction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { getLiquidateIx } from "@jup-ag/lend/borrow";
+import fs from "fs";
+import path from "path";
+
+const KEYPAIR_PATH = "/path/to/your/keypair.json"; // Path to your local keypair file (update this path)
+const RPC_URL = "https://api.mainnet-beta.solana.com"; // RPC endpoint
+const VAULT_ID = 1; // Target vault (market)
+const DEBT_AMOUNT = new BN(100_000); // Debt to liquidate, in smallest units (borrow token base units)
+
+function loadKeypair(keypairPath: string): Keypair {
+    const fullPath = path.resolve(keypairPath);
+    const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+    return Keypair.fromSecretKey(new Uint8Array(secret));
+}
+
+// 1. Load user keypair and establish connection
+const userKeypair = loadKeypair(KEYPAIR_PATH);
+const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+const signer = userKeypair.publicKey;
+
+// 2. Get liquidate instructions from SDK
+const { ixs, addressLookupTableAccounts } = await getLiquidateIx({
+    vaultId: VAULT_ID,
+    debtAmount: DEBT_AMOUNT,
+    connection,
+    signer,
+});
+
+if (!ixs?.length) {
+    throw new Error("No liquidate instructions returned by Jupiter Lend SDK.");
+}
+
+// 3. Build versioned (v0) transaction with address lookup tables
+const latestBlockhash = await connection.getLatestBlockhash();
+const message = new TransactionMessage({
+    payerKey: signer,
+    recentBlockhash: latestBlockhash.blockhash,
+    instructions: ixs,
+}).compileToV0Message(addressLookupTableAccounts ?? []);
+
+const transaction = new VersionedTransaction(message);
+transaction.sign([userKeypair]);
+
+// 4. Send and confirm the transaction
+const signature = await connection.sendTransaction(transaction, {
+    skipPreflight: false,
+    maxRetries: 3,
+    preflightCommitment: "confirmed",
+});
+await connection.confirmTransaction(
+    { signature, ...latestBlockhash },
+    "confirmed"
+);
+
+console.log("Liquidate successful! Signature:", signature);
+```

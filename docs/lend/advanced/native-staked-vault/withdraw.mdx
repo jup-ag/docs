@@ -1,0 +1,91 @@
+---
+title: "Withdraw Staked SOL"
+description: "Withdraw pool tokens from vault, then burn them via Single Pool to receive stake back."
+llmsDescription: "How to withdraw staked SOL from a Jupiter Lend Native Staked Vault. Covers the two-step flow: withdraw pool tokens from vault via getOperateIx with MAX_WITHDRAW_AMOUNT from @jup-ag/lend/borrow, then burn pool tokens via SinglePoolProgram.withdraw from @solana/spl-single-pool-classic to receive a new stake account. Complete TypeScript code example with VersionedTransaction."
+---
+
+<Info>
+  These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
+</Info>
+
+Withdraw pool tokens from a Native Staked Vault, then burn them via the Single Pool program to receive your stake back.
+
+**Flow:**
+1. Withdraw pool tokens from vault via `getOperateIx` (negative colAmount)
+2. Burn pool tokens with `SinglePoolProgram.withdraw` → receive stake account
+
+---
+
+## Withdraw
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    ```bash
+    npm install @solana/web3.js @solana/spl-single-pool-classic bn.js @jup-ag/lend @jup-ag/lend-read
+    ```
+
+    ```typescript
+    import { SinglePoolProgram, findPoolAddress } from "@solana/spl-single-pool-classic";
+    import {
+      Connection, Keypair, PublicKey,
+      TransactionMessage, VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getOperateIx, MAX_WITHDRAW_AMOUNT } from "@jup-ag/lend/borrow";
+    ```
+  </Step>
+  <Step titleSize="h2" title="Withdraw Pool Tokens from Vault">
+    Use `getOperateIx` with `MAX_WITHDRAW_AMOUNT` to withdraw all collateral.
+
+    ```typescript
+    const { ixs: operateIxs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId,
+      positionId: userPositionId,
+      colAmount: MAX_WITHDRAW_AMOUNT,
+      debtAmount: new BN(0),
+      connection,
+      signer,
+    });
+    instructions.push(...operateIxs);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Burn Pool Tokens and Receive Stake">
+    Use `SinglePoolProgram.withdraw` to burn pool tokens and receive a new stake account.
+
+    ```typescript
+    const SINGLE_POOL_PROGRAM_ID = new PublicKey("SVSPxpvHdN29nkVg9rPapPNDddN5DipNLRUFhyjFThE");
+    const pool = await findPoolAddress(SINGLE_POOL_PROGRAM_ID, voteAccount);
+    const newStakeAccount = Keypair.generate();
+
+    const withdrawIxs = await SinglePoolProgram.withdraw({
+      connection,
+      pool,
+      userWallet: signer,
+      userStakeAccount: newStakeAccount.publicKey,
+      tokenAmount: tokenAmount.toNumber(),
+      createStakeAccount: true,
+    });
+    instructions.push(...withdrawIxs.instructions);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Assemble and Execute the Transaction">
+    Build a v0 message, sign with user keypair and new stake account keypair.
+
+    ```typescript
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: blockhash,
+      instructions,
+    }).compileToV0Message(addressLookupTableAccounts ?? []);
+
+    const tx = new VersionedTransaction(message);
+    tx.sign([userKeypair, newStakeAccount]);
+
+    const signature = await connection.sendTransaction(tx, {
+      skipPreflight: false, maxRetries: 3, preflightCommitment: "confirmed",
+    });
+    console.log("Withdraw successful:", signature);
+    ```
+  </Step>
+</Steps>

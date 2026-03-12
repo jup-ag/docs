@@ -50,6 +50,20 @@ BEFORE making the change.
 **Alternatives considered:** Separate top-level groups (`Trigger V1`, `Trigger V2`) — rejected because it doesn't match existing API patterns.
 **Migration notes:** Redirects added for old V1 API reference paths (`/api-reference/trigger/create-order` → `/api-reference/trigger/v1/create-order`, etc.). No redirects needed for `trigger-v2` paths as they never existed in prod.
 
+### [2026-03-12] Restructure Lend docs into Earn/Borrow/Advanced hierarchy
+**Status:** implemented
+**Scope:** folder-structure | navigation | redirect
+**Files affected:** `docs/lend/`, `docs.json`
+**Linear issue:** DEVREL-74
+
+**Context:** Lend docs were initially structured as flat groups (Architecture, Lend API, Lend SDK). The product has two distinct user journeys (depositing to earn yield vs borrowing against collateral) plus advanced CPI recipes.
+**Decision:**
+- Top-level: overview, architecture, API-vs-SDK comparison, getting started
+- Subfolders: `earn/` (deposit, withdraw, read-data, API), `borrow/` (create-position, deposit, borrow, repay, withdraw, combined, CPI, API), `flashloan/`, `liquidity/` (overview, analytics), `advanced/` (multiply, unwind, repay-with-collateral, vault-swap), `resources/` (IDL/types)
+- Two redirects: `/docs/lend/sdk` → `/docs/lend/api-vs-sdk`, `/docs/lend/liquidation` → `/docs/lend/borrow/liquidation`
+**Rationale:** Mirrors the Earn/Borrow product distinction. Keeps advanced CPI recipes separate from basic SDK usage so beginners aren't overwhelmed. Consistent with how other products (Ultra, Trigger) use subfolders for distinct capabilities.
+**Alternatives considered:** Keep flat structure with all pages at `docs/lend/`. Rejected because 20+ pages in one folder is hard to navigate and doesn't reflect the two-sided product model.
+
 ---
 
 ## Content Type Definitions

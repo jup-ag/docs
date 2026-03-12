@@ -176,28 +176,89 @@
             "groups": [
               {
                 "group": " ",
-                "pages": ["docs/lend/index"]
-              },
-              {
-                "group": "Architecture",
                 "pages": [
-                  "docs/lend/oracles"
+                  "docs/lend/index",
+                  "docs/lend/architecture",
+                  "docs/lend/oracles",
+                  "docs/lend/api-vs-sdk"
                 ]
               },
               {
-                "group": "Lend API",
-                "tag": "BETA",
+                "group": "Earn",
                 "pages": [
-                  "docs/lend/earn",
-                  "docs/lend/borrow"
+                  "docs/lend/earn/index",
+                  "docs/lend/earn/api",
+                  {
+                    "group": "Earn SDK",
+                    "pages": [
+                      "docs/lend/earn/deposit",
+                      "docs/lend/earn/withdraw",
+                      "docs/lend/earn/read-data"
+                    ]
+                  },
+                  "docs/lend/earn/cpi"
                 ]
               },
               {
-                "group": "Lend SDK",
-                "tag": "BETA",
+                "group": "Borrow",
                 "pages": [
-                  "docs/lend/sdk",
-                  "docs/lend/liquidation"
+                  "docs/lend/borrow/index",
+                  "docs/lend/borrow/api",
+                  {
+                    "group": "Borrow SDK",
+                    "pages": [
+                      "docs/lend/borrow/create-position",
+                      "docs/lend/borrow/deposit",
+                      "docs/lend/borrow/borrow",
+                      "docs/lend/borrow/repay",
+                      "docs/lend/borrow/withdraw",
+                      "docs/lend/borrow/combined",
+                      "docs/lend/borrow/liquidation",
+                      "docs/lend/borrow/read-vault-data"
+                    ]
+                  },
+                  "docs/lend/borrow/cpi"
+                ]
+              },
+              {
+                "group": "Flashloan",
+                "pages": [
+                  "docs/lend/flashloan/index",
+                  "docs/lend/flashloan/execute"
+                ]
+              },
+              {
+                "group": "Liquidity",
+                "pages": [
+                  "docs/lend/liquidity/index",
+                  "docs/lend/liquidity/analytics"
+                ]
+              },
+              {
+                "group": "Advanced",
+                "pages": [
+                  "docs/lend/advanced/index",
+                  "docs/lend/advanced/multiply",
+                  "docs/lend/advanced/unwind",
+                  "docs/lend/advanced/repay-with-collateral-max-withdraw",
+                  "docs/lend/advanced/vault-swap",
+                  "docs/lend/advanced/utilization-after-deposit",
+                  {
+                    "group": "Native Staked Vaults",
+                    "pages": [
+                      "docs/lend/advanced/native-staked-vault/index",
+                      "docs/lend/advanced/native-staked-vault/deposit",
+                      "docs/lend/advanced/native-staked-vault/withdraw"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Resources",
+                "pages": [
+                  "docs/lend/program-addresses",
+                  "docs/lend/idl-and-types",
+                  "docs/lend/dune"
                 ]
               }
             ]
@@ -1145,6 +1206,14 @@
     {
       "source": "/resources/ai-workflow",
       "destination": "/ai"
+    },
+    {
+      "source": "/docs/lend/sdk",
+      "destination": "/docs/lend/api-vs-sdk"
+    },
+    {
+      "source": "/docs/lend/liquidation",
+      "destination": "/docs/lend/borrow/liquidation"
     }
   ]
 }

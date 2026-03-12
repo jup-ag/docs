@@ -192,23 +192,7 @@ Do the work following the Writing and Reviewing guidelines below. After writing:
 - Self-review against the Reviewing checklist
 - Ensure all acceptance criteria from the Linear issue are met
 
-### 6. Ship
-
-Once the work is ready:
-- Run through the Reviewing and Pre-Commit checklists
-- Commit and push the branch
-- Open a PR via `gh` CLI
-- Reference the Linear issue in the PR body with a link: `Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX)`
-- Update the Linear issue to `In Review`
-
-After PR is merged:
-- Return to main and pull: `git checkout main && git pull origin main`
-- Move the Linear issue to `Content` if the work creates a content opportunity
-  (video walkthrough, blog post, tweet, etc.). Most docs work does.
-- Only move to `Done` if there is genuinely no content follow-up needed
-  (e.g. typo fixes, config changes)
-
-### 7. Changelog
+#### Changelog
 
 If your changes affect a public API or product, add a changelog entry to `updates/index.mdx`.
 
@@ -239,10 +223,9 @@ Brief description of what changed and what developers need to do.
 
 Within a month, order entries by importance. Use clear headings that describe the change.
 
-### 8. Retrospective
+#### Capture learnings
 
-Once the PR is approved and before merging, run a retrospective on the work.
-Capture any reusable knowledge in `.claude/rules/` so future sessions inherit it automatically.
+As you work, capture reusable knowledge in `.claude/rules/` so future sessions inherit it automatically.
 
 | File | Trigger |
 |------|---------|
@@ -253,6 +236,22 @@ Capture any reusable knowledge in `.claude/rules/` so future sessions inherit it
 These files are auto-loaded at the start of every session. Entries here eliminate repeat
 discovery work and prevent the same mistakes across contributors. If you hit something
 non-obvious during the task, document it.
+
+### 6. Ship
+
+Once the work is ready:
+- Run through the Reviewing and Pre-Commit checklists
+- Commit and push the branch
+- Open a PR via `gh` CLI
+- Reference the Linear issue in the PR body with a link: `Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX)`
+- Update the Linear issue to `In Review`
+
+After PR is merged:
+- Return to main and pull: `git checkout main && git pull origin main`
+- Move the Linear issue to `Content` if the work creates a content opportunity
+  (video walkthrough, blog post, tweet, etc.). Most docs work does.
+- Only move to `Done` if there is genuinely no content follow-up needed
+  (e.g. typo fixes, config changes)
 
 ---
 

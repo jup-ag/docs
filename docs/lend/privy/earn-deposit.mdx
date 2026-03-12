@@ -1,26 +1,26 @@
 ---
-title: "Withdraw from Earn with Privy"
-description: "Withdraw assets from Jupiter Earn vaults using Privy embedded wallets."
-llmsDescription: "How to withdraw from Jupiter Earn vaults using Privy embedded wallets. Covers PrivyClient setup, getWithdrawIxs from @jup-ag/lend/earn, optional getUserPosition from @jup-ag/lend-read for max withdraw, building VersionedTransaction, signing via privy.wallets().solana().signTransaction, and sending the transaction. Complete flow for keyless Earn withdrawals."
+title: "Deposit to Earn with Privy"
+description: "Deposit assets into Jupiter Earn vaults using Privy embedded wallets."
+llmsDescription: "How to deposit into Jupiter Earn vaults using Privy embedded wallets. Covers PrivyClient setup, wallet creation, getDepositIxs from @jup-ag/lend/earn to build deposit instructions, building VersionedTransaction for Privy signing, signing via privy.wallets().solana().signTransaction, and sending the transaction. Complete flow for keyless Earn deposits."
 ---
 
-Withdraw assets from Jupiter Earn vaults using Privy embedded wallets. Users can redeem their yield-earning position without managing their own private keys.
+Deposit assets into Jupiter Earn vaults using Privy embedded wallets. Users can earn yield without managing their own private keys.
 
 ## Prerequisites
 
 ```bash
-npm install @solana/web3.js@1 bn.js @jup-ag/lend @jup-ag/lend-read @privy-io/node
+npm install @solana/web3.js@1 bn.js @jup-ag/lend @privy-io/node
 ```
 
 ---
 
-## Withdraw from Earn with Privy
+## Deposit to Earn with Privy
 
 <Steps>
   <Step>
     ### Import Dependencies
 
-    Import the required packages for Privy client, Solana RPC, and Jupiter Lend Earn SDK.
+    Import the required packages for Privy client, Solana RPC, and Jupiter Lend Earn SDK operations.
 
     ```typescript
     import { PrivyClient } from "@privy-io/node";
@@ -31,7 +31,7 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @jup-ag/lend-read @privy-io/nod
       VersionedTransaction,
     } from "@solana/web3.js";
     import BN from "bn.js";
-    import { getWithdrawIxs } from "@jup-ag/lend/earn";
+    import { getDepositIxs } from "@jup-ag/lend/earn";
     ```
   </Step>
 
@@ -45,7 +45,7 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @jup-ag/lend-read @privy-io/nod
     const PRIVY_APP_SECRET = "put-your-privy-app-secret-here";
     const RPC_ENDPOINT = "https://api.mainnet-beta.solana.com";
     const ASSET_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC
-    const WITHDRAW_AMOUNT = new BN(10_000_000); // 10 USDC (6 decimals)
+    const DEPOSIT_AMOUNT = new BN(10_000_000); // 10 USDC (6 decimals)
     const AUTH_KEY_ID = "put-your-auth-key-id-here"; // from Privy dashboard or REST API
     const AUTH_KEY_PRIVATE = "put-your-auth-key-private-here"; // P-256 private key
     const WALLET_ID = "put-your-wallet-id-here";
@@ -59,7 +59,9 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @jup-ag/lend-read @privy-io/nod
     ```
 
     <Note>
-      Update the configuration values with your Privy app credentials. `AUTH_KEY_ID` identifies the authorization key (from dashboard/API), `AUTH_KEY_PRIVATE` is the P-256 private key used for signing. See the [Privy authorization keys docs](https://docs.privy.io/controls/authorization-keys/owners/overview) for setup.
+      Update the configuration values with your Privy app credentials. Ensure the Privy wallet holds SOL (for fees) and USDC (for deposit).
+
+      **Authorization keys:** Generate a P-256 key pair via the [Privy dashboard](https://docs.privy.io/controls/authorization-keys/keys/create/key), `generateP256KeyPair()` from `@privy-io/node`, or OpenSSL. The dashboard/API returns a **key ID** (`AUTH_KEY_ID`) used to identify the key when configuring wallet ownership. The **private key** (`AUTH_KEY_PRIVATE`) is used in the `authorization_context` when signing transactions. See the [Privy authorization keys docs](https://docs.privy.io/controls/authorization-keys/owners/overview) for details.
     </Note>
   </Step>
 
@@ -75,45 +77,23 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @jup-ag/lend-read @privy-io/nod
     }
     const signer = new PublicKey(wallet.address);
     ```
-
-    <Accordion title="Withdraw full position">
-      To withdraw the entire balance instead of a fixed amount, use the Read SDK to fetch the position:
-
-      ```typescript
-      import { Client } from "@jup-ag/lend-read";
-
-      const readClient = new Client(connection);
-      const position = await readClient.lending.getUserPosition(
-        new PublicKey(ASSET_MINT),
-        signer
-      );
-
-      if (position.underlyingAssets.isZero()) {
-        throw new Error("No Earn position to withdraw");
-      }
-
-      const WITHDRAW_AMOUNT = position.underlyingAssets;
-      ```
-
-      This requires `@jup-ag/lend-read`: `npm install @jup-ag/lend-read`
-    </Accordion>
   </Step>
 
   <Step>
-    ### Build Withdraw Instructions
+    ### Build Deposit Instructions
 
-    Use the Jupiter Lend Earn SDK to generate withdraw instructions.
+    Use the Jupiter Lend Earn SDK to generate deposit instructions.
 
     ```typescript
-    const { ixs: withdrawIxs } = await getWithdrawIxs({
+    const { ixs: depositIxs } = await getDepositIxs({
       connection,
       signer,
       asset: new PublicKey(ASSET_MINT),
-      amount: WITHDRAW_AMOUNT,
+      amount: DEPOSIT_AMOUNT,
     });
 
-    if (!withdrawIxs?.length) {
-      throw new Error("No withdraw instructions returned by Jupiter Lend SDK");
+    if (!depositIxs?.length) {
+      throw new Error("No deposit instructions returned by Jupiter Lend SDK");
     }
     ```
   </Step>
@@ -130,7 +110,7 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @jup-ag/lend-read @privy-io/nod
     const message = new TransactionMessage({
       payerKey: signer,
       recentBlockhash: blockhash,
-      instructions: withdrawIxs,
+      instructions: depositIxs,
     }).compileToV0Message();
 
     const transaction = new VersionedTransaction(message);
@@ -181,11 +161,11 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @jup-ag/lend-read @privy-io/nod
       { signature, blockhash, lastValidBlockHeight },
       "confirmed"
     );
-    console.log("Withdrawal successful! Signature:", signature);
+    console.log("Deposit successful! Signature:", signature);
     ```
 
     <Tip>
-      The withdrawal is complete. The user's vault shares have been redeemed for underlying tokens (e.g. USDC) in their Privy wallet.
+      The deposit is complete. The user's funds are now earning yield in Jupiter Earn via their Privy embedded wallet.
     </Tip>
   </Step>
 </Steps>
@@ -195,10 +175,10 @@ npm install @solana/web3.js@1 bn.js @jup-ag/lend @jup-ag/lend-read @privy-io/nod
 ## Related
 
 <CardGroup cols={2}>
-  <Card title="Deposit to Earn with Privy" icon="wallet" href="/docs/lend/earn/privy-deposit">
-    Deposit into Earn using Privy wallets
+  <Card title="Deposit to Earn" icon="wallet" href="/docs/lend/earn/deposit">
+    Standard Earn deposit with keypair signing
   </Card>
-  <Card title="Withdraw from Earn" icon="arrow-right-from-bracket" href="/docs/lend/earn/withdraw">
-    Standard Earn withdraw with keypair signing
+  <Card title="Withdraw from Earn with Privy" icon="arrow-right-from-bracket" href="/docs/lend/privy/earn-withdraw">
+    Withdraw from Earn using Privy wallets
   </Card>
 </CardGroup>

@@ -175,13 +175,17 @@ Example response:
 |:------|:------------|
 | `id` | Unique trade identifier |
 | `ownerPubkey` | Trader's wallet address |
+| `marketId` | Market identifier |
 | `message` | Human-readable trade summary |
+| `timestamp` | Unix timestamp (seconds) of the trade |
 | `action` | `buy` or `sell` |
 | `side` | `yes` or `no` |
 | `priceUsd` | Execution price in micro USD |
 | `amountUsd` | Total trade value in micro USD |
 | `eventTitle` | Parent event title |
 | `marketTitle` | Market title |
+| `eventImageUrl` | Image URL for the parent event |
+| `eventId` | Parent event identifier |
 
 ---
 
@@ -226,8 +230,8 @@ Example response:
       "wrongPredictions": 10,
       "winRatePct": "75.00",
       "period": "weekly",
-      "periodStart": "2026-02-24",
-      "periodEnd": "2026-03-03"
+      "periodStart": "2026-02-24T00:00:00.000Z",
+      "periodEnd": "2026-03-03T00:00:00.000Z"
     },
     {
       "ownerPubkey": "second-trader-pubkey",
@@ -238,8 +242,8 @@ Example response:
       "wrongPredictions": 18,
       "winRatePct": "67.27",
       "period": "weekly",
-      "periodStart": "2026-02-24",
-      "periodEnd": "2026-03-03"
+      "periodStart": "2026-02-24T00:00:00.000Z",
+      "periodEnd": "2026-03-03T00:00:00.000Z"
     }
   ],
   "summary": {

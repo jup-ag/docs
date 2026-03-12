@@ -241,7 +241,7 @@ Within a month, order entries by importance. Use clear headings that describe th
 
 ### 8. Retrospective
 
-Before requesting review, run a retrospective on the work.
+Once the PR is approved and before merging, run a retrospective on the work.
 Capture any reusable knowledge in `.claude/rules/` so future sessions inherit it automatically.
 
 | File | Trigger |

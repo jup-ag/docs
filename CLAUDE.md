@@ -239,19 +239,20 @@ Brief description of what changed and what developers need to do.
 
 Within a month, order entries by importance. Use clear headings that describe the change.
 
-### 8. Learn
+### 8. Retrospective
 
-After shipping, reflect on whether the work surfaced anything a future session should know.
-Update `.claude/rules/` if any of these apply:
+After the PR is merged and the Linear issue is moved, run a post-ship retrospective on the work.
+Capture any reusable knowledge in `.claude/rules/` so future sessions inherit it automatically.
 
-| File | Update when... |
-|------|----------------|
-| `product-learning.md` | You discovered undocumented API behaviour, gotchas, corrections, or open questions |
-| `decisions.md` | You made an IA decision, added redirects, or chose between structural alternatives |
-| `style-guide.md` | You established a new terminology convention, formatting pattern, or content rule |
+| File | Trigger |
+|------|---------|
+| `product-learning.md` | Undocumented API behaviour, response schema drift, parameter gotchas, or open questions discovered during implementation |
+| `decisions.md` | Information architecture decisions (page placement, redirects, structural trade-offs) with rationale |
+| `style-guide.md` | New terminology conventions, formatting patterns, or content rules established during review |
 
-This is not optional busywork. These files are loaded every session and prevent
-repeating mistakes. If you learned something non-obvious while working, write it down.
+These files are auto-loaded at the start of every session. Entries here eliminate repeat
+discovery work and prevent the same mistakes across contributors. If you hit something
+non-obvious during the task, document it.
 
 ---
 

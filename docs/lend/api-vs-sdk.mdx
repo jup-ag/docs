@@ -20,22 +20,22 @@ Jupiter Lend provides multiple integration options:
 
 | Capability | REST API | Read SDK | Lend SDK |
 | ---------- | -------- | -------- | -------- |
-| Earn tokens and pool details | `tokens` endpoint | `getAllJlTokens`, `getJlTokenDetails`, `getAllJlTokenDetails` | — |
-| Earn user positions | `positions` endpoint | `getUserPosition`, `getUserPositions` | — |
-| Earnings data | `earnings` endpoint | — | — |
-| Vault config and state | — | `getAllVaults`, `getVaultByVaultId` | — |
-| Borrow user positions | Coming soon | `getAllUserPositions`, `getPositionByVaultId` | — |
-| Earn transactions (deposit, withdraw, mint, redeem) | `deposit`, `withdraw`, `mint`, `redeem` or `*-instructions` | — | `getDepositIxs`, `getWithdrawIxs`, `getMintIxs`, `getRedeemIxs` |
-| Borrow transactions | Coming soon | — | `getInitPositionIx`, `getOperateIx`, etc. |
+| Earn tokens and pool details | `tokens` endpoint | `getAllJlTokens`, `getJlTokenDetails`, `getAllJlTokenDetails` | - |
+| Earn user positions | `positions` endpoint | `getUserPosition`, `getUserPositions` | - |
+| Earnings data | `earnings` endpoint | - | - |
+| Vault config and state | - | `getAllVaults`, `getVaultByVaultId` | - |
+| Borrow user positions | Coming soon | `getAllUserPositions`, `getPositionByVaultId` | - |
+| Earn transactions (deposit, withdraw, mint, redeem) | `deposit`, `withdraw`, `mint`, `redeem` or `*-instructions` | - | `getDepositIxs`, `getWithdrawIxs`, `getMintIxs`, `getRedeemIxs` |
+| Borrow transactions | Coming soon | - | `getInitPositionIx`, `getOperateIx`, etc. |
 | Language | Any (HTTP) | TypeScript/JavaScript | TypeScript/JavaScript |
 
 ## Data and analytics
 
 ### Earn tokens and positions
 
-**REST API** — Fetch available tokens, positions, and earnings via HTTP. See the [Earn API reference](/api-reference/lend/earn) for endpoints (`tokens`, `positions`, `earnings`), and request formats.
+**REST API:** Fetch available tokens, positions, and earnings via HTTP. See the [Earn API reference](/api-reference/lend/earn) for endpoints (`tokens`, `positions`, `earnings`), and request formats.
 
-**Read SDK** — Read tokens and positions directly from chain:
+**Read SDK:** Read tokens and positions directly from chain:
 
 ```typescript
 import { Client } from "@jup-ag/lend-read";
@@ -53,7 +53,7 @@ const positions = await client.lending.getUserPositions(user);
 
 ### Vault and Borrow data
 
-**Read SDK** — Vault and position reads:
+**Read SDK:** Vault and position reads:
 
 ```typescript
 // All vaults
@@ -74,9 +74,9 @@ const { userPosition, vaultData } = await client.vault.getPositionByVaultId(vaul
 
 ### Earn deposit and withdraw
 
-**REST API** — Request unsigned transactions or instructions for deposit, withdraw, mint, and redeem. See the [Earn API reference](/api-reference/lend/earn) for `deposit`, `withdraw`, `mint`, `redeem` and `deposit-instructions`, `withdraw-instructions`, `mint-instructions`, `redeem-instructions` endpoints.
+**REST API:** Request unsigned transactions or instructions for deposit, withdraw, mint, and redeem. See the [Earn API reference](/api-reference/lend/earn) for `deposit`, `withdraw`, `mint`, `redeem` and `deposit-instructions`, `withdraw-instructions`, `mint-instructions`, `redeem-instructions` endpoints.
 
-**Lend SDK** — Build instructions directly:
+**Lend SDK:** Build instructions directly:
 
 ```typescript
 import { getDepositIxs, getWithdrawIxs } from "@jup-ag/lend/earn";

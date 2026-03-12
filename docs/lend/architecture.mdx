@@ -42,9 +42,9 @@ Protocols (Lending, Vaults) must be registered via `init_new_protocol(supply_min
 
 ### Operate flow
 
-1. **pre_operate(mint)** — marks the interacting protocol and timestamp on `TokenReserve`
+1. **pre_operate(mint):** marks the interacting protocol and timestamp on `TokenReserve`
 2. Caller moves tokens into the Liquidity vault (via SPL transfer)
-3. **operate(supply_amount, borrow_amount, withdraw_to, borrow_to, transfer_type)** — updates exchange prices, UserSupplyPosition/UserBorrowPosition, TokenReserve totals, and performs transfers
+3. **operate(supply_amount, borrow_amount, withdraw_to, borrow_to, transfer_type):** updates exchange prices, UserSupplyPosition/UserBorrowPosition, TokenReserve totals, and performs transfers
 
 Exchange prices and rates are updated during `operate`, so interest accrues on every interaction.
 
@@ -96,10 +96,10 @@ Vaults use **tick-based** pricing: collateralization is computed from a price-ra
 
 ### User flow
 
-- **init_position** — create Position + position mint NFT
-- **operate** — deposit/withdraw collateral, borrow/repay debt
-- **liquidate** — liquidate undercollateralized positions
-- **rebalance** — rebalancer supplies/borrows on Liquidity to match vault demand
+- **init_position:** create Position + position mint NFT
+- **operate:** deposit/withdraw collateral, borrow/repay debt
+- **liquidate:** liquidate undercollateralized positions
+- **rebalance:** rebalancer supplies/borrows on Liquidity to match vault demand
 
 The protocol signer for Liquidity CPI is the **VaultConfig PDA**. Each vault has both a `UserSupplyPosition` (collateral) and a `UserBorrowPosition` (debt) on Liquidity. The Oracle program provides prices for collateral valuation and liquidation checks.
 

@@ -130,7 +130,7 @@ For **borrow**: `colAmount` = 0, `debtAmount` > 0.
 
 <AccordionGroup>
   <Accordion title="How much can you borrow?">
-    Your maximum borrow depends on your collateral value, the vault's loan-to-value (LTV) limits, and current borrows. Keep LTV below the liquidation threshold. The SDK does not provide a "max borrow" sentinel—compute the maximum from your position (e.g. `getCurrentPosition` or `getFinalPosition`) and the vault's LTV, or use your app/API for the limit.
+    Your maximum borrow depends on your collateral value, the vault's loan-to-value (LTV) limits, and current borrows. Keep LTV below the liquidation threshold. The SDK does not provide a "max borrow" sentinel. Compute the maximum from your position (e.g. `getCurrentPosition` or `getFinalPosition`) and the vault's LTV, or use your app/API for the limit.
   </Accordion>
   <Accordion title="Interest">
     Borrowed amounts accrue interest over time. Repay to reduce debt and stop interest on the repaid portion.

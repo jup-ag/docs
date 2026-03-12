@@ -20,8 +20,8 @@ For TypeScript SDK integration (off-chain), see [Create Position](/docs/lend/bor
 
 Vault CPI requires two steps:
 
-1. **Initialise Position NFT** — creates the on-chain position (one-time per position)
-2. **Operate** — a single function for all deposit, withdraw, borrow, and payback operations
+1. **Initialise Position NFT:** creates the on-chain position (one-time per position)
+2. **Operate:** a single function for all deposit, withdraw, borrow, and payback operations
 
 ---
 
@@ -224,8 +224,8 @@ pub struct OperateParams<'info> {
 | `borrow_rate_model` | Borrow interest rate model | Mutable |
 | `vault_supply_token_account` | Vault's supply token holding account | Mutable |
 | `vault_borrow_token_account` | Vault's borrow token holding account | Mutable |
-| `supply_token_claim_account` | Optional — for claim-type transfers on supply side | Mutable |
-| `borrow_token_claim_account` | Optional — for claim-type transfers on borrow side | Mutable |
+| `supply_token_claim_account` | Optional, for claim-type transfers on supply side | Mutable |
+| `borrow_token_claim_account` | Optional, for claim-type transfers on borrow side | Mutable |
 | `liquidity` | Main liquidity protocol PDA | Mutable |
 | `liquidity_program` | Liquidity protocol program ID | Mutable |
 | `oracle_program` | Oracle program ID | Immutable |
@@ -422,6 +422,6 @@ await program.methods
 ### Return Values
 
 The `operate` function returns:
-- `nft_id` — position NFT ID
-- `new_col_final` — final collateral change amount (unscaled)
-- `new_debt_final` — final debt change amount (unscaled)
+- `nft_id`: position NFT ID
+- `new_col_final`: final collateral change amount (unscaled)
+- `new_debt_final`: final debt change amount (unscaled)

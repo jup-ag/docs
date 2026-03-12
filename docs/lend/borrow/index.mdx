@@ -4,7 +4,7 @@ description: "Introduction to Jupiter Borrow and the Read SDK."
 llmsDescription: "Introduction to Jupiter Borrow, the collateralised borrowing side of Jupiter Lend. Covers the vault and position model (NFT-based positions, tick-based pricing), key TypeScript data structures (VaultConfig, UserPosition, NftPosition), and links to borrow operations and vault data reading via the Read SDK."
 ---
 
-Jupiter Borrow is the collateralized borrowing side of Jupiter Lend. Users create positions by depositing collateral into vaults, then borrow against that collateral. Each vault has a supply token (collateral) and a borrow token. Positions are represented as NFTs, and the protocol tracks collateral, debt, tick-based pricing, and liquidation status. Users can deposit, borrow, repay, withdraw, and liquidators can liquidate undercollateralized positions. Integration is done via the Jupiter Lend SDK for transactions and the Read SDK for vault and position data.
+Jupiter Borrow is the collateralised borrowing side of Jupiter Lend. Users create positions by depositing collateral into vaults, then borrow against that collateral. Each vault has a supply token (collateral) and a borrow token. Positions are represented as NFTs, and the protocol tracks collateral, debt, tick-based pricing, and liquidation status. Users can deposit, borrow, repay, withdraw, and liquidators can liquidate undercollateralised positions. Integration is done via the Jupiter Lend SDK for transactions and the Read SDK for vault and position data.
 
 ---
 
@@ -114,7 +114,7 @@ type NftPosition = {
 ## Vault and position model
 
 - **Vault** — A market with a supply token (collateral) and borrow token. Each vault has config (oracle, risk params), state (totals, exchange prices), and limits (withdraw, borrow availability).
-- **Position** — A user's collateralized borrow. Identified by vault ID and position (NFT) id. Tracks collateral (supply), debt (borrow), tick, and liquidation status.
+- **Position** — A user's collateralised borrow. Identified by vault ID and position (NFT) id. Tracks collateral (supply), debt (borrow), tick, and liquidation status.
 - **Tick** — Price ticks determine the borrow amount for a given collateral amount. Positions use tick-based pricing for leverage.
 
 ---

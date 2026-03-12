@@ -9,14 +9,7 @@
   },
   "favicon": "/favicon.png",
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "cursor",
-      "vscode"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude", "cursor", "vscode"]
   },
   "appearance": {
     "default": "dark"
@@ -37,9 +30,7 @@
         "groups": [
           {
             "group": " ",
-            "pages": [
-              "index"
-            ]
+            "pages": ["index"]
           }
         ]
       },
@@ -137,9 +128,7 @@
                       },
                       {
                         "group": "Debugging",
-                        "pages": [
-                          "docs/swap/common-errors"
-                        ]
+                        "pages": ["docs/swap/common-errors"]
                       }
                     ]
                   }
@@ -280,9 +269,7 @@
             "groups": [
               {
                 "group": " ",
-                "pages": [
-                  "docs/prediction/index"
-                ]
+                "pages": ["docs/prediction/index"]
               },
               {
                 "group": "Trading Guides",
@@ -310,9 +297,7 @@
             "groups": [
               {
                 "group": " ",
-                "pages": [
-                  "docs/perps/index"
-                ]
+                "pages": ["docs/perps/index"]
               },
               {
                 "group": "Perps Program",
@@ -331,9 +316,7 @@
             "groups": [
               {
                 "group": " ",
-                "pages": [
-                  "docs/trigger/index"
-                ]
+                "pages": ["docs/trigger/index"]
               },
               {
                 "group": "Trigger Order API",
@@ -371,9 +354,7 @@
             "groups": [
               {
                 "group": " ",
-                "pages": [
-                  "docs/recurring/index"
-                ]
+                "pages": ["docs/recurring/index"]
               },
               {
                 "group": "Recurring API",
@@ -393,9 +374,7 @@
               },
               {
                 "group": "Debugging",
-                "pages": [
-                  "docs/recurring/best-practices"
-                ]
+                "pages": ["docs/recurring/best-practices"]
               }
             ]
           },
@@ -405,9 +384,7 @@
             "groups": [
               {
                 "group": " ",
-                "pages": [
-                  "docs/portfolio/index"
-                ]
+                "pages": ["docs/portfolio/index"]
               },
               {
                 "group": "Portfolio API",
@@ -424,9 +401,7 @@
             "groups": [
               {
                 "group": " ",
-                "pages": [
-                  "docs/send/index"
-                ]
+                "pages": ["docs/send/index"]
               },
               {
                 "group": "Send API",
@@ -446,9 +421,7 @@
             "groups": [
               {
                 "group": " ",
-                "pages": [
-                  "docs/studio/index"
-                ]
+                "pages": ["docs/studio/index"]
               },
               {
                 "group": "Studio API",
@@ -466,9 +439,7 @@
             "groups": [
               {
                 "group": " ",
-                "pages": [
-                  "docs/lock/index"
-                ]
+                "pages": ["docs/lock/index"]
               }
             ]
           },
@@ -478,9 +449,7 @@
             "groups": [
               {
                 "group": " ",
-                "pages": [
-                  "docs/routing/index"
-                ]
+                "pages": ["docs/routing/index"]
               },
               {
                 "group": "Routing Integrations",
@@ -505,9 +474,7 @@
         "groups": [
           {
             "group": " ",
-            "pages": [
-              "guides/index"
-            ]
+            "pages": ["guides/index"]
           },
           {
             "group": "Developer Guides",
@@ -527,9 +494,7 @@
         "groups": [
           {
             "group": " ",
-            "pages": [
-              "api-reference/index"
-            ]
+            "pages": ["api-reference/index"]
           },
           {
             "group": "API Reference",
@@ -601,10 +566,7 @@
                   },
                   {
                     "group": "V2 (Deprecated)",
-                    "pages": [
-                      "api-reference/price/v2",
-                      "api-reference/price/v2/price"
-                    ]
+                    "pages": ["api-reference/price/v2", "api-reference/price/v2/price"]
                   }
                 ]
               }
@@ -793,9 +755,7 @@
         "groups": [
           {
             "group": " ",
-            "pages": [
-              "tool-kits/index"
-            ]
+            "pages": ["tool-kits/index"]
           },
           {
             "group": "Jupiter Plugin",
@@ -804,9 +764,9 @@
               {
                 "group": "Walkthrough",
                 "pages": [
-                  "tool-kits/plugin/nextjs-app-example",
-                  "tool-kits/plugin/react-app-example",
-                  "tool-kits/plugin/html-app-example"
+                "tool-kits/plugin/nextjs-app-example",
+                "tool-kits/plugin/react-app-example",
+                "tool-kits/plugin/html-app-example"
                 ]
               },
               "tool-kits/plugin/customization",
@@ -823,9 +783,7 @@
           },
           {
             "group": "Jupiter Referral Program",
-            "pages": [
-              "tool-kits/referral-program"
-            ]
+            "pages": ["tool-kits/referral-program"]
           }
         ]
       },
@@ -961,19 +919,19 @@
   },
   "seo": {
     "metatags": {
-      "og:title": "Jupiter Developers",
-      "og:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
-      "og:image": "/logo/og.png",
-      "og:type": "website",
-      "og:url": "https://dev.jup.ag/",
-      "og:site_name": "Jupiter Developers",
-      "description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
-      "keywords": "Jupiter, Jupiter Developer Documentation, Jupiter API, Jupiter SDK, Jupiter Swap, Jupiter V6, Jupiter Lend, Jupiter Perps, Jupiter Studio, Jupiter Tool Kits, Jupiter Plugin, Jupiter Terminal, Jupiter Mobile Adapter, Jupiter Wallet Kit, Jupiter Referral Program, Jupiter Routing, Solana, Crypto, Solana Swap, Crypto Swap",
-      "twitter:card": "summary_large_image",
-      "twitter:site": "@JupiterExchange",
-      "twitter:title": "Jupiter Developers",
-      "twitter:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
-      "twitter:image": "/logo/og.png"
+        "og:title": "Jupiter Developers",
+        "og:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
+        "og:image": "/logo/og.png",
+        "og:type": "website",
+        "og:url": "https://dev.jup.ag/",
+        "og:site_name": "Jupiter Developers",
+        "description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
+        "keywords": "Jupiter, Jupiter Developer Documentation, Jupiter API, Jupiter SDK, Jupiter Swap, Jupiter V6, Jupiter Lend, Jupiter Perps, Jupiter Studio, Jupiter Tool Kits, Jupiter Plugin, Jupiter Terminal, Jupiter Mobile Adapter, Jupiter Wallet Kit, Jupiter Referral Program, Jupiter Routing, Solana, Crypto, Solana Swap, Crypto Swap",
+        "twitter:card": "summary_large_image",
+        "twitter:site": "@JupiterExchange",
+        "twitter:title": "Jupiter Developers",
+        "twitter:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
+        "twitter:image": "/logo/og.png"
     }
   },
   "redirects": [

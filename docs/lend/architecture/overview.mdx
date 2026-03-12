@@ -11,7 +11,7 @@ Jupiter Lend is built on three core programs: **Liquidity** (the shared lending 
 | Program   | Purpose                                                                           | Program ID                                    |
 |-----------|-----------------------------------------------------------------------------------|-----------------------------------------------|
 | Liquidity | Core layer: token vaults, exchange prices, utilization, rates                     | `jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC` |
-| Lending   | Earn: deposit assets, mint jltokens, supply into Liquidity                        | `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9` |
+| Lending   | Earn: deposit assets, mint jlTokens, supply into Liquidity                        | `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9` |
 | Vaults    | Borrow: collateralize, borrow, liquidate, supply/borrow via Liquidity             | `jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi` |
 
 ```
@@ -23,7 +23,7 @@ Jupiter Lend is built on three core programs: **Liquidity** (the shared lending 
 ┌──────────────────────────────┐    ┌──────────────────────────────┐
 │  Lending (Earn)              │    │  Vaults (Borrow)             │
 │  deposit / withdraw / redeem │    │  deposit / borrow / repay    │
-│  mint jltokens               │    │  liquidate / rebalance       │
+│  mint jlTokens               │    │  liquidate / rebalance       │
 └──────────────┬───────────────┘    └──────────────┬───────────────┘
                │                                   │
                │         CPI (operate)             │
@@ -71,7 +71,7 @@ Exchange prices and rates are updated during `operate`, so interest accrues on e
 
 ## Lending (Earn)
 
-Earn lets users deposit assets and receive jltokens (shares). Deposits are supplied into Liquidity; jltokens represent a share of the pool with accrued interest and rewards.
+Earn lets users deposit assets and receive jlTokens (shares). Deposits are supplied into Liquidity; jlTokens represent a share of the pool with accrued interest and rewards.
 
 ### Key state
 
@@ -82,10 +82,10 @@ Earn lets users deposit assets and receive jltokens (shares). Deposits are suppl
 
 ### User flow
 
-- **Deposit:** User transfers tokens → Lending CPIs Liquidity `pre_operate` + `operate(supply)` → mints jltokens
-- **Withdraw/Redeem:** Burns jltokens → CPIs Liquidity `operate(withdraw)` → user receives underlying
+- **Deposit:** User transfers tokens → Lending CPIs Liquidity `pre_operate` + `operate(supply)` → mints jlTokens
+- **Withdraw/Redeem:** Burns jlTokens → CPIs Liquidity `operate(withdraw)` → user receives underlying
 
-The protocol signer for Liquidity CPI is the **Lending PDA** (not the user). Each Lending pool has a single `UserSupplyPosition` on Liquidity for that mint. The rewards rate model (separate program) adjusts the jltoken exchange price to include rewards on top of base yield.
+The protocol signer for Liquidity CPI is the **Lending PDA** (not the user). Each Lending pool has a single `UserSupplyPosition` on Liquidity for that mint. The rewards rate model (separate program) adjusts the jlToken exchange price to include rewards on top of base yield.
 
 ### CPI summary
 
@@ -148,7 +148,7 @@ Both Lending and Vaults share the same Liquidity layer:
 User → Lending.deposit() → transfer tokens to Liquidity vault
                          → pre_operate (Lending PDA)
                          → operate(supply, borrow=0)
-                         → mint jltokens
+                         → mint jlTokens
 ```
 
 ### Borrow (Vaults)
@@ -175,9 +175,9 @@ User → Vaults.operate() → transfer collateral to vault
 
 ## Related docs
 
-- [Unifying Liquidity](/docs/lend/liquidity/index) — Liquidity layer overview and key features
-- [Earn Overview](/docs/lend/earn/index) — deposit/withdraw mechanics
-- [Borrow Overview](/docs/lend/borrow/index) — vaults, positions, liquidations
-- [Liquidity analytics](/docs/lend/liquidity/analytics) — market data, utilization, exchange prices
-- [Oracles](/docs/lend/architecture/oracles) — price feeds for vaults
-- [Program addresses](/docs/lend/program-addresses) — program IDs and IDL
+- [Unifying Liquidity](/docs/lend/liquidity/index): Liquidity layer overview and key features
+- [Earn Overview](/docs/lend/earn/index): deposit/withdraw mechanics
+- [Borrow Overview](/docs/lend/borrow/index): vaults, positions, liquidations
+- [Liquidity analytics](/docs/lend/liquidity/analytics): market data, utilization, exchange prices
+- [Oracles](/docs/lend/architecture/oracles): price feeds for vaults
+- [Program addresses](/docs/lend/program-addresses): program IDs and IDL

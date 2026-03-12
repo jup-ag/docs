@@ -20,6 +20,16 @@ description: "Latest announcements and breaking changes across Jupiter APIs."
 
 <Update label="March 2026" description="">
 
+### Lend Earn API: Earnings endpoint schema change
+
+The `GET /lend/v1/earn/earnings` response schema has been updated:
+
+* **Removed:** `totalDeposits`, `totalWithdraws`, `totalBalance`, `totalAssets` fields
+* **Changed:** `earnings` type from `string` to `number`
+* **Added:** `slot` field (`number`) indicating the slot at which earnings were computed
+
+---
+
 ## Jupiter Lend Documentation
 
 Comprehensive documentation for Jupiter Lend (powered by Instadapp) is now available, covering the full Lend product suite.
@@ -30,14 +40,6 @@ Comprehensive documentation for Jupiter Lend (powered by Instadapp) is now avail
 * **Liquidity & Analytics:** Reserve data, utilisation curves, and on-chain analytics queries
 * **Advanced Recipes:** Multiply (leveraged long), Unwind (deleverage), Repay-with-Collateral, and Vault Swap, all using CPI + Jupiter swap in a single transaction
 * **Architecture:** Three-program design (Liquidity Layer, Lending/Earn, Vaults/Borrow) with oracle integration (Pyth, SwitchboardV2, ScopePrices)
-
-### Earn API: Earnings endpoint schema change
-
-The `GET /lend/v1/earn/earnings` response schema has been updated:
-
-* **Removed:** `totalDeposits`, `totalWithdraws`, `totalBalance`, `totalAssets` fields
-* **Changed:** `earnings` type from `string` to `number`
-* **Added:** `slot` field (`number`) indicating the slot at which earnings were computed
 
 <Card title="Lend Documentation" href="/docs/lend" icon="building-columns" iconType="solid" horizontal/>
 

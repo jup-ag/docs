@@ -90,11 +90,8 @@ Core product documentation covering each Jupiter API with usage guides and code 
 
 - [Jupiter Lend Overview](https://dev.jup.ag/docs/lend/index.md): Overview of Jupiter Lend, covering Earn (deposit-and-earn yield) and Borrow (collateralised borrowing) on Solana. Includes installation of @jup-ag/lend and @solana/web3.js, RPC setup, wallet creation, and links to Earn vaults and Borrow markets documentation.
 - [API vs SDK](https://dev.jup.ag/docs/lend/api-vs-sdk.md): Comparison of Jupiter Lend integration options: REST API for language-agnostic HTTP access to Earn endpoints, @jup-ag/lend-read Read SDK for on-chain Earn and Borrow data, and @jup-ag/lend Lend SDK for instruction building. Includes capability matrix, code examples, and recommended usage table.
-
-#### Architecture
-
-- [Core Architecture](https://dev.jup.ag/docs/lend/architecture/overview.md): Jupiter Lend core architecture: three-program design with Liquidity as the core layer, Lending (Earn) for deposit-and-earn, and Vaults (Borrow) for collateralized borrowing. Covers CPI flow, shared state, TokenReserve, UserSupplyPosition, UserBorrowPosition, tick-based pricing, and program IDs.
-- [Oracles](https://dev.jup.ag/docs/lend/architecture/oracles.md): Jupiter Lend Oracle Program (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) provides price data via a hop-based system using Pyth, Chainlink, Redstone, StakePool, MsolPool, SinglePool, and JupLend sources.
+- [Core Architecture](https://dev.jup.ag/docs/lend/architecture.md): Jupiter Lend core architecture: three-program design with Liquidity as the core layer, Lending (Earn) for deposit-and-earn, and Vaults (Borrow) for collateralized borrowing. Covers CPI flow, shared state, TokenReserve, UserSupplyPosition, UserBorrowPosition, tick-based pricing, and program IDs.
+- [Oracles](https://dev.jup.ag/docs/lend/oracles.md): Jupiter Lend Oracle Program (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) provides price data via a hop-based system using Pyth, Chainlink, Redstone, StakePool, MsolPool, SinglePool, and JupLend sources.
 
 #### Earn
 

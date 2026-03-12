@@ -68,4 +68,3 @@ Track all redirects added to `vercel.json` here for visibility:
 | `/api-reference/trigger/cancel-order` | `/api-reference/trigger/v1/cancel-order` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
 | `/api-reference/trigger/cancel-orders` | `/api-reference/trigger/v1/cancel-orders` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
 | `/api-reference/trigger/get-trigger-orders` | `/api-reference/trigger/v1/get-trigger-orders` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
-| `/docs/lend/oracles` | `/docs/lend/architecture/oracles` | 2026-03-12 | Architecture restructure (DEVREL-74) |

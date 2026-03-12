@@ -126,6 +126,7 @@ Core product documentation covering each Jupiter API with usage guides and code 
 
 #### Liquidity
 
+- [Unifying Liquidity](https://dev.jup.ag/docs/lend/liquidity/index.md): Jupiter Lend Liquidity layer: single shared layer that consolidates liquidity across Earn and Borrow. Key features: capital efficiency, automated ceilings, advanced liquidation, highest LTVs.
 - [Liquidity Data & Analytics](https://dev.jup.ag/docs/lend/liquidity/analytics.md): How to use the @jup-ag/lend-read SDK Liquidity module for data and analytics: dashboards, APY aggregators, and protocol state queries. Covers listedTokens() for market discovery, getOverallTokenData() for supply/borrow rates and utilisation, getExchangePricesAndConfig() and calculateExchangePrice() for real-time price computation, getUserSupplyData() and getUserBorrowData() for individual positions, getUserMultipleBorrowSupplyData() for batched portfolio fetching, and getAllUserPositions() for global protocol state indexing. Distinct from Dune or other third-party analytics—this is the canonical SDK for Jupiter Lend liquidity layer data.
 
 #### Advanced

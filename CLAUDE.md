@@ -241,7 +241,7 @@ Within a month, order entries by importance. Use clear headings that describe th
 
 ### 8. Retrospective
 
-After the PR is merged and the Linear issue is moved, run a post-ship retrospective on the work.
+Before requesting review, run a retrospective on the work.
 Capture any reusable knowledge in `.claude/rules/` so future sessions inherit it automatically.
 
 | File | Trigger |

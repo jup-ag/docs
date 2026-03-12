@@ -20,27 +20,16 @@ description: "Latest announcements and breaking changes across Jupiter APIs."
 
 <Update label="March 2026" description="">
 
-## Jupiter Lend API & SDK
+## Jupiter Lend Documentation
 
-Comprehensive documentation for Jupiter Lend (powered by Instadapp) is now available, covering the Lend REST API and SDK.
+Comprehensive documentation for Jupiter Lend (powered by Instadapp) is now available, covering the full Lend product suite.
 
-### Lend Earn API
-
-The Earn API at `api.jup.ag/lend/v1/earn/` now has full documentation, including:
-
-* `POST /deposit` and `POST /withdraw`: deposit/withdraw by asset amount
-* `POST /mint` and `POST /redeem`: deposit/withdraw by share count
-* `GET /tokens`: list all supported vaults with supply rates and liquidity
-* `GET /positions`: query user position data (shares, underlying assets, balance)
-* `GET /earnings`: get earnings for specific positions
-* All endpoints also have `-instructions` variants for CPI and composability
-
-### Lend SDK
-
-* **Earn SDK:** `getDepositIxs`, `getWithdrawIxs`, read-data helpers for jlToken shares and balances
-* **Borrow SDK:** Create positions, deposit collateral, borrow, repay, withdraw, and combined single-transaction operations
-* **Advanced Recipes:** Multiply, Unwind, Repay-with-Collateral, and Vault Swap using CPI + Jupiter swap
-* **Flash Loans:** Borrow and repay within the same transaction
+* **Earn:** Deposit and withdraw via the Lend SDK or REST API, with read-data helpers for jlToken shares and balances
+* **Borrow:** Create positions, deposit collateral, borrow, repay, and withdraw, including combined single-transaction operations
+* **Flash Loans:** Borrow and repay within the same transaction for arbitrage, liquidation, or collateral swaps
+* **Liquidity & Analytics:** Reserve data, utilisation curves, and on-chain analytics queries
+* **Advanced Recipes:** Multiply (leveraged long), Unwind (deleverage), Repay-with-Collateral, and Vault Swap, all using CPI + Jupiter swap in a single transaction
+* **Architecture:** Three-program design (Liquidity Layer, Lending/Earn, Vaults/Borrow) with oracle integration (Pyth, SwitchboardV2, ScopePrices)
 
 <Card title="Lend Documentation" href="/docs/lend" icon="building-columns" iconType="solid" horizontal/>
 

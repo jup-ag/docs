@@ -1,0 +1,130 @@
+---
+title: "Liquidity Data & Analytics"
+description: "Query market state, interest rates, and utilisation for Jupiter Lend liquidity layer."
+llmsDescription: "How to use the @jup-ag/lend-read SDK Liquidity module for data and analytics: dashboards, APY aggregators, and protocol state queries. Covers listedTokens() for market discovery, getOverallTokenData() for supply/borrow rates and utilisation, getExchangePricesAndConfig() and calculateExchangePrice() for real-time price computation, getUserSupplyData() and getUserBorrowData() for individual positions, getUserMultipleBorrowSupplyData() for batched portfolio fetching, and getAllUserPositions() for global protocol state indexing. Distinct from Dune or other third-party analytics, this is the canonical SDK for Jupiter Lend liquidity layer data."
+---
+
+The Liquidity layer is the foundation of Jupiter Lend, holding all the underlying assets. While you usually interact with the Earn (Lending) and Borrow (Vaults) layers to perform operations, querying the Liquidity layer directly is useful for **analytics, dashboards, and APY aggregators**.
+
+The `@jup-ag/lend-read` SDK provides a `Liquidity` module to fetch real-time market data, interest rates, and raw user balances.
+
+<Note>
+  The Liquidity module is **read-only**. To supply or borrow assets, use the Earn or Borrow modules instead.
+</Note>
+
+## Understanding the Data
+
+<AccordionGroup>
+  <Accordion title="Exchange Prices">
+    **`supplyExchangePrice` & `borrowExchangePrice`**: These convert the protocol's raw internal accounting numbers into actual token amounts. As interest accrues, these prices increase. The SDK methods (like `getUserSupplyData`) automatically apply these exchange prices to give you human-readable token amounts.
+  </Accordion>
+  <Accordion title="Utilisation">
+    **`lastStoredUtilization`**: The ratio of borrowed assets to supplied assets. High utilisation drives up both supply and borrow interest rates.
+  </Accordion>
+  <Accordion title="Limits">
+    **`withdrawalLimit` & `borrowLimit`**: To protect against flash crashes or bank runs, Jupiter Lend implements automated expanding limits. You can query `withdrawable` and `borrowable` on user data objects to see exactly how much liquidity a user can move in the current block.
+  </Accordion>
+</AccordionGroup>
+
+## Discovering Markets
+
+Use `listedTokens()` as your starting point to dynamically discover which markets exist on Jupiter Lend. This fetches an array of all supported token mints (`PublicKey` objects) that have initialised reserves in the Liquidity protocol, allowing your application to automatically support new tokens as they are added without hardcoding addresses.
+
+```typescript
+import { Client } from "@jup-ag/lend-read";
+import { Connection } from "@solana/web3.js";
+
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+const client = new Client(connection);
+
+// Fetch all supported token mints
+const supportedTokens = await client.liquidity.listedTokens();
+console.log(`Jupiter Lend supports ${supportedTokens.length} assets.`);
+```
+
+## Calculating Real-Time Prices
+
+Because interest accrues constantly, the stored on-chain price is slightly outdated until someone interacts with the protocol. These methods let you fetch the raw rate configuration and calculate the exact real-time exchange price locally, which is useful for accurate dashboards and avoiding stale data.
+
+```typescript
+// Fetch the raw configuration for a token
+const config = await client.liquidity.getExchangePricesAndConfig(USDC);
+
+// Calculate the real-time exchange prices locally based on accrued interest
+const { supplyExchangePrice, borrowExchangePrice } = client.liquidity.calculateExchangePrice(config);
+
+console.log(`Supply Exchange Price: ${supplyExchangePrice.toString()}`);
+```
+
+## Querying Market Data
+
+This is the core method for building APY aggregators and TVL dashboards. It fetches comprehensive market data including `supplyRate` and `borrowRate` (to determine APYs in basis points), `lastStoredUtilization` (to see how much capital is being borrowed), and total supply/borrow metrics. You can fetch a single token or all tokens simultaneously.
+
+```typescript
+import { PublicKey } from "@solana/web3.js";
+
+const USDC = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+
+// Fetch single token data
+const data = await client.liquidity.getOverallTokenData(USDC);
+
+// Or fetch all tokens at once for efficiency
+// const allData = await client.liquidity.getAllOverallTokensData();
+
+const supplyApr = Number(data.supplyRate) / 100;
+const borrowApr = Number(data.borrowRate) / 100;
+const utilization = Number(data.lastStoredUtilization) / 100;
+
+console.log(`USDC Supply APR: ${supplyApr}% | Utilization: ${utilization}%`);
+```
+
+## Querying User Balances
+
+These methods return a specific user's exact balance for a given token. The returned `supply` or `borrow` amounts are already adjusted by real-time exchange prices, meaning they accurately reflect any interest earned or owed. They also return expanding limits dictating how much liquidity the user can instantly move.
+
+```typescript
+const userWallet = new PublicKey("YOUR_WALLET_PUBKEY");
+
+// Query a user's supply position for USDC
+const { userSupplyData } = await client.liquidity.getUserSupplyData(userWallet, USDC);
+console.log(`Supplied USDC: ${userSupplyData.supply.toString()}`);
+
+// Query a user's borrow position for USDC
+const { userBorrowData } = await client.liquidity.getUserBorrowData(userWallet, USDC);
+console.log(`Borrowed USDC: ${userBorrowData.borrow.toString()}`);
+```
+
+## Batched Portfolio Fetching
+
+Instead of making dozens of RPC requests to check a user's balance for every token, batch them. This optimised method fetches a user's entire portfolio (multiple supply and borrow positions across different tokens) in a single RPC call, reducing load times for user-facing dashboards.
+
+```typescript
+const SOL = new PublicKey("So11111111111111111111111111111111111111112");
+
+// Provide the arrays of tokens the user might be supplying or borrowing
+const supplyTokens = [USDC, SOL];
+const borrowTokens = [USDC];
+
+const portfolio = await client.liquidity.getUserMultipleBorrowSupplyData(
+  userWallet,
+  supplyTokens,
+  borrowTokens
+);
+
+console.log("Supplies:", portfolio.userSuppliesData);
+console.log("Borrows:", portfolio.userBorrowingsData);
+```
+
+## Global Protocol State
+
+This method is for analytics indexers or liquidator bots that need to map out the entire state of the protocol. It fetches every single active user position (supply and borrow) across the entire Liquidity protocol, allowing you to find the largest suppliers or identify at-risk positions globally.
+
+```typescript
+// Fetch every active position in the protocol
+const allPositions = await client.liquidity.getAllUserPositions();
+
+console.log(`Found ${allPositions.length} active positions across Jupiter Lend.`);
+
+// Example: Find the top 5 largest USDC borrowers
+// (Requires filtering the returned data by token and sorting)
+```

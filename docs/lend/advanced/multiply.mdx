@@ -1,0 +1,322 @@
+---
+title: "Multiply (Leverage)"
+description: "Build leveraged positions by combining flashloans, Jupiter Swap, and vault operations."
+llmsDescription: "How to build a leveraged (multiply/looping) position on Jupiter Lend using a single atomic Solana transaction. Combines getFlashBorrowIx/getFlashPaybackIx from @jup-ag/lend/flashloan, Jupiter Lite API swap-instructions endpoint for swaps, and getOperateIx from @jup-ag/lend/borrow for vault deposit+borrow. Covers the full flow: flashloan debt asset → swap to collateral → deposit collateral and borrow debt → payback flashloan. Includes complete TypeScript code example with VersionedTransaction, address lookup tables, and helper functions."
+---
+
+<Info>
+  These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
+</Info>
+
+"Multiply" (often called "looping" or "leveraging") is the process of using borrowed capital to increase your exposure to an asset. Use Jupiter **Lite API** for swap quotes and instructions.
+
+For example, to multiply your SOL exposure using USDC debt:
+1. You have 1 SOL (collateral).
+2. Flashloan 100 USDC from Jupiter Lend (debt asset).
+3. Swap 100 USDC → SOL using Jupiter Lite API.
+4. Deposit your SOL + swapped SOL into the vault and borrow 100 USDC.
+5. Pay back the flashloan with the borrowed USDC.
+
+All of this happens atomically in a single Solana transaction.
+
+---
+
+## Multiply
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    Import Solana web3, Jupiter Lend SDKs, and BN for amounts.
+
+    ```bash
+    npm install @solana/web3.js bn.js @jup-ag/lend @jup-ag/lend-read
+    ```
+
+    ```typescript
+    import {
+      AddressLookupTableAccount,
+      Connection,
+      Keypair,
+      PublicKey,
+      TransactionInstruction,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getFlashBorrowIx, getFlashPaybackIx } from "@jup-ag/lend/flashloan";
+    import { getOperateIx } from "@jup-ag/lend/borrow";
+    import fs from "fs";
+    import path from "path";
+    ```
+  </Step>
+  <Step titleSize="h2" title="Load Keypair and Initialise Connection">
+    Load the signer and create the RPC connection.
+
+    ```typescript
+    const KEYPAIR_PATH = "/path/to/your/keypair.json";
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    function loadKeypair(p: string): Keypair {
+      return Keypair.fromSecretKey(new Uint8Array(JSON.parse(fs.readFileSync(path.resolve(p), "utf8"))));
+    }
+    const userKeypair = loadKeypair(KEYPAIR_PATH);
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
+
+    const solMint = new PublicKey("So11111111111111111111111111111111111111112");
+    const usdcMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    const initialCollateral = new BN(1_000_000_000); // 1 SOL @ 9 decimals
+    ```
+  </Step>
+  <Step titleSize="h2" title="Get Flashloan Instructions">
+    Use `getFlashBorrowIx` and `getFlashPaybackIx` to flashloan the **debt asset** (e.g. USDC).
+
+    ```typescript
+    const borrowAmount = new BN(100_000_000); // 100 USDC @ 6 decimals
+    const flashBorrowIx = await getFlashBorrowIx({ connection, signer, asset: usdcMint, amount: borrowAmount });
+    const flashPaybackIx = await getFlashPaybackIx({ connection, signer, asset: usdcMint, amount: borrowAmount });
+    ```
+  </Step>
+
+  <Step titleSize="h2" title="Get Quote and Swap Instructions (Jupiter Lite API)">
+    Fetch a quote from Jupiter Lite API, then POST to `swap-instructions` to get the swap instruction. Build your own transaction, do not use a pre-built swap transaction.
+
+    ```typescript
+    const LITE_API = "https://lite-api.jup.ag/swap/v1";
+    const quoteResponse = await fetch(
+      `${LITE_API}/quote?inputMint=${usdcMint.toBase58()}&outputMint=${solMint.toBase58()}&amount=${borrowAmount.toString()}&slippageBps=100`
+    ).then((r) => r.json());
+    if (quoteResponse.error || !quoteResponse.routePlan) throw new Error(quoteResponse.error ?? "No quote");
+
+    const swapRes = await fetch(`${LITE_API}/swap-instructions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quoteResponse, userPublicKey: signer.toBase58() }),
+    }).then((r) => r.json());
+    if (swapRes.error) throw new Error(swapRes.error ?? "No swap instructions");
+    const swapIx = jupIxToTransactionInstruction(swapRes.swapInstruction);
+    ```
+
+    The `jupIxToTransactionInstruction` helper converts the JSON instruction from the API into a Solana `TransactionInstruction`:
+
+    ```typescript
+    function jupIxToTransactionInstruction(ix: {
+      programId: string;
+      accounts: Array<{ pubkey: string; isSigner: boolean; isWritable: boolean }>;
+      data: string;
+    }): TransactionInstruction {
+      return new TransactionInstruction({
+        programId: new PublicKey(ix.programId),
+        keys: ix.accounts.map((a) => ({
+          pubkey: new PublicKey(a.pubkey),
+          isSigner: a.isSigner,
+          isWritable: a.isWritable,
+        })),
+        data: Buffer.from(ix.data, "base64"),
+      });
+    }
+    ```
+  </Step>
+
+  <Step titleSize="h2" title="Get Vault Operations">
+    Compute total collateral (initial + swapped) and get operate instructions.
+
+    ```typescript
+    const swapOutputAmount = new BN(quoteResponse.outAmount);
+    const supplyAmount = initialCollateral.add(swapOutputAmount);
+
+    const { ixs: operateIxs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId: 1,
+      positionId: 0,
+      colAmount: supplyAmount,
+      debtAmount: borrowAmount,
+      connection,
+      signer,
+    });
+    ```
+  </Step>
+
+  <Step titleSize="h2" title="Assemble and Execute the Transaction">
+    Fetch address lookup tables for the swap, then create a versioned transaction with instructions in order.
+
+    **Order:** Flashloan Borrow → Swap (USDC→SOL) → Vault Operate (deposit + borrow) → Flashloan Payback
+
+    The `getAddressLookupTableAccounts` helper resolves lookup table addresses into account objects:
+
+    ```typescript
+    async function getAddressLookupTableAccounts(
+      connection: Connection,
+      keys: string[]
+    ): Promise<AddressLookupTableAccount[]> {
+      if (!keys?.length) return [];
+      const infos = await connection.getMultipleAccountsInfo(keys.map((k) => new PublicKey(k)));
+      return infos.reduce((acc, info, i) => {
+        if (info) {
+          acc.push(new AddressLookupTableAccount({
+            key: new PublicKey(keys[i]),
+            state: AddressLookupTableAccount.deserialize(info.data),
+          }));
+        }
+        return acc;
+      }, [] as AddressLookupTableAccount[]);
+    }
+    ```
+
+    ```typescript
+    const swapAlts = await getAddressLookupTableAccounts(connection, swapRes.addressLookupTableAddresses ?? []);
+    const allAlts = [...(addressLookupTableAccounts ?? []), ...swapAlts];
+
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: blockhash,
+      instructions: [flashBorrowIx, swapIx, ...operateIxs, flashPaybackIx],
+    }).compileToV0Message(allAlts);
+
+    const tx = new VersionedTransaction(message);
+    tx.sign([userKeypair]);
+    const signature = await connection.sendTransaction(tx, { skipPreflight: false, maxRetries: 3, preflightCommitment: "confirmed" });
+    await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, "confirmed");
+    console.log("Multiply successful:", signature);
+    ```
+  </Step>
+</Steps>
+
+## Full code example
+
+<Info>
+  Ensure supply and borrow token ATAs exist for the user before building the transaction. Use `createAssociatedTokenAccountIdempotentInstruction` from `@solana/spl-token` if needed.
+</Info>
+
+```typescript expandable
+import {
+  AddressLookupTableAccount,
+  Connection,
+  Keypair,
+  PublicKey,
+  TransactionInstruction,
+  TransactionMessage,
+  VersionedTransaction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { getFlashBorrowIx, getFlashPaybackIx } from "@jup-ag/lend/flashloan";
+import { getOperateIx } from "@jup-ag/lend/borrow";
+import fs from "fs";
+import path from "path";
+
+const KEYPAIR_PATH = "/path/to/your/keypair.json";
+const RPC_URL = "https://api.mainnet-beta.solana.com";
+const LITE_API = "https://lite-api.jup.ag/swap/v1";
+const VAULT_ID = 1;
+const SOL_MINT = new PublicKey("So11111111111111111111111111111111111111112");
+const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+
+const INITIAL_COLLATERAL = new BN(1_000_000_000); // 1 SOL @ 9 decimals
+const BORROW_USDC = new BN(100_000_000); // 100 USDC @ 6 decimals
+
+function loadKeypair(p: string): Keypair {
+  return Keypair.fromSecretKey(new Uint8Array(JSON.parse(fs.readFileSync(path.resolve(p), "utf8"))));
+}
+
+function jupIxToTransactionInstruction(ix: {
+  programId: string;
+  accounts: Array<{ pubkey: string; isSigner: boolean; isWritable: boolean }>;
+  data: string;
+}): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: new PublicKey(ix.programId),
+    keys: ix.accounts.map((a) => ({
+      pubkey: new PublicKey(a.pubkey),
+      isSigner: a.isSigner,
+      isWritable: a.isWritable,
+    })),
+    data: Buffer.from(ix.data, "base64"),
+  });
+}
+
+async function getAddressLookupTableAccounts(
+  connection: Connection,
+  keys: string[]
+): Promise<AddressLookupTableAccount[]> {
+  if (!keys?.length) return [];
+  const infos = await connection.getMultipleAccountsInfo(keys.map((k) => new PublicKey(k)));
+  return infos.reduce((acc, info, i) => {
+    if (info) {
+      acc.push(
+        new AddressLookupTableAccount({
+          key: new PublicKey(keys[i]),
+          state: AddressLookupTableAccount.deserialize(info.data),
+        })
+      );
+    }
+    return acc;
+  }, [] as AddressLookupTableAccount[]);
+}
+
+async function main() {
+  const userKeypair = loadKeypair(KEYPAIR_PATH);
+  const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+  const signer = userKeypair.publicKey;
+
+  const flashParams = { connection, signer, asset: USDC_MINT, amount: BORROW_USDC };
+  const [flashBorrowIx, flashPaybackIx, quoteResponse, latestBlockhash] = await Promise.all([
+    getFlashBorrowIx(flashParams),
+    getFlashPaybackIx(flashParams),
+    fetch(
+      `${LITE_API}/quote?inputMint=${USDC_MINT.toBase58()}&outputMint=${SOL_MINT.toBase58()}&amount=${BORROW_USDC.toString()}&slippageBps=100`
+    ).then((r) => r.json()),
+    connection.getLatestBlockhash("confirmed"),
+  ]);
+
+  if (quoteResponse.error || !quoteResponse.routePlan) {
+    throw new Error(quoteResponse.error ?? "No quote from Jupiter Lite");
+  }
+
+  const swapOutputAmount = new BN(quoteResponse.outAmount);
+  const supplyAmount = INITIAL_COLLATERAL.add(swapOutputAmount);
+
+  const { ixs: operateIxs, addressLookupTableAccounts } = await getOperateIx({
+    vaultId: VAULT_ID,
+    positionId: 0,
+    colAmount: supplyAmount,
+    debtAmount: BORROW_USDC,
+    connection,
+    signer,
+  });
+
+  const swapRes = await fetch(`${LITE_API}/swap-instructions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ quoteResponse, userPublicKey: signer.toBase58() }),
+  }).then((r) => r.json());
+
+  if (swapRes.error) {
+    throw new Error(swapRes.error ?? "No swap instructions from Jupiter Lite");
+  }
+
+  const swapIx = jupIxToTransactionInstruction(swapRes.swapInstruction);
+  const swapAlts = await getAddressLookupTableAccounts(connection, swapRes.addressLookupTableAddresses ?? []);
+  const allAlts = [...(addressLookupTableAccounts ?? []), ...swapAlts];
+
+  const message = new TransactionMessage({
+    payerKey: signer,
+    recentBlockhash: latestBlockhash.blockhash,
+    instructions: [flashBorrowIx, swapIx, ...operateIxs, flashPaybackIx],
+  }).compileToV0Message(allAlts);
+
+  const tx = new VersionedTransaction(message);
+  tx.sign([userKeypair]);
+
+  const signature = await connection.sendTransaction(tx, {
+    skipPreflight: false,
+    maxRetries: 3,
+    preflightCommitment: "confirmed",
+  });
+  await connection.confirmTransaction(
+    { signature, blockhash: latestBlockhash.blockhash, lastValidBlockHeight: latestBlockhash.lastValidBlockHeight },
+    "confirmed"
+  );
+
+  console.log("Multiply successful:", signature);
+}
+
+main().catch(console.error);
+```

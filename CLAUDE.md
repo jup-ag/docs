@@ -192,6 +192,51 @@ Do the work following the Writing and Reviewing guidelines below. After writing:
 - Self-review against the Reviewing checklist
 - Ensure all acceptance criteria from the Linear issue are met
 
+#### Changelog
+
+If your changes affect a public API or product, add a changelog entry to `updates/index.mdx`.
+
+**When to add an entry:**
+- New API endpoints or products
+- Breaking changes or deprecations
+- Behavioural changes to existing endpoints
+- New SDK releases or major version bumps
+- Migration deadlines or sunset dates
+
+**When NOT needed:**
+- Typo fixes, formatting, or docs-only restructuring
+- Internal refactors with no user-facing change
+- Adding guides or blog posts (these are content, not changelog)
+
+**Format:** Use the existing `<Update>` component, grouped by month (newest first):
+
+```mdx
+<Update label="March 2026" description="">
+## Feature or Change Title
+
+Brief description of what changed and what developers need to do.
+
+- Key detail or migration step
+- Link to relevant docs page
+</Update>
+```
+
+Within a month, order entries by importance. Use clear headings that describe the change.
+
+#### Capture learnings
+
+As you work, capture reusable knowledge in `.claude/rules/` so future sessions inherit it automatically.
+
+| File | Trigger |
+|------|---------|
+| `product-learning.md` | Undocumented API behaviour, response schema drift, parameter gotchas, or open questions discovered during implementation |
+| `decisions.md` | Information architecture decisions (page placement, redirects, structural trade-offs) with rationale |
+| `style-guide.md` | New terminology conventions, formatting patterns, or content rules established during review |
+
+These files are auto-loaded at the start of every session. Entries here eliminate repeat
+discovery work and prevent the same mistakes across contributors. If you hit something
+non-obvious during the task, document it.
+
 ### 6. Ship
 
 Once the work is ready:
@@ -379,6 +424,8 @@ Always run/check before committing:
 6. No placeholder text like "TODO" or "Lorem ipsum" left in content
 7. OpenAPI spec changes in `openapi-spec/` are reflected in `api-reference/` pages
 8. Images/assets added to `static/` are actually referenced somewhere
+9. Changelog entry in `updates/index.mdx` if changes affect a public API or product
+10. `.claude/rules/` updated if you discovered product behaviour, made IA decisions, or established conventions
 
 ## Pull Requests
 
@@ -423,6 +470,8 @@ gh pr diff
 - [ ] All pages have `title`, `description`, `llmsDescription`
 - [ ] `docs.json` navigation updated (if applicable)
 - [ ] Redirects added (if paths changed)
+- [ ] Changelog entry added to `updates/index.mdx` (if API/product change)
+- [ ] `.claude/rules/` updated with any learnings or decisions
 ```
 
 ### Conventions

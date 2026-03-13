@@ -18,6 +18,88 @@ description: "Latest announcements and breaking changes across Jupiter APIs."
 
 ---
 
+<Update label="March 2026" description="">
+
+### Lend Earn API: Earnings endpoint schema change
+
+The `GET /lend/v1/earn/earnings` response schema has been updated:
+
+* **Removed:** `totalDeposits`, `totalWithdraws`, `totalBalance`, `totalAssets` fields
+* **Changed:** `earnings` type from `string` to `number`
+* **Added:** `slot` field (`number`) indicating the slot at which earnings were computed
+
+---
+
+## Jupiter Lend Documentation
+
+Comprehensive documentation for Jupiter Lend (powered by Instadapp) is now available, covering the full Lend product suite.
+
+* **Earn:** Deposit and withdraw via the Lend SDK or REST API, with read-data helpers for jlToken shares and balances
+* **Borrow:** Create positions, deposit collateral, borrow, repay, and withdraw, including combined single-transaction operations
+* **Flash Loans:** Borrow and repay within the same transaction for arbitrage, liquidation, or collateral swaps
+* **Liquidity & Analytics:** Reserve data, utilisation curves, and on-chain analytics queries
+* **Advanced Recipes:** Multiply (leveraged long), Unwind (deleverage), Repay-with-Collateral, and Vault Swap, all using CPI + Jupiter swap in a single transaction
+* **Architecture:** Three-program design (Liquidity Layer, Lending/Earn, Vaults/Borrow) with oracle integration (Pyth, SwitchboardV2, ScopePrices)
+
+<Card title="Lend Documentation" href="/docs/lend" icon="building-columns" iconType="solid" horizontal/>
+
+</Update>
+
+---
+
+<Update label="February 2026" description="">
+
+## Prediction Market API
+
+Jupiter Prediction Market API is now available in beta. Trade on the outcomes of real-world events across categories like Sports, Crypto, Politics, E-sports, Culture, Economics, and Tech.
+
+* Binary prediction markets on Solana with YES/NO contracts
+* Buy and sell contracts at dynamic prices reflecting market sentiment
+* Track positions, P&L, and trading history via dedicated endpoints
+* Claim JupUSD payouts when predictions are correct
+
+<Note>
+The Prediction Market API is currently in beta and subject to breaking changes.
+</Note>
+
+<Card title="Prediction Market Docs" href="/docs/prediction" icon="magnifying-glass" iconType="solid" horizontal/>
+
+</Update>
+
+---
+
+<Update label="January 2026" description="">
+
+## Ultra Manual Mode
+
+Ultra now supports manual mode for integrators building user-facing trading UIs. Override automatic slippage, priority fee, and broadcast settings when explicit control over execution behaviour is needed.
+
+* Intended for manual trading experiences (similar to jup.ag's manual mode) or personal, self-directed usage
+* Default Ultra behaviour remains recommended for production integrations
+* Transactions with manual overrides fall outside Jupiter's supported execution model
+
+<Card title="Manual Mode Docs" href="/docs/ultra/manual-mode" icon="sliders" iconType="solid" horizontal/>
+
+</Update>
+
+---
+
+<Update label="December 2025" description="">
+
+## Portfolio API (Beta)
+
+The Jupiter Portfolio API is now available in beta, providing comprehensive portfolio tracking across the Solana ecosystem.
+
+* Query user DeFi positions across protocols on Solana (lending, staking, LP positions)
+* Retrieve staked JUP amounts
+* Built by the Sonarwatch team, now part of Jupiter
+
+<Card title="Portfolio API Docs" href="/docs/portfolio" icon="chart-pie" iconType="solid" horizontal/>
+
+</Update>
+
+---
+
 <Update label="November 2025" description="">
 
 ## Deprecate Lite API URL
@@ -99,8 +181,17 @@ description: "Latest announcements and breaking changes across Jupiter APIs."
   WSOL in a token account, you receive native SOL in a regular account.
 * Refer to [`nativeDestinationAccount` API Reference](/api-reference/swap/swap#body-native-destination-account) 
   for more details.  
-* [npm package version 6.0.46](https://www.npmjs.com/package/@jup-ag/api/v/6.0.46) 
+* [npm package version 6.0.46](https://www.npmjs.com/package/@jup-ag/api/v/6.0.46)
   has been released with the latest schema.
+
+---
+
+## Ultra Swap API
+
+### `receiver` parameter
+* A new `receiver` parameter has been added to the Ultra Swap API.
+* This allows specifying a different wallet to receive the output tokens, decoupling the payer from the recipient.
+* Refer to the [Ultra API Reference](/api-reference/ultra) for details.
 
 </Update>
 

@@ -16,32 +16,24 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 # Ultra Swap API
 
 ## Undocumented Behavior
-<!-- Things the API does that aren't captured in docs or OpenAPI specs -->
-<!-- e.g., edge cases, implicit defaults, silent failures -->
 
-- [YYYY-MM-DD] {description}
+- [2026-03-09] `wrapAndUnwrapSol=true` always closes the wSOL token account after the transaction, regardless of whether the input or output mint is SOL. This was missing from the parameter description until PR#842.
+- [2026-03-09] The `receiver` parameter allows specifying a different wallet to receive the output tokens, decoupling the payer from the recipient (added PR#791).
 
 ## Ambiguities
-<!-- Areas where the docs could be read multiple ways, or where the behavior -->
-<!-- is unclear even after reading the source -->
-
-- [YYYY-MM-DD] {description}
 
 ## Known Issues
-<!-- Bugs, limitations, or quirks that developers hit but we haven't fixed yet -->
-
-- [YYYY-MM-DD] {description}
 
 ## Open Questions
-<!-- Things we need answers to, from a human -->
-
-- [YYYY-MM-DD] {question}
 
 ---
 
 # Metis Swap API
 
 ## Undocumented Behavior
+
+- [2026-03-09] `routePlan[].percent` may return `null` when using `instructionVersion=V2` due to the upgraded routing algorithm. Code must handle null values.
+- [2026-03-09] The `mostReliableAmmsQuoteReport` parameter in the quote endpoint helps debug routing failures by reporting which AMMs were considered and why they were excluded.
 
 ## Ambiguities
 
@@ -114,5 +106,82 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 - [2026-03-03] The frontmatter field for AI descriptions is `llmsDescription` (with an 's'), not `llmDescription`
 
 ---
+
+# Prediction Market API
+
+## Undocumented Behavior
+
+- [2026-03-09] Live API response schemas diverged from initial OpenAPI spec in several places (caught in PR#836/#839): Profile types are strings not numbers, PnL History returns `history` key not `data`, Leaderboard uses nested `{ all_time, weekly, monthly }` structure, `settlementTime` was renamed to `resolveAt`. Always verify against the live API when writing examples.
+
+## Ambiguities
+
+## Known Issues
+
+## Open Questions
+
+## Content Gaps
+
+## Patterns & Conventions
+
+---
+
+# Trigger Order API
+
+## Architecture
+
+- [2026-03-10] V2 uses vault-based architecture with Privy-managed custodial wallets. Deposits go into vault accounts, not PDA order accounts like V1.
+- [2026-03-10] JWT authentication via challenge-response flow. Challenge types: `message` (standard wallets) or `transaction` (hardware wallets). Challenge TTL: 5 min, JWT TTL: 24h.
+- [2026-03-10] All fund operations (deposits, withdrawals) require wallet signature. A leaked JWT can cancel/edit orders but cannot move funds.
+- [2026-03-10] Cancellation is two-step: initiate (order moves to `ready_to_cancel`, preventing fills) then sign withdrawal tx and confirm.
+
+## Order Types
+
+- [2026-03-10] Three order types: `single` (price limit), `oco` (one-cancels-other TP/SL pair sharing one deposit), `otoco` (parent trigger activates OCO on fill).
+- [2026-03-10] Default slippage: TP/buy-below uses RTSE auto slippage, SL/buy-above defaults to 20% (2000 bps) for execution certainty.
+- [2026-03-10] V2 triggers on USD price (not pool rate like V1). Output amount is not guaranteed.
+
+## Source Code
+
+- [2026-03-10] V2 API source: `Documents/Projects/trigger-order/api-v2/` — Hono.js on Cloudflare Workers with Zod OpenAPI validation.
+- [2026-03-10] Vault register returns 200 on success, 409 if vault already exists (not 201 despite the source returning 200 — user confirmed 201 is the intended documented behaviour).
+- [2026-03-10] DCA order routes exist in source (`/orders/dca/`) but are intentionally excluded from docs.
+- [2026-03-10] Vault link routes (`/vault/link`) exist but are hidden/internal.
+
+## Open Questions
+
+- [2026-03-10] Vault register: source returns 200 but docs say 201. Which is correct?
+- [2026-03-10] Are `/vault/link` endpoints needed in public docs?
+
+---
+
+# Jupiter Lend (Instadapp)
+
+## Architecture
+
+- [2026-03-12] Three on-chain programs: Liquidity Layer (reserves, interest-rate curves), Lending/Earn (jlToken deposits/withdrawals), Vaults/Borrow (position NFTs, collateral, debt). All interactions go through `operate` instructions with operation-specific payloads.
+- [2026-03-12] Oracle support: Pyth, SwitchboardV2, and ScopePrices. Oracle type is per-reserve, not per-market.
+- [2026-03-12] CPI pattern: advanced recipes (multiply, unwind, vault swap) use cross-program invocation to Jupiter swap within a single transaction. Requires `jupIxToTransactionInstruction` helper to convert Jupiter API response into CPI-compatible instructions, plus `getAddressLookupTableAccounts` for ALTs.
+
+## SDK vs API
+
+- [2026-03-12] Two integration paths: Lend SDK (`@jup-ag/lend-sdk`) for TypeScript with helper functions, and REST API for language-agnostic access. SDK wraps the same on-chain programs but provides typed helpers like `getDepositIxs`, `getWithdrawIxs`, `getBorrowIxs`.
+- [2026-03-12] SDK deposit/withdraw functions use named parameters (`{ connection, signer, asset, amount }`), not positional args. This was a common source of errors in early examples.
+
+## Terminology
+
+- [2026-03-12] "Earn" = supply/deposit side (get jlTokens). "Borrow" = vault/debt side (position NFTs). Never use "Supply" or "Lending" as section names, use "Earn" and "Borrow" to match the product UI.
+- [2026-03-12] jlTokens are yield-bearing receipt tokens for deposits (similar to cTokens in Compound). Exchange rate increases over time as interest accrues.
+- [2026-03-12] Position NFTs represent borrow positions. Each position is uniquely identified by an NFT mint.
+
+## Known Issues
+
+## Open Questions
+
+## Content Gaps
+
+## Patterns & Conventions
+
+- [2026-03-12] All Lend SDK code examples use the same boilerplate: load keypair from file, initialise Connection, define mint constants. Consistent across all pages for copy-paste reliability.
+- [2026-03-12] Import Private Key accordion uses base58 decode pattern (`bs58.decode(privateKey)` with `Keypair.fromSecretKey`), not file-read. This matches how browser wallets export keys.
 
 <!-- Please add sections for the other APIs or products when necessary -->

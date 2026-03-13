@@ -176,28 +176,89 @@
             "groups": [
               {
                 "group": " ",
-                "pages": ["docs/lend/index"]
-              },
-              {
-                "group": "Architecture",
                 "pages": [
-                  "docs/lend/oracles"
+                  "docs/lend/index",
+                  "docs/lend/architecture",
+                  "docs/lend/oracles",
+                  "docs/lend/api-vs-sdk"
                 ]
               },
               {
-                "group": "Lend API",
-                "tag": "BETA",
+                "group": "Earn",
                 "pages": [
-                  "docs/lend/earn",
-                  "docs/lend/borrow"
+                  "docs/lend/earn/index",
+                  "docs/lend/earn/api",
+                  {
+                    "group": "Earn SDK",
+                    "pages": [
+                      "docs/lend/earn/deposit",
+                      "docs/lend/earn/withdraw",
+                      "docs/lend/earn/read-data"
+                    ]
+                  },
+                  "docs/lend/earn/cpi"
                 ]
               },
               {
-                "group": "Lend SDK",
-                "tag": "BETA",
+                "group": "Borrow",
                 "pages": [
-                  "docs/lend/sdk",
-                  "docs/lend/liquidation"
+                  "docs/lend/borrow/index",
+                  "docs/lend/borrow/api",
+                  {
+                    "group": "Borrow SDK",
+                    "pages": [
+                      "docs/lend/borrow/create-position",
+                      "docs/lend/borrow/deposit",
+                      "docs/lend/borrow/borrow",
+                      "docs/lend/borrow/repay",
+                      "docs/lend/borrow/withdraw",
+                      "docs/lend/borrow/combined",
+                      "docs/lend/borrow/liquidation",
+                      "docs/lend/borrow/read-vault-data"
+                    ]
+                  },
+                  "docs/lend/borrow/cpi"
+                ]
+              },
+              {
+                "group": "Flashloan",
+                "pages": [
+                  "docs/lend/flashloan/index",
+                  "docs/lend/flashloan/execute"
+                ]
+              },
+              {
+                "group": "Liquidity",
+                "pages": [
+                  "docs/lend/liquidity/index",
+                  "docs/lend/liquidity/analytics"
+                ]
+              },
+              {
+                "group": "Advanced",
+                "pages": [
+                  "docs/lend/advanced/index",
+                  "docs/lend/advanced/multiply",
+                  "docs/lend/advanced/unwind",
+                  "docs/lend/advanced/repay-with-collateral-max-withdraw",
+                  "docs/lend/advanced/vault-swap",
+                  "docs/lend/advanced/utilization-after-deposit",
+                  {
+                    "group": "Native Staked Vaults",
+                    "pages": [
+                      "docs/lend/advanced/native-staked-vault/index",
+                      "docs/lend/advanced/native-staked-vault/deposit",
+                      "docs/lend/advanced/native-staked-vault/withdraw"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Resources",
+                "pages": [
+                  "docs/lend/program-addresses",
+                  "docs/lend/idl-and-types",
+                  "docs/lend/dune"
                 ]
               }
             ]
@@ -258,22 +319,32 @@
                 "pages": ["docs/trigger/index"]
               },
               {
-                "group": "Trigger API",
+                "group": "Trigger Order API",
+                "tag": "BETA",
                 "pages": [
+                  "docs/trigger/authentication",
                   "docs/trigger/create-order",
-                  "docs/trigger/execute-order"
+                  "docs/trigger/manage-orders",
+                  "docs/trigger/order-history",
+                  "docs/trigger/best-practices"
                 ]
               },
               {
-                "group": "Order Management",
+                "group": " ",
                 "pages": [
-                  "docs/trigger/cancel-order",
-                  "docs/trigger/get-trigger-orders"
+                  {
+                    "group": "Trigger Order API V1",
+                    "expanded": false,
+                    "pages": [
+                      "docs/trigger/v1/index",
+                      "docs/trigger/v1/create-order",
+                      "docs/trigger/v1/execute-order",
+                      "docs/trigger/v1/cancel-order",
+                      "docs/trigger/v1/get-trigger-orders",
+                      "docs/trigger/v1/best-practices"
+                    ]
+                  }
                 ]
-              },
-              {
-                "group": "Debugging",
-                "pages": ["docs/trigger/best-practices"]
               }
             ]
           },
@@ -599,11 +670,35 @@
                 "group": "Trigger",
                 "pages": [
                   "api-reference/trigger",
-                  "api-reference/trigger/create-order",
-                  "api-reference/trigger/execute",
-                  "api-reference/trigger/cancel-order",
-                  "api-reference/trigger/cancel-orders",
-                  "api-reference/trigger/get-trigger-orders"
+                  {
+                    "group": "V2",
+                    "tag": "BETA",
+                    "pages": [
+                      "api-reference/trigger/v2",
+                      "api-reference/trigger/v2/challenge",
+                      "api-reference/trigger/v2/verify",
+                      "api-reference/trigger/v2/verify-token",
+                      "api-reference/trigger/v2/vault",
+                      "api-reference/trigger/v2/vault-register",
+                      "api-reference/trigger/v2/deposit-craft",
+                      "api-reference/trigger/v2/create-order",
+                      "api-reference/trigger/v2/update-order",
+                      "api-reference/trigger/v2/cancel-order",
+                      "api-reference/trigger/v2/confirm-cancel",
+                      "api-reference/trigger/v2/order-history"
+                    ]
+                  },
+                  {
+                    "group": "V1",
+                    "pages": [
+                      "api-reference/trigger/v1",
+                      "api-reference/trigger/v1/create-order",
+                      "api-reference/trigger/v1/execute",
+                      "api-reference/trigger/v1/cancel-order",
+                      "api-reference/trigger/v1/cancel-orders",
+                      "api-reference/trigger/v1/get-trigger-orders"
+                    ]
+                  }
                 ]
               },
               {
@@ -889,6 +984,26 @@
       "destination": "/api-reference/trigger/:slug*"
     },
     {
+      "source": "/api-reference/trigger/create-order",
+      "destination": "/api-reference/trigger/v1/create-order"
+    },
+    {
+      "source": "/api-reference/trigger/execute",
+      "destination": "/api-reference/trigger/v1/execute"
+    },
+    {
+      "source": "/api-reference/trigger/cancel-order",
+      "destination": "/api-reference/trigger/v1/cancel-order"
+    },
+    {
+      "source": "/api-reference/trigger/cancel-orders",
+      "destination": "/api-reference/trigger/v1/cancel-orders"
+    },
+    {
+      "source": "/api-reference/trigger/get-trigger-orders",
+      "destination": "/api-reference/trigger/v1/get-trigger-orders"
+    },
+    {
       "source": "/docs/api/token-api/:slug*",
       "destination": "/api-reference/tokens/:slug*"
     },
@@ -1091,6 +1206,14 @@
     {
       "source": "/resources/ai-workflow",
       "destination": "/ai"
+    },
+    {
+      "source": "/docs/lend/sdk",
+      "destination": "/docs/lend/api-vs-sdk"
+    },
+    {
+      "source": "/docs/lend/liquidation",
+      "destination": "/docs/lend/borrow/liquidation"
     },
     {
       "source": "/skills",

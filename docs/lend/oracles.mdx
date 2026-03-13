@@ -1,7 +1,7 @@
 ---
 title: "Oracles"
-description: "Price oracle system for the Jupiter Lend protocol, using Pyth feeds with freshness and confidence validation."
-llmsDescription: "Jupiter Lend Oracle Program (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) provides price data via a hop-based system using Pyth feeds, with freshness and confidence interval validation."
+description: "Price oracle system for the Jupiter Lend protocol, using multiple source types with freshness and confidence validation."
+llmsDescription: "Jupiter Lend Oracle Program (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) provides price data via a hop-based system using Pyth, Chainlink, Redstone, StakePool, MsolPool, SinglePool, and JupLend sources."
 ---
 
 The Oracle Program delivers accurate price data to the protocol by integrating with trusted oracle providers. It calculates exchange rates by combining multiple price sources in a structured sequence, ensuring reliable asset valuations.
@@ -16,40 +16,69 @@ The Oracle Program delivers accurate price data to the protocol by integrating w
 
 ## Hop-Based Oracle System
 
-The system computes exchange rates by processing prices from up to four sources in a sequential chain. Each source contributes to the final rate through multiplication or division, with the option to invert values as needed. Currently, Pyth is the supported source type.
+The system computes exchange rates by processing prices from up to four sources in a sequential chain. Each source contributes to the final rate through multiplication or division, with the option to invert values as needed. The output of each hop becomes the input for the next.
 
-For example, to derive the JUPSOL/SOL rate, the system combines JUPSOL/USD and SOL/USD feeds, inverting the latter to obtain USD/SOL, resulting in an accurate exchange rate.
+For example, to derive the JUPSOL/SOL rate, the system combines JUPSOL/USD and SOL/USD feeds, inverting the latter to obtain USD/SOL.
+
+### Supported source types
+
+| Source      | Description                                                        | Accounts per hop                            |
+|-------------|--------------------------------------------------------------------|---------------------------------------------|
+| Pyth        | Pyth push oracle feeds                                             | 1                                           |
+| Chainlink   | Chainlink Solana feeds                                             | 1                                           |
+| Redstone    | Redstone oracle feeds                                              | 1                                           |
+| StakePool   | SPL Stake Pool (Jito, Marinade, etc.)                              | 1                                           |
+| MsolPool    | Marinade mSOL pool state                                           | 1                                           |
+| SinglePool  | SPL Single Pool (Helius, Jupiter, Nansen, Emerald, Shift, Kiln)    | 3 (stake, mint, stake program)              |
+| JupLend     | JupLend fToken exchange rate                                       | 4 (Lending, TokenReserve, RateModel, FTokenMint) |
+
 
 This design enables the system to:
-- Aggregate rates from multiple feeds, reducing dependency on any single provider
-- Adjust for varying units or scales using predefined multipliers and divisors
+- Aggregate rates from multiple feeds and providers, reducing dependency on any single source
+- Support diverse asset types including LSTs, stablecoins, and protocol tokens
 - Validate data integrity at each step
 
-## Freshness Enforcement
+## Validation
 
-To ensure prices reflect current market conditions, the system enforces strict time-based validity checks:
+### Freshness
 
-- **User Operations**: Prices must be no older than 60 seconds to be considered valid for actions like borrowing or supplying assets
-- **Liquidations**: Prices can be up to 1800 seconds (30 minutes) old, allowing liquidations to proceed during temporary oracle delays while avoiding reliance on outdated data
+| Operation type                                    | Max age                 |
+|---------------------------------------------------|-------------------------|
+| User operations (supply, borrow, repay, withdraw)  | 600 seconds (10 minutes)|
+| Liquidations                                      | 7200 seconds (2 hours)  |
 
-These checks prevent the protocol from using stale prices for liquidation or health factor calculations.
+Pyth and Redstone use Unix timestamp freshness. Chainlink uses slot-based freshness (≈400 ms per slot).
 
-## Confidence Interval Validation
+### Confidence (Pyth only)
 
-The system evaluates the confidence interval provided by Pyth price feeds to ensure data reliability:
+Pyth feeds include a confidence interval. The oracle rejects feeds whose confidence exceeds:
 
-- **User Operations**: The confidence interval must be within 2% of the reported price
-- **Liquidations**: The confidence interval must be within 4% of the reported price
+| Operation type | Max confidence |
+|----------------|----------------|
+| User operations| 2% of price    |
+| Liquidations   | 4% of price    |
 
-If a price feed's confidence exceeds these thresholds, it is rejected.
+Only Pyth validates confidence. Other sources (Chainlink, Redstone, StakePool, MsolPool, SinglePool, JupLend) either derive rates on-chain or only enforce freshness; they do not expose or check a confidence interval.
 
 ## Providers
 
-The program currently utilizes Pyth push feeds for price data. Integration with Chainlink streams is underway to broaden the range of sources.
+| Provider       | Source    | Use case                                                                 |
+|----------------|-----------|--------------------------------------------------------------------------|
+| Pyth           | Pyth      | Spot prices (SOL, ETH, BTC, JLP, etc.)                                  |
+| Chainlink      | Chainlink | SOL/USD, WBTC/USD, EURC/USD                                             |
+| Redstone       | Redstone  | Additional price feeds                                                  |
+| Marinade       | MsolPool  | mSOL/SOL                                                                |
+| Jito           | StakePool | JITOSOL/SOL                                                             |
+| SPL Single Pool| SinglePool| Staked SOL (Helius, Jupiter, Nansen, Emerald, Shift, Kiln)              |
+| JupLend        | JupLend   | fToken exchange rates (e.g., JUPUSD)                                    |
 
 ## Oracle Verification Script
 
-Use this script to verify oracle prices by providing a nonce:
+Use this script to verify oracle prices by providing a nonce. The oracle PDA is derived from the `oracle` seed and a 16-bit nonce.
+
+<Warning>
+  For oracles that use **SinglePool** or **JupLend** sources, `remainingAccounts` must include 3 or 4 consecutive source accounts per hop respectively, as configured in the oracle. The script below works for simple oracles (e.g., single Pyth or Chainlink feed).
+</Warning>
 
 ```typescript
 import { Program, AnchorProvider } from "@coral-xyz/anchor";
@@ -98,7 +127,7 @@ class OracleReader {
   async getPrice(nonce: number) {
     const oraclePDA = this.findOraclePDA(nonce);
     const oracleAccount = await this.program.account.oracle.fetch(oraclePDA);
-    
+
     const remainingAccounts = oracleAccount.sources.map((source: any) => ({
       pubkey: source.source,
       isWritable: false,

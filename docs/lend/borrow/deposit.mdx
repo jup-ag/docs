@@ -1,0 +1,212 @@
+---
+title: "Deposit Collateral"
+description: "Deposit assets as collateral into a Jupiter Lend borrow position."
+llmsDescription: "Deposit collateral into a Jupiter Lend borrow position using getOperateIx with positive colAmount and zero debtAmount. Covers versioned (v0) transaction building with address lookup tables, positionId 0 for batch create + deposit, operate parameters table, and full TypeScript code example."
+---
+
+Deposit collateral (supply assets) into an existing Jupiter Lend borrow position. The SDK builds operate instructions with a positive collateral amount and zero debt change. Transactions use versioned (v0) format with address lookup tables.
+
+## Deposit
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    Import the required packages for Solana RPC, Jupiter Lend borrow SDK, and versioned transaction building.
+
+    ```typescript
+    import {
+      Connection,
+      Keypair,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getOperateIx } from "@jup-ag/lend/borrow";
+    import fs from "fs";
+    import path from "path";
+    ```
+
+    <Note>
+      Deposit uses `getOperateIx` with positive `colAmount` and zero `debtAmount`. Versioned transactions and address lookup tables are required.
+    </Note>
+  </Step>
+  <Step titleSize="h2" title="Load Keypair and Initialise Connection">
+    Load the signer and create the RPC connection. Set vault ID, position ID, and deposit amount.
+
+    ```typescript
+    const KEYPAIR_PATH = "/path/to/your/keypair.json";
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const VAULT_ID = 1;
+    const POSITION_ID = 0; // Use 0 to create position + deposit in one tx; or nftId from Create Position
+    const DEPOSIT_AMOUNT = new BN(1_000_000); // Collateral in base units (e.g. 1 USDC = 1_000_000)
+
+    function loadKeypair(keypairPath: string): Keypair {
+      const fullPath = path.resolve(keypairPath);
+      const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      return Keypair.fromSecretKey(new Uint8Array(secret));
+    }
+
+    const userKeypair = loadKeypair(KEYPAIR_PATH);
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
+    ```
+
+    <Info>
+      Pass `positionId: 0` to batch **init position + deposit** in one transaction. The SDK returns `nftId` (your new position ID) for future operations. If you already have a position, use its `nftId` instead.
+    </Info>
+  </Step>
+  <Step titleSize="h2" title="Build Deposit Instructions">
+    Build operate instructions with positive collateral amount and no debt change.
+
+    ```typescript
+    const { ixs, addressLookupTableAccounts, nftId } = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId: POSITION_ID,
+      colAmount: DEPOSIT_AMOUNT,
+      debtAmount: new BN(0),
+      connection,
+      signer,
+    });
+
+    // When positionId is 0, nftId is the new position ID
+    if (POSITION_ID === 0) console.log("New position ID (nftId):", nftId);
+
+    if (!ixs?.length) {
+      throw new Error("No deposit instructions returned by Jupiter Lend SDK.");
+    }
+    ```
+
+    <Info>
+      Deposit is operate with `colAmount` \> 0 and `debtAmount` = 0. Your supplied tokens are locked as collateral and increase your borrowing capacity.
+    </Info>
+  </Step>
+  <Step>
+    ### Build and Sign Transaction
+
+    Build a v0 message with the instructions and address lookup tables, then sign.
+
+    ```typescript
+    const latestBlockhash = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: latestBlockhash.blockhash,
+      instructions: ixs,
+    }).compileToV0Message(addressLookupTableAccounts ?? []);
+
+    const transaction = new VersionedTransaction(message);
+    transaction.sign([userKeypair]);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Send and Confirm Transaction">
+    Send the transaction and confirm.
+
+    ```typescript
+    const signature = await connection.sendTransaction(transaction, {
+      skipPreflight: false,
+      maxRetries: 3,
+      preflightCommitment: "confirmed",
+    });
+    await connection.confirmTransaction(signature, "confirmed");
+
+    console.log("Deposit successful! Signature:", signature);
+    ```
+
+    <Info>
+      After depositing, you can **Borrow** against this collateral. Monitor your LTV to avoid liquidation.
+    </Info>
+  </Step>
+</Steps>
+
+## Operate parameters
+
+`getOperateIx` accepts the following parameters:
+
+| Parameter     | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `vaultId`     | `number`    | Target vault (market) ID. |
+| `positionId`  | `number`    | Position NFT ID. Use `0` to create a new position and deposit in one transaction. |
+| `colAmount`   | `BN`        | Signed collateral amount in base units. **Positive** = deposit (add collateral). **Negative** = withdraw. Use `new BN(0)` for borrow/repay-only. |
+| `debtAmount`  | `BN`        | Signed debt amount in base units. **Positive** = borrow (add debt). **Negative** = repay (reduce debt). Use `new BN(0)` for deposit/withdraw-only. |
+| `connection`  | `Connection`| Solana RPC connection. |
+| `signer`      | `PublicKey` | Wallet that signs the transaction (position owner). |
+
+For **deposit**: `colAmount` > 0, `debtAmount` = 0.
+
+<AccordionGroup>
+  <Accordion title="Deposit vs Borrow">
+    **Deposit** adds collateral (supply token) to your position. **Borrow** withdraws the borrow token from the vault to your wallet and increases your debt. Deposit first, then borrow.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Full code example
+
+```typescript expandable
+import {
+    Connection,
+    Keypair,
+    TransactionMessage,
+    VersionedTransaction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { getOperateIx } from "@jup-ag/lend/borrow";
+import fs from "fs";
+import path from "path";
+
+const KEYPAIR_PATH = "/path/to/your/keypair.json"; // Path to your local keypair file (update this path)
+const RPC_URL = "https://api.mainnet-beta.solana.com"; // RPC endpoint
+const VAULT_ID = 1; // Target vault (market)
+const POSITION_ID = 0; // 0 = create + deposit in one tx; or nftId from existing position
+const DEPOSIT_AMOUNT = new BN(1_000_000); // Collateral to deposit, in smallest units (supply token base units)
+
+function loadKeypair(keypairPath: string): Keypair {
+    const fullPath = path.resolve(keypairPath);
+    const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+    return Keypair.fromSecretKey(new Uint8Array(secret));
+}
+
+// 1. Load user keypair and establish connection
+const userKeypair = loadKeypair(KEYPAIR_PATH);
+const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+const signer = userKeypair.publicKey;
+
+// 2. Get deposit instructions from SDK (operate with positive colAmount, zero debtAmount)
+// Pass positionId: 0 to batch init position + deposit in one transaction
+const { ixs, addressLookupTableAccounts, nftId } = await getOperateIx({
+    vaultId: VAULT_ID,
+    positionId: POSITION_ID,
+    colAmount: DEPOSIT_AMOUNT,
+    debtAmount: new BN(0),
+    connection,
+    signer,
+});
+
+if (!ixs?.length) {
+    throw new Error("No deposit instructions returned by Jupiter Lend SDK.");
+}
+
+// 3. Build the transaction with latest blockhash and add deposit instructions
+// Versioned (v0) transaction with address lookup tables; ready to be signed and sent
+const latestBlockhash = await connection.getLatestBlockhash();
+const message = new TransactionMessage({
+    payerKey: signer,
+    recentBlockhash: latestBlockhash.blockhash,
+    instructions: ixs,
+}).compileToV0Message(addressLookupTableAccounts ?? []);
+
+const transaction = new VersionedTransaction(message);
+transaction.sign([userKeypair]);
+
+// 4. Send and confirm the transaction
+const signature = await connection.sendTransaction(transaction, {
+    skipPreflight: false,
+    maxRetries: 3,
+    preflightCommitment: "confirmed",
+});
+await connection.confirmTransaction(
+    { signature, ...latestBlockhash },
+    "confirmed"
+);
+
+console.log("Deposit successful! Signature:", signature);
+```

@@ -324,11 +324,8 @@ paths:
               example:
                 - address: "So11111111111111111111111111111111111111112"
                   ownerAddress: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
-                  totalDeposits: "1000000000"
-                  totalWithdraws: "0"
-                  totalBalance: "1034483000"
-                  totalAssets: "1034483000"
-                  earnings: "34483000"
+                  earnings: 34483000
+                  slot: 345678901
 
 
 components:
@@ -434,26 +431,17 @@ components:
       required:
         - address
         - ownerAddress
-        - totalDeposits
-        - totalWithdraws
-        - totalBalance
-        - totalAssets
         - earnings
+        - slot
       properties:
         address:
           type: string
         ownerAddress:
           type: string
-        totalDeposits:
-          type: string
-        totalWithdraws:
-          type: string
-        totalBalance:
-          type: string
-        totalAssets:
-          type: string
         earnings:
-          type: string
+          type: number
+        slot:
+          type: number
 
     UserPosition:
       type: object

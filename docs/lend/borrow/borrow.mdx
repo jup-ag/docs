@@ -1,0 +1,211 @@
+---
+title: "Borrow Assets"
+description: "Borrow assets against your collateral"
+llmsDescription: "Borrow assets from a Jupiter Lend vault against deposited collateral using getOperateIx with zero colAmount and positive debtAmount. Covers versioned (v0) transaction building, operate parameters, LTV and interest mechanics, and full TypeScript code example."
+---
+
+Borrow assets from a Jupiter Lend vault against your deposited collateral. The SDK builds operate instructions with zero collateral change and a positive debt amount. Transactions use versioned (v0) format with address lookup tables.
+
+---
+
+## Borrow
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    Import the required packages for Solana RPC, Jupiter Lend borrow SDK, and versioned transaction building.
+
+    ```typescript
+    import {
+      Connection,
+      Keypair,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getOperateIx } from "@jup-ag/lend/borrow";
+    import fs from "fs";
+    import path from "path";
+    ```
+
+    <Note>
+      Borrow uses `getOperateIx` with zero `colAmount` and positive `debtAmount`. The borrowed asset is sent to your wallet.
+    </Note>
+  </Step>
+  <Step titleSize="h2" title="Load Keypair and Initialise Connection">
+    Load the signer and create the RPC connection. Set vault ID, position ID, and borrow amount.
+
+    ```typescript
+    const KEYPAIR_PATH = "/path/to/your/keypair.json";
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const VAULT_ID = 1;
+    const POSITION_ID = 0; // nftId from Create Position
+    const BORROW_AMOUNT = new BN(100_000); // Borrow token base units (e.g. 0.1 USDT)
+
+    function loadKeypair(keypairPath: string): Keypair {
+      const fullPath = path.resolve(keypairPath);
+      const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      return Keypair.fromSecretKey(new Uint8Array(secret));
+    }
+
+    const userKeypair = loadKeypair(KEYPAIR_PATH);
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
+    ```
+
+    <Warning>
+      You must have an existing position with deposited collateral. Your borrow capacity depends on collateral value and the vault's LTV limits.
+    </Warning>
+  </Step>
+  <Step titleSize="h2" title="Build Borrow Instructions">
+    Build operate instructions with no collateral change and positive debt amount.
+
+    ```typescript
+    const { ixs, addressLookupTableAccounts } = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId: POSITION_ID,
+      colAmount: new BN(0),
+      debtAmount: BORROW_AMOUNT,
+      connection,
+      signer,
+    });
+
+    if (!ixs?.length) {
+      throw new Error("No borrow instructions returned by Jupiter Lend SDK.");
+    }
+    ```
+
+    <Info>
+      Borrow is operate with `colAmount` = 0 and `debtAmount` \> 0. The borrow token is sent to your wallet; you accrue interest until you **Repay**.
+    </Info>
+  </Step>
+  <Step titleSize="h2" title="Build and Sign Transaction">
+    Build a v0 message with the instructions and address lookup tables, then sign.
+
+    ```typescript
+    const latestBlockhash = await connection.getLatestBlockhash();
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: latestBlockhash.blockhash,
+      instructions: ixs,
+    }).compileToV0Message(addressLookupTableAccounts ?? []);
+
+    const transaction = new VersionedTransaction(message);
+    transaction.sign([userKeypair]);
+    ```
+  </Step>
+  <Step titleSize="h2" title="Send and Confirm Transaction">
+    Send the transaction and confirm.
+
+    ```typescript
+    const signature = await connection.sendTransaction(transaction, {
+      skipPreflight: false,
+      maxRetries: 3,
+      preflightCommitment: "confirmed",
+    });
+    await connection.confirmTransaction(signature, "confirmed");
+
+    console.log("Borrow successful! Signature:", signature);
+    ```
+
+    <Info>
+      Borrowing increases your debt and LTV. Repay with the **Repay** flow to reduce debt and improve position health.
+    </Info>
+  </Step>
+</Steps>
+
+## Operate parameters
+
+`getOperateIx` accepts the following parameters:
+
+| Parameter     | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `vaultId`     | `number`    | Target vault (market) ID. |
+| `positionId`  | `number`    | Position NFT ID (from Create Position or a previous deposit). |
+| `colAmount`   | `BN`        | Signed collateral amount in base units. **Positive** = deposit. **Negative** = withdraw. Use `new BN(0)` for borrow-only. |
+| `debtAmount`  | `BN`        | Signed debt amount in base units. **Positive** = borrow (add debt). **Negative** = repay (reduce debt). Use `new BN(0)` for deposit/withdraw-only. |
+| `connection`  | `Connection`| Solana RPC connection. |
+| `signer`      | `PublicKey` | Wallet that signs the transaction (position owner). |
+
+For **borrow**: `colAmount` = 0, `debtAmount` > 0.
+
+<AccordionGroup>
+  <Accordion title="How much can you borrow?">
+    Your maximum borrow depends on your collateral value, the vault's loan-to-value (LTV) limits, and current borrows. Keep LTV below the liquidation threshold. The SDK does not provide a "max borrow" sentinel. Compute the maximum from your position (e.g. `getCurrentPosition` or `getFinalPosition`) and the vault's LTV, or use your app/API for the limit.
+  </Accordion>
+  <Accordion title="Interest">
+    Borrowed amounts accrue interest over time. Repay to reduce debt and stop interest on the repaid portion.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Full code example
+
+```typescript expandable
+import {
+    Connection,
+    Keypair,
+    TransactionMessage,
+    VersionedTransaction,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { getOperateIx } from "@jup-ag/lend/borrow";
+import fs from "fs";
+import path from "path";
+
+const KEYPAIR_PATH = "/path/to/your/keypair.json"; // Path to your local keypair file (update this path)
+const RPC_URL = "https://api.mainnet-beta.solana.com"; // RPC endpoint
+const VAULT_ID = 1; // Target vault (market)
+const POSITION_ID = 0; // nftId from Create Position script
+const BORROW_AMOUNT = new BN(100_000); // Amount to borrow, in smallest units (borrow token base units)
+
+function loadKeypair(keypairPath: string): Keypair {
+    const fullPath = path.resolve(keypairPath);
+    const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+    return Keypair.fromSecretKey(new Uint8Array(secret));
+}
+
+// 1. Load user keypair and establish connection
+const userKeypair = loadKeypair(KEYPAIR_PATH);
+const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+const signer = userKeypair.publicKey;
+
+// 2. Get borrow instructions from SDK (operate with zero colAmount, positive debtAmount)
+const { ixs, addressLookupTableAccounts } = await getOperateIx({
+    vaultId: VAULT_ID,
+    positionId: POSITION_ID,
+    colAmount: new BN(0),
+    debtAmount: BORROW_AMOUNT,
+    connection,
+    signer,
+});
+
+if (!ixs?.length) {
+    throw new Error("No borrow instructions returned by Jupiter Lend SDK.");
+}
+
+// 3. Build the transaction with latest blockhash and add borrow instructions
+// Versioned (v0) transaction with address lookup tables; ready to be signed and sent
+const latestBlockhash = await connection.getLatestBlockhash();
+const message = new TransactionMessage({
+    payerKey: signer,
+    recentBlockhash: latestBlockhash.blockhash,
+    instructions: ixs,
+}).compileToV0Message(addressLookupTableAccounts ?? []);
+
+const transaction = new VersionedTransaction(message);
+transaction.sign([userKeypair]);
+
+// 4. Send and confirm the transaction
+const signature = await connection.sendTransaction(transaction, {
+    skipPreflight: false,
+    maxRetries: 3,
+    preflightCommitment: "confirmed",
+});
+await connection.confirmTransaction(
+    { signature, ...latestBlockhash },
+    "confirmed"
+);
+
+console.log("Borrow successful! Signature:", signature);
+```

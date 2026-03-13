@@ -1,0 +1,224 @@
+---
+title: "Read Earn Data"
+description: "Read Earn (supply) balances, positions, and pool metrics using the Jupiter Lend Read SDK."
+llmsDescription: "Read Earn (supply) balances, positions, and pool metrics using the @jup-ag/lend-read Read SDK. Covers Client setup, getAllJlTokens, getJlTokenDetails (supply rate, rewards rate, conversion rates), getUserPosition, getUserPositions, getPreviews, getExchangePrice, and getJlTokenRewards. Includes SDK type definitions for UserPosition and TokenDetails."
+---
+
+<Note>
+  All position and pool data here is read from on-chain accounts using the **Jupiter Lend Read SDK**. No API calls are required.
+</Note>
+
+---
+
+## Reading Earn data with the SDK
+
+Use the Read SDK to list supported tokens, fetch pool details (supply rate, rewards, totals), and get a user's position (shares, underlying assets, wallet balance). The SDK uses your RPC to read program accounts.
+
+<Steps>
+  <Step title="Create a client">
+    Create a `Client` with an RPC URL or a Solana `Connection`. The client exposes `lending`, `liquidity`, and `vault` modules.
+
+    ```typescript
+    import { Client } from "@jup-ag/lend-read";
+    import { Connection } from "@solana/web3.js";
+
+    const connection = new Connection("https://api.mainnet-beta.solana.com");
+    const client = new Client(connection);
+
+    // Or use the default mainnet RPC
+    const clientDefault = new Client();
+    ```
+  </Step>
+
+  <Step title="Get all supported lending tokens">
+    Get the list of all underlying token mints for Earn. Use these when you need to iterate over every market.
+
+    <Info>
+      **jlTokens** (Jupiter Lend tokens) are receipt tokens you receive when you deposit into Earn. Each underlying asset (e.g. USDC) has a corresponding jlToken representing your share of the pool. Balances accrue interest and rewards; you burn them on withdraw to receive the underlying asset back.
+    </Info>
+
+    ```typescript
+    const jlTokenMints = await client.lending.getAllJlTokens();
+
+    jlTokenMints.forEach((mint) => {
+      console.log("jlToken mint:", mint.toBase58());
+    });
+    ```
+  </Step>
+
+  <Step title="Get lending token (pool) details">
+    Fetch full pool-level data for one underlying mint: totals, supply rate, rewards rate, conversion rates, and decimals. Pass the **underlying** token mint (e.g. USDC), not the jlToken mint.
+
+    ```typescript
+    import { PublicKey } from "@solana/web3.js";
+
+    const usdcMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    const details = await client.lending.getJlTokenDetails(usdcMint);
+
+    console.log({
+      tokenAddress: details.tokenAddress.toBase58(),
+      underlyingAddress: details.underlyingAddress.toBase58(),
+      decimals: details.decimals,
+      totalAssets: details.totalAssets.toString(),
+      totalSupply: details.totalSupply.toString(),
+      supplyRate: details.supplyRate.toString(),
+      rewardsRate: details.rewardsRate.toString(),
+      conversionRateToShares: details.conversionRateToShares.toString(),
+      conversionRateToAssets: details.conversionRateToAssets.toString(),
+    });
+    ```
+
+    <Info>
+      **Rates:** `supplyRate` and `rewardsRate` are scaled by the SDK's internal precision (e.g. 1e12). Use the same scaling when displaying APY or comparing with other sources.
+    </Info>
+  </Step>
+
+  <Step title="Get all token details at once">
+    Fetch full pool details for every supported lending token. Use `getAllJlTokenDetails()` when building a market list or token selector.
+
+    ```typescript
+    const allDetails = await client.lending.getAllJlTokenDetails();
+
+    allDetails.forEach((d) => {
+      console.log(d.underlyingAddress.toBase58(), "supplyRate:", d.supplyRate.toString());
+    });
+    ```
+  </Step>
+
+  <Step title="Get user position for one asset">
+    Get a user's Earn position for a single underlying asset: jlToken shares, equivalent underlying amount, and wallet balance of the underlying token.
+
+    ```typescript
+    const usdcMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    const user = new PublicKey("YourUserWalletPublicKey");
+
+    const position = await client.lending.getUserPosition(usdcMint, user);
+
+    console.log({
+      jlTokenShares: position.jlTokenShares.toString(),
+      underlyingAssets: position.underlyingAssets.toString(),
+      underlyingBalance: position.underlyingBalance.toString(),
+    });
+    ```
+
+    <Info>
+      - **jlTokenShares:** User's share balance in the pool
+      - **underlyingAssets:** Value of those shares in underlying token units
+      - **underlyingBalance:** User's wallet balance of the underlying token (not deposited)
+    </Info>
+  </Step>
+
+  <Step title="Get all user positions across tokens">
+    Get the user's positions for every supported lending token in one call. Each item includes pool details and the user's position for that token.
+
+    ```typescript
+    const user = new PublicKey("YourUserWalletPublicKey");
+    const positions = await client.lending.getUserPositions(user);
+
+    for (const { jlTokenDetails, userPosition } of positions) {
+      if (userPosition.jlTokenShares.isZero()) continue;
+      console.log({
+        underlying: jlTokenDetails.underlyingAddress.toBase58(),
+        shares: userPosition.jlTokenShares.toString(),
+        underlyingAssets: userPosition.underlyingAssets.toString(),
+      });
+    }
+    ```
+  </Step>
+
+  <Step title="Preview deposit and withdraw amounts">
+    Before depositing or withdrawing, preview how many shares you get for a given asset amount (deposit/mint) or how many assets you get for a given share amount (redeem/withdraw). Pass amounts as `BN`.
+
+    ```typescript
+    import { BN } from "bn.js";
+
+    const usdcMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    const assetsAmount = new BN("1000000"); // 1 USDC (6 decimals)
+    const sharesAmount = new BN("1000000");
+
+    const previews = await client.lending.getPreviews(usdcMint, assetsAmount, sharesAmount);
+
+    console.log({
+      previewDeposit: previews.previewDeposit.toString(),
+      previewMint: previews.previewMint.toString(),
+      previewWithdraw: previews.previewWithdraw.toString(),
+      previewRedeem: previews.previewRedeem.toString(),
+    });
+    ```
+  </Step>
+
+  <Step title="Get exchange price and rewards">
+    For custom calculations, read the current exchange price (shares ↔ assets) and rewards info for a given underlying mint.
+
+    ```typescript
+    const usdcMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+
+    const exchangePrice = await client.lending.getExchangePrice(usdcMint);
+    console.log("Exchange price (scaled):", exchangePrice.toString());
+
+    const [rewardsRateModelPubkey, rewardsRate] = await client.lending.getJlTokenRewards(usdcMint);
+    console.log("Rewards rate model:", rewardsRateModelPubkey.toBase58(), "rate:", rewardsRate.toString());
+    ```
+  </Step>
+
+  <Step title="Get rewards rate model config (optional)">
+    Fetch the rewards rate model configuration (duration, start/end time, reward amount) for a lending token. Use when displaying reward campaign details.
+
+    ```typescript
+    const config = await client.lending.getJlTokenRewardsRateModelConfig(usdcMint);
+
+    console.log({
+      duration: config.duration.toString(),
+      startTime: config.startTime.toString(),
+      endTime: config.endTime.toString(),
+      rewardAmount: config.rewardAmount.toString(),
+    });
+    ```
+  </Step>
+</Steps>
+
+---
+
+## SDK types
+
+### User position
+
+Returned by `getUserPosition` and inside each item of `getUserPositions`:
+
+| Field              | Type | Description                                      |
+| ------------------ | ---- | ------------------------------------------------ |
+| `jlTokenShares`    | BN   | User's share balance in the pool                 |
+| `underlyingAssets` | BN   | Equivalent underlying token amount for those shares |
+| `underlyingBalance`| BN   | User's wallet balance of the underlying token    |
+| `allowance`        | BN   | Reserved (currently 0)                           |
+
+### Token (pool) details
+
+Returned by `getJlTokenDetails`, `getAllJlTokenDetails`, and as `jlTokenDetails` in `getUserPositions`:
+
+| Field                    | Type      | Description                          |
+| ------------------------ | --------- | ------------------------------------ |
+| `tokenAddress`           | PublicKey | jlToken mint address                 |
+| `underlyingAddress`      | PublicKey | Underlying asset mint                |
+| `decimals`               | number    | Token decimals                       |
+| `totalAssets`            | BN        | Total underlying assets in the pool  |
+| `totalSupply`            | BN        | Total jlToken supply                 |
+| `supplyRate`             | BN        | Supply rate (scaled)                 |
+| `rewardsRate`            | BN        | Rewards rate (scaled)                |
+| `conversionRateToShares` | BN        | Multiplier: assets → shares         |
+| `conversionRateToAssets` | BN        | Multiplier: shares → assets         |
+
+Use `conversionRateToAssets` with the SDK's precision (e.g. 1e12) when converting user shares to a displayable underlying amount if you are not using `underlyingAssets` from `getUserPosition`.
+
+---
+
+## Additional resources
+
+<CardGroup cols={2}>
+  <Card icon="box" href="https://www.npmjs.com/package/@jup-ag/lend-read" title="NPM: @jup-ag/lend-read">
+    Install the Read SDK for on-chain Earn data.
+  </Card>
+  <Card icon="book" title="Internal SDK reference">
+    See your internal Jupiter Lend Read SDK reference for full type definitions and advanced usage.
+  </Card>
+</CardGroup>

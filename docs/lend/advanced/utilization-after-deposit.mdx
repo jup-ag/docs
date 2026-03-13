@@ -1,0 +1,120 @@
+---
+title: "Utilisation After Deposit"
+description: "Calculate the final utilisation on the Liquidity Layer after a hypothetical deposit."
+llmsDescription: "How to calculate the projected utilisation on the Jupiter Lend Liquidity Layer after a hypothetical deposit using the @jup-ag/lend-read SDK Liquidity module. Read-only guide covering getOverallTokenData() for current totalSupply and totalBorrow, utilisation formula (totalBorrow / totalSupply), and computing the new utilisation after adding a deposit. Includes complete TypeScript code example with BN arithmetic."
+---
+
+<Info>
+  This guide uses read-only APIs from the Liquidity module. No transactions, keypairs, or ATAs required.
+</Info>
+
+Use the **Liquidity** module from `@jup-ag/lend-read` to fetch real-time market data and compute how utilisation would change if you made a deposit.
+
+**Formula:** Utilisation is the ratio of borrowed assets to supplied assets: `utilisation = totalBorrow / totalSupply`. After a deposit, supply increases while borrow stays the same: `newUtilisation = totalBorrow / (totalSupply + depositAmount)`.
+
+**Example:** If the Liquidity Layer has \$500M supplied and \$200M borrowed (40% utilisation), a \$100M deposit would give new supply \$600M and new utilisation **33.33%** (\$200M / \$600M).
+
+---
+
+## Utilisation After Deposit
+
+<Steps>
+  <Step titleSize="h2" title="Import Dependencies">
+    ```bash
+    npm install @solana/web3.js bn.js @jup-ag/lend-read
+    ```
+
+    ```typescript
+    import { Client } from "@jup-ag/lend-read";
+    import { Connection, PublicKey } from "@solana/web3.js";
+    import BN from "bn.js";
+    ```
+  </Step>
+  <Step titleSize="h2" title="Initialise Connection and Fetch Liquidity Data">
+    Create the RPC connection and client. Use `client.liquidity.getOverallTokenData(token)` to get `totalSupply`, `totalBorrow`, and `lastStoredUtilization` for the target token (e.g. USDC).
+
+    ```typescript
+    const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const client = new Client(connection);
+    const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+
+    const data = await client.liquidity.getOverallTokenData(USDC_MINT);
+    const totalSupply = new BN(data.totalSupply.toString());
+    const totalBorrow = new BN(data.totalBorrow.toString());
+    ```
+  </Step>
+  <Step titleSize="h2" title="Convert Deposit to Base Units">
+    Express your deposit in the token's base units. For USDC (6 decimals), $100M = `100_000_000 * 10^6`.
+
+    ```typescript
+    const DEPOSIT_USD = 100_000_000;
+    const USDC_DECIMALS = 6;
+    const depositAmount = new BN(DEPOSIT_USD).mul(new BN(10).pow(new BN(USDC_DECIMALS)));
+    ```
+  </Step>
+  <Step titleSize="h2" title="Calculate New Utilisation">
+    Add the deposit to supply and compute the new utilisation. Express as basis points (x 10,000) or percentage.
+
+    ```typescript
+    const newSupply = totalSupply.add(depositAmount);
+    const newUtilBps = totalBorrow.muln(10_000).div(newSupply); // basis points
+    const newUtilPercent = Number(newUtilBps) / 100; // e.g. 3333 → 33.33%
+    console.log("Final utilisation:", newUtilPercent.toFixed(2) + "%");
+    ```
+  </Step>
+</Steps>
+
+## Full code example
+
+<Info>
+  See [Liquidity Data & Analytics](/docs/lend/liquidity/analytics) for more on the Liquidity module and available methods.
+</Info>
+
+```typescript expandable
+import { Client } from "@jup-ag/lend-read";
+import { Connection, PublicKey } from "@solana/web3.js";
+import BN from "bn.js";
+
+const RPC_URL = "https://api.mainnet-beta.solana.com";
+const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+
+const DEPOSIT_USD = 100_000_000;
+const USDC_DECIMALS = 6;
+const depositAmount = new BN(DEPOSIT_USD).mul(new BN(10).pow(new BN(USDC_DECIMALS)));
+
+function utilizationToPercent(utilizationBps: BN): string {
+  return (Number(utilizationBps) / 100).toFixed(2);
+}
+
+async function main() {
+  const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+  const client = new Client(connection);
+
+  const data = await client.liquidity.getOverallTokenData(USDC_MINT);
+
+  const totalSupply = new BN(data.totalSupply.toString());
+  const totalBorrow = new BN(data.totalBorrow.toString());
+  const currentUtilBps = new BN(data.lastStoredUtilization.toString());
+
+  const newSupply = totalSupply.add(depositAmount);
+  const newUtilBps = totalBorrow.muln(10_000).div(newSupply);
+
+  const supplyUsd = Number(totalSupply) / 10 ** USDC_DECIMALS;
+  const borrowUsd = Number(totalBorrow) / 10 ** USDC_DECIMALS;
+  const depositUsd = Number(depositAmount) / 10 ** USDC_DECIMALS;
+
+  console.log("=== USDC Liquidity Layer ===\n");
+  console.log("Current state:");
+  console.log(`  Total supply:     $${supplyUsd.toLocaleString()}`);
+  console.log(`  Total borrow:     $${borrowUsd.toLocaleString()}`);
+  console.log(`  Utilisation:      ${utilizationToPercent(currentUtilBps)}%\n`);
+  console.log(`Hypothetical deposit: $${depositUsd.toLocaleString()}\n`);
+  console.log("After deposit:");
+  console.log(`  New total supply: $${(supplyUsd + depositUsd).toLocaleString()}`);
+  console.log(`  Total borrow:     $${borrowUsd.toLocaleString()} (unchanged)`);
+  console.log(`  Final utilisation: ${utilizationToPercent(newUtilBps)}%`);
+}
+
+main().catch(console.error);
+```

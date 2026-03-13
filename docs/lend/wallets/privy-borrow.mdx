@@ -1,0 +1,268 @@
+---
+title: "Borrow with Privy"
+description: "Create a position, deposit collateral, and borrow assets using Privy embedded wallets."
+llmsDescription: "How to create a borrow position, deposit collateral, and borrow assets from Jupiter Lend vaults using Privy embedded wallets. Covers PrivyClient setup, getOperateIx from @jup-ag/lend/borrow with positionId 0 for batched create-and-deposit, versioned transactions with address lookup tables, Privy signing via privy.wallets().solana().signTransaction, and the full create-deposit-borrow flow. Complete guide for keyless borrowing."
+---
+
+Create a borrow position, deposit collateral, and borrow assets from Jupiter Lend vaults using Privy embedded wallets. The full flow uses two transactions: one to create a position and deposit collateral, and one to borrow.
+
+## Prerequisites
+
+```bash
+npm install @solana/web3.js@1 bn.js @jup-ag/lend @privy-io/node
+```
+
+---
+
+## Create Position and Deposit Collateral
+
+<Steps>
+  <Step>
+    ### Import Dependencies
+
+    ```typescript
+    import { PrivyClient } from "@privy-io/node";
+    import {
+      Connection,
+      PublicKey,
+      TransactionMessage,
+      VersionedTransaction,
+    } from "@solana/web3.js";
+    import BN from "bn.js";
+    import { getOperateIx } from "@jup-ag/lend/borrow";
+    ```
+  </Step>
+
+  <Step>
+    ### Configure Privy and Initialise Client
+
+    Set up your Privy credentials, Solana connection, and borrow parameters.
+
+    ```typescript
+    const PRIVY_APP_ID = "put-your-privy-app-id-here";
+    const PRIVY_APP_SECRET = "put-your-privy-app-secret-here";
+    const RPC_ENDPOINT = "https://api.mainnet-beta.solana.com";
+    const VAULT_ID = 1; // target vault (market) ID
+    const COLLATERAL_AMOUNT = new BN(1_000_000); // e.g. 1 USDC (6 decimals)
+    const AUTH_KEY_ID = "put-your-auth-key-id-here"; // from Privy dashboard or REST API
+    const AUTH_KEY_PRIVATE = "put-your-auth-key-private-here"; // P-256 private key
+    const WALLET_ID = "put-your-wallet-id-here";
+
+    const privy = new PrivyClient({
+      appId: PRIVY_APP_ID,
+      appSecret: PRIVY_APP_SECRET,
+    });
+
+    const connection = new Connection(RPC_ENDPOINT);
+    ```
+
+    <Note>
+      `AUTH_KEY_ID` identifies the authorization key (from dashboard/API), `AUTH_KEY_PRIVATE` is the P-256 private key used for signing. See the [Privy authorization keys docs](https://docs.privy.io/controls/authorization-keys/owners/overview) for setup.
+    </Note>
+  </Step>
+
+  <Step>
+    ### Get Wallet Address
+
+    ```typescript
+    const wallet = await privy.wallets().get(WALLET_ID);
+    if (!wallet) {
+      throw new Error(`Wallet ${WALLET_ID} not found`);
+    }
+    const signer = new PublicKey(wallet.address);
+    ```
+  </Step>
+
+  <Step>
+    ### Build Create Position + Deposit Instructions
+
+    Pass `positionId: 0` to create a new position and deposit collateral in a single transaction. The SDK returns `nftId` for future operations.
+
+    ```typescript
+    const { ixs, addressLookupTableAccounts, nftId } = await getOperateIx({
+      vaultId: VAULT_ID,
+      positionId: 0, // 0 = create new position + deposit in one tx
+      colAmount: COLLATERAL_AMOUNT,
+      debtAmount: new BN(0),
+      connection,
+      signer,
+    });
+
+    console.log("New position ID (nftId):", nftId);
+
+    if (!ixs?.length) {
+      throw new Error("No deposit instructions returned by Jupiter Lend SDK");
+    }
+    ```
+
+    Save `nftId` for subsequent operations (borrow, repay, withdraw). With `positionId: 0`, the SDK batches position creation and collateral deposit into one transaction.
+  </Step>
+
+  <Step>
+    ### Build and Sign Transaction
+
+    Borrow transactions use versioned (v0) format with address lookup tables.
+
+    ```typescript
+    const { blockhash, lastValidBlockHeight } =
+      await connection.getLatestBlockhash();
+
+    const message = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: blockhash,
+      instructions: ixs,
+    }).compileToV0Message(addressLookupTableAccounts ?? []);
+
+    const transaction = new VersionedTransaction(message);
+    const serializedTx = Buffer.from(transaction.serialize()).toString("base64");
+
+    const signResponse = await privy
+      .wallets()
+      .solana()
+      .signTransaction(WALLET_ID, {
+        transaction: serializedTx,
+        authorization_context: {
+          authorization_private_keys: [AUTH_KEY_PRIVATE],
+        },
+      });
+
+    if (!signResponse?.signed_transaction) {
+      throw new Error("Privy signing failed: no signed transaction returned");
+    }
+    ```
+  </Step>
+
+  <Step>
+    ### Send Transaction
+
+    ```typescript
+    const signedTxBytes = Buffer.from(
+      signResponse.signed_transaction as string,
+      "base64"
+    );
+    const signature = await connection.sendRawTransaction(signedTxBytes, {
+      skipPreflight: false,
+    });
+    await connection.confirmTransaction(
+      { signature, blockhash, lastValidBlockHeight },
+      "confirmed"
+    );
+    console.log("Position created and collateral deposited! Signature:", signature);
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Borrow Against Collateral
+
+Once you have a position with deposited collateral, borrow assets against it.
+
+<Steps>
+  <Step>
+    ### Build Borrow Instructions
+
+    Use the `nftId` from the previous step as `positionId`. Set `colAmount` to 0 and `debtAmount` to the borrow amount.
+
+    ```typescript
+    const BORROW_AMOUNT = new BN(100_000); // e.g. 0.1 USDT (6 decimals)
+    const POSITION_ID = nftId; // from create position step above
+
+    const { ixs: borrowIxs, addressLookupTableAccounts: borrowAlts } =
+      await getOperateIx({
+        vaultId: VAULT_ID,
+        positionId: POSITION_ID,
+        colAmount: new BN(0),
+        debtAmount: BORROW_AMOUNT,
+        connection,
+        signer,
+      });
+
+    if (!borrowIxs?.length) {
+      throw new Error("No borrow instructions returned by Jupiter Lend SDK");
+    }
+    ```
+
+    <Warning>
+      Your borrow capacity depends on collateral value and the vault's LTV limits. Monitor your position to avoid liquidation.
+    </Warning>
+  </Step>
+
+  <Step>
+    ### Build, Sign, and Send
+
+    ```typescript
+    const borrowBlockhash = await connection.getLatestBlockhash();
+
+    const borrowMessage = new TransactionMessage({
+      payerKey: signer,
+      recentBlockhash: borrowBlockhash.blockhash,
+      instructions: borrowIxs,
+    }).compileToV0Message(borrowAlts ?? []);
+
+    const borrowTx = new VersionedTransaction(borrowMessage);
+    const borrowSerialised = Buffer.from(borrowTx.serialize()).toString("base64");
+
+    const borrowSignResponse = await privy
+      .wallets()
+      .solana()
+      .signTransaction(WALLET_ID, {
+        transaction: borrowSerialised,
+        authorization_context: {
+          authorization_private_keys: [AUTH_KEY_PRIVATE],
+        },
+      });
+
+    if (!borrowSignResponse?.signed_transaction) {
+      throw new Error("Privy signing failed: no signed transaction returned");
+    }
+
+    const borrowSignedBytes = Buffer.from(
+      borrowSignResponse.signed_transaction as string,
+      "base64"
+    );
+    const borrowSig = await connection.sendRawTransaction(borrowSignedBytes, {
+      skipPreflight: false,
+    });
+    await connection.confirmTransaction(
+      {
+        signature: borrowSig,
+        blockhash: borrowBlockhash.blockhash,
+        lastValidBlockHeight: borrowBlockhash.lastValidBlockHeight,
+      },
+      "confirmed"
+    );
+    console.log("Borrow successful! Signature:", borrowSig);
+    ```
+
+    The borrowed tokens are now in the Privy wallet. Repay with the standard [Repay](/docs/lend/borrow/repay) flow using the same `positionId`.
+  </Step>
+</Steps>
+
+---
+
+## Operate Parameters
+
+`getOperateIx` accepts the following parameters:
+
+| Parameter     | Type        | Description |
+| ------------- | ----------- | ----------- |
+| `vaultId`     | `number`    | Target vault (market) ID. |
+| `positionId`  | `number`    | Position NFT ID. Use `0` to create a new position and deposit in one transaction. |
+| `colAmount`   | `BN`        | Signed collateral amount in base units. **Positive** = deposit. **Negative** = withdraw. Use `new BN(0)` for borrow/repay-only. |
+| `debtAmount`  | `BN`        | Signed debt amount in base units. **Positive** = borrow. **Negative** = repay. Use `new BN(0)` for deposit/withdraw-only. |
+| `connection`  | `Connection`| Solana RPC connection. |
+| `signer`      | `PublicKey` | Wallet that signs the transaction (position owner). |
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Earn with Privy" icon="wallet" href="/docs/lend/wallets/privy-earn">
+    Deposit and withdraw with Privy wallets
+  </Card>
+  <Card title="Deposit Collateral" icon="building-columns" href="/docs/lend/borrow/deposit">
+    Standard collateral deposit with keypair signing
+  </Card>
+</CardGroup>

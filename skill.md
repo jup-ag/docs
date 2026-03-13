@@ -1,3 +1,18 @@
+---
+name: jupiter-agent-skills
+description: Discovery index for all Jupiter agent skills. Lists available skills for integrating Jupiter APIs (swaps, lend, perps, triggers, recurring, tokens, price, portfolio, prediction markets, send, studio, lock, routing) with install commands and documentation links.
+license: MIT
+metadata:
+  author: jupiter
+  version: "1.0.0"
+tags:
+  - jupiter
+  - jup-ag
+  - agent-skills
+  - integrating-jupiter
+  - jupiter-lend
+---
+
 # Jupiter Agent Skills
 
 > Agent skills for integrating with the Jupiter ecosystem on Solana. Each skill provides structured guidance, code examples, and API references for AI coding agents.

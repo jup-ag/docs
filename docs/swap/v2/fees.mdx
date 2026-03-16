@@ -30,9 +30,101 @@ Jupiter charges a platform fee on `/order` swaps. This fee is included in the qu
 }
 ```
 
+#### Fee breakdown
+
+The platform fee varies by token pair:
+
+| Token Pair | Fee (bps) |
+|------------|-----------|
+| Buying Jupiter tokens (SOL/Stable to JUP/JLP/jupSOL) | 0 |
+| Pegged assets (LST-LST, Stable-Stable) | 0 |
+| SOL-Stable | 2 |
+| LST-Stable | 5 |
+| Everything else | 10 |
+| New tokens (within 24 hours of token age) | 50 |
+
+#### Fee mint priority
+
+Jupiter determines which token to collect fees in based on a priority list:
+
+1. **SOL**
+2. **Stablecoins** (USDC, USDT, etc.)
+3. **Liquid staked tokens** (jupSOL, etc.)
+4. **Bluechips** (large market cap tokens)
+5. **Others**
+
+Check the `feeMint` and `feeBps` fields in the `/order` response to see which token and rate apply to your swap.
+
 ### Referral fees
 
-Use the [Jupiter Referral Program](/tool-kits/referral-program) to earn fees on swaps. Set `referralAccount` and `referralFee`:
+Use the [Jupiter Referral Program](/tool-kits/referral-program) to earn fees on `/order` swaps. This requires setting up referral accounts before you can collect fees.
+
+#### How it works
+
+- Jupiter takes 20% of your integrator fee (no separate platform fee when referral is active)
+- Jupiter decides which token mint to collect fees in based on the [fee mint priority](#fee-mint-priority) list
+- You must create a `referralTokenAccount` for each mint you expect to receive fees in
+- If the `referralTokenAccount` for the `feeMint` is not initialised, the order still returns but executes without your fees (the user still gets their swap)
+- Fee range: 50 to 255 bps
+- Supports SPL and Token2022 tokens
+
+#### Setup
+
+Three one-time steps before you can collect fees:
+
+1. **Install the Referral SDK**
+
+```bash
+npm install @jup-ag/referral-sdk
+```
+
+2. **Create a `referralAccount`** (once)
+
+```typescript expandable
+import { ReferralProvider } from "@jup-ag/referral-sdk";
+import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY!));
+const provider = new ReferralProvider(connection);
+
+// Jupiter Ultra Referral Project
+const projectPubKey = new PublicKey("DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc");
+
+const transaction = await provider.initializeReferralAccountWithName({
+  payerPubKey: wallet.publicKey,
+  partnerPubKey: wallet.publicKey,
+  projectPubKey: projectPubKey,
+  name: "your-app-name",
+});
+
+const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
+console.log("referralAccount:", transaction.referralAccountPubKey.toBase58());
+```
+
+3. **Create `referralTokenAccount` for each fee mint**
+
+Create a token account for each mint you expect to collect fees in. Start with SOL and USDC. You can add more later.
+
+```typescript expandable
+const mint = new PublicKey("So11111111111111111111111111111111111111112"); // SOL
+
+const transaction = await provider.initializeReferralTokenAccountV2({
+  payerPubKey: wallet.publicKey,
+  referralAccountPubKey: new PublicKey("YOUR_REFERRAL_ACCOUNT"),
+  mint,
+});
+
+const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
+console.log("referralTokenAccount:", transaction.tokenAccount.toBase58());
+```
+
+You can also use the [Referral Dashboard](https://referral.jup.ag/) to create accounts via a web interface.
+
+#### Usage
+
+Pass `referralAccount` and `referralFee` to `/order`:
 
 ```typescript
 const params = new URLSearchParams({
@@ -41,7 +133,7 @@ const params = new URLSearchParams({
   amount: "1000000000",
   taker: walletAddress,
   referralAccount: "YOUR_REFERRAL_ACCOUNT",
-  referralFee: "50", // 0.5%
+  referralFee: "50", // 50 bps = 0.5%
 });
 
 const response = await fetch(
@@ -49,6 +141,8 @@ const response = await fetch(
   { headers: { "x-api-key": API_KEY } }
 );
 ```
+
+Verify your fees are applied by checking the `feeBps` field in the response matches your `referralFee` value. If it falls back to the default platform fee, the `referralTokenAccount` for that `feeMint` is likely not initialised.
 
 <Warning>
   Adding `referralAccount` disables RFQ routing. You will only get Metis quotes.
@@ -74,7 +168,7 @@ const response = await fetch(
 );
 ```
 
-The platform fee is collected as part of the swap instruction. You must provide a token account (`feeAccount`) to receive the fees.
+Your fee is added as part of the swap instruction. The `feeAccount` can be any SPL token account you control (it does not need to be a referral program account). You are responsible for creating and managing this account.
 
 ## Fee response fields
 

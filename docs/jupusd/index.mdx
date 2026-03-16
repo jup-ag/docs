@@ -139,7 +139,12 @@ import { findAssociatedTokenPda } from "@solana-program/token";
 
 // Wallet must be a registered benefactor
 const userSigner = /* your wallet signer */;
-const feePayerSigner = userSigner;
+
+// Benefactor address: provided to you during onboarding (KYC/KYB)
+const benefactorAddress = address("YOUR_BENEFACTOR_ADDRESS");
+
+// Collateral mint (e.g. USDC)
+const USDC = address("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 
 // --- Derive program accounts ---
 
@@ -147,7 +152,7 @@ const feePayerSigner = userSigner;
 const configAddress = await findConfig();
 const configAccount = await fetchConfig(rpc, configAddress);
 
-// Vault PDA (derived from collateral mint, e.g. USDC)
+// Vault PDA (derived from collateral mint)
 const vaultAddress = await findVault(USDC);
 const vaultAccount = await fetchVault(rpc, vaultAddress);
 
@@ -215,7 +220,12 @@ import {
 
 // Wallet must be a registered benefactor
 const userSigner = /* your wallet signer */;
-const feePayerSigner = userSigner;
+
+// Benefactor address: provided to you during onboarding (KYC/KYB)
+const benefactorAddress = address("YOUR_BENEFACTOR_ADDRESS");
+
+// Collateral mint (e.g. USDC)
+const USDC = address("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 
 // --- Derive program accounts ---
 
@@ -223,7 +233,7 @@ const feePayerSigner = userSigner;
 const configAddress = await findConfig();
 const configAccount = await fetchConfig(rpc, configAddress);
 
-// Vault PDA (derived from collateral mint, e.g. USDC)
+// Vault PDA (derived from collateral mint)
 const vaultAddress = await findVault(USDC);
 const vaultAccount = await fetchVault(rpc, vaultAddress);
 

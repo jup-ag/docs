@@ -1,7 +1,7 @@
 ---
 title: "Fees"
 description: "Fee models for /order and /build"
-llmsDescription: "Documentation of Jupiter Swap API V2 fee models. /order charges a Jupiter platform fee and supports integrator fees (referralAccount + referralFee for the Jupiter referral program, or advanced fees via feeBps/feeFlat/feeMint/feeReceiver). /build charges no Jupiter swap fees, only integrator platform fees via platformFeeBps + feeAccount. Adding fee parameters to /order disables RFQ routing (JupiterZ), restricting to Metis-only quotes. Covers fee response fields, fee calculation, and code examples for both paths."
+llmsDescription: "Documentation of Jupiter Swap API V2 fee models. /order charges a Jupiter platform fee and supports integrator referral fees (referralAccount + referralFee via the Jupiter referral program). /build charges no Jupiter swap fees, only integrator platform fees via platformFeeBps + feeAccount. Adding referral fee parameters to /order disables RFQ routing (JupiterZ), restricting to Metis-only quotes. Covers fee response fields, fee calculation, and code examples for both paths."
 ---
 
 The two Swap API paths have different fee models. This page covers both.
@@ -11,7 +11,7 @@ The two Swap API paths have different fee models. This page covers both.
 | | `/order` | `/build` |
 | --- | --- | --- |
 | **Jupiter swap fee** | Yes (platform fee) | **No** |
-| **Integrator fees** | Referral fees or advanced fees (feeBps/feeFlat) | Platform fee only (platformFeeBps) or DIY |
+| **Integrator fees** | Referral fees (referralAccount + referralFee) | Platform fee only (platformFeeBps) or DIY |
 | **RFQ routing** | Disabled when fee params are added | Not available |
 
 ## `/order` fees
@@ -54,47 +54,6 @@ const response = await fetch(
   Adding `referralAccount` disables RFQ routing. You will only get Metis quotes.
 </Warning>
 
-### Advanced fees (feeBps / feeFlat)
-
-For more control over fee collection, use the advanced fee parameters:
-
-| Parameter | Description |
-| --- | --- |
-| `feeBps` | Fee as a portion of swap input USD value (1-10000 bps). ExactIn only. |
-| `feeFlat` | Flat fee amount in `feeMint`. |
-| `feeReducer` | Required if both feeBps and feeFlat set. `min` (lower of the two), `max` (higher), or `sum` (both combined). |
-| `feeMint` | Token to collect fees in. Required. |
-| `feeReceiver` | Wallet to receive fees. Required. |
-
-```typescript
-const params = new URLSearchParams({
-  inputMint: "So11111111111111111111111111111111111111112",
-  outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-  amount: "1000000000",
-  taker: walletAddress,
-  feeBps: "100",     // 1%
-  feeMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-  feeReceiver: "YOUR_WALLET_ADDRESS",
-});
-```
-
-The response `advancedFee` field shows the calculated fee:
-
-```json
-{
-  "advancedFee": {
-    "feeBps": "100",
-    "feeReceiver": "YOUR_WALLET_ADDRESS",
-    "feeMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-    "feeUsdValue": 1.71
-  }
-}
-```
-
-<Warning>
-  Advanced fees also disable RFQ routing, restricting to Metis-only quotes.
-</Warning>
-
 ## `/build` fees
 
 Jupiter does not charge swap fees on `/build`. The only fee mechanism is integrator platform fees via `platformFeeBps` and `feeAccount`:
@@ -127,7 +86,7 @@ The `/order` response includes these fee-related fields:
 | `feeMint` | Token fees are collected in |
 | `platformFee.amount` | Jupiter platform fee amount |
 | `platformFee.feeBps` | Jupiter platform fee rate |
-| `advancedFee` | Integrator fee details (present if feeBps/feeFlat used) |
+| `referralAccount` | Referral account used (if set) |
 
 ## Related
 

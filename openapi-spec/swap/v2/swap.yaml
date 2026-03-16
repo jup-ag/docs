@@ -86,20 +86,6 @@ components:
         feeMint:
           type: string
 
-    AdvancedFee:
-      type: object
-      properties:
-        feeBps:
-          type: string
-        feeFlat:
-          type: string
-        feeReceiver:
-          type: string
-        feeMint:
-          type: string
-        feeUsdValue:
-          type: number
-
     SwapEvent:
       type: object
       properties:
@@ -164,130 +150,104 @@ paths:
           schema:
             type: string
           description: |
-            The public key of the taker. Must be present if you intend to sign and execute the transaction.
-            If omitted, the response will contain a quote but no transaction.
+            - The public key of the wallet that will sign the transaction
+            - If not provided, the response will contain a quote but no transaction
+            - Must be present if you intend to sign and execute the transaction via `/execute`
           example: GkwFnmMDvn3HGMpJpWBg8tgJxr3NxNvg3AXxvXVPbRGJ
         - name: receiver
           in: query
           schema:
             type: string
           description: |
-            Override recipient of output tokens. Must differ from taker. Ignored if no taker.
+            - The public key of the account that will receive the output tokens
+            - Must differ from `taker`
+            - Expects a wallet address, not a token account
+            - For non-SOL output: tokens are sent to the receiver's associated token account (ATA). If the ATA is not initialised, a create ATA instruction is added to the transaction
+            - For SOL output: native SOL is transferred directly to the receiver
+            - Does not support destination wSOL token accounts
+            - Disables RFQ routing (JupiterZ)
         - name: swapMode
           in: query
           schema:
             type: string
-            enum: [ExactIn, ExactOut]
-          description: Either 'ExactIn' or 'ExactOut'. Defaults to ExactIn.
+            enum: [ExactIn]
+          description: |
+            - Swap mode. Currently only `ExactIn` is supported.
         - name: slippageBps
           in: query
           schema:
             type: integer
             minimum: 0
             maximum: 10000
-          description: Slippage tolerance in basis points.
+          description: |
+            - Slippage tolerance in basis points (0-10000)
+            - If not set, Jupiter automatically determines an appropriate slippage
           example: 50
         - name: referralAccount
           in: query
           schema:
             type: string
           description: |
-            Address of your referral account for the Jupiter referral project.
-            If set, referralFee must also be set. Disables RFQ routing.
+            - Address of your referral account for the Jupiter referral project
+            - Must be used together with `referralFee`
+            - Disables RFQ routing (JupiterZ)
+            - See the [Referral Program](/tool-kits/referral-program) for setup
         - name: referralFee
           in: query
           schema:
             type: number
+            minimum: 50
+            maximum: 255
           description: |
-            Referral fee in basis points. Must pair with referralAccount.
+            - Referral fee in basis points (50-255)
+            - Must be used together with `referralAccount`
           example: 50
-        - name: feeBps
-          in: query
-          schema:
-            type: string
-          description: |
-            Integrator fee as a portion of swap input USD value, collected in feeMint.
-            Integer between 1 and 10000 inclusive. ExactIn only. Disables RFQ routing.
-        - name: feeFlat
-          in: query
-          schema:
-            type: string
-          description: |
-            Flat fee amount in feeMint. Must be a positive integer. ExactIn only.
-        - name: feeReducer
-          in: query
-          schema:
-            type: string
-            enum: [min, max, sum]
-          description: Required if both feeBps and feeFlat are specified. Determines total fee calculation.
-        - name: feeReceiver
-          in: query
-          schema:
-            type: string
-          description: |
-            Wallet address to receive fees. Required if feeBps or feeFlat is specified.
-        - name: feeMint
-          in: query
-          schema:
-            type: string
-          description: |
-            Mint to collect fee in. If SOL mint, fee collected in native SOL.
-            Required if feeBps or feeFlat is specified.
         - name: payer
           in: query
           schema:
             type: string
           description: |
-            Account that pays gas-related fees (signature, priority, rent) on behalf of the taker.
-            Enabling this changes routing behaviour.
+            - The public key of an account that will cover gas-related fees (signature fees, priority fees, and rent) on behalf of the taker
+            - Enabling this changes routing behaviour: Jupiter may route through a dedicated gasless flow if the taker lacks sufficient SOL for gas
           example: gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB
-        - name: gasMint
-          in: query
-          schema:
-            type: string
-          description: Mint the taker will refund the payer in. Ignored if payer is not set.
         - name: priorityFeeLamports
           in: query
           schema:
             type: number
-          description: Priority fee in lamports.
+          description: |
+            - Priority fee in lamports
+            - If not set, Jupiter automatically determines an appropriate priority fee
+            - Setting this overrides the automatic optimisation
         - name: jitoTipLamports
           in: query
           schema:
             type: number
-          description: Jito MEV tip in lamports.
-        - name: nozomiTipLamports
-          in: query
-          schema:
-            type: number
-          description: Nozomi tip in lamports.
+          description: |
+            - Jito MEV tip in lamports for faster block inclusion
         - name: broadcastFeeType
           in: query
           schema:
             type: string
             enum: [maxCap, exactFee]
-          description: Ignored if priorityFeeLamports and jitoTipLamports are not set.
+          description: |
+            - Fee cap strategy: `maxCap` treats the fee as a maximum, `exactFee` uses the exact amount
+            - Ignored if neither `priorityFeeLamports` nor `jitoTipLamports` are set
         - name: excludeRouters
           in: query
           schema:
             type: string
-          description: Comma-separated list of routers to exclude (e.g. "metis,jupiterz").
-          example: metis,jupiterz
+          description: |
+            - Comma-separated list of routers to exclude
+            - Available routers: `iris` (Metis), `jupiterz` (RFQ), `dflow`, `okx`
+          example: jupiterz,dflow
         - name: excludeDexes
           in: query
           schema:
             type: string
-          description: Comma-separated list of DEXes to exclude from routing.
-        - name: useWsol
-          in: query
-          schema:
-            type: boolean
-          description: Whether to use wrapped SOL instead of native SOL. Defaults to false.
-        - name: closeAuthority
-          in: query
-          schema:
-            type: string
-          description: Close authority for ATAs created during the swap transaction.
+          description: |
+            - Comma-separated list of DEXes to exclude from the Iris (Metis) router
+            - **Important**: This only affects the Iris router, not other routers
+            - For example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
       responses:
         "200":
           description: Quote with optional assembled transaction
@@ -318,7 +278,7 @@ paths:
                     type: number
                   otherAmountThreshold:
                     type: string
-                    description: Minimum output (ExactIn) or maximum input (ExactOut)
+                    description: Minimum output amount after slippage
                   swapMode:
                     type: string
                   slippageBps:
@@ -340,8 +300,6 @@ paths:
                     description: Total fees including platform fee and other fees
                   platformFee:
                     $ref: "#/components/schemas/PlatformFee"
-                  advancedFee:
-                    $ref: "#/components/schemas/AdvancedFee"
                   signatureFeeLamports:
                     type: number
                   signatureFeePayer:
@@ -372,8 +330,8 @@ paths:
                     type: string
                     nullable: true
                     description: |
-                      Base64-encoded transaction. Null if taker is not provided.
-                      Empty string if taker is provided but transaction could not be built (check errorCode).
+                      - Base64-encoded transaction. Null if taker is not provided.
+                      - Empty string if taker is provided but transaction could not be built (check errorCode).
                   lastValidBlockHeight:
                     type: string
                   gasless:
@@ -465,15 +423,15 @@ paths:
           schema:
             type: string
           description: |
-            Comma-separated list of DEXes to restrict routing to.
-            Mutually exclusive with excludeDexes.
+            - Comma-separated list of DEXes to restrict routing to.
+            - Mutually exclusive with excludeDexes.
         - name: excludeDexes
           in: query
           schema:
             type: string
           description: |
-            Comma-separated list of DEXes to exclude.
-            Mutually exclusive with dexes.
+            - Comma-separated list of DEXes to exclude.
+            - Mutually exclusive with dexes.
         - name: platformFeeBps
           in: query
           schema:
@@ -510,15 +468,15 @@ paths:
           schema:
             type: string
           description: |
-            SPL token account to receive output tokens.
-            Mutually exclusive with nativeDestinationAccount.
+            - SPL token account to receive output tokens.
+            - Mutually exclusive with nativeDestinationAccount.
         - name: nativeDestinationAccount
           in: query
           schema:
             type: string
           description: |
-            Native SOL account to receive output.
-            Mutually exclusive with destinationTokenAccount.
+            - Native SOL account to receive output.
+            - Mutually exclusive with destinationTokenAccount.
         - name: blockhashSlotsToExpiry
           in: query
           schema:
@@ -654,10 +612,10 @@ paths:
                   code:
                     type: number
                     description: |
-                      Error code. 0 = success.
-                      Ultra: -1 (missing cached order), -2 (invalid signed tx), -3 (invalid message bytes).
-                      Aggregator: -1000 (failed to land), -1001 (unknown), -1002 (invalid tx), -1003 (not fully signed), -1004 (invalid block height).
-                      RFQ: -2000 (failed to land), -2001 (unknown), -2002 (invalid payload), -2003 (quote expired), -2004 (swap rejected).
+                      - Error code. 0 = success.
+                      - Ultra: -1 (missing cached order), -2 (invalid signed tx), -3 (invalid message bytes).
+                      - Aggregator: -1000 (failed to land), -1001 (unknown), -1002 (invalid tx), -1003 (not fully signed), -1004 (invalid block height).
+                      - RFQ: -2000 (failed to land), -2001 (unknown), -2002 (invalid payload), -2003 (quote expired), -2004 (swap rejected).
                   totalInputAmount:
                     type: string
                     description: Total input token amount before fees

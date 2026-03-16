@@ -14,12 +14,24 @@ By default, `/order` with no optional parameters enables all routers:
 | --- | --- | --- |
 | **Metis (Iris)** | Onchain aggregator | Jupiter's core routing engine |
 | **JupiterZ** | RFQ (Request for Quote) | Market makers providing off-chain liquidity. Often beats onchain by 5-20bps on major pairs. |
-| **Dflow** | Third-party | Decentralised order flow |
-| **OKX** | Third-party | OKX liquidity |
+| **Dflow** | Third-party | - |
+| **OKX** | Third-party | - |
 
 The `/build` endpoint always uses **Metis only**. RFQ and third-party routers are not available.
 
 The response `router` field tells you which router won: `iris` (Metis), `jupiterz`, `dflow`, or `okx`.
+
+## Routing impact matrix
+
+This table shows which routers are available for each parameter combination on `/order`.
+
+| Parameter | Metis | JupiterZ (RFQ) | Dflow | OKX |
+| --- | --- | --- | --- |--- |
+| **(no optional params)** | Yes | Yes | Yes | Yes |
+| `receiver` | Yes | **No** | Yes | Yes |
+| `referralAccount` | Yes | **No** | Yes | Yes |
+| `payer` (gasless) | **No** | **No** | **No** | **No** |
+| `excludeRouters: jupiterz` | Yes | **No** | Yes | Yes |
 
 ## `/order` parameters
 
@@ -35,20 +47,17 @@ The response `router` field tells you which router won: `iris` (Metis), `jupiter
 
 | Parameter | Type | Default | Routing | Description |
 | --- | --- | --- | --- | --- |
-| `taker` | string | - | All routers | Wallet address. Required to receive a transaction. |
-| `receiver` | string | - | Metis only | Override output token recipient. Must differ from taker. |
-| `closeAuthority` | string | taker | All routers | Close authority for ATAs created during the swap. |
+| `taker` | string | - | All routers | Wallet address that will sign the transaction. Required to receive an assembled transaction. Without it, you get a quote only. |
+| `receiver` | string | - | Metis only | Override output token recipient. Must differ from taker. Expects a wallet address (not a token account). For non-SOL output, tokens go to the receiver's ATA. Disables RFQ routing. |
 
 ### Swap behaviour
 
 | Parameter | Type | Default | Routing | Description |
 | --- | --- | --- | --- | --- |
-| `swapMode` | ExactIn, ExactOut | ExactIn | All routers | ExactOut disables third-party routers (Dflow, OKX). |
-| `slippageBps` | integer (0-10000) | auto | All routers | Slippage tolerance in basis points. |
-| `excludeRouters` | string | - | Controls routing | Comma-separated routers to exclude (e.g. "metis,jupiterz"). |
-| `excludeDexes` | string | - | All routers | Comma-separated DEXes to exclude. |
-| `useWsol` | boolean | false | All routers | Use wrapped SOL instead of native SOL. |
-
+| `swapMode` | ExactIn | ExactIn | All routers | Swap mode. Currently only `ExactIn` is supported. |
+| `slippageBps` | integer (0-10000) | auto | All routers | Slippage tolerance in basis points. If not set, Jupiter automatically determines an appropriate value. |
+| `excludeRouters` | string | - | Controls routing | Comma-separated routers to exclude. Available: `iris` (Metis), `jupiterz` (RFQ), `dflow`, `okx`. |
+| `excludeDexes` | string | - | Iris only | Comma-separated DEXes to exclude from the Iris (Metis) router. Does not affect other routers. |
 ### Integrator fees
 
 <Warning>
@@ -57,24 +66,17 @@ The response `router` field tells you which router won: `iris` (Metis), `jupiter
 
 | Parameter | Type | Default | Routing | Description |
 | --- | --- | --- | --- | --- |
-| `referralAccount` | string | - | Metis only | Referral account address. Requires `referralFee`. |
-| `referralFee` | number | - | Metis only | Referral fee in basis points. Requires `referralAccount`. |
-| `feeBps` | string | - | Metis only | Integrator fee as bps of input USD value. ExactIn only. |
-| `feeFlat` | string | - | Metis only | Flat fee in feeMint. ExactIn only. |
-| `feeReducer` | min, max, sum | - | Metis only | Required if both feeBps and feeFlat set. |
-| `feeReceiver` | string | - | Metis only | Wallet to receive fees. Required with feeBps or feeFlat. |
-| `feeMint` | string | - | Metis only | Token to collect fees in. Required with feeBps or feeFlat. |
+| `referralAccount` | string | - | Metis only | Referral account address for the Jupiter referral project. Must be used with `referralFee`. See [Referral Program](/tool-kits/referral-program). |
+| `referralFee` | number (50-255) | - | Metis only | Referral fee in basis points. Must be used with `referralAccount`. |
 
 ### Gas and priority
 
 | Parameter | Type | Default | Routing | Description |
 | --- | --- | --- | --- | --- |
-| `payer` | string | - | Gasless only | External account paying gas on behalf of taker. Enables gasless flow. |
-| `gasMint` | string | - | Gasless only | Mint the taker refunds the payer in. Requires `payer`. |
-| `priorityFeeLamports` | number | auto | All routers | Priority fee in lamports. |
-| `jitoTipLamports` | number | - | All routers | Jito MEV tip in lamports. |
-| `nozomiTipLamports` | number | - | All routers | Nozomi tip in lamports. |
-| `broadcastFeeType` | maxCap, exactFee | - | All routers | Fee cap strategy. Ignored if no priority/tip fees set. |
+| `payer` | string | - | Gasless only | Account that covers gas-related fees (signature, priority, rent) on behalf of the taker. Enables gasless flow if taker lacks SOL. |
+| `priorityFeeLamports` | number | auto | All routers | Priority fee in lamports. If not set, Jupiter automatically optimises. |
+| `jitoTipLamports` | number | - | All routers | Jito MEV tip in lamports for faster block inclusion. |
+| `broadcastFeeType` | maxCap, exactFee | - | All routers | `maxCap` treats fee as a maximum, `exactFee` uses exact amount. Ignored if no priority/tip fees set. |
 
 ## `/build` parameters
 
@@ -105,22 +107,6 @@ All `/build` requests use Metis-only routing. No RFQ or third-party routers.
 | `destinationTokenAccount` | string | - | SPL token account for output |
 | `nativeDestinationAccount` | string | - | Native SOL account for output |
 | `blockhashSlotsToExpiry` | integer (1-300) | 150 | Slots until blockhash expires |
-
-## Routing impact matrix
-
-This table shows which routers are available for each parameter combination on `/order`.
-
-| Parameter | Metis | JupiterZ (RFQ) | Dflow | OKX |
-| --- | --- | --- | --- | --- | --- |
-| **(no optional params)** | Yes | Yes | Yes | Yes |
-| `receiver` | Yes | **No** | Yes | Yes | Yes |
-| `referralAccount` | Yes | **No** | Yes | Yes | Yes |
-| `feeBps` / `feeFlat` | Yes | **No** | Yes | Yes | Yes |
-| `payer` (gasless) | **No** | **No** | **No** | **No** | **No** |
-| `swapMode: ExactOut` | Yes | Yes | **No** | **No** | **No** |
-| `excludeRouters: jupiterz` | Yes | **No** | Yes | Yes | Yes |
-
-Gasless mode uses a dedicated router (Mantis) not listed above. It activates when `payer` is set and the taker cannot pay gas.
 
 ## Mode: ultra vs manual
 

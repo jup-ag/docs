@@ -1,7 +1,7 @@
 ---
 title: "Advanced Techniques"
 description: "CU simulation, fast mode, gasless, and other advanced patterns"
-llmsDescription: "Advanced techniques for Jupiter Swap API V2 covering both /order and /build paths. Topics: compute unit (CU) estimation via transaction simulation for /build (since /build does not return CU instructions by default), removing no-op createIdempotent instructions to save space, mode: fast for reduced latency routing on /build, maxAccounts for controlling transaction size, gasless swaps via the payer parameter on /order, priority fee strategies (priorityFeeLamports, jitoTipLamports, nozomiTipLamports), and a note about Metis binary for circular arbitrage routes."
+llmsDescription: "Advanced techniques for Jupiter Swap API V2 covering both /order and /build paths. Topics: compute unit (CU) estimation via transaction simulation for /build (since /build does not return CU instructions by default), removing no-op createIdempotent instructions to save space, mode: fast for reduced latency routing on /build, maxAccounts for controlling transaction size, gasless swaps via the payer parameter on /order, priority fee strategies (priorityFeeLamports, jitoTipLamports), and a note about Metis binary for circular arbitrage routes."
 ---
 
 Advanced patterns for both the `/order` and `/build` paths.
@@ -106,7 +106,6 @@ When `payer` is set and the taker lacks sufficient SOL for gas:
 - Jupiter routes through a dedicated gasless flow (Mantis)
 - The payer signs alongside the taker
 - A platform fee is added to recoup gas costs
-- `gasMint` optionally specifies which token the taker refunds the payer in
 
 <Note>
   Setting manual slippage or priority fees alongside `payer` disables the gasless retry mechanism.
@@ -122,7 +121,6 @@ Control priority fees on `/order` with these parameters:
 | --- | --- |
 | `priorityFeeLamports` | Priority fee in lamports |
 | `jitoTipLamports` | Jito MEV tip for faster inclusion |
-| `nozomiTipLamports` | Nozomi tip for faster inclusion |
 | `broadcastFeeType` | `maxCap` (fee is a maximum) or `exactFee` (exact amount) |
 
 Without these parameters, Jupiter automatically sets an appropriate priority fee. Setting them manually gives you control but overrides the automatic optimisation.

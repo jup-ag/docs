@@ -1,64 +1,63 @@
 ---
-title: "Metis Swap API Overview"
-sidebarTitle: "About Metis Swap API"
-description: "Low-level routing engine for developers who need CPI, custom instructions, or full transaction control. Requires your own RPC."
+title: "Swap API"
+description: "One API for all swap use cases on Jupiter"
+llmsDescription: "Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Two paths: /order (default happy path with managed execution, all routers including RFQ, gasless, MEV protection) and /build (advanced path returning raw swap instructions for custom transactions, CPI, composability). Covers when to use which path, routing trade-offs, and links to all sub-pages. /execute is managed execution for /order only. /build has no swap fees and uses Metis-only routing."
 ---
 
-Metis is Jupiter's low-level routing engine for developers who need CPI, custom instructions, or full transaction control. The flow is three steps: get a quote (`GET /swap/v1/quote`), build a transaction (`POST /swap/v1/swap`), then sign and send via your own RPC. Unlike Ultra, Metis requires you to handle slippage, priority fees, and transaction landing yourself.
+The Swap API unifies Jupiter's swap capabilities into a single entry point at `https://api.jup.ag/swap/v2`. Two paths cover every use case: a default happy path for the best swap experience, and an advanced path for full transaction control.
 
-Metis is Jupiter's original, low-level routing engine designed for maximum flexibility, transparency, and composability. It was the foundation that set the standard for reliable, general-purpose liquidity aggregation on Solana, and its learnings directly informed the development of newer engines like Iris (which powers Jupiter Ultra).
+## Two paths
 
-Unlike Jupiter Ultra and its routing engines (Juno, Iris, JupiterZ), which focus on end-to-end execution and abstraction, Metis exposes granular control over raw swap instructions. This is beneficial for developers and integrators who need to fine-tune every aspect of their swap transactions.
+<CardGroup cols={2}>
+  <Card title="Order & Execute" icon="bolt" href="/docs/swap/v2/order-and-execute">
+    The default path. Get a fully assembled transaction with the best price across all routers, sign it, and send it to `/execute` for managed landing.
+  </Card>
 
-**Related:** [Jupiter routing ecosystem](/docs/routing) | [Metis v7 blog post](/blog/metis-v7)
+  <Card title="Build Custom Transactions" icon="code" href="/docs/swap/v2/build">
+    The advanced path. Get raw swap instructions to build your own transaction. Add custom instructions, CPI, or modify the transaction however you need.
+  </Card>
+</CardGroup>
 
-<Card href="/docs/routing" icon="book-open" horizontal>
-Learn more about how Metis fits into Jupiter's routing ecosystem, including Juno, Iris, and JupiterZ, in our [Routing documentation](/docs/routing).
-</Card>
+## Choosing a path
 
-<Card href="/blog/metis-v7" icon="book-open" horizontal>
-Metis is now an independent public good, no longer coupled to Jupiter or Ultra, and is maintained as a toolkit for the ecosystem. Read more in our [Metis v7 blog post](/blog/metis-v7).
+| | `/order` + `/execute` | `/build` |
+| --- | --- | --- |
+| **Returns** | Assembled transaction | Raw swap instructions |
+| **Routers** | All (Metis, RFQ, Dflow, OKX) | Metis only |
+| **Best for** | Most integrations. Best price, simplest flow. | Custom transactions, CPI, composability. |
+| **Execution** | Managed via `/execute` (RTSE, Jupiter Beam, retry) | Self-managed via your own RPC |
+| **Swap fees** | Yes (Jupiter platform fee) | No |
+| **Integrator fees** | Referral fees, advanced fees (feeBps/feeFlat) | Platform fee only (platformFeeBps) or DIY |
+| **Transaction modification** | No | Full control |
 
-Though Jupiter continues to provide access to a hosted Metis API for developers.
-</Card>
+**Start with `/order`.** It gives you the best price because all routers compete, including RFQ market makers who often beat onchain routing by 5-20bps on major pairs. Only use `/build` if you need to modify the transaction.
 
-## We recommend using Ultra Swap API
+<Note>
+  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See [Parameters & Routing](/docs/swap/v2/parameters) for details.
+</Note>
 
-Ultra Swap API is the spiritual successor to Metis Swap API, and is much simpler to use than Metis Swap API. If you are first starting out on your Solana development journey, using Ultra Swap API is highly recommended over Metis Swap API.
+## Endpoints
 
-<Tip>
-For more information about Ultra Swap API, please refer to the [Ultra Swap API](/docs/ultra) documentation.
-</Tip>
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| [`/order`](/docs/swap/v2/order-and-execute) | GET | Get a quote and assembled transaction |
+| [`/build`](/docs/swap/v2/build) | GET | Get a quote and raw swap instructions |
+| [`/execute`](/docs/swap/v2/order-and-execute#execute-the-transaction) | POST | Execute a signed `/order` transaction |
 
-<Info>
-**Using Metis Swap API**
+**Base URL:** `https://api.jup.ag/swap/v2`
 
-Requires your own maintenance, optimizations and dependencies.
-   * **Upkeep of RPCs**: To retrieve wallet balances, broadcast and retrieve transactions, etc.
-   * **Deciding transaction fee**: Including, but not limited to, priority fee, Jito fee, etc.
-   * **Deciding slippage**: The optimal slippage to use to balance between trade success and price protection, do note that [RTSE is only available via Ultra Swap API](/docs/ultra#real-time-slippage-estimator).
-   * **Broadcasting the transaction**: Ultra uses a proprietary transaction sending engine which dramatically improves landing rate and speed.
-   * **Parsing the swap results**: Polling and parsing the resulting transaction from the RPC, including handling for success and error cases.
+All endpoints require an API key via the `x-api-key` header. Get one at [portal.jup.ag](https://portal.jup.ag).
 
-Though comes with other ways to use Jupiter.
-   * Add custom instructions.
-   * Use via Cross Program Invocation (CPI) calls.
-   * Choose your own transaction broadcasting method (like Typical RPCs, Jito, etc).
-   * Modify the number of accounts to use in a transaction.
-</Info>
+## Previous versions
 
-## Getting Started with Metis Swap API
+The Swap API V2 replaces the need for separate Ultra and Metis integrations. Both remain available:
 
-1. [**Get Quote**](/docs/swap/get-quote): Request for a quote which consists of the route plan, and other params such as integrator fee, slippage, etc.
+- [Ultra Swap API](/docs/ultra) for the original managed execution flow
+- [Metis Swap API V1](/docs/swap/v1) for the original low-level routing engine
 
-2. [**Build Swap Transaction**](/docs/swap/build-swap-transaction): Post the quote to build a swap transaction.
+## Related
 
-   * You can utilize other methods to return swap instructions or use CPI rather than the default swap transaction.
-   * You can utilize other parameters such as priority fee, dynamic slippage, etc to customize the transaction.
-
-3. [**Send Swap Transaction**](/docs/swap/send-swap-transaction): Sign and send the swap transaction to the network via your own RPC or other methods.
-
-**Other Guides**
-
-* [**Adding Fees to Metis Swap API**](/docs/swap/add-fees-to-swap): Add custom integrator fees to the swap transaction.
-* [**Requote with Lower Max Accounts**](/docs/swap/requote-with-lower-max-accounts): Requote with a lower max accounts to reduce the transaction size to fit more instructions or other use cases.
+- [Parameters & Routing](/docs/swap/v2/parameters) for the full parameter reference and routing impact matrix
+- [Fees](/docs/swap/v2/fees) for fee models across both paths
+- [Migration Guide](/docs/swap/v2/migration) for migrating from Ultra or Metis
+- [API Reference](/api-reference/swap) for the OpenAPI specification

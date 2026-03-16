@@ -1,0 +1,139 @@
+---
+title: "Parameters & Routing"
+description: "Full parameter reference and routing impact for /order and /build"
+llmsDescription: "Complete parameter reference for Jupiter Swap API V2 /order and /build endpoints. Documents every parameter with its type, default value, and routing impact. Key concept: /order without optional params uses all routers (Metis, JupiterZ RFQ, Dflow, OKX) for best price. Adding certain parameters restricts routing to Metis only, losing RFQ liquidity. Includes per-parameter routing badges and a full routing impact matrix showing which parameters disable which routers. Also covers mode field (ultra vs manual) and how the response indicates which router won the quote."
+---
+
+The Swap API V2 routes through multiple liquidity sources. Which parameters you pass to `/order` determines which routers are eligible, directly affecting the price you get.
+
+## Routing overview
+
+By default, `/order` with no optional parameters enables all routers:
+
+| Router | Type | Description |
+| --- | --- | --- |
+| **Metis (Iris)** | Onchain aggregator | Jupiter's core routing engine |
+| **JupiterZ** | RFQ (Request for Quote) | Market makers providing off-chain liquidity. Often beats onchain by 5-20bps on major pairs. |
+| **Dflow** | Third-party | Decentralised order flow |
+| **OKX** | Third-party | OKX liquidity |
+
+The `/build` endpoint always uses **Metis only**. RFQ and third-party routers are not available.
+
+The response `router` field tells you which router won: `iris` (Metis), `jupiterz`, `dflow`, or `okx`.
+
+## `/order` parameters
+
+### Required
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `inputMint` | string | Mint address of the input token |
+| `outputMint` | string | Mint address of the output token |
+| `amount` | string | Amount in smallest unit of the input token |
+
+### Taker and recipient
+
+| Parameter | Type | Default | Routing | Description |
+| --- | --- | --- | --- | --- |
+| `taker` | string | - | All routers | Wallet address. Required to receive a transaction. |
+| `receiver` | string | - | Metis only | Override output token recipient. Must differ from taker. |
+| `closeAuthority` | string | taker | All routers | Close authority for ATAs created during the swap. |
+
+### Swap behaviour
+
+| Parameter | Type | Default | Routing | Description |
+| --- | --- | --- | --- | --- |
+| `swapMode` | ExactIn, ExactOut | ExactIn | All routers | ExactOut disables third-party routers (Dflow, OKX). |
+| `slippageBps` | integer (0-10000) | auto | All routers | Slippage tolerance in basis points. |
+| `excludeRouters` | string | - | Controls routing | Comma-separated routers to exclude (e.g. "metis,jupiterz"). |
+| `excludeDexes` | string | - | All routers | Comma-separated DEXes to exclude. |
+| `useWsol` | boolean | false | All routers | Use wrapped SOL instead of native SOL. |
+
+### Integrator fees
+
+<Warning>
+  Adding fee parameters disables RFQ routing (JupiterZ). You will only get Metis quotes, which may result in worse pricing on major pairs.
+</Warning>
+
+| Parameter | Type | Default | Routing | Description |
+| --- | --- | --- | --- | --- |
+| `referralAccount` | string | - | Metis only | Referral account address. Requires `referralFee`. |
+| `referralFee` | number | - | Metis only | Referral fee in basis points. Requires `referralAccount`. |
+| `feeBps` | string | - | Metis only | Integrator fee as bps of input USD value. ExactIn only. |
+| `feeFlat` | string | - | Metis only | Flat fee in feeMint. ExactIn only. |
+| `feeReducer` | min, max, sum | - | Metis only | Required if both feeBps and feeFlat set. |
+| `feeReceiver` | string | - | Metis only | Wallet to receive fees. Required with feeBps or feeFlat. |
+| `feeMint` | string | - | Metis only | Token to collect fees in. Required with feeBps or feeFlat. |
+
+### Gas and priority
+
+| Parameter | Type | Default | Routing | Description |
+| --- | --- | --- | --- | --- |
+| `payer` | string | - | Gasless only | External account paying gas on behalf of taker. Enables gasless flow. |
+| `gasMint` | string | - | Gasless only | Mint the taker refunds the payer in. Requires `payer`. |
+| `priorityFeeLamports` | number | auto | All routers | Priority fee in lamports. |
+| `jitoTipLamports` | number | - | All routers | Jito MEV tip in lamports. |
+| `nozomiTipLamports` | number | - | All routers | Nozomi tip in lamports. |
+| `broadcastFeeType` | maxCap, exactFee | - | All routers | Fee cap strategy. Ignored if no priority/tip fees set. |
+
+## `/build` parameters
+
+All `/build` requests use Metis-only routing. No RFQ or third-party routers.
+
+### Required
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `inputMint` | string | Mint address of the input token |
+| `outputMint` | string | Mint address of the output token |
+| `amount` | string | Amount in smallest unit of the input token |
+| `userPublicKey` | string | Your wallet address |
+
+### Optional
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `slippageBps` | integer (0-10000) | 50 | Slippage tolerance in basis points |
+| `mode` | "fast" | (default) | Reduced latency routing (trades optimality for speed) |
+| `maxAccounts` | integer (1-64) | 64 | Maximum accounts for the swap route |
+| `platformFeeBps` | integer (0-10000) | 0 | Integrator platform fee. Requires `feeAccount`. |
+| `feeAccount` | string | - | Token account to collect platform fees |
+| `payer` | string | userPublicKey | Account paying transaction fees and rent |
+| `wrapAndUnwrapSol` | boolean | true | Auto wrap/unwrap SOL |
+| `dexes` | string | (all) | Restrict to specific DEXes. Mutually exclusive with `excludeDexes`. |
+| `excludeDexes` | string | (none) | Exclude specific DEXes. Mutually exclusive with `dexes`. |
+| `destinationTokenAccount` | string | - | SPL token account for output |
+| `nativeDestinationAccount` | string | - | Native SOL account for output |
+| `blockhashSlotsToExpiry` | integer (1-300) | 150 | Slots until blockhash expires |
+
+## Routing impact matrix
+
+This table shows which routers are available for each parameter combination on `/order`.
+
+| Parameter | Metis | JupiterZ (RFQ) | Dflow | OKX |
+| --- | --- | --- | --- | --- | --- |
+| **(no optional params)** | Yes | Yes | Yes | Yes |
+| `receiver` | Yes | **No** | Yes | Yes | Yes |
+| `referralAccount` | Yes | **No** | Yes | Yes | Yes |
+| `feeBps` / `feeFlat` | Yes | **No** | Yes | Yes | Yes |
+| `payer` (gasless) | **No** | **No** | **No** | **No** | **No** |
+| `swapMode: ExactOut` | Yes | Yes | **No** | **No** | **No** |
+| `excludeRouters: jupiterz` | Yes | **No** | Yes | Yes | Yes |
+
+Gasless mode uses a dedicated router (Mantis) not listed above. It activates when `payer` is set and the taker cannot pay gas.
+
+## Mode: ultra vs manual
+
+The `/order` response includes a `mode` field:
+
+- **"ultra"**: No optional params used. All routers competed. Best price.
+- **"manual"**: Optional params detected. Routing may be restricted.
+
+This field is informational. It helps you verify that your request got the routing behaviour you expected.
+
+## Related
+
+- [Fees](/docs/swap/v2/fees) for detailed fee documentation
+- [Advanced Techniques](/docs/swap/v2/advanced) for gasless, priority fees, CU simulation
+- [Order & Execute](/docs/swap/v2/order-and-execute) for the default swap flow
+- [Build Custom Transactions](/docs/swap/v2/build) for the advanced path

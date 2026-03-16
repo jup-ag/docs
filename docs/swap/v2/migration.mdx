@@ -1,0 +1,161 @@
+---
+title: "Migration Guide"
+description: "Migrate from Metis or Ultra to the Swap API V2"
+llmsDescription: "Migration guide for moving from Jupiter Metis Swap API (V1) or Ultra Swap API to the unified Swap API V2. Covers: Metis to /build migration (parameter mapping from /quote + /swap-instructions to /build, V1 to V2 instruction differences including no fee events and percent to bps change in routePlan), Ultra to /order migration (minimal changes, same /order + /execute flow), and breaking changes. Includes side-by-side parameter mapping tables and response format differences."
+---
+
+This guide covers migrating from the Metis Swap API or Ultra Swap API to the unified Swap API V2.
+
+## Metis to `/build`
+
+If you currently use Metis `/quote` + `/swap-instructions`, migrate to `/build` which combines both into a single call with better routing.
+
+### What changes
+
+| Before (Metis) | After (Swap V2) |
+| --- | --- |
+| Two calls: `GET /swap/v1/quote` then `POST /swap/v1/swap-instructions` | One call: `GET /swap/v2/build` |
+| Base URL: `https://api.jup.ag/swap/v1` | Base URL: `https://api.jup.ag/swap/v2` |
+| V1 instruction format | V2 instruction format |
+| `percent` in routePlan | `bps` in routePlan (V2) |
+
+### Parameter mapping
+
+| Metis (`/quote`) | Swap V2 (`/build`) | Notes |
+| --- | --- | --- |
+| `inputMint` | `inputMint` | Same |
+| `outputMint` | `outputMint` | Same |
+| `amount` | `amount` | Same |
+| `slippageBps` | `slippageBps` | Same, defaults to 50 |
+| `swapMode` | - | Not supported. `/build` is ExactIn only. |
+| `dexes` | `dexes` | Same |
+| `excludeDexes` | `excludeDexes` | Same |
+| `maxAccounts` | `maxAccounts` | Same, defaults to 64 |
+| `platformFeeBps` | `platformFeeBps` | Same |
+| - | `userPublicKey` | New required parameter (replaces the signer in `/swap-instructions` body) |
+| - | `mode` | New. Set to "fast" for reduced latency. |
+| - | `feeAccount` | New. Required if `platformFeeBps` is positive. |
+
+### Response mapping
+
+| Metis (`/swap-instructions`) | Swap V2 (`/build`) | Notes |
+| --- | --- | --- |
+| `computeBudgetInstructions` | `computeBudgetInstructions` | Same structure |
+| `setupInstructions` | `setupInstructions` | Same structure |
+| `swapInstruction` | `swapInstruction` | Now V2 format |
+| `cleanupInstruction` | `cleanupInstruction` | Same |
+| - | `otherInstructions` | New field |
+| `addressLookupTableAddresses` | `addressesByLookupTableAddress` | New format: object mapping ALT address to account arrays (no separate RPC fetch needed) |
+| - | `blockhashWithMetadata` | New: blockhash included in response |
+
+### V1 to V2 instruction differences
+
+Swap V2 defaults to `instructionVersion=V2`. Key differences:
+
+**V2 instructions do not emit fee events.** If you parse swap results by reading fee transfer events from the transaction, you need to update your parsing logic. Use the `/order` response fields (`inputAmountResult`, `outputAmountResult`) or parse token balance changes instead.
+
+**Route plan uses `bps` instead of `percent`.** V1 uses `percent` (e.g. 100 for 100%), V2 uses `bps` (e.g. 10000 for 100%). Both fields are present in V2 responses for backwards compatibility, but `bps` is the canonical value.
+
+```typescript
+// V1: percent field
+routePlan[0].percent  // 100
+
+// V2: bps field (preferred)
+routePlan[0].bps      // 10000
+```
+
+### Before and after
+
+**Before (Metis: two calls)**
+
+```typescript
+// 1. Get quote
+const quote = await fetch(
+  "https://api.jup.ag/swap/v1/quote?" +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112",
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      amount: "100000000",
+      slippageBps: "50",
+    }),
+  { headers: { "x-api-key": API_KEY } }
+).then((r) => r.json());
+
+// 2. Get swap instructions
+const instructions = await fetch(
+  "https://api.jup.ag/swap/v1/swap-instructions",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+    },
+    body: JSON.stringify({
+      quoteResponse: quote,
+      userPublicKey: walletAddress,
+    }),
+  }
+).then((r) => r.json());
+```
+
+**After (Swap V2: one call)**
+
+```typescript
+const build = await fetch(
+  "https://api.jup.ag/swap/v2/build?" +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112",
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      amount: "100000000",
+      userPublicKey: walletAddress,
+      slippageBps: "50",
+    }),
+  { headers: { "x-api-key": API_KEY } }
+).then((r) => r.json());
+```
+
+### What you gain
+
+- **Single call** instead of two
+- **Dynamic intermediate tokens** for better routing on long-tail pairs
+- **Long-tail token support** out of the box
+- **Market slippage estimation** built into quotes
+- **Address lookup tables resolved** in the response (no extra RPC call)
+- **Blockhash included** in the response
+
+## Ultra to `/order`
+
+If you currently use Ultra `/order` + `/execute`, migration is minimal. The endpoints are the same, with a new base URL.
+
+### What changes
+
+| Before (Ultra) | After (Swap V2) |
+| --- | --- |
+| Base URL: `https://ultra-api.jup.ag` | Base URL: `https://api.jup.ag/swap/v2` |
+| `GET /order` | `GET /order` |
+| `POST /execute` | `POST /execute` |
+
+The request parameters and response format are identical. Update the base URL and you are done.
+
+### What you gain
+
+- Unified documentation and API reference
+- Same endpoint for both happy path and advanced path
+- Future improvements shipped to V2 first
+
+## Metis to `/order`
+
+If you currently use Metis but don't need transaction modification, consider migrating to `/order` instead of `/build`. You get:
+
+- All routers including RFQ (better pricing)
+- Managed execution via `/execute` (no RPC management)
+- Gasless support
+- Simpler integration (one call + sign + execute)
+
+The trade-off: you cannot modify the transaction.
+
+## Related
+
+- [Order & Execute](/docs/swap/v2/order-and-execute) for the default swap flow
+- [Build Custom Transactions](/docs/swap/v2/build) for the advanced path
+- [Parameters & Routing](/docs/swap/v2/parameters) for the full parameter reference

@@ -1,0 +1,224 @@
+---
+title: "Order & Execute"
+description: "Get a swap quote, sign, and execute with managed landing"
+llmsDescription: "How to perform a swap using Jupiter's Swap API V2 default path: GET /order to get a quote and assembled transaction, sign it with your wallet, and POST /execute for managed transaction landing. Covers the minimal happy path with no optional parameters (all routers compete for best price including RFQ), the full request/response shapes, and a complete @solana/kit TypeScript code example. /execute handles landing, confirmation, and retry. Error codes documented for both aggregator and RFQ swap types."
+---
+
+The `/order` + `/execute` flow is the recommended way to swap on Jupiter. You get the best price (all routers compete, including RFQ market makers), and Jupiter handles transaction landing for you.
+
+## Quick start
+
+Three steps: get an order, sign it, execute it.
+
+<CodeGroup>
+```typescript expandable title="@solana/kit"
+import {
+  createKeyPairSignerFromPrivateKeyBytes,
+  getTransactionDecoder,
+  getTransactionEncoder,
+  signTransaction,
+} from "@solana/kit";
+import bs58 from "bs58";
+
+const API_KEY = process.env.JUPITER_API_KEY;
+if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
+const BASE_URL = "https://api.jup.ag/swap/v2";
+
+// Load wallet from base58 secret key in .env
+const secretKey = bs58.decode(process.env.PRIVATE_KEY!);
+const signer = await createKeyPairSignerFromPrivateKeyBytes(
+  secretKey.slice(0, 32) // Extract 32-byte private key from 64-byte secret key
+);
+
+// Step 1: Get an order
+const orderResponse = await fetch(
+  `${BASE_URL}/order?` +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112",   // SOL
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+      amount: "100000000", // 0.1 SOL
+      taker: signer.address,
+    }),
+  { headers: { "x-api-key": API_KEY } }
+);
+const order = await orderResponse.json();
+
+if (!order.transaction) {
+  throw new Error(order.error ?? "No transaction returned");
+}
+
+// Step 2: Sign the transaction
+const transactionBytes = Buffer.from(order.transaction, "base64");
+const transaction = getTransactionDecoder().decode(transactionBytes);
+const signedTransaction = await signTransaction([signer.keyPair], transaction);
+
+// Step 3: Execute
+const signedTxBytes = getTransactionEncoder().encode(signedTransaction);
+const signedTxBase64 = Buffer.from(signedTxBytes).toString("base64");
+
+const executeResponse = await fetch(`${BASE_URL}/execute`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    signedTransaction: signedTxBase64,
+    requestId: order.requestId,
+  }),
+});
+const result = await executeResponse.json();
+
+if (result.status === "Success") {
+  console.log(`Swap successful: ${result.signature}`);
+  console.log(`In: ${result.inputAmountResult}, Out: ${result.outputAmountResult}`);
+} else {
+  console.error(`Swap failed: ${result.error} (code: ${result.code})`);
+}
+```
+
+```typescript expandable title="@solana/web3.js"
+import { Keypair, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+const API_KEY = process.env.JUPITER_API_KEY;
+if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
+const BASE_URL = "https://api.jup.ag/swap/v2";
+
+// Load wallet from base58 secret key in .env
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY!));
+
+// Step 1: Get an order
+const orderResponse = await fetch(
+  `${BASE_URL}/order?` +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112",   // SOL
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+      amount: "100000000", // 0.1 SOL
+      taker: wallet.publicKey.toString(),
+    }),
+  { headers: { "x-api-key": API_KEY } }
+);
+const order = await orderResponse.json();
+
+if (!order.transaction) {
+  throw new Error(order.error ?? "No transaction returned");
+}
+
+// Step 2: Sign the transaction
+const transactionBuf = Buffer.from(order.transaction, "base64");
+const transaction = VersionedTransaction.deserialize(transactionBuf);
+transaction.sign([wallet]);
+
+// Step 3: Execute
+const signedTxBase64 = Buffer.from(transaction.serialize()).toString("base64");
+
+const executeResponse = await fetch(`${BASE_URL}/execute`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    signedTransaction: signedTxBase64,
+    requestId: order.requestId,
+  }),
+});
+const result = await executeResponse.json();
+
+if (result.status === "Success") {
+  console.log(`Swap successful: ${result.signature}`);
+  console.log(`In: ${result.inputAmountResult}, Out: ${result.outputAmountResult}`);
+} else {
+  console.error(`Swap failed: ${result.error} (code: ${result.code})`);
+}
+```
+</CodeGroup>
+
+## How it works
+
+### 1. Get an order
+
+`GET /order` returns a quote and an assembled transaction in a single call. All routers compete for the best price: Metis (onchain aggregator), JupiterZ (RFQ), Dflow, and OKX.
+
+**Required parameters:**
+
+| Parameter | Description |
+| --- | --- |
+| `inputMint` | Mint address of the token you are selling |
+| `outputMint` | Mint address of the token you are buying |
+| `amount` | Amount in the smallest unit of the input token |
+| `taker` | Your wallet address. Required to receive an assembled transaction. |
+
+Without `taker`, you get a quote but no transaction. This is useful for price checks.
+
+**Key response fields:**
+
+| Field | Description |
+| --- | --- |
+| `transaction` | Base64-encoded transaction to sign. Null if `taker` is not set. |
+| `requestId` | Pass this to `/execute`. |
+| `outAmount` | Expected output amount before slippage. |
+| `router` | Which router won the quote (iris, jupiterz, dflow, okx). |
+| `mode` | "ultra" (no optional params) or "manual" (optional params used). |
+
+For the full parameter reference and how each parameter affects routing, see [Parameters & Routing](/docs/swap/v2/parameters).
+
+### 2. Sign the transaction
+
+The transaction returned by `/order` is unsigned. Sign it with your wallet's private key. The example above uses `@solana/kit`. The transaction is a versioned transaction (v0).
+
+### 3. Execute the transaction
+
+`POST /execute` takes the signed transaction and the `requestId` from the order response. Jupiter handles:
+
+- Transaction landing via optimised RPC infrastructure
+- Confirmation polling
+- Retry on transient failures
+- RTSE (Real-Time Swap Execution) for aggregator swaps
+- Jupiter Beam for accelerated landing
+
+**Request body:**
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `signedTransaction` | Yes | Base64-encoded signed transaction |
+| `requestId` | Yes | The `requestId` from the `/order` response |
+| `lastValidBlockHeight` | No | Block height for nonce validation |
+
+**Response:**
+
+| Field | Description |
+| --- | --- |
+| `status` | "Success" or "Failed" |
+| `signature` | Transaction signature (present on both success and some failures) |
+| `code` | Error code. 0 = success. See [error codes](#error-codes) below. |
+| `inputAmountResult` | Amount of input token used for the swap |
+| `outputAmountResult` | Amount of output token received |
+
+## Error codes
+
+| Code | Category | Meaning |
+| --- | --- | --- |
+| `0` | Success | Transaction confirmed |
+| `-1` | Ultra | Missing cached order (requestId not found or expired) |
+| `-2` | Ultra | Invalid signed transaction |
+| `-3` | Ultra | Invalid message bytes |
+| `-1000` | Aggregator | Failed to land |
+| `-1001` | Aggregator | Unknown error |
+| `-1002` | Aggregator | Invalid transaction |
+| `-1003` | Aggregator | Transaction not fully signed |
+| `-1004` | Aggregator | Invalid block height |
+| `-2000` | RFQ | Failed to land |
+| `-2001` | RFQ | Unknown error |
+| `-2002` | RFQ | Invalid payload |
+| `-2003` | RFQ | Quote expired |
+| `-2004` | RFQ | Swap rejected |
+
+## Related
+
+- [Parameters & Routing](/docs/swap/v2/parameters) for optional parameters and their routing impact
+- [Fees](/docs/swap/v2/fees) for adding integrator fees to `/order`
+- [Advanced Techniques](/docs/swap/v2/advanced) for gasless swaps, priority fees, and CU optimisation
+- [API Reference: GET /order](/api-reference/swap/v2/order) for the full OpenAPI specification
+- [API Reference: POST /execute](/api-reference/swap/v2/execute) for the full OpenAPI specification

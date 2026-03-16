@@ -30,7 +30,7 @@ This table shows which routers are available for each parameter combination on `
 | **(no optional params)** | Yes | Yes | Yes | Yes |
 | `receiver` | Yes | **No** | Yes | Yes |
 | `referralAccount` | Yes | **No** | Yes | Yes |
-| `payer` (gasless) | **No** | **No** | **No** | **No** |
+| `payer` (integrator gasless) | Yes | **No** | **No** | **No** |
 | `excludeRouters: jupiterz` | Yes | **No** | Yes | Yes |
 
 ## `/order` parameters
@@ -73,7 +73,7 @@ This table shows which routers are available for each parameter combination on `
 
 | Parameter | Type | Default | Routing | Description |
 | --- | --- | --- | --- | --- |
-| `payer` | string | - | Gasless only | Account that covers gas-related fees (signature, priority, rent) on behalf of the taker. Enables gasless flow if taker lacks SOL. |
+| `payer` | string | - | Iris only | Account that covers all gas-related fees (signature, priority, rent) on behalf of the taker. Routes through Iris only. Transaction requires both taker and payer signatures. See [Gasless Swaps](/docs/swap/v2/advanced/gasless) for details. |
 | `priorityFeeLamports` | number | auto | All routers | Priority fee in lamports. If not set, Jupiter automatically optimises. |
 | `jitoTipLamports` | number | - | All routers | Jito MEV tip in lamports for faster block inclusion. |
 | `broadcastFeeType` | maxCap, exactFee | - | All routers | `maxCap` treats fee as a maximum, `exactFee` uses exact amount. Ignored if no priority/tip fees set. |

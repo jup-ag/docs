@@ -1,0 +1,56 @@
+---
+title: "Reduce Transaction Size"
+description: "Control account count and remove unnecessary instructions"
+llmsDescription: "How to reduce transaction size on Jupiter Swap API V2 /build. Two techniques: maxAccounts parameter (1-64, default 64) to limit the number of accounts in the swap route, and removing no-op createAssociatedTokenAccountIdempotent instructions from setupInstructions when the token accounts already exist. Both free up space for custom instructions and help avoid the 1232-byte transaction size limit."
+---
+
+When building custom transactions with `/build`, you may hit the 1232-byte transaction size limit, especially when adding custom instructions alongside the swap. Two techniques help.
+
+## Limit accounts with `maxAccounts`
+
+Set `maxAccounts` (1-64, default 64) to limit the number of accounts in the swap route. Lower values produce simpler routes with fewer accounts.
+
+```
+GET /build?...&maxAccounts=20
+```
+
+Use this when:
+- Your transaction already has many accounts from custom instructions
+- You are hitting the transaction size limit
+- You need room for CPI accounts
+
+Reducing `maxAccounts` may result in worse pricing because the router has fewer DEXes and splits available.
+
+## Remove no-op setup instructions
+
+The `/build` response always includes `createAssociatedTokenAccountIdempotent` instructions in `setupInstructions`, even when the token accounts already exist. These are no-ops on existing accounts but still consume transaction space.
+
+To reclaim that space:
+
+1. Check onchain if the associated token accounts already exist
+2. If they exist, omit those setup instructions from your transaction
+3. If they don't exist, keep the instructions
+
+```typescript
+// Check if ATA exists before including the setup instruction
+const ataAddress = await findAssociatedTokenPda({
+  mint: address(outputMint),
+  owner: address(userPublicKey),
+  tokenProgram: TOKEN_PROGRAM_ADDRESS,
+});
+
+const accountInfo = await rpc.getAccountInfo(ataAddress[0]).send();
+
+// Only include setup instruction if account does not exist
+const filteredSetupInstructions = build.setupInstructions.filter((ix) => {
+  // Compare with the createIdempotent instruction's target account
+  // Keep instructions for accounts that don't exist yet
+  return !accountExists(ix, existingAccounts);
+});
+```
+
+## Related
+
+- [Build Custom Transactions](/docs/swap/v2/build) for the full `/build` workflow
+- [Reduce Latency](/docs/swap/v2/advanced/reduce-latency) for faster routing
+- [Parameters & Routing](/docs/swap/v2/parameters) for the full parameter reference

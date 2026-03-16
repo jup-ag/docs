@@ -27,7 +27,8 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 | **Best for** | Most integrations. Best price, simplest flow. | Custom transactions, CPI, composability. |
 | **Execution** | Managed via `/execute` (RTSE, Jupiter Beam, retry) | Self-managed via your own RPC |
 | **Swap fees** | Yes (Jupiter platform fee) | No |
-| **Integrator fees** | Referral fees, advanced fees (feeBps/feeFlat) | Platform fee only (platformFeeBps) or DIY |
+| **Integrator fees** | Referral fees (referralAccount + referralFee) | Platform fee only (platformFeeBps) or DIY |
+| **Gasless** | [Automatic Gasless, or your own `payer`](/docs/swap/v2/advanced/gasless)) | Use your own `payer` |
 | **Transaction modification** | No | Full control |
 
 **Start with `/order`.** It gives you the best price because all routers compete, including RFQ market makers who often beat onchain routing by 5-20bps on major pairs. Only use `/build` if you need to modify the transaction.
@@ -47,13 +48,6 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 **Base URL:** `https://api.jup.ag/swap/v2`
 
 All endpoints require an API key via the `x-api-key` header. Get one at [portal.jup.ag](https://portal.jup.ag).
-
-## Previous versions
-
-The Swap API V2 replaces the need for separate Ultra and Metis integrations. Both remain available:
-
-- [Ultra Swap API](/docs/ultra) for the original managed execution flow
-- [Metis Swap API V1](/docs/swap/v1) for the original low-level routing engine
 
 ## Related
 

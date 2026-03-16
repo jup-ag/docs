@@ -1,0 +1,48 @@
+---
+title: "Estimate Compute Units"
+description: "Simulate transactions to set accurate compute unit limits"
+llmsDescription: "How to estimate compute units for Jupiter Swap API V2 /build transactions. The /build response includes default computeBudgetInstructions, but for production use, simulate the transaction first to get actual CU consumed, then replace the compute unit limit instruction with a tighter value (plus 10-20% buffer). This reduces fees and avoids wasted compute budget."
+---
+
+The `/build` response includes `computeBudgetInstructions` with a default compute unit limit. For production use, simulate the transaction first to get an accurate CU estimate, then set a tighter limit to reduce fees.
+
+## Steps
+
+1. Build the transaction with all instructions (including your custom ones)
+2. Simulate to get actual CU consumed
+3. Replace the compute unit limit instruction with the simulated value plus a buffer
+
+```typescript
+import { getSetComputeUnitLimitInstruction } from "@solana-program/compute-budget";
+
+// 1. Build the transaction with all instructions (see /build guide)
+// 2. Simulate to get actual CU used
+const simulation = await rpc
+  .simulateTransaction(getBase64EncodedWireTransaction(transaction), {
+    encoding: "base64",
+    commitment: "processed",
+  })
+  .send();
+
+const unitsConsumed = simulation.value.unitsConsumed;
+
+// 3. Replace the compute budget instruction with a tighter limit
+// Add a 10-20% buffer for safety
+const cuLimitIx = getSetComputeUnitLimitInstruction({
+  units: Math.ceil(unitsConsumed * 1.15),
+});
+```
+
+Replace the first instruction in `computeBudgetInstructions` with your simulated CU limit. Keep the compute unit price instruction as-is (or set your own).
+
+## Why this matters
+
+- Default CU limits are conservative to avoid transaction failures
+- Tighter limits mean lower priority fee costs (priority fee = CU price x CU limit)
+- Overly tight limits cause transaction failures, so always add a 10-20% buffer
+
+## Related
+
+- [Build Custom Transactions](/docs/swap/v2/build) for the full `/build` workflow
+- [Priority Fees](/docs/swap/v2/advanced/priority-fees) for controlling priority fee strategy
+- [Reduce Transaction Size](/docs/swap/v2/advanced/reduce-transaction-size) for other optimisations

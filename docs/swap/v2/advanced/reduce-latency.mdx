@@ -1,0 +1,26 @@
+---
+title: "Reduce Latency"
+description: "Get faster swap quotes with fast mode"
+llmsDescription: "How to reduce swap quote latency on Jupiter Swap API V2 /build using mode=fast. Fast mode uses a Bellman-Ford algorithm with stricter constraints (fewer hops, fewer splits) to trade quote optimality for speed. Useful for high-frequency trading, well-known pairs (SOL/USDC), and bots where speed matters more than the last basis point."
+---
+
+Set `mode=fast` on `/build` to reduce routing latency at the cost of quote optimality. This uses a Bellman-Ford algorithm with stricter constraints (fewer hops, fewer splits).
+
+```
+GET /build?inputMint=...&outputMint=...&amount=...&userPublicKey=...&mode=fast
+```
+
+## When to use
+
+- You are swapping high-frequency and need low latency
+- The pair is well-known (e.g. SOL/USDC) and doesn't benefit from complex routing
+- You are building a trading bot where speed matters more than extracting the last basis point
+
+## Trade-offs
+
+Fast mode may return slightly worse pricing compared to the default mode, because the router explores fewer route combinations. For most pairs and sizes, the difference is negligible.
+
+## Related
+
+- [Reduce Transaction Size](/docs/swap/v2/advanced/reduce-transaction-size) for controlling account count
+- [Build Custom Transactions](/docs/swap/v2/build) for the full `/build` workflow

@@ -2,14 +2,10 @@
 title: "Swap API"
 sidebarTitle: "Overview"
 description: "Jupiter Swap API endpoints for quotes, transactions, and instructions"
-llmsDescription: "Overview of Jupiter Swap API versions. V2 is the unified Swap API with three endpoints: GET /order (quote + assembled transaction), GET /build (quote + raw instructions), POST /execute (managed execution). V1 (Metis) has: GET /quote, POST /swap, POST /swap-instructions, GET /program-id-to-label. Base URLs: V2 at api.jup.ag/swap/v2, V1 at api.jup.ag/swap/v1."
+llmsDescription: "Jupiter Swap API V2 reference. Three endpoints: GET /order (quote + assembled transaction with managed execution via /execute), GET /build (quote + raw swap instructions for custom transactions), POST /execute (managed transaction landing for /order). Base URL: api.jup.ag/swap/v2. All endpoints require x-api-key header."
 ---
 
-## V2 (Recommended)
-
 The unified Swap API. Two paths: `/order` for managed execution, `/build` for custom transactions.
-
-**Base URL:** `https://api.jup.ag/swap/v2`
 
 <CardGroup>
   <Card title="GET /order" href="/api-reference/swap/v2/order" icon="file-lines" horizontal>
@@ -20,26 +16,5 @@ The unified Swap API. Two paths: `/order` for managed execution, `/build` for cu
   </Card>
   <Card title="POST /execute" href="/api-reference/swap/v2/execute" icon="file-lines" horizontal>
     Execute a signed transaction from /order with managed landing
-  </Card>
-</CardGroup>
-
-## V1 (Metis)
-
-The original low-level routing engine for maximum flexibility and composability.
-
-**Base URL:** `https://api.jup.ag/swap/v1`
-
-<CardGroup>
-  <Card title="GET /quote" href="/api-reference/swap/v1/quote" icon="file-lines" horizontal>
-    Request a swap quote
-  </Card>
-  <Card title="POST /swap" href="/api-reference/swap/v1/swap" icon="file-lines" horizontal>
-    Build a serialised swap transaction from a quote
-  </Card>
-  <Card title="POST /swap-instructions" href="/api-reference/swap/v1/swap-instructions" icon="file-lines" horizontal>
-    Get raw swap instructions from a quote
-  </Card>
-  <Card title="GET /program-id-to-label" href="/api-reference/swap/v1/program-id-to-label" icon="file-lines" horizontal>
-    Map program IDs to human-readable labels
   </Card>
 </CardGroup>

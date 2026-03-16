@@ -1,13 +1,12 @@
 # Jupiter
 
 > Jupiter is DeFi infrastructure on Solana providing swap, lending, perpetuals, limit-order, DCA, and portfolio APIs.
-> Two main swap APIs: **Ultra** (recommended — managed execution, gasless, RPC-less) and **Metis** (advanced — low-level routing primitives, bring your own RPC).
-> Base URL: `https://api.jup.ag`. All endpoints require an `x-api-key` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).
+> **Swap API V2** (recommended): `/order` for managed execution, `/build` for custom transactions. Base URL: `https://api.jup.ag/swap/v2`.
+> All endpoints require an `x-api-key` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).
 
 ## Quick Reference
 
-- Ultra Swap API (recommended): `GET /ultra/v1/order` + `POST /ultra/v1/execute`
-- Metis Swap API (advanced): `GET /swap/v1/quote` + `POST /swap/v1/swap`
+- Swap API V2 (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`
 - Trigger (limit orders): `POST /trigger/v1/createOrder`
 - Recurring (DCA): `POST /recurring/v1/createOrder`
 - Lend: `POST /lend/v1/earn/deposit`
@@ -272,7 +271,6 @@ OpenAPI specifications for every Jupiter endpoint.
 - [Jupiter Portfolio API](https://dev.jup.ag/openapi-spec/portfolio/portfolio.yaml): Jupiter Portfolio API Schema
 - [Jupiter Send API](https://dev.jup.ag/openapi-spec/send/send.yaml): Jupiter Send API Schema
 - [Jupiter Studio API](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Jupiter Studio API Schema
-- [Jupiter Ultra Swap API](https://dev.jup.ag/openapi-spec/ultra/ultra.yaml): Jupiter Ultra Swap API Schema
 
 ## Tool Kits
 

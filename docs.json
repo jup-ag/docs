@@ -526,77 +526,31 @@
                 "group": "Swap",
                 "pages": [
                   "api-reference/swap",
-                  {
-                    "group": "V2",
-                    "pages": [
-                      "api-reference/swap/v2",
-                      "api-reference/swap/v2/order",
-                      "api-reference/swap/v2/build",
-                      "api-reference/swap/v2/execute"
-                    ]
-                  },
-                  {
-                    "group": "V1 (Metis)",
-                    "expanded": false,
-                    "pages": [
-                      "api-reference/swap/v1",
-                      "api-reference/swap/v1/quote",
-                      "api-reference/swap/v1/swap",
-                      "api-reference/swap/v1/swap-instructions",
-                      "api-reference/swap/v1/program-id-to-label"
-                    ]
-                  }
+                  "api-reference/swap/v2/order",
+                  "api-reference/swap/v2/build",
+                  "api-reference/swap/v2/execute"
                 ]
               },
               {
                 "group": "Tokens",
                 "pages": [
                   "api-reference/tokens",
-                  {
-                    "group": "V2",
-                    "pages": [
-                      "api-reference/tokens/v2",
-                      "api-reference/tokens/v2/search",
-                      "api-reference/tokens/v2/tag",
-                      "api-reference/tokens/v2/category",
-                      "api-reference/tokens/v2/recent",
-                      "api-reference/tokens/v2/get-content",
-                      "api-reference/tokens/v2/get-content-cooking",
-                      "api-reference/tokens/v2/get-content-feed"
-                    ]
-                  },
-                  {
-                    "group": "V1 (Deprecated)",
-                    "pages": [
-                      "api-reference/tokens/v1",
-                      "api-reference/tokens/v1/token-information",
-                      "api-reference/tokens/v1/mints-in-market",
-                      "api-reference/tokens/v1/tradable",
-                      "api-reference/tokens/v1/tagged",
-                      "api-reference/tokens/v1/new",
-                      "api-reference/tokens/v1/all"
-                    ]
-                  }
+                  "api-reference/tokens/v2",
+                  "api-reference/tokens/v2/search",
+                  "api-reference/tokens/v2/tag",
+                  "api-reference/tokens/v2/category",
+                  "api-reference/tokens/v2/recent",
+                  "api-reference/tokens/v2/get-content",
+                  "api-reference/tokens/v2/get-content-cooking",
+                  "api-reference/tokens/v2/get-content-feed"
                 ]
               },
               {
                 "group": "Price",
                 "pages": [
                   "api-reference/price",
-                  {
-                    "group": "V3",
-                    "pages": [
-                      "api-reference/price/v3",
-                      "api-reference/price/v3/price"
-                    ]
-                  },
-                  {
-                    "group": "V2 (Deprecated)",
-                    "pages": [
-                      "api-reference/price/v2",
-                      "api-reference/price/v2/price"
-                    ]
-                  }
+                  "api-reference/price/v3",
+                  "api-reference/price/v3/price"
                 ]
               }
             ]
@@ -771,19 +725,6 @@
                   "api-reference/studio/dbc-pool-addresses-by-mint",
                   "api-reference/studio/dbc-fee",
                   "api-reference/studio/dbc-fee-create-tx"
-                ]
-              },
-              {
-                "group": "Ultra Swap",
-                "pages": [
-                  "api-reference/ultra",
-                  "api-reference/ultra/order",
-                  "api-reference/ultra/execute",
-                  "api-reference/ultra/holdings",
-                  "api-reference/ultra/shield",
-                  "api-reference/ultra/search",
-                  "api-reference/ultra/routers",
-                  "api-reference/ultra/balances"
                 ]
               }
             ]

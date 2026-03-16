@@ -1,0 +1,24 @@
+---
+title: "Swap API V2"
+sidebarTitle: "Overview"
+description: "API reference for the Jupiter Swap API V2"
+llmsDescription: "Jupiter Swap API V2 endpoint reference. Three endpoints: GET /order (quote + assembled transaction with managed execution), GET /build (quote + raw swap instructions for custom transactions), POST /execute (managed transaction landing for /order). Base URL: https://api.jup.ag/swap/v2"
+---
+
+## Swap Endpoints
+
+<CardGroup>
+  <Card title="GET /order" href="/api-reference/swap/v2/order" icon="file-lines" horizontal>
+    Get a swap quote and assembled transaction with managed execution
+  </Card>
+  <Card title="GET /build" href="/api-reference/swap/v2/build" icon="file-lines" horizontal>
+    Get a swap quote with raw instructions for building custom transactions
+  </Card>
+  <Card title="POST /execute" href="/api-reference/swap/v2/execute" icon="file-lines" horizontal>
+    Execute a signed transaction from /order with managed landing
+  </Card>
+</CardGroup>
+
+**Base URL:** `https://api.jup.ag/swap/v2`
+
+All endpoints require an API key via the `x-api-key` header. Get one at [portal.jup.ag](https://portal.jup.ag).

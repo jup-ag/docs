@@ -2,4 +2,5 @@
 openapi: /openapi-spec/swap/v2/swap.yaml get /build
 title: "Build Transaction"
 description: "Get a swap quote with raw instructions for building custom transactions"
+llmsDescription: "GET /build endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/build. Returns a swap quote with raw instructions (computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions) and address lookup tables. Integrators build their own transactions, add custom instructions (CPI, memo, transfer), simulate, sign, and send via their own RPC. Metis-only routing. No Jupiter swap fees. /execute is not available for /build transactions."
 ---

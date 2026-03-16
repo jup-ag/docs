@@ -20,6 +20,22 @@ description: "Latest announcements and breaking changes across Jupiter APIs."
 
 <Update label="March 2026" description="">
 
+## Swap API V2
+
+The unified Swap API consolidates Ultra and Metis into a single entry point at `api.jup.ag/swap/v2`. Three endpoints:
+
+* **`GET /order`** — default path. Returns an assembled transaction with all Ultra benefits (RTSE, Jupiter Beam, gasless, multi-router competition including RFQ). Sign and send to `/execute`.
+* **`GET /build`** — advanced path. Returns raw swap instructions for building custom transactions (CPI, custom instructions, composability). No Jupiter swap fees.
+* **`POST /execute`** — managed execution for `/order` transactions.
+
+Ultra and Metis APIs remain available but are no longer the primary recommendation. See the [migration guide](/docs/swap/v2/migration) for moving from Metis or Ultra to the new API.
+
+- [Swap API overview](/docs/swap)
+- [Order & Execute](/docs/swap/v2/order-and-execute)
+- [Build Custom Transactions](/docs/swap/v2/build)
+
+---
+
 ### Lend Earn API: Earnings endpoint schema change
 
 The `GET /lend/v1/earn/earnings` response schema has been updated:

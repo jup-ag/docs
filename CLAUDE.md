@@ -493,6 +493,79 @@ references, bookmarks, and indexed search results. The cost is always higher tha
   4. Note the redirect in `.claude/rules/decisions.md` under the Redirect Log
 - If you're unsure whether a rename is worth it, **don't do it** — ask the user.
 
+## Deprecating API Versions (Apply for deprecation or no longer maintained resources)
+
+When a new API version replaces an old one (e.g. Swap V2 replacing Ultra/Metis V1), follow
+this workflow to:
+- From human reader perspective: Phase out the old version without breaking existing users 
+  or links. (Note that they are still searchable via Mintlify's UI search)
+- From agentic reader perspective: Prevent from indexing or allowing them to find the entrypoint 
+  to the deprecated or no longer maintained docs
+
+### 1. Keep old pages live — never delete
+
+Old API reference pages stay in the filesystem. External links, bookmarks, AI agent caches, 
+and search indexes all point to them. Deleting breaks everything.
+
+Though, this is not true for all old pages, some can be deleted and redirected.
+
+### 2. Remove from navigation
+
+Remove the old version's pages from `docs.json` navigation. They become undiscoverable
+in the sidebar but remain accessible via direct URL.
+
+### 3. Add `deprecated: true` in frontmatter
+
+Add `deprecated: true` to the frontmatter of every deprecated page. This signals to
+`generate-llms-from-docs.js` to exclude the page from `llms.txt`, preventing AI agents
+from discovering it.
+
+```mdx
+---
+title: "Get Quote"
+description: "Request a swap quote"
+deprecated: true
+---
+```
+
+### 4. Add deprecation callout
+
+Add a `<Warning>` immediately after the frontmatter pointing to the replacement:
+
+```mdx
+<Warning>
+This endpoint is part of the Metis Swap API (V1) which has been superseded by the
+[Swap API V2](/api-reference/swap). Use `/build` for custom transactions.
+</Warning>
+```
+
+### 5. Update `llmsDescription` on overview pages
+
+Prefix the `llmsDescription` with "DEPRECATED — use [replacement] instead." so any AI
+that reads the page directly (not via llms.txt) sees the deprecation signal.
+
+### 6. Update top-level overview
+
+The top-level overview page (e.g. `api-reference/swap.mdx`) should only show cards for
+the current version. Remove cards for deprecated versions.
+
+### Result
+
+| Channel | Behaviour |
+|---------|-----------|
+| **Sidebar nav** | Old version hidden — new users never see it |
+| **Direct URL** | Still works — existing bookmarks/links don't break |
+| **llms.txt** | Old version excluded — AI agents discover only the current version |
+| **Page content** | Warning callout directs visitors to the replacement |
+| **Mintlify search** | Old pages still searchable by title (pages exist on disk) |
+
+### When to apply
+
+Apply this workflow whenever:
+- A new API version is released (Swap V2, Trigger V2, Price V3, etc.)
+- An API is being sunset or replaced
+- An endpoint is removed or merged into another
+
 ## Do NOT
 
 - Create new top-level folders without explicit approval — the IA is intentional

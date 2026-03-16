@@ -1,0 +1,256 @@
+---
+title: "JUICED Collateral Integration"
+description: "Integrate JUICED as a collateral asset in your protocol"
+llmsDescription: "Technical guide for integrating JUICED as a collateral asset. JUICED is a yield-bearing SPL token from Jupiter Lend Earn representing deposited JupUSD. Covers token details (mint address, decimals), onchain pricing via get_underlying_balance and get_exchange_price functions, deposit/withdraw flows using both the Lend API (HTTP endpoints at api.jup.ag/lend/v1/earn/) and Lend SDK (@jup-ag/lend), read functions for querying token data, withdrawal behaviour (Automated Debt Ceiling), program IDs, and risk considerations for lending protocols (exchange rate monotonicity, JupUSD peg dependency, T-bill yield variability, smart contract risk)."
+---
+
+## Overview
+
+JUICED is a yield-bearing SPL token issued by Jupiter Lend. It represents a deposit of [JupUSD](/docs/jupusd) (a reserve-backed stablecoin pegged to \$1) into the Jupiter Lend Earn protocol.
+
+JUICED follows a vault share model: the JUICED/JupUSD exchange rate increases monotonically as yield accrues. The rate never decreases.
+
+Yield comes from two sources, both accrued into the token price:
+
+- **Borrowing interest** from JupUSD utilisation on Jupiter Lend.
+- **T-bill yield** from the reserves backing minted JupUSD (primarily Ethena's USDtb, backed by BlackRock's BUIDL), distributed through Jupiter's rewards distributor.
+
+JUICED can be held, transferred, and used as collateral. This guide covers everything a protocol needs to integrate JUICED as a collateral asset.
+
+---
+
+## Token details
+
+| Field                | Value                                                                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Name**             | JUICED                                                                                                                         |
+| **Ticker**           | JUICED                                                                                                                         |
+| **Mint address**     | [`7GxATsNMnaC88vdwd2t3mwrFuQwwGvmYPrUQ4D6FotXk`](https://solscan.io/token/7GxATsNMnaC88vdwd2t3mwrFuQwwGvmYPrUQ4D6FotXk)        |
+| **Standard**         | SPL Token                                                                                                                      |
+| **Decimals**         | 9                                                                                                                              |
+| **Underlying asset** | JupUSD ([`JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD`](https://solscan.io/token/JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD)) |
+
+---
+
+## Pricing
+
+JUICED is contract-priced. Its value is derived from the onchain exchange rate against JupUSD:
+
+```
+JUICED price = exchange_rate × JupUSD price ($1)
+```
+
+JupUSD is pegged to \$1 on the borrow side of Jupiter Lend, like other stablecoins.
+
+### Reading the exchange rate onchain
+
+The Jupiter Lend program (Fluid) exposes two functions to read the current JUICED/JupUSD exchange rate:
+
+**[`get_underlying_balance`](https://github.com/Instadapp/fluid-solana-programs/blob/main/programs/lending/src/utils/helpers.rs#L15)** returns the underlying JupUSD balance for 1 share (1e9 lamports). This is the effective price of one JUICED token in JupUSD terms.
+
+**[`get_exchange_price`](https://github.com/Instadapp/fluid-solana-programs/blob/main/programs/lending/src/utils/helpers.rs#L219)** returns the exchange price of 1 share directly.
+
+### Rate update frequency
+
+The exchange rate is updated on every interaction with the protocol (deposit, withdraw, borrow, repay). A weekly cron job ensures the rate is updated even if no interactions occur for an extended period.
+
+### Rate behaviour
+
+The exchange rate is monotonically increasing. It does not decrease under normal protocol operation. This makes JUICED suitable as collateral with predictable value appreciation.
+
+<Note>
+  An additional Jupiter Lend oracle is available for pricing via CPI. Contact the Jupiter team for integration details.
+</Note>
+
+---
+
+## Deposit and withdraw
+
+Protocols can deposit JupUSD to receive JUICED, or withdraw JupUSD by redeeming JUICED. Two integration paths are available: the [Lend API](/docs/lend/earn/api) (HTTP) and the [Lend SDK](/docs/lend/earn/deposit) (TypeScript).
+
+<Tabs>
+  <Tab title="Lend API">
+    The Lend API is the simplest integration path. It returns a signed transaction that you submit to the network.
+
+    <Info>
+      An API key is required. See [API Key Setup](/portal/setup) for details.
+    </Info>
+
+    **Deposit JupUSD to receive JUICED**
+
+    ```typescript
+    const response = await fetch("https://api.jup.ag/lend/v1/earn/deposit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "your-api-key",
+      },
+      body: JSON.stringify({
+        asset: "JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD", // JupUSD mint
+        amount: "1000000000", // Amount in lamports (1 JupUSD = 1e9)
+        signer: wallet.publicKey.toString(),
+      }),
+    });
+    ```
+
+    **Withdraw JupUSD by redeeming JUICED**
+
+    ```typescript
+    const response = await fetch("https://api.jup.ag/lend/v1/earn/withdraw", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "your-api-key",
+      },
+      body: JSON.stringify({
+        asset: "JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD", // JupUSD mint
+        amount: "1000000000", // Amount in lamports
+        signer: wallet.publicKey.toString(),
+      }),
+    });
+    ```
+
+    You can also use the **mint/redeem** endpoints to operate in share amounts (JUICED units) instead of underlying amounts (JupUSD units):
+
+    ```typescript
+    // Deposit by share amount
+    const response = await fetch("https://api.jup.ag/lend/v1/earn/mint", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "your-api-key",
+      },
+      body: JSON.stringify({
+        asset: "JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD",
+        signer: wallet.publicKey.toString(),
+        shares: "1000000000", // JUICED shares to mint
+      }),
+    });
+    ```
+
+    For the full API schema, see the [Lend API Reference](/api-reference/lend).
+  </Tab>
+
+  <Tab title="Lend SDK">
+    The Lend SDK provides instruction-level access, useful for building custom transactions or CPI integrations.
+
+    **Installation**
+
+    ```bash
+    npm install @jup-ag/lend
+    ```
+
+    **Deposit**
+
+    ```typescript
+    import { getDepositIx } from "@jup-ag/lend/earn";
+    import { Connection, PublicKey } from "@solana/web3.js";
+    import { BN } from "bn.js";
+
+    const connection = new Connection("https://api.mainnet-beta.solana.com");
+
+    const depositIx = await getDepositIx({
+      amount: new BN(1000000000),    // 1 JupUSD in lamports
+      asset: new PublicKey("JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD"),
+      signer: signer.publicKey,
+      connection,
+      cluster: "mainnet",
+    });
+    ```
+
+    **Withdraw**
+
+    ```typescript
+    import { getWithdrawIx } from "@jup-ag/lend/earn";
+
+    const withdrawIx = await getWithdrawIx({
+      amount: new BN(1000000000),
+      asset: new PublicKey("JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD"),
+      signer: signer.publicKey,
+      connection,
+      cluster: "mainnet",
+    });
+    ```
+
+    **CPI integration**
+
+    For protocols that need to deposit/withdraw within their own program instructions, use the context functions:
+
+    ```typescript
+    import { getDepositContext, getWithdrawContext } from "@jup-ag/lend/earn";
+    ```
+
+    These return the account contexts needed for Cross-Program Invocation. See the [Lend Earn CPI documentation](/docs/lend/earn/cpi) for full details.
+  </Tab>
+</Tabs>
+
+### Read functions
+
+The SDK provides read functions to query token and position data:
+
+```typescript
+import { getLendingTokens, getLendingTokenDetails } from "@jup-ag/lend/earn";
+
+// List all available lending tokens
+const allTokens = await getLendingTokens({ connection });
+
+// Get details for JUICED (supply, rates, liquidity)
+const juicedDetails = await getLendingTokenDetails({
+  lendingToken: new PublicKey("7GxATsNMnaC88vdwd2t3mwrFuQwwGvmYPrUQ4D6FotXk"),
+  connection,
+});
+```
+
+Token data is also available via the API:
+
+```typescript
+const vaults = await (
+  await fetch("https://api.jup.ag/lend/v1/earn/tokens", {
+    headers: { "x-api-key": "your-api-key" },
+  })
+).json();
+```
+
+---
+
+## Withdrawal behaviour
+
+There are no supply limits on the Earn protocol. Withdrawals use an Automated Debt Ceiling: the withdrawal allowance increases every block, creating a smoothing curve that prevents sudden large outflows. Under normal conditions, withdrawals are instant.
+
+---
+
+## Program IDs
+
+| Program                        | Address                                                                                                                 |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| **Jupiter Lend Earn**          | [`jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9`](https://solscan.io/account/jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9) |
+| **Jupiter Lend Borrow**        | [`jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi`](https://solscan.io/account/jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi) |
+| **Jupiter Lend Earn Rewards**  | [`jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar`](https://solscan.io/account/jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar) |
+| **Jupiter Lend Liquidity**     | [`jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC`](https://solscan.io/account/jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC) |
+| **Jupiter Lend Borrow Oracle** | [`jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc`](https://solscan.io/account/jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) |
+
+---
+
+## Risk considerations for integrators
+
+Protocols integrating JUICED as collateral should evaluate the following:
+
+**Exchange rate is monotonically increasing.** Under normal protocol operation, the JUICED/JupUSD rate only goes up. This simplifies collateral valuation but does not eliminate all risk vectors.
+
+**JupUSD peg dependency.** JUICED value ultimately depends on JupUSD maintaining its \$1 peg. JupUSD is backed by Ethena's USDtb and USDC, held in an Anchorage Porto Wallet. A depeg event on JupUSD would directly impact JUICED valuation.
+
+**T-bill yield is variable and can be diluted.** T-bill yield is generated by the reserves backing minted JupUSD but distributed across all JUICED supply. If JUICED supply exceeds minted JupUSD supply, per-unit T-bill yield decreases. This does not affect the exchange rate direction (still increasing) but affects the rate of appreciation.
+
+**Withdrawal liquidity.** Withdrawals are subject to the Automated Debt Ceiling smoothing mechanism. In extreme scenarios (mass withdrawals, high utilisation), redemption to JupUSD may be delayed.
+
+**Smart contract risk.** JUICED depends on the Jupiter Lend program (Fluid). JupUSD has been audited by Offside Labs, Guardian, and Pashov. Jupiter Lend contracts have been audited by Zenith and Offside.
+
+**Third-party dependencies.** The yield chain involves Ethena (USDtb issuer), BlackRock (BUIDL fund), and Anchorage (custody). Changes in operations or regulatory status of these parties could affect JUICED yield or JupUSD backing.
+
+## Related
+
+- [JupUSD Mint & Redeem](/docs/jupusd) for minting and redeeming JupUSD
+- [Lend Earn API](/docs/lend/earn/api) for the full Earn API reference
+- [Lend Earn SDK: Deposit](/docs/lend/earn/deposit) for SDK deposit documentation
+- [Lend Earn SDK: Withdraw](/docs/lend/earn/withdraw) for SDK withdrawal documentation
+- [Lend Earn CPI](/docs/lend/earn/cpi) for Cross-Program Invocation integration

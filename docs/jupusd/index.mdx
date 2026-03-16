@@ -1,0 +1,355 @@
+---
+title: "Mint & Redeem"
+description: "Technical documentation for minting and redeeming JupUSD"
+llmsDescription: "How to mint and redeem JupUSD programmatically using the @jup-ag/jup-usd-sdk TypeScript SDK, the JupUSD Web API (api.jupusd.money), or the web UI (jupusd.money/mint). Covers benefactor requirements (KYC/KYB whitelisting), Pyth oracle integration for peg validation and exchange rates, per-window rate limiting (config, vault, benefactor levels), key program addresses (JupUSD mint, program, custodian, reserves, multisig), and a complete error reference for all mint/redeem failure modes."
+---
+
+<Warning>
+  Direct minting and redemption is restricted to onboarded, whitelisted participants (KYC/KYB market makers and institutional partners). Retail users can access JupUSD permissionlessly through [Jupiter Swap](https://jup.ag/), Jupiter Mobile, and other Solana platforms.
+</Warning>
+
+## Overview
+
+JupUSD is minted and redeemed through a dedicated Solana program. The program accepts collateral (USDC or USDtb), mints JupUSD 1:1 (minus fees), and handles the reverse operation for redemption.
+
+A **0.04% fee** applies to all mint and redeem transactions through the program.
+
+Three integration methods are available:
+
+<CardGroup cols={3}>
+  <Card title="SDK" icon="code" href="#sdk">
+    TypeScript SDK for programmatic integration.
+  </Card>
+
+  <Card title="Web API" icon="globe" href="#web-api">
+    HTTP endpoints for direct service integrations.
+  </Card>
+
+  <Card title="UI" icon="browser" href="#ui">
+    Web interface for manual operations.
+  </Card>
+</CardGroup>
+
+The mint/redeem Solana program is source-available under the BSL licence: [GitHub repository](https://github.com/jup-ag/jupusd-program/tree/main/programs/jup-stable).
+
+### Key addresses
+
+| Field                           | Address                                                                                                                   |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **JupUSD Mint**                 | [`JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD`](https://solscan.io/token/JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD)     |
+| **Program**                     | [`JUPUSDecMzAVgztLe6eGhwUBj1Pn3j9WAXwmtHmfbRr`](https://solscan.io/account/JUPUSDecMzAVgztLe6eGhwUBj1Pn3j9WAXwmtHmfbRr)   |
+| **Custodian (reserves)**        | [`B3q4P4XSmycvoHLaiEjchsGDafFPhKokvHvNRuW29N1y`](https://solscan.io/account/B3q4P4XSmycvoHLaiEjchsGDafFPhKokvHvNRuW29N1y) |
+| **Program reserves**            | [`CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA`](https://solscan.io/account/CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA) |
+| **Multisig (update authority)** | [`31wgH9Czzd3qgquTGxVxtxJuzBd8Fm4xEo8rPX7CNfhM`](https://solscan.io/account/31wgH9Czzd3qgquTGxVxtxJuzBd8Fm4xEo8rPX7CNfhM) |
+
+---
+
+## Concepts
+
+### Benefactor
+
+A **benefactor** is a wallet authorised to mint and redeem JupUSD through the program. Every benefactor is linked to a KYC (individual) or KYB (entity) verification. If your benefactor account is disabled, the transaction will fail with the `BenefactorDisabled` error.
+
+### Oracle
+
+The JupUSD program uses [Pyth](https://pyth.network/) as its oracle provider. Oracles serve two purposes in the mint/redeem flow:
+
+1. **Peg validation**: verify that the collateral (USDC, USDtb) has not depegged before allowing the operation.
+2. **Exchange rate**: the oracle price is used in the calculation of the mint/redeem exchange rate.
+
+There is no fallback mechanism. If the Pyth feed is unavailable or rejected (confidence too wide, stale data), the transaction will fail with `PriceConfidenceTooWide` or `NoValidPrice`.
+
+Oracle validation parameters are configured per vault. You can inspect the current configuration for each vault onchain. For example, the USDC vault configuration: [`7JnALHo2bFuKsgkNymiqJwt228jy3my99CnfF75QD9oj`](https://solscan.io/account/7JnALHo2bFuKsgkNymiqJwt228jy3my99CnfF75QD9oj#accountData).
+
+### Rate limiting
+
+Mint and redeem operations are rate-limited at the config (global), vault, and benefactor levels.
+
+Typical benefactor limits:
+
+| Window     | Mint limit | Redeem limit |
+| ---------- | ---------- | ------------ |
+| **1 hour** | 40M        | 10M          |
+| **1 day**  | 100M       | 100M         |
+
+These values can vary per benefactor. If you encounter `MintLimitExceeded` or `RedeemLimitExceeded`, wait for the current window to reset or contact the team to request higher limits.
+
+---
+
+## SDK
+
+The TypeScript SDK provides programmatic access to mint and redeem instructions. An IDL is also available for non-TypeScript integrations: [view IDL on Solscan](https://solscan.io/account/JUPUSDecMzAVgztLe6eGhwUBj1Pn3j9WAXwmtHmfbRr#programIdl).
+
+### Installation
+
+<CodeGroup>
+  ```bash npm
+  npm install @jup-ag/jup-usd-sdk
+  ```
+
+  ```bash yarn
+  yarn add @jup-ag/jup-usd-sdk
+  ```
+
+  ```bash pnpm
+  pnpm add @jup-ag/jup-usd-sdk
+  ```
+</CodeGroup>
+
+Alternatively, install from the [GitHub repository](https://github.com/jup-ag/jupusd-program/tree/main/packages/sdk).
+
+---
+
+### Mint
+
+The Mint instruction transfers collateral from your wallet to the JupUSD custodian and mints new JupUSD tokens to the provided token account.
+
+#### Key parameters
+
+| Parameter      | Description                                                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `amountIn`     | Amount of collateral to deposit.                                                                                                            |
+| `minAmountOut` | Minimum amount of JupUSD to receive. If the minted amount falls below this value, the transaction reverts with `SlippageToleranceExceeded`. |
+
+<Note>
+  Your wallet must be a registered benefactor to call the Mint instruction. If you are not onboarded, the transaction will fail.
+</Note>
+
+#### Oracle accounts
+
+Each vault requires a specific set of Pyth oracle accounts. When building the instruction:
+
+- Include all non-empty oracle accounts from the vault.
+- Preserve the exact order in which they are stored onchain.
+- Passing incorrect or incomplete oracle accounts will cause the transaction to fail.
+
+#### Example
+
+```typescript
+import { AccountRole, address } from "@solana/kit";
+import {
+  findConfig,
+  fetchVault,
+  fetchConfig,
+  findVault,
+  getMintInstructionAsync,
+  JUP_STABLE_PROGRAM_ADDRESS,
+} from "@jup-ag/jup-usd-sdk";
+import { findAssociatedTokenPda } from "@solana-program/token";
+
+// Wallet must be a registered benefactor
+const userSigner = /* your wallet signer */;
+const feePayerSigner = userSigner;
+
+// --- Derive program accounts ---
+
+// Config PDA
+const configAddress = await findConfig();
+const configAccount = await fetchConfig(rpc, configAddress);
+
+// Vault PDA (derived from collateral mint, e.g. USDC)
+const vaultAddress = await findVault(USDC);
+const vaultAccount = await fetchVault(rpc, vaultAddress);
+
+// --- Collect required oracle accounts ---
+const remainingAccounts = vaultAccount.data.oracles
+  .filter((oracle) => oracle.__kind !== "Empty")
+  .map((oracle) => ({
+    role: AccountRole.READONLY,
+    address: address(oracle.fields[0].account),
+  }));
+
+// --- Mint instruction (deposit collateral -> receive JupUSD) ---
+const mintIx = await getMintInstructionAsync({
+  user: userSigner,
+  userCollateralTokenAccount,
+  userLpTokenAccount,
+  config: configAddress,
+  authority: configAccount.data.authority,
+  lpMint: configAccount.data.mint,
+  vault: vaultAddress,
+  vaultMint: configAccount.data.mint,
+  custodian: vaultAccount.data.custodian,
+  custodianTokenAccount: await findAssociatedTokenPda({
+    mint: vaultAccount.data.mint,
+    owner: vaultAccount.data.custodian,
+    tokenProgram: vaultAccount.data.token_program,
+  }),
+  benefactor: benefactorAddress,
+  lpTokenProgram: configAccount.data.tokenProgram,
+  vaultTokenProgram: configAccount.data.tokenProgram,
+  program: JUP_STABLE_PROGRAM_ADDRESS,
+  amount: amountIn,        // Collateral amount
+  minAmountOut,            // Slippage protection
+});
+
+// Append oracle accounts in the correct order
+mintIx.accounts.push(...remainingAccounts);
+```
+
+---
+
+### Redeem
+
+The Redeem instruction burns JupUSD from your token account and withdraws the corresponding collateral from the vault back to your wallet.
+
+#### Key parameters
+
+| Parameter      | Description                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `amountIn`     | Amount of JupUSD to redeem (burn).                                                                                                                |
+| `minAmountOut` | Minimum amount of collateral to receive. If the returned amount falls below this value, the transaction reverts with `SlippageToleranceExceeded`. |
+
+#### Example
+
+```typescript
+import { AccountRole, address } from "@solana/kit";
+import {
+  findConfig,
+  fetchVault,
+  fetchConfig,
+  findVault,
+  getRedeemInstructionAsync,
+  JUP_STABLE_PROGRAM_ADDRESS,
+} from "@jup-ag/jup-usd-sdk";
+
+// Wallet must be a registered benefactor
+const userSigner = /* your wallet signer */;
+const feePayerSigner = userSigner;
+
+// --- Derive program accounts ---
+
+// Config PDA
+const configAddress = await findConfig();
+const configAccount = await fetchConfig(rpc, configAddress);
+
+// Vault PDA (derived from collateral mint, e.g. USDC)
+const vaultAddress = await findVault(USDC);
+const vaultAccount = await fetchVault(rpc, vaultAddress);
+
+// --- Collect required oracle accounts ---
+const remainingAccounts = vaultAccount.data.oracles
+  .filter((oracle) => oracle.__kind !== "Empty")
+  .map((oracle) => ({
+    role: AccountRole.READONLY,
+    address: address(oracle.fields[0].account),
+  }));
+
+// --- Redeem instruction (burn JupUSD -> receive collateral) ---
+const redeemIx = await getRedeemInstructionAsync({
+  user: userSigner,
+  userLpTokenAccount,              // JupUSD token account
+  userCollateralTokenAccount,      // Destination collateral account
+  config: configAddress,
+  authority: configAccount.data.authority,
+  lpMint: configAccount.data.mint,
+  vault: vaultAddress,
+  vaultTokenAccount,               // Vault collateral token account
+  vaultMint: vaultAccount.data.mint,
+  benefactor: benefactorAddress,
+  lpTokenProgram: configAccount.data.tokenProgram,
+  vaultTokenProgram: configAccount.data.tokenProgram,
+  program: JUP_STABLE_PROGRAM_ADDRESS,
+  amount: amountIn,                // Amount of JupUSD to burn
+  minAmountOut,                    // Slippage protection
+});
+
+// Append oracle accounts in the correct order
+redeemIx.accounts.push(...remainingAccounts);
+```
+
+---
+
+## Web API
+
+The JupUSD Web API provides HTTP endpoints for minting and redeeming without using the SDK directly.
+
+**Base URL:** `https://api.jupusd.money/`
+
+Full API documentation is available at [api.jupusd.money](https://api.jupusd.money/).
+
+<Note>
+  Access to the Web API requires a registered benefactor wallet, the same as for SDK and UI operations.
+</Note>
+
+---
+
+## UI
+
+The JupUSD web interface provides a graphical way to mint and redeem without writing code. It is available at: [jupusd.money/mint](https://jupusd.money/mint).
+
+<Warning>
+  You must be correctly onboarded before using the UI. If you see a warning message, it means you are using the wrong wallet address or there was an issue during onboarding.
+</Warning>
+
+### Mint via UI
+
+<Steps>
+  <Step title="Connect your wallet">
+    Connect a whitelisted Solana wallet (e.g. Jupiter Wallet, Phantom, Solflare).
+  </Step>
+
+  <Step title="Enter amount">
+    Enter the desired USDC amount to provide as collateral. The UI will compute a quote and display the expected JupUSD you will receive.
+  </Step>
+
+  <Step title="Approve and mint">
+    Click "Approve & Mint." Your wallet will prompt you to confirm the transaction.
+  </Step>
+
+  <Step title="Confirm">
+    Confirm the transaction in your wallet. A transaction receipt link will be provided once complete.
+  </Step>
+</Steps>
+
+### Redeem via UI
+
+<Steps>
+  <Step title="Connect your wallet">
+    Ensure your whitelisted wallet is connected.
+  </Step>
+
+  <Step title="Navigate to Redeem">
+    Switch to the "Redeem" tab.
+  </Step>
+
+  <Step title="Enter amount">
+    Enter the amount of JupUSD you wish to burn. The UI will calculate the expected collateral return.
+  </Step>
+
+  <Step title="Redeem">
+    Click "Redeem" and approve the transaction in your wallet.
+  </Step>
+
+  <Step title="Confirm">
+    Confirmation of the redemption will appear, along with a link to the transaction on the explorer.
+  </Step>
+</Steps>
+
+---
+
+## Error reference
+
+The following errors may occur when calling the Mint or Redeem instructions.
+
+| Error                                       | When it happens                                                            | How to fix                                                                                                     |
+| ------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **InvalidLPMint / InvalidVaultMint**        | The JupUSD or vault mint account does not match the config or vault state. | Fetch the config and vault accounts onchain and pass the exact mint accounts recorded there.                   |
+| **InvalidAuthority**                        | The authority PDA does not match the config.                               | Pass the correct authority stored in the config account.                                                       |
+| **InvalidVaultTokenAccount**                | The vault token account does not match the vault state.                    | Pass the vault or custodian token account recorded on the vault.                                               |
+| **InvalidCustodian**                        | The custodian account does not match the vault's configured custodian.     | Use the custodian pubkey stored on the vault account.                                                          |
+| **BenefactorDisabled**                      | The benefactor is currently disabled.                                      | Your account is whitelisted but not currently approved to mint, or access has been disabled. Contact the team. |
+| **VaultDisabled**                           | The vault is not enabled for minting or redeeming.                         | Wait for operators to enable the vault.                                                                        |
+| **ProtocolPaused**                          | Global mint/redeem operations are paused.                                  | Wait for protocol admins to re-enable mint/redeem.                                                             |
+| **MintLimitExceeded / RedeemLimitExceeded** | A per-window rate limit was exceeded (config, vault, or benefactor level). | Retry after the rate-limit window resets, or request higher limits from the team.                              |
+| **ZeroAmount**                              | Input amount is zero, or the computed output rounds to zero.               | Submit a non-zero amount large enough to produce output after fees.                                            |
+| **SlippageToleranceExceeded**               | Computed output is lower than `minAmountOut`.                              | Increase slippage tolerance or retry when pricing is more favourable.                                          |
+| **PriceConfidenceTooWide**                  | Pyth oracle confidence interval or spread is too wide.                     | Retry once oracle confidence tightens. Verify correct oracle accounts were supplied.                           |
+| **NoValidPrice**                            | No Pyth oracle price passed validation.                                    | Check oracle health and retry once price feeds are reporting valid data.                                       |
+| **MathOverflow**                            | Arithmetic overflow during price or amount calculation.                    | This should not happen under normal conditions. Contact the team.                                              |
+| **VaultIsDry**                              | Redeem request exceeds the vault's available collateral balance.           | The program vault balance is too low. Wait for it to be replenished or contact the team.                       |
+
+## Related
+
+- [JUICED Collateral Integration](/docs/jupusd/juiced) for integrating JUICED as a collateral asset
+- [Jupiter Lend Earn](/docs/lend/earn) for the underlying Earn protocol

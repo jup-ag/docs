@@ -1,8 +1,13 @@
 ---
 title: "Payments Through Swap"
 description: "Accept payments in any token while receiving your preferred token using the Metis Swap API."
-llmsDescription: "Use the Metis Swap API with ExactOut swap mode to accept payments in any token while receiving your preferred token. Set destinationTokenAccount to route output to a merchant wallet."
+llmsDescription: "DEPRECATED — use Swap API V2 instead. Use the Metis Swap API with ExactOut swap mode to accept payments in any token while receiving your preferred token. Set destinationTokenAccount to route output to a merchant wallet."
+deprecated: true
 ---
+
+<Warning>
+The Metis Swap API (V1) has been superseded by the [Swap API V2](/docs/swap). Use [Build Custom Transactions](/docs/swap/v2/build) for custom transaction workflows.
+</Warning>
 
 Use the Metis Swap API as a payment solution by setting `swapMode` to `ExactOut` in the quote request. This lets a customer pay in any token while the merchant receives an exact amount of their preferred token via `destinationTokenAccount`.
 

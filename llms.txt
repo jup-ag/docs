@@ -57,35 +57,6 @@ Core product documentation covering each Jupiter API with usage guides and code 
 - [Advanced Techniques](https://dev.jup.ag/docs/swap/v2/advanced.md): Advanced techniques for Jupiter Swap API V2 covering both /order and /build paths. Topics: compute unit (CU) estimation via transaction simulation for /build (since /build does not return CU instructions by default), removing no-op createIdempotent instructions to save space, mode: fast for reduced latency routing on /build, maxAccounts for controlling transaction size, gasless swaps via the payer parameter on /order, priority fee strategies (priorityFeeLamports, jitoTipLamports, nozomiTipLamports), and a note about Metis binary for circular arbitrage routes.
 - [Migration Guide](https://dev.jup.ag/docs/swap/v2/migration.md): Migration guide for moving from Jupiter Metis Swap API (V1) or Ultra Swap API to the unified Swap API V2. Covers: Metis to /build migration (parameter mapping from /quote + /swap-instructions to /build, V1 to V2 instruction differences including no fee events and percent to bps change in routePlan), Ultra to /order migration (minimal changes, same /order + /execute flow), and breaking changes. Includes side-by-side parameter mapping tables and response format differences.
 
-#### V1
-
-- [Metis Swap API Overview](https://dev.jup.ag/docs/swap/v1/index.md): Low-level routing engine for developers who need CPI, custom instructions, or full transaction control. Requires your own RPC.
-- [Get Quote](https://dev.jup.ag/docs/swap/v1/get-quote.md): GET /swap/v1/quote returns route plans from the Metis routing engine. Required params: inputMint, outputMint, amount, slippageBps.
-- [Build Swap Transaction](https://dev.jup.ag/docs/swap/v1/build-swap-transaction.md): POST /swap/v1/swap builds a serialized swap transaction from a quote. Supports dynamicComputeUnitLimit, dynamicSlippage, and prioritizationFeeLamports.
-- [Send Swap Transaction](https://dev.jup.ag/docs/swap/v1/send-swap-transaction.md): Sign and send the serialized Metis swap transaction via your own RPC. Covers priority fee estimation, compute unit limits, dynamic slippage, and Jito broadcasting.
-- [Add Fees To Swap](https://dev.jup.ag/docs/swap/v1/add-fees-to-swap.md): Add integrator fees to Metis swaps using the platformFeeBps quote parameter and feeAccount swap parameter. Supports SPL and Token2022 tokens.
-- [Payments Through Swap](https://dev.jup.ag/docs/swap/v1/payments-through-swap.md): Use the Metis Swap API with ExactOut swap mode to accept payments in any token while receiving your preferred token. Set destinationTokenAccount to route output to a merchant wallet.
-- [Requote with Lower Max Accounts](https://dev.jup.ag/docs/swap/v1/requote-with-lower-max-accounts.md): Reduce the maxAccounts quote parameter when adding custom instructions causes the swap transaction to exceed Solana's 1232-byte size limit. Includes retry logic to find the right account count.
-- [Common Errors](https://dev.jup.ag/docs/swap/v1/common-errors.md): Reference for Metis Swap API errors: Jupiter program errors (slippage, insufficient funds), Solana and DEX program errors, routing errors, and swap transaction composing errors with debug tips.
-
-### Ultra
-
-- [Ultra Swap API Overview](https://dev.jup.ag/docs/ultra/index.md): Jupiter's flagship swap API: RPC-less, gasless, with automatic slippage optimization and sub-second transaction landing. Start here for most swap integrations.
-- [Ultra Swap API Quick Start](https://dev.jup.ag/docs/ultra/get-started.md): Two-step swap flow: call GET /order to get a transaction, sign it, then POST /execute. Includes links to all Ultra endpoints and guides.
-- [Gasless Support](https://dev.jup.ag/docs/ultra/gasless.md): Two gasless mechanisms: Ultra Gasless Support (covers all gas when taker has < 0.01 SOL, min ~$10 trade) and JupiterZ RFQ (market maker pays network fees). Also supports Integrator Gas Payer.
-- [Fees](https://dev.jup.ag/docs/ultra/fees.md): Ultra Swap charges 5–10 bps per swap. Integrators can add custom fees (Jupiter takes 20% of integrator fees). Fee mint is determined by a priority list.
-- [Manual Mode](https://dev.jup.ag/docs/ultra/manual-mode.md): Use manual mode to control Ultra API parameters like slippage or priority fee settings. Not recommended for default integrations — use only for user-facing trading UIs.
-- [Get Order](https://dev.jup.ag/docs/ultra/get-order.md): GET /ultra/v1/order returns a base64-encoded unsigned swap transaction. Required params: inputMint, outputMint, amount, taker.
-- [Execute Order](https://dev.jup.ag/docs/ultra/execute-order.md): POST /ultra/v1/execute accepts the signed transaction and requestId, broadcasts it, and returns the swap result.
-- [Search Token](https://dev.jup.ag/docs/ultra/search-token.md): GET /ultra/v1/search?query={query} returns token metadata by symbol, name, or mint address. Supports comma-separated queries, up to 100 mints.
-- [Get Holdings](https://dev.jup.ag/docs/ultra/get-holdings.md): GET /ultra/v1/holdings/{address} returns detailed token holdings including token account info, frozen status, and native SOL balance.
-- [Get Shield](https://dev.jup.ag/docs/ultra/get-shield.md): GET /ultra/v1/shield?mints={mints} returns token security warnings (freeze authority, mint authority, low organic activity, etc.) for specified mint addresses.
-- [Response](https://dev.jup.ag/docs/ultra/response.md): Ultra Swap API response schemas and error codes for /order (errorCode 1–3) and /execute (codes 0, -1 to -5, -1000s aggregator, -2000s RFQ, and program-level codes).
-- [Rate Limit](https://dev.jup.ag/docs/ultra/rate-limit.md): Ultra Swap API uses dynamic rate limiting: 50 base requests per 10-second window, scaling with executed swap volume. Free API key required from portal.jup.ag.
-- [Add Integrator Fees](https://dev.jup.ag/docs/ultra/add-fees-to-ultra.md): Four-step setup to add custom fees (50–255 bps) to Ultra Swap: install referral SDK, create referralAccount, create referralTokenAccount per mint, then pass referralAccount and referralFee to /order.
-- [Add Integrator Payer](https://dev.jup.ag/docs/ultra/add-payer.md): Use the payer parameter to pay network fees and rent on behalf of users. Requires referralAccount and referralFee. Enforces Iris-only routing.
-- [Integrate Jupiter Plugin](https://dev.jup.ag/docs/ultra/plugin-integration.md): Drop-in Ultra Swap UI widget for any web app. Three display modes (integrated, widget, modal), wallet passthrough support, and integrator fee configuration.
-
 ### Tokens
 
 - [Token Verification and Listing](https://dev.jup.ag/docs/tokens/index.md): Jupiter's token verification system, listing process, and search APIs. Use the V2 API for programmatic token discovery and metadata.

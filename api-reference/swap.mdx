@@ -1,20 +1,45 @@
 ---
-title: "Metis Swap API"
+title: "Swap API"
 sidebarTitle: "Overview"
-description: "Endpoints for quotes, swap transactions, swap instructions, and program labels."
+description: "Jupiter Swap API endpoints for quotes, transactions, and instructions"
+llmsDescription: "Overview of Jupiter Swap API versions. V2 is the unified Swap API with three endpoints: GET /order (quote + assembled transaction), GET /build (quote + raw instructions), POST /execute (managed execution). V1 (Metis) has: GET /quote, POST /swap, POST /swap-instructions, GET /program-id-to-label. Base URLs: V2 at api.jup.ag/swap/v2, V1 at api.jup.ag/swap/v1."
 ---
 
+## V2 (Recommended)
+
+The unified Swap API. Two paths: `/order` for managed execution, `/build` for custom transactions.
+
+**Base URL:** `https://api.jup.ag/swap/v2`
+
 <CardGroup>
-  <Card title="quote" href="/api-reference/swap/quote" icon="file-lines" horizontal>
-    Request for a quote to be used in `POST /swap`
+  <Card title="GET /order" href="/api-reference/swap/v2/order" icon="file-lines" horizontal>
+    Get a swap quote and assembled transaction with managed execution
   </Card>
-  <Card title="swap" href="/api-reference/swap/swap" icon="file-lines" horizontal>
-    Request for a base64-encoded unsigned swap transaction based on the `/quote` response
+  <Card title="GET /build" href="/api-reference/swap/v2/build" icon="file-lines" horizontal>
+    Get a swap quote with raw instructions for building custom transactions
   </Card>
-  <Card title="swap-instructions" href="/api-reference/swap/swap-instructions" icon="file-lines" horizontal>
-    Request for swap instructions that you can use from the quote you get from `/quote`
+  <Card title="POST /execute" href="/api-reference/swap/v2/execute" icon="file-lines" horizontal>
+    Execute a signed transaction from /order with managed landing
   </Card>
-  <Card title="program-id-to-label" href="/api-reference/swap/program-id-to-label" icon="file-lines" horizontal>
-    Returns a hash, which key is the program id and value is the label.
+</CardGroup>
+
+## V1 (Metis)
+
+The original low-level routing engine for maximum flexibility and composability.
+
+**Base URL:** `https://api.jup.ag/swap/v1`
+
+<CardGroup>
+  <Card title="GET /quote" href="/api-reference/swap/v1/quote" icon="file-lines" horizontal>
+    Request a swap quote
+  </Card>
+  <Card title="POST /swap" href="/api-reference/swap/v1/swap" icon="file-lines" horizontal>
+    Build a serialised swap transaction from a quote
+  </Card>
+  <Card title="POST /swap-instructions" href="/api-reference/swap/v1/swap-instructions" icon="file-lines" horizontal>
+    Get raw swap instructions from a quote
+  </Card>
+  <Card title="GET /program-id-to-label" href="/api-reference/swap/v1/program-id-to-label" icon="file-lines" horizontal>
+    Map program IDs to human-readable labels
   </Card>
 </CardGroup>

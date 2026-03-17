@@ -32,7 +32,7 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 **Start with `/order`.** It gives you the best price because all routers compete, including RFQ market makers who often beat onchain routing by 5-20bps on major pairs. Only use `/build` if you need to modify the transaction.
 
 <Note>
-  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See [Parameters & Routing](/docs/swap/v2/parameters) for details.
+  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See [Routing](/docs/swap/v2/routing) for details.
 </Note>
 
 ## Endpoints
@@ -49,7 +49,7 @@ All endpoints require an API key via the `x-api-key` header. Get one at [portal.
 
 ## Related
 
-- [Parameters & Routing](/docs/swap/v2/parameters) for the full parameter reference and routing impact matrix
+- [Routing](/docs/swap/v2/routing) for the routing impact matrix
 - [Fees](/docs/swap/v2/fees) for fee models across both paths
 - [Migration Guide](/docs/swap/v2/migration) for migrating from Ultra or Metis
 - [API Reference](/api-reference/swap) for the OpenAPI specification

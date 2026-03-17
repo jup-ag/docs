@@ -29,11 +29,29 @@ Jupiter automatically covers all gas costs when the taker lacks SOL. No configur
 **How it works:**
 - Jupiter calculates the required SOL to cover gas and increases the swap fee. The taker receives less output tokens. The `feeBps` field in the response reflects this increased fee.
 - A secondary signer (Jupiter's gas payer) is added to the transaction.
-- When a JupiterZ (RFQ) market maker provides the winning quote, the market maker pays network and priority fees directly. ATA rent is not covered by the market maker, so the taker must have enough SOL for rent or JupiterZ will not be routed.
 
 **Limitations:**
 - Does not work with integrator params (`referralAccount`, `referralFee`, `payer`)
 - Does not work with manual mode params (`slippageBps`, `priorityFeeLamports`, `excludeRouters`)
+
+## JupiterZ gasless (`/order`)
+
+Alternatively, when a JupiterZ (RFQ) market maker provides the winning quote in `/order`, the market maker pays network and priority fees directly. ATA rent is not covered by the market maker, so the taker must have enough SOL for rent or JupiterZ will not be routed.
+
+**When it applies:**
+- Taker trades a pair the MMs are willing to quote
+- Only when using default `/order` parameters (no optional params)
+
+**What it covers:** transaction gas (signature fee, priority fee) but not token account rent.
+
+**How it works:**
+- The order transaction will include a secondary signer for the MM
+- We set the gas payer to the MM signer and upon receiving your partially signed transaction from `/execute`, we send it to the MM for them to sign and execute
+
+**Limitations:**
+- Does not work with integrator params (`referralAccount`, `referralFee`, `payer`)
+- Does not work with manual mode params (`slippageBps`, `priorityFeeLamports`, `excludeRouters`)
+- Requires taker to have sufficient SOL for token account rent
 
 ## Integrator payer
 
@@ -67,6 +85,7 @@ The returned transaction needs two signatures (taker + payer) before sending to 
 - Temporary wSOL ATA rent is covered by the payer and returned in the same transaction
 - Other ATAs are covered by the payer but not returned (they hold tokens post-swap)
 - Routes through Metis only
+- This needs to be used together with referral parameters (`referralAccount` and `referralFee`) because we assume that you will be taking fees to recoup the costs spent on gas
 
 ### On `/build`
 
@@ -89,20 +108,9 @@ const response = await fetch(
 
 The returned instructions will have fee payer accounts set to the `payer` address. You are responsible for building the transaction, collecting both signatures (taker + payer), and sending via your own RPC.
 
-## Scenario matrix (`/order`)
-
-| Scenario | Automatic gasless | RFQ (if quoted) |
-| --- | --- | --- |
-| **Taker has SOL and ATA** | Taker pays gas | MM pays gas |
-| **Taker has SOL, no ATA** | Taker pays gas and ATA rent | MM pays gas, taker pays ATA rent |
-| **No SOL, has ATA** | Gas taken from swap amount (min \$10 swap) | MM pays gas |
-| **No SOL, no ATA** | Gas and rent from swap amount (min \$10 swap) | Not supported (no ATA funding) |
-| **No SOL, has ATA, small swap** | Quote shown but cannot swap | MM pays gas |
-| **No SOL, no ATA, small swap** | Quote shown but cannot swap | Not supported (no ATA funding) |
-
 ## Related
 
 - [Order & Execute](/docs/swap/v2/order-and-execute) for the default swap flow
 - [Build Custom Transactions](/docs/swap/v2/build) for the advanced path
-- [Parameters & Routing](/docs/swap/v2/parameters) for how `payer` affects routing
+- [Routing](/docs/swap/v2/routing) for how `payer` affects routing
 - [Fees](/docs/swap/v2/fees) for how gasless affects the fee calculation

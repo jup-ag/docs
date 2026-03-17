@@ -32,7 +32,7 @@ If you currently use Metis `/quote` + `/swap-instructions`, migrate to `/build` 
 | `excludeDexes` | `excludeDexes` | Same |
 | `maxAccounts` | `maxAccounts` | Same, defaults to 64 |
 | `platformFeeBps` | `platformFeeBps` | Same |
-| - | `userPublicKey` | New required parameter (replaces the signer in `/swap-instructions` body) |
+| `userPublicKey` | `taker` | Required parameter that represents the account that is swapping |
 | - | `mode` | New. Set to "fast" for reduced latency. |
 | - | `feeAccount` | New. Required if `platformFeeBps` is positive. |
 
@@ -107,7 +107,7 @@ const build = await fetch(
       inputMint: "So11111111111111111111111111111111111111112",
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
-      userPublicKey: walletAddress,
+      taker: walletAddress,
       slippageBps: "50",
     }),
   { headers: { "x-api-key": API_KEY } }

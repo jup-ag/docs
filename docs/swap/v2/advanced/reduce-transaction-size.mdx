@@ -45,7 +45,7 @@ import { TOKEN_PROGRAM_ADDRESS } from "@solana-program/token";
 // If it does, the createIdempotent instruction is a no-op and can be removed
 const outputAta = await findAssociatedTokenPda({
   mint: address(outputMint),
-  owner: address(userPublicKey),
+  owner: address(taker),
   tokenProgram: TOKEN_PROGRAM_ADDRESS,
 });
 

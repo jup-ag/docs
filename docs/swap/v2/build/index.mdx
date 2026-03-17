@@ -271,7 +271,7 @@ const buildRes = await fetch(
       inputMint: "So11111111111111111111111111111111111111112",
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
-      userPublicKey: signer.address,
+      taker: signer.address,
       slippageBps: "100",
     }),
   { headers: { "x-api-key": API_KEY } },
@@ -387,7 +387,7 @@ const buildRes = await fetch(
       inputMint: "So11111111111111111111111111111111111111112",
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
-      userPublicKey: signer.publicKey.toString(),
+      taker: signer.publicKey.toString(),
     }),
   { headers: { "x-api-key": API_KEY } },
 );
@@ -475,7 +475,7 @@ if (confirmation.value.err) {
 | `inputMint` | Mint address of the token you are selling |
 | `outputMint` | Mint address of the token you are buying |
 | `amount` | Amount in the smallest unit of the input token |
-| `userPublicKey` | Your wallet address |
+| `taker` | Your wallet address |
 
 **Key response fields:**
 
@@ -555,7 +555,7 @@ Sign the transaction with your wallet and send via your own RPC.
 | `maxAccounts` | 64 | Maximum accounts for the swap route (1-64) |
 | `platformFeeBps` | 0 | Integrator platform fee in bps (requires `feeAccount`) |
 | `feeAccount` | - | Token account to collect platform fees |
-| `payer` | userPublicKey | Account that pays transaction fees and rent |
+| `payer` | public key | Account that pays transaction fees and rent |
 | `wrapAndUnwrapSol` | true | Whether to wrap/unwrap SOL automatically |
 | `dexes` | (all) | Restrict routing to specific DEXes |
 | `excludeDexes` | (none) | Exclude specific DEXes from routing |

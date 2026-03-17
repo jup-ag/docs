@@ -396,7 +396,7 @@ paths:
         - $ref: "#/components/parameters/InputMintParameter"
         - $ref: "#/components/parameters/OutputMintParameter"
         - $ref: "#/components/parameters/AmountParameter"
-        - name: userPublicKey
+        - name: taker
           in: query
           required: true
           schema:
@@ -457,7 +457,7 @@ paths:
           in: query
           schema:
             type: string
-          description: Account that pays transaction fees and rent. Defaults to userPublicKey.
+          description: Account that pays transaction fees and rent. Defaults to taker when not passed in.
         - name: wrapAndUnwrapSol
           in: query
           schema:

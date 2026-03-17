@@ -89,14 +89,14 @@ The returned transaction needs two signatures (taker + payer) before sending to 
 
 ### On `/build`
 
-Pass `payer` to change the fee payer on all returned instructions. The payer address replaces the default `userPublicKey` as the fee payer for the transaction.
+Pass `payer` to change the fee payer on all returned instructions. The payer address replaces the default `taker` as the fee payer for the transaction.
 
 ```typescript
 const params = new URLSearchParams({
   inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
   outputMint: "So11111111111111111111111111111111111111112",
   amount: "1000000",
-  userPublicKey: userWallet,
+  taker: userWallet,
   payer: integratorPayerWallet,
 });
 

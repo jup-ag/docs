@@ -32,21 +32,30 @@ To reclaim that space:
 3. If they don't exist, keep the instructions
 
 ```typescript
-// Check if ATA exists before including the setup instruction
-const ataAddress = await findAssociatedTokenPda({
+import { findAssociatedTokenPda } from "@solana-program/associated-token";
+import { TOKEN_PROGRAM_ADDRESS } from "@solana-program/token";
+
+// For each setup instruction, check if the target ATA already exists
+// If it does, the createIdempotent instruction is a no-op and can be removed
+const outputAta = await findAssociatedTokenPda({
   mint: address(outputMint),
   owner: address(userPublicKey),
   tokenProgram: TOKEN_PROGRAM_ADDRESS,
 });
 
-const accountInfo = await rpc.getAccountInfo(ataAddress[0]).send();
+const accountInfo = await rpc.getAccountInfo(outputAta[0]).send();
+const ataExists = accountInfo.value !== null;
 
-// Only include setup instruction if account does not exist
-const filteredSetupInstructions = build.setupInstructions.filter((ix) => {
-  // Compare with the createIdempotent instruction's target account
-  // Keep instructions for accounts that don't exist yet
-  return !accountExists(ix, existingAccounts);
-});
+// If ATA exists, filter out the createIdempotent instruction for it
+const filteredSetupInstructions = ataExists
+  ? build.setupInstructions.filter((ix) => {
+      // Skip instructions targeting the existing ATA
+      // Match by checking if any account in the instruction is the ATA address
+      return !ix.accounts.some(
+        (acc) => acc.pubkey === outputAta[0] && acc.isWritable
+      );
+    })
+  : build.setupInstructions;
 ```
 
 ## Related

@@ -72,13 +72,14 @@ const addressesByLookupTable = lookupTableAddresses.length > 0
 
 // Step 4: Build the transaction message
 const { blockhash, lastValidBlockHeight } = build.blockhashWithMetadata;
+const blockhashStr = bs58.encode(Buffer.from(blockhash)); // Convert byte array to base58
 
 const transactionMessage = pipe(
   createTransactionMessage({ version: 0 }),
   (tx) => setTransactionMessageFeePayer(signer.address, tx),
   (tx) =>
     setTransactionMessageLifetimeUsingBlockhash(
-      { blockhash, lastValidBlockHeight: BigInt(lastValidBlockHeight) },
+      { blockhash: blockhashStr, lastValidBlockHeight: BigInt(lastValidBlockHeight) },
       tx
     ),
   (tx) => appendTransactionMessageInstructions(instructions, tx)
@@ -170,10 +171,11 @@ for (const address of lookupTableAddresses) {
 
 // Step 4: Build the transaction
 const { blockhash, lastValidBlockHeight } = build.blockhashWithMetadata;
+const recentBlockhash = bs58.encode(Buffer.from(blockhash)); // Convert byte array to base58
 
 const messageV0 = new TransactionMessage({
   payerKey: wallet.publicKey,
-  recentBlockhash: bs58.encode(Buffer.from(blockhash)),
+  recentBlockhash,
   instructions,
 }).compileToV0Message(addressLookupTableAccounts);
 
@@ -187,7 +189,7 @@ const signature = await connection.sendRawTransaction(transaction.serialize(), {
 
 const confirmation = await connection.confirmTransaction({
   signature,
-  blockhash: bs58.encode(Buffer.from(blockhash)),
+  blockhash: recentBlockhash,
   lastValidBlockHeight,
 });
 

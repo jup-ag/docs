@@ -28,43 +28,22 @@ Metis is now an independent public good, no longer coupled to Jupiter or Ultra, 
 Though Jupiter continues to provide access to a hosted Metis API for developers.
 </Card>
 
-## We recommend using Ultra Swap API
+## We recommend using Swap API V2
 
-Ultra Swap API is the spiritual successor to Metis Swap API, and is much simpler to use than Metis Swap API. If you are first starting out on your Solana development journey, using Ultra Swap API is highly recommended over Metis Swap API.
-
-<Tip>
-For more information about Ultra Swap API, please refer to the [Ultra Swap API](/docs/ultra) documentation.
-</Tip>
-
-<Info>
-**Using Metis Swap API**
-
-Requires your own maintenance, optimizations and dependencies.
-   * **Upkeep of RPCs**: To retrieve wallet balances, broadcast and retrieve transactions, etc.
-   * **Deciding transaction fee**: Including, but not limited to, priority fee, Jito fee, etc.
-   * **Deciding slippage**: The optimal slippage to use to balance between trade success and price protection, do note that [RTSE is only available via Ultra Swap API](/docs/ultra#real-time-slippage-estimator).
-   * **Broadcasting the transaction**: Ultra uses a proprietary transaction sending engine which dramatically improves landing rate and speed.
-   * **Parsing the swap results**: Polling and parsing the resulting transaction from the RPC, including handling for success and error cases.
-
-Though comes with other ways to use Jupiter.
-   * Add custom instructions.
-   * Use via Cross Program Invocation (CPI) calls.
-   * Choose your own transaction broadcasting method (like Typical RPCs, Jito, etc).
-   * Modify the number of accounts to use in a transaction.
-</Info>
+The [Swap API V2](/docs/swap) unifies Ultra and Metis into a single API. Use [`/order`](/docs/swap/v2/order-and-execute) for the simplest flow with managed execution, or [`/build`](/docs/swap/v2/build) if you need custom transactions (the replacement for Metis `/swap-instructions`).
 
 ## Getting Started with Metis Swap API
 
-1. [**Get Quote**](/docs/swap/get-quote): Request for a quote which consists of the route plan, and other params such as integrator fee, slippage, etc.
+1. [**Get Quote**](/docs/swap/v1/get-quote): Request for a quote which consists of the route plan, and other params such as integrator fee, slippage, etc.
 
-2. [**Build Swap Transaction**](/docs/swap/build-swap-transaction): Post the quote to build a swap transaction.
+2. [**Build Swap Transaction**](/docs/swap/v1/build-swap-transaction): Post the quote to build a swap transaction.
 
    * You can utilize other methods to return swap instructions or use CPI rather than the default swap transaction.
    * You can utilize other parameters such as priority fee, dynamic slippage, etc to customize the transaction.
 
-3. [**Send Swap Transaction**](/docs/swap/send-swap-transaction): Sign and send the swap transaction to the network via your own RPC or other methods.
+3. [**Send Swap Transaction**](/docs/swap/v1/send-swap-transaction): Sign and send the swap transaction to the network via your own RPC or other methods.
 
 **Other Guides**
 
-* [**Adding Fees to Metis Swap API**](/docs/swap/add-fees-to-swap): Add custom integrator fees to the swap transaction.
-* [**Requote with Lower Max Accounts**](/docs/swap/requote-with-lower-max-accounts): Requote with a lower max accounts to reduce the transaction size to fit more instructions or other use cases.
+* [**Adding Fees to Metis Swap API**](/docs/swap/v1/add-fees-to-swap): Add custom integrator fees to the swap transaction.
+* [**Requote with Lower Max Accounts**](/docs/swap/v1/requote-with-lower-max-accounts): Requote with a lower max accounts to reduce the transaction size to fit more instructions or other use cases.

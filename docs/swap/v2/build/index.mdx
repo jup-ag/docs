@@ -482,7 +482,7 @@ if (confirmation.value.err) {
 
 | Field | Description |
 | --- | --- |
-| `computeBudgetInstructions` | Compute unit price and limit instructions |
+| `computeBudgetInstructions` | Compute unit price instruction (does not include compute unit limit) |
 | `setupInstructions` | Pre-swap setup (e.g. ATA creation) |
 | `swapInstruction` | The main swap instruction |
 | `cleanupInstruction` | Post-swap cleanup (may be null) |
@@ -523,7 +523,7 @@ The `/build` response includes `computeBudgetInstructions` with the compute unit
 
 Why: integrators using `/build` typically add their own instructions, so the CU usage will differ from the base swap. The simulation gives you the actual CU consumed, and you set the limit to 1.2x that value (capped at 1,400,000).
 
-The code example above demonstrates this in steps 4-5 (kit) or is handled automatically by the compute budget instructions (web3.js). See [Solana fee structure](https://solana.com/docs/core/fees/fee-structure) for more on compute units and [Estimate Compute Units](/docs/swap/v2/advanced/compute-units) for a standalone guide.
+The kit code example above demonstrates this in steps 4-5 (simulate with max CU, then rebuild with 1.2x the simulated value). The web3.js example includes `computeBudgetInstructions` as-is, which only sets the compute unit price. For production use, you should also simulate and set the compute unit limit in your web3.js code. See [Solana fee structure](https://solana.com/docs/core/fees/fee-structure) for more on compute units and [Estimate Compute Units](/docs/swap/v2/advanced/compute-units) for a standalone guide.
 
 ### 4. Build a v0 transaction
 

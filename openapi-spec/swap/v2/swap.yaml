@@ -515,7 +515,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Instruction"
-                    description: Compute unit price and limit instructions
+                    description: Compute unit price instruction (does not include compute unit limit)
                   setupInstructions:
                     type: array
                     items:

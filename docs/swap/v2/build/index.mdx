@@ -174,6 +174,7 @@ function buildTransaction(
 
 ```typescript @solana/web3.js expandable
 import {
+  ComputeBudgetProgram,
   Connection,
   Keypair,
   PublicKey,
@@ -184,6 +185,8 @@ import {
   AddressLookupTableAccount,
 } from "@solana/web3.js";
 import bs58 from "bs58";
+
+const COMPUTE_UNIT_LIMIT_MAX = 1_400_000;
 
 const BASE_URL = "https://api.jup.ag/swap/v2";
 
@@ -398,7 +401,7 @@ if (!buildRes.ok) {
 }
 const build: BuildResponse = await buildRes.json();
 
-// Step 2: Collect all instructions
+// Step 2: Collect instructions (no compute unit limit yet, we simulate first)
 // Example: add a SOL transfer after the swap
 const RECIPIENT = new PublicKey("YOUR_RECIPIENT_ADDRESS");
 const transferIx = SystemProgram.transfer({
@@ -408,7 +411,6 @@ const transferIx = SystemProgram.transfer({
 });
 
 const instructions = [
-  ...build.computeBudgetInstructions.map(toInstruction),
   ...build.setupInstructions.map(toInstruction),
   toInstruction(build.swapInstruction),
   transferIx, // Your custom instruction, added after the swap
@@ -431,35 +433,59 @@ for (const addr of lookupTableAddresses) {
   }
 }
 
-// Step 4: Build the transaction
 const { blockhash, lastValidBlockHeight } = build.blockhashWithMetadata;
 const recentBlockhash = bs58.encode(Buffer.from(blockhash));
 
-const messageV0 = new TransactionMessage({
+// Step 4: Simulate with max CU limit to estimate actual usage
+const simulationMessage = new TransactionMessage({
   payerKey: signer.publicKey,
   recentBlockhash,
-  instructions,
+  instructions: [
+    ComputeBudgetProgram.setComputeUnitLimit({ units: COMPUTE_UNIT_LIMIT_MAX }),
+    ...instructions,
+  ],
 }).compileToV0Message(addressLookupTableAccounts);
 
-const transaction = new VersionedTransaction(messageV0);
+const simulationTx = new VersionedTransaction(simulationMessage);
+const simulationResult = await connection.simulateTransaction(simulationTx, {
+  replaceRecentBlockhash: true,
+});
+
+if (simulationResult.value.err) {
+  console.error("Simulation failed:", simulationResult.value.err);
+}
+
+// Set 1.2x buffer on simulated CU, capped at max
+const estimatedCUL = simulationResult.value.unitsConsumed
+  ? Math.min(
+      Math.ceil(simulationResult.value.unitsConsumed * 1.2),
+      COMPUTE_UNIT_LIMIT_MAX,
+    )
+  : COMPUTE_UNIT_LIMIT_MAX;
+console.log(
+  `Simulated CUs: ${simulationResult.value.unitsConsumed}, using limit: ${estimatedCUL}`,
+);
+
+// Step 5: Build final transaction with estimated CU limit + CU price from response
+const finalMessage = new TransactionMessage({
+  payerKey: signer.publicKey,
+  recentBlockhash,
+  instructions: [
+    ComputeBudgetProgram.setComputeUnitLimit({ units: estimatedCUL }),
+    ...build.computeBudgetInstructions.map(toInstruction), // CU price from response
+    ...instructions,
+  ],
+}).compileToV0Message(addressLookupTableAccounts);
+
+const transaction = new VersionedTransaction(finalMessage);
 transaction.sign([signer]);
 
-// Step 5: Send and confirm
+// Step 6: Send and confirm
 const signature = await connection.sendRawTransaction(transaction.serialize(), {
-  skipPreflight: false,
+  skipPreflight: true,
 });
 
-const confirmation = await connection.confirmTransaction({
-  signature,
-  blockhash: recentBlockhash,
-  lastValidBlockHeight,
-});
-
-if (confirmation.value.err) {
-  console.error("Transaction failed:", confirmation.value.err);
-} else {
-  console.log(`Swap confirmed: https://solscan.io/tx/${signature}`);
-}
+console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
 ```
 </CodeGroup>
 
@@ -523,7 +549,7 @@ The `/build` response includes `computeBudgetInstructions` with the compute unit
 
 Why: integrators using `/build` typically add their own instructions, so the CU usage will differ from the base swap. The simulation gives you the actual CU consumed, and you set the limit to 1.2x that value (capped at 1,400,000).
 
-The kit code example above demonstrates this in steps 4-5 (simulate with max CU, then rebuild with 1.2x the simulated value). The web3.js example includes `computeBudgetInstructions` as-is, which only sets the compute unit price. For production use, you should also simulate and set the compute unit limit in your web3.js code. See [Solana fee structure](https://solana.com/docs/core/fees/fee-structure) for more on compute units and [Estimate Compute Units](/docs/swap/v2/advanced/compute-units) for a standalone guide.
+Both code examples above demonstrate this: simulate with max CU limit, then rebuild with 1.2x the simulated value plus the CU price from the response. See [Solana fee structure](https://solana.com/docs/core/fees/fee-structure) for more on compute units and [Estimate Compute Units](/docs/swap/v2/advanced/compute-units) for a standalone guide.
 
 ### 4. Build a v0 transaction
 

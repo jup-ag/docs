@@ -16,44 +16,52 @@ import {
   createKeyPairSignerFromPrivateKeyBytes,
   getTransactionDecoder,
   getTransactionEncoder,
-  signTransaction,
+  partiallySignTransaction,
 } from "@solana/kit";
 import bs58 from "bs58";
 
 const API_KEY = process.env.JUPITER_API_KEY;
 if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
-const BASE_URL = "https://api.jup.ag/swap/v2";
+const BASE_URL = "https://ultra-api.jup.ag";
 
 // Load wallet from base58 secret key in .env
-const secretKey = bs58.decode(process.env.PRIVATE_KEY!);
+const secretKey = bs58.decode(process.env.BS58_PRIVATE_KEY!);
 const signer = await createKeyPairSignerFromPrivateKeyBytes(
-  secretKey.slice(0, 32) // Extract 32-byte private key from 64-byte secret key
+  secretKey.slice(0, 32), // Extract 32-byte private key from 64-byte secret key
 );
 
 // Step 1: Get an order
 const orderResponse = await fetch(
   `${BASE_URL}/order?` +
     new URLSearchParams({
-      inputMint: "So11111111111111111111111111111111111111112",   // SOL
+      inputMint: "So11111111111111111111111111111111111111112", // SOL
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
-      amount: "100000000", // 0.1 SOL
+      amount: "1000000", // 0.1 SOL
       taker: signer.address,
+      excludeRouters: "metis,okx,dflow,hashflow",
     }),
-  { headers: { "x-api-key": API_KEY } }
+  { headers: { "x-api-key": API_KEY } },
 );
 const order = await orderResponse.json();
 
 if (!order.transaction) {
-  throw new Error(order.error ?? "No transaction returned");
+  throw new Error(JSON.stringify(order, null, 2));
+} else {
+  console.log(JSON.stringify(order, null, 2));
 }
 
 // Step 2: Sign the transaction
 const transactionBytes = Buffer.from(order.transaction, "base64");
 const transaction = getTransactionDecoder().decode(transactionBytes);
-const signedTransaction = await signTransaction([signer.keyPair], transaction);
+const partiallySignedTransaction = await partiallySignTransaction(
+  [signer.keyPair],
+  transaction,
+);
 
 // Step 3: Execute
-const signedTxBytes = getTransactionEncoder().encode(signedTransaction);
+const signedTxBytes = getTransactionEncoder().encode(
+  partiallySignedTransaction,
+);
 const signedTxBase64 = Buffer.from(signedTxBytes).toString("base64");
 
 const executeResponse = await fetch(`${BASE_URL}/execute`, {
@@ -70,78 +78,20 @@ const executeResponse = await fetch(`${BASE_URL}/execute`, {
 const result = await executeResponse.json();
 
 if (result.status === "Success") {
-  console.log(`Swap successful: ${result.signature}`);
-  console.log(`In: ${result.inputAmountResult}, Out: ${result.outputAmountResult}`);
+  console.log("Swap successful:", JSON.stringify(result, null, 2));
+  console.log(`https://solscan.io/tx/${result.signature}`);
 } else {
-  console.error(`Swap failed: ${result.error} (code: ${result.code})`);
-}
-```
-
-```typescript expandable title="@solana/web3.js"
-import { Keypair, VersionedTransaction } from "@solana/web3.js";
-import bs58 from "bs58";
-
-const API_KEY = process.env.JUPITER_API_KEY;
-if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
-const BASE_URL = "https://api.jup.ag/swap/v2";
-
-// Load wallet from base58 secret key in .env
-const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY!));
-
-// Step 1: Get an order
-const orderResponse = await fetch(
-  `${BASE_URL}/order?` +
-    new URLSearchParams({
-      inputMint: "So11111111111111111111111111111111111111112",   // SOL
-      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
-      amount: "100000000", // 0.1 SOL
-      taker: wallet.publicKey.toString(),
-    }),
-  { headers: { "x-api-key": API_KEY } }
-);
-const order = await orderResponse.json();
-
-if (!order.transaction) {
-  throw new Error(order.error ?? "No transaction returned");
-}
-
-// Step 2: Sign the transaction
-const transactionBuf = Buffer.from(order.transaction, "base64");
-const transaction = VersionedTransaction.deserialize(transactionBuf);
-transaction.sign([wallet]);
-
-// Step 3: Execute
-const signedTxBase64 = Buffer.from(transaction.serialize()).toString("base64");
-
-const executeResponse = await fetch(`${BASE_URL}/execute`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "x-api-key": API_KEY,
-  },
-  body: JSON.stringify({
-    signedTransaction: signedTxBase64,
-    requestId: order.requestId,
-  }),
-});
-const result = await executeResponse.json();
-
-if (result.status === "Success") {
-  console.log(`Swap successful: ${result.signature}`);
-  console.log(`In: ${result.inputAmountResult}, Out: ${result.outputAmountResult}`);
-} else {
-  console.error(`Swap failed: ${result.error} (code: ${result.code})`);
+  console.error("Swap failed:", JSON.stringify(result, null, 2));
+  console.log(`https://solscan.io/tx/${result.signature}`);
 }
 ```
 </CodeGroup>
-
----
 
 ## How it works
 
 ### 1. Get an order
 
-`GET /order` returns a quote and an assembled transaction in a single call. All routers compete for the best price: Metis (onchain aggregator), JupiterZ (RFQ), Dflow, and OKX.
+`GET /order` returns a quote and an assembled transaction in a single call. All routers compete for the best price: Metis, JupiterZ, Dflow, and OKX.
 
 **Required parameters:**
 
@@ -172,10 +122,11 @@ The transaction returned by `/order` is unsigned. Sign it with your wallet's pri
 
 `POST /execute` takes the signed transaction and the `requestId` from the order response. Jupiter handles:
 
-- Pre-applied optimised RTSE (Real-Time Slippage Estimator) and priority fee strategy for aggregator swaps
-- Jupiter Beam for accelerated transaction sending and landing
+- Optimised slippage via RTSE (Real-Time Slippage Estimator), which adjusts slippage at execution time to balance trade success and price protection
+- Optimised priority fee strategy for current network conditions
+- Jupiter Beam for accelerated transaction sending and landing across multiple RPC providers
 - Confirmation polling
-- Parse success and importantly failed transactions
+- Parses both successful and failed transactions
 
 **Request body:**
 
@@ -194,8 +145,6 @@ The transaction returned by `/order` is unsigned. Sign it with your wallet's pri
 | `code` | Error code. 0 = success. See [error codes](#error-codes) below. |
 | `inputAmountResult` | Amount of input token used for the swap |
 | `outputAmountResult` | Amount of output token received |
-
----
 
 ## Error codes
 

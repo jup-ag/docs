@@ -14,11 +14,15 @@ The `/build` response includes `computeBudgetInstructions` with a default comput
 
 ```typescript
 import { getSetComputeUnitLimitInstruction } from "@solana-program/compute-budget";
+import { getTransactionEncoder } from "@solana/kit";
 
 // 1. Build the transaction with all instructions (see /build guide)
 // 2. Simulate to get actual CU used
+const txBytes = getTransactionEncoder().encode(transaction);
+const txBase64 = Buffer.from(txBytes).toString("base64");
+
 const simulation = await rpc
-  .simulateTransaction(getBase64EncodedWireTransaction(transaction), {
+  .simulateTransaction(txBase64, {
     encoding: "base64",
     commitment: "processed",
   })

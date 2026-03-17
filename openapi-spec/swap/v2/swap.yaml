@@ -238,15 +238,15 @@ paths:
             type: string
           description: |
             - Comma-separated list of routers to exclude
-            - Available routers: `iris` (Metis), `jupiterz` (RFQ), `dflow`, `okx`
+            - Available routers: `iris` (Metis), `jupiterz` (JupiterZ), `dflow`, `okx`
           example: jupiterz,dflow
         - name: excludeDexes
           in: query
           schema:
             type: string
           description: |
-            - Comma-separated list of DEXes to exclude from the Iris (Metis) router
-            - **Important**: This only affects the Iris router, not other routers
+            - Comma-separated list of DEXes to exclude from the Metis router
+            - **Important**: This only affects the Metis router, not other routers
             - For example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
       responses:
         "200":

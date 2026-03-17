@@ -12,14 +12,14 @@ By default, `/order` with no optional parameters enables all routers:
 
 | Router | Type | Description |
 | --- | --- | --- |
-| **Metis (Iris)** | Onchain aggregator | Jupiter's core routing engine |
+| **Metis** | Onchain aggregator | Jupiter's core routing engine. Returns as `iris` in the API response `router` field. |
 | **JupiterZ** | RFQ (Request for Quote) | Market makers providing off-chain liquidity. Often beats onchain by 5-20bps on major pairs. |
 | **Dflow** | Third-party | - |
 | **OKX** | Third-party | - |
 
 The `/build` endpoint always uses **Metis only**. RFQ and third-party routers are not available.
 
-The response `router` field tells you which router won: `iris` (Metis), `jupiterz`, `dflow`, or `okx`.
+The response `router` field tells you which router won: `iris` (Metis), `jupiterz` (JupiterZ), `dflow`, or `okx`.
 
 ## Routing impact matrix
 
@@ -57,7 +57,7 @@ This table shows which routers are available for each parameter combination on `
 | `swapMode` | ExactIn | ExactIn | All routers | Swap mode. Currently only `ExactIn` is supported. |
 | `slippageBps` | integer (0-10000) | auto | All routers | Slippage tolerance in basis points. If not set, Jupiter automatically determines an appropriate value. |
 | `excludeRouters` | string | - | Controls routing | Comma-separated routers to exclude. Available: `iris` (Metis), `jupiterz` (RFQ), `dflow`, `okx`. |
-| `excludeDexes` | string | - | Iris only | Comma-separated DEXes to exclude from the Iris (Metis) router. Does not affect other routers. |
+| `excludeDexes` | string | - | Metis only | Comma-separated DEXes to exclude from the Metis router. Does not affect other routers. |
 ### Integrator fees
 
 <Warning>
@@ -73,7 +73,7 @@ This table shows which routers are available for each parameter combination on `
 
 | Parameter | Type | Default | Routing | Description |
 | --- | --- | --- | --- | --- |
-| `payer` | string | - | Iris only | Account that covers all gas-related fees (signature, priority, rent) on behalf of the taker. Routes through Iris only. Transaction requires both taker and payer signatures. See [Gasless Swaps](/docs/swap/v2/advanced/gasless) for details. |
+| `payer` | string | - | Metis only | Account that covers all gas-related fees (signature, priority, rent) on behalf of the taker. Routes through Metis only. Transaction requires both taker and payer signatures. See [Gasless Swaps](/docs/swap/v2/advanced/gasless) for details. |
 | `priorityFeeLamports` | number | auto | All routers | Priority fee in lamports. If not set, Jupiter automatically optimises. |
 | `jitoTipLamports` | number | - | All routers | Jito MEV tip in lamports for faster block inclusion. |
 | `broadcastFeeType` | maxCap, exactFee | - | All routers | `maxCap` treats fee as a maximum, `exactFee` uses exact amount. Ignored if no priority/tip fees set. |
@@ -108,14 +108,9 @@ All `/build` requests use Metis-only routing. No RFQ or third-party routers.
 | `nativeDestinationAccount` | string | - | Native SOL account for output |
 | `blockhashSlotsToExpiry` | integer (1-300) | 150 | Slots until blockhash expires |
 
-## Mode: ultra vs manual
-
-The `/order` response includes a `mode` field:
-
-- **"ultra"**: No optional params used. All routers competed. Best price.
-- **"manual"**: Optional params detected. Routing may be restricted.
-
-This field is informational. It helps you verify that your request got the routing behaviour you expected.
+<Note>
+  The `/order` response includes a `mode` field: **"ultra"** (no optional params, all routers competed) or **"manual"** (optional params detected, routing may be restricted). Use this to verify your request got the expected routing behaviour.
+</Note>
 
 ## Related
 

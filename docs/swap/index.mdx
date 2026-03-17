@@ -6,8 +6,6 @@ llmsDescription: "Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. 
 
 The Swap API unifies Jupiter's swap capabilities into a single entry point at `https://api.jup.ag/swap/v2`. Two paths cover every use case: a default happy path for the best swap experience, and an advanced path for full transaction control.
 
-## Two paths
-
 <CardGroup cols={2}>
   <Card title="Order & Execute" icon="bolt" href="/docs/swap/v2/order-and-execute">
     The default path. Get a fully assembled transaction with the best price across all routers, sign it, and send it to `/execute` for managed landing.
@@ -25,7 +23,7 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 | **Returns** | Assembled transaction | Raw swap instructions |
 | **Routers** | All (Metis, RFQ, Dflow, OKX) | Metis only |
 | **Best for** | Most integrations. Best price, simplest flow. | Custom transactions, CPI, composability. |
-| **Execution** | Managed via `/execute` (RTSE, Jupiter Beam, retry) | Self-managed via your own RPC |
+| **Execution** | Managed via `/execute` (optimised slippage, priority fees, accelerated landing) | Self-managed via your own RPC |
 | **Swap fees** | Yes (Jupiter platform fee) | No |
 | **Integrator fees** | Referral fees (referralAccount + referralFee) | Platform fee only (platformFeeBps) or DIY |
 | **Gasless** | [Automatic gasless, or your own `payer`](/docs/swap/v2/advanced/gasless) | Use your own `payer` |

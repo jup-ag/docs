@@ -10,23 +10,7 @@ deprecated: true
 The Metis Swap API (V1) has been superseded by the [Swap API V2](/docs/swap). Use [Build Custom Transactions](/docs/swap/v2/build) for custom transaction workflows.
 </Warning>
 
-Metis is Jupiter's low-level routing engine for developers who need CPI, custom instructions, or full transaction control. The flow is three steps: get a quote (`GET /swap/v1/quote`), build a transaction (`POST /swap/v1/swap`), then sign and send via your own RPC. Unlike Ultra, Metis requires you to handle slippage, priority fees, and transaction landing yourself.
-
-Metis is Jupiter's original, low-level routing engine designed for maximum flexibility, transparency, and composability. It was the foundation that set the standard for reliable, general-purpose liquidity aggregation on Solana, and its learnings directly informed the development of newer engines like Iris (which powers Jupiter Ultra).
-
-Unlike Jupiter Ultra and its routing engines (Juno, Iris, JupiterZ), which focus on end-to-end execution and abstraction, Metis exposes granular control over raw swap instructions. This is beneficial for developers and integrators who need to fine-tune every aspect of their swap transactions.
-
-**Related:** [Jupiter routing ecosystem](/docs/routing) | [Metis v7 blog post](/blog/metis-v7)
-
-<Card href="/docs/routing" icon="book-open" horizontal>
-Learn more about how Metis fits into Jupiter's routing ecosystem, including Juno, Iris, and JupiterZ, in our [Routing documentation](/docs/routing).
-</Card>
-
-<Card href="/blog/metis-v7" icon="book-open" horizontal>
-Metis is now an independent public good, no longer coupled to Jupiter or Ultra, and is maintained as a toolkit for the ecosystem. Read more in our [Metis v7 blog post](/blog/metis-v7).
-
-Though Jupiter continues to provide access to a hosted Metis API for developers.
-</Card>
+Metis is Jupiter's low-level routing engine for developers who need CPI, custom instructions, or full transaction control. Three steps: get a quote (`GET /swap/v1/quote`), build a transaction (`POST /swap/v1/swap`), then sign and send via your own RPC.
 
 ## We recommend using Swap API V2
 

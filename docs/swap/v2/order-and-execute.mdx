@@ -22,7 +22,7 @@ import bs58 from "bs58";
 
 const API_KEY = process.env.JUPITER_API_KEY;
 if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
-const BASE_URL = "https://ultra-api.jup.ag";
+const BASE_URL = "https://api.jup.ag/swap/v2";
 
 // Load wallet from base58 secret key in .env
 const secretKey = bs58.decode(process.env.BS58_PRIVATE_KEY!);
@@ -36,9 +36,8 @@ const orderResponse = await fetch(
     new URLSearchParams({
       inputMint: "So11111111111111111111111111111111111111112", // SOL
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
-      amount: "1000000", // 0.1 SOL
+      amount: "100000000",
       taker: signer.address,
-      excludeRouters: "metis,okx,dflow,hashflow",
     }),
   { headers: { "x-api-key": API_KEY } },
 );
@@ -84,6 +83,72 @@ if (result.status === "Success") {
   console.error("Swap failed:", JSON.stringify(result, null, 2));
   console.log(`https://solscan.io/tx/${result.signature}`);
 }
+
+```
+
+```typescript expandable title="@solana/web3.js"
+import { Keypair, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+const API_KEY = process.env.JUPITER_API_KEY;
+if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
+const BASE_URL = "https://api.jup.ag/swap/v2";
+
+// Load wallet from base58 secret key in .env
+const secretKey = bs58.decode(process.env.BS58_PRIVATE_KEY!);
+const signer = Keypair.fromSecretKey(secretKey);
+
+// Step 1: Get an order
+const orderResponse = await fetch(
+  `${BASE_URL}/order?` +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112", // SOL
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+      amount: "1000000",
+      taker: signer.publicKey.toString(),
+    }),
+  { headers: { "x-api-key": API_KEY } },
+);
+const order = await orderResponse.json();
+
+if (!order.transaction) {
+  throw new Error(JSON.stringify(order, null, 2));
+} else {
+  console.log(JSON.stringify(order, null, 2));
+}
+
+// Step 2: Sign the transaction
+const transaction = VersionedTransaction.deserialize(
+  Buffer.from(order.transaction, "base64"),
+);
+transaction.sign([signer]);
+
+// Step 3: Execute
+const signedTransaction = Buffer.from(transaction.serialize()).toString(
+  "base64",
+);
+
+const executeResponse = await fetch(`${BASE_URL}/execute`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    signedTransaction,
+    requestId: order.requestId,
+  }),
+});
+const result = await executeResponse.json();
+
+if (result.status === "Success") {
+  console.log("Swap successful:", JSON.stringify(result, null, 2));
+  console.log(`https://solscan.io/tx/${result.signature}`);
+} else {
+  console.error("Swap failed:", JSON.stringify(result, null, 2));
+  console.log(`https://solscan.io/tx/${result.signature}`);
+}
+
 ```
 </CodeGroup>
 
@@ -116,15 +181,16 @@ For the full parameter reference and how each parameter affects routing, see [Pa
 
 ### 2. Sign the transaction
 
-The transaction returned by `/order` is unsigned. Sign it with your wallet's private key. The example above uses `@solana/kit`. The transaction is a versioned transaction (v0).
-
+- The transaction returned by `/order` is unsigned. Sign it with your wallet's private key. The example above uses `@solana/kit`. The transaction is a versioned transaction (v0).
+- Note: we use the `partiallySignTransaction` for partial signing because when JupiterZ routing is provided, there is an additional signer which is the MM that will be required after sending the transaction to `/execute` request.
+- 
 ### 3. Execute the transaction
 
 `POST /execute` takes the signed transaction and the `requestId` from the order response. Jupiter handles:
 
 - Optimised slippage via RTSE (Real-Time Slippage Estimator), which adjusts slippage at execution time to balance trade success and price protection
 - Optimised priority fee strategy for current network conditions
-- Jupiter Beam for accelerated transaction sending and landing across multiple RPC providers
+- Jupiter Beam (our own proprietary transaction execution pipeline) for accelerated transaction sending and landing across multiple RPC providers
 - Confirmation polling
 - Parses both successful and failed transactions
 

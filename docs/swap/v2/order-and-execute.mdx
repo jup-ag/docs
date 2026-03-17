@@ -299,7 +299,7 @@ For the full parameter reference and how each parameter affects routing, see [Ro
 
 - The transaction returned by `/order` is unsigned. Sign it with your wallet's private key. The example above uses `@solana/kit`. The transaction is a versioned transaction (v0).
 - Note: we use the `partiallySignTransaction` for partial signing because when JupiterZ routing is provided, there is an additional signer which is the MM that will be required after sending the transaction to `/execute` request.
-- 
+
 ### 3. Execute the transaction
 
 `POST /execute` takes the signed transaction and the `requestId` from the order response. Jupiter handles:

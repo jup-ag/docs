@@ -12,7 +12,7 @@ The `/build` endpoint returns raw swap instructions instead of an assembled tran
 
 <Accordion title="Imports, types, and helpers">
 <CodeGroup>
-```typescript @solana/kit expanadable
+```typescript @solana/kit expandable
 import {
   AccountRole,
   Address,
@@ -282,7 +282,7 @@ if (!buildRes.ok) {
 }
 const build: BuildResponse = await buildRes.json();
 
-// Step 2: Collect instructions (without compute unit limit — we'll simulate first)
+// Step 2: Collect instructions (no compute unit limit yet, we simulate first)
 // Example: add a SOL transfer after the swap
 const RECIPIENT = address("YOUR_RECIPIENT_ADDRESS");
 const transferIx = getTransferSolInstruction({
@@ -388,6 +388,7 @@ const buildRes = await fetch(
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
       taker: signer.publicKey.toString(),
+      slippageBps: "100",
     }),
   { headers: { "x-api-key": API_KEY } },
 );

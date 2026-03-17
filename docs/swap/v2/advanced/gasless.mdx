@@ -1,7 +1,7 @@
 ---
 title: "Gasless Swaps"
 description: "Let users swap without holding SOL for transaction fees"
-llmsDescription: "How gasless swaps work on Jupiter Swap API V2. Two approaches: automatic gasless on /order (Jupiter covers gas when taker has < 0.01 SOL, min ~$10 trade, fee deducted from swap output) and integrator payer on both /order and /build (integrator covers gas via the payer parameter, fee payer accounts are changed to the payer address). Covers types of gas costs, when automatic gasless applies, integrator payer setup for both endpoints, scenario matrix, and limitations."
+llmsDescription: "How gasless swaps work on Jupiter Swap API V2. Two approaches: automatic gasless on /order (Jupiter covers gas when taker has < 0.01 SOL, min ~\$10 trade, fee deducted from swap output) and integrator payer on both /order and /build (integrator covers gas via the payer parameter, fee payer accounts are changed to the payer address). Covers types of gas costs, when automatic gasless applies, integrator payer setup for both endpoints, scenario matrix, and limitations."
 ---
 
 Gasless swaps let users trade without holding SOL for transaction fees. Two approaches are available depending on your integration.

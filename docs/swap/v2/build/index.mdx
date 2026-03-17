@@ -6,105 +6,178 @@ llmsDescription: "How to use Jupiter's Swap API V2 /build endpoint to get raw sw
 
 The `/build` endpoint returns raw swap instructions instead of an assembled transaction. You build the transaction yourself, which gives you full control to add custom instructions, CPI, or modify any part of the transaction.
 
-<Note>
-  `/build` transactions cannot use `/execute`. You are responsible for sending the transaction via your own RPC and handling confirmation. Jupiter does not charge swap fees on `/build`.
-</Note>
-
 ## Quick start
 
+### Prerequisites
+
+<Accordion title="Imports, types, and helpers">
 <CodeGroup>
-```typescript expandable title="@solana/kit"
+```typescript @solana/kit expanadable
 import {
-  createSolanaRpc,
-  createKeyPairSignerFromPrivateKeyBytes,
-  createTransactionMessage,
-  setTransactionMessageLifetimeUsingBlockhash,
+  AccountRole,
+  Address,
+  address,
+  AddressesByLookupTableAddress,
   appendTransactionMessageInstructions,
+  Base64EncodedBytes,
+  Blockhash,
+  compileTransaction,
+  compressTransactionMessageUsingAddressLookupTables,
+  createKeyPairSignerFromBytes,
+  createSolanaRpc,
+  createTransactionMessage,
+  getBase58Decoder,
+  getBase58Encoder,
+  getBase64Codec,
+  getBase64EncodedWireTransaction,
+  AccountMeta,
+  Instruction,
   pipe,
   setTransactionMessageFeePayer,
-  signTransactionMessageWithSigners,
-  getTransactionEncoder,
-  fetchAddressesForLookupTables,
+  setTransactionMessageLifetimeUsingBlockhash,
+  signTransaction,
 } from "@solana/kit";
-import bs58 from "bs58";
+import { getTransferSolInstruction } from "@solana-program/system"; // For adding custom instructions
 
-const API_KEY = process.env.JUPITER_API_KEY;
-if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
+// ── Config ──────────────────────────────────────────────────────────────────
 const BASE_URL = "https://api.jup.ag/swap/v2";
-const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
-
-// Load wallet from base58 secret key in .env
-const secretKey = bs58.decode(process.env.PRIVATE_KEY!);
-const signer = await createKeyPairSignerFromPrivateKeyBytes(
-  secretKey.slice(0, 32) // Extract 32-byte private key from 64-byte secret key
+const COMPUTE_BUDGET_PROGRAM: Address = address(
+  "ComputeBudget111111111111111111111111111111",
 );
+const COMPUTE_UNIT_LIMIT_MAX = 1_400_000;
+const CU_BUFFER_NUMERATOR = 120n;
+const CU_BUFFER_DENOMINATOR = 100n; // 120% of simulated CUs
 
-// Step 1: Get swap instructions from /build
-const buildResponse = await fetch(
-  `${BASE_URL}/build?` +
-    new URLSearchParams({
-      inputMint: "So11111111111111111111111111111111111111112",
-      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-      amount: "100000000",
-      userPublicKey: signer.address,
-    }),
-  { headers: { "x-api-key": API_KEY } }
-);
-const build = await buildResponse.json();
+// ── Instruction types ───────────────────────────────────────────────────────
 
-// Step 2: Collect all instructions
-const instructions = [
-  ...build.computeBudgetInstructions,
-  ...build.setupInstructions,
-  build.swapInstruction,
-  ...(build.cleanupInstruction ? [build.cleanupInstruction] : []),
-  ...build.otherInstructions,
-  // Add your own instructions here (memo, transfer, etc.)
-];
+type Account = {
+  pubkey: Address;
+  isSigner: boolean;
+  isWritable: boolean;
+};
 
-// Step 3: Resolve address lookup tables
-const lookupTableAddresses = build.addressesByLookupTableAddress
-  ? Object.keys(build.addressesByLookupTableAddress)
-  : [];
-const addressesByLookupTable = lookupTableAddresses.length > 0
-  ? await fetchAddressesForLookupTables(lookupTableAddresses, rpc)
-  : {};
+type ApiInstruction = {
+  programId: Address;
+  accounts: Account[];
+  data: Base64EncodedBytes;
+};
 
-// Step 4: Build the transaction message
-const { blockhash, lastValidBlockHeight } = build.blockhashWithMetadata;
-const blockhashStr = bs58.encode(Buffer.from(blockhash)); // Convert byte array to base58
+function toAccountMeta(acc: Account): AccountMeta {
+  const role =
+    acc.isSigner && acc.isWritable
+      ? AccountRole.WRITABLE_SIGNER
+      : acc.isSigner
+        ? AccountRole.READONLY_SIGNER
+        : acc.isWritable
+          ? AccountRole.WRITABLE
+          : AccountRole.READONLY;
+  return { address: acc.pubkey, role };
+}
 
-const transactionMessage = pipe(
-  createTransactionMessage({ version: 0 }),
-  (tx) => setTransactionMessageFeePayer(signer.address, tx),
-  (tx) =>
-    setTransactionMessageLifetimeUsingBlockhash(
-      { blockhash: blockhashStr, lastValidBlockHeight: BigInt(lastValidBlockHeight) },
-      tx
-    ),
-  (tx) => appendTransactionMessageInstructions(instructions, tx)
-);
+function createInstruction(
+  ix: ApiInstruction,
+): Instruction<string, readonly AccountMeta[]> {
+  return {
+    programAddress: ix.programId,
+    accounts: ix.accounts.map(toAccountMeta),
+    data: Uint8Array.from(getBase64Codec().encode(ix.data)),
+  };
+}
 
-// Step 5: Sign and send
-const signedTx = await signTransactionMessageWithSigners(transactionMessage);
-const signedTxBytes = getTransactionEncoder().encode(signedTx);
-const signedTxBase64 = Buffer.from(signedTxBytes).toString("base64");
+// ── Build response type ─────────────────────────────────────────────────────
 
-const signature = await rpc
-  .sendTransaction(signedTxBase64, {
-    encoding: "base64",
-    skipPreflight: false,
-  })
-  .send();
+type BuildResponse = {
+  inputMint: string;
+  outputMint: string;
+  inAmount: string;
+  outAmount: string;
+  otherAmountThreshold: string;
+  swapMode: string;
+  slippageBps: number;
+  routePlan: {
+    percent: number;
+    bps: number;
+    swapInfo: {
+      ammKey: string;
+      label: string;
+      inputMint: string;
+      outputMint: string;
+      inAmount: string;
+      outAmount: string;
+    };
+  }[];
+  computeBudgetInstructions: ApiInstruction[];
+  setupInstructions: ApiInstruction[];
+  swapInstruction: ApiInstruction;
+  cleanupInstruction: ApiInstruction | null;
+  otherInstructions: ApiInstruction[];
+  addressesByLookupTableAddress: Record<string, string[]> | null;
+  blockhashWithMetadata: {
+    blockhash: number[];
+    lastValidBlockHeight: number;
+  };
+};
 
-console.log(`Transaction sent: ${signature}`);
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function makeSetComputeUnitLimitIx(units: number): ApiInstruction {
+  const data = Buffer.alloc(5);
+  data.writeUInt8(0x02, 0);
+  data.writeUInt32LE(units, 1);
+  return {
+    programId: COMPUTE_BUDGET_PROGRAM,
+    accounts: [],
+    data: data.toString("base64") as ApiInstruction["data"],
+  };
+}
+
+function transformBlockhash(meta: BuildResponse["blockhashWithMetadata"]): {
+  blockhash: Blockhash;
+  lastValidBlockHeight: bigint;
+} {
+  return {
+    blockhash: getBase58Decoder().decode(
+      Uint8Array.from(meta.blockhash),
+    ) as Blockhash,
+    lastValidBlockHeight: BigInt(meta.lastValidBlockHeight),
+  };
+}
+
+function transformALTs(
+  raw: Record<string, string[]> | null,
+): AddressesByLookupTableAddress {
+  if (!raw) return {};
+  return Object.fromEntries(
+    Object.entries(raw).map(([key, addrs]) => [
+      address(key),
+      addrs.map((a) => address(a)),
+    ]),
+  );
+}
+
+function buildTransaction(
+  ixs: Instruction<string, readonly AccountMeta[]>[],
+  blockhash: { blockhash: Blockhash; lastValidBlockHeight: bigint },
+  alts: AddressesByLookupTableAddress,
+  feePayer: Address,
+) {
+  return pipe(
+    createTransactionMessage({ version: 0 }),
+    (msg) => appendTransactionMessageInstructions(ixs, msg),
+    (msg) => compressTransactionMessageUsingAddressLookupTables(msg, alts),
+    (msg) => setTransactionMessageFeePayer(feePayer, msg),
+    (msg) => setTransactionMessageLifetimeUsingBlockhash(blockhash, msg),
+    (msg) => compileTransaction(msg),
+  );
+}
 ```
 
-```typescript expandable title="@solana/web3.js"
+```typescript @solana/web3.js expandable
 import {
   Connection,
   Keypair,
   PublicKey,
+  SystemProgram,
   TransactionInstruction,
   TransactionMessage,
   VersionedTransaction,
@@ -112,32 +185,60 @@ import {
 } from "@solana/web3.js";
 import bs58 from "bs58";
 
-const API_KEY = process.env.JUPITER_API_KEY;
-if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
 const BASE_URL = "https://api.jup.ag/swap/v2";
-const connection = new Connection("https://api.mainnet-beta.solana.com");
 
-// Load wallet from base58 secret key in .env
-const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY!));
+// ── API response types ──────────────────────────────────────────────────────
 
-// Step 1: Get swap instructions from /build
-const buildResponse = await fetch(
-  `${BASE_URL}/build?` +
-    new URLSearchParams({
-      inputMint: "So11111111111111111111111111111111111111112",
-      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-      amount: "100000000",
-      userPublicKey: wallet.publicKey.toString(),
-    }),
-  { headers: { "x-api-key": API_KEY } }
-);
-const build = await buildResponse.json();
+type ApiAccount = {
+  pubkey: string;
+  isSigner: boolean;
+  isWritable: boolean;
+};
 
-// Helper: convert API instruction to TransactionInstruction
-function toInstruction(ix: any): TransactionInstruction {
+type ApiInstruction = {
+  programId: string;
+  accounts: ApiAccount[];
+  data: string; // base64
+};
+
+type BuildResponse = {
+  inputMint: string;
+  outputMint: string;
+  inAmount: string;
+  outAmount: string;
+  otherAmountThreshold: string;
+  swapMode: string;
+  slippageBps: number;
+  routePlan: {
+    percent: number;
+    bps: number;
+    swapInfo: {
+      ammKey: string;
+      label: string;
+      inputMint: string;
+      outputMint: string;
+      inAmount: string;
+      outAmount: string;
+    };
+  }[];
+  computeBudgetInstructions: ApiInstruction[];
+  setupInstructions: ApiInstruction[];
+  swapInstruction: ApiInstruction;
+  cleanupInstruction: ApiInstruction | null;
+  otherInstructions: ApiInstruction[];
+  addressesByLookupTableAddress: Record<string, string[]> | null;
+  blockhashWithMetadata: {
+    blockhash: number[];
+    lastValidBlockHeight: number;
+  };
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function toInstruction(ix: ApiInstruction): TransactionInstruction {
   return new TransactionInstruction({
     programId: new PublicKey(ix.programId),
-    keys: ix.accounts.map((acc: any) => ({
+    keys: ix.accounts.map((acc) => ({
       pubkey: new PublicKey(acc.pubkey),
       isSigner: acc.isSigner,
       isWritable: acc.isWritable,
@@ -145,15 +246,175 @@ function toInstruction(ix: any): TransactionInstruction {
     data: Buffer.from(ix.data, "base64"),
   });
 }
+```
+</CodeGroup>
+</Accordion>
+
+### Code example
+
+<CodeGroup>
+```typescript expandable title="@solana/kit"
+const API_KEY = process.env.JUPITER_API_KEY;
+const RPC_URL = process.env.RPC_URL;
+if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
+if (!RPC_URL) throw new Error("Missing RPC_URL");
+
+const signer = await createKeyPairSignerFromBytes(
+  getBase58Encoder().encode(process.env.BS58_PRIVATE_KEY!),
+);
+const rpc = createSolanaRpc(RPC_URL);
+
+// Step 1: Get swap instructions from /build
+const buildRes = await fetch(
+  `${BASE_URL}/build?` +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112",
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      amount: "100000000",
+      userPublicKey: signer.address,
+      slippageBps: "100",
+    }),
+  { headers: { "x-api-key": API_KEY } },
+);
+if (!buildRes.ok) {
+  console.error(`/build failed: ${buildRes.status}`, await buildRes.text());
+  process.exit(1);
+}
+const build: BuildResponse = await buildRes.json();
+
+// Step 2: Collect instructions (without compute unit limit — we'll simulate first)
+// Example: add a SOL transfer after the swap
+const RECIPIENT = address("YOUR_RECIPIENT_ADDRESS");
+const transferIx = getTransferSolInstruction({
+  source: signer,
+  destination: RECIPIENT,
+  amount: 1_000_000n, // 0.001 SOL
+});
+
+const instructions = [
+  ...build.setupInstructions.map(createInstruction),
+  createInstruction(build.swapInstruction),
+  transferIx, // Your custom instruction, added after the swap
+  ...(build.cleanupInstruction
+    ? [createInstruction(build.cleanupInstruction)]
+    : []),
+  ...build.otherInstructions.map(createInstruction),
+];
+
+// Step 3: Prepare blockhash and address lookup tables
+const blockhash = transformBlockhash(build.blockhashWithMetadata);
+const alts = transformALTs(build.addressesByLookupTableAddress);
+
+// Step 4: Simulate with max CU limit to estimate actual usage
+const simulationTx = buildTransaction(
+  [
+    createInstruction(makeSetComputeUnitLimitIx(COMPUTE_UNIT_LIMIT_MAX)),
+    ...instructions,
+  ],
+  blockhash,
+  alts,
+  signer.address,
+);
+
+const simulationResult = await rpc
+  .simulateTransaction(getBase64EncodedWireTransaction(simulationTx), {
+    encoding: "base64",
+    commitment: "confirmed",
+    replaceRecentBlockhash: true,
+  })
+  .send();
+
+if (simulationResult.value.err) {
+  console.error("Simulation failed:", simulationResult.value.err);
+}
+
+// Set 1.2x buffer on simulated CU, capped at max
+const estimatedCUL = simulationResult.value.unitsConsumed
+  ? Math.min(
+      Number(
+        (simulationResult.value.unitsConsumed * CU_BUFFER_NUMERATOR) /
+          CU_BUFFER_DENOMINATOR,
+      ),
+      COMPUTE_UNIT_LIMIT_MAX,
+    )
+  : COMPUTE_UNIT_LIMIT_MAX;
+console.log(
+  `Simulated CUs: ${simulationResult.value.unitsConsumed}, using limit: ${estimatedCUL}`,
+);
+
+// Step 5: Build final transaction with estimated CU limit + CU price from response
+const compiledTx = buildTransaction(
+  [
+    createInstruction(makeSetComputeUnitLimitIx(estimatedCUL)),
+    ...build.computeBudgetInstructions.map(createInstruction),
+    ...instructions,
+  ],
+  blockhash,
+  alts,
+  signer.address,
+);
+
+// Step 6: Sign
+const signedTransaction = await signTransaction([signer.keyPair], compiledTx);
+
+// Step 7: Send via your own RPC
+const wireTransaction = getBase64EncodedWireTransaction(signedTransaction);
+const signature = await rpc
+  .sendTransaction(wireTransaction, {
+    encoding: "base64",
+    skipPreflight: true,
+  })
+  .send();
+
+console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
+```
+
+```typescript expandable title="@solana/web3.js"
+const API_KEY = process.env.JUPITER_API_KEY;
+const RPC_URL = process.env.RPC_URL;
+if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
+if (!RPC_URL) throw new Error("Missing RPC_URL");
+
+const connection = new Connection(RPC_URL);
+const signer = Keypair.fromSecretKey(
+  bs58.decode(process.env.BS58_PRIVATE_KEY!),
+);
+
+// Step 1: Get swap instructions from /build
+const buildRes = await fetch(
+  `${BASE_URL}/build?` +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112",
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      amount: "100000000",
+      userPublicKey: signer.publicKey.toString(),
+    }),
+  { headers: { "x-api-key": API_KEY } },
+);
+if (!buildRes.ok) {
+  console.error(`/build failed: ${buildRes.status}`, await buildRes.text());
+  process.exit(1);
+}
+const build: BuildResponse = await buildRes.json();
 
 // Step 2: Collect all instructions
+// Example: add a SOL transfer after the swap
+const RECIPIENT = new PublicKey("YOUR_RECIPIENT_ADDRESS");
+const transferIx = SystemProgram.transfer({
+  fromPubkey: signer.publicKey,
+  toPubkey: RECIPIENT,
+  lamports: 1_000_000, // 0.001 SOL
+});
+
 const instructions = [
   ...build.computeBudgetInstructions.map(toInstruction),
   ...build.setupInstructions.map(toInstruction),
   toInstruction(build.swapInstruction),
-  ...(build.cleanupInstruction ? [toInstruction(build.cleanupInstruction)] : []),
+  transferIx, // Your custom instruction, added after the swap
+  ...(build.cleanupInstruction
+    ? [toInstruction(build.cleanupInstruction)]
+    : []),
   ...build.otherInstructions.map(toInstruction),
-  // Add your own instructions here (memo, transfer, etc.)
 ];
 
 // Step 3: Resolve address lookup tables
@@ -162,8 +423,8 @@ const lookupTableAddresses = build.addressesByLookupTableAddress
   : [];
 const addressLookupTableAccounts: AddressLookupTableAccount[] = [];
 
-for (const address of lookupTableAddresses) {
-  const account = await connection.getAddressLookupTable(new PublicKey(address));
+for (const addr of lookupTableAddresses) {
+  const account = await connection.getAddressLookupTable(new PublicKey(addr));
   if (account.value) {
     addressLookupTableAccounts.push(account.value);
   }
@@ -171,16 +432,16 @@ for (const address of lookupTableAddresses) {
 
 // Step 4: Build the transaction
 const { blockhash, lastValidBlockHeight } = build.blockhashWithMetadata;
-const recentBlockhash = bs58.encode(Buffer.from(blockhash)); // Convert byte array to base58
+const recentBlockhash = bs58.encode(Buffer.from(blockhash));
 
 const messageV0 = new TransactionMessage({
-  payerKey: wallet.publicKey,
+  payerKey: signer.publicKey,
   recentBlockhash,
   instructions,
 }).compileToV0Message(addressLookupTableAccounts);
 
 const transaction = new VersionedTransaction(messageV0);
-transaction.sign([wallet]);
+transaction.sign([signer]);
 
 // Step 5: Send and confirm
 const signature = await connection.sendRawTransaction(transaction.serialize(), {
@@ -196,7 +457,7 @@ const confirmation = await connection.confirmTransaction({
 if (confirmation.value.err) {
   console.error("Transaction failed:", confirmation.value.err);
 } else {
-  console.log(`Swap confirmed: ${signature}`);
+  console.log(`Swap confirmed: https://solscan.io/tx/${signature}`);
 }
 ```
 </CodeGroup>
@@ -253,21 +514,27 @@ Insert custom instructions alongside the swap instructions. Common examples:
 - Create or close token accounts
 - Custom program CPI
 
-See [Swap Instructions](/docs/swap/v2/build/other-instructions) for a reference of common instructions.
+See [Other Instructions](/docs/swap/v2/build/other-instructions) for a reference of common instructions.
 
-### 3. Build a v0 transaction
+### 3. Simulate compute unit limit
+
+The `/build` response includes `computeBudgetInstructions` with the compute unit price but **not** the compute unit limit. You need to simulate the transaction to determine the correct limit.
+
+Why: integrators using `/build` typically add their own instructions, so the CU usage will differ from the base swap. The simulation gives you the actual CU consumed, and you set the limit to 1.2x that value (capped at 1,400,000).
+
+The code example above demonstrates this in steps 4-5 (kit) or is handled automatically by the compute budget instructions (web3.js). See [Solana fee structure](https://solana.com/docs/core/fees/fee-structure) for more on compute units and [Estimate Compute Units](/docs/swap/v2/advanced/compute-units) for a standalone guide.
+
+### 4. Build a v0 transaction
 
 The response includes address lookup tables in `addressesByLookupTableAddress`. Use these to compile a v0 (versioned) transaction, which supports more accounts than legacy transactions.
 
-### 4. Sign and send
+### 5. Sign and send
 
-Sign the transaction with your wallet and send via your own RPC. You are responsible for:
+Sign the transaction with your wallet and send via your own RPC.
 
-- Setting an appropriate compute unit limit (simulate first)
-- Choosing a priority fee strategy
-- Handling confirmation and retry
-
-See [Advanced Techniques](/docs/swap/v2/advanced) for compute unit simulation and priority fee strategies.
+<Note>
+`/build` transactions cannot use `/execute`. You are responsible for sending the transaction via your own RPC and handling confirmation. Jupiter does not charge swap fees on `/build`.
+</Note>
 
 ## Key differences from `/order`
 
@@ -300,7 +567,7 @@ For the full parameter reference, see [Parameters & Routing](/docs/swap/v2/param
 
 ## Related
 
-- [Swap Instructions](/docs/swap/v2/build/other-instructions) for common instructions to compose with your swap
+- [Other Instructions](/docs/swap/v2/build/other-instructions) for common instructions to compose with your swap
 - [Parameters & Routing](/docs/swap/v2/parameters) for the full parameter reference
 - [Fees](/docs/swap/v2/fees) for adding platform fees to `/build`
 - [Advanced Techniques](/docs/swap/v2/advanced) for CU simulation, `mode: "fast"`, and `maxAccounts`

@@ -19,7 +19,9 @@ Use this when:
 - You are hitting the transaction size limit
 - You need room for CPI accounts
 
-Reducing `maxAccounts` may result in worse pricing because the router has fewer DEXes and splits available.
+<Warning>
+  Setting `maxAccounts` too low will severely degrade routing quality. Very low values (e.g below 50) can result in **no route found** or **significantly worse pricing**, because the router cannot access enough DEXes or split the route across multiple pools. Start with a moderate reduction (e.g. reducing 2 and retry) and test pricing impact before going lower.
+</Warning>
 
 ## Remove no-op setup instructions
 
@@ -30,6 +32,10 @@ To reclaim that space:
 1. Check onchain if the associated token accounts already exist
 2. If they exist, omit those setup instructions from your transaction
 3. If they don't exist, keep the instructions
+
+<Note>
+  This technique requires an additional RPC call (`getAccountInfo`) per ATA you check. Depending on your RPC latency and how many ATAs the swap involves, this can add measurable overhead to your overall swap flow. Consider whether the space savings are worth the added latency for your use case, or batch the account checks in parallel or pre-swap.
+</Note>
 
 ```typescript
 import { findAssociatedTokenPda } from "@solana-program/associated-token";

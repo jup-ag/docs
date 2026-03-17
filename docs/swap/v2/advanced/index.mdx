@@ -1,15 +1,12 @@
 ---
 title: "Overview"
 description: "Advanced techniques for both /order and /build"
-llmsDescription: "Index of advanced techniques for Jupiter Swap API V2. Sub-pages cover: gasless swaps (automatic and integrator payer on both /order and /build), priority fees (/order), compute unit estimation (/build), reducing transaction size (maxAccounts + removing no-op instructions), and reducing latency (fast mode). Also notes that circular arbitrage routes are not supported and require the Metis binary."
+llmsDescription: "Index of advanced techniques for Jupiter Swap API V2. Sub-pages cover: gasless swaps (automatic and integrator payer on both /order and /build), compute unit estimation (/build), reducing transaction size (maxAccounts + removing no-op instructions), and reducing latency (fast mode). Also notes that circular arbitrage routes are not supported and require the Metis binary."
 ---
 
 <CardGroup cols={2}>
   <Card title="Gasless Swaps" icon="gas-pump" href="/docs/swap/v2/advanced/gasless">
     Let users swap without holding SOL. Automatic gasless on `/order`, integrator payer on both paths.
-  </Card>
-  <Card title="Priority Fees" icon="gauge-high" href="/docs/swap/v2/advanced/priority-fees">
-    Control priority fees and Jito tips on `/order`.
   </Card>
   <Card title="Estimate Compute Units" icon="microchip" href="/docs/swap/v2/advanced/compute-units">
     Simulate transactions to set accurate CU limits on `/build`.

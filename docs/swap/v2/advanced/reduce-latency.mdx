@@ -1,14 +1,27 @@
 ---
 title: "Reduce Latency"
 description: "Get faster swap quotes with fast mode"
-llmsDescription: "How to reduce swap quote latency on Jupiter Swap API V2 /build using mode=fast. Fast mode uses a Bellman-Ford algorithm with stricter constraints (fewer hops, fewer splits) to trade quote optimality for speed. Useful for high-frequency trading, well-known pairs (SOL/USDC), and bots where speed matters more than the last basis point."
+llmsDescription: "How to reduce swap quote latency on Jupiter Swap API V2 /build using mode=fast. Fast mode runs the getRecentPriorityFee RPC call in parallel with the Metis routing engine, and uses a Bellman-Ford algorithm with no splitting for faster route computation. Useful for high-frequency trading, well-known pairs (SOL/USDC), and bots where speed matters more than quote optimality."
 ---
 
-Set `mode=fast` on `/build` to reduce routing latency at the cost of quote optimality. This uses a Bellman-Ford algorithm with stricter constraints (fewer hops, fewer splits).
+Set `mode=fast` on `/build` to reduce routing latency at the cost of quote optimality.
 
 ```
 GET /build?inputMint=...&outputMint=...&amount=...&userPublicKey=...&mode=fast
 ```
+
+## How it works
+
+Fast mode optimises for speed in two ways:
+
+- **Bellman-Ford with no splitting:** the routing algorithm uses Bellman-Ford without splitting the route across multiple pools. This reduces computation time significantly, at the cost of potentially missing better multi-pool routes.
+- **Parallel priority fee lookup:** the `getRecentPriorityFee` RPC call runs in parallel with the call to Metis routing engine to get the swap instructions, instead of sequentially. This eliminates the RPC round-trip from the critical path.
+
+<Note>
+When the `getRecentPriorityFee` is done in parallel and not sequentially, this can impact the final priority fee estimation.
+
+This is because, when done sequentially, we are able to first get the swap instructions which includes the writable accounts, which then enables the `getRecentPriorityFee` to include these writable accounts (hot accounts) to be factored into the estimation.
+</Note>
 
 ## When to use
 
@@ -18,7 +31,12 @@ GET /build?inputMint=...&outputMint=...&amount=...&userPublicKey=...&mode=fast
 
 ## Trade-offs
 
-Fast mode may return slightly worse pricing compared to the default mode, because the router explores fewer route combinations. For most pairs and sizes, the difference is negligible.
+Fast mode may return suboptimal pricing compared to the default mode because:
+- No as accurate priority fee estimation as mentioned above
+- No route splitting means the entire amount goes through a single pool path
+- Fewer route combinations are explored
+
+For most major pairs and typical sizes, the pricing difference is negligible. For large swaps or illiquid pairs, the default mode will find better routes.
 
 ## Related
 

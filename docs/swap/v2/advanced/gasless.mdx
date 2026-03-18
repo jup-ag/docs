@@ -46,7 +46,7 @@ Alternatively, when a JupiterZ (RFQ) market maker provides the winning quote in 
 
 **How it works:**
 - The order transaction will include a secondary signer for the MM
-- We set the gas payer to the MM signer and upon receiving your partially signed transaction from `/execute`, we send it to the MM for them to sign and execute
+- Jupiter sets the gas payer to the MM signer and upon receiving your partially signed transaction from `/execute`, then sends it to the MM for them to sign and execute
 
 **Limitations:**
 - Does not work with integrator params (`referralAccount`, `referralFee`, `payer`)
@@ -60,6 +60,10 @@ Integrators can cover all gas costs on behalf of their users by passing the `pay
 ### On `/order`
 
 Pass `payer` to cover all gas-related fees. The transaction requires both taker and payer signatures.
+
+<Note>
+This needs to be used together with referral parameters (`referralAccount` and `referralFee`) because it is assumed that you will be taking fees to recoup the costs spent on gas.
+</Note>
 
 ```typescript
 const params = new URLSearchParams({
@@ -85,7 +89,6 @@ The returned transaction needs two signatures (taker + payer) before sending to 
 - Temporary wSOL ATA rent is covered by the payer and returned in the same transaction
 - Other ATAs are covered by the payer but not returned (they hold tokens post-swap)
 - Routes through Metis only
-- This needs to be used together with referral parameters (`referralAccount` and `referralFee`) because we assume that you will be taking fees to recoup the costs spent on gas
 
 ### On `/build`
 

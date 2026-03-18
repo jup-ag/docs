@@ -41,6 +41,8 @@ To reclaim that space:
 import { findAssociatedTokenPda } from "@solana-program/associated-token";
 import { TOKEN_PROGRAM_ADDRESS } from "@solana-program/token";
 
+// Assumes @solana/kit imports and rpc from build/index.mdx example
+
 // For each setup instruction, check if the target ATA already exists
 // If it does, the createIdempotent instruction is a no-op and can be removed
 const outputAta = await findAssociatedTokenPda({

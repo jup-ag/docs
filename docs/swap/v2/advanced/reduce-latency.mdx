@@ -20,7 +20,9 @@ Fast mode optimises for speed in two ways:
 <Note>
 When the `getRecentPriorityFee` is done in parallel and not sequentially, this can impact the final priority fee estimation.
 
-This is because, when done sequentially, we are able to first get the swap instructions which includes the writable accounts, which then enables the `getRecentPriorityFee` to include these writable accounts (hot accounts) to be factored into the estimation.
+When done sequentially, the Metis routing result provides the writable accounts (hot accounts/local fee market) that we will use in `getRecentPriorityFee` to further estimate accurately.
+
+When done parallelly, those accounts are not yet known, hence `getRecentPriorityFee` will estimate globally based on global fees.
 </Note>
 
 ## When to use
@@ -32,7 +34,7 @@ This is because, when done sequentially, we are able to first get the swap instr
 ## Trade-offs
 
 Fast mode may return suboptimal pricing compared to the default mode because:
-- No as accurate priority fee estimation as mentioned above
+- Less accurate priority fee estimation as mentioned above
 - No route splitting means the entire amount goes through a single pool path
 - Fewer route combinations are explored
 

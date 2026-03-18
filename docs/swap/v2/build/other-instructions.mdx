@@ -85,86 +85,16 @@ const memoIx = getAddMemoInstruction({
 
 For protocols that need to invoke the Jupiter swap from within their own onchain program, use the swap instruction from `/build` as the inner instruction in a CPI call.
 
-### How CPI swaps work
-
-A typical CPI swap transaction:
-
-1. Borrow enough SOL from your program to open a wSOL account that the program owns
-2. Swap token X from the user to wSOL on Jupiter via CPI
-3. Close the wSOL account and send SOL to the program
-4. The program transfers the SOL back to the user
-
-### Considerations
-
-- CPI cannot use Address Lookup Tables (ALTs), which limits the number of accounts in the transaction. Jupiter's complex routing often requires many accounts. If you exceed the 1232-byte transaction size limit, consider using Flash Fill instead (see below).
-- Use `maxAccounts` on `/build` to control route complexity and keep the transaction within size limits.
-- Set your own compute budget, as CPI adds overhead.
-
-### CPI with `jupiter-cpi` crate
-
-Add the `jupiter-cpi` crate to your Anchor program:
-
-```toml
-[dependencies]
-jupiter-cpi = { git = "https://github.com/jup-ag/jupiter-cpi", rev = "5eb8977" }
-```
-
-```rust expandable
-use jupiter_cpi;
-
-let signer_seeds: &[&[&[u8]]] = &[...];
-
-// Pass accounts to context one-by-one and construct accounts here
-// Or in practice, it may be easier to use remaining_accounts
-// https://book.anchor-lang.com/anchor_in_depth/the_program_module.html
-
-let accounts = jupiter_cpi::cpi::accounts::SharedAccountsRoute {
-    token_program: ,
-    program_authority: ,
-    user_transfer_authority: ,
-    source_token_account: ,
-    program_source_token_account: ,
-    program_destination_token_account: ,
-    destination_token_account: ,
-    source_mint: ,
-    destination_mint: ,
-    platform_fee_account: ,
-    token_2022_program: ,
-};
-
-let cpi_ctx = CpiContext::new_with_signer(
-    ctx.accounts.jup.to_account_info(),
-    accounts,
-    signer_seeds,
-);
-
-jupiter_cpi::cpi::shared_accounts_route(
-    cpi_ctx,
-    id,
-    route_plan,
-    in_amount,
-    quoted_out_amount,
-    slippage_bps,
-    platform_fee_bps,
-);
-```
-
-### Flash Fill (alternative to CPI)
-
-Flash Fill allows the use of Versioned Transactions and ALTs, avoiding the account limit constraints of CPI. The flow:
-
-1. Borrow enough SOL for opening the wSOL account from the Flash Fill program
-2. Create the wSOL account for the borrower
-3. Swap token X to wSOL
-4. Close the wSOL account and send SOL to the borrower
-5. Repay the SOL for opening the wSOL account back to the program
-
-### References
-
-- [CPI swap example](https://github.com/jup-ag/jupiter-cpi-swap-example)
-- [SOL swap CPI](https://github.com/jup-ag/sol-swap-cpi)
-- [jupiter-cpi crate](https://github.com/jup-ag/jupiter-cpi)
-- [Flash Fill example](https://github.com/jup-ag/sol-swap-flash-fill)
+- [How CPI works](https://solana.com/docs/core/cpi)
+- **CPI considerations**
+  - CPI cannot use Address Lookup Tables (ALTs), which limits the number of accounts in the transaction. Jupiter's complex routing often requires many accounts.
+  - Use `maxAccounts` on `/build` to control route complexity and keep the transaction within size limits.
+  - Set your own compute budget, as CPI adds overhead.
+- **Flash Fill (alternative to CPI)**: allows the use of Versioned Transactions and ALTs, avoiding the account limit constraints of CPI. The flow:
+- **References**
+  - [CPI swap example](https://github.com/jup-ag/jupiter-cpi-swap-example)
+  - [SOL swap CPI](https://github.com/jup-ag/sol-swap-cpi)
+  - [Flash Fill example](https://github.com/jup-ag/sol-swap-flash-fill)
 
 ## Related
 

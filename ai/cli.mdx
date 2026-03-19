@@ -1,7 +1,7 @@
 ---
 title: "Jupiter CLI"
 description: "Trade on Jupiter from your terminal, Telegram, or through AI agents."
-llmsDescription: "Documentation for the Jupiter CLI (jup), a command-line tool for interacting with Jupiter's products on Solana: Spot trading (swaps, portfolio, transfers), Perpetual futures (leveraged longs/shorts with TP/SL), and Lending (earn yield on deposits). The CLI is non-interactive and LLM-friendly by design, with JSON output mode for structured responses. Covers three usage paths: direct terminal usage, Telegram and other chat apps via OpenClaw, and AI agent integration. Includes installation methods (npm, install script, standalone binary), key management, and command examples for all products."
+llmsDescription: "The Jupiter CLI (jup) is a command-line tool for interacting with Jupiter's products on Solana: Spot trading, Perpetual futures, and Lending. It is non-interactive and LLM-friendly by design, with JSON output mode for structured responses. Install via npm (npm i -g @jup-ag/cli). For full command references, key management, configuration, and JSON response schemas, see the CLI documentation at https://github.com/jup-ag/cli/tree/main/docs. Three usage paths: direct terminal, Telegram via OpenClaw/miniclaw, and AI agent integration."
 ---
 
 The Jupiter CLI (`jup`) lets you interact with Jupiter's products from the command line. Trade spot, open perps positions, earn yield, and more.
@@ -12,48 +12,21 @@ The CLI is pre-v1 (early alpha) and should be considered unstable. Breaking chan
 
 ## Install
 
-<Tabs>
-  <Tab title="npm">
-  ```bash
-  npm i -g @jup-ag/cli
-  ```
-  </Tab>
-  <Tab title="Install script">
-  Auto-detects the best install method:
-  ```bash
-  curl -fsSL https://raw.githubusercontent.com/jup-ag/cli/main/scripts/install.sh | bash
-  ```
-  </Tab>
-  <Tab title="Standalone binary">
-  Download the latest binary from [GitHub releases](https://github.com/jup-ag/cli/releases):
-  ```bash
-  curl -fsSL https://github.com/jup-ag/cli/releases/latest/download/jup-linux-x64 -o jup
-  chmod +x jup
-  sudo mv jup /usr/local/bin/
-  ```
-  Replace `jup-linux-x64` with the appropriate binary for your platform (`jup-darwin-arm64`, `jup-darwin-x64`, etc.).
-  </Tab>
-</Tabs>
-
-## Set Up a Key
-
-A key is required for signing transactions (swaps, transfers, lending). Keys are stored locally at `~/.config/jup/keys/`.
-
 ```bash
-# Generate a new key
-jup keys add mykey
-
-# Or import from a file, private key, or seed phrase
-jup keys add mykey --file /path/to/keypair.json
-jup keys add mykey --private-key <key>
-jup keys add mykey --seed-phrase "word1 word2 ..."
+npm i -g @jup-ag/cli
 ```
 
-Verify your setup:
+For other install methods (install script, standalone binary), see the [CLI repository](https://github.com/jup-ag/cli).
+
+## Usage
+
+The CLI covers three products: Spot (swaps, portfolio, transfers), Perps (leveraged longs/shorts), and Lend (earn yield on deposits). For the full command reference, key management, configuration, and examples, see the [CLI documentation](https://github.com/jup-ag/cli/tree/main/docs).
 
 ```bash
-jup keys list
-jup spot portfolio
+jup --help
+jup spot --help
+jup perps --help
+jup lend --help
 ```
 
 ## Ways to Use
@@ -63,14 +36,8 @@ jup spot portfolio
 The most direct way. Install, add a key, and start trading:
 
 ```bash
-# Swap 1 SOL to USDC
+jup keys add mykey
 jup spot swap --from SOL --to USDC --amount 1
-
-# Open a 3x long SOL position with $10 USDC
-jup perps open --asset SOL --side long --amount 10 --input USDC --leverage 3
-
-# Deposit 100 USDC into lending
-jup lend earn deposit --token USDC --amount 100
 ```
 
 ### Telegram
@@ -105,25 +72,11 @@ For a more lightweight starting point, check out [miniclaw](https://github.com/y
 
 The CLI is designed to be LLM-friendly. All commands are non-interactive and support JSON output for structured, parseable responses.
 
-Enable JSON mode globally:
-```bash
-jup config set --output json
-```
-
-Or per-command:
 ```bash
 jup spot swap --from SOL --to USDC --amount 1 -f json
 ```
 
 AI agents (Claude Code, Cursor, Codex, etc.) can invoke CLI commands directly through shell access. Point your agent at the [CLI documentation on GitHub](https://github.com/jup-ag/cli/tree/main/docs) for complete command references and JSON response schemas.
-
-You can also use the CLI's built-in help:
-```bash
-jup --help
-jup spot --help
-jup perps --help
-jup lend --help
-```
 
 <Tip>
 Set an API key from [Portal](https://portal.jup.ag) for higher rate limits when running automated workflows:
@@ -132,50 +85,11 @@ jup config set --api-key <your-key>
 ```
 </Tip>
 
-## Products
-
-### Spot
-
-Search tokens, get quotes, execute swaps, view portfolio, check trade history, and transfer tokens.
-
-```bash
-jup spot tokens --search SOL
-jup spot quote --from SOL --to USDC --amount 1
-jup spot swap --from SOL --to USDC --amount 1
-jup spot portfolio
-jup spot history
-jup spot transfer --token SOL --to <address> --amount 1
-```
-
-### Perps
-
-Trade perpetual futures on SOL, BTC, and ETH. Open and close positions, set take-profit and stop-loss, and place limit orders.
-
-```bash
-jup perps markets
-jup perps open --asset SOL --side long --amount 10 --input USDC --leverage 3
-jup perps positions
-jup perps set --position <pubkey> --tp 100 --sl 70
-jup perps close --position <pubkey>
-jup perps history
-```
-
-### Lend
-
-View available tokens and APY, deposit to earn yield, and withdraw.
-
-```bash
-jup lend earn tokens
-jup lend earn deposit --token USDC --amount 100
-jup lend earn positions
-jup lend earn withdraw --token USDC --amount 50
-```
-
 ## Resources
 
 <CardGroup cols={2}>
-  <Card title="GitHub" icon="github" href="https://github.com/jup-ag/cli">
-    Source code, full command documentation, and changelog.
+  <Card title="CLI Documentation" icon="github" href="https://github.com/jup-ag/cli/tree/main/docs">
+    Full command reference, key management, configuration, and examples.
   </Card>
   <Card title="Developer Portal" icon="key" href="https://portal.jup.ag">
     Get an API key for higher rate limits.

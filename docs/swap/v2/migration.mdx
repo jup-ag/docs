@@ -50,7 +50,7 @@ If you currently use Metis `/quote` + `/swap-instructions`, migrate to `/build` 
 
 ### V1 to V2 instruction differences
 
-Swap V2 defaults to `instructionVersion=V2`. Key differences:
+Swap V2 defaults to `instructionVersion=V2` or the V2 routing instructions in the Jupiter Aggregator Program. Key differences:
 
 **V2 instructions do not emit fee events.** If you parse swap results by reading fee transfer events from the transaction, you need to update your parsing logic. Use the `/order` response fields (`inputAmountResult`, `outputAmountResult`) or parse token balance changes instead.
 
@@ -122,6 +122,9 @@ const build = await fetch(
 - **Market slippage estimation** built into quotes
 - **Address lookup tables resolved** in the response (no extra RPC call)
 - **Blockhash included** in the response
+- And much more
+
+---
 
 ## Ultra to `/order`
 
@@ -142,6 +145,8 @@ The request parameters and response format are identical. Update the base URL an
 - Unified documentation and API reference
 - Same endpoint for both happy path and advanced path
 - Future improvements shipped to V2 first
+
+---
 
 ## Metis to `/order`
 

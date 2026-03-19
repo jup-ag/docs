@@ -1,0 +1,46 @@
+---
+title: "Reduce Latency"
+description: "Get faster swap quotes with fast mode"
+llmsDescription: "How to reduce swap quote latency on Jupiter Swap API V2 /build using mode=fast. Fast mode runs the getRecentPriorityFee RPC call in parallel with the Metis routing engine, and uses a Bellman-Ford algorithm with no splitting for faster route computation. Useful for high-frequency trading, well-known pairs (SOL/USDC), and bots where speed matters more than quote optimality."
+---
+
+Set `mode=fast` on `/build` to reduce routing latency at the cost of quote optimality.
+
+```
+GET /build?inputMint=...&outputMint=...&amount=...&taker=...&mode=fast
+```
+
+## How it works
+
+Fast mode optimises for speed in two ways:
+
+- **Bellman-Ford with no splitting:** the routing algorithm uses Bellman-Ford without splitting the route across multiple pools. This reduces computation time significantly, at the cost of potentially missing better multi-pool routes.
+- **Parallel priority fee lookup:** the `getRecentPriorityFee` RPC call runs in parallel with the call to Metis routing engine to get the swap instructions, instead of sequentially. This eliminates the RPC round-trip from the critical path.
+
+<Note>
+When the `getRecentPriorityFee` is done in parallel and not sequentially, this can impact the final priority fee estimation.
+
+When done sequentially, the Metis routing result provides the writable accounts (hot accounts/local fee market) that we will use in `getRecentPriorityFee` to further estimate accurately.
+
+When done parallelly, those accounts are not yet known, hence `getRecentPriorityFee` will estimate globally based on global fees.
+</Note>
+
+## When to use
+
+- You are swapping high-frequency and need low latency
+- The pair is well-known (e.g. SOL/USDC) and doesn't benefit from complex routing
+- You are building a trading bot where speed matters more than optimising the last basis point
+
+## Trade-offs
+
+Fast mode may return suboptimal pricing compared to the default mode because:
+- Less accurate priority fee estimation as mentioned above
+- No route splitting means the entire amount goes through a single pool path
+- Fewer route combinations are explored
+
+For most major pairs and typical sizes, the pricing difference is negligible. For large swaps or illiquid pairs, the default mode will find better routes.
+
+## Related
+
+- [Reduce Transaction Size](/docs/swap/v2/advanced/reduce-transaction-size) for controlling account count
+- [Build Custom Transactions](/docs/swap/v2/build) for the full `/build` workflow

@@ -1,8 +1,13 @@
 ---
 title: "Gasless Support"
 description: "Gasless swap mechanisms that let users trade without holding SOL for transaction fees."
-llmsDescription: "Two gasless mechanisms: Ultra Gasless Support (covers all gas when taker has < 0.01 SOL, min ~$10 trade) and JupiterZ RFQ (market maker pays network fees). Also supports Integrator Gas Payer."
+llmsDescription: "DEPRECATED — use Swap API V2 instead. Two gasless mechanisms: Ultra Gasless Support (covers all gas when taker has < 0.01 SOL, min ~$10 trade) and JupiterZ RFQ (market maker pays network fees). Also supports Integrator Gas Payer."
+deprecated: true
 ---
+
+<Warning>
+The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap). Use [Order & Execute](/docs/swap/v2/order-and-execute) for the recommended swap flow.
+</Warning>
 
 The Jupiter Ultra Swap includes **2 different gasless mechanisms** that allow users to
 execute swaps without having to pay for network fees, priority fees/tips or rent in SOL. This 

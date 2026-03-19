@@ -1,0 +1,30 @@
+---
+title: "Metis Swap V1"
+sidebarTitle: "Overview"
+description: "API reference for the Metis Swap API (V1)"
+llmsDescription: "DEPRECATED — use Swap API V2 /build at api.jup.ag/swap/v2/build instead. Jupiter Metis Swap API V1 endpoint reference. Endpoints: GET /quote, POST /swap (serialised transaction), POST /swap-instructions (raw instructions), GET /program-id-to-label. Base URL: https://api.jup.ag/swap/v1"
+deprecated: true
+---
+
+<Warning>
+This endpoint is part of the Metis Swap API (V1) which has been superseded by the [Swap API V2](/api-reference/swap). Use `/build` for custom transactions.
+</Warning>
+
+## Endpoints
+
+<CardGroup>
+  <Card title="GET /quote" href="/api-reference/swap/v1/quote" icon="file-lines" horizontal>
+    Request a swap quote
+  </Card>
+  <Card title="POST /swap" href="/api-reference/swap/v1/swap" icon="file-lines" horizontal>
+    Build a serialised swap transaction from a quote
+  </Card>
+  <Card title="POST /swap-instructions" href="/api-reference/swap/v1/swap-instructions" icon="file-lines" horizontal>
+    Get raw swap instructions from a quote
+  </Card>
+  <Card title="GET /program-id-to-label" href="/api-reference/swap/v1/program-id-to-label" icon="file-lines" horizontal>
+    Map program IDs to human-readable labels
+  </Card>
+</CardGroup>
+
+**Base URL:** `https://api.jup.ag/swap/v1`

@@ -1,0 +1,360 @@
+---
+title: "Order & Execute"
+description: "Get a swap quote, sign, and execute with managed landing"
+llmsDescription: "How to perform a swap using Jupiter's Swap API V2 default path: GET /order to get a quote and assembled transaction, sign it with your wallet, and POST /execute for managed transaction landing. Covers the minimal happy path with no optional parameters (all routers compete for best price including RFQ), the full request/response shapes, and a complete @solana/kit TypeScript code example. /execute handles landing, confirmation, and retry. Error codes documented for both aggregator and RFQ swap types."
+---
+
+The `/order` + `/execute` flow is the recommended way to swap on Jupiter. You get the best price (all routers compete, including RFQ market makers), and Jupiter handles transaction landing for you.
+
+## Quick start
+
+Three steps: get an order, sign it, execute it.
+
+### Prerequisites
+
+<Accordion title="Loading a wallet for testing">
+
+There are several ways to load a wallet for testing. All examples on this page use `BS58_PRIVATE_KEY` from your `.env` file.
+
+<CodeGroup>
+```typescript title="From base58 secret key (.env)"
+// .env: BS58_PRIVATE_KEY=your_base58_secret_key
+
+// @solana/kit
+import { createKeyPairSignerFromBytes, getBase58Encoder } from "@solana/kit";
+const signer = await createKeyPairSignerFromBytes(
+  getBase58Encoder().encode(process.env.BS58_PRIVATE_KEY!),
+);
+
+// @solana/web3.js
+import { Keypair } from "@solana/web3.js";
+import bs58 from "bs58";
+const signer = Keypair.fromSecretKey(bs58.decode(process.env.BS58_PRIVATE_KEY!));
+```
+
+```typescript title="From Solana CLI keypair file"
+import fs from "fs";
+
+// @solana/kit
+import { createKeyPairSignerFromBytes } from "@solana/kit";
+const keyfileBytes = JSON.parse(
+  fs.readFileSync("/path/to/.config/solana/id.json", "utf8"),
+);
+const signer = await createKeyPairSignerFromBytes(
+  new Uint8Array(keyfileBytes),
+);
+
+// @solana/web3.js
+import { Keypair } from "@solana/web3.js";
+const keyfileBytes = JSON.parse(
+  fs.readFileSync("/path/to/.config/solana/id.json", "utf8"),
+);
+const signer = Keypair.fromSecretKey(new Uint8Array(keyfileBytes));
+```
+
+```typescript title="From raw byte array"
+// @solana/kit
+import { createKeyPairSignerFromBytes } from "@solana/kit";
+const signer = await createKeyPairSignerFromBytes(
+  new Uint8Array([/* 64 bytes */]),
+);
+
+// @solana/web3.js
+import { Keypair } from "@solana/web3.js";
+const signer = Keypair.fromSecretKey(new Uint8Array([/* 64 bytes */]));
+```
+</CodeGroup>
+
+<Warning>
+  Never commit private keys to source control. Use environment variables or the Solana CLI keyfile for testing. In production, use a proper key management solution.
+</Warning>
+</Accordion>
+
+<Accordion title="Imports, types, and constants">
+<CodeGroup>
+```typescript title="@solana/kit"
+import {
+  createKeyPairSignerFromBytes,
+  getBase58Encoder,
+  getTransactionDecoder,
+  getTransactionEncoder,
+  partiallySignTransaction,
+} from "@solana/kit";
+
+type OrderResponse = {
+  transaction: string;       // base64-encoded transaction
+  requestId: string;
+  outAmount: string;
+  router: string;            // "iris" | "jupiterz" | "dflow" | "okx"
+  mode: string;              // "ultra" | "manual"
+  feeBps: number;
+  feeMint: string;
+};
+
+type ExecuteResponse = {
+  status: "Success" | "Failed";
+  signature: string;
+  code: number;
+  inputAmountResult: string;
+  outputAmountResult: string;
+  error?: string;
+};
+
+const API_KEY = process.env.JUPITER_API_KEY;
+if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
+const BASE_URL = "https://api.jup.ag/swap/v2";
+
+// Load wallet from base58 secret key in .env
+const signer = await createKeyPairSignerFromBytes(
+  getBase58Encoder().encode(process.env.BS58_PRIVATE_KEY!),
+);
+```
+
+```typescript title="@solana/web3.js"
+import { Keypair, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+type OrderResponse = {
+  transaction: string;       // base64-encoded transaction
+  requestId: string;
+  outAmount: string;
+  router: string;            // "iris" | "jupiterz" | "dflow" | "okx"
+  mode: string;              // "ultra" | "manual"
+  feeBps: number;
+  feeMint: string;
+};
+
+type ExecuteResponse = {
+  status: "Success" | "Failed";
+  signature: string;
+  code: number;
+  inputAmountResult: string;
+  outputAmountResult: string;
+  error?: string;
+};
+
+const API_KEY = process.env.JUPITER_API_KEY;
+if (!API_KEY) throw new Error("Missing JUPITER_API_KEY");
+const BASE_URL = "https://api.jup.ag/swap/v2";
+
+// Load wallet from base58 secret key in .env
+const signer = Keypair.fromSecretKey(
+  bs58.decode(process.env.BS58_PRIVATE_KEY!),
+);
+```
+</CodeGroup>
+</Accordion>
+
+### Code example
+
+<CodeGroup>
+```typescript expandable title="@solana/kit"
+// Step 1: Get an order
+const orderResponse = await fetch(
+  `${BASE_URL}/order?` +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112", // SOL
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+      amount: "100000000",
+      taker: signer.address,
+    }),
+  { headers: { "x-api-key": API_KEY } },
+);
+if (!orderResponse.ok) {
+  console.error(`/order failed: ${orderResponse.status}`, await orderResponse.text());
+  process.exit(1);
+}
+const order: OrderResponse = await orderResponse.json();
+
+if (!order.transaction) {
+  console.error("No transaction in response:", JSON.stringify(order, null, 2));
+  process.exit(1);
+}
+
+// Step 2: Sign the transaction
+// Use partiallySignTransaction because JupiterZ quotes require an additional
+// market maker signature, which is added during /execute
+const transactionBytes = Buffer.from(order.transaction, "base64");
+const transaction = getTransactionDecoder().decode(transactionBytes);
+const signedTransaction = await partiallySignTransaction(
+  [signer.keyPair],
+  transaction,
+);
+
+// Step 3: Execute
+const signedTxBytes = getTransactionEncoder().encode(signedTransaction);
+const signedTxBase64 = Buffer.from(signedTxBytes).toString("base64");
+
+const executeResponse = await fetch(`${BASE_URL}/execute`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    signedTransaction: signedTxBase64,
+    requestId: order.requestId,
+  }),
+});
+if (!executeResponse.ok) {
+  console.error(`/execute failed: ${executeResponse.status}`, await executeResponse.text());
+  process.exit(1);
+}
+const result: ExecuteResponse = await executeResponse.json();
+
+console.log(`https://solscan.io/tx/${result.signature}`);
+if (result.status === "Success") {
+  console.log("Swap successful:", JSON.stringify(result, null, 2));
+} else {
+  console.error("Swap failed:", JSON.stringify(result, null, 2));
+}
+```
+
+```typescript expandable title="@solana/web3.js"
+// Step 1: Get an order
+const orderResponse = await fetch(
+  `${BASE_URL}/order?` +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112", // SOL
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+      amount: "100000000",
+      taker: signer.publicKey.toString(),
+    }),
+  { headers: { "x-api-key": API_KEY } },
+);
+if (!orderResponse.ok) {
+  console.error(`/order failed: ${orderResponse.status}`, await orderResponse.text());
+  process.exit(1);
+}
+const order: OrderResponse = await orderResponse.json();
+
+if (!order.transaction) {
+  console.error("No transaction in response:", JSON.stringify(order, null, 2));
+  process.exit(1);
+}
+
+// Step 2: Sign the transaction
+const transaction = VersionedTransaction.deserialize(
+  Buffer.from(order.transaction, "base64"),
+);
+transaction.sign([signer]);
+
+// Step 3: Execute
+const signedTransaction = Buffer.from(transaction.serialize()).toString("base64");
+
+const executeResponse = await fetch(`${BASE_URL}/execute`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    signedTransaction,
+    requestId: order.requestId,
+  }),
+});
+if (!executeResponse.ok) {
+  console.error(`/execute failed: ${executeResponse.status}`, await executeResponse.text());
+  process.exit(1);
+}
+const result: ExecuteResponse = await executeResponse.json();
+
+console.log(`https://solscan.io/tx/${result.signature}`);
+if (result.status === "Success") {
+  console.log("Swap successful:", JSON.stringify(result, null, 2));
+} else {
+  console.error("Swap failed:", JSON.stringify(result, null, 2));
+}
+```
+</CodeGroup>
+
+## How it works
+
+### 1. Get an order
+
+`GET /order` returns a quote and an assembled transaction in a single call. All routers compete for the best price: Metis, JupiterZ, Dflow, and OKX.
+
+<Note>
+  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See [Routing](/docs/swap/v2/routing) for details.
+</Note>
+
+**Required parameters:**
+
+| Parameter | Description |
+| --- | --- |
+| `inputMint` | Mint address of the token you are selling |
+| `outputMint` | Mint address of the token you are buying |
+| `amount` | Amount in the smallest unit of the input token |
+| `taker` | Your wallet address. Required to receive an assembled transaction.<br/>Without `taker`, you get a quote but no transaction. This is useful for price checks. |
+
+**Key response fields:**
+
+| Field | Description |
+| --- | --- |
+| `transaction` | Base64-encoded transaction to sign. Null if `taker` is not set. |
+| `requestId` | Pass this to `/execute`. |
+| `outAmount` | Expected output amount before slippage. |
+| `router` | Which router won the quote (iris, jupiterz, dflow, okx). |
+| `mode` | "ultra" (no optional params) or "manual" (optional params used). |
+
+For the full parameter reference and how each parameter affects routing, see [Routing](/docs/swap/v2/routing).
+
+### 2. Sign the transaction
+
+- The transaction returned by `/order` is unsigned. Sign it with your wallet's private key. The example above uses `@solana/kit`. The transaction is a versioned transaction (v0).
+- Note: we use the `partiallySignTransaction` for partial signing because when JupiterZ routing is provided, there is an additional signer which is the MM that will be required after sending the transaction to `/execute` request.
+
+### 3. Execute the transaction
+
+`POST /execute` takes the signed transaction and the `requestId` from the order response. Jupiter handles:
+
+- Optimised slippage via RTSE (Real-Time Slippage Estimator), which adjusts slippage at execution time to balance trade success and price protection
+- Optimised priority fee strategy for current network conditions
+- Jupiter Beam (our own proprietary transaction execution pipeline) for accelerated transaction sending and landing across multiple RPC providers
+- Confirmation polling
+- Parses both successful and failed transactions
+
+**Request body:**
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `signedTransaction` | Yes | Base64-encoded signed transaction |
+| `requestId` | Yes | The `requestId` from the `/order` response |
+| `lastValidBlockHeight` | No | Block height for nonce validation |
+
+**Response:**
+
+| Field | Description |
+| --- | --- |
+| `status` | "Success" or "Failed" |
+| `signature` | Transaction signature (present on both success and some failures) |
+| `code` | Error code. 0 = success. See [error codes](#error-codes) below. |
+| `inputAmountResult` | Amount of input token used for the swap |
+| `outputAmountResult` | Amount of output token received |
+
+## Error codes
+
+| Code | Category | Meaning |
+| --- | --- | --- |
+| `0` | Success | Transaction confirmed |
+| `-1` | Execute | Missing cached order (requestId not found or expired) |
+| `-2` | Execute | Invalid signed transaction |
+| `-3` | Execute | Invalid message bytes |
+| `-1000` | Aggregator | Failed to land |
+| `-1001` | Aggregator | Unknown error |
+| `-1002` | Aggregator | Invalid transaction |
+| `-1003` | Aggregator | Transaction not fully signed |
+| `-1004` | Aggregator | Invalid block height |
+| `-2000` | RFQ | Failed to land |
+| `-2001` | RFQ | Unknown error |
+| `-2002` | RFQ | Invalid payload |
+| `-2003` | RFQ | Quote expired |
+| `-2004` | RFQ | Swap rejected |
+
+## Related
+
+- [Routing](/docs/swap/v2/routing) for optional parameters and their routing impact
+- [Fees](/docs/swap/v2/fees) for adding integrator fees to `/order`
+- [Advanced Techniques](/docs/swap/v2/advanced) for gasless swaps, priority fees, and CU optimisation
+- [API Reference: GET /order](/api-reference/swap/v2/order) for the full OpenAPI specification
+- [API Reference: POST /execute](/api-reference/swap/v2/execute) for the full OpenAPI specification

@@ -64,74 +64,34 @@
         "tab": "Docs",
         "menu": [
           {
-            "item": "Ultra Swap",
-            "icon": "bolt",
+            "item": "Swap",
+            "icon": "arrow-right-arrow-left",
             "groups": [
               {
-                "group": "About Ultra Swap",
+                "group": "Swap API",
                 "pages": [
-                  "docs/ultra/index",
-                  "docs/ultra/get-started",
-                  "docs/ultra/gasless",
-                  "docs/ultra/fees",
-                  "docs/ultra/manual-mode"
-                ]
-              },
-              {
-                "group": "Ultra Swap API",
-                "pages": [
-                  "docs/ultra/get-order",
-                  "docs/ultra/execute-order",
+                  "docs/swap/index",
+                  "docs/swap/v2/order-and-execute",
                   {
-                    "group": "Data Endpoints",
+                    "group": "Build Custom Transactions",
                     "pages": [
-                      "docs/ultra/search-token",
-                      "docs/ultra/get-holdings",
-                      "docs/ultra/get-shield"
+                      "docs/swap/v2/build/index",
+                      "docs/swap/v2/build/other-instructions"
                     ]
                   },
-                  "docs/ultra/response",
-                  "docs/ultra/rate-limit"
+                  "docs/swap/v2/routing",
+                  "docs/swap/v2/fees",
+                  "docs/swap/v2/migration"
                 ]
               },
               {
-                "group": "Ultra Swap Guides",
+                "group": "Advanced",
                 "pages": [
-                  "docs/ultra/add-fees-to-ultra",
-                  "docs/ultra/add-payer",
-                  "docs/ultra/plugin-integration"
-                ]
-              },
-              {
-                "group": " ",
-                "pages": [
-                  {
-                    "group": "Metis Swap API",
-                    "expanded": false,
-                    "pages": [
-                      {
-                        "group": "Usage",
-                        "pages": [
-                          "docs/swap/index",
-                          "docs/swap/get-quote",
-                          "docs/swap/build-swap-transaction",
-                          "docs/swap/send-swap-transaction"
-                        ]
-                      },
-                      {
-                        "group": "Guides",
-                        "pages": [
-                          "docs/swap/add-fees-to-swap",
-                          "docs/swap/payments-through-swap",
-                          "docs/swap/requote-with-lower-max-accounts"
-                        ]
-                      },
-                      {
-                        "group": "Debugging",
-                        "pages": ["docs/swap/common-errors"]
-                      }
-                    ]
-                  }
+                  "docs/swap/v2/advanced/index",
+                  "docs/swap/v2/advanced/gasless",
+                  "docs/swap/v2/advanced/compute-units",
+                  "docs/swap/v2/advanced/reduce-transaction-size",
+                  "docs/swap/v2/advanced/reduce-latency"
                 ]
               }
             ]
@@ -163,10 +123,7 @@
             "groups": [
               {
                 "group": "Price API",
-                "pages": [
-                  "docs/price/index",
-                  "docs/price/v3"
-                ]
+                "pages": ["docs/price/index", "docs/price/v3"]
               }
             ]
           },
@@ -410,9 +367,7 @@
               {
                 "group": "Portfolio API",
                 "tag": "BETA",
-                "pages": [
-                  "docs/portfolio/jupiter-positions"
-                ]
+                "pages": ["docs/portfolio/jupiter-positions"]
               }
             ]
           },
@@ -447,10 +402,7 @@
               {
                 "group": "Studio API",
                 "tag": "BETA",
-                "pages": [
-                  "docs/studio/create-token",
-                  "docs/studio/claim-fee"
-                ]
+                "pages": ["docs/studio/create-token", "docs/studio/claim-fee"]
               }
             ]
           },
@@ -521,75 +473,30 @@
             "group": "API Reference",
             "pages": [
               {
-                "group": "Ultra Swap",
-                "pages": [
-                  "api-reference/ultra",
-                  "api-reference/ultra/order",
-                  "api-reference/ultra/execute",
-                  "api-reference/ultra/holdings",
-                  "api-reference/ultra/shield",
-                  "api-reference/ultra/search",
-                  "api-reference/ultra/routers",
-                  "api-reference/ultra/balances"
-                ]
-              },
-              {
-                "group": "Metis Swap",
+                "group": "Swap",
                 "pages": [
                   "api-reference/swap",
-                  "api-reference/swap/quote",
-                  "api-reference/swap/swap",
-                  "api-reference/swap/swap-instructions",
-                  "api-reference/swap/program-id-to-label"
+                  "api-reference/swap/v2/order",
+                  "api-reference/swap/v2/build",
+                  "api-reference/swap/v2/execute"
                 ]
               },
               {
                 "group": "Tokens",
                 "pages": [
                   "api-reference/tokens",
-                  {
-                    "group": "V2",
-                    "pages": [
-                      "api-reference/tokens/v2",
-                      "api-reference/tokens/v2/search",
-                      "api-reference/tokens/v2/tag",
-                      "api-reference/tokens/v2/category",
-                      "api-reference/tokens/v2/recent",
-                      "api-reference/tokens/v2/get-content",
-                      "api-reference/tokens/v2/get-content-cooking",
-                      "api-reference/tokens/v2/get-content-feed"
-                    ]
-                  },
-                  {
-                    "group": "V1 (Deprecated)",
-                    "pages": [
-                      "api-reference/tokens/v1",
-                      "api-reference/tokens/v1/token-information",
-                      "api-reference/tokens/v1/mints-in-market",
-                      "api-reference/tokens/v1/tradable",
-                      "api-reference/tokens/v1/tagged",
-                      "api-reference/tokens/v1/new",
-                      "api-reference/tokens/v1/all"
-                    ]
-                  }
+                  "api-reference/tokens/v2/search",
+                  "api-reference/tokens/v2/tag",
+                  "api-reference/tokens/v2/category",
+                  "api-reference/tokens/v2/recent",
+                  "api-reference/tokens/v2/get-content",
+                  "api-reference/tokens/v2/get-content-cooking",
+                  "api-reference/tokens/v2/get-content-feed"
                 ]
               },
               {
                 "group": "Price",
-                "pages": [
-                  "api-reference/price",
-                  {
-                    "group": "V3",
-                    "pages": [
-                      "api-reference/price/v3",
-                      "api-reference/price/v3/price"
-                    ]
-                  },
-                  {
-                    "group": "V2 (Deprecated)",
-                    "pages": ["api-reference/price/v2", "api-reference/price/v2/price"]
-                  }
-                ]
+                "pages": ["api-reference/price", "api-reference/price/v3/price"]
               }
             ]
           },
@@ -681,9 +588,7 @@
                   },
                   {
                     "group": "Vault",
-                    "pages": [
-                      "api-reference/prediction/get-vault-info"
-                    ]
+                    "pages": ["api-reference/prediction/get-vault-info"]
                   }
                 ]
               },
@@ -785,9 +690,9 @@
               {
                 "group": "Walkthrough",
                 "pages": [
-                "tool-kits/plugin/nextjs-app-example",
-                "tool-kits/plugin/react-app-example",
-                "tool-kits/plugin/html-app-example"
+                  "tool-kits/plugin/nextjs-app-example",
+                  "tool-kits/plugin/react-app-example",
+                  "tool-kits/plugin/html-app-example"
                 ]
               },
               "tool-kits/plugin/customization",
@@ -813,18 +718,11 @@
         "groups": [
           {
             "group": " ",
-            "pages": [
-              "ai/index"
-            ]
+            "pages": ["ai/index"]
           },
           {
             "group": "AI Resources",
-            "pages": [
-              "ai/skills",
-              "ai/llms-txt",
-              "ai/mcp",
-              "ai/ecosystem"
-            ]
+            "pages": ["ai/skills", "ai/llms-txt", "ai/mcp", "ai/ecosystem"]
           }
         ]
       },
@@ -940,19 +838,19 @@
   },
   "seo": {
     "metatags": {
-        "og:title": "Jupiter Developers",
-        "og:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
-        "og:image": "/logo/og.png",
-        "og:type": "website",
-        "og:url": "https://dev.jup.ag/",
-        "og:site_name": "Jupiter Developers",
-        "description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
-        "keywords": "Jupiter, Jupiter Developer Documentation, Jupiter API, Jupiter SDK, Jupiter Swap, Jupiter V6, Jupiter Lend, Jupiter Perps, Jupiter Studio, Jupiter Tool Kits, Jupiter Plugin, Jupiter Terminal, Jupiter Mobile Adapter, Jupiter Wallet Kit, Jupiter Referral Program, Jupiter Routing, Solana, Crypto, Solana Swap, Crypto Swap",
-        "twitter:card": "summary_large_image",
-        "twitter:site": "@JupiterExchange",
-        "twitter:title": "Jupiter Developers",
-        "twitter:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
-        "twitter:image": "/logo/og.png"
+      "og:title": "Jupiter Developers",
+      "og:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
+      "og:image": "/logo/og.png",
+      "og:type": "website",
+      "og:url": "https://dev.jup.ag/",
+      "og:site_name": "Jupiter Developers",
+      "description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
+      "keywords": "Jupiter, Jupiter Developer Documentation, Jupiter API, Jupiter SDK, Jupiter Swap, Jupiter V6, Jupiter Lend, Jupiter Perps, Jupiter Studio, Jupiter Tool Kits, Jupiter Plugin, Jupiter Terminal, Jupiter Mobile Adapter, Jupiter Wallet Kit, Jupiter Referral Program, Jupiter Routing, Solana, Crypto, Solana Swap, Crypto Swap",
+      "twitter:card": "summary_large_image",
+      "twitter:site": "@JupiterExchange",
+      "twitter:title": "Jupiter Developers",
+      "twitter:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
+      "twitter:image": "/logo/og.png"
     }
   },
   "redirects": [
@@ -1078,7 +976,7 @@
     },
     {
       "source": "/docs/swap-api/:slug*",
-      "destination": "/docs/swap/:slug*"
+      "destination": "/docs/swap/v1/:slug*"
     },
     {
       "source": "/docs/lend-api/:slug*",
@@ -1239,6 +1137,50 @@
     {
       "source": "/skills",
       "destination": "/skill"
+    },
+    {
+      "source": "/docs/swap/get-quote",
+      "destination": "/docs/swap/v1/get-quote"
+    },
+    {
+      "source": "/docs/swap/build-swap-transaction",
+      "destination": "/docs/swap/v1/build-swap-transaction"
+    },
+    {
+      "source": "/docs/swap/send-swap-transaction",
+      "destination": "/docs/swap/v1/send-swap-transaction"
+    },
+    {
+      "source": "/docs/swap/add-fees-to-swap",
+      "destination": "/docs/swap/v1/add-fees-to-swap"
+    },
+    {
+      "source": "/docs/swap/payments-through-swap",
+      "destination": "/docs/swap/v1/payments-through-swap"
+    },
+    {
+      "source": "/docs/swap/requote-with-lower-max-accounts",
+      "destination": "/docs/swap/v1/requote-with-lower-max-accounts"
+    },
+    {
+      "source": "/docs/swap/common-errors",
+      "destination": "/docs/swap/v1/common-errors"
+    },
+    {
+      "source": "/api-reference/swap/quote",
+      "destination": "/api-reference/swap/v1/quote"
+    },
+    {
+      "source": "/api-reference/swap/swap",
+      "destination": "/api-reference/swap/v1/swap"
+    },
+    {
+      "source": "/api-reference/swap/swap-instructions",
+      "destination": "/api-reference/swap/v1/swap-instructions"
+    },
+    {
+      "source": "/api-reference/swap/program-id-to-label",
+      "destination": "/api-reference/swap/v1/program-id-to-label"
     }
   ]
 }

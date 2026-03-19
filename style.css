@@ -29,3 +29,15 @@ color: white !important;
     }
 }
 
+/* Products dropdown – extend beyond Mintlify default height */
+@media screen and (max-width: 767px) {
+    [data-radix-menu-content] {
+        max-height: 80vh !important;
+    }
+}
+@media screen and (min-width: 768px) {
+    [data-radix-menu-content] {
+        max-height: 600px !important;
+    }
+}
+

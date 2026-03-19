@@ -420,16 +420,23 @@ const instructions = [
   ...build.otherInstructions.map(toInstruction),
 ];
 
-// Step 3: Resolve address lookup tables
-const lookupTableAddresses = build.addressesByLookupTableAddress
-  ? Object.keys(build.addressesByLookupTableAddress)
-  : [];
+// Step 3: Resolve address lookup tables (from /build response, no RPC needed)
 const addressLookupTableAccounts: AddressLookupTableAccount[] = [];
-
-for (const addr of lookupTableAddresses) {
-  const account = await connection.getAddressLookupTable(new PublicKey(addr));
-  if (account.value) {
-    addressLookupTableAccounts.push(account.value);
+if (build.addressesByLookupTableAddress) {
+  for (const [tableAddr, addresses] of Object.entries(
+    build.addressesByLookupTableAddress,
+  )) {
+    addressLookupTableAccounts.push(
+      new AddressLookupTableAccount({
+        key: new PublicKey(tableAddr),
+        state: {
+          deactivationSlot: BigInt("18446744073709551615"),
+          lastExtendedSlot: 0,
+          lastExtendedSlotStartIndex: 0,
+          addresses: addresses.map((a) => new PublicKey(a)),
+        },
+      }),
+    );
   }
 }
 

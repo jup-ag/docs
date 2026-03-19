@@ -27,6 +27,10 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 | Developer Portal      | Portal, Dev Portal, Dashboard            | Full name first, then "Portal" is OK     |
 | API key               | api key, API Key, apiKey                  | Lowercase "key" in prose, camelCase only in code |
 | Solana                | SOL (when referring to the chain)         | "SOL" only for the token                 |
+| Swap API          | Unified Swap API, Swap V2             | "Swap API" in prose. Use "V2" only when contrasting with V1 |
+| `/order`          | order endpoint, order API              | Always backtick the path in prose              |
+| `/build`          | build endpoint, build API              | Always backtick the path in prose              |
+| `/execute`        | execute endpoint, execute API          | Always backtick the path in prose              |
 
 ### Product-Specific Terms
 
@@ -177,7 +181,7 @@ Format: `- [YYYY-MM-DD] Decision: rationale`
 - [2026-02-26] Tone set to "technical but approachable": professional and precise, not cold or overly formal. No em dashes for asides.
 - [2026-03-09] API guide code examples should cover the full lifecycle (e.g. quote → build → sign → send) and include error handling at each stage, not just the happy path. Developers copy code from guides directly.
 - [2026-03-09] When documenting API response schemas, always verify examples against the live API. OpenAPI specs can drift from actual responses, especially for newer APIs.
-- [2026-03-10] Dollar signs in Mintlify must be escaped as `\$` to prevent math/LaTeX rendering (e.g. `\$300` not `$300`).
+- [2026-03-10] Frontmatter is YAML, body is markdown: escaping rules differ. Markdown-specific escaping (e.g. `\$` for LaTeX prevention) must NOT be used in YAML frontmatter strings (`title`, `description`, `llmsDescription`) because YAML only recognizes its own escape sequences (`\n`, `\t`, `\\`, `\"`). Using `\$` in frontmatter causes a Mintlify parse error. In the markdown body, `$` must be escaped as `\$` to prevent LaTeX rendering (e.g. `\$300` not `$300`).
 - [2026-03-10] OpenAPI security schemes: separate array items = OR, same object = AND. For endpoints requiring both API key and Bearer auth, use `- ApiKeyAuth: []\n  BearerAuth: []` (same item), not separate items.
 - [2026-03-10] V1 collapsed dropdown pattern: use `"expanded": false` on the group in `docs.json` nav (same pattern as Metis Swap in Ultra docs).
 - [2026-03-10] API reference overview pages should list endpoints grouped by category with `<CardGroup>` cards linking to each endpoint (see Prediction API as reference pattern).
@@ -185,3 +189,6 @@ Format: `- [YYYY-MM-DD] Decision: rationale`
 - [2026-03-12] Lend terminology: use "Earn" (not "Supply" or "Lending") for the deposit side, "Borrow" for the vault/debt side. Matches product UI naming.
 - [2026-03-12] SDK named parameters: when documenting SDK functions, always show the named-parameter form (`{ connection, signer, asset, amount }`) not positional args. Positional forms are error-prone and not how the SDK is designed.
 - [2026-03-12] Import Private Key pattern: use base58 decode (`bs58.decode(privateKey)` with `Keypair.fromSecretKey`), not file-read from JSON. Browser wallets export base58 strings.
+- [2026-03-17] Swap V2 code examples always show both @solana/kit and @solana/web3.js in `<CodeGroup>` tabs, with kit listed first. Prerequisites (imports, types, helpers) go in a collapsible `<Accordion>` to keep the main example clean.
+- [2026-03-19] When `/build` returns ALT data (`addressesByLookupTableAddress`), never make RPC calls to resolve ALTs. Construct lookup table objects locally from the response data. Both kit and web3.js examples should use a `transformALTs` helper for consistency.
+- [2026-03-19] For @solana/web3.js `AddressLookupTableAccount` construction: `compileToV0Message` only uses `key` and `state.addresses`. Other state fields (`deactivationSlot`, `lastExtendedSlot`, `lastExtendedSlotStartIndex`) are TypeScript requirements only. Encapsulate in a helper rather than exposing placeholder values in the main code example.

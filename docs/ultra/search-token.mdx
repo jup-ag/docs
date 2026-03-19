@@ -1,8 +1,13 @@
 ---
 title: "Search Token"
 description: "Search for tokens by symbol, name, or mint address through the Ultra Swap API."
-llmsDescription: "GET /ultra/v1/search?query={query} returns token metadata by symbol, name, or mint address. Supports comma-separated queries, up to 100 mints."
+llmsDescription: "DEPRECATED — use Swap API V2 instead. GET /ultra/v1/search?query={query} returns token metadata by symbol, name, or mint address. Supports comma-separated queries, up to 100 mints."
+deprecated: true
 ---
+
+<Warning>
+The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap). Use [Order & Execute](/docs/swap/v2/order-and-execute) for the recommended swap flow.
+</Warning>
 
 The Ultra Swap API provides an endpoint to search tokens in the background for you and returns you the search results, along with the mint information.
 

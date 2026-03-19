@@ -493,6 +493,116 @@ references, bookmarks, and indexed search results. The cost is always higher tha
   4. Note the redirect in `.claude/rules/decisions.md` under the Redirect Log
 - If you're unsure whether a rename is worth it, **don't do it** — ask the user.
 
+## Deprecating Pages
+
+When content is superseded, sunset, or no longer maintained, follow this workflow. It applies
+to both **API reference pages** and **docs pages** (guides, product docs, etc.).
+
+Goals:
+- **Humans**: phase out old content without breaking bookmarks or links. Old pages remain
+  accessible via direct URL and Mintlify UI search.
+- **AI agents**: prevent discovery via llms.txt. If an agent lands on a deprecated page
+  directly, the frontmatter and callout make it clear the page should not be used.
+
+### What to deprecate
+
+This is a human decision. Ask the user if unclear. General rules:
+
+| Situation | Action |
+|-----------|--------|
+| New API version replaces old (e.g. Swap V2 replaces Ultra/Metis V1) | Deprecate all old version pages (docs + API reference) |
+| API endpoint removed or merged | Deprecate the specific endpoint page |
+| Product docs rewritten with new narrative (e.g. Ultra docs superseded by Swap V2 docs) | Deprecate the old product docs section |
+| Guide references only deprecated APIs | Deprecate the guide |
+| Page has mixed current + deprecated content | Do NOT deprecate. Update the content instead. |
+| Page is still the only documentation for a live feature | Do NOT deprecate, even if old. |
+
+When in doubt, ask. The cost of wrongly deprecating a useful page is higher than leaving
+an old page undeprecated.
+
+### Steps
+
+#### 1. Keep old pages live
+
+Old pages stay in the filesystem. External links, bookmarks, AI agent caches, and search
+indexes all point to them. Deleting breaks everything.
+
+Exception: pages that were never linked externally (e.g. internal drafts) can be deleted
+with a redirect in `docs.json`.
+
+#### 2. Remove from navigation
+
+Remove the old pages from `docs.json` navigation. They become undiscoverable in the
+sidebar but remain accessible via direct URL and Mintlify search.
+
+For docs pages in collapsed sub-sections (e.g. Ultra Swap nested under the Swap nav item),
+keep the collapsed group in the nav if removing it would break the page hierarchy. The
+`deprecated: true` frontmatter handles the AI exclusion regardless of nav presence.
+
+#### 3. Add `deprecated: true` to frontmatter
+
+Add `deprecated: true` to the frontmatter of every deprecated page. This signals to
+`generate-llms-from-docs.js` to exclude the page from `llms.txt`, preventing AI agents
+from discovering it.
+
+```mdx
+---
+title: "Get Quote"
+description: "Request a swap quote"
+deprecated: true
+---
+```
+
+This works for both docs pages and API reference pages.
+
+#### 4. Add deprecation callout
+
+Add a `<Warning>` immediately after the frontmatter pointing to the replacement:
+
+```mdx
+<Warning>
+The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap).
+Use [Order & Execute](/docs/swap/v2/order-and-execute) for the recommended swap flow.
+</Warning>
+```
+
+For docs pages, link to the replacement docs page. For API reference pages, link to the
+replacement API reference page.
+
+#### 5. Update `llmsDescription`
+
+Prefix the `llmsDescription` with "DEPRECATED — use [replacement] instead." on every
+deprecated page that has one. For pages without `llmsDescription`, add one with the
+DEPRECATED prefix.
+
+This catches AI agents that read the page directly (not via llms.txt).
+
+#### 6. Update top-level overview pages
+
+Overview pages (e.g. `api-reference/swap.mdx`, `docs/swap/index.mdx`) should only show
+cards and links for the current version. Remove references to deprecated versions so new
+readers are not confused by multiple options.
+
+### Result
+
+| Channel | Behaviour |
+|---------|-----------|
+| **Sidebar nav** | Old version hidden or collapsed — new users don't see it prominently |
+| **Direct URL** | Still works — existing bookmarks and links don't break |
+| **llms.txt** | Excluded — AI agents discover only current content |
+| **Mintlify search** | Still searchable — humans who know what they want can find it |
+| **Page content** | Warning callout directs visitors to the replacement |
+| **llmsDescription** | DEPRECATED prefix signals to any AI reading the page directly |
+
+### When to apply
+
+Apply this workflow whenever:
+- A new API version is released (Swap V2, Trigger V2, Price V3, etc.)
+- An API is being sunset or replaced
+- An endpoint is removed or merged into another
+- Product documentation is rewritten with a new structure or narrative
+- A guide becomes obsolete because the APIs it references are deprecated
+
 ## Do NOT
 
 - Create new top-level folders without explicit approval — the IA is intentional

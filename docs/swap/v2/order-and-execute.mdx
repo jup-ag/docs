@@ -274,6 +274,10 @@ if (result.status === "Success") {
 
 `GET /order` returns a quote and an assembled transaction in a single call. All routers compete for the best price: Metis, JupiterZ, Dflow, and OKX.
 
+<Note>
+  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See [Routing](/docs/swap/v2/routing) for details.
+</Note>
+
 **Required parameters:**
 
 | Parameter | Description |

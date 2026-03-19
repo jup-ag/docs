@@ -8,7 +8,7 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 
 <CardGroup cols={2}>
   <Card title="Order & Execute" icon="bolt" href="/docs/swap/v2/order-and-execute">
-    The default path. Get a fully assembled transaction with the best price across all routers, sign it, and send it to `/execute` for managed landing.
+    The default path. Get a fully assembled transaction with the best price across all routers, sign it, and send it to execute endpoint for managed landing.
   </Card>
 
   <Card title="Build Custom Transactions" icon="code" href="/docs/swap/v2/build">
@@ -30,10 +30,6 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 | **Transaction modification** | No | Full control |
 
 **Start with `/order`.** It gives you the best price because all routers compete, including RFQ market makers who often beat onchain routing by 5-20bps on major pairs. Only use `/build` if you need to modify the transaction.
-
-<Note>
-  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See [Routing](/docs/swap/v2/routing) for details.
-</Note>
 
 ## Endpoints
 

@@ -1,0 +1,102 @@
+---
+title: "Other Instructions"
+description: "Common instructions to compose with your swap transaction"
+llmsDescription: "Reference of common Solana instructions that developers compose with Jupiter /build swap instructions. Covers: creating associated token accounts (ATA) with createAssociatedTokenAccountIdempotent, closing token accounts to reclaim rent, adding SOL transfers (tips, payments), attaching memo instructions, and general guidance on instruction ordering. Each instruction includes a @solana/kit code example showing how to build the instruction and where to place it relative to the swap instructions."
+---
+
+When using `/build`, you can add your own instructions alongside the swap. This page covers common instructions and how to compose them.
+
+## Instruction ordering
+
+When building your transaction, follow this order:
+
+1. Compute budget instructions (from `/build` response)
+2. Setup instructions (from `/build` response)
+3. **Your pre-swap instructions** (e.g. create token accounts)
+4. Swap instruction (from `/build` response)
+5. **Your post-swap instructions** (e.g. transfer, memo, close accounts)
+6. Cleanup instruction (from `/build` response, if present)
+
+## Create associated token account
+
+If the recipient does not have a token account for the output mint, create one before the swap. Use `createAssociatedTokenAccountIdempotent` to safely handle the case where the account already exists.
+
+```typescript
+import { getCreateAssociatedTokenIdempotentInstruction } from "@solana-program/associated-token";
+import { TOKEN_PROGRAM_ADDRESS } from "@solana-program/token";
+
+const createAtaIx = getCreateAssociatedTokenIdempotentInstruction({
+  payer: signer,
+  owner: address(recipientAddress),
+  mint: address(outputMint),
+  tokenProgram: TOKEN_PROGRAM_ADDRESS,
+});
+
+// Add before the swap instruction
+```
+
+## Close token account
+
+After a swap, you may want to close a token account to reclaim its rent. This is common when swapping to native SOL (the wrapped SOL account can be closed after unwrapping).
+
+```typescript
+import { getCloseAccountInstruction } from "@solana-program/token";
+
+const closeIx = getCloseAccountInstruction({
+  account: address(tokenAccountToClose),
+  destination: signer.address, // Rent refund destination
+  owner: signer,
+});
+
+// Add after the swap instruction
+```
+
+## SOL transfer
+
+Add a SOL transfer to tip a validator, pay a fee, or send funds alongside the swap.
+
+```typescript
+import { getTransferSolInstruction } from "@solana-program/system";
+
+const transferIx = getTransferSolInstruction({
+  source: signer,
+  destination: address(recipientAddress),
+  amount: 1_000_000n, // 0.001 SOL in lamports
+});
+
+// Add before or after the swap instruction
+```
+
+## Memo instruction
+
+Attach a memo to the transaction for tracking, tagging, or compliance purposes.
+
+```typescript
+import { getAddMemoInstruction } from "@solana-program/memo";
+
+const memoIx = getAddMemoInstruction({
+  memo: "swap-order-12345",
+});
+
+// Add anywhere in the transaction
+```
+
+## CPI (Cross-Program Invocation)
+
+For protocols that need to invoke the Jupiter swap from within their own onchain program, use the swap instruction from `/build` as the inner instruction in a CPI call.
+
+- [How CPI works](https://solana.com/docs/core/cpi)
+- **CPI considerations**
+  - CPI cannot use Address Lookup Tables (ALTs), which limits the number of accounts in the transaction. Jupiter's complex routing often requires many accounts.
+  - Use `maxAccounts` on `/build` to control route complexity and keep the transaction within size limits.
+  - Set your own compute budget, as CPI adds overhead.
+- **Flash Fill (alternative to CPI)**: allows the use of Versioned Transactions and ALTs, avoiding the account limit constraints of CPI. The flow:
+- **References**
+  - [CPI swap example](https://github.com/jup-ag/jupiter-cpi-swap-example)
+  - [SOL swap CPI](https://github.com/jup-ag/sol-swap-cpi)
+  - [Flash Fill example](https://github.com/jup-ag/sol-swap-flash-fill)
+
+## Related
+
+- [Build Custom Transactions](/docs/swap/v2/build) for the full `/build` workflow
+- [Advanced Techniques](/docs/swap/v2/advanced) for compute unit simulation and priority fee strategies

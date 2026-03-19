@@ -47,6 +47,40 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 ---
 
+# Swap API V2
+
+## Architecture
+
+- [2026-03-17] Three endpoints: `/order` (default, all routers compete), `/build` (raw instructions, Metis-only routing), `/execute` (managed landing for `/order` only).
+- [2026-03-17] `/order` without optional params gets all routers (Metis, JupiterZ, Hashflow, Dflow, OKX, Mantis). Adding certain params (fee, slippage overrides) may restrict to Metis-only routing.
+- [2026-03-17] `/build` has no Jupiter swap fees. Only integrator platform fees via `platformFeeBps`.
+- [2026-03-17] `/build` returns `computeBudgetInstructions` with CU price only, NOT CU limit. Integrators must simulate to determine CU limit (confirmed from `ultra-api` source: `setComputeUnitPrice` only).
+
+## V1 vs V2 Instruction Differences
+
+- [2026-03-17] V2 instructions do not emit fee events. Integrators parsing swap results via fee events need to update their parsing logic.
+- [2026-03-17] Route plan response format: V1 uses `percent`, V2 uses `bps`.
+- [2026-03-17] V2 defaults `instructionVersion=V2` for all usage.
+
+## ALT (Address Lookup Table) Handling
+
+- [2026-03-19] `/build` returns `addressesByLookupTableAddress` as `Record<string, string[]>` (table address to contained addresses). This is the full mapping needed to compile v0 transactions. No RPC calls needed to resolve ALTs.
+- [2026-03-19] @solana/kit: use `compressTransactionMessageUsingAddressLookupTables` with the mapped data directly (just transform addresses).
+- [2026-03-19] @solana/web3.js: construct `AddressLookupTableAccount` from the response data. The constructor requires `state` fields (`deactivationSlot`, `lastExtendedSlot`, `lastExtendedSlotStartIndex`) but `compileToV0Message` only reads `key` and `state.addresses` at runtime. Use placeholder values for the unused fields.
+
+## Known Issues
+
+## Open Questions
+
+## Content Gaps
+
+## Patterns & Conventions
+
+- [2026-03-17] Code examples provide both @solana/kit and @solana/web3.js variants in `<CodeGroup>` tabs. Kit is listed first as the recommended modern SDK.
+- [2026-03-17] Prerequisites (imports, types, helpers) go in a collapsible `<Accordion>` above the main code example to keep the page scannable.
+
+---
+
 # Tokens API
 
 ## Undocumented Behavior
@@ -154,7 +188,7 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 ---
 
-# Jupiter Lend (Instadapp)
+# Jupiter Lend (Fluid Protocol)
 
 ## Architecture
 

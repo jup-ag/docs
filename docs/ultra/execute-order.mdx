@@ -1,8 +1,13 @@
 ---
 title: "Execute Order"
 description: "Submit a signed Ultra Swap transaction for execution and receive the swap result."
-llmsDescription: "POST /ultra/v1/execute accepts the signed transaction and requestId, broadcasts it, and returns the swap result."
+llmsDescription: "DEPRECATED — use Swap API V2 instead. POST /ultra/v1/execute accepts the signed transaction and requestId, broadcasts it, and returns the swap result."
+deprecated: true
 ---
+
+<Warning>
+The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap). Use [Order & Execute](/docs/swap/v2/order-and-execute) for the recommended swap flow.
+</Warning>
 
 After signing the transaction from `/order`, submit it to `POST /ultra/v1/execute` with the `signedTransaction` and `requestId`. Jupiter broadcasts the transaction via its proprietary engine and returns the swap status.
 

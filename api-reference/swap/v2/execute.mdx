@@ -1,0 +1,6 @@
+---
+openapi: /openapi-spec/swap/v2/swap.yaml post /execute
+title: "Execute Transaction"
+description: "Execute a signed transaction from /order with managed landing"
+llmsDescription: "POST /execute endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/execute. Executes a signed transaction obtained from /order. Handles transaction landing, confirmation, and retry via RTSE and Jupiter Beam. Request body: signedTransaction (base64), requestId (from /order). Response includes status (Success/Failed), signature, inputAmountResult, outputAmountResult, and error codes. Only available for /order transactions, not /build."
+---

@@ -1,20 +1,24 @@
 ---
-title: "Metis Swap API"
+title: "Swap API"
 sidebarTitle: "Overview"
-description: "Endpoints for quotes, swap transactions, swap instructions, and program labels."
+description: "Jupiter Swap API endpoints for quotes, transactions, and instructions"
+llmsDescription: "Jupiter Swap API V2 reference. Three endpoints: GET /order (quote + assembled transaction with managed execution via /execute), GET /build (quote + raw swap instructions for custom transactions), POST /execute (managed transaction landing for /order). Base URL: api.jup.ag/swap/v2. All endpoints require x-api-key header."
 ---
 
+The unified Swap API. Two paths: `/order` for managed execution, `/build` for custom transactions.
+
 <CardGroup>
-  <Card title="quote" href="/api-reference/swap/quote" icon="file-lines" horizontal>
-    Request for a quote to be used in `POST /swap`
+  <Card title="GET /order" href="/api-reference/swap/v2/order" icon="file-lines" horizontal>
+    Get a swap quote and assembled transaction with managed execution
   </Card>
-  <Card title="swap" href="/api-reference/swap/swap" icon="file-lines" horizontal>
-    Request for a base64-encoded unsigned swap transaction based on the `/quote` response
+  <Card title="GET /build" href="/api-reference/swap/v2/build" icon="file-lines" horizontal>
+    Get a swap quote with raw instructions for building custom transactions
   </Card>
-  <Card title="swap-instructions" href="/api-reference/swap/swap-instructions" icon="file-lines" horizontal>
-    Request for swap instructions that you can use from the quote you get from `/quote`
-  </Card>
-  <Card title="program-id-to-label" href="/api-reference/swap/program-id-to-label" icon="file-lines" horizontal>
-    Returns a hash, which key is the program id and value is the label.
+  <Card title="POST /execute" href="/api-reference/swap/v2/execute" icon="file-lines" horizontal>
+    Execute a signed transaction from /order with managed landing
   </Card>
 </CardGroup>
+
+**Base URL:** `https://api.jup.ag/swap/v2`
+
+All endpoints require an API key via the `x-api-key` header. Get one at [portal.jup.ag](https://portal.jup.ag).

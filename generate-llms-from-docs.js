@@ -54,12 +54,11 @@ console.log(`✅ Generated llms.txt at: ${path.join(baseFolder, 'llms.txt')}`);
 function generateLlmsTxt(sortedData) {
   let output = '# Jupiter\n\n';
   output += `> Jupiter is DeFi infrastructure on Solana providing swap, lending, perpetuals, limit-order, DCA, and portfolio APIs.\n`;
-  output += `> Two main swap APIs: **Ultra** (recommended — managed execution, gasless, RPC-less) and **Metis** (advanced — low-level routing primitives, bring your own RPC).\n`;
-  output += `> Base URL: \`https://api.jup.ag\`. All endpoints require an \`x-api-key\` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).\n\n`;
+  output += `> **Swap API V2** (recommended): \`/order\` for managed execution, \`/build\` for custom transactions. Base URL: \`https://api.jup.ag/swap/v2\`.\n`;
+  output += `> All endpoints require an \`x-api-key\` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).\n\n`;
 
   output += `## Quick Reference\n\n`;
-  output += `- Ultra Swap API (recommended): \`GET /ultra/v1/order\` + \`POST /ultra/v1/execute\`\n`;
-  output += `- Metis Swap API (advanced): \`GET /swap/v1/quote\` + \`POST /swap/v1/swap\`\n`;
+  output += `- Swap API V2 (recommended): \`GET /swap/v2/order\` + \`POST /swap/v2/execute\` or \`GET /swap/v2/build\`\n`;
   output += `- Trigger (limit orders): \`POST /trigger/v1/createOrder\`\n`;
   output += `- Recurring (DCA): \`POST /recurring/v1/createOrder\`\n`;
   output += `- Lend: \`POST /lend/v1/earn/deposit\`\n`;
@@ -314,7 +313,7 @@ function extractFrontmatter(filePath) {
     const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*(?:\n|$)/);
     if (!match) throw new Error('No frontmatter found in file: ' + filePath);
 
-    let title, description, llmsDescription;
+    let title, description, llmsDescription, deprecated = false;
     match[1].split('\n').forEach(line => {
       line = line.trim();
       if (!line || line.startsWith('#')) return;
@@ -331,8 +330,11 @@ function extractFrontmatter(filePath) {
         if (key === 'title') title = value;
         if (key === 'description') description = value;
         if (key === 'llmsDescription') llmsDescription = value;
+        if (key === 'deprecated' && value === 'true') deprecated = true;
       }
     });
+
+    if (deprecated) return null;
 
     if (!title || !description) {
       throw new Error(`Missing frontmatter 'title' or 'description' in file: ${filePath}`);

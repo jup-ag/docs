@@ -9,7 +9,14 @@
   },
   "favicon": "/favicon.png",
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude", "cursor", "vscode"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "cursor",
+      "vscode"
+    ]
   },
   "appearance": {
     "default": "dark"
@@ -30,7 +37,9 @@
         "groups": [
           {
             "group": " ",
-            "pages": ["index"]
+            "pages": [
+              "index"
+            ]
           }
         ]
       },
@@ -126,7 +135,10 @@
               },
               {
                 "group": "Price",
-                "pages": ["docs/price/index", "docs/price/v3"]
+                "pages": [
+                  "docs/price/index",
+                  "docs/price/v3"
+                ]
               },
               {
                 "group": "API Reference",
@@ -146,7 +158,10 @@
                   },
                   {
                     "group": "Price",
-                    "pages": ["api-reference/price", "api-reference/price/v3/price"]
+                    "pages": [
+                      "api-reference/price",
+                      "api-reference/price/v3/price"
+                    ]
                   }
                 ]
               }
@@ -277,12 +292,123 @@
             ]
           },
           {
+            "item": "Perps",
+            "icon": "chart-line",
+            "groups": [
+              {
+                "group": " ",
+                "pages": [
+                  "docs/perps/index"
+                ]
+              },
+              {
+                "group": "Perps Program",
+                "pages": [
+                  "docs/perps/position-account",
+                  "docs/perps/position-request-account",
+                  "docs/perps/pool-account",
+                  "docs/perps/custody-account"
+                ]
+              }
+            ]
+          },
+          {
+            "item": "Trigger",
+            "icon": "bullseye",
+            "groups": [
+              {
+                "group": " ",
+                "pages": [
+                  "docs/trigger/index"
+                ]
+              },
+              {
+                "group": "Trigger Order API",
+                "tag": "BETA",
+                "pages": [
+                  "docs/trigger/authentication",
+                  "docs/trigger/create-order",
+                  "docs/trigger/manage-orders",
+                  "docs/trigger/order-history",
+                  "docs/trigger/best-practices"
+                ]
+              },
+              {
+                "group": "API Reference",
+                "tag": "BETA",
+                "pages": [
+                  "api-reference/trigger",
+                  "api-reference/trigger/v2",
+                  "api-reference/trigger/v2/challenge",
+                  "api-reference/trigger/v2/verify",
+                  "api-reference/trigger/v2/verify-token",
+                  "api-reference/trigger/v2/vault",
+                  "api-reference/trigger/v2/vault-register",
+                  "api-reference/trigger/v2/deposit-craft",
+                  "api-reference/trigger/v2/create-order",
+                  "api-reference/trigger/v2/update-order",
+                  "api-reference/trigger/v2/cancel-order",
+                  "api-reference/trigger/v2/confirm-cancel",
+                  "api-reference/trigger/v2/order-history"
+                ]
+              }
+            ]
+          },
+          {
+            "item": "Recurring",
+            "icon": "clock-rotate-left",
+            "groups": [
+              {
+                "group": " ",
+                "pages": [
+                  "docs/recurring/index"
+                ]
+              },
+              {
+                "group": "Recurring API",
+                "pages": [
+                  "docs/recurring/create-order",
+                  "docs/recurring/execute-order"
+                ]
+              },
+              {
+                "group": "Order Management",
+                "pages": [
+                  "docs/recurring/cancel-order",
+                  "docs/recurring/deposit-price-order",
+                  "docs/recurring/withdraw-price-order",
+                  "docs/recurring/get-recurring-orders"
+                ]
+              },
+              {
+                "group": "Debugging",
+                "pages": [
+                  "docs/recurring/best-practices"
+                ]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "api-reference/recurring",
+                  "api-reference/recurring/create-order",
+                  "api-reference/recurring/execute",
+                  "api-reference/recurring/cancel-order",
+                  "api-reference/recurring/price-deposit",
+                  "api-reference/recurring/price-withdraw",
+                  "api-reference/recurring/get-recurring-orders"
+                ]
+              }
+            ]
+          },
+          {
             "item": "Prediction",
             "icon": "check-to-slot",
             "groups": [
               {
                 "group": " ",
-                "pages": ["docs/prediction/index"]
+                "pages": [
+                  "docs/prediction/index"
+                ]
               },
               {
                 "group": "Trading Guides",
@@ -361,109 +487,10 @@
                   },
                   {
                     "group": "Vault",
-                    "pages": ["api-reference/prediction/get-vault-info"]
+                    "pages": [
+                      "api-reference/prediction/get-vault-info"
+                    ]
                   }
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Perps",
-            "icon": "chart-line",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/perps/index"]
-              },
-              {
-                "group": "Perps Program",
-                "pages": [
-                  "docs/perps/position-account",
-                  "docs/perps/position-request-account",
-                  "docs/perps/pool-account",
-                  "docs/perps/custody-account"
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Trigger",
-            "icon": "bullseye",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/trigger/index"]
-              },
-              {
-                "group": "Trigger Order API",
-                "tag": "BETA",
-                "pages": [
-                  "docs/trigger/authentication",
-                  "docs/trigger/create-order",
-                  "docs/trigger/manage-orders",
-                  "docs/trigger/order-history",
-                  "docs/trigger/best-practices"
-                ]
-              },
-              {
-                "group": "API Reference",
-                "tag": "BETA",
-                "pages": [
-                  "api-reference/trigger",
-                  "api-reference/trigger/v2",
-                  "api-reference/trigger/v2/challenge",
-                  "api-reference/trigger/v2/verify",
-                  "api-reference/trigger/v2/verify-token",
-                  "api-reference/trigger/v2/vault",
-                  "api-reference/trigger/v2/vault-register",
-                  "api-reference/trigger/v2/deposit-craft",
-                  "api-reference/trigger/v2/create-order",
-                  "api-reference/trigger/v2/update-order",
-                  "api-reference/trigger/v2/cancel-order",
-                  "api-reference/trigger/v2/confirm-cancel",
-                  "api-reference/trigger/v2/order-history"
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Recurring",
-            "icon": "clock-rotate-left",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/recurring/index"]
-              },
-              {
-                "group": "Recurring API",
-                "pages": [
-                  "docs/recurring/create-order",
-                  "docs/recurring/execute-order"
-                ]
-              },
-              {
-                "group": "Order Management",
-                "pages": [
-                  "docs/recurring/cancel-order",
-                  "docs/recurring/deposit-price-order",
-                  "docs/recurring/withdraw-price-order",
-                  "docs/recurring/get-recurring-orders"
-                ]
-              },
-              {
-                "group": "Debugging",
-                "pages": ["docs/recurring/best-practices"]
-              },
-              {
-                "group": "API Reference",
-                "pages": [
-                  "api-reference/recurring",
-                  "api-reference/recurring/create-order",
-                  "api-reference/recurring/execute",
-                  "api-reference/recurring/cancel-order",
-                  "api-reference/recurring/price-deposit",
-                  "api-reference/recurring/price-withdraw",
-                  "api-reference/recurring/get-recurring-orders"
                 ]
               }
             ]
@@ -474,12 +501,16 @@
             "groups": [
               {
                 "group": " ",
-                "pages": ["docs/portfolio/index"]
+                "pages": [
+                  "docs/portfolio/index"
+                ]
               },
               {
                 "group": "Portfolio API",
                 "tag": "BETA",
-                "pages": ["docs/portfolio/jupiter-positions"]
+                "pages": [
+                  "docs/portfolio/jupiter-positions"
+                ]
               },
               {
                 "group": "API Reference",
@@ -499,7 +530,9 @@
             "groups": [
               {
                 "group": " ",
-                "pages": ["docs/send/index"]
+                "pages": [
+                  "docs/send/index"
+                ]
               },
               {
                 "group": "Send API",
@@ -530,12 +563,17 @@
             "groups": [
               {
                 "group": " ",
-                "pages": ["docs/studio/index"]
+                "pages": [
+                  "docs/studio/index"
+                ]
               },
               {
                 "group": "Studio API",
                 "tag": "BETA",
-                "pages": ["docs/studio/create-token", "docs/studio/claim-fee"]
+                "pages": [
+                  "docs/studio/create-token",
+                  "docs/studio/claim-fee"
+                ]
               },
               {
                 "group": "API Reference",
@@ -557,7 +595,9 @@
             "groups": [
               {
                 "group": " ",
-                "pages": ["docs/lock/index"]
+                "pages": [
+                  "docs/lock/index"
+                ]
               }
             ]
           },
@@ -567,7 +607,9 @@
             "groups": [
               {
                 "group": " ",
-                "pages": ["docs/routing/index"]
+                "pages": [
+                  "docs/routing/index"
+                ]
               },
               {
                 "group": "Routing Integrations",
@@ -591,7 +633,9 @@
             "groups": [
               {
                 "group": " ",
-                "pages": ["tool-kits/index"]
+                "pages": [
+                  "tool-kits/index"
+                ]
               },
               {
                 "group": "Jupiter Plugin",
@@ -619,7 +663,9 @@
               },
               {
                 "group": "Jupiter Referral Program",
-                "pages": ["tool-kits/referral-program"]
+                "pages": [
+                  "tool-kits/referral-program"
+                ]
               }
             ]
           }
@@ -630,11 +676,18 @@
         "groups": [
           {
             "group": " ",
-            "pages": ["ai/index"]
+            "pages": [
+              "ai/index"
+            ]
           },
           {
             "group": "AI Resources",
-            "pages": ["ai/skills", "ai/llms-txt", "ai/mcp", "ai/ecosystem"]
+            "pages": [
+              "ai/skills",
+              "ai/llms-txt",
+              "ai/mcp",
+              "ai/ecosystem"
+            ]
           }
         ]
       },

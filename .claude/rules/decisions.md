@@ -64,6 +64,34 @@ BEFORE making the change.
 **Rationale:** Mirrors the Earn/Borrow product distinction. Keeps advanced CPI recipes separate from basic SDK usage so beginners aren't overwhelmed. Consistent with how other products (Ultra, Trigger) use subfolders for distinct capabilities.
 **Alternatives considered:** Keep flat structure with all pages at `docs/lend/`. Rejected because 20+ pages in one folder is hard to navigate and doesn't reflect the two-sided product model.
 
+### [2026-03-17] Swap API V2 docs structure
+**Status:** implemented
+**Scope:** folder-structure | navigation | new-section
+**Files affected:** `docs/swap/`, `docs/swap/v2/`, `api-reference/swap/`, `openapi-spec/swap/v2/`, `docs.json`
+**Linear issue:** DEVREL-83
+
+**Context:** Jupiter unified its swap APIs (Ultra and Metis) into a single Swap API at `api.jup.ag/swap/v2`. Needed a complete documentation structure for three endpoints (`/order`, `/build`, `/execute`) while preserving existing V1 docs.
+**Decision:**
+- Top-level overview at `docs/swap/index.mdx` with comparison table (order vs build)
+- V2 pages: `order-and-execute.mdx`, `build/index.mdx`, `build/other-instructions.mdx`, `routing.mdx`, `fees.mdx`, `migration.mdx`
+- Advanced guides as standalone pages under `docs/swap/v2/advanced/` (CU simulation, gasless, reduce latency, reduce tx size)
+- Existing Metis pages moved to `docs/swap/v1/` with collapsed nav
+- API reference: `api-reference/swap/v2/` with `order.mdx`, `build.mdx`, `execute.mdx`
+- OpenAPI spec: `openapi-spec/swap/v2/swap.yaml`
+**Rationale:** Follows the same V1/V2 restructure pattern established by Trigger (DEVREL-75). V2 is primary, V1 collapsed. Advanced guides split into individual pages to avoid one long page (per DEVREL-56 decision).
+**Alternatives considered:** Keeping advanced as a single page. Rejected because each technique (gasless, CU sim, reduce tx size) is a distinct use case that benefits from its own page.
+**Migration notes:** V1 paths preserved at `docs/swap/v1/`. No redirects needed as old Metis paths were already at `docs/swap/`.
+
+### [2026-03-19] Move Advanced group to top-level nav sibling
+**Status:** implemented
+**Scope:** navigation
+**Files affected:** `docs.json`
+**Linear issue:** DEVREL-83
+
+**Context:** Advanced pages were nested inside the Swap V2 group in the sidebar, making them harder to discover.
+**Decision:** Move "Advanced" group to be a sibling of the Swap V2 group at the same nesting level.
+**Rationale:** Advanced techniques apply across both `/order` and `/build` paths, so they shouldn't be nested under either. Top-level placement improves discoverability.
+
 ---
 
 ## Content Type Definitions

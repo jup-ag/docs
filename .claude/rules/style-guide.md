@@ -27,6 +27,10 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 | Developer Portal      | Portal, Dev Portal, Dashboard            | Full name first, then "Portal" is OK     |
 | API key               | api key, API Key, apiKey                  | Lowercase "key" in prose, camelCase only in code |
 | Solana                | SOL (when referring to the chain)         | "SOL" only for the token                 |
+| Swap API          | Unified Swap API, Swap V2             | "Swap API" in prose. Use "V2" only when contrasting with V1 |
+| `/order`          | order endpoint, order API              | Always backtick the path in prose              |
+| `/build`          | build endpoint, build API              | Always backtick the path in prose              |
+| `/execute`        | execute endpoint, execute API          | Always backtick the path in prose              |
 
 ### Product-Specific Terms
 
@@ -185,3 +189,6 @@ Format: `- [YYYY-MM-DD] Decision: rationale`
 - [2026-03-12] Lend terminology: use "Earn" (not "Supply" or "Lending") for the deposit side, "Borrow" for the vault/debt side. Matches product UI naming.
 - [2026-03-12] SDK named parameters: when documenting SDK functions, always show the named-parameter form (`{ connection, signer, asset, amount }`) not positional args. Positional forms are error-prone and not how the SDK is designed.
 - [2026-03-12] Import Private Key pattern: use base58 decode (`bs58.decode(privateKey)` with `Keypair.fromSecretKey`), not file-read from JSON. Browser wallets export base58 strings.
+- [2026-03-17] Swap V2 code examples always show both @solana/kit and @solana/web3.js in `<CodeGroup>` tabs, with kit listed first. Prerequisites (imports, types, helpers) go in a collapsible `<Accordion>` to keep the main example clean.
+- [2026-03-19] When `/build` returns ALT data (`addressesByLookupTableAddress`), never make RPC calls to resolve ALTs. Construct lookup table objects locally from the response data. Both kit and web3.js examples should use a `transformALTs` helper for consistency.
+- [2026-03-19] For @solana/web3.js `AddressLookupTableAccount` construction: `compileToV0Message` only uses `key` and `state.addresses`. Other state fields (`deactivationSlot`, `lastExtendedSlot`, `lastExtendedSlotStartIndex`) are TypeScript requirements only. Encapsulate in a helper rather than exposing placeholder values in the main code example.

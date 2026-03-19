@@ -249,6 +249,24 @@ function toInstruction(ix: ApiInstruction): TransactionInstruction {
     data: Buffer.from(ix.data, "base64"),
   });
 }
+
+function transformALTs(
+  raw: Record<string, string[]> | null,
+): AddressLookupTableAccount[] {
+  if (!raw) return [];
+  return Object.entries(raw).map(
+    ([key, addresses]) =>
+      new AddressLookupTableAccount({
+        key: new PublicKey(key),
+        state: {
+          deactivationSlot: BigInt("18446744073709551615"),
+          lastExtendedSlot: 0,
+          lastExtendedSlotStartIndex: 0,
+          addresses: addresses.map((a) => new PublicKey(a)),
+        },
+      }),
+  );
+}
 ```
 </CodeGroup>
 </Accordion>
@@ -421,24 +439,9 @@ const instructions = [
 ];
 
 // Step 3: Resolve address lookup tables (from /build response, no RPC needed)
-const addressLookupTableAccounts: AddressLookupTableAccount[] = [];
-if (build.addressesByLookupTableAddress) {
-  for (const [tableAddr, addresses] of Object.entries(
-    build.addressesByLookupTableAddress,
-  )) {
-    addressLookupTableAccounts.push(
-      new AddressLookupTableAccount({
-        key: new PublicKey(tableAddr),
-        state: {
-          deactivationSlot: BigInt("18446744073709551615"),
-          lastExtendedSlot: 0,
-          lastExtendedSlotStartIndex: 0,
-          addresses: addresses.map((a) => new PublicKey(a)),
-        },
-      }),
-    );
-  }
-}
+const addressLookupTableAccounts = transformALTs(
+  build.addressesByLookupTableAddress,
+);
 
 const { blockhash, lastValidBlockHeight } = build.blockhashWithMetadata;
 const recentBlockhash = bs58.encode(Buffer.from(blockhash));

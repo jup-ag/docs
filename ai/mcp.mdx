@@ -1,19 +1,22 @@
 ---
-title: "MCP"
-description: "Model Context Protocol integration for Jupiter — query docs and APIs directly from your AI editor."
-llmsDescription: "Jupiter supports the Model Context Protocol (MCP) through Mintlify's native MCP server at https://dev.jup.ag/mcp. This enables AI tools like Claude Code, Cursor, Windsurf, and other MCP-compatible editors to query Jupiter documentation and OpenAPI specifications in-context. The MCP server allows AI assistants to look up API endpoints, read documentation pages, scaffold API calls, and debug errors against the real specification without leaving the editor."
+title: "Documentation MCP"
+description: "Search and query Jupiter docs and APIs from your AI editor via Model Context Protocol."
+llmsDescription: "Jupiter supports the Model Context Protocol (MCP) through Mintlify's native MCP server at https://dev.jup.ag/mcp. This enables AI tools like Claude Code, Cursor, Windsurf, and other MCP-compatible editors to search and query Jupiter documentation and OpenAPI specifications in-context. The MCP server allows AI assistants to look up API endpoints, read documentation pages, and understand API schemas without leaving the editor. It is a read-only documentation server, not a tool for executing API calls."
 ---
 
-Jupiter supports the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) through Mintlify's native integration. This lets AI tools query Jupiter's documentation and API specifications directly from your editor.
+Jupiter supports the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) through Mintlify's native integration. This lets AI tools search and query Jupiter's documentation and API specifications directly from your editor.
 
 ## What is MCP?
 
 MCP is an open protocol that connects AI assistants to external data sources and tools. With Jupiter's MCP server, your AI editor can:
 
-- **Query documentation** — look up any API endpoint, guide, or reference
-- **Read OpenAPI specs** — access full request/response schemas
-- **Scaffold API calls** — generate code from real specifications
-- **Debug errors** — check your code against the actual API contract
+- **Search documentation**: find relevant API endpoints, guides, and references
+- **Read OpenAPI specs**: access full request/response schemas
+- **Understand API contracts**: look up parameters, response fields, and error codes
+
+<Note>
+This is a read-only documentation server. It helps your AI assistant understand Jupiter's APIs, but does not execute API calls. For trading via AI tools, see [Jupiter CLI](/ai/cli) or [Trading MCP](/ai/trading-mcp).
+</Note>
 
 ## Mintlify Native MCP
 
@@ -27,17 +30,16 @@ This server exposes all Jupiter documentation and OpenAPI specifications through
 
 ## What You Get
 
-Once connected, your AI assistant has full access to:
+Once connected, your AI assistant can search and read:
 
 | Resource | Description |
 |:---------|:------------|
 | **Documentation pages** | All guides, tutorials, and reference docs |
 | **OpenAPI specifications** | Complete API schemas for Ultra Swap, Tokens, Price, and more |
-| **Code examples** | Sample implementations from the docs |
 | **Error references** | Common error codes and troubleshooting guides |
 
 <Tip>
-Combine MCP with [llms.txt](/ai/llms-txt) for the best results — use MCP for in-editor queries and llms.txt for batch processing or RAG pipelines.
+Combine MCP with [llms.txt](/ai/llms-txt) for the best results: use MCP for in-editor queries and llms.txt for batch processing or RAG pipelines.
 </Tip>
 
 ## Setup

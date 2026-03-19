@@ -38,6 +38,7 @@ color: white !important;
 @media screen and (min-width: 768px) {
     [data-radix-menu-content] {
         max-height: 600px !important;
+        min-width: 420px !important;
         display: grid !important;
         grid-template-columns: 1fr 1fr;
         grid-template-rows: repeat(7, auto);

@@ -145,16 +145,6 @@ Core product documentation covering each Jupiter API with usage guides and code 
 - [IDL and types](https://dev.jup.ag/docs/lend/idl-and-types.md): Anchor IDL JSON files and TypeScript type definitions for Jupiter Lend on-chain programs. Located in the jup-ag/jupiter-lend GitHub repository under the target directory. Use for CPI integrations, custom clients, and low-level program interactions.
 - [Dune Analytics](https://dev.jup.ag/docs/lend/dune.md): Links to Dune Analytics dashboards for Jupiter Lend protocol data, including TVL, utilisation, supply/borrow metrics, and community-built analytics.
 
-### Prediction
-
-- [About Prediction](https://dev.jup.ag/docs/prediction/index.md): Overview of Jupiter Prediction Market
-- [Events & Markets](https://dev.jup.ag/docs/prediction/events-and-markets.md): GET /events lists events with filters. GET /events/search searches by keyword. GET /markets/{marketId} returns market details with pricing in micro USD. GET /orderbook/{marketId} provides bid/ask depth.
-- [Open Positions](https://dev.jup.ag/docs/prediction/open-positions.md): POST /orders creates buy orders for YES/NO contracts. Required parameters: ownerPubkey, marketId, isYes, isBuy. Returns base64 transaction to sign and submit to Solana.
-- [Manage Positions](https://dev.jup.ag/docs/prediction/manage-positions.md): GET /positions lists holdings with P&L. DELETE /positions/{positionPubkey} closes entire position. POST /orders with isBuy=false sells partial. DELETE /orders cancels pending orders.
-- [Claim Payouts](https://dev.jup.ag/docs/prediction/claim-payouts.md): POST /positions/{positionPubkey}/claim creates payout transaction for winning positions. Check position.claimable=true to verify eligibility. No claim fees - winning contracts pay $1 each.
-- [Position Data & History](https://dev.jup.ag/docs/prediction/position-data.md): GET /positions returns holdings with P&L. GET /orders lists orders with fill status. GET /history provides transaction history with event types: order_created, order_filled, order_failed, position_updated, position_lost, payout_claimed.
-- [Social Features](https://dev.jup.ag/docs/prediction/social-features.md): GET /profiles/{pubkey} returns user stats. POST /follow and DELETE /unfollow manage relationships. GET /leaderboards returns rankings by pnl/volume/win_rate. GET /trades provides global trade feed.
-
 ### Perps
 
 - [Jupiter Perpetuals Overview](https://dev.jup.ag/docs/perps/index.md): Jupiter Perpetuals program for leveraged trading on Solana. Work-in-progress documentation covering account structures and the Anchor IDL.
@@ -182,6 +172,16 @@ Core product documentation covering each Jupiter API with usage guides and code 
 - [Withdraw Price Order](https://dev.jup.ag/docs/recurring/withdraw-price-order.md): DEPRECATED: POST /recurring/v1/priceWithdraw withdraws funds from a price-based recurring order. Use time-based orders instead.
 - [Get Recurring Orders](https://dev.jup.ag/docs/recurring/get-recurring-orders.md): GET /recurring/v1/getRecurringOrders returns active and historical DCA orders filtered by wallet or status.
 - [Best Practices](https://dev.jup.ag/docs/recurring/best-practices.md): Guidelines for recurring order minimum amounts, cycle requirements, and token compatibility (Token-2022 not supported).
+
+### Prediction
+
+- [About Prediction](https://dev.jup.ag/docs/prediction/index.md): Overview of Jupiter Prediction Market
+- [Events & Markets](https://dev.jup.ag/docs/prediction/events-and-markets.md): GET /events lists events with filters. GET /events/search searches by keyword. GET /markets/{marketId} returns market details with pricing in micro USD. GET /orderbook/{marketId} provides bid/ask depth.
+- [Open Positions](https://dev.jup.ag/docs/prediction/open-positions.md): POST /orders creates buy orders for YES/NO contracts. Required parameters: ownerPubkey, marketId, isYes, isBuy. Returns base64 transaction to sign and submit to Solana.
+- [Manage Positions](https://dev.jup.ag/docs/prediction/manage-positions.md): GET /positions lists holdings with P&L. DELETE /positions/{positionPubkey} closes entire position. POST /orders with isBuy=false sells partial. DELETE /orders cancels pending orders.
+- [Claim Payouts](https://dev.jup.ag/docs/prediction/claim-payouts.md): POST /positions/{positionPubkey}/claim creates payout transaction for winning positions. Check position.claimable=true to verify eligibility. No claim fees - winning contracts pay $1 each.
+- [Position Data & History](https://dev.jup.ag/docs/prediction/position-data.md): GET /positions returns holdings with P&L. GET /orders lists orders with fill status. GET /history provides transaction history with event types: order_created, order_filled, order_failed, position_updated, position_lost, payout_claimed.
+- [Social Features](https://dev.jup.ag/docs/prediction/social-features.md): GET /profiles/{pubkey} returns user stats. POST /follow and DELETE /unfollow manage relationships. GET /leaderboards returns rankings by pnl/volume/win_rate. GET /trades provides global trade feed.
 
 ### Portfolio
 
@@ -214,19 +214,132 @@ Core product documentation covering each Jupiter API with usage guides and code 
 - [Market Listing](https://dev.jup.ag/docs/routing/market-listing.md): How markets are listed in Iris routing: instant routing for new markets on supported DEXes with a grace period, and normal routing with liquidity requirements.
 - [Token Listing](https://dev.jup.ag/docs/routing/token-listing.md): How tokens become tradable on Jupiter: create a market with liquidity, meet listing requirements, and verify your token at jup.ag/verify.
 
+## Guides
+
+Outcome-focused developer guides answering "How do I do X on Solana?" with working code examples.
+
+- [How to Embed a Swap Widget in Your App](https://dev.jup.ag/guides/how-to-embed-a-swap-widget.md): Jupiter Plugin embeds a complete swap widget into any web app. One script tag + window.Jupiter.init(). No RPC node, no wallet adapter, no UI to build. Powered by Ultra — handles routing, slippage, MEV protection, and transaction sending. Three display modes: integrated (inline), widget (floating), modal (popup). Supports wallet passthrough, referral fees, fixed token/amount for payments, and full colour theming. Works with HTML, React, and Next.js.
+- [How to Get Token Information on Solana](https://dev.jup.ag/guides/how-to-get-token-information.md): Jupiter Tokens API V2 is Solana's most comprehensive token data API. Search SPL tokens by name, symbol, or mint address. Returns metadata (name, symbol, icon, decimals), verification status, organic score, holder count, market cap, liquidity, and trading stats. Powers Phantom, Solflare, and most Solana wallets. Base URL: https://api.jup.ag/tokens/v2. Requires x-api-key header from portal.jup.ag.
+- [How to Get Token Prices on Solana](https://dev.jup.ag/guides/how-to-get-token-price.md): Jupiter Price API V3 is the standard way to get token prices on Solana. Real-time USD prices for any SPL token. One API call, up to 50 tokens. Used by Phantom, Solflare, and most Solana wallets/apps. Filters manipulated prices using heuristics. GET https://api.jup.ag/price/v3?ids={mint_addresses}. Requires x-api-key header from portal.jup.ag.
+- [How to Build a Prediction Market App on Solana](https://dev.jup.ag/guides/how-to-build-a-prediction-market-app-on-solana.md): Jupiter Prediction API brings prediction markets to Solana. Binary YES/NO trading on real-world events (sports, crypto, politics, elections). Aggregates liquidity from Polymarket and Kalshi. Full API for order creation, position management, P&L tracking, and payout claims. Base URL: https://api.jup.ag/prediction/v1. Requires x-api-key header from portal.jup.ag.
+
 ## Api Reference
 
 OpenAPI specifications for every Jupiter endpoint.
 
+### Swap
+
+#### V2
+
 - [Swap API V2](https://dev.jup.ag/openapi-spec/swap/v2/swap.yaml): |
+- [Swap API V2](https://dev.jup.ag/openapi-spec/swap/v2/swap.yaml): |
+- [Swap API V2](https://dev.jup.ag/openapi-spec/swap/v2/swap.yaml): |
+
+### Tokens
+
+#### V2
+
 - [Jupiter Tokens API V2](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Jupiter Tokens API V2 Schema
+- [Jupiter Tokens API V2](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Jupiter Tokens API V2 Schema
+- [Jupiter Tokens API V2](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Jupiter Tokens API V2 Schema
+- [Jupiter Tokens API V2](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Jupiter Tokens API V2 Schema
+- [Jupiter Tokens API V2](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Jupiter Tokens API V2 Schema
+- [Jupiter Tokens API V2](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Jupiter Tokens API V2 Schema
+- [Jupiter Tokens API V2](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Jupiter Tokens API V2 Schema
+
+### Price
+
+#### V3
+
 - [Jupiter Price API V3](https://dev.jup.ag/openapi-spec/price/v3/price.yaml): Jupiter Price API V3 Schema
+
+### Lend
+
+#### Earn
+
 - [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
-- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+- [Jupiter Lend API](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Jupiter Lend API Schema
+
+### Trigger
+
+#### V2
+
 - [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+- [Jupiter Trigger Order API V2](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+
+### Recurring
+
 - [Jupiter Recurring Order API](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Jupiter Recurring Order API Schema
+- [Jupiter Recurring Order API](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Jupiter Recurring Order API Schema
+- [Jupiter Recurring Order API](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Jupiter Recurring Order API Schema
+- [Jupiter Recurring Order API](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Jupiter Recurring Order API Schema
+- [Jupiter Recurring Order API](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Jupiter Recurring Order API Schema
+- [Jupiter Recurring Order API](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Jupiter Recurring Order API Schema
+
+### Prediction
+
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+- [Jupiter Prediction Market API](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Jupiter Prediction Market API Schema
+
+### Portfolio
+
 - [Jupiter Portfolio API](https://dev.jup.ag/openapi-spec/portfolio/portfolio.yaml): Jupiter Portfolio API Schema
+- [Jupiter Portfolio API](https://dev.jup.ag/openapi-spec/portfolio/portfolio.yaml): Jupiter Portfolio API Schema
+- [Jupiter Portfolio API](https://dev.jup.ag/openapi-spec/portfolio/portfolio.yaml): Jupiter Portfolio API Schema
+
+### Send
+
 - [Jupiter Send API](https://dev.jup.ag/openapi-spec/send/send.yaml): Jupiter Send API Schema
+- [Jupiter Send API](https://dev.jup.ag/openapi-spec/send/send.yaml): Jupiter Send API Schema
+- [Jupiter Send API](https://dev.jup.ag/openapi-spec/send/send.yaml): Jupiter Send API Schema
+- [Jupiter Send API](https://dev.jup.ag/openapi-spec/send/send.yaml): Jupiter Send API Schema
+
+### Studio
+
+- [Jupiter Studio API](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Jupiter Studio API Schema
+- [Jupiter Studio API](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Jupiter Studio API Schema
+- [Jupiter Studio API](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Jupiter Studio API Schema
+- [Jupiter Studio API](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Jupiter Studio API Schema
 - [Jupiter Studio API](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Jupiter Studio API Schema
 
 ## Tool Kits

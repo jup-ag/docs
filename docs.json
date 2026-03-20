@@ -104,9 +104,14 @@
                 ]
               },
               {
+                "group": "Guides",
+                "pages": [
+                  "guides/how-to-embed-a-swap-widget"
+                ]
+              },
+              {
                 "group": "API Reference",
                 "pages": [
-                  "api-reference/swap",
                   "api-reference/swap/v2/order",
                   "api-reference/swap/v2/build",
                   "api-reference/swap/v2/execute"
@@ -141,12 +146,18 @@
                 ]
               },
               {
+                "group": "Guides",
+                "pages": [
+                  "guides/how-to-get-token-information",
+                  "guides/how-to-get-token-price"
+                ]
+              },
+              {
                 "group": "API Reference",
                 "pages": [
                   {
                     "group": "Tokens",
                     "pages": [
-                      "api-reference/tokens",
                       "api-reference/tokens/v2/search",
                       "api-reference/tokens/v2/tag",
                       "api-reference/tokens/v2/category",
@@ -159,7 +170,6 @@
                   {
                     "group": "Price",
                     "pages": [
-                      "api-reference/price",
                       "api-reference/price/v3/price"
                     ]
                   }
@@ -172,7 +182,7 @@
             "icon": "piggy-bank",
             "groups": [
               {
-                "group": " ",
+                "group": "Lend",
                 "pages": [
                   "docs/lend/index",
                   "docs/lend/architecture",
@@ -268,12 +278,10 @@
               {
                 "group": "API Reference",
                 "pages": [
-                  "api-reference/lend",
                   {
                     "group": "Earn",
                     "tag": "BETA",
                     "pages": [
-                      "api-reference/lend/earn",
                       "api-reference/lend/earn/deposit",
                       "api-reference/lend/earn/withdraw",
                       "api-reference/lend/earn/mint",
@@ -296,14 +304,9 @@
             "icon": "chart-line",
             "groups": [
               {
-                "group": " ",
-                "pages": [
-                  "docs/perps/index"
-                ]
-              },
-              {
                 "group": "Perps Program",
                 "pages": [
+                  "docs/perps/index",
                   "docs/perps/position-account",
                   "docs/perps/position-request-account",
                   "docs/perps/pool-account",
@@ -317,15 +320,10 @@
             "icon": "bullseye",
             "groups": [
               {
-                "group": " ",
-                "pages": [
-                  "docs/trigger/index"
-                ]
-              },
-              {
                 "group": "Trigger Order API",
                 "tag": "BETA",
                 "pages": [
+                  "docs/trigger/index",
                   "docs/trigger/authentication",
                   "docs/trigger/create-order",
                   "docs/trigger/manage-orders",
@@ -337,8 +335,6 @@
                 "group": "API Reference",
                 "tag": "BETA",
                 "pages": [
-                  "api-reference/trigger",
-                  "api-reference/trigger/v2",
                   "api-reference/trigger/v2/challenge",
                   "api-reference/trigger/v2/verify",
                   "api-reference/trigger/v2/verify-token",
@@ -359,14 +355,9 @@
             "icon": "clock-rotate-left",
             "groups": [
               {
-                "group": " ",
-                "pages": [
-                  "docs/recurring/index"
-                ]
-              },
-              {
                 "group": "Recurring API",
                 "pages": [
+                  "docs/recurring/index",
                   "docs/recurring/create-order",
                   "docs/recurring/execute-order"
                 ]
@@ -389,7 +380,6 @@
               {
                 "group": "API Reference",
                 "pages": [
-                  "api-reference/recurring",
                   "api-reference/recurring/create-order",
                   "api-reference/recurring/execute",
                   "api-reference/recurring/cancel-order",
@@ -405,7 +395,7 @@
             "icon": "check-to-slot",
             "groups": [
               {
-                "group": " ",
+                "group": "Prediction",
                 "pages": [
                   "docs/prediction/index"
                 ]
@@ -429,9 +419,14 @@
                 ]
               },
               {
+                "group": "Guides",
+                "pages": [
+                  "guides/how-to-build-a-prediction-market-app-on-solana"
+                ]
+              },
+              {
                 "group": "API Reference",
                 "pages": [
-                  "api-reference/prediction",
                   {
                     "group": "Events",
                     "pages": [
@@ -500,15 +495,10 @@
             "icon": "wallet",
             "groups": [
               {
-                "group": " ",
-                "pages": [
-                  "docs/portfolio/index"
-                ]
-              },
-              {
                 "group": "Portfolio API",
                 "tag": "BETA",
                 "pages": [
+                  "docs/portfolio/index",
                   "docs/portfolio/jupiter-positions"
                 ]
               },
@@ -516,7 +506,6 @@
                 "group": "API Reference",
                 "tag": "BETA",
                 "pages": [
-                  "api-reference/portfolio",
                   "api-reference/portfolio/get-positions",
                   "api-reference/portfolio/get-staked-jup",
                   "api-reference/portfolio/get-platforms"
@@ -529,15 +518,10 @@
             "icon": "paper-plane",
             "groups": [
               {
-                "group": " ",
-                "pages": [
-                  "docs/send/index"
-                ]
-              },
-              {
                 "group": "Send API",
                 "tag": "BETA",
                 "pages": [
+                  "docs/send/index",
                   "docs/send/invite-code",
                   "docs/send/craft-send",
                   "docs/send/craft-clawback",
@@ -548,7 +532,6 @@
                 "group": "API Reference",
                 "tag": "BETA",
                 "pages": [
-                  "api-reference/send",
                   "api-reference/send/craft-send",
                   "api-reference/send/craft-clawback",
                   "api-reference/send/pending-invites",
@@ -562,15 +545,10 @@
             "icon": "building-columns",
             "groups": [
               {
-                "group": " ",
-                "pages": [
-                  "docs/studio/index"
-                ]
-              },
-              {
                 "group": "Studio API",
                 "tag": "BETA",
                 "pages": [
+                  "docs/studio/index",
                   "docs/studio/create-token",
                   "docs/studio/claim-fee"
                 ]
@@ -579,7 +557,6 @@
                 "group": "API Reference",
                 "tag": "BETA",
                 "pages": [
-                  "api-reference/studio",
                   "api-reference/studio/dbc-pool-create-tx",
                   "api-reference/studio/dbc-pool-submit",
                   "api-reference/studio/dbc-pool-addresses-by-mint",
@@ -594,7 +571,7 @@
             "icon": "lock",
             "groups": [
               {
-                "group": " ",
+                "group": "Lock",
                 "pages": [
                   "docs/lock/index"
                 ]
@@ -606,7 +583,7 @@
             "icon": "route",
             "groups": [
               {
-                "group": " ",
+                "group": "Routing",
                 "pages": [
                   "docs/routing/index"
                 ]
@@ -632,7 +609,7 @@
             "icon": "toolbox",
             "groups": [
               {
-                "group": " ",
+                "group": "Tool Kits",
                 "pages": [
                   "tool-kits/index"
                 ]

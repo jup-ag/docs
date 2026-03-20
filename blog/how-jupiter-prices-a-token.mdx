@@ -1,0 +1,164 @@
+---
+title: "How hard can it be to price a token on-chain? (very)"
+description: "What happens between fetch('api.jup.ag/price/v3') and the number you get back."
+llmsDescription: "Blog post exploring how Jupiter's Price API V3 derives token prices on Solana. Covers why pool-state pricing fails at scale, the last-swap-price methodology, path-based price derivation through swap ratio chains anchored to oracle-priced tokens like SOL, heuristic quality filters (liquidity depth, trading patterns, holder distribution), the V3 response format (usdPrice, blockId, decimals, priceChange24h), and practical integration notes on missing tokens, price freshness, and discrepancies with other price sources."
+"og:title": "How hard can it be to price a token on-chain? (very)"
+"og:description": "What happens between fetch('api.jup.ag/price/v3') and the number you get back."
+"og:type": "article"
+"og:image": "/static/blog/how-jupiter-prices-a-token/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![How hard can it be to price a token on-chain?](/static/blog/how-jupiter-prices-a-token/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/anmol.png" alt="Anmol" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">Anmol</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 20, 2026</span>
+  </div>
+</div>
+
+I joined Jupiter about five months ago. Most of my time is spent in the trenches, talking to partners using our APIs, onboarding new teams, building demo apps, helping integrators debug, writing changelogs when things ship (v often). A lot of my day is reading other people's code and figuring out why it's not doing what they expect.
+
+Last week it hit me. The Price API is one of three core liquidity APIs we offer. Most apps building on Solana already use it. I've called this endpoint thousands of times. And I realized I have no idea how the price actually gets derived.
+
+I know the params. I know how the API response looks. I've debugged enough integrations to pattern-match most issues on a first look. But if you asked me what happens between the request leaving an app and the number arriving back, I could give you the high-level architecture but not the actual derivation logic.
+
+This past weekend I went looking. If you're building an app, none of this is something you need to know, Jupiter handles it all behind a single endpoint. But if you're the kind of person who can't leave a black box alone, these are my notes.
+
+---
+
+## First guess
+
+Just like any normal person, my first thought was to ask Claude. I had to physically sit on my hands to control myself. The kind of shit you have to do to control the urge. I think I might be an addict but that is a story for another article.
+
+Moving onto my first original thought in about 6 months. My assumption was that the Price API reads on-chain pool state and derives price from reserves. For a standard Raydium pool, you calculate price from the reserve ratio, if the pool holds 10,000 SOL and 25,000,000 JUP, the implied price is 0.0004 SOL per JUP, quick mafs. For concentrated liquidity pools on Orca or Meteora, you'd read `sqrtPriceX64` from the pool account and convert. Either way, you're deriving price from pool state at a given slot.
+
+I tested this by using Jupiter's quote API with `onlyDirectRoutes=true` to force a single-pool quote for a bunch of tokens, then compared the implied price against what the Price API returned.
+
+For liquid tokens at small sizes (1 SOL, ~\$90), the difference was tiny. SOL-JUP was off by like 0.15%. BONK, POPCAT, MEW, all within 0.1-0.6%. I was almost ready to call it a day and assume pool pricing was good enough.
+
+Then I tried a mid-cap at a larger trade size, around \$9,000 worth. Off by over 10%. The liquidity wasn't deep enough to absorb the size so the single-pool price and the actual market price diverged hard.
+
+That's the thing about pool-state pricing. It tells you what the next trade would get at a specific size on a specific pool. But that's a theoretical price, it changes depending on which pool you look at, how much you're trading, and where the LPs decided to concentrate their liquidity. At small sizes on liquid tokens it looks fine. Scale up or go to thinner markets and it falls apart.
+
+![Single-pool price vs Price API — how trade size affects the gap](/static/blog/how-jupiter-prices-a-token/pool-price-divergence.png)
+
+Then what is the reality? What someone actually paid in their last swap? That's the actual price. Someone looked at the market, routed through whatever combination of pools made sense, and agreed to a number. That's the closest thing to a real market price you can get on-chain, not what a pool implies, but what a human (or bot) actually executed at.
+
+So that's not what the Price API is doing. First original thought in 6 months and it was wrong, amazing.
+
+---
+
+## Ok, maybe it averages them?
+
+Fine. Next guess would be that it maybe takes a weighted average across all the pools. Weight each venue by trading volume, combine them into one number to get a price. That's what most off-chain pricing services do, felt safe enough.
+
+But knowing myself, I wasn't going to build a whole volume-weighted aggregator to test this. Two guesses in and I figured I should just bend the knee and hit up the engineer that actually built the latest version of the API.
+
+---
+
+## What V3 actually does
+
+So here's what he told me. V3 uses the last swapped price. The most recent actual trade for that token, across every DEX Jupiter aggregates. Not a TWAP, not a weighted average, not some implied mid-price from pool state. Just the latest trade someone actually made.
+
+It seemed too simple to be true but the more that I thought about it, the more sense it made. TWAPs and weighted averages factor in older prices. If a token's price just moved 8% in the last block, a TWAP is still catching up because it's averaging in prices from five minutes ago. Last-swap gives you what someone actually paid right now, which is what most integrators care about.
+
+But obviously if the price is one trade, what stops someone from making that one trade a bad one? Wash trade, bot, whatever. That's handled by a filtering layer I'll get to in a second. First, the part that nerd-sniped me the most.
+
+---
+
+## But how does it get a USD price?
+
+Knowing the last swap happened doesn't give you a USD price. If someone swapped 1 JUP for 0.0018 SOL, you know the JUP/SOL ratio. But you don't know what JUP is worth in dollars unless you know what SOL is worth in dollars.
+
+Jupiter solves this by anchoring to a small set of tokens whose USD price comes from external oracles. SOL is the primary anchor. Its dollar value is a known quantity, externally verified, continuously updated.
+
+From there it's just math. You follow the swap ratios.
+
+1 JUP → 0.0018 SOL. SOL = \$90.35 (from oracle). So JUP ≈ \$0.1626.
+
+But the chain doesn't stop at one hop.
+
+Say there's a token, call it \$THING, that has never been swapped against SOL or USDC. It only has a pair against BONK. And BONK has a pair against SOL. And SOL has an oracle price. So:
+
+`$THING → BONK → SOL → USD.`
+
+The price of \$THING is derived through a chain of swap ratios, all anchored back to one trusted root. Every token price in Jupiter's system is basically a path, a sequence of exchange rates that eventually terminates at something an oracle can vouch for.
+
+![Price derivation path — every price is a path back to the anchor](/static/blog/how-jupiter-prices-a-token/price-derivation-path.png)
+
+A memecoin launched 10 minutes ago with only a SOL pair? One hop. Priced.
+
+A DeFi derivative that only trades against a stablecoin wrapper on one CLMM? Two or three hops. Still priced.
+
+The system doesn't need a USD pair for every token. It just needs any recent swap path that connects back to the anchor set. The coverage comes from the graph, not from explicit token-by-token support. That's how you get pricing for essentially every token on Solana without maintaining a manual registry.
+
+This is so fucking cool
+
+![This is so cool](https://i.pinimg.com/originals/02/68/87/0268871f55ef32809b9f02c83ab1dc23.gif)
+
+---
+
+## Filtering out bad prices
+
+Ok so at this point I had a pretty good picture of how the price gets derived. But anyone who's been on Solana for more than a week has seen a pumpfun token where the chart looks like organic price action and it's actually one wallet talking to itself. If the price is the last trade, what stops a bad actor from just being the last trade?
+
+![Heuristic filters](/static/blog/how-jupiter-prices-a-token/quality-gate-filter.png)
+
+Before any price reaches your app, Jupiter runs it through a set of heuristic filters. They check liquidity depth (is there actual liquidity or would a \$50 trade move the price 40%), trading patterns (organic activity vs wash trading), holder distribution (if three wallets hold 95% of supply, what does "market price" even mean), and an organic score that looks at all of the above together.
+
+If a token doesn't pass, it just doesn't show up in the response. Not a zero, not stale data. The token is just absent. The system has the price but it doesn't trust it enough to serve it.
+
+A missing token in the response isn't "we don't have data." It's "we have data, and the market around this token doesn't look right." Thin liquidity, suspicious trading, concentrated holders, something raised a flag.
+
+And the other side of it: if a token does show up in the response, it's been through all of that. The liquidity is real, the trading passed inspection, the number got vetted before it reached your `fetch` callback. That's easy to take for granted when you're just parsing JSON.
+
+On top of the heuristic filters, for certain token categories like stables, yield bearing tokens, and big caps like SOL, there's also realtime outlier detection. It still uses the last traded price as the base, but filters out outlier trades as they happen. From what I was told, the plan is to possibly generalize this to all tokens eventually. I imagine that's going to be tough though, how do you tell the difference between a fake pump and a real one in realtime?
+
+---
+
+## The response
+
+```json
+{
+  "usdPrice": 0.1622,
+  "blockId": 348004026,
+  "decimals": 6,
+  "priceChange24h": 0.53
+}
+```
+
+Only four fields. V2 had more, buy price, sell price, and others. V3 replaced all of that with a single price.
+
+Multiple price fields meant different platforms were showing different numbers for the same token. One used buy price, another used sell price, someone else computed their own midpoint. The "single source of truth" was producing multiple truths depending on which field you picked. I respect this level of "we gave you options and you chose chaos, so now you get one option." lol. Its like V3 is the adult and mature version of V2.
+
+`blockId` is a Solana block reference, compare it to the current block and you know how fresh the price is. `decimals` saves you a `getAccountInfo` call that I've seen in way too many codebases. And `priceChange24h` covers the thing most integrators were computing themselves, badly, because everyone rolls their own 24h window slightly differently.
+
+One thing to keep in mind, and this comes up a lot especially from traders and arbers using our APIs: what the Price API returns is a lagging indicator, it's the last trade that already happened. If you need the exact execution price for a specific amount right now, use the `/quote` endpoint on the [Swap API](/docs/swap). Price API is for display and reference, `/quote` is what you use when you're actually about to swap.
+
+---
+
+## Things worth knowing if you're integrating
+
+**On missing tokens in the response.** When a token doesn't show up in the response, it might have swap data, it's been traded. But something about the market around it didn't pass the heuristic filters, either the liquidity depth, trading pattern, or holder distribution raised a flag. Can also mean the token hasn't been swapped in 7+ days so there's no recent swap to derive from.
+
+**On price freshness.** The price updates when someone makes a qualifying swap. For popular tokens that's every few seconds. For long-tail tokens the `blockId` gap can be big, the price might be minutes or hours old. That's not the API being slow, that's just nobody trading. Worth showing price age in your UI for smaller tokens.
+
+**On discrepancies with other price sources.** If you're seeing different numbers from Birdeye, Dexscreener, or CoinGecko, it's a methodology difference, not a bug. Those platforms typically use TWAPs or volume-weighted composites, which means they're averaging over a window of time so the price looks smoother. V3 gives you the last actual trade, so it's going to be more reactive to recent swaps. Neither is wrong, they're just answering different questions.
+
+---
+
+## Why I wrote this up
+
+I could have kept going without looking into any of this. The API works. The integrations I help build work. Nothing was broken. Nobody asked me to spend a weekend on this.
+
+But there's a difference between using a tool and understanding it. Everything I build and debug going forward is a bit better now that I know what's actually happening under the endpoint. Not dramatically. Just enough to not be a very helpful parrot.
+
+If you use an API every day, try this: explain, from memory, what happens between the request and the response. Not what params to pass. Not how the response looks. What the system does. If you hit a gap, that's a good weekend.
+
+[`api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112`](/docs/price/v3) if you want to look for yourself.
+
+**Price API Guide:** [Video walkthrough on X](https://x.com/JupDevRel/status/2030100801805328443)

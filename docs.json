@@ -108,11 +108,11 @@
                 ]
               },
               {
-                "version": "Swap V1",
+                "version": "Ultra V1",
                 "tag": "Legacy",
                 "groups": [
                   {
-                    "group": "Ultra Swap",
+                    "group": "Ultra",
                     "pages": [
                       "docs/ultra/index",
                       "docs/ultra/get-started",
@@ -129,7 +129,12 @@
                       "docs/ultra/search-token",
                       "docs/ultra/add-payer",
                       "docs/ultra/add-fees-to-ultra",
-                      "docs/ultra/plugin-integration",
+                      "docs/ultra/plugin-integration"
+                    ]
+                  },
+                  {
+                    "group": "API Reference",
+                    "pages": [
                       "api-reference/ultra/order",
                       "api-reference/ultra/execute",
                       "api-reference/ultra/balances",
@@ -138,9 +143,15 @@
                       "api-reference/ultra/search",
                       "api-reference/ultra/routers"
                     ]
-                  },
+                  }
+                ]
+              },
+              {
+                "version": "Metis V1",
+                "tag": "Legacy",
+                "groups": [
                   {
-                    "group": "Metis Swap",
+                    "group": "Metis",
                     "pages": [
                       "docs/swap/v1/index",
                       "docs/swap/v1/get-quote",
@@ -149,7 +160,12 @@
                       "docs/swap/v1/add-fees-to-swap",
                       "docs/swap/v1/payments-through-swap",
                       "docs/swap/v1/requote-with-lower-max-accounts",
-                      "docs/swap/v1/common-errors",
+                      "docs/swap/v1/common-errors"
+                    ]
+                  },
+                  {
+                    "group": "API Reference",
+                    "pages": [
                       "api-reference/swap/v1",
                       "api-reference/swap/v1/quote",
                       "api-reference/swap/v1/swap",

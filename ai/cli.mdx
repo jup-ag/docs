@@ -1,0 +1,88 @@
+---
+title: "Jupiter CLI"
+description: "Trade on Jupiter from your terminal, Telegram, or through AI agents."
+llmsDescription: "The Jupiter CLI (jup) is a command-line tool for interacting with Jupiter's products on Solana: Spot trading, Perpetual futures, and Lending. It is non-interactive and LLM-friendly by design, with JSON output mode for structured responses. Install via npm (npm i -g @jup-ag/cli). For full command references, key management, configuration, and JSON response schemas, see the CLI documentation at https://github.com/jup-ag/cli/tree/main/docs. Three usage paths: direct terminal, Telegram via OpenClaw/miniclaw, and AI agent integration."
+---
+
+The Jupiter CLI (`jup`) lets you interact with Jupiter's products from the command line. Trade spot, open perps positions, earn yield, and more.
+
+<Warning>
+The CLI is pre-v1 (early alpha) and should be considered unstable. Breaking changes may be introduced without warning.
+</Warning>
+
+## Install
+
+```bash
+npm i -g @jup-ag/cli
+```
+
+For other install methods (install script, standalone binary), see the [CLI repository](https://github.com/jup-ag/cli).
+
+## Usage
+
+The CLI covers Jupiter products like Spot (swaps, portfolio, transfers), Perps (leveraged longs/shorts), and Lend (earn yield on deposits). For the full command reference, key management, configuration, and examples, see the full [CLI documentation](https://github.com/jup-ag/cli/tree/main/docs) in the public CLI repository.
+
+## Ways to Use
+
+### Terminal
+
+The most direct way. Install, add a key, and start trading:
+
+```bash
+jup keys add mykey
+jup spot swap --from SOL --to USDC --amount 1
+```
+
+### Telegram
+
+Use the CLI through [OpenClaw](https://openclaw.ai), an open-source AI assistant that runs locally and connects to Telegram and other chat apps (WhatsApp, Discord, Slack, Signal).
+
+1. Install OpenClaw:
+   ```bash
+   curl -fsSL https://openclaw.ai/install.sh | bash
+   ```
+2. Connect your Telegram account by following the [OpenClaw setup guide](https://openclaw.ai)
+3. Install the Jupiter CLI:
+   ```bash
+   npm i -g @jup-ag/cli
+   ```
+4. Add a key:
+   ```bash
+   jup keys add mykey
+   ```
+5. Message your OpenClaw bot on Telegram:
+   > "Swap 1 SOL to USDC"
+
+   OpenClaw executes the CLI command on your behalf and returns the result in chat.
+
+<Tip>
+For a more lightweight starting point, check out [miniclaw](https://github.com/yoeven/miniclaw), a minimal open-source personal AI assistant you can run locally with Telegram.
+</Tip>
+
+### AI Agents
+
+The CLI is designed to be LLM-friendly. All commands are non-interactive and support JSON output for structured, parseable responses.
+
+```bash
+jup spot swap --from SOL --to USDC --amount 1 -f json
+```
+
+AI agents (Claude Code, Cursor, Codex, etc.) can invoke CLI commands directly through shell access. Point your agent at the [CLI documentation on GitHub](https://github.com/jup-ag/cli/tree/main/docs) for complete command references and JSON response schemas.
+
+<Tip>
+Set an API key from [Portal](https://portal.jup.ag) for higher rate limits when running automated workflows:
+```bash
+jup config set --api-key <your-key>
+```
+</Tip>
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="CLI Documentation" icon="github" href="https://github.com/jup-ag/cli/tree/main/docs">
+    Full command reference, key management, configuration, and examples.
+  </Card>
+  <Card title="Developer Portal" icon="key" href="https://portal.jup.ag">
+    Get an API key for higher rate limits.
+  </Card>
+</CardGroup>

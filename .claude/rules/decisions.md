@@ -122,3 +122,28 @@ Track all redirects added to `vercel.json` here for visibility:
 | `/api-reference/trigger/cancel-orders` | `/api-reference/trigger/v1/cancel-orders` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
 | `/api-reference/trigger/get-trigger-orders` | `/api-reference/trigger/v1/get-trigger-orders` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
 | `/ai/ecosystem` | `/ai` | 2026-03-23 | Ecosystem page removed in AI section rework (PR #857) |
+
+### [2026-03-23] Anchors-based product nav with versioning
+**Status:** implemented
+**Scope:** navigation | folder-structure | redirect
+**Files affected:** `docs.json`, `generate-llms-from-docs.js`, `llms.txt`, `docs/swap/`, `api-reference/swap/`, `docs/trigger/`, `api-reference/trigger/`
+**Linear issue:** DEVREL-115
+
+**Context:** Tabs-based nav with separate Docs, API Reference, Guides, and Tool Kits tabs didn't scale. Developers had to jump between tabs to understand one product. AI/LLM retrieval got fragmented context.
+**Decision:**
+- Root nav switched from tabs to anchors (Get Started, Products, AI, Changelog, Resources)
+- Products anchor uses Mintlify product switcher with per-product sidebars
+- Docs + guides + API ref colocated per product
+- API versioning: latest version has no URL prefix, legacy keeps prefix (Next.js pattern)
+- Swap: three versions (Swap V2, Ultra V1, Swap V1) with flat page lists
+- Trigger: two versions (Trigger V2, Trigger V1)
+- Tokens and Price split into separate products
+- Thin products (Portfolio, Send, Studio, Lock) combined into "More"
+- Consistent group naming: no "API" suffix on first groups (Swap, Trigger, Recurring)
+- Guides distributed to parent products; guides index page in Get Started for browse-all
+- AI section follows PR #857 structure (Trade with AI / Build with AI)
+- llms.txt generator rewritten to walk nav tree directly
+- get-started/overview deprecated (redundant with landing page + product switcher)
+**Rationale:** Matches Stripe/Node.js/Cloudflare pattern of product-centric docs. Single retrieval gets full product context for both humans and LLMs.
+**Alternatives considered:** Keep tabs with cross-linking. Rejected because it fragments product context and scales poorly with 13+ products.
+**Migration notes:** Redirects added for all old /v2/ swap and trigger URLs. Two orphaned guides (Ultra swap, Metis custom swap) deprecated with Warning callouts. Theme changed from mint to willow.

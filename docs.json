@@ -707,8 +707,12 @@
             "pages": ["ai/index"]
           },
           {
-            "group": "AI Resources",
-            "pages": ["ai/skills", "ai/llms-txt", "ai/mcp", "ai/ecosystem"]
+            "group": "Trade with AI",
+            "pages": ["ai/cli"]
+          },
+          {
+            "group": "Build with AI",
+            "pages": ["ai/mcp", "ai/skills", "ai/llms-txt"]
           }
         ]
       },
@@ -841,6 +845,10 @@
     }
   },
   "redirects": [
+    {
+      "source": "/ai/ecosystem",
+      "destination": "/ai"
+    },
     {
       "source": "/docs/environment-setup",
       "destination": "/get-started/environment-setup"

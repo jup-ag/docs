@@ -44,8 +44,8 @@ Simply request via the base URL with the query parameters of your desired mint a
 
 ```js
 const price = await (
-    await fetch(
-        'https://api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112,JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN'
+  await fetch(
+    'https://api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112,JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN',
     {
       headers: {
         'x-api-key': 'your-api-key',
@@ -93,8 +93,8 @@ Here is the sample response, notice a few details here:
 * Additionally, we also use the aforementioned heuristics to determine the price of a token and if the price is reliable - if certain combinations of these factors indicate potential issues with price reliability or market health, the token will be flagged and not provided a price.
 * The token is flagged as suspicious and this can be cross referenced with the Token API V2's `audit.isSus` field.
 
-**V2 had more information**
+**V3 simplifies pricing**
 
-* Yes V2 had more information, however, we think that it is not the best representation of price and it also caused different interpretations of price across the different platforms.
-* With Price API V3, we are handling the complexities to ensure price accuracy and elimate outliers [using the heuristics as mentioned above](#how-price-is-derived), so there will only be one stable and accurate price source for all.
-* If you require more information like Price API V2, you can use the `/quote` endpoint of the Swap API to derive those data ([you can refer to this post about how Price API V2 is derived](https://www.jupresear.ch/t/introducing-the-price-v2-api/22175)).
+* V3 returns a single accurate price per token, eliminating ambiguity from V2's multiple price fields that led to inconsistent interpretations across platforms.
+* Price accuracy is maintained through [heuristics](#how-price-is-derived) that eliminate outliers, providing one stable price source.
+* If you need the additional data that V2 provided, use the `/quote` endpoint of the Swap API to derive equivalent values ([see how Price API V2 pricing was derived](https://www.jupresear.ch/t/introducing-the-price-v2-api/22175)).

@@ -21,7 +21,7 @@ const folders = [
   'tool-kits',
   'ai',
   'resources',
-  'updates',
+  'changelog',
 ];
 
 const SECTION_SUMMARIES = {
@@ -33,7 +33,7 @@ const SECTION_SUMMARIES = {
   'tool-kits': 'Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.',
   'ai': 'AI-first developer experience — AI-friendly docs, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.',
   'resources': 'Support channels and community resources.',
-  'updates': 'Changelog and release notes.',
+  'changelog': 'Changelog and release notes.',
 };
 
 // Process all folders and generate output
@@ -133,7 +133,7 @@ function sortNestedData(nestedData) {
   const docsJson = JSON.parse(fs.readFileSync(path.join(baseFolder, 'docs.json'), 'utf8'));
   const navigation = docsJson.navigation;
   
-  if (!navigation?.tabs) {
+  if (!navigation?.anchors && !navigation?.tabs) {
     throw new Error('No navigation found in docs.json');
   }
 
@@ -221,8 +221,32 @@ function sortNestedData(nestedData) {
     }
   };
 
-  navigation.tabs.forEach(tab => processNavElement(tab));
-  
+  const processAnchor = (anchor) => {
+    if (anchor.groups) {
+      anchor.groups.forEach(group => processNavElement(group));
+    }
+    if (anchor.products) {
+      anchor.products.forEach(product => {
+        if (product.versions) {
+          product.versions.forEach(version => {
+            if (version.groups) {
+              version.groups.forEach(group => processNavElement(group));
+            }
+          });
+        }
+        if (product.groups) {
+          product.groups.forEach(group => processNavElement(group));
+        }
+      });
+    }
+  };
+
+  if (navigation.anchors) {
+    navigation.anchors.forEach(anchor => processAnchor(anchor));
+  } else if (navigation.tabs) {
+    navigation.tabs.forEach(tab => processNavElement(tab));
+  }
+
   return sortedData;
 }
 

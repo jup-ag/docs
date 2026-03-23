@@ -24,16 +24,14 @@ if (!anchors) {
 
 const PRODUCT_SUMMARIES = {
   'Swap': 'Token swap API with managed execution (/order) and custom transaction building (/build).',
-  'Tokens & Price': 'Token metadata, search, verification, and real-time USD pricing APIs.',
+  'Tokens': 'Token metadata, search, verification, and organic score APIs.',
+  'Price': 'Real-time heuristics-based USD token pricing.',
   'Lend': 'Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and Flashloans.',
   'Perps': 'Leveraged perpetuals trading on Solana.',
   'Trigger': 'Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.',
   'Recurring': 'Automated dollar-cost averaging (DCA) with time-based recurring orders.',
   'Prediction': 'Binary prediction markets for real-world events.',
-  'Portfolio': 'Cross-protocol DeFi position aggregation.',
-  'Send': 'Token transfers via invite codes, claimable through Jupiter Mobile.',
-  'Studio': 'Token creation with Dynamic Bonding Curves, LP fee management, and vesting.',
-  'Lock': 'Open-source token locking and vesting.',
+  'More': 'Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).',
   'Routing': 'Routing engine architecture, DEX integration, and market maker onboarding.',
   'Tool Kits': 'Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.',
 };

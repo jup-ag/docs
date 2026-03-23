@@ -36,6 +36,10 @@
             ]
           },
           {
+            "group": "Guides",
+            "pages": ["guides/index"]
+          },
+          {
             "group": "Portal",
             "pages": [
               "portal/setup",
@@ -63,7 +67,7 @@
                 "tag": "Latest",
                 "groups": [
                   {
-                    "group": "Swap API",
+                    "group": "Swap",
                     "pages": [
                       "docs/swap/index",
                       "docs/swap/order-and-execute",
@@ -110,81 +114,47 @@
                   {
                     "group": "Ultra Swap",
                     "pages": [
-                      {
-                        "group": "About",
-                        "expanded": false,
-                        "pages": [
-                          "docs/ultra/index",
-                          "docs/ultra/get-started",
-                          "docs/ultra/fees",
-                          "docs/ultra/gasless",
-                          "docs/ultra/manual-mode",
-                          "docs/ultra/rate-limit"
-                        ]
-                      },
-                      {
-                        "group": "Guide",
-                        "expanded": false,
-                        "pages": [
-                          "docs/ultra/get-order",
-                          "docs/ultra/execute-order",
-                          "docs/ultra/response",
-                          "docs/ultra/get-balances",
-                          "docs/ultra/get-holdings",
-                          "docs/ultra/get-shield",
-                          "docs/ultra/search-token",
-                          "docs/ultra/add-payer",
-                          "docs/ultra/add-fees-to-ultra",
-                          "docs/ultra/plugin-integration"
-                        ]
-                      },
-                      {
-                        "group": "API Reference",
-                        "expanded": false,
-                        "pages": [
-                          "api-reference/ultra/order",
-                          "api-reference/ultra/execute",
-                          "api-reference/ultra/balances",
-                          "api-reference/ultra/holdings",
-                          "api-reference/ultra/shield",
-                          "api-reference/ultra/search",
-                          "api-reference/ultra/routers"
-                        ]
-                      }
+                      "docs/ultra/index",
+                      "docs/ultra/get-started",
+                      "docs/ultra/fees",
+                      "docs/ultra/gasless",
+                      "docs/ultra/manual-mode",
+                      "docs/ultra/rate-limit",
+                      "docs/ultra/get-order",
+                      "docs/ultra/execute-order",
+                      "docs/ultra/response",
+                      "docs/ultra/get-balances",
+                      "docs/ultra/get-holdings",
+                      "docs/ultra/get-shield",
+                      "docs/ultra/search-token",
+                      "docs/ultra/add-payer",
+                      "docs/ultra/add-fees-to-ultra",
+                      "docs/ultra/plugin-integration",
+                      "api-reference/ultra/order",
+                      "api-reference/ultra/execute",
+                      "api-reference/ultra/balances",
+                      "api-reference/ultra/holdings",
+                      "api-reference/ultra/shield",
+                      "api-reference/ultra/search",
+                      "api-reference/ultra/routers"
                     ]
                   },
                   {
                     "group": "Metis Swap",
                     "pages": [
-                      {
-                        "group": "About",
-                        "expanded": false,
-                        "pages": ["docs/swap/v1/index"]
-                      },
-                      {
-                        "group": "Guide",
-                        "expanded": false,
-                        "pages": [
-                          "docs/swap/v1/get-quote",
-                          "docs/swap/v1/build-swap-transaction",
-                          "docs/swap/v1/send-swap-transaction",
-                          "docs/swap/v1/add-fees-to-swap",
-                          "docs/swap/v1/payments-through-swap",
-                          "docs/swap/v1/requote-with-lower-max-accounts",
-                          "docs/swap/v1/common-errors"
-                        ]
-                      },
-                      {
-                        "group": "API Reference",
-                        "expanded": false,
-                        "pages": [
-                          "api-reference/swap/v1",
-                          "api-reference/swap/v1/quote",
-                          "api-reference/swap/v1/swap",
-                          "api-reference/swap/v1/swap-instructions",
-                          "api-reference/swap/v1/program-id-to-label"
-                        ]
-                      }
+                      "docs/swap/v1/index",
+                      "docs/swap/v1/get-quote",
+                      "docs/swap/v1/build-swap-transaction",
+                      "docs/swap/v1/send-swap-transaction",
+                      "docs/swap/v1/add-fees-to-swap",
+                      "docs/swap/v1/payments-through-swap",
+                      "docs/swap/v1/requote-with-lower-max-accounts",
+                      "docs/swap/v1/common-errors",
+                      "api-reference/swap/v1",
+                      "api-reference/swap/v1/quote",
+                      "api-reference/swap/v1/swap",
+                      "api-reference/swap/v1/swap-instructions",
+                      "api-reference/swap/v1/program-id-to-label"
                     ]
                   }
                 ]
@@ -192,7 +162,7 @@
             ]
           },
           {
-            "product": "Tokens & Price",
+            "product": "Tokens",
             "icon": "coin",
             "groups": [
               {
@@ -206,36 +176,38 @@
                 ]
               },
               {
+                "group": "Guides",
+                "pages": ["guides/how-to-get-token-information"]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "api-reference/tokens/v2/search",
+                  "api-reference/tokens/v2/tag",
+                  "api-reference/tokens/v2/category",
+                  "api-reference/tokens/v2/recent",
+                  "api-reference/tokens/v2/get-content",
+                  "api-reference/tokens/v2/get-content-cooking",
+                  "api-reference/tokens/v2/get-content-feed"
+                ]
+              }
+            ]
+          },
+          {
+            "product": "Price",
+            "icon": "tag",
+            "groups": [
+              {
                 "group": "Price",
                 "pages": ["docs/price/index"]
               },
               {
                 "group": "Guides",
-                "pages": [
-                  "guides/how-to-get-token-information",
-                  "guides/how-to-get-token-price"
-                ]
+                "pages": ["guides/how-to-get-token-price"]
               },
               {
                 "group": "API Reference",
-                "pages": [
-                  {
-                    "group": "Tokens",
-                    "pages": [
-                      "api-reference/tokens/v2/search",
-                      "api-reference/tokens/v2/tag",
-                      "api-reference/tokens/v2/category",
-                      "api-reference/tokens/v2/recent",
-                      "api-reference/tokens/v2/get-content",
-                      "api-reference/tokens/v2/get-content-cooking",
-                      "api-reference/tokens/v2/get-content-feed"
-                    ]
-                  },
-                  {
-                    "group": "Price",
-                    "pages": ["api-reference/price/v3/price"]
-                  }
-                ]
+                "pages": ["api-reference/price/v3/price"]
               }
             ]
           },
@@ -387,7 +359,7 @@
                 "tag": "Latest",
                 "groups": [
                   {
-                    "group": "Trigger API",
+                    "group": "Trigger",
                     "pages": [
                       "docs/trigger/index",
                       "docs/trigger/authentication",
@@ -434,7 +406,7 @@
                 "tag": "Legacy",
                 "groups": [
                   {
-                    "group": "Trigger API",
+                    "group": "Trigger",
                     "pages": [
                       "docs/trigger/v1/index",
                       "docs/trigger/v1/create-order",
@@ -464,7 +436,7 @@
             "icon": "clock-rotate-left",
             "groups": [
               {
-                "group": "Recurring API",
+                "group": "Recurring",
                 "pages": [
                   "docs/recurring/index",
                   "docs/recurring/create-order",
@@ -502,7 +474,7 @@
             "icon": "check-to-slot",
             "groups": [
               {
-                "group": "Prediction API",
+                "group": "Prediction",
                 "tag": "BETA",
                 "pages": [
                   "docs/prediction/index",
@@ -592,11 +564,11 @@
             ]
           },
           {
-            "product": "Portfolio",
-            "icon": "wallet",
+            "product": "More",
+            "icon": "ellipsis",
             "groups": [
               {
-                "group": "Portfolio API",
+                "group": "Portfolio",
                 "tag": "BETA",
                 "pages": [
                   "docs/portfolio/index",
@@ -604,22 +576,7 @@
                 ]
               },
               {
-                "group": "API Reference",
-                "tag": "BETA",
-                "pages": [
-                  "api-reference/portfolio/get-positions",
-                  "api-reference/portfolio/get-staked-jup",
-                  "api-reference/portfolio/get-platforms"
-                ]
-              }
-            ]
-          },
-          {
-            "product": "Send",
-            "icon": "paper-plane",
-            "groups": [
-              {
-                "group": "Send API",
+                "group": "Send",
                 "tag": "BETA",
                 "pages": [
                   "docs/send/index",
@@ -630,23 +587,7 @@
                 ]
               },
               {
-                "group": "API Reference",
-                "tag": "BETA",
-                "pages": [
-                  "api-reference/send/craft-send",
-                  "api-reference/send/craft-clawback",
-                  "api-reference/send/pending-invites",
-                  "api-reference/send/invite-history"
-                ]
-              }
-            ]
-          },
-          {
-            "product": "Studio",
-            "icon": "building-columns",
-            "groups": [
-              {
-                "group": "Studio API",
+                "group": "Studio",
                 "tag": "BETA",
                 "pages": [
                   "docs/studio/index",
@@ -655,25 +596,40 @@
                 ]
               },
               {
-                "group": "API Reference",
-                "tag": "BETA",
-                "pages": [
-                  "api-reference/studio/dbc-pool-create-tx",
-                  "api-reference/studio/dbc-pool-submit",
-                  "api-reference/studio/dbc-pool-addresses-by-mint",
-                  "api-reference/studio/dbc-fee",
-                  "api-reference/studio/dbc-fee-create-tx"
-                ]
-              }
-            ]
-          },
-          {
-            "product": "Lock",
-            "icon": "lock",
-            "groups": [
-              {
                 "group": "Lock",
                 "pages": ["docs/lock/index"]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  {
+                    "group": "Portfolio",
+                    "pages": [
+                      "api-reference/portfolio/get-positions",
+                      "api-reference/portfolio/get-staked-jup",
+                      "api-reference/portfolio/get-platforms"
+                    ]
+                  },
+                  {
+                    "group": "Send",
+                    "pages": [
+                      "api-reference/send/craft-send",
+                      "api-reference/send/craft-clawback",
+                      "api-reference/send/pending-invites",
+                      "api-reference/send/invite-history"
+                    ]
+                  },
+                  {
+                    "group": "Studio",
+                    "pages": [
+                      "api-reference/studio/dbc-pool-create-tx",
+                      "api-reference/studio/dbc-pool-submit",
+                      "api-reference/studio/dbc-pool-addresses-by-mint",
+                      "api-reference/studio/dbc-fee",
+                      "api-reference/studio/dbc-fee-create-tx"
+                    ]
+                  }
+                ]
               }
             ]
           },

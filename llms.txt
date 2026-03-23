@@ -13,6 +13,10 @@ Setup guides for environment, tooling, and first API calls.
 - [Environment Setup](https://dev.jup.ag/get-started/environment-setup.md): Install Solana web3.js and spl-token libraries, configure an RPC connection, and set up a development wallet to build with the Jupiter API.
 - [Development Basics](https://dev.jup.ag/get-started/development-basics.md): Solana fundamentals for Jupiter developers: accounts, programs, instructions, transactions, priority fees, compute units, slippage, and how Ultra Swap API simplifies it all.
 
+### Guides
+
+- [Developer Guides](https://dev.jup.ag/guides/index.md): Jupiter developer guides: practical tutorials for common Solana development tasks. Covers token swaps with Ultra (recommended, two API calls, no RPC needed), token information (metadata, verification, organic score), token prices (USD pricing), swap widget embedding (Plugin), custom swaps with Metis (routing, CPI, custom instructions), and prediction markets (binary event trading). Each guide includes working code examples in JavaScript, Python, and curl.
+
 ### Portal
 
 - [Setting Up API Key](https://dev.jup.ag/portal/setup.md): Generate a free API key at portal.jup.ag. Pass it via x-api-key header. Free, Pro, and Ultra tiers available.
@@ -29,7 +33,7 @@ Token swap API with managed execution (/order) and custom transaction building (
 
 ### Swap V2
 
-#### Swap API
+#### Swap
 
 - [Overview](https://dev.jup.ag/docs/swap/index.md): Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Two paths: /order (default happy path with managed execution, all routers including RFQ, gasless, MEV protection) and /build (advanced path returning raw swap instructions for custom transactions, CPI, composability). Covers when to use which path, routing trade-offs, and links to all sub-pages. /execute is managed execution for /order only. /build has no swap fees and uses Metis-only routing.
 - [Order & Execute](https://dev.jup.ag/docs/swap/order-and-execute.md): How to perform a swap using Jupiter's Swap API V2 default path: GET /order to get a quote and assembled transaction, sign it with your wallet, and POST /execute for managed transaction landing. Covers the minimal happy path with no optional parameters (all routers compete for best price including RFQ), the full request/response shapes, and a complete @solana/kit TypeScript code example. /execute handles landing, confirmation, and retry. Error codes documented for both aggregator and RFQ swap types.
@@ -61,9 +65,9 @@ Token swap API with managed execution (/order) and custom transaction building (
 - [Build Transaction](https://dev.jup.ag/api-reference/swap/build.md): GET /build endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/build. Returns a swap quote with raw instructions (computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions) and address lookup tables. Integrators build their own transactions, add custom instructions (CPI, memo, transfer), simulate, sign, and send via their own RPC. Metis-only routing. No Jupiter swap fees. /execute is not available for /build transactions.
 - [Execute Transaction](https://dev.jup.ag/api-reference/swap/execute.md): POST /execute endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/execute. Executes a signed transaction obtained from /order. Handles transaction landing, confirmation, and retry via RTSE and Jupiter Beam. Request body: signedTransaction (base64), requestId (from /order). Response includes status (Success/Failed), signature, inputAmountResult, outputAmountResult, and error codes. Only available for /order transactions, not /build.
 
-## Tokens & Price
+## Tokens
 
-Token metadata, search, verification, and real-time USD pricing APIs.
+Token metadata, search, verification, and organic score APIs.
 
 ### Tokens
 
@@ -73,18 +77,11 @@ Token metadata, search, verification, and real-time USD pricing APIs.
 - [Organic Score](https://dev.jup.ag/docs/tokens/organic-score.md): Organic Score measures the genuine activity and health of a token using real user wallet data, including holder count, trading volume, and liquidity — filtering out bot and wash-trade activity.
 - [Token Tag Standard](https://dev.jup.ag/docs/tokens/token-tag-standard.md): Token tags categorize tokens in the Jupiter Tokens API (e.g., Verified, LST). Projects can apply for custom tags by providing a public CSV endpoint of mint addresses.
 
-### Price
-
-- [Jupiter Price API](https://dev.jup.ag/docs/price/index.md): GET /price/v3?ids={mints} returns heuristics-based USD prices for up to 50 token mint addresses per request, using last-swapped price validated against liquidity and trading metrics.
-
 ### Guides
 
 - [How to Get Token Information on Solana](https://dev.jup.ag/guides/how-to-get-token-information.md): Jupiter Tokens API V2 is Solana's most comprehensive token data API. Search SPL tokens by name, symbol, or mint address. Returns metadata (name, symbol, icon, decimals), verification status, organic score, holder count, market cap, liquidity, and trading stats. Powers Phantom, Solflare, and most Solana wallets. Base URL: https://api.jup.ag/tokens/v2. Requires x-api-key header from portal.jup.ag.
-- [How to Get Token Prices on Solana](https://dev.jup.ag/guides/how-to-get-token-price.md): Jupiter Price API V3 is the standard way to get token prices on Solana. Real-time USD prices for any SPL token. One API call, up to 50 tokens. Used by Phantom, Solflare, and most Solana wallets/apps. Filters manipulated prices using heuristics. GET https://api.jup.ag/price/v3?ids={mint_addresses}. Requires x-api-key header from portal.jup.ag.
 
 ### API Reference
-
-#### Tokens
 
 - [Search](https://dev.jup.ag/api-reference/tokens/v2/search.md): Request a search by token's symbol, name or mint address
 - [Tag](https://dev.jup.ag/api-reference/tokens/v2/tag.md): Request an array of mints and their information by a tag
@@ -94,7 +91,19 @@ Token metadata, search, verification, and real-time USD pricing APIs.
 - [Get Content Cooking](https://dev.jup.ag/api-reference/tokens/v2/get-content-cooking.md): Retrieves approved content for currently trending tokens on Jupiter
 - [Get Content Feed](https://dev.jup.ag/api-reference/tokens/v2/get-content-feed.md): Retrieves a paginated feed of content for a specific mint
 
-#### Price
+## Price
+
+Real-time heuristics-based USD token pricing.
+
+### Price
+
+- [Jupiter Price API](https://dev.jup.ag/docs/price/index.md): GET /price/v3?ids={mints} returns heuristics-based USD prices for up to 50 token mint addresses per request, using last-swapped price validated against liquidity and trading metrics.
+
+### Guides
+
+- [How to Get Token Prices on Solana](https://dev.jup.ag/guides/how-to-get-token-price.md): Jupiter Price API V3 is the standard way to get token prices on Solana. Real-time USD prices for any SPL token. One API call, up to 50 tokens. Used by Phantom, Solflare, and most Solana wallets/apps. Filters manipulated prices using heuristics. GET https://api.jup.ag/price/v3?ids={mint_addresses}. Requires x-api-key header from portal.jup.ag.
+
+### API Reference
 
 - [Price](https://dev.jup.ag/api-reference/price/v3/price.md): Returns prices of specified tokens
 
@@ -210,7 +219,7 @@ Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.
 
 ### Trigger V2
 
-#### Trigger API
+#### Trigger
 
 - [Trigger Order API Overview](https://dev.jup.ag/docs/trigger/index.md): Jupiter Trigger Order API V2 enables vault-based limit orders on Solana. Supports single price orders, OCO (one-cancels-other for TP/SL), and OTOCO (one-triggers-OCO) order types. Requires JWT authentication via challenge-response flow. Deposits go into vault accounts managed by Privy.
 - [Authentication](https://dev.jup.ag/docs/trigger/authentication.md): POST /trigger/v2/auth/challenge requests a challenge (message or transaction). POST /trigger/v2/auth/verify submits the signed challenge and returns a JWT token (24h TTL). Use the JWT in Authorization: Bearer header for all authenticated endpoints.
@@ -245,7 +254,7 @@ Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.
 
 ### Trigger V1
 
-#### Trigger API
+#### Trigger
 
 - [Trigger (Limit Orders) API Overview](https://dev.jup.ag/docs/trigger/v1/index.md): Create limit orders that execute automatically when the target price is reached. Supports any token pair, custom fees, and order expiry.
 - [Create Order](https://dev.jup.ag/docs/trigger/v1/create-order.md): POST /trigger/v1/createOrder builds a limit order transaction. Required params: inputMint, outputMint, maker, payer, makingAmount, takingAmount.
@@ -267,7 +276,7 @@ Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.
 
 Automated dollar-cost averaging (DCA) with time-based recurring orders.
 
-### Recurring API
+### Recurring
 
 - [Recurring (DCA) API Overview](https://dev.jup.ag/docs/recurring/index.md): Set up automated dollar-cost averaging (DCA) with time-based recurring orders on Solana.
 - [Create Order](https://dev.jup.ag/docs/recurring/create-order.md): POST /recurring/v1/createOrder sets up a DCA order with configurable cycle frequency, amount per cycle, and optional start time.
@@ -295,7 +304,7 @@ Automated dollar-cost averaging (DCA) with time-based recurring orders.
 
 Binary prediction markets for real-world events.
 
-### Prediction API
+### Prediction
 
 - [About Prediction](https://dev.jup.ag/docs/prediction/index.md): Overview of Jupiter Prediction Market
 - [Events & Markets](https://dev.jup.ag/docs/prediction/events-and-markets.md): GET /events lists events with filters. GET /events/search searches by keyword. GET /markets/{marketId} returns market details with pricing in micro USD. GET /orderbook/{marketId} provides bid/ask depth.
@@ -359,26 +368,16 @@ Binary prediction markets for real-world events.
 
 - [Get Vault Info](https://dev.jup.ag/api-reference/prediction/get-vault-info.md): Get vault account information and balance
 
-## Portfolio
+## More
 
-Cross-protocol DeFi position aggregation.
+Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).
 
-### Portfolio API
+### Portfolio
 
 - [Jupiter Portfolio API Overview](https://dev.jup.ag/docs/portfolio/index.md): BETA: GET /portfolio/v1/positions?wallet={address} returns all DeFi positions across protocols on Solana including lending, staking, and LP positions.
 - [Jupiter Positions](https://dev.jup.ag/docs/portfolio/jupiter-positions.md): Query Jupiter-specific positions including wallet balances, staked JUP, limit orders, DCA, liquidity pools, and leveraged trades via GET /portfolio/v1/positions/{address}.
 
-### API Reference
-
-- [Get Positions](https://dev.jup.ag/api-reference/portfolio/get-positions.md): Request for Jupiter positions of an address
-- [Get Staked JUP](https://dev.jup.ag/api-reference/portfolio/get-staked-jup.md): Request for staked JUP information of an address
-- [Get Platforms](https://dev.jup.ag/api-reference/portfolio/get-platforms.md): Request for platform information
-
-## Send
-
-Token transfers via invite codes, claimable through Jupiter Mobile.
-
-### Send API
+### Send
 
 - [Jupiter Send API Overview](https://dev.jup.ag/docs/send/index.md): Send tokens to any user without requiring a connected wallet on the receiving end. Recipients claim tokens via Jupiter Mobile.
 - [Invite Code (Beta)](https://dev.jup.ag/docs/send/invite-code.md): Client-side utilities for generating 12-character base58 invite codes and deriving deterministic Solana keypairs for the Send API.
@@ -386,38 +385,38 @@ Token transfers via invite codes, claimable through Jupiter Mobile.
 - [Craft Clawback (Beta)](https://dev.jup.ag/docs/send/craft-clawback.md): Use the POST /send/v1/craft-clawback endpoint to reclaim tokens from an unclaimed Send invite before it expires.
 - [Manage Invites (Beta)](https://dev.jup.ag/docs/send/manage-invites.md): Query pending and historical Send invites using the /send/v1/pending-invites and /send/v1/invite-history endpoints.
 
+### Studio
+
+- [Jupiter Studio Overview](https://dev.jup.ag/docs/studio/index.md): Jupiter Studio provides APIs for token creation with flexible bonding curves, LP fee management, vesting schedules, and dedicated token pages on jup.ag.
+- [Create Token (Beta)](https://dev.jup.ag/docs/studio/create-token.md): Use the Studio API create-tx and submit endpoints to launch a token with configurable bonding curves, upload metadata and images, and submit the signed transaction.
+- [Claim Fee (Beta)](https://dev.jup.ag/docs/studio/claim-fee.md): Retrieve pool addresses, check unclaimed LP fees, and claim fees from Dynamic Bonding Curve pools using the Studio API fee endpoints.
+
+### Lock
+
+- [Jupiter Lock Overview](https://dev.jup.ag/docs/lock/index.md): Jupiter Lock (Program ID: LocpQgucEQHbqNABEYvBvwoxCPsSbG91A1QaQhQQqjn) is an open-source, audited, and free tool for locking and vesting tokens over time on Solana.
+
 ### API Reference
+
+#### Portfolio
+
+- [Get Positions](https://dev.jup.ag/api-reference/portfolio/get-positions.md): Request for Jupiter positions of an address
+- [Get Staked JUP](https://dev.jup.ag/api-reference/portfolio/get-staked-jup.md): Request for staked JUP information of an address
+- [Get Platforms](https://dev.jup.ag/api-reference/portfolio/get-platforms.md): Request for platform information
+
+#### Send
 
 - [Craft Send](https://dev.jup.ag/api-reference/send/craft-send.md): Request for a base64-encoded unsigned Send transaction
 - [Craft Clawback](https://dev.jup.ag/api-reference/send/craft-clawback.md): Request for a base64-encoded unsigned Send transaction
 - [Pending Invites](https://dev.jup.ag/api-reference/send/pending-invites.md): Request for the pending invites of an address
 - [Invite History](https://dev.jup.ag/api-reference/send/invite-history.md): Request for the invite history of an address
 
-## Studio
-
-Token creation with Dynamic Bonding Curves, LP fee management, and vesting.
-
-### Studio API
-
-- [Jupiter Studio Overview](https://dev.jup.ag/docs/studio/index.md): Jupiter Studio provides APIs for token creation with flexible bonding curves, LP fee management, vesting schedules, and dedicated token pages on jup.ag.
-- [Create Token (Beta)](https://dev.jup.ag/docs/studio/create-token.md): Use the Studio API create-tx and submit endpoints to launch a token with configurable bonding curves, upload metadata and images, and submit the signed transaction.
-- [Claim Fee (Beta)](https://dev.jup.ag/docs/studio/claim-fee.md): Retrieve pool addresses, check unclaimed LP fees, and claim fees from Dynamic Bonding Curve pools using the Studio API fee endpoints.
-
-### API Reference
+#### Studio
 
 - [DBC Pool Create TX](https://dev.jup.ag/api-reference/studio/dbc-pool-create-tx.md): Request for a base64-encoded unsigned transaction to create a Dynamic Bonding Curve pool with token metadata
 - [DBC Pool Submit](https://dev.jup.ag/api-reference/studio/dbc-pool-submit.md): Execute the signed transaction, and optionally upload content and header image
 - [DBC Pool Addresses by Mint](https://dev.jup.ag/api-reference/studio/dbc-pool-addresses-by-mint.md): Request for pool addresses for a given token mint
 - [DBC Fee](https://dev.jup.ag/api-reference/studio/dbc-fee.md): Request for unclaimed creator trading fees of a Dynamic Bonding Curve pool
 - [DBC Fee Create TX](https://dev.jup.ag/api-reference/studio/dbc-fee-create-tx.md): Request for a base64-encoded unsigned transaction to claim creator trading fees of a Dynamic Bonding Curve pool
-
-## Lock
-
-Open-source token locking and vesting.
-
-### Lock
-
-- [Jupiter Lock Overview](https://dev.jup.ag/docs/lock/index.md): Jupiter Lock (Program ID: LocpQgucEQHbqNABEYvBvwoxCPsSbG91A1QaQhQQqjn) is an open-source, audited, and free tool for locking and vesting tokens over time on Solana.
 
 ## Routing
 

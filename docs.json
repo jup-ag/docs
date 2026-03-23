@@ -108,7 +108,7 @@
                 ]
               },
               {
-                "version": "Swap V1",
+                "version": "Ultra V1",
                 "tag": "Legacy",
                 "groups": [
                   {
@@ -129,7 +129,12 @@
                       "docs/ultra/search-token",
                       "docs/ultra/add-payer",
                       "docs/ultra/add-fees-to-ultra",
-                      "docs/ultra/plugin-integration",
+                      "docs/ultra/plugin-integration"
+                    ]
+                  },
+                  {
+                    "group": "API Reference",
+                    "pages": [
                       "api-reference/ultra/order",
                       "api-reference/ultra/execute",
                       "api-reference/ultra/balances",
@@ -138,7 +143,13 @@
                       "api-reference/ultra/search",
                       "api-reference/ultra/routers"
                     ]
-                  },
+                  }
+                ]
+              },
+              {
+                "version": "Swap V1",
+                "tag": "Legacy",
+                "groups": [
                   {
                     "group": "Metis",
                     "pages": [
@@ -149,7 +160,12 @@
                       "docs/swap/v1/add-fees-to-swap",
                       "docs/swap/v1/payments-through-swap",
                       "docs/swap/v1/requote-with-lower-max-accounts",
-                      "docs/swap/v1/common-errors",
+                      "docs/swap/v1/common-errors"
+                    ]
+                  },
+                  {
+                    "group": "API Reference",
+                    "pages": [
                       "api-reference/swap/v1",
                       "api-reference/swap/v1/quote",
                       "api-reference/swap/v1/swap",

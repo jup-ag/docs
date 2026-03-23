@@ -17,7 +17,7 @@ const folders = [
   'portal',
   'guides',
   'docs',
-  'openapi-spec',
+  'api-reference',
   'tool-kits',
   'ai',
   'resources',
@@ -39,16 +39,24 @@ const SECTION_SUMMARIES = {
 // Process all folders and generate output
 const data = folders.flatMap(folder => {
   const folderPath = path.join(baseFolder, folder);
-  return folder === 'openapi-spec'
-    ? processApiReference(folderPath)
-    : processData(folderPath);
+  return processData(folderPath);
 });
 
 const nestedData = buildNestedStructure(data);
 const sortedData = sortNestedData(nestedData);
 const output = generateLlmsTxt(sortedData);
 
-fs.writeFileSync(path.join(baseFolder, 'llms.txt'), output, 'utf8');
+// Deduplicate entries by URL - nav can reference the same page in multiple locations
+const seenUrls = new Set();
+const deduped = output.split('\n').filter(line => {
+  const match = line.match(/^- \[.*?\]\((https:\/\/[^)]+)\)/);
+  if (!match) return true; // keep non-entry lines
+  if (seenUrls.has(match[1])) return false;
+  seenUrls.add(match[1]);
+  return true;
+}).join('\n');
+
+fs.writeFileSync(path.join(baseFolder, 'llms.txt'), deduped, 'utf8');
 console.log(`✅ Generated llms.txt at: ${path.join(baseFolder, 'llms.txt')}`);
 
 function generateLlmsTxt(sortedData) {
@@ -78,6 +86,7 @@ function generateLlmsTxt(sortedData) {
       return;
     }
     if (typeof data !== 'object' || data === null) return;
+    if (depth > 6) return; // prevent infinite recursion
 
     const keys = Object.keys(data);
     if (keys.length === 0) return;
@@ -193,7 +202,7 @@ function sortNestedData(nestedData) {
     
     const pathSegments = normalizedPath.split('/').filter(seg => seg);
     const value = findValueForApiReference(pathSegments);
-    
+
     if (value !== null) {
       setNestedValue(sortedData, pathSegments, value);
     }
@@ -265,7 +274,12 @@ function buildNestedStructure(data) {
       curr[key] = curr[key] || {};
       curr = curr[key];
     }
-    curr[pathSegments[pathSegments.length - 1]] = item.copy;
+    const last = pathSegments[pathSegments.length - 1];
+    // Don't overwrite an object (has child entries) with a string (e.g. YAML summary
+    // overwriting per-endpoint MDX entries)
+    if (!(last in curr) || typeof curr[last] !== 'object') {
+      curr[last] = item.copy;
+    }
   }
   return result;
 }

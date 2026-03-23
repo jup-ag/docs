@@ -27,7 +27,7 @@ const PRODUCT_SUMMARIES = {
   'Tokens': 'Token metadata, search, verification, and organic score APIs.',
   'Price': 'Real-time heuristics-based USD token pricing.',
   'Lend': 'Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and Flashloans.',
-  'Perps': 'Leveraged perpetuals trading on Solana.',
+  'Perps': 'Leveraged perpetuals trading on Solana (on-chain program, no REST API).',
   'Trigger': 'Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.',
   'Recurring': 'Automated dollar-cost averaging (DCA) with time-based recurring orders.',
   'Prediction': 'Binary prediction markets for real-world events.',
@@ -224,7 +224,7 @@ emit('> All endpoints require an `x-api-key` header — generate a free key at [
 
 emit('## Quick Reference\n\n');
 emit('- Swap API V2 (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`\n');
-emit('- Trigger (limit orders): `POST /trigger/v1/createOrder`\n');
+emit('- Trigger (limit orders): `POST /trigger/v2/orders/price`\n');
 emit('- Recurring (DCA): `POST /recurring/v1/createOrder`\n');
 emit('- Lend: `POST /lend/v1/earn/deposit`\n');
 emit('- Price: `GET /price/v3?ids={mints}`\n');

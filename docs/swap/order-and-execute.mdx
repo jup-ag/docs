@@ -275,7 +275,7 @@ if (result.status === "Success") {
 `GET /order` returns a quote and an assembled transaction in a single call. All routers compete for the best price: Metis, JupiterZ, Dflow, and OKX.
 
 <Note>
-  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See [Routing](/docs/swap/v2/routing) for details.
+  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See [Routing](/docs/swap/routing) for details.
 </Note>
 
 **Required parameters:**
@@ -297,7 +297,7 @@ if (result.status === "Success") {
 | `router` | Which router won the quote (iris, jupiterz, dflow, okx). |
 | `mode` | "ultra" (no optional params) or "manual" (optional params used). |
 
-For the full parameter reference and how each parameter affects routing, see [Routing](/docs/swap/v2/routing).
+For the full parameter reference and how each parameter affects routing, see [Routing](/docs/swap/routing).
 
 ### 2. Sign the transaction
 
@@ -353,8 +353,8 @@ For the full parameter reference and how each parameter affects routing, see [Ro
 
 ## Related
 
-- [Routing](/docs/swap/v2/routing) for optional parameters and their routing impact
-- [Fees](/docs/swap/v2/fees) for adding integrator fees to `/order`
-- [Advanced Techniques](/docs/swap/v2/advanced) for gasless swaps, priority fees, and CU optimisation
-- [API Reference: GET /order](/api-reference/swap/v2/order) for the full OpenAPI specification
-- [API Reference: POST /execute](/api-reference/swap/v2/execute) for the full OpenAPI specification
+- [Routing](/docs/swap/routing) for optional parameters and their routing impact
+- [Fees](/docs/swap/fees) for adding integrator fees to `/order`
+- [Advanced Techniques](/docs/swap/advanced) for gasless swaps, priority fees, and CU optimisation
+- [API Reference: GET /order](/api-reference/swap/order) for the full OpenAPI specification
+- [API Reference: POST /execute](/api-reference/swap/execute) for the full OpenAPI specification

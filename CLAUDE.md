@@ -562,7 +562,7 @@ Add a `<Warning>` immediately after the frontmatter pointing to the replacement:
 ```mdx
 <Warning>
 The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap).
-Use [Order & Execute](/docs/swap/v2/order-and-execute) for the recommended swap flow.
+Use [Order & Execute](/docs/swap/order-and-execute) for the recommended swap flow.
 </Warning>
 ```
 

@@ -6,7 +6,7 @@ deprecated: true
 ---
 
 <Warning>
-The Metis Swap API (V1) has been superseded by the [Swap API V2](/docs/swap). Use [Build Custom Transactions](/docs/swap/v2/build) for custom transaction workflows.
+The Metis Swap API (V1) has been superseded by the [Swap API V2](/docs/swap). Use [Build Custom Transactions](/docs/swap/build) for custom transaction workflows.
 </Warning>
 
 When adding custom instructions to a Metis swap transaction causes it to exceed Solana's 1232-byte transaction size limit, reduce `maxAccounts` in the `/quote` request and rebuild. This page provides a retry loop that decrements `maxAccounts` until the transaction fits.

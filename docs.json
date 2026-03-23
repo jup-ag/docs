@@ -58,7 +58,7 @@
             "icon": "arrow-right-arrow-left",
             "versions": [
               {
-                "version": "V2",
+                "version": "Swap V2",
                 "default": true,
                 "tag": "Latest",
                 "groups": [
@@ -104,7 +104,7 @@
                 ]
               },
               {
-                "version": "V1",
+                "version": "Swap V1",
                 "tag": "Legacy",
                 "groups": [
                   {
@@ -400,30 +400,30 @@
                   {
                     "group": "API Reference",
                     "pages": [
-                      "api-reference/trigger/v2",
+                      "api-reference/trigger/index",
                       {
                         "group": "Authenticate",
                         "pages": [
-                          "api-reference/trigger/v2/challenge",
-                          "api-reference/trigger/v2/verify",
-                          "api-reference/trigger/v2/verify-token",
-                          "api-reference/trigger/v2/vault",
-                          "api-reference/trigger/v2/vault-register"
+                          "api-reference/trigger/challenge",
+                          "api-reference/trigger/verify",
+                          "api-reference/trigger/verify-token",
+                          "api-reference/trigger/vault",
+                          "api-reference/trigger/vault-register"
                         ]
                       },
                       {
                         "group": "Order Management",
                         "pages": [
-                          "api-reference/trigger/v2/deposit-craft",
-                          "api-reference/trigger/v2/create-order",
-                          "api-reference/trigger/v2/update-order",
-                          "api-reference/trigger/v2/cancel-order",
-                          "api-reference/trigger/v2/confirm-cancel"
+                          "api-reference/trigger/deposit-craft",
+                          "api-reference/trigger/create-order",
+                          "api-reference/trigger/update-order",
+                          "api-reference/trigger/cancel-order",
+                          "api-reference/trigger/confirm-cancel"
                         ]
                       },
                       {
                         "group": "History",
-                        "pages": ["api-reference/trigger/v2/order-history"]
+                        "pages": ["api-reference/trigger/order-history"]
                       }
                     ]
                   }
@@ -1242,6 +1242,14 @@
     {
       "source": "/api-reference/swap/v2/execute",
       "destination": "/api-reference/swap/execute"
+    },
+    {
+      "source": "/api-reference/trigger/v2/:slug*",
+      "destination": "/api-reference/trigger/:slug*"
+    },
+    {
+      "source": "/api-reference/trigger/v2",
+      "destination": "/api-reference/trigger/index"
     }
   ]
 }

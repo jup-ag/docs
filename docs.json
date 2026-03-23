@@ -127,13 +127,8 @@
                 "group": "Tokens",
                 "pages": [
                   "docs/tokens/index",
-                  {
-                    "group": "V2",
-                    "pages": [
-                      "docs/tokens/v2/token-information",
-                      "docs/tokens/v2/content"
-                    ]
-                  },
+                  "docs/tokens/v2/token-information",
+                  "docs/tokens/v2/content",
                   "docs/tokens/organic-score",
                   "docs/tokens/token-tag-standard"
                 ]
@@ -141,8 +136,7 @@
               {
                 "group": "Price",
                 "pages": [
-                  "docs/price/index",
-                  "docs/price/v3"
+                  "docs/price/index"
                 ]
               },
               {
@@ -304,7 +298,7 @@
             "icon": "chart-line",
             "groups": [
               {
-                "group": "Perps Program",
+                "group": "Perps",
                 "pages": [
                   "docs/perps/index",
                   "docs/perps/position-account",
@@ -320,7 +314,7 @@
             "icon": "bullseye",
             "groups": [
               {
-                "group": "Trigger Order API",
+                "group": "Trigger API",
                 "tag": "BETA",
                 "pages": [
                   "docs/trigger/index",
@@ -395,15 +389,10 @@
             "icon": "check-to-slot",
             "groups": [
               {
-                "group": "Prediction",
-                "pages": [
-                  "docs/prediction/index"
-                ]
-              },
-              {
-                "group": "Trading Guides",
+                "group": "Prediction API",
                 "tag": "BETA",
                 "pages": [
+                  "docs/prediction/index",
                   "docs/prediction/events-and-markets",
                   "docs/prediction/open-positions",
                   "docs/prediction/manage-positions",
@@ -426,6 +415,7 @@
               },
               {
                 "group": "API Reference",
+                "tag": "BETA",
                 "pages": [
                   {
                     "group": "Events",
@@ -585,12 +575,7 @@
               {
                 "group": "Routing",
                 "pages": [
-                  "docs/routing/index"
-                ]
-              },
-              {
-                "group": "Routing Integrations",
-                "pages": [
+                  "docs/routing/index",
                   "docs/routing/dex-integration",
                   "docs/routing/rfq-integration"
                 ]

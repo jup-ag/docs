@@ -3,11 +3,11 @@ th {
 }
 
 .dark th {
-color: white !important;
+    color: white !important;
 }
 
 #banner {
-    background-color: #F2E584 !important;
+    background-color: #f2e584 !important;
 }
 #banner * {
     color: black !important;
@@ -29,6 +29,75 @@ color: white !important;
     }
 }
 
+/* ── Product & version selectors: inline pair ── */
+
+/* Hide the version button from the header row, reposition it
+   next to the product selector. The version button is the
+   button[aria-haspopup] inside the header's logo row (the div
+   that also contains .nav-logo images). We target it via :has(). */
+
+/* The logo row's parent: make it relative for positioning context */
+/*@media screen and (min-width: 1024px) {*/
+
+/* Make the product selector's parent container a flex row */
+/*.nav-dropdown-products-selector-trigger {
+        border: 1px solid rgba(128, 128, 128, 0.2) !important;
+        background: rgba(128, 128, 128, 0.06) !important;
+        border-radius: 0.5rem !important;
+        padding: 0.375rem 0.625rem !important;
+        height: auto !important;
+        font-size: 0.8125rem !important;
+        font-weight: 600 !important;
+    }
+
+    .dark .nav-dropdown-products-selector-trigger {
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .nav-dropdown-products-selector-trigger:hover {
+        border-color: rgba(128, 128, 128, 0.35) !important;
+        background: rgba(128, 128, 128, 0.1) !important;
+    }*/
+
+/* Hide version button from header, move it inline with product selector.
+       The version button is a sibling of the dark-mode toggle button,
+       inside the logo/header row. We use :has(.nav-logo) to find its
+       grandparent, then target the button[aria-haspopup] within. */
+/*div:has(> a > .nav-logo) > button[aria-haspopup="menu"] {*/
+/*position: absolute !important;*/
+/* Position it to the right of the product selector area */
+/* The sidebar content has px-4 (1rem) padding, and the product
+           selector starts after mt-6. We calculate based on sidebar layout. */
+/*top: 5.5rem !important;
+        right: 1rem !important;
+        z-index: 10 !important;
+        border: 1px solid rgba(128, 128, 128, 0.2) !important;
+        background: rgba(128, 128, 128, 0.06) !important;
+        border-radius: 0.5rem !important;
+        padding: 0.375rem 0.625rem !important;
+        font-size: 0.8125rem !important;
+        font-weight: 600 !important;
+    }
+
+    .dark div:has(> a > .nav-logo) > button[aria-haspopup="menu"] {
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    div:has(> a > .nav-logo) > button[aria-haspopup="menu"]:hover {
+        border-color: rgba(128, 128, 128, 0.35) !important;
+        background: rgba(128, 128, 128, 0.1) !important;
+    }*/
+
+/* Shrink product selector to leave room for version button */
+/*.nav-dropdown-products-selector-trigger {
+        width: calc(100% - 7rem) !important;
+        max-width: none !important;
+    }
+
+}*/
+
 /* Products dropdown – extend beyond Mintlify default height */
 @media screen and (max-width: 767px) {
     [data-radix-menu-content] {
@@ -38,12 +107,11 @@ color: white !important;
 @media screen and (min-width: 768px) {
     [data-radix-menu-content] {
         max-height: 600px !important;
-        min-width: 420px !important;
-        display: grid !important;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: repeat(7, auto);
-        grid-auto-flow: column;
-        gap: 0 1rem;
+        /*min-width: 420px !important;*/
+        /*display: grid !important;*/
+        /*grid-template-columns: 1fr 1fr;*/
+        /*grid-template-rows: repeat(7, auto);*/
+        /*grid-auto-flow: column;*/
+        /*gap: 0 1rem;*/
     }
 }
-

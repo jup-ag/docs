@@ -246,7 +246,6 @@ interface TokenInfo {
   priceBlockId: number | null;   // Solana block for price recency
   liquidity: number | null;      // Total liquidity in USD
   holderCount: number | null;
-  fees: number | null;           // Trading fees in USD
   apy?: { jupEarn: number };     // APY from Jupiter Lend's Earn (only present for listed assets)
 
   // Quality & verification
@@ -273,9 +272,6 @@ interface TokenInfo {
   stats1h?: SwapStats | null;
   stats6h?: SwapStats | null;
   stats24h?: SwapStats | null;
-  stats7d?: SwapStats | null;    // Typically just priceChange, but may include volume
-  stats30d?: SwapStats | null;
-
   updatedAt: string;             // Last data update timestamp
 }
 
@@ -346,9 +342,6 @@ interface SwapStats {
     "numOrganicBuyers": 291,
     "numNetBuyers": 1201
   },
-  "stats7d": { "priceChange": -12.21 },
-  "stats30d": { "priceChange": -27.43 },
-  "fees": 53.51,
   "updatedAt": "2026-02-23T03:54:14.460Z"
 }
 ```

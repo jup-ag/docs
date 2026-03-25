@@ -9,7 +9,14 @@
   },
   "favicon": "/favicon.png",
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude", "cursor", "vscode"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "cursor",
+      "vscode"
+    ]
   },
   "appearance": {
     "default": "dark"
@@ -20,10 +27,9 @@
     }
   },
   "navigation": {
-    "anchors": [
+    "tabs": [
       {
-        "anchor": "Get Started",
-        "icon": "rocket",
+        "tab": "Get Started",
         "groups": [
           {
             "group": " ",
@@ -49,8 +55,7 @@
         ]
       },
       {
-        "anchor": "Products",
-        "icon": "grid-2",
+        "tab": "Products",
         "products": [
           {
             "product": "Swap",
@@ -90,7 +95,9 @@
                   },
                   {
                     "group": "Guides",
-                    "pages": ["guides/how-to-embed-a-swap-widget"]
+                    "pages": [
+                      "guides/how-to-embed-a-swap-widget"
+                    ]
                   },
                   {
                     "group": "API Reference",
@@ -188,7 +195,9 @@
               },
               {
                 "group": "Guides",
-                "pages": ["guides/how-to-get-token-information"]
+                "pages": [
+                  "guides/how-to-get-token-information"
+                ]
               },
               {
                 "group": "API Reference",
@@ -210,15 +219,21 @@
             "groups": [
               {
                 "group": "Price",
-                "pages": ["docs/price/index"]
+                "pages": [
+                  "docs/price/index"
+                ]
               },
               {
                 "group": "Guides",
-                "pages": ["guides/how-to-get-token-price"]
+                "pages": [
+                  "guides/how-to-get-token-price"
+                ]
               },
               {
                 "group": "API Reference",
-                "pages": ["api-reference/price/v3/price"]
+                "pages": [
+                  "api-reference/price/v3/price"
+                ]
               }
             ]
           },
@@ -406,7 +421,9 @@
                       },
                       {
                         "group": "History",
-                        "pages": ["api-reference/trigger/order-history"]
+                        "pages": [
+                          "api-reference/trigger/order-history"
+                        ]
                       }
                     ]
                   }
@@ -465,7 +482,9 @@
               },
               {
                 "group": "Debugging",
-                "pages": ["docs/recurring/best-practices"]
+                "pages": [
+                  "docs/recurring/best-practices"
+                ]
               },
               {
                 "group": "API Reference",
@@ -568,7 +587,9 @@
                   },
                   {
                     "group": "Vault",
-                    "pages": ["api-reference/prediction/get-vault-info"]
+                    "pages": [
+                      "api-reference/prediction/get-vault-info"
+                    ]
                   }
                 ]
               }
@@ -608,7 +629,9 @@
               },
               {
                 "group": "Lock",
-                "pages": ["docs/lock/index"]
+                "pages": [
+                  "docs/lock/index"
+                ]
               },
               {
                 "group": "API Reference",
@@ -671,7 +694,9 @@
             "groups": [
               {
                 "group": "Tool Kits",
-                "pages": ["tool-kits/index"]
+                "pages": [
+                  "tool-kits/index"
+                ]
               },
               {
                 "group": "Jupiter Plugin",
@@ -699,37 +724,47 @@
               },
               {
                 "group": "Jupiter Referral Program",
-                "pages": ["tool-kits/referral-program"]
+                "pages": [
+                  "tool-kits/referral-program"
+                ]
               }
             ]
           }
         ]
       },
       {
-        "anchor": "AI",
-        "icon": "robot",
+        "tab": "AI",
         "groups": [
           {
             "group": " ",
-            "pages": ["ai/index"]
+            "pages": [
+              "ai/index"
+            ]
           },
           {
             "group": "Trade with AI",
-            "pages": ["ai/cli"]
+            "pages": [
+              "ai/cli"
+            ]
           },
           {
             "group": "Build with AI",
-            "pages": ["ai/mcp", "ai/skills", "ai/llms-txt"]
+            "pages": [
+              "ai/mcp",
+              "ai/skills",
+              "ai/llms-txt"
+            ]
           }
         ]
       },
       {
-        "anchor": "Changelog",
-        "icon": "arrow-rotate-right",
+        "tab": "Changelog",
         "groups": [
           {
             "group": " ",
-            "pages": ["changelog/index"]
+            "pages": [
+              "changelog/index"
+            ]
           },
           {
             "group": "Blog",
@@ -746,8 +781,7 @@
         ]
       },
       {
-        "anchor": "Resources",
-        "icon": "book",
+        "tab": "Resources",
         "groups": [
           {
             "group": "Resources",

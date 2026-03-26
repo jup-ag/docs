@@ -89,6 +89,7 @@ function extractFrontmatter(pagePath) {
     let title,
       description,
       llmsDescription,
+      openapi,
       deprecated = false;
     match[1].split("\n").forEach((line) => {
       line = line.trim();
@@ -106,6 +107,7 @@ function extractFrontmatter(pagePath) {
         if (key === "title") title = value;
         if (key === "description") description = value;
         if (key === "llmsDescription") llmsDescription = value;
+        if (key === "openapi") openapi = value;
         if (key === "deprecated" && value === "true") deprecated = true;
       }
     });
@@ -121,7 +123,7 @@ function extractFrontmatter(pagePath) {
       return null;
     }
 
-    const result = { title, description: llmsDescription || description };
+    const result = { title, description: llmsDescription || description, openapi };
     frontmatterCache.set(pagePath, result);
     return result;
   } catch (e) {
@@ -149,11 +151,18 @@ function emitHeading(text, depth) {
 
 function emitEntry(pagePath) {
   if (pagePath === "index") return false; // skip root homepage
+  if (seenUrls.has(pagePath)) return false;
   const fm = extractFrontmatter(pagePath);
   if (!fm) return false;
-  const url = `${BASE_URL}/${pagePath}.md`;
-  if (seenUrls.has(url)) return false;
-  seenUrls.add(url);
+  seenUrls.add(pagePath);
+  // API ref pages with openapi field link to the spec YAML instead of .md
+  let url;
+  if (fm.openapi) {
+    const specPath = fm.openapi.split(/\s+/)[0]; // e.g. "/openapi-spec/swap/v2/swap.yaml"
+    url = `${BASE_URL}${specPath}`;
+  } else {
+    url = `${BASE_URL}/${pagePath}.md`;
+  }
   emit(`- [${fm.title}](${url}): ${fm.description}\n`);
   return true;
 }

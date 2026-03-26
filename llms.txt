@@ -8,7 +8,9 @@
 
 Setup guides for environment, tooling, and first API calls.
 
-- [Get Started](https://dev.jup.ag/get-started/index.md): This tutorial provides step-by-step guidance for building a token swap widget using Jupiter's core liquidity APIs. Learn to use the Ultra Swap API (for swap quotes and execution), Tokens V2 API (for token discovery and metadata), and Price V3 API (for real-time USD token prices) in standalone functions. Requires no API keys, blockchain RPC, credentials, or upfront payments, making integration fast and accessible for developers and LLM agents.
+### Get Started
+
+- [Jupiter Developer Docs](https://dev.jup.ag/get-started/index.md): Welcome page for Jupiter Developer Docs. Introduces Jupiter as Solana DeFi infrastructure and provides quick navigation to product APIs (Swap, Tokens, Price, Lend, Trigger, Recurring, Prediction, Perps), developer resources (Guides, API Reference, Developer Platform), AI resources (CLI, Skills, MCP, llms.txt), community links, socials (Blog and X), and get-started setup pages.
 - [Environment Setup](https://dev.jup.ag/get-started/environment-setup.md): Install Solana web3.js and spl-token libraries, configure an RPC connection, and set up a development wallet to build with the Jupiter API.
 - [Development Basics](https://dev.jup.ag/get-started/development-basics.md): Solana fundamentals for Jupiter developers: accounts, programs, instructions, transactions, priority fees, compute units, slippage, and how Ultra Swap API simplifies it all.
 - [Developer Guides](https://dev.jup.ag/guides/index.md): Jupiter developer guides: practical tutorials for common Solana development tasks. Covers token swaps with Ultra (recommended, two API calls, no RPC needed), token information (metadata, verification, organic score), token prices (USD pricing), swap widget embedding (Plugin), custom swaps with Metis (routing, CPI, custom instructions), and prediction markets (binary event trading). Each guide includes working code examples in JavaScript, Python, and curl.

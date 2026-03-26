@@ -185,10 +185,8 @@
                 "group": "Tokens",
                 "pages": [
                   "docs/tokens/index",
-                  "docs/tokens/v2/token-information",
-                  "docs/tokens/v2/content",
-                  "docs/tokens/organic-score",
-                  "docs/tokens/token-tag-standard"
+                  "docs/tokens/token-information",
+                  "docs/tokens/content"
                 ]
               },
               {
@@ -198,13 +196,13 @@
               {
                 "group": "API Reference",
                 "pages": [
-                  "api-reference/tokens/v2/search",
-                  "api-reference/tokens/v2/tag",
-                  "api-reference/tokens/v2/category",
-                  "api-reference/tokens/v2/recent",
-                  "api-reference/tokens/v2/get-content",
-                  "api-reference/tokens/v2/get-content-cooking",
-                  "api-reference/tokens/v2/get-content-feed"
+                  "api-reference/tokens/search",
+                  "api-reference/tokens/tag",
+                  "api-reference/tokens/category",
+                  "api-reference/tokens/recent",
+                  "api-reference/tokens/get-content",
+                  "api-reference/tokens/get-content-cooking",
+                  "api-reference/tokens/get-content-feed"
                 ]
               }
             ]
@@ -223,7 +221,7 @@
               },
               {
                 "group": "API Reference",
-                "pages": ["api-reference/price/v3/price"]
+                "pages": ["api-reference/price/index"]
               }
             ]
           },
@@ -810,6 +808,34 @@
   },
   "redirects": [
     {
+      "source": "/docs/tokens/v2/token-information",
+      "destination": "/docs/tokens/token-information"
+    },
+    {
+      "source": "/docs/tokens/v2/content",
+      "destination": "/docs/tokens/content"
+    },
+    {
+      "source": "/docs/tokens/organic-score",
+      "destination": "/docs/tokens"
+    },
+    {
+      "source": "/docs/tokens/token-tag-standard",
+      "destination": "/docs/tokens"
+    },
+    {
+      "source": "/api-reference/tokens/v2/:slug*",
+      "destination": "/api-reference/tokens/:slug*"
+    },
+    {
+      "source": "/api-reference/price/v3/price",
+      "destination": "/api-reference/price"
+    },
+    {
+      "source": "/docs/price/v3",
+      "destination": "/docs/price"
+    },
+    {
       "source": "/docs/routing",
       "destination": "/docs/swap/routing"
     },
@@ -1103,7 +1129,7 @@
     },
     {
       "source": "/docs/tokens/v2",
-      "destination": "/docs/tokens/v2/token-information"
+      "destination": "/docs/tokens/token-information"
     },
     {
       "source": "/resources/ai-workflow",

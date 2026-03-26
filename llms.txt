@@ -72,11 +72,9 @@ Token metadata, search, verification, and organic score APIs.
 
 ### Tokens
 
-- [Token Verification and Listing](https://dev.jup.ag/docs/tokens/index.md): Jupiter's token verification system, listing process, and search APIs. Use the V2 API for programmatic token discovery and metadata.
-- [Tokens API V2](https://dev.jup.ag/docs/tokens/v2/token-information.md): GET /tokens/v2 endpoints for retrieving token metadata by mint address, symbol search, tag, category, or recency. Returns name, symbol, icon, organic score, holder count, and trading stats.
-- [Content API (BETA)](https://dev.jup.ag/docs/tokens/v2/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD. Pro tier only.
-- [Organic Score](https://dev.jup.ag/docs/tokens/organic-score.md): Organic Score measures the genuine activity and health of a token using real user wallet data, including holder count, trading volume, and liquidity — filtering out bot and wash-trade activity.
-- [Token Tag Standard](https://dev.jup.ag/docs/tokens/token-tag-standard.md): Token tags categorize tokens in the Jupiter Tokens API (e.g., Verified, LST). Projects can apply for custom tags by providing a public CSV endpoint of mint addresses.
+- [Tokens API](https://dev.jup.ag/docs/tokens/index.md): Jupiter Tokens API V2 for programmatic token discovery and metadata. Search by name/symbol/mint, get verification status, organic score, holder count, market cap, and trading stats. Covers verification levels (verified, unverified, banned), organic score methodology, and token tag standard.
+- [Tokens API V2](https://dev.jup.ag/docs/tokens/token-information.md): GET /tokens/v2 endpoints for retrieving token metadata by mint address, symbol search, tag, category, or recency. Returns name, symbol, icon, organic score, holder count, and trading stats.
+- [Content API (BETA)](https://dev.jup.ag/docs/tokens/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD. Pro tier only.
 
 ### Guides
 

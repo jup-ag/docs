@@ -9,9 +9,9 @@
 Setup guides for environment, tooling, and first API calls.
 
 - [Get Started](https://dev.jup.ag/get-started/index.md): This tutorial provides step-by-step guidance for building a token swap widget using Jupiter's core liquidity APIs. Learn to use the Ultra Swap API (for swap quotes and execution), Tokens V2 API (for token discovery and metadata), and Price V3 API (for real-time USD token prices) in standalone functions. Requires no API keys, blockchain RPC, credentials, or upfront payments, making integration fast and accessible for developers and LLM agents.
-- [Developer Guides](https://dev.jup.ag/guides/index.md): Jupiter developer guides: practical tutorials for common Solana development tasks. Covers token swaps with Ultra (recommended, two API calls, no RPC needed), token information (metadata, verification, organic score), token prices (USD pricing), swap widget embedding (Plugin), custom swaps with Metis (routing, CPI, custom instructions), and prediction markets (binary event trading). Each guide includes working code examples in JavaScript, Python, and curl.
 - [Environment Setup](https://dev.jup.ag/get-started/environment-setup.md): Install Solana web3.js and spl-token libraries, configure an RPC connection, and set up a development wallet to build with the Jupiter API.
 - [Development Basics](https://dev.jup.ag/get-started/development-basics.md): Solana fundamentals for Jupiter developers: accounts, programs, instructions, transactions, priority fees, compute units, slippage, and how Ultra Swap API simplifies it all.
+- [Developer Guides](https://dev.jup.ag/guides/index.md): Jupiter developer guides: practical tutorials for common Solana development tasks. Covers token swaps with Ultra (recommended, two API calls, no RPC needed), token information (metadata, verification, organic score), token prices (USD pricing), swap widget embedding (Plugin), custom swaps with Metis (routing, CPI, custom instructions), and prediction markets (binary event trading). Each guide includes working code examples in JavaScript, Python, and curl.
 
 ### Portal
 
@@ -197,18 +197,6 @@ Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and F
 - [Positions](https://dev.jup.ag/api-reference/lend/earn/positions.md): Request for the position data of one or multiple users
 - [Earnings](https://dev.jup.ag/api-reference/lend/earn/earnings.md): Request for the earnings of one or multiple positions of a user
 
-## Perps
-
-Leveraged perpetuals trading on Solana (on-chain program, no REST API).
-
-### Perps
-
-- [Jupiter Perpetuals Overview](https://dev.jup.ag/docs/perps/index.md): Jupiter Perpetuals program for leveraged trading on Solana. Work-in-progress documentation covering account structures and the Anchor IDL.
-- [Position Account](https://dev.jup.ag/docs/perps/position-account.md): The Position account stores trade position data including owner, side (long/short), entry price, size, collateral, PNL, and borrow fee snapshot. Derived from the trader's wallet, custody, and collateral custody.
-- [PositionRequest Account](https://dev.jup.ag/docs/perps/position-request-account.md): The PositionRequest account represents a pending request to open, close, or modify a position, including TP/SL triggers. It is a PDA derived from the Position account with a unique random seed.
-- [Pool Account](https://dev.jup.ag/docs/perps/pool-account.md): The Pool account stores JLP pool configuration including AUM (aumUsd), custody public keys, position limits, fee schedules (open/close/swap), and APR calculation data. Only one Pool account exists.
-- [Custody Account](https://dev.jup.ag/docs/perps/custody-account.md): The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state.
-
 ## Trigger
 
 Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.
@@ -247,26 +235,6 @@ Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.
 ##### History
 
 - [Order History](https://dev.jup.ag/api-reference/trigger/order-history.md): Get historical trigger orders for an account
-
-### Trigger V1
-
-#### Trigger
-
-- [Trigger (Limit Orders) API Overview](https://dev.jup.ag/docs/trigger/v1/index.md): Create limit orders that execute automatically when the target price is reached. Supports any token pair, custom fees, and order expiry.
-- [Create Order](https://dev.jup.ag/docs/trigger/v1/create-order.md): POST /trigger/v1/createOrder builds a limit order transaction. Required params: inputMint, outputMint, maker, payer, makingAmount, takingAmount.
-- [Execute Order](https://dev.jup.ag/docs/trigger/v1/execute-order.md): POST /trigger/v1/execute submits a filled trigger order. Jupiter automatically monitors and executes orders when the target price is reached.
-- [Cancel Order](https://dev.jup.ag/docs/trigger/v1/cancel-order.md): POST /trigger/v1/cancelOrder cancels an open trigger order and returns unfilled tokens to the maker.
-- [Get Trigger Orders](https://dev.jup.ag/docs/trigger/v1/get-trigger-orders.md): GET /trigger/v1/getTriggerOrders returns open and historical trigger orders filtered by wallet, status, or token pair.
-- [Best Practices](https://dev.jup.ag/docs/trigger/v1/best-practices.md): Guidelines for trigger order minimum amounts, price validation, slippage settings, and token compatibility.
-
-#### API Reference
-
-- [Trigger API V1](https://dev.jup.ag/api-reference/trigger/v1.md): Endpoints for creating, executing, and canceling limit orders.
-- [Create Order](https://dev.jup.ag/api-reference/trigger/v1/create-order.md): Request for a base64-encoded unsigned trigger order creation transaction to be used in POST /trigger/v1/execute
-- [Execute](https://dev.jup.ag/api-reference/trigger/v1/execute.md): Execute the signed transaction and get the execution status
-- [Cancel Order](https://dev.jup.ag/api-reference/trigger/v1/cancel-order.md): Request for a base64-encoded unsigned trigger order cancellation transaction to be used in POST /trigger/v1/execute
-- [Cancel Orders](https://dev.jup.ag/api-reference/trigger/v1/cancel-orders.md): Request for a base64-encoded unsigned trigger order cancellation transaction(s) to be used in POST /trigger/v1/execute
-- [Get Trigger Orders](https://dev.jup.ag/api-reference/trigger/v1/get-trigger-orders.md): Request for the active or historical orders associated to the provided account
 
 ## Recurring
 
@@ -363,6 +331,18 @@ Binary prediction markets for real-world events.
 #### Vault
 
 - [Get Vault Info](https://dev.jup.ag/api-reference/prediction/get-vault-info.md): Get vault account information and balance
+
+## Perps
+
+Leveraged perpetuals trading on Solana (on-chain program, no REST API).
+
+### Perps
+
+- [Jupiter Perpetuals Overview](https://dev.jup.ag/docs/perps/index.md): Jupiter Perpetuals program for leveraged trading on Solana. Work-in-progress documentation covering account structures and the Anchor IDL.
+- [Position Account](https://dev.jup.ag/docs/perps/position-account.md): The Position account stores trade position data including owner, side (long/short), entry price, size, collateral, PNL, and borrow fee snapshot. Derived from the trader's wallet, custody, and collateral custody.
+- [PositionRequest Account](https://dev.jup.ag/docs/perps/position-request-account.md): The PositionRequest account represents a pending request to open, close, or modify a position, including TP/SL triggers. It is a PDA derived from the Position account with a unique random seed.
+- [Pool Account](https://dev.jup.ag/docs/perps/pool-account.md): The Pool account stores JLP pool configuration including AUM (aumUsd), custody public keys, position limits, fee schedules (open/close/swap), and APR calculation data. Only one Pool account exists.
+- [Custody Account](https://dev.jup.ag/docs/perps/custody-account.md): The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state.
 
 ## More
 
@@ -462,7 +442,7 @@ Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.
 
 ## AI
 
-AI-first developer experience — AI-friendly docs, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.
+AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.
 
 - [AI](https://dev.jup.ag/ai/index.md): Landing page for Jupiter's AI resources, split into two paths: (1) Trade with AI - use Jupiter CLI to interact with Jupiter products (Spot, Perps, Lend) through terminal, Telegram, or AI agents; (2) Build with AI - integrate Jupiter into AI applications using agent skills, llms.txt, and MCP documentation server. All Jupiter APIs are AI-agent friendly: no RPC required, no API key required for basic usage, and simple REST interfaces.
 

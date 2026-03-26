@@ -2,45 +2,53 @@
 
 /**
  * Generate llms.txt from docs.json navigation structure.
- * Walks the nav tree directly (anchors → products → versions → groups → pages)
+ * Walks the nav tree directly (tabs → products → versions → groups → pages)
  * so output mirrors the site structure. Deprecated pages are skipped.
  * Follows llms.txt standard: https://llmstxt.org/#format
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const BASE_URL = 'https://dev.jup.ag';
+const BASE_URL = "https://dev.jup.ag";
 const baseFolder = __dirname;
 
-const docsJson = JSON.parse(fs.readFileSync(path.join(baseFolder, 'docs.json'), 'utf8'));
-const { anchors } = docsJson.navigation;
+const docsJson = JSON.parse(
+  fs.readFileSync(path.join(baseFolder, "docs.json"), "utf8"),
+);
+const navigation = docsJson.navigation || {};
+const topLevelNav = navigation.tabs;
 
-if (!anchors) {
-  throw new Error('No navigation.anchors found in docs.json');
+if (!topLevelNav) {
+  throw new Error("No navigation.tabs found in docs.json");
 }
 
 // --- Section summaries ---
 
 const PRODUCT_SUMMARIES = {
-  'Swap': 'Token swap API with managed execution (/order) and custom transaction building (/build).',
-  'Tokens': 'Token metadata, search, verification, and organic score APIs.',
-  'Price': 'Real-time heuristics-based USD token pricing.',
-  'Lend': 'Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and Flashloans.',
-  'Perps': 'Leveraged perpetuals trading on Solana (on-chain program, no REST API).',
-  'Trigger': 'Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.',
-  'Recurring': 'Automated dollar-cost averaging (DCA) with time-based recurring orders.',
-  'Prediction': 'Binary prediction markets for real-world events.',
-  'More': 'Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).',
-  'Routing': 'Routing engine architecture, DEX integration, and market maker onboarding.',
-  'Tool Kits': 'Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.',
+  Swap: "Token swap API with managed execution (/order) and custom transaction building (/build).",
+  Tokens: "Token metadata, search, verification, and organic score APIs.",
+  Price: "Real-time heuristics-based USD token pricing.",
+  Lend: "Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and Flashloans.",
+  Perps:
+    "Leveraged perpetuals trading on Solana (on-chain program, no REST API).",
+  Trigger:
+    "Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.",
+  Recurring:
+    "Automated dollar-cost averaging (DCA) with time-based recurring orders.",
+  Prediction: "Binary prediction markets for real-world events.",
+  More: "Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).",
+  Routing:
+    "Routing engine architecture, DEX integration, and market maker onboarding.",
+  "Tool Kits":
+    "Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.",
 };
 
-const ANCHOR_SUMMARIES = {
-  'Get Started': 'Setup guides for environment, tooling, and first API calls.',
-  'AI': 'AI-first developer experience — AI-friendly docs, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.',
-  'Changelog': 'Changelog, release notes, and developer blog.',
-  'Resources': 'Support channels, brand assets, and community resources.',
+const TAB_SUMMARIES = {
+  "Get Started": "Setup guides for environment, tooling, and first API calls.",
+  AI: "AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.",
+  Changelog: "Changelog, release notes, and developer blog.",
+  Resources: "Support channels, brand assets, and community resources.",
 };
 
 // --- Frontmatter extraction (cached) ---
@@ -51,15 +59,18 @@ function extractFrontmatter(pagePath) {
   if (frontmatterCache.has(pagePath)) return frontmatterCache.get(pagePath);
 
   const candidates = [
-    path.join(baseFolder, pagePath + '.mdx'),
-    path.join(baseFolder, pagePath + '.md'),
-    path.join(baseFolder, pagePath, 'index.mdx'),
-    path.join(baseFolder, pagePath, 'index.md'),
+    path.join(baseFolder, pagePath + ".mdx"),
+    path.join(baseFolder, pagePath + ".md"),
+    path.join(baseFolder, pagePath, "index.mdx"),
+    path.join(baseFolder, pagePath, "index.md"),
   ];
 
   let filePath;
   for (const c of candidates) {
-    if (fs.existsSync(c)) { filePath = c; break; }
+    if (fs.existsSync(c)) {
+      filePath = c;
+      break;
+    }
   }
 
   if (!filePath) {
@@ -69,7 +80,7 @@ function extractFrontmatter(pagePath) {
   }
 
   try {
-    const content = fs.readFileSync(filePath, 'utf8');
+    const content = fs.readFileSync(filePath, "utf8");
     const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
     if (!match) {
       console.error(`No frontmatter: ${filePath}`);
@@ -77,22 +88,27 @@ function extractFrontmatter(pagePath) {
       return null;
     }
 
-    let title, description, llmsDescription, deprecated = false;
-    match[1].split('\n').forEach(line => {
+    let title,
+      description,
+      llmsDescription,
+      deprecated = false;
+    match[1].split("\n").forEach((line) => {
       line = line.trim();
-      if (!line || line.startsWith('#')) return;
-      const colonIndex = line.indexOf(':');
+      if (!line || line.startsWith("#")) return;
+      const colonIndex = line.indexOf(":");
       if (colonIndex > 0) {
         const key = line.substring(0, colonIndex).trim();
         let value = line.substring(colonIndex + 1).trim();
-        if ((value.startsWith('"') && value.endsWith('"')) ||
-            (value.startsWith("'") && value.endsWith("'"))) {
+        if (
+          (value.startsWith('"') && value.endsWith('"')) ||
+          (value.startsWith("'") && value.endsWith("'"))
+        ) {
           value = value.slice(1, -1);
         }
-        if (key === 'title') title = value;
-        if (key === 'description') description = value;
-        if (key === 'llmsDescription') llmsDescription = value;
-        if (key === 'deprecated' && value === 'true') deprecated = true;
+        if (key === "title") title = value;
+        if (key === "description") description = value;
+        if (key === "llmsDescription") llmsDescription = value;
+        if (key === "deprecated" && value === "true") deprecated = true;
       }
     });
 
@@ -119,20 +135,22 @@ function extractFrontmatter(pagePath) {
 
 // --- Output building ---
 
-let output = '';
+let output = "";
 const seenUrls = new Set();
 
-function emit(text) { output += text; }
+function emit(text) {
+  output += text;
+}
 
 function emitHeading(text, depth) {
-  if (output && !output.endsWith('\n\n')) {
-    emit(output.endsWith('\n') ? '\n' : '\n\n');
+  if (output && !output.endsWith("\n\n")) {
+    emit(output.endsWith("\n") ? "\n" : "\n\n");
   }
-  emit(`${'#'.repeat(Math.min(depth, 6))} ${text}\n\n`);
+  emit(`${"#".repeat(Math.min(depth, 6))} ${text}\n\n`);
 }
 
 function emitEntry(pagePath) {
-  if (pagePath === 'index') return false; // skip root homepage
+  if (pagePath === "index") return false; // skip root homepage
   const fm = extractFrontmatter(pagePath);
   if (!fm) return false;
   const url = `${BASE_URL}/${pagePath}.md`;
@@ -149,8 +167,11 @@ function walkPages(pages, headingDepth) {
   let afterSubgroup = false;
 
   for (const page of pages) {
-    if (typeof page === 'string') {
-      if (afterSubgroup) { emit('\n'); afterSubgroup = false; }
+    if (typeof page === "string") {
+      if (afterSubgroup) {
+        emit("\n");
+        afterSubgroup = false;
+      }
       if (emitEntry(page)) count++;
     } else if (page?.pages) {
       emitHeading(page.group, headingDepth);
@@ -171,6 +192,7 @@ function walkGroup(group, headingDepth) {
 }
 
 function walkVersion(version, headingDepth) {
+  if (version.tag === "Unmaintained") return 0;
   emitHeading(version.version, headingDepth);
   let count = 0;
   for (const group of version.groups || []) {
@@ -198,17 +220,18 @@ function walkProduct(product) {
   return count;
 }
 
-function walkAnchor(anchor) {
-  if (anchor.products) {
-    for (const product of anchor.products) {
+function walkTopLevel(item) {
+  if (item.products) {
+    for (const product of item.products) {
       walkProduct(product);
     }
-  } else if (anchor.groups) {
-    emitHeading(anchor.anchor, 2);
-    if (ANCHOR_SUMMARIES[anchor.anchor]) {
-      emit(`${ANCHOR_SUMMARIES[anchor.anchor]}\n\n`);
+  } else if (item.groups) {
+    const sectionName = item.tab;
+    emitHeading(sectionName, 2);
+    if (TAB_SUMMARIES[sectionName]) {
+      emit(`${TAB_SUMMARIES[sectionName]}\n\n`);
     }
-    for (const group of anchor.groups) {
+    for (const group of item.groups) {
       walkGroup(group, 3);
     }
   }
@@ -217,30 +240,44 @@ function walkAnchor(anchor) {
 // --- Build output ---
 
 // Header
-emit('# Jupiter\n\n');
-emit('> Jupiter is DeFi infrastructure on Solana providing swap, lending, perpetuals, limit-order, DCA, and portfolio APIs.\n');
-emit('> **Swap API V2** (recommended): `/order` for managed execution, `/build` for custom transactions. Base URL: `https://api.jup.ag/swap/v2`.\n');
-emit('> All endpoints require an `x-api-key` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).\n\n');
+emit("# Jupiter\n\n");
+emit(
+  "> Jupiter is DeFi infrastructure on Solana providing swap, lending, perpetuals, limit-order, DCA, and portfolio APIs.\n",
+);
+emit(
+  "> **Swap API V2** (recommended): `/order` for managed execution, `/build` for custom transactions. Base URL: `https://api.jup.ag/swap/v2`.\n",
+);
+emit(
+  "> All endpoints require an `x-api-key` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).\n\n",
+);
 
-emit('## Quick Reference\n\n');
-emit('- Swap API V2 (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`\n');
-emit('- Trigger (limit orders): `POST /trigger/v2/orders/price`\n');
-emit('- Recurring (DCA): `POST /recurring/v1/createOrder`\n');
-emit('- Lend: `POST /lend/v1/earn/deposit`\n');
-emit('- Price: `GET /price/v3?ids={mints}`\n');
-emit('- Tokens: `GET /tokens/v2/search?query={query}`\n');
-emit('- Portfolio: `GET /portfolio/v1/positions?wallet={address}`\n\n');
+emit("## Quick Reference\n\n");
+emit(
+  "- Swap API V2 (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`\n",
+);
+emit("- Trigger (limit orders): `POST /trigger/v2/orders/price`\n");
+emit("- Recurring (DCA): `POST /recurring/v1/createOrder`\n");
+emit("- Lend: `POST /lend/v1/earn/deposit`\n");
+emit("- Price: `GET /price/v3?ids={mints}`\n");
+emit("- Tokens: `GET /tokens/v2/search?query={query}`\n");
+emit("- Portfolio: `GET /portfolio/v1/positions?wallet={address}`\n\n");
 
 // Walk navigation
-for (const anchor of anchors) {
-  walkAnchor(anchor);
+for (const item of topLevelNav) {
+  walkTopLevel(item);
 }
 
 // Footer
-emitHeading('Optional', 2);
-emit('- [Dev Portal](https://portal.jup.ag/): Access the Jupiter Portal to manage API key, access to metrics and logs\n');
-emit('- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs\n');
-emit(`- [Stay Updated](${BASE_URL}/resources/support): Get support and stay updated with Jupiter\n`);
+emitHeading("Optional", 2);
+emit(
+  "- [Dev Portal](https://portal.jup.ag/): Access the Jupiter Portal to manage API key, access to metrics and logs\n",
+);
+emit(
+  "- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs\n",
+);
+emit(
+  `- [Stay Updated](${BASE_URL}/resources/support): Get support and stay updated with Jupiter\n`,
+);
 
 // --- Clean up empty sections ---
 // A section is empty if it has no `- [` entries before the next same-or-higher-level heading.
@@ -248,20 +285,26 @@ emit(`- [Stay Updated](${BASE_URL}/resources/support): Get support and stay upda
 function removeEmptySections(text) {
   let result = text;
   for (let pass = 0; pass < 10; pass++) {
-    const lines = result.split('\n');
+    const lines = result.split("\n");
     const kept = [];
     let changed = false;
 
     for (let i = 0; i < lines.length; i++) {
       const headingMatch = lines[i].match(/^(#{2,6}) /);
-      if (!headingMatch) { kept.push(lines[i]); continue; }
+      if (!headingMatch) {
+        kept.push(lines[i]);
+        continue;
+      }
 
       const level = headingMatch[1].length;
       let hasEntries = false;
       for (let j = i + 1; j < lines.length; j++) {
         const nextMatch = lines[j].match(/^(#{1,6}) /);
         if (nextMatch && nextMatch[1].length <= level) break;
-        if (lines[j].startsWith('- [')) { hasEntries = true; break; }
+        if (lines[j].startsWith("- [")) {
+          hasEntries = true;
+          break;
+        }
       }
 
       if (hasEntries) {
@@ -270,26 +313,28 @@ function removeEmptySections(text) {
         changed = true;
         // Also skip non-heading, non-entry lines that belong to this empty section
         // (summary text, blank lines) until the next heading or entry
-        while (i + 1 < lines.length &&
-               !lines[i + 1].match(/^#{1,6} /) &&
-               !lines[i + 1].startsWith('- [')) {
+        while (
+          i + 1 < lines.length &&
+          !lines[i + 1].match(/^#{1,6} /) &&
+          !lines[i + 1].startsWith("- [")
+        ) {
           i++;
         }
       }
     }
 
-    result = kept.join('\n');
+    result = kept.join("\n");
     if (!changed) break;
   }
   return result;
 }
 
 output = removeEmptySections(output);
-output = output.replace(/\n{3,}/g, '\n\n').trim() + '\n';
+output = output.replace(/\n{3,}/g, "\n\n").trim() + "\n";
 
 // --- Write ---
 
-fs.writeFileSync(path.join(baseFolder, 'llms.txt'), output, 'utf8');
+fs.writeFileSync(path.join(baseFolder, "llms.txt"), output, "utf8");
 
 const entries = output.match(/^- \[/gm);
 console.log(`✅ Generated llms.txt: ${entries ? entries.length : 0} entries`);

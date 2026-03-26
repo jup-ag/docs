@@ -9,14 +9,7 @@
   },
   "favicon": "/favicon.png",
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "cursor",
-      "vscode"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude", "cursor", "vscode"]
   },
   "appearance": {
     "default": "dark"
@@ -95,9 +88,7 @@
                   },
                   {
                     "group": "Guides",
-                    "pages": [
-                      "guides/how-to-embed-a-swap-widget"
-                    ]
+                    "pages": ["guides/how-to-embed-a-swap-widget"]
                   },
                   {
                     "group": "API Reference",
@@ -110,8 +101,37 @@
                 ]
               },
               {
+                "version": "Swap V1",
+                "tag": "Unmaintained",
+                "groups": [
+                  {
+                    "group": "Metis",
+                    "pages": [
+                      "docs/swap/v1/index",
+                      "docs/swap/v1/get-quote",
+                      "docs/swap/v1/build-swap-transaction",
+                      "docs/swap/v1/send-swap-transaction",
+                      "docs/swap/v1/add-fees-to-swap",
+                      "docs/swap/v1/payments-through-swap",
+                      "docs/swap/v1/requote-with-lower-max-accounts",
+                      "docs/swap/v1/common-errors"
+                    ]
+                  },
+                  {
+                    "group": "Metis API Reference",
+                    "pages": [
+                      "api-reference/swap/v1",
+                      "api-reference/swap/v1/quote",
+                      "api-reference/swap/v1/swap",
+                      "api-reference/swap/v1/swap-instructions",
+                      "api-reference/swap/v1/program-id-to-label"
+                    ]
+                  }
+                ]
+              },
+              {
                 "version": "Ultra V1",
-                "tag": "Legacy",
+                "tag": "Unmaintained",
                 "groups": [
                   {
                     "group": "Ultra",
@@ -135,7 +155,7 @@
                     ]
                   },
                   {
-                    "group": "API Reference",
+                    "group": "Ultra API Reference",
                     "pages": [
                       "api-reference/ultra/order",
                       "api-reference/ultra/execute",
@@ -144,35 +164,6 @@
                       "api-reference/ultra/shield",
                       "api-reference/ultra/search",
                       "api-reference/ultra/routers"
-                    ]
-                  }
-                ]
-              },
-              {
-                "version": "Swap V1",
-                "tag": "Legacy",
-                "groups": [
-                  {
-                    "group": "Metis",
-                    "pages": [
-                      "docs/swap/v1/index",
-                      "docs/swap/v1/get-quote",
-                      "docs/swap/v1/build-swap-transaction",
-                      "docs/swap/v1/send-swap-transaction",
-                      "docs/swap/v1/add-fees-to-swap",
-                      "docs/swap/v1/payments-through-swap",
-                      "docs/swap/v1/requote-with-lower-max-accounts",
-                      "docs/swap/v1/common-errors"
-                    ]
-                  },
-                  {
-                    "group": "API Reference",
-                    "pages": [
-                      "api-reference/swap/v1",
-                      "api-reference/swap/v1/quote",
-                      "api-reference/swap/v1/swap",
-                      "api-reference/swap/v1/swap-instructions",
-                      "api-reference/swap/v1/program-id-to-label"
                     ]
                   }
                 ]
@@ -195,9 +186,7 @@
               },
               {
                 "group": "Guides",
-                "pages": [
-                  "guides/how-to-get-token-information"
-                ]
+                "pages": ["guides/how-to-get-token-information"]
               },
               {
                 "group": "API Reference",
@@ -215,25 +204,19 @@
           },
           {
             "product": "Price",
-            "icon": "tag",
+            "icon": "dollar-sign",
             "groups": [
               {
                 "group": "Price",
-                "pages": [
-                  "docs/price/index"
-                ]
+                "pages": ["docs/price/index"]
               },
               {
                 "group": "Guides",
-                "pages": [
-                  "guides/how-to-get-token-price"
-                ]
+                "pages": ["guides/how-to-get-token-price"]
               },
               {
                 "group": "API Reference",
-                "pages": [
-                  "api-reference/price/v3/price"
-                ]
+                "pages": ["api-reference/price/v3/price"]
               }
             ]
           },
@@ -360,22 +343,6 @@
             ]
           },
           {
-            "product": "Perps",
-            "icon": "chart-line",
-            "groups": [
-              {
-                "group": "Perps",
-                "pages": [
-                  "docs/perps/index",
-                  "docs/perps/position-account",
-                  "docs/perps/position-request-account",
-                  "docs/perps/pool-account",
-                  "docs/perps/custody-account"
-                ]
-              }
-            ]
-          },
-          {
             "product": "Trigger",
             "icon": "bullseye",
             "versions": [
@@ -421,9 +388,7 @@
                       },
                       {
                         "group": "History",
-                        "pages": [
-                          "api-reference/trigger/order-history"
-                        ]
+                        "pages": ["api-reference/trigger/order-history"]
                       }
                     ]
                   }
@@ -431,7 +396,7 @@
               },
               {
                 "version": "Trigger V1",
-                "tag": "Legacy",
+                "tag": "Unmaintained",
                 "groups": [
                   {
                     "group": "Trigger",
@@ -482,9 +447,7 @@
               },
               {
                 "group": "Debugging",
-                "pages": [
-                  "docs/recurring/best-practices"
-                ]
+                "pages": ["docs/recurring/best-practices"]
               },
               {
                 "group": "API Reference",
@@ -587,10 +550,24 @@
                   },
                   {
                     "group": "Vault",
-                    "pages": [
-                      "api-reference/prediction/get-vault-info"
-                    ]
+                    "pages": ["api-reference/prediction/get-vault-info"]
                   }
+                ]
+              }
+            ]
+          },
+          {
+            "product": "Perps",
+            "icon": "chart-line",
+            "groups": [
+              {
+                "group": "Perps",
+                "pages": [
+                  "docs/perps/index",
+                  "docs/perps/position-account",
+                  "docs/perps/position-request-account",
+                  "docs/perps/pool-account",
+                  "docs/perps/custody-account"
                 ]
               }
             ]
@@ -629,9 +606,7 @@
               },
               {
                 "group": "Lock",
-                "pages": [
-                  "docs/lock/index"
-                ]
+                "pages": ["docs/lock/index"]
               },
               {
                 "group": "API Reference",
@@ -694,9 +669,7 @@
             "groups": [
               {
                 "group": "Tool Kits",
-                "pages": [
-                  "tool-kits/index"
-                ]
+                "pages": ["tool-kits/index"]
               },
               {
                 "group": "Jupiter Plugin",
@@ -724,9 +697,7 @@
               },
               {
                 "group": "Jupiter Referral Program",
-                "pages": [
-                  "tool-kits/referral-program"
-                ]
+                "pages": ["tool-kits/referral-program"]
               }
             ]
           }
@@ -737,23 +708,15 @@
         "groups": [
           {
             "group": " ",
-            "pages": [
-              "ai/index"
-            ]
+            "pages": ["ai/index"]
           },
           {
             "group": "Trade with AI",
-            "pages": [
-              "ai/cli"
-            ]
+            "pages": ["ai/cli"]
           },
           {
             "group": "Build with AI",
-            "pages": [
-              "ai/mcp",
-              "ai/skills",
-              "ai/llms-txt"
-            ]
+            "pages": ["ai/mcp", "ai/skills", "ai/llms-txt"]
           }
         ]
       },
@@ -762,9 +725,7 @@
         "groups": [
           {
             "group": " ",
-            "pages": [
-              "changelog/index"
-            ]
+            "pages": ["changelog/index"]
           },
           {
             "group": "Blog",

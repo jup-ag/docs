@@ -1,34 +1,53 @@
 ---
 title: "AI"
 sidebarTitle: "Overview"
-description: "Trade on Jupiter through AI tools, or build applications with Jupiter's AI-friendly developer resources."
-llmsDescription: "Landing page for Jupiter's AI resources, split into two paths: (1) Trade with AI - use Jupiter CLI to interact with Jupiter products (Spot, Perps, Lend) through terminal, Telegram, or AI agents; (2) Build with AI - integrate Jupiter into AI applications using agent skills, llms.txt, and MCP documentation server. All Jupiter APIs are AI-agent friendly: no RPC required, no API key required for basic usage, and simple REST interfaces."
+description: "Connect your AI agent to Jupiter's APIs and docs"
+llmsDescription: "Overview of Jupiter's AI surface area. Covers how agents connect to Jupiter based on their environment: local agents (Claude Code, Cursor, Codex) use CLI + Skills, hosted agents (ChatGPT, Claude.ai) use MCP. Tools split into two categories: reading docs (llms.txt, Skills, Docs MCP) and executing operations (CLI, Jupiter MCP). All Jupiter APIs are AI-native: no RPC required, clean JSON responses, simple REST interfaces."
 ---
 
-Jupiter is built for AI from the ground up. Most APIs require no RPC, no upfront credentials, and return clean JSON that AI tools can parse and act on immediately.
+Jupiter's APIs are AI-native: no RPC, clean JSON, simple REST. Whether your agent is running locally or on a hosted platform, there's a way to connect it to Jupiter.
 
-## Trade with AI
+## Pick the Right Tool
 
-Running an AI agent to help you trade? Use these tools which are optimised for agentic use cases.
+Which tools to use depends on where your agent runs and what it needs to do:
 
-<CardGroup cols={2}>
-  <Card title="Jupiter CLI" icon="terminal" href="/ai/cli">
-    Trade from your terminal, Telegram, or through AI agents. Non-interactive, JSON-native, and designed for both humans and LLMs.
+| Goal | Local (Claude Code, Cursor, Codex) | Hosted (ChatGPT, Claude.ai) |
+| --- | --- | --- |
+| **Read the docs** | Skills + llms.txt | Docs MCP + llms.txt |
+| **Execute operations** | CLI | Jupiter MCP |
+
+**Local agents** have shell access, can install packages and run commands. The CLI + Skills combination integrates naturally into these environments.
+
+**Hosted agents** cannot install tools or execute shell commands. MCP exposes Jupiter's capabilities as a network service that any agent can discover and call without prior setup.
+
+## Read the Docs
+
+For agents that need to discover and understand Jupiter's APIs before writing code or taking action.
+
+<CardGroup cols={3}>
+  <Card title="llms.txt" icon="file-lines" href="/ai/llms-txt">
+    LLM-optimised documentation index. Works everywhere, no setup required.
+  </Card>
+
+  <Card title="Skills" icon="wand-magic-sparkles" href="/ai/skills">
+    Pre-built context files that give coding agents structured integration guidance for Jupiter's APIs.
+  </Card>
+
+  <Card title="Docs MCP" icon="plug" href="/ai/mcp">
+    Search and query Jupiter docs via Model Context Protocol. For agents without filesystem access.
   </Card>
 </CardGroup>
 
-## Build with AI
+## Execute Operations
 
-Developing applications that integrate with Jupiter? Use these docs and skills that are optimised for LLMs to develop with.
+For agents that interact with Jupiter directly - swap tokens, check prices, place orders.
 
 <CardGroup cols={2}>
-  <Card title="Documentation MCP" icon="plug" href="/ai/mcp">
-    Search and query Jupiter docs and API specifications from your AI editor via Model Context Protocol.
+  <Card title="Jupiter CLI" icon="terminal" href="/ai/cli">
+    Trade from your terminal, Telegram, or through AI agents. Non-interactive, JSON-native, designed for both humans and LLMs.
   </Card>
-  <Card title="Skills" icon="wand-magic-sparkles" href="/ai/skills">
-    Pre-built agent skill definitions for Jupiter's APIs, compatible with major AI frameworks.
-  </Card>
-  <Card title="llms.txt" icon="file-lines" href="/ai/llms-txt">
-    LLM-optimised documentation index for RAG pipelines and AI consumption.
+
+  <Card title="Jupiter MCP" icon="bolt">
+    Execute Jupiter operations via MCP from any hosted platform. Coming soon.
   </Card>
 </CardGroup>

@@ -70,7 +70,6 @@ paths:
                   usdPrice: 0.1415
                   priceBlockId: 402118601
                   liquidity: 2992387.89
-                  fees: 53.54
                   stats24h:
                     priceChange: -8.27
                     holderChange: -0.03
@@ -81,10 +80,6 @@ paths:
                     numBuys: 33979
                     numSells: 31608
                     numTraders: 5174
-                  stats7d:
-                    priceChange: -12.52
-                  stats30d:
-                    priceChange: -28.11
                   updatedAt: "2026-02-23T04:55:12.461Z"
         '400':
           description: Bad request
@@ -359,10 +354,6 @@ components:
           type: string
           nullable: true
           description: Freeze authority address (present when freeze authority is not disabled)
-        issuer:
-          type: string
-          nullable: true
-          description: Token issuer name (e.g., "Circle" for USDC)
         circSupply:
           type: number
           nullable: true
@@ -403,10 +394,6 @@ components:
           type: number
           nullable: true
           description: Total liquidity in USD
-        fees:
-          type: number
-          nullable: true
-          description: Trading fees in USD
         apy:
           type: object
           nullable: true
@@ -427,14 +414,6 @@ components:
         stats24h:
           $ref: "#/components/schemas/SwapStats"
           nullable: true
-        stats7d:
-          $ref: "#/components/schemas/SwapStats"
-          nullable: true
-          description: 7-day stats (typically only priceChange, but may include volume fields)
-        stats30d:
-          $ref: "#/components/schemas/SwapStats"
-          nullable: true
-          description: 30-day stats (typically only priceChange, but may include volume fields)
         firstPool:
           type: object
           nullable: true

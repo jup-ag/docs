@@ -22,34 +22,35 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Get Started",
-        "groups": [
+        "tab": "Docs",
+        "products": [
           {
-            "group": " ",
-            "pages": [
-              "get-started/index",
-              "get-started/environment-setup",
-              "get-started/development-basics",
-              "guides/index"
+            "product": "Get Started",
+            "icon": "rocket",
+            "groups": [
+              {
+                "group": " ",
+                "pages": [
+                  "get-started/index",
+                  "get-started/environment-setup",
+                  "get-started/development-basics",
+                  "guides/index"
+                ]
+              },
+              {
+                "group": "Portal",
+                "pages": [
+                  "portal/setup",
+                  "portal/migrate-from-lite-api",
+                  "portal/payment",
+                  "portal/responses",
+                  "portal/rate-limit",
+                  "portal/latency",
+                  "portal/faq"
+                ]
+              }
             ]
           },
-          {
-            "group": "Portal",
-            "pages": [
-              "portal/setup",
-              "portal/migrate-from-lite-api",
-              "portal/payment",
-              "portal/responses",
-              "portal/rate-limit",
-              "portal/latency",
-              "portal/faq"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Products",
-        "products": [
           {
             "product": "Swap",
             "icon": "arrow-right-arrow-left",
@@ -662,44 +663,6 @@
                 ]
               }
             ]
-          },
-          {
-            "product": "Tool Kits",
-            "icon": "toolbox",
-            "groups": [
-              {
-                "group": "Tool Kits",
-                "pages": ["tool-kits/index"]
-              },
-              {
-                "group": "Jupiter Plugin",
-                "pages": [
-                  "tool-kits/plugin/index",
-                  {
-                    "group": "Walkthrough",
-                    "pages": [
-                      "tool-kits/plugin/nextjs-app-example",
-                      "tool-kits/plugin/react-app-example",
-                      "tool-kits/plugin/html-app-example"
-                    ]
-                  },
-                  "tool-kits/plugin/customization",
-                  "tool-kits/plugin/faq"
-                ]
-              },
-              {
-                "group": "Jupiter Wallet Kit",
-                "pages": [
-                  "tool-kits/wallet-kit/index",
-                  "tool-kits/wallet-kit/jupiter-wallet-extension",
-                  "tool-kits/wallet-kit/jupiter-mobile-adapter"
-                ]
-              },
-              {
-                "group": "Jupiter Referral Program",
-                "pages": ["tool-kits/referral-program"]
-              }
-            ]
           }
         ]
       },
@@ -717,6 +680,43 @@
           {
             "group": "Build with AI",
             "pages": ["ai/mcp", "ai/skills", "ai/llms-txt"]
+          }
+        ]
+      },
+      {
+        "tab": "Tool Kits",
+        "groups": [
+          {
+            "group": "Tool Kits",
+            "pages": ["tool-kits/index"]
+          },
+          {
+            "group": "Jupiter Plugin",
+            "pages": [
+              "tool-kits/plugin/index",
+              {
+                "group": "Walkthrough",
+                "pages": [
+                  "tool-kits/plugin/nextjs-app-example",
+                  "tool-kits/plugin/react-app-example",
+                  "tool-kits/plugin/html-app-example"
+                ]
+              },
+              "tool-kits/plugin/customization",
+              "tool-kits/plugin/faq"
+            ]
+          },
+          {
+            "group": "Jupiter Wallet Kit",
+            "pages": [
+              "tool-kits/wallet-kit/index",
+              "tool-kits/wallet-kit/jupiter-wallet-extension",
+              "tool-kits/wallet-kit/jupiter-mobile-adapter"
+            ]
+          },
+          {
+            "group": "Jupiter Referral Program",
+            "pages": ["tool-kits/referral-program"]
           }
         ]
       },

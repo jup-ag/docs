@@ -40,13 +40,13 @@ const PRODUCT_SUMMARIES = {
   More: "Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).",
   Routing:
     "Routing engine architecture, DEX integration, and market maker onboarding.",
-  "Tool Kits":
-    "Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.",
+  "Get Started": "Setup guides for environment, tooling, and first API calls.",
 };
 
 const TAB_SUMMARIES = {
-  "Get Started": "Setup guides for environment, tooling, and first API calls.",
   AI: "AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.",
+  "Tool Kits":
+    "Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.",
   Changelog: "Changelog, release notes, and developer blog.",
   Resources: "Support channels, brand assets, and community resources.",
 };

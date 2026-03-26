@@ -43,9 +43,38 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 
 All endpoints require an API key via the `x-api-key` header. Get one at [portal.jup.ag](https://portal.jup.ag).
 
-## Related
+## API Reference
 
-- [Routing](/docs/swap/routing) for the routing impact matrix
-- [Fees](/docs/swap/fees) for fee models across both paths
-- [Migration Guide](/docs/swap/migration) for migrating from Ultra or Metis
-- [API Reference](/api-reference/swap) for the OpenAPI specification
+<CardGroup cols={3}>
+  <Card title="GET /order" icon="bolt" href="/api-reference/swap/order">
+    Get a quote and assembled transaction
+  </Card>
+
+  <Card title="GET /build" icon="code" href="/api-reference/swap/build">
+    Get a quote and raw swap instructions
+  </Card>
+
+  <Card title="POST /execute" icon="play" href="/api-reference/swap/execute">
+    Execute a signed /order transaction
+  </Card>
+</CardGroup>
+
+## Learn More
+
+<CardGroup cols={2}>
+  <Card title="Routing" icon="route" href="/docs/swap/routing">
+    How routing works, which routers are available on each endpoint, and the routing impact matrix.
+  </Card>
+
+  <Card title="Fees" icon="receipt" href="/docs/swap/fees">
+    Fee models for /order (platform + referral) and /build (integrator only).
+  </Card>
+
+  <Card title="Advanced" icon="gear" href="/docs/swap/advanced">
+    Gasless swaps, compute unit estimation, reducing transaction size and latency.
+  </Card>
+
+  <Card title="Migration Guide" icon="arrow-right" href="/docs/swap/migration">
+    Migrating from Ultra or Metis to Swap V2.
+  </Card>
+</CardGroup>

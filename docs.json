@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "maple",
+  "theme": "mint",
   "name": "Jupiter",
   "colors": {
     "primary": "#00BEF0",
@@ -22,163 +22,88 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Docs",
-        "products": [
+        "tab": "Get Started",
+        "groups": [
           {
-            "product": "Get Started",
-            "icon": "rocket",
+            "group": "Get Started",
+            "pages": [
+              "get-started/index",
+              "get-started/environment-setup",
+              "get-started/development-basics",
+              "guides/index"
+            ]
+          },
+          {
+            "group": "Portal",
+            "pages": [
+              "portal/setup",
+              "portal/migrate-from-lite-api",
+              "portal/payment",
+              "portal/responses",
+              "portal/rate-limit",
+              "portal/latency",
+              "portal/faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Docs",
+        "menu": [
+          {
+            "item": "Swap",
+            "icon": "arrow-right-arrow-left",
             "groups": [
               {
-                "group": "Get Started",
+                "group": "Swap",
                 "pages": [
-                  "get-started/index",
-                  "get-started/environment-setup",
-                  "get-started/development-basics",
-                  "guides/index"
+                  "docs/swap/index",
+                  "docs/swap/order-and-execute",
+                  {
+                    "group": "Build Custom Transactions",
+                    "pages": [
+                      "docs/swap/build/index",
+                      "docs/swap/build/other-instructions"
+                    ]
+                  },
+                  "docs/swap/fees",
+                  "docs/swap/migration"
                 ]
               },
               {
-                "group": "Portal",
+                "group": "Routing",
                 "pages": [
-                  "portal/setup",
-                  "portal/migrate-from-lite-api",
-                  "portal/payment",
-                  "portal/responses",
-                  "portal/rate-limit",
-                  "portal/latency",
-                  "portal/faq"
+                  "docs/swap/routing/index",
+                  "docs/swap/routing/dex-integration",
+                  "docs/swap/routing/rfq-integration"
+                ]
+              },
+              {
+                "group": "Advanced",
+                "pages": [
+                  "docs/swap/advanced/index",
+                  "docs/swap/advanced/gasless",
+                  "docs/swap/advanced/compute-units",
+                  "docs/swap/advanced/reduce-transaction-size",
+                  "docs/swap/advanced/reduce-latency"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": ["guides/how-to-embed-a-swap-widget"]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "api-reference/swap/order",
+                  "api-reference/swap/build",
+                  "api-reference/swap/execute"
                 ]
               }
             ]
           },
           {
-            "product": "Swap",
-            "icon": "arrow-right-arrow-left",
-            "versions": [
-              {
-                "version": "Swap V2",
-                "default": true,
-                "tag": "Latest",
-                "groups": [
-                  {
-                    "group": "Swap",
-                    "pages": [
-                      "docs/swap/index",
-                      "docs/swap/order-and-execute",
-                      {
-                        "group": "Build Custom Transactions",
-                        "pages": [
-                          "docs/swap/build/index",
-                          "docs/swap/build/other-instructions"
-                        ]
-                      },
-                      "docs/swap/fees",
-                      "docs/swap/migration"
-                    ]
-                  },
-                  {
-                    "group": "Routing",
-                    "pages": [
-                      "docs/swap/routing/index",
-                      "docs/swap/routing/dex-integration",
-                      "docs/swap/routing/rfq-integration"
-                    ]
-                  },
-                  {
-                    "group": "Advanced",
-                    "pages": [
-                      "docs/swap/advanced/index",
-                      "docs/swap/advanced/gasless",
-                      "docs/swap/advanced/compute-units",
-                      "docs/swap/advanced/reduce-transaction-size",
-                      "docs/swap/advanced/reduce-latency"
-                    ]
-                  },
-                  {
-                    "group": "Guides",
-                    "pages": ["guides/how-to-embed-a-swap-widget"]
-                  },
-                  {
-                    "group": "API Reference",
-                    "pages": [
-                      "api-reference/swap/order",
-                      "api-reference/swap/build",
-                      "api-reference/swap/execute"
-                    ]
-                  }
-                ]
-              },
-              {
-                "version": "Swap V1",
-                "tag": "Unmaintained",
-                "groups": [
-                  {
-                    "group": "Metis",
-                    "pages": [
-                      "docs/swap/v1/index",
-                      "docs/swap/v1/get-quote",
-                      "docs/swap/v1/build-swap-transaction",
-                      "docs/swap/v1/send-swap-transaction",
-                      "docs/swap/v1/add-fees-to-swap",
-                      "docs/swap/v1/payments-through-swap",
-                      "docs/swap/v1/requote-with-lower-max-accounts",
-                      "docs/swap/v1/common-errors"
-                    ]
-                  },
-                  {
-                    "group": "Metis API Reference",
-                    "pages": [
-                      "api-reference/swap/v1/quote",
-                      "api-reference/swap/v1/swap",
-                      "api-reference/swap/v1/swap-instructions",
-                      "api-reference/swap/v1/program-id-to-label"
-                    ]
-                  }
-                ]
-              },
-              {
-                "version": "Ultra V1",
-                "tag": "Unmaintained",
-                "groups": [
-                  {
-                    "group": "Ultra",
-                    "pages": [
-                      "docs/ultra/index",
-                      "docs/ultra/get-started",
-                      "docs/ultra/fees",
-                      "docs/ultra/gasless",
-                      "docs/ultra/manual-mode",
-                      "docs/ultra/rate-limit",
-                      "docs/ultra/get-order",
-                      "docs/ultra/execute-order",
-                      "docs/ultra/response",
-                      "docs/ultra/get-balances",
-                      "docs/ultra/get-holdings",
-                      "docs/ultra/get-shield",
-                      "docs/ultra/search-token",
-                      "docs/ultra/add-payer",
-                      "docs/ultra/add-fees-to-ultra",
-                      "docs/ultra/plugin-integration"
-                    ]
-                  },
-                  {
-                    "group": "Ultra API Reference",
-                    "pages": [
-                      "api-reference/ultra/order",
-                      "api-reference/ultra/execute",
-                      "api-reference/ultra/balances",
-                      "api-reference/ultra/holdings",
-                      "api-reference/ultra/shield",
-                      "api-reference/ultra/search",
-                      "api-reference/ultra/routers"
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "product": "Tokens",
+            "item": "Tokens",
             "icon": "coin",
             "groups": [
               {
@@ -208,7 +133,7 @@
             ]
           },
           {
-            "product": "Price",
+            "item": "Price",
             "icon": "dollar-sign",
             "groups": [
               {
@@ -226,7 +151,7 @@
             ]
           },
           {
-            "product": "Lend",
+            "item": "Lend",
             "icon": "piggy-bank",
             "groups": [
               {
@@ -348,87 +273,53 @@
             ]
           },
           {
-            "product": "Trigger",
+            "item": "Trigger",
             "icon": "crosshairs",
-            "versions": [
+            "groups": [
               {
-                "version": "Trigger V2",
-                "default": true,
-                "tag": "Latest",
-                "groups": [
-                  {
-                    "group": "Trigger",
-                    "pages": [
-                      "docs/trigger/index",
-                      "docs/trigger/authentication",
-                      "docs/trigger/create-order",
-                      "docs/trigger/manage-orders",
-                      "docs/trigger/order-history",
-                      "docs/trigger/best-practices"
-                    ]
-                  },
-                  {
-                    "group": "API Reference",
-                    "pages": [
-                      {
-                        "group": "Authenticate",
-                        "pages": [
-                          "api-reference/trigger/challenge",
-                          "api-reference/trigger/verify",
-                          "api-reference/trigger/verify-token",
-                          "api-reference/trigger/vault",
-                          "api-reference/trigger/vault-register"
-                        ]
-                      },
-                      {
-                        "group": "Order Management",
-                        "pages": [
-                          "api-reference/trigger/deposit-craft",
-                          "api-reference/trigger/create-order",
-                          "api-reference/trigger/update-order",
-                          "api-reference/trigger/cancel-order",
-                          "api-reference/trigger/confirm-cancel"
-                        ]
-                      },
-                      {
-                        "group": "History",
-                        "pages": ["api-reference/trigger/order-history"]
-                      }
-                    ]
-                  }
+                "group": "Trigger",
+                "pages": [
+                  "docs/trigger/index",
+                  "docs/trigger/authentication",
+                  "docs/trigger/create-order",
+                  "docs/trigger/manage-orders",
+                  "docs/trigger/order-history",
+                  "docs/trigger/best-practices"
                 ]
               },
               {
-                "version": "Trigger V1",
-                "tag": "Unmaintained",
-                "groups": [
+                "group": "API Reference",
+                "pages": [
                   {
-                    "group": "Trigger",
+                    "group": "Authenticate",
                     "pages": [
-                      "docs/trigger/v1/index",
-                      "docs/trigger/v1/create-order",
-                      "docs/trigger/v1/execute-order",
-                      "docs/trigger/v1/cancel-order",
-                      "docs/trigger/v1/get-trigger-orders",
-                      "docs/trigger/v1/best-practices"
+                      "api-reference/trigger/challenge",
+                      "api-reference/trigger/verify",
+                      "api-reference/trigger/verify-token",
+                      "api-reference/trigger/vault",
+                      "api-reference/trigger/vault-register"
                     ]
                   },
                   {
-                    "group": "API Reference",
+                    "group": "Order Management",
                     "pages": [
-                      "api-reference/trigger/v1/create-order",
-                      "api-reference/trigger/v1/execute",
-                      "api-reference/trigger/v1/cancel-order",
-                      "api-reference/trigger/v1/cancel-orders",
-                      "api-reference/trigger/v1/get-trigger-orders"
+                      "api-reference/trigger/deposit-craft",
+                      "api-reference/trigger/create-order",
+                      "api-reference/trigger/update-order",
+                      "api-reference/trigger/cancel-order",
+                      "api-reference/trigger/confirm-cancel"
                     ]
+                  },
+                  {
+                    "group": "History",
+                    "pages": ["api-reference/trigger/order-history"]
                   }
                 ]
               }
             ]
           },
           {
-            "product": "Recurring",
+            "item": "Recurring",
             "icon": "clock-rotate-left",
             "groups": [
               {
@@ -466,7 +357,7 @@
             ]
           },
           {
-            "product": "Prediction",
+            "item": "Prediction",
             "icon": "check-to-slot",
             "groups": [
               {
@@ -560,7 +451,7 @@
             ]
           },
           {
-            "product": "Perps",
+            "item": "Perps",
             "icon": "chart-line",
             "groups": [
               {
@@ -576,7 +467,7 @@
             ]
           },
           {
-            "product": "More",
+            "item": "More",
             "icon": "ellipsis",
             "groups": [
               {

@@ -38,8 +38,6 @@ const PRODUCT_SUMMARIES = {
     "Automated dollar-cost averaging (DCA) with time-based recurring orders.",
   Prediction: "Binary prediction markets for real-world events.",
   More: "Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).",
-  Routing:
-    "Routing engine architecture, DEX integration, and market maker onboarding.",
   "Get Started": "Setup guides for environment, tooling, and first API calls.",
 };
 

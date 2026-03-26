@@ -72,9 +72,16 @@
                           "docs/swap/build/other-instructions"
                         ]
                       },
-                      "docs/swap/routing",
                       "docs/swap/fees",
                       "docs/swap/migration"
+                    ]
+                  },
+                  {
+                    "group": "Routing",
+                    "pages": [
+                      "docs/swap/routing/index",
+                      "docs/swap/routing/dex-integration",
+                      "docs/swap/routing/rfq-integration"
                     ]
                   },
                   {
@@ -642,27 +649,6 @@
                 ]
               }
             ]
-          },
-          {
-            "product": "Routing",
-            "icon": "route",
-            "groups": [
-              {
-                "group": "Routing",
-                "pages": [
-                  "docs/routing/index",
-                  "docs/routing/dex-integration",
-                  "docs/routing/rfq-integration"
-                ]
-              },
-              {
-                "group": "Creating Markets & Tokens",
-                "pages": [
-                  "docs/routing/market-listing",
-                  "docs/routing/token-listing"
-                ]
-              }
-            ]
           }
         ]
       },
@@ -828,6 +814,26 @@
     }
   },
   "redirects": [
+    {
+      "source": "/docs/routing",
+      "destination": "/docs/swap/routing"
+    },
+    {
+      "source": "/docs/routing/dex-integration",
+      "destination": "/docs/swap/routing/dex-integration"
+    },
+    {
+      "source": "/docs/routing/rfq-integration",
+      "destination": "/docs/swap/routing/rfq-integration"
+    },
+    {
+      "source": "/docs/routing/market-listing",
+      "destination": "/docs/swap/routing"
+    },
+    {
+      "source": "/docs/routing/token-listing",
+      "destination": "/docs/swap/routing"
+    },
     {
       "source": "/docs/environment-setup",
       "destination": "/get-started/environment-setup"

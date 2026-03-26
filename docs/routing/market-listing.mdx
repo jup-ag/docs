@@ -1,76 +1,10 @@
 ---
 title: "Market Listing"
 description: "Understand how markets are listed and maintained on Jupiter."
-llmsDescription: "How markets are listed in Iris routing: instant routing for new markets on supported DEXes with a grace period, and normal routing with liquidity requirements."
+llmsDescription: "DEPRECATED — market listing requirements are no longer applicable. In Swap V2, all markets on supported DEXes are tradable via Iris market revival. See /docs/swap/routing for current routing documentation."
+deprecated: true
 ---
 
-This page explains how markets are listed and maintained in Jupiter's Iris routing engine. There are two routing types: instant routing (automatic listing for new markets on supported DEXes with a grace period) and normal routing (requires meeting liquidity criteria checked every 30 minutes).
-
-## Routing Type
-
-Iris creates routes in the perspective of markets and there are 2 types of routing for all markets.
-
-We constantly index for updated market data and newly created markets to check against the rules for market listing to ensure markets are eligible for and remain in the Iris routing engine.
-
-<Card title="Instant routing">
-  * We automatically list all new markets that are created on specific DEXes (list is below).
-  * These markets have a grace period, where the liquidity criteria is not applied.
-  * The grace period is determined by token age and not market age.
-    <Tip>
-      **Token age check**
-      | Token Age | Scenario                        | Result   |
-      |-----------|---------------------------------|----------|
-      | -         | Token minted, no pool           | -        |
-      | 1 day     | First pool created and trading  | Within grace period, instant routing |
-      | 20 days   | Second pool created and trading | Within grace period, instant routing |
-      | 30 days   | Third pool created and trading  | Outside grace period, normal routing |
-    </Tip>
-  * After the grace period has passed, the liquidity criteria will apply (refer to normal routing).
-  * For bonding curves, if it does not graduate after the grace period, it will be removed from routing.
-    * Only when the bonding curve has graduated to a new market, the graduated market will be added to routing.
-
-  <Accordion title="List of DEXes that are eligible for Instant Routing">
-    - Meteora Dynamic Bonding Curve
-    - Meteora Dynamic AMM
-    - Meteora DAMM V2
-    - Meteora DLMM
-    - Raydium
-    - Raydium CLMM
-    - Raydium CPMM
-    - Raydium Launchlab
-    - Pump.fun AMM
-    - Pump.fun
-    - Fluxbeam
-    - Whirlpool
-    - Moonshot
-    - Virtuals
-    - Boop.fun
-  </Accordion>
-</Card>
-
-<Card title="Normal routing">
-  * This is the default for all markets.
-  * Every 30 minutes, we will check the liquidity of the market.
-  * If the liquidity is not enough, we will remove the market from routing.
-  * Refer to [Market Liquidity Requirements](#market-liquidity-requirements) for more details.
-</Card>
-
-## Market Liquidity Requirements
-
-The market must fit one of the following criteria for it to be routable:
-
-1. **Less than 30\% price difference on \$500**
-
-Using a benchmark position size of \$500, a user should encounter less than 30% price difference after buying \$500 worth and then selling back on the same market.
-
-Price Difference = (\$500 - Final USD value) / \$500 If the price difference is more than 30%, it means that there is insufficient liquidity in the market for the benchmark position size of \$500.
-
-2. **Less than 20\% price impact on market**
-
-If the above (sell back \$500 worth) fails, we will compare the price per token received from buying \$1000 worth vs the price per token received from buying \$500 worth to calculate price impact.
-
-If the price impact is more than 20\%, it means that the market is illiquid.
-
-<Tip>
-If you are unsure if your market has passed the liquidity requirement, you can check your pool directly via the UI of the DEX you created the market on.
-</Tip>
+<Warning>
+This page is no longer applicable. In Swap V2, all markets on supported DEXes are tradable via Iris market revival. See [Routing](/docs/swap/routing) for current routing documentation.
+</Warning>

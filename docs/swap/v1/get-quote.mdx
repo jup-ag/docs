@@ -1,12 +1,11 @@
 ---
 title: "Get Quote"
 description: "Get a swap route quote from the Metis routing engine."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. GET /swap/v1/quote returns route plans from the Metis routing engine. Required params: inputMint, outputMint, amount, slippageBps."
-deprecated: true
+llmsDescription: "UNMAINTAINED: GET /swap/v1/quote returns route plans from the Metis routing engine. Required params: inputMint, outputMint, amount, slippageBps. Covers restrictIntermediateTokens, maxAccounts, onlyDirectRoutes, platformFeeBps, and legacy transaction support."
 ---
 
 <Warning>
-The Metis Swap API (V1) has been superseded by the [Swap API V2](/docs/swap). Use [Build Custom Transactions](/docs/swap/build) for custom transaction workflows.
+**Metis Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 The `/swap/v1/quote` endpoint returns route plans from the Metis routing engine. Pass `inputMint`, `outputMint`, `amount`, and `slippageBps` to receive the best route with price impact and detailed swap info. The quote is the first step in the Metis swap flow.

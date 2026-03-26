@@ -1,12 +1,12 @@
 ---
 title: "Manual Mode"
 description: "Use manual mode to control Ultra API parameters like slippage or priority fee settings."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. Use manual mode to control Ultra API parameters like slippage or priority fee settings. Not recommended for default integrations — use only for user-facing trading UIs."
-deprecated: true
+llmsDescription: "UNMAINTAINED: Use manual mode to control Ultra API parameters like slippage or priority fee settings. Not recommended for default integrations — use only for user-facing trading UIs."
 ---
 
+
 <Warning>
-The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap). Use [Order & Execute](/docs/swap/order-and-execute) for the recommended swap flow.
+**Ultra Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 Manual mode lets you override Ultra's automatic slippage, priority fee, and broadcast settings. It is intended for user-facing trading UIs (like jup.ag's manual mode) or personal use — not as a default integration. Transactions with manual overrides fall outside Jupiter's supported execution model.

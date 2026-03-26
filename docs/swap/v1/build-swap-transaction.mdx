@@ -1,12 +1,11 @@
 ---
 title: "Build Swap Transaction"
 description: "Build a serialized swap transaction from a Metis quote with configurable compute and fee settings."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. POST /swap/v1/swap builds a serialized swap transaction from a quote. Supports dynamicComputeUnitLimit, dynamicSlippage, and prioritizationFeeLamports."
-deprecated: true
+llmsDescription: "UNMAINTAINED: POST /swap/v1/swap builds a serialized swap transaction from a quote. Supports dynamicComputeUnitLimit, dynamicSlippage, and prioritizationFeeLamports. Also covers /swap-instructions for instruction-level control and CPI/Flash Fill integration."
 ---
 
 <Warning>
-The Metis Swap API (V1) has been superseded by the [Swap API V2](/docs/swap). Use [Build Custom Transactions](/docs/swap/build) for custom transaction workflows.
+**Metis Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 The `/swap/v1/swap` endpoint takes a quote response and user public key, then returns a serialized transaction ready for signing. You can optimize landing with `dynamicComputeUnitLimit`, `dynamicSlippage`, and `prioritizationFeeLamports`. For instruction-level control, use `/swap/v1/swap-instructions` instead.

@@ -1,12 +1,12 @@
 ---
 title: "Get Shield"
 description: "Check token security warnings including freeze authority, mint authority, and organic activity signals."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. GET /ultra/v1/shield?mints={mints} returns token security warnings (freeze authority, mint authority, low organic activity, etc.) for specified mint addresses."
-deprecated: true
+llmsDescription: "UNMAINTAINED: GET /ultra/v1/shield?mints={mints} returns token security warnings (freeze authority, mint authority, low organic activity, etc.) for specified mint addresses."
 ---
 
+
 <Warning>
-The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap). Use [Order & Execute](/docs/swap/order-and-execute) for the recommended swap flow.
+**Ultra Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 The `/ultra/v1/shield` endpoint returns security warnings for one or more token mint addresses. Warnings include freeze authority, mint authority, unverified status, low organic activity, and new listing alerts. Use this to inform users before they trade.

@@ -1,12 +1,12 @@
 ---
 title: "Rate Limit"
 description: "The Ultra Swap API uses a unique rate limiting mechanism that scales with your executed swap volume over time."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. Ultra Swap API uses dynamic rate limiting: 50 base requests per 10-second window, scaling with executed swap volume. Free API key required from portal.jup.ag."
-deprecated: true
+llmsDescription: "UNMAINTAINED: Ultra Swap API uses dynamic rate limiting: 50 base requests per 10-second window, scaling with executed swap volume. Free API key required from portal.jup.ag."
 ---
 
+
 <Warning>
-The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap). Use [Order & Execute](/docs/swap/order-and-execute) for the recommended swap flow.
+**Ultra Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 Ultra Swap uses dynamic rate limiting that scales with your executed swap volume. The base quota is 50 requests per 10-second sliding window, and additional quota is added based on your rolling 24-hour volume from `/execute`. A free API key from [portal.jup.ag](https://portal.jup.ag) is required.

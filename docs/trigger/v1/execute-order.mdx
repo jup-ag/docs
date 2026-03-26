@@ -1,8 +1,12 @@
 ---
 title: "Execute Order"
 description: "Submit a signed trigger order transaction for on-chain execution."
-llmsDescription: "POST /trigger/v1/execute submits a filled trigger order. Jupiter automatically monitors and executes orders when the target price is reached."
+llmsDescription: "UNMAINTAINED: POST /trigger/v1/execute submits a signed trigger order transaction for on-chain execution. Covers signing with web3.js v1, using the /execute endpoint, and sending the transaction yourself."
 ---
+
+<Warning>
+**Trigger V1** is no longer actively maintained and has been superseded by [Trigger V2](/docs/trigger).
+</Warning>
 
 After getting the order transaction, you can sign and send to the network yourself or use the Trigger API's `/execute` endpoint to do it for you.
 

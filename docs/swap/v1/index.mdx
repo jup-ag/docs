@@ -2,12 +2,11 @@
 title: "Metis Swap API Overview"
 sidebarTitle: "About Metis Swap API"
 description: "Low-level routing engine for developers who need CPI, custom instructions, or full transaction control. Requires your own RPC."
-llmsDescription: "DEPRECATED — use Swap API V2 /build instead. Metis Swap API V1 overview for low-level routing with CPI, custom instructions, and full transaction control. Superseded by Swap API V2 at api.jup.ag/swap/v2/build."
-deprecated: true
+llmsDescription: "UNMAINTAINED: Metis Swap API V1 overview for low-level routing with CPI, custom instructions, and full transaction control. Three-step flow: get a quote, build a transaction, sign and send via your own RPC."
 ---
 
 <Warning>
-The Metis Swap API (V1) has been superseded by the [Swap API V2](/docs/swap). Use [Build Custom Transactions](/docs/swap/build) for custom transaction workflows.
+**Metis Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 Metis is Jupiter's low-level routing engine for developers who need CPI, custom instructions, or full transaction control. Three steps: get a quote (`GET /swap/v1/quote`), build a transaction (`POST /swap/v1/swap`), then sign and send via your own RPC.

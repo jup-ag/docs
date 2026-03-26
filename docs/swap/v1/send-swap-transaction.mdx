@@ -1,12 +1,11 @@
 ---
 title: "Send Swap Transaction"
 description: "Sign and send a Metis swap transaction with guidance on priority fees, compute units, and broadcasting."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. Sign and send the serialized Metis swap transaction via your own RPC. Covers priority fee estimation, compute unit limits, dynamic slippage, and Jito broadcasting."
-deprecated: true
+llmsDescription: "UNMAINTAINED: Sign and send the serialized Metis swap transaction via your own RPC. Covers priority fee estimation with prioritizationFeeLamports, compute unit optimisation with dynamicComputeUnitLimit, dynamic slippage, and Jito tip broadcasting."
 ---
 
 <Warning>
-The Metis Swap API (V1) has been superseded by the [Swap API V2](/docs/swap). Use [Build Custom Transactions](/docs/swap/build) for custom transaction workflows.
+**Metis Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 After building the swap transaction, deserialize it, sign with your wallet, and send via `connection.sendRawTransaction()`. This page covers transaction preparation, priority fee estimation, compute unit optimization, dynamic slippage, and alternative broadcasting methods (RPCs and Jito).

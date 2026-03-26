@@ -2,12 +2,12 @@
 title: "Get Balances (Deprecated)"
 sidebarTitle: "Get Balances"
 description: "Retrieve token balances for a wallet address. Deprecated in favor of the Holdings endpoint."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. GET /ultra/v1/balances/{address} returns token balances. Deprecated — use GET /ultra/v1/holdings/{address} for detailed token holdings instead."
-deprecated: true
+llmsDescription: "UNMAINTAINED: GET /ultra/v1/balances/{address} returns token balances. Deprecated — use GET /ultra/v1/holdings/{address} for detailed token holdings instead."
 ---
 
+
 <Warning>
-The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap). Use [Order & Execute](/docs/swap/order-and-execute) for the recommended swap flow.
+**Ultra Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 **Deprecated:** This endpoint returns simplified token balances. Use [Get Holdings](/docs/ultra/get-holdings) (`/ultra/v1/holdings/{address}`) instead for detailed token account information including frozen status and ATA flags.

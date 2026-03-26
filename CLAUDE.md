@@ -493,6 +493,45 @@ references, bookmarks, and indexed search results. The cost is always higher tha
   4. Note the redirect in `.claude/rules/decisions.md` under the Redirect Log
 - If you're unsure whether a rename is worth it, **don't do it** — ask the user.
 
+## Unmaintained Pages
+
+When an API or product version is no longer actively maintained but still functional,
+mark it as **unmaintained** rather than deprecated. The distinction matters:
+
+- **Deprecated** = "don't use this, it may stop working" — excluded from llms.txt via `deprecated: true` frontmatter
+- **Unmaintained** = "still works, but no longer our focus" — excluded from llms.txt via version tag check in `generate-llms-from-docs.js`
+
+### When to use unmaintained vs deprecated
+
+| Situation | Label |
+|-----------|-------|
+| API still works but a newer version exists (e.g. Trigger V1, Ultra V1, Metis V1) | **Unmaintained** |
+| API is being sunset or will stop working | **Deprecated** |
+| Endpoint removed or no longer functional | **Deprecated** |
+
+### Steps for unmaintained pages
+
+1. **Version tag in docs.json**: Set `"tag": "Unmaintained"` on the version entry
+2. **`llmsDescription` prefix**: Add or update `llmsDescription` with an `UNMAINTAINED: ` prefix
+   so LLMs that land on the page directly (not via llms.txt) know the page is unmaintained
+3. **Callout**: Add a `<Warning>` after the frontmatter pointing to the replacement:
+   ```mdx
+   <Warning>
+   **API Name** is no longer actively maintained and has been superseded by [Replacement](/path).
+   </Warning>
+   ```
+4. **Do NOT set `deprecated: true`**: This adds a "Deprecated" badge in the Mintlify sidebar.
+   Unmaintained pages are already excluded from llms.txt by the version tag check in the generator script.
+5. **Keep in navigation**: Unmaintained pages stay in `docs.json` nav under their version.
+   The "Unmaintained" tag in the version selector communicates the status.
+
+### Currently unmaintained
+
+- **Swap V1** (Ultra + Metis) — replaced by Swap V2
+- **Trigger V1** — replaced by Trigger V2
+
+---
+
 ## Deprecating Pages
 
 When content is superseded, sunset, or no longer maintained, follow this workflow. It applies

@@ -1,20 +1,19 @@
 ---
 title: "Routing"
 description: "How routing works and what affects it"
-llmsDescription: "How routing works on Jupiter Swap API V2. Covers the Juno routing architecture (Iris, JupiterZ RFQ, Dflow, OKX), which routers are available on each endpoint (/order uses all routers, /build uses Metis only, Swap V1 uses Metis only), the routing impact matrix showing which optional parameters disable which routers, and ultra vs manual mode. Integrators building DEXes can integrate into Metis; market makers can integrate into JupiterZ via RFQ."
+llmsDescription: "How routing works on Jupiter Swap API V2. Covers the routing architecture (Metis, JupiterZ RFQ, Dflow, OKX), which routers are available on each endpoint (/order uses all routers, /build uses Metis only, Swap V1 uses Metis only), the routing impact matrix showing which optional parameters disable which routers, and ultra vs manual mode. Integrators building DEXes can integrate into Metis; market makers can integrate into JupiterZ via RFQ."
 ---
 
 The Swap API V2 routes through multiple liquidity sources. Which endpoint you use and which parameters you pass determines which routers are eligible, directly affecting the price you get.
 
 ## Routing architecture
 
-Jupiter's routing is powered by **Juno**, a meta-aggregator that combines multiple routing engines and selects the best execution price across all of them. Juno employs a self-learning mechanism that automatically sidelines underperforming sources and continuously optimises across all engines.
+Jupiter's routing combines multiple engines and selects the best execution price across all of them, with a self-learning mechanism that automatically sidelines underperforming sources.
 
 | Engine | Role |
 | --- | --- |
-| **Iris** | Jupiter's latest onchain routing engine. Multi-hop, multi-split swaps across Solana DEXes. Evolved from Metis. |
+| **Metis** | Jupiter's onchain routing engine. Multi-hop, multi-split swaps across Solana DEXes. Also available as an [independent public good](https://metis.builders). |
 | **JupiterZ** | RFQ (Request for Quote) system where market makers compete to provide off-chain liquidity. Often beats onchain by 5-20bps on major pairs. |
-| **Metis** | The original low-level routing engine. Exposes raw swap instructions for full transaction control (CPI, custom instructions). Now an [independent public good](https://metis.builders). |
 | **Dflow** | Third-party decentralised order flow. |
 | **OKX** | Third-party OKX liquidity. |
 
@@ -24,10 +23,10 @@ Not all routers are available on every endpoint. This is the most common source 
 
 | Endpoint | Routers | Notes |
 | --- | --- | --- |
-| **`/swap/v2/order`** (no optional params) | Iris, JupiterZ, Dflow, OKX | All routers compete. Best price. |
+| **`/swap/v2/order`** (no optional params) | Metis, JupiterZ, Dflow, OKX | All routers compete. Best price. |
 | **`/swap/v2/order`** (with optional params) | Depends on params | See [routing impact matrix](#routing-impact-matrix) below. |
 | **`/swap/v2/build`** | Metis only | Returns raw instructions. No RFQ, no third-party routers. |
-| **Swap V1** (`/v6/quote` + `/v6/swap`) | Metis only | Legacy endpoint. Same Metis engine, no Juno aggregation. |
+| **Swap V1** (`/v6/quote` + `/v6/swap`) | Metis only | Legacy endpoint. Same Metis engine, no aggregation. |
 
 <Warning>
 If you are using `/build` or Swap V1, you are only getting Metis routing. You will miss JupiterZ (RFQ) liquidity, which can be 5-20bps better on major pairs. Use `/order` without optional params for the best price.
@@ -39,7 +38,7 @@ The `/order` endpoint, by default with no optional parameters, enables all route
 
 | Router | Type | Description |
 | --- | --- | --- |
-| **Metis** (via Iris) | Onchain aggregator | Jupiter's core routing engine, accessed through Iris |
+| **Metis** | Onchain aggregator | Jupiter's core routing engine |
 | **JupiterZ** | RFQ (Request for Quote) | Market makers providing off-chain liquidity |
 | **Dflow** | Third-party | Decentralised order flow |
 | **OKX** | Third-party | OKX liquidity |

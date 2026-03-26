@@ -566,8 +566,9 @@ an old page undeprecated.
 Old pages stay in the filesystem. External links, bookmarks, AI agent caches, and search
 indexes all point to them. Deleting breaks everything.
 
-Exception: pages that were never linked externally (e.g. internal drafts) can be deleted
-with a redirect in `docs.json`.
+Exception: pages can be deleted if a redirect is added in `docs.json` to cover the old URL.
+Use this for pages that are completely irrelevant (not just superseded) and have no value
+remaining on disk.
 
 #### 2. Remove from navigation
 

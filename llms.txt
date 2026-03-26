@@ -44,7 +44,7 @@ Token swap API with managed execution (/order) and custom transaction building (
 
 #### Routing
 
-- [Routing](https://dev.jup.ag/docs/swap/routing/index.md): How routing works on Jupiter Swap API V2. Covers the Juno routing architecture (Iris, JupiterZ RFQ, Dflow, OKX), which routers are available on each endpoint (/order uses all routers, /build uses Metis only, Swap V1 uses Metis only), the routing impact matrix showing which optional parameters disable which routers, and ultra vs manual mode. Integrators building DEXes can integrate into Metis; market makers can integrate into JupiterZ via RFQ.
+- [Routing](https://dev.jup.ag/docs/swap/routing/index.md): How routing works on Jupiter Swap API V2. Covers the routing architecture (Metis, JupiterZ RFQ, Dflow, OKX), which routers are available on each endpoint (/order uses all routers, /build uses Metis only, Swap V1 uses Metis only), the routing impact matrix showing which optional parameters disable which routers, and ultra vs manual mode. Integrators building DEXes can integrate into Metis; market makers can integrate into JupiterZ via RFQ.
 - [Integrate DEX into Metis](https://dev.jup.ag/docs/swap/routing/dex-integration.md): Requirements and steps to integrate your DEX into the Metis routing engine, including the Jupiter AMM Interface SDK and security audit prerequisites.
 - [Integrate MM into JupiterZ (RFQ)](https://dev.jup.ag/docs/swap/routing/rfq-integration.md): Host a webhook implementing the RFQ API schema, pass fulfillment and response time requirements, and onboard your market maker into JupiterZ.
 

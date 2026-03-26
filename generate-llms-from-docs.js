@@ -155,6 +155,8 @@ function emitEntry(pagePath) {
   const fm = extractFrontmatter(pagePath);
   if (!fm) return false;
   seenUrls.add(pagePath);
+  // Skip API ref overview pages (no openapi field = just navigation cards, no real content)
+  if (pagePath.startsWith("api-reference/") && !fm.openapi) return false;
   // API ref pages with openapi field link to the spec YAML instead of .md
   let url;
   if (fm.openapi) {

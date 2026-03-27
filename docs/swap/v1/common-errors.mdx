@@ -61,11 +61,11 @@ The common routing errors you may encounter are usually related to attempting to
 
 | Error | Description | Debug |
 | :--- | :--- | :--- |
-| NO\_ROUTES\_FOUND | No routes were found for the requested swap | * Check jup.ag if it's routable <br/> * [Check the liquidity of the token's markets](https://support.jup.ag/hc/en-us/articles/18453861473436-Why-is-this-token-not-tradable-on-Jupiter) |
-| COULD\_NOT\_FIND\_ANY\_ROUTE | Unable to find any valid route for the swap | * Check jup.ag if it's routable <br/> * [Check the liquidity of the token's markets](https://support.jup.ag/hc/en-us/articles/18453861473436-Why-is-this-token-not-tradable-on-Jupiter) |
+| NO\_ROUTES\_FOUND | No routes were found for the requested swap | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets |
+| COULD\_NOT\_FIND\_ANY\_ROUTE | Unable to find any valid route for the swap | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets |
 | ROUTE\_PLAN\_DOES\_NOT\_   CONSUME\_ALL\_THE\_AMOUNT | The calculated route cannot process the entire input amount, you can get more output amount by reducing your input amount | * Try reducing your input amount |
 | MARKET\_NOT\_FOUND | The specified market address was not found | * Verify the market address exists and is active |
-| TOKEN\_NOT\_TRADABLE | The specified token mint is not available for trading | * Check jup.ag if it's routable <br/> * [Check the liquidity of the token's markets](https://support.jup.ag/hc/en-us/articles/18453861473436-Why-is-this-token-not-tradable-on-Jupiter) |
+| TOKEN\_NOT\_TRADABLE | The specified token mint is not available for trading | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets |
 | NOT\_SUPPORTED | Generic error for unsupported operations | * Check the specific error message for details |
 | CIRCULAR\_ARBITRAGE\_   IS\_DISABLED | Attempted to swap a token for itself | * Input and output tokens must be different |
 | CANNOT\_COMPUTE\_   OTHER\_AMOUNT\_THRESHOLD | Failed to calculate the minimum output amount based on slippage | * Verify the input amount and slippage parameters are valid |

@@ -24,8 +24,10 @@ if (!topLevelNav) {
 }
 
 // --- Section summaries ---
+// Used for both tabs (Get Started, AI, Tool Kits, etc.) and menu items (Swap, Tokens, etc.)
 
-const PRODUCT_SUMMARIES = {
+const SECTION_SUMMARIES = {
+  // Docs tab menu items
   Swap: "Token swap API with managed execution (/order) and custom transaction building (/build).",
   Tokens: "Token metadata, search, verification, and organic score APIs.",
   Price: "Real-time heuristics-based USD token pricing.",
@@ -38,10 +40,8 @@ const PRODUCT_SUMMARIES = {
     "Automated dollar-cost averaging (DCA) with time-based recurring orders.",
   Prediction: "Binary prediction markets for real-world events.",
   More: "Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).",
+  // Tabs
   "Get Started": "Setup guides for environment, tooling, and first API calls.",
-};
-
-const TAB_SUMMARIES = {
   AI: "AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.",
   "Tool Kits":
     "Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.",
@@ -156,7 +156,10 @@ function emitEntry(pagePath) {
   if (!fm) return false;
   seenUrls.add(pagePath);
   // Skip API ref overview pages (no openapi field = just navigation cards, no real content)
-  if (pagePath.startsWith("api-reference/") && !fm.openapi) return false;
+  if (pagePath.startsWith("api-reference/") && !fm.openapi) {
+    console.warn(`Skipped API ref page (no openapi field): ${pagePath}`);
+    return false;
+  }
   // API ref pages with openapi field link to the spec YAML instead of .md
   let url;
   if (fm.openapi) {
@@ -212,8 +215,8 @@ function walkVersion(version, headingDepth) {
 
 function walkProduct(product) {
   emitHeading(product.product, 2);
-  if (PRODUCT_SUMMARIES[product.product]) {
-    emit(`${PRODUCT_SUMMARIES[product.product]}\n\n`);
+  if (SECTION_SUMMARIES[product.product]) {
+    emit(`${SECTION_SUMMARIES[product.product]}\n\n`);
   }
   let count = 0;
   if (product.versions) {
@@ -231,14 +234,28 @@ function walkProduct(product) {
 
 function walkTopLevel(item) {
   if (item.products) {
+    // Anchors/products-based nav (legacy)
     for (const product of item.products) {
       walkProduct(product);
     }
+  } else if (item.menu) {
+    // Tabs with dropdown menu (e.g. Docs tab) — each menu item is like a product
+    for (const menuItem of item.menu) {
+      emitHeading(menuItem.item, 2);
+      if (SECTION_SUMMARIES[menuItem.item]) {
+        emit(`${SECTION_SUMMARIES[menuItem.item]}\n\n`);
+      }
+      let count = 0;
+      for (const group of menuItem.groups || []) {
+        count += walkGroup(group, 3);
+      }
+    }
   } else if (item.groups) {
+    // Tabs with flat groups (e.g. Get Started, AI, Tool Kits)
     const sectionName = item.tab;
     emitHeading(sectionName, 2);
-    if (TAB_SUMMARIES[sectionName]) {
-      emit(`${TAB_SUMMARIES[sectionName]}\n\n`);
+    if (SECTION_SUMMARIES[sectionName]) {
+      emit(`${SECTION_SUMMARIES[sectionName]}\n\n`);
     }
     for (const group of item.groups) {
       walkGroup(group, 3);

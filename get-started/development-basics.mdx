@@ -1,7 +1,7 @@
 ---
 title: "Development Basics"
-description: "Solana fundamentals for Jupiter developers: accounts, programs, transactions, priority fees, and how Ultra Swap simplifies it all."
-llmsDescription: "Solana fundamentals for Jupiter developers: accounts, programs, instructions, transactions, priority fees, compute units, slippage, and how Ultra Swap API simplifies it all."
+description: "Solana fundamentals for Jupiter developers: accounts, programs, transactions, priority fees, and how the Swap API simplifies it all."
+llmsDescription: "Solana fundamentals for Jupiter developers: accounts, programs, instructions, transactions, priority fees, compute units, slippage, and how the Swap API V2 simplifies it all. Use the /order + /execute path for managed execution (no RPC needed) or /build for custom transactions."
 ---
 
 Solana uses an account-based architecture where data is stored in accounts and mutated by programs (smart contracts).
@@ -23,12 +23,12 @@ See the official Solana docs for [Web3.js](https://solana.com/docs/clients/javas
 
 | Method | Description |
 | :--- | :--- |
-| [Ultra Swap API](/docs/ultra) | Get a quote, sign, and submit - no RPC needed. Handles transaction sending and optimisation for you. |
+| [Swap API](/docs/swap/order-and-execute) | Get an order, sign, and submit. |
 | [Cross Program Invocation (CPI)](https://solana.com/docs/core/cpi) | Call Jupiter Swap from your on-chain program. Recommended since the [Loosen CPI restriction](https://github.com/solana-labs/solana/issues/26641) feature. |
 | Flash Fill | Alternative to CPI using Versioned Transactions and Address Lookup Tables to reduce account size. |
 
 <Tip>
-The [Ultra Swap API](/docs/ultra) handles transaction building, sending, priority fees, and compute optimisation for you. No RPC required.
+The [Swap API's order and execute path](/docs/swap/order-and-execute) handles transaction building, sending, priority fees, and compute optimisation for you. No RPC required.
 </Tip>
 
 ## Transaction Fundamentals
@@ -64,7 +64,3 @@ Transactions reach the network via:
 1. Standard RPCs
 2. RPCs with Stake-Weighted Quality of Service (SWQoS)
 3. Jito RPC
-
-<Tip>
-The [Ultra Swap API](/docs/ultra) optimises priority fees, compute units, slippage, and broadcasting for you - no additional parameters or RPC needed.
-</Tip>

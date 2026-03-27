@@ -675,6 +675,14 @@
           {
             "label": "Brand Kit",
             "href": "https://dev.jup.ag/resources/brand-kit"
+          },
+          {
+            "label": "API Status",
+            "href": "https://status.jup.ag"
+          },
+          {
+            "label": "Updates",
+            "href": "https://t.me/jup_dev"
           }
         ]
       }
@@ -747,6 +755,10 @@
       "destination": "/docs/swap/routing"
     },
     {
+      "source": "/get-started/overview",
+      "destination": "/get-started"
+    },
+    {
       "source": "/docs/environment-setup",
       "destination": "/get-started/environment-setup"
     },
@@ -777,6 +789,14 @@
     {
       "source": "/docs/api",
       "destination": "/api-reference"
+    },
+    {
+      "source": "/api-reference/ultra",
+      "destination": "/api-reference/ultra/order"
+    },
+    {
+      "source": "/api-reference/swap/v1",
+      "destination": "/api-reference/swap/v1/quote"
     },
     {
       "source": "/docs/api/ultra-api/:slug*",

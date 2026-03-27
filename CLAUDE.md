@@ -511,19 +511,21 @@ mark it as **unmaintained** rather than deprecated. The distinction matters:
 
 ### Steps for unmaintained pages
 
-1. **Version tag in docs.json**: Set `"tag": "Unmaintained"` on the version entry
-2. **`llmsDescription` prefix**: Add or update `llmsDescription` with an `UNMAINTAINED: ` prefix
-   so LLMs that land on the page directly (not via llms.txt) know the page is unmaintained
-3. **Callout**: Add a `<Warning>` after the frontmatter pointing to the replacement:
+1. **`llmsDescription` prefix**: Add or update `llmsDescription` with an `UNMAINTAINED: ` prefix
+   followed by a specific description of the endpoint/page, so LLMs that land on the page
+   directly (not via llms.txt) know the page is unmaintained and what it does.
+   Example: `"UNMAINTAINED: GET /ultra/v1/order returns a base64-encoded unsigned swap transaction. New integrations should use Swap V2 /order."`
+2. **Callout**: Add a `<Warning>` after the frontmatter pointing to the replacement:
    ```mdx
    <Warning>
    **API Name** is no longer actively maintained and has been superseded by [Replacement](/path).
    </Warning>
    ```
-4. **Do NOT set `deprecated: true`**: This adds a "Deprecated" badge in the Mintlify sidebar.
-   Unmaintained pages are already excluded from llms.txt by the version tag check in the generator script.
-5. **Keep in navigation**: Unmaintained pages stay in `docs.json` nav under their version.
-   The "Unmaintained" tag in the version selector communicates the status.
+3. **Do NOT set `deprecated: true`**: This adds a "Deprecated" badge in the Mintlify sidebar.
+4. **Remove from navigation**: Unmaintained pages are removed from `docs.json` nav but kept
+   in the filesystem. They remain accessible via direct URL and Mintlify search.
+   The generator script excludes them from llms.txt as a safety net (skips versions
+   tagged "Unmaintained" if version-based nav is ever re-added).
 
 ### Currently unmaintained
 

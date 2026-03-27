@@ -2,9 +2,10 @@
 openapi: /openapi-spec/ultra/ultra.yaml get /order
 title: "Get Order"
 description: "Request for a base64-encoded unsigned swap transaction to be used in POST /ultra/v1/execute"
-deprecated: true
+llmsDescription: "UNMAINTAINED: GET /ultra/v1/order returns a base64-encoded unsigned swap transaction. New integrations should use Swap V2 /order."
 ---
 
+
 <Warning>
-This endpoint is part of the Ultra Swap API which has been superseded by the [Swap API V2](/api-reference/swap). Use the Swap API V2 for all new integrations.
+**Ultra Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>

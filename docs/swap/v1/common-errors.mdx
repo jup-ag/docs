@@ -1,12 +1,11 @@
 ---
 title: "Common Errors"
 description: "List of errors that can be returned by the Metis Swap API, Swap Program or from other programs like DEXes, System or Token programs."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. Reference for Metis Swap API errors: Jupiter program errors (slippage, insufficient funds), Solana and DEX program errors, routing errors, and swap transaction composing errors with debug tips."
-deprecated: true
+llmsDescription: "UNMAINTAINED: Reference for Metis Swap API errors: Jupiter program errors (slippage tolerance exceeded, insufficient funds, incorrect token program ID), Solana and DEX program errors, routing errors (no routes found, token not tradable), and swap transaction composing errors with debug guidance."
 ---
 
 <Warning>
-The Metis Swap API (V1) has been superseded by the [Swap API V2](/docs/swap). Use [Build Custom Transactions](/docs/swap/v2/build) for custom transaction workflows.
+**Metis Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 This page covers error categories you may encounter when using the Metis Swap API: Jupiter Swap program errors (e.g., slippage exceeded, insufficient funds), Solana and DEX program errors, routing errors (e.g., no routes found, token not tradable), and swap transaction composing errors. Each entry includes debug guidance.
@@ -62,11 +61,11 @@ The common routing errors you may encounter are usually related to attempting to
 
 | Error | Description | Debug |
 | :--- | :--- | :--- |
-| NO\_ROUTES\_FOUND | No routes were found for the requested swap | * Check jup.ag if it's routable <br/> * [Check the liquidity of the token's markets](https://support.jup.ag/hc/en-us/articles/18453861473436-Why-is-this-token-not-tradable-on-Jupiter) |
-| COULD\_NOT\_FIND\_ANY\_ROUTE | Unable to find any valid route for the swap | * Check jup.ag if it's routable <br/> * [Check the liquidity of the token's markets](https://support.jup.ag/hc/en-us/articles/18453861473436-Why-is-this-token-not-tradable-on-Jupiter) |
+| NO\_ROUTES\_FOUND | No routes were found for the requested swap | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets |
+| COULD\_NOT\_FIND\_ANY\_ROUTE | Unable to find any valid route for the swap | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets |
 | ROUTE\_PLAN\_DOES\_NOT\_   CONSUME\_ALL\_THE\_AMOUNT | The calculated route cannot process the entire input amount, you can get more output amount by reducing your input amount | * Try reducing your input amount |
 | MARKET\_NOT\_FOUND | The specified market address was not found | * Verify the market address exists and is active |
-| TOKEN\_NOT\_TRADABLE | The specified token mint is not available for trading | * Check jup.ag if it's routable <br/> * [Check the liquidity of the token's markets](https://support.jup.ag/hc/en-us/articles/18453861473436-Why-is-this-token-not-tradable-on-Jupiter) |
+| TOKEN\_NOT\_TRADABLE | The specified token mint is not available for trading | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets |
 | NOT\_SUPPORTED | Generic error for unsupported operations | * Check the specific error message for details |
 | CIRCULAR\_ARBITRAGE\_   IS\_DISABLED | Attempted to swap a token for itself | * Input and output tokens must be different |
 | CANNOT\_COMPUTE\_   OTHER\_AMOUNT\_THRESHOLD | Failed to calculate the minimum output amount based on slippage | * Verify the input amount and slippage parameters are valid |

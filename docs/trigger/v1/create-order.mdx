@@ -1,8 +1,12 @@
 ---
 title: "Create Order"
 description: "Create a new trigger (limit) order specifying the token pair, amounts, and target price."
-llmsDescription: "POST /trigger/v1/createOrder builds a limit order transaction. Required params: inputMint, outputMint, maker, payer, makingAmount, takingAmount."
+llmsDescription: "UNMAINTAINED: POST /trigger/v1/createOrder builds a limit order transaction. Required params: inputMint, outputMint, maker, payer, makingAmount, takingAmount. Covers optional params (slippageBps, expiredAt, feeBps, feeAccount), response format, and how to sign and submit the transaction."
 ---
+
+<Warning>
+**Trigger V1** is no longer actively maintained and has been superseded by [Trigger V2](/docs/trigger).
+</Warning>
 
 The `POST /trigger/v1/createOrder` endpoint builds a transaction for a new limit order. You must provide `inputMint`, `outputMint`, `maker`, `payer`, `makingAmount`, and `takingAmount`. The endpoint returns a base64-encoded transaction that you sign and send to the network (either directly or via the `/execute` endpoint).
 

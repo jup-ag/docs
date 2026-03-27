@@ -1,12 +1,12 @@
 ---
 title: "Get Order"
 description: "Request a swap quote and unsigned transaction from the Ultra Swap API."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. GET /ultra/v1/order returns a base64-encoded unsigned swap transaction. Required params: inputMint, outputMint, amount, taker."
-deprecated: true
+llmsDescription: "UNMAINTAINED: GET /ultra/v1/order returns a base64-encoded unsigned swap transaction. Required params: inputMint, outputMint, amount, taker."
 ---
 
+
 <Warning>
-The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap). Use [Order & Execute](/docs/swap/v2/order-and-execute) for the recommended swap flow.
+**Ultra Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 To get an Ultra Swap order, you need to pass in the required parameters such as:

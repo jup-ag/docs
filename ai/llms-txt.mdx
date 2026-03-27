@@ -29,7 +29,7 @@ A plain Markdown file containing a structured index of all Jupiter documentation
 
 - [Build with Jupiter](https://dev.jup.ag/index.md)
 - [Get Started](https://dev.jup.ag/get-started/index.md): Welcome to Jupiter's Developer Docs...
-- [Overview](https://dev.jup.ag/docs/ultra/index.md): Overview of Ultra Swap and its features.
+- [Overview](https://dev.jup.ag/docs/swap/index.md): One API for all swap use cases on Jupiter.
 - [API Reference](https://dev.jup.ag/api-reference/index.md): Overview of Jupiter API Reference
 ```
 
@@ -56,14 +56,14 @@ Any documentation page can be accessed as raw markdown, making it easy for AI ag
 **Method 1: Append `.md` to the URL**
 
 ```bash
-curl https://dev.jup.ag/docs/ultra.md
-curl https://dev.jup.ag/docs/ultra/get-started.md
+curl https://dev.jup.ag/docs/swap.md
+curl https://dev.jup.ag/docs/swap/order-and-execute.md
 ```
 
 **Method 2: Use the `Accept` header**
 
 ```bash
-curl -H "Accept: text/markdown" https://dev.jup.ag/docs/ultra
+curl -H "Accept: text/markdown" https://dev.jup.ag/docs/swap
 ```
 
 Both methods return the page content as `text/markdown`.

@@ -1,12 +1,11 @@
 ---
 title: "Requote with Lower Max Accounts"
 description: "Handle oversized swap transactions by reducing the account count in your quote request."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. Reduce the maxAccounts quote parameter when adding custom instructions causes the swap transaction to exceed Solana's 1232-byte size limit. Includes retry logic to find the right account count."
-deprecated: true
+llmsDescription: "UNMAINTAINED: Reduce the maxAccounts quote parameter when adding custom instructions causes the swap transaction to exceed Solana's 1232-byte size limit. Includes a retry loop that decrements maxAccounts until the transaction fits."
 ---
 
 <Warning>
-The Metis Swap API (V1) has been superseded by the [Swap API V2](/docs/swap). Use [Build Custom Transactions](/docs/swap/v2/build) for custom transaction workflows.
+**Metis Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 When adding custom instructions to a Metis swap transaction causes it to exceed Solana's 1232-byte transaction size limit, reduce `maxAccounts` in the `/quote` request and rebuild. This page provides a retry loop that decrements `maxAccounts` until the transaction fits.

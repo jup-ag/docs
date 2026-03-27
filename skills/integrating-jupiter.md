@@ -180,7 +180,7 @@ Use each block as a minimal execution contract. Fetch the linked refs for full r
 - **Triggers**: `token metadata`, `token search`, `verification`, `shield`
 - **Endpoints**: `/search?query={q}` (GET, comma-separate mints, max 100), `/tag?query={tag}` (GET, `verified` or `lst`), `/{category}/{interval}` (GET, categories: `toporganicscore`, `toptraded`, `toptrending`; intervals: `5m`, `1h`, `6h`, `24h`), `/recent` (GET)
 - **Gotchas**: Use mint address as primary identity; treat symbol/name as convenience. Surface `audit.isSus` and `organicScore` in UX.
-- Refs: [Overview](https://dev.jup.ag/docs/tokens/index.md) | [Token info v2](https://dev.jup.ag/docs/tokens/v2/token-information.md) | [OpenAPI](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml)
+- Refs: [Overview](https://dev.jup.ag/docs/tokens/index.md) | [Token info](https://dev.jup.ag/docs/tokens/token-information.md) | [OpenAPI](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml)
 
 ---
 
@@ -191,7 +191,7 @@ Use each block as a minimal execution contract. Fetch the linked refs for full r
 - **Limit**: Max 50 mint IDs per request
 - **Endpoints**: `/price/v3?ids={mints}` (GET, comma-separated)
 - **Gotchas**: Tokens with unreliable pricing return `null` or are omitted (not an error). Fail closed on missing/low-confidence data for safety-sensitive actions. Use `confidenceLevel` field.
-- Refs: [Overview](https://dev.jup.ag/docs/price/index.md) | [Price v3](https://dev.jup.ag/docs/price/v3.md) | [OpenAPI](https://dev.jup.ag/openapi-spec/price/v3/price.yaml)
+- Refs: [Overview](https://dev.jup.ag/docs/price/index.md) | [OpenAPI](https://dev.jup.ag/openapi-spec/price/v3/price.yaml)
 
 ---
 

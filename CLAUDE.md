@@ -493,6 +493,47 @@ references, bookmarks, and indexed search results. The cost is always higher tha
   4. Note the redirect in `.claude/rules/decisions.md` under the Redirect Log
 - If you're unsure whether a rename is worth it, **don't do it** — ask the user.
 
+## Unmaintained Pages
+
+When an API or product version is no longer actively maintained but still functional,
+mark it as **unmaintained** rather than deprecated. The distinction matters:
+
+- **Deprecated** = "don't use this, it may stop working" — excluded from llms.txt via `deprecated: true` frontmatter
+- **Unmaintained** = "still works, but no longer our focus" — excluded from llms.txt via version tag check in `generate-llms-from-docs.js`
+
+### When to use unmaintained vs deprecated
+
+| Situation | Label |
+|-----------|-------|
+| API still works but a newer version exists (e.g. Trigger V1, Ultra V1, Metis V1) | **Unmaintained** |
+| API is being sunset or will stop working | **Deprecated** |
+| Endpoint removed or no longer functional | **Deprecated** |
+
+### Steps for unmaintained pages
+
+1. **`llmsDescription` prefix**: Add or update `llmsDescription` with an `UNMAINTAINED: ` prefix
+   followed by a specific description of the endpoint/page, so LLMs that land on the page
+   directly (not via llms.txt) know the page is unmaintained and what it does.
+   Example: `"UNMAINTAINED: GET /ultra/v1/order returns a base64-encoded unsigned swap transaction. New integrations should use Swap V2 /order."`
+2. **Callout**: Add a `<Warning>` after the frontmatter pointing to the replacement:
+   ```mdx
+   <Warning>
+   **API Name** is no longer actively maintained and has been superseded by [Replacement](/path).
+   </Warning>
+   ```
+3. **Do NOT set `deprecated: true`**: This adds a "Deprecated" badge in the Mintlify sidebar.
+4. **Remove from navigation**: Unmaintained pages are removed from `docs.json` nav but kept
+   in the filesystem. They remain accessible via direct URL and Mintlify search.
+   The generator script excludes them from llms.txt as a safety net (skips versions
+   tagged "Unmaintained" if version-based nav is ever re-added).
+
+### Currently unmaintained
+
+- **Swap V1** (Ultra + Metis) — replaced by Swap V2
+- **Trigger V1** — replaced by Trigger V2
+
+---
+
 ## Deprecating Pages
 
 When content is superseded, sunset, or no longer maintained, follow this workflow. It applies
@@ -527,8 +568,9 @@ an old page undeprecated.
 Old pages stay in the filesystem. External links, bookmarks, AI agent caches, and search
 indexes all point to them. Deleting breaks everything.
 
-Exception: pages that were never linked externally (e.g. internal drafts) can be deleted
-with a redirect in `docs.json`.
+Exception: pages can be deleted if a redirect is added in `docs.json` to cover the old URL.
+Use this for pages that are completely irrelevant (not just superseded) and have no value
+remaining on disk.
 
 #### 2. Remove from navigation
 
@@ -562,7 +604,7 @@ Add a `<Warning>` immediately after the frontmatter pointing to the replacement:
 ```mdx
 <Warning>
 The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap).
-Use [Order & Execute](/docs/swap/v2/order-and-execute) for the recommended swap flow.
+Use [Order & Execute](/docs/swap/order-and-execute) for the recommended swap flow.
 </Warning>
 ```
 

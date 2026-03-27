@@ -1,12 +1,12 @@
 ---
 title: "Get Holdings"
 description: "Retrieve detailed token holdings and balances for a wallet address."
-llmsDescription: "DEPRECATED — use Swap API V2 instead. GET /ultra/v1/holdings/{address} returns detailed token holdings including token account info, frozen status, and native SOL balance."
-deprecated: true
+llmsDescription: "UNMAINTAINED: GET /ultra/v1/holdings/{address} returns detailed token holdings including token account info, frozen status, and native SOL balance."
 ---
 
+
 <Warning>
-The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap). Use [Order & Execute](/docs/swap/v2/order-and-execute) for the recommended swap flow.
+**Ultra Swap API** is no longer actively maintained and has been superseded by [Swap V2](/docs/swap).
 </Warning>
 
 The `/ultra/v1/holdings/{address}` endpoint returns all token holdings for a wallet, including token account details (amount, frozen status, ATA flag, decimals). The top-level response contains the native SOL balance. For SOL-only queries, use `/holdings/{address}/native`.

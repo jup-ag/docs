@@ -1,7 +1,7 @@
 ---
 title: "Read Vault Data"
 description: "Read vault config, state, and user positions (Borrow) using the Jupiter Lend Read SDK."
-llmsDescription: "Read vault configuration, state, and user positions for Jupiter Lend Borrow using the @jup-ag/lend-read Read SDK. Covers Client setup, getAllVaults, getVaultByVaultId, getVaultConfig, getVaultState, getAllUserPositions, getPositionByVaultId, getUserPosition, getCurrentPositionState, getFinalPosition, getAllPositionIdsForVault, getAllPositionsWithRiskRatio, getNftOwner. Includes SDK type definitions for NftPosition, UserPosition, VaultConfig, VaultState."
+llmsDescription: "Read vault configuration, state, and user positions for Jupiter Lend Borrow using the @jup-ag/lend-read Read SDK. Covers Client setup, getAllVaults, getVaultByVaultId, getVaultConfig, getVaultState, getAllUserPositions, getPositionByVaultId, getUserPosition, getCurrentPositionState, getFinalPosition, getAllPositionIdsForVault, getAllPositionsWithRiskRatio, getNftOwner. getAllUserPositions and getPositionByVaultId return NftPosition & { vault: VaultEntireData } — each position includes full vault data. Includes SDK type definitions for NftPosition, UserPosition, VaultConfig, VaultState."
 ---
 
 <Note>
@@ -95,7 +95,7 @@ Use the Read SDK to list vaults, read vault config and state, and get user posit
   </Step>
 
   <Step title="Get all user positions">
-    Get all positions owned by a user across all vaults. Returns decoded `NftPosition` objects with supply, borrow, tick, liquidation status, and owner. Use this for dashboards or portfolio views.
+    Get all positions owned by a user across all vaults. Returns `NftPosition & { vault: VaultEntireData }` — each position includes full vault data. Use this for dashboards or portfolio views.
 
     ```typescript
     import { PublicKey } from "@solana/web3.js";
@@ -105,6 +105,7 @@ Use the Read SDK to list vaults, read vault config and state, and get user posit
 
     positions.forEach((p) => {
       console.log({
+        vaultId: p.vault.constantViews.vaultId,
         nftId: p.nftId,
         owner: p.owner.toBase58(),
         supply: p.supply.toString(),
@@ -117,22 +118,23 @@ Use the Read SDK to list vaults, read vault config and state, and get user posit
   </Step>
 
   <Step title="Get position by vault and NFT id">
-    Get a single position by vault ID and position (NFT) id. Returns decoded position plus full vault data. Use `getPositionByVaultId(vaultId, nftId)` when you have both IDs.
+    Get a single position by vault ID and position (NFT) id. Returns `NftPosition & { vault: VaultEntireData }` — position fields flattened with full vault data. Use `getPositionByVaultId(vaultId, nftId)` when you have both IDs.
 
     ```typescript
     const vaultId = 1;
     const nftId = 5;
 
-    const { userPosition, vaultData } = await client.vault.getPositionByVaultId(vaultId, nftId);
+    const position = await client.vault.getPositionByVaultId(vaultId, nftId);
 
     console.log({
-      owner: userPosition.owner.toBase58(),
-      supply: userPosition.supply.toString(),
-      borrow: userPosition.borrow.toString(),
-      dustBorrow: userPosition.dustBorrow.toString(),
-      tick: userPosition.tick,
-      tickId: userPosition.tickId,
-      isLiquidated: userPosition.isLiquidated,
+      vaultId: position.vault.constantViews.vaultId,
+      owner: position.owner.toBase58(),
+      supply: position.supply.toString(),
+      borrow: position.borrow.toString(),
+      dustBorrow: position.dustBorrow.toString(),
+      tick: position.tick,
+      tickId: position.tickId,
+      isLiquidated: position.isLiquidated,
     });
     ```
   </Step>
@@ -240,21 +242,25 @@ Use the Read SDK to list vaults, read vault config and state, and get user posit
 
 ## SDK types
 
-### NftPosition
+### NftPosition (with vault)
 
-Returned by `getAllUserPositions` and `getPositionByVaultId`:
+Returned by `getAllUserPositions` and `getPositionByVaultId` as `NftPosition & { vault: VaultEntireData }`:
 
-| Field            | Type      | Description                      |
-| ---------------- | --------- | -------------------------------- |
-| `nftId`          | number    | Position / NFT id                |
-| `owner`          | PublicKey | Owner wallet                     |
-| `isSupplyPosition` | boolean | True if supply-only              |
-| `supply`         | BN        | Collateral (with exchange price) |
-| `borrow`         | BN        | Debt (with exchange price)       |
-| `dustBorrow`     | BN        | Dust borrow amount               |
-| `tick`           | number    | Price tick                       |
-| `tickId`         | number    | Tick id                          |
-| `isLiquidated`   | boolean   | True if position is liquidated   |
+| Field            | Type             | Description                      |
+| ---------------- | ---------------- | -------------------------------- |
+| `nftId`          | number           | Position / NFT id                |
+| `owner`          | PublicKey        | Owner wallet                     |
+| `isSupplyPosition` | boolean        | True if supply-only              |
+| `supply`         | BN               | Collateral (with exchange price) |
+| `beforeSupply`   | BN               | Raw collateral before adjustment |
+| `borrow`         | BN               | Debt (with exchange price)       |
+| `beforeBorrow`   | BN               | Raw debt before adjustment       |
+| `dustBorrow`     | BN               | Dust borrow amount               |
+| `beforeDustBorrow` | BN             | Raw dust debt                    |
+| `tick`           | number           | Price tick                       |
+| `tickId`         | number           | Tick id                          |
+| `isLiquidated`   | boolean          | True if position is liquidated   |
+| `vault`          | VaultEntireData  | Full vault data for this position|
 
 ### User position (raw)
 

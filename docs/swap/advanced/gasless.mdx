@@ -1,0 +1,119 @@
+---
+title: "Gasless Swaps"
+description: "Let users swap without holding SOL for transaction fees"
+llmsDescription: "How gasless swaps work on Jupiter Swap API V2. Two approaches: automatic gasless on /order (Jupiter covers gas when taker has < 0.01 SOL, min ~$10 trade, fee deducted from swap output) and integrator payer on both /order and /build (integrator covers gas via the payer parameter, fee payer accounts are changed to the payer address). Covers types of gas costs, when automatic gasless applies, integrator payer setup for both endpoints, scenario matrix, and limitations."
+---
+
+Gasless swaps let users trade without holding SOL for transaction fees. Two approaches are available depending on your integration.
+
+## Types of gas costs
+
+Solana transactions can incur four types of gas costs:
+
+1. **Base network transaction fee** (signature fee)
+2. **Associated token account (ATA) rent** for new token accounts
+3. **Priority fee** (or tips for Jito, etc.)
+4. **Other account rent** (some DEXes require additional accounts of the taker, e.g. Pump.fun)
+
+## Automatic gasless (`/order`)
+
+Jupiter automatically covers all gas costs when the taker lacks SOL. No configuration needed.
+
+**When it applies:**
+- Taker has less than 0.01 SOL
+- Minimum trade size of ~\$10 (dynamic, varies with current priority fee market)
+- Only when using default `/order` parameters (no optional params)
+
+**What it covers:** all four gas types (signature fee, priority fee, ATA rent, other account rent).
+
+**How it works:**
+- Jupiter calculates the required SOL to cover gas and increases the swap fee. The taker receives less output tokens. The `feeBps` field in the response reflects this increased fee.
+- A secondary signer (Jupiter's gas payer) is added to the transaction.
+
+**Limitations:**
+- Does not work with integrator params (`referralAccount`, `referralFee`, `payer`)
+- Does not work with manual mode params (`slippageBps`, `priorityFeeLamports`, `excludeRouters`)
+
+## JupiterZ gasless (`/order`)
+
+Alternatively, when a JupiterZ (RFQ) market maker provides the winning quote in `/order`, the market maker pays network and priority fees directly. ATA rent is not covered by the market maker, so the taker must have enough SOL for rent or JupiterZ will not be routed.
+
+**When it applies:**
+- Taker trades a pair the MMs are willing to quote
+- Only when using default `/order` parameters (no optional params)
+
+**What it covers:** transaction gas (signature fee, priority fee) but not token account rent.
+
+**How it works:**
+- The order transaction will include a secondary signer for the MM
+- Jupiter sets the gas payer to the MM signer and upon receiving your partially signed transaction from `/execute`, then sends it to the MM for them to sign and execute
+
+**Limitations:**
+- Does not work with integrator params (`referralAccount`, `referralFee`, `payer`)
+- Does not work with manual mode params (`slippageBps`, `priorityFeeLamports`, `excludeRouters`)
+- Requires taker to have sufficient SOL for token account rent
+
+## Integrator payer
+
+Integrators can cover all gas costs on behalf of their users by passing the `payer` parameter. This works on both `/order` and `/build`.
+
+### On `/order`
+
+Pass `payer` to cover all gas-related fees. The transaction requires both taker and payer signatures.
+
+<Note>
+This needs to be used together with referral parameters (`referralAccount` and `referralFee`) because it is assumed that you will be taking fees to recoup the costs spent on gas.
+</Note>
+
+```typescript
+const params = new URLSearchParams({
+  inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+  outputMint: "So11111111111111111111111111111111111111112",     // SOL
+  amount: "1000000",
+  taker: userWallet,
+  payer: integratorPayerWallet,
+});
+
+const response = await fetch(
+  `https://api.jup.ag/swap/v2/order?${params}`,
+  { headers: { "x-api-key": API_KEY } }
+);
+```
+
+The returned transaction needs two signatures (taker + payer) before sending to `/execute`.
+
+**What it covers:** all four gas types.
+
+**How it works:**
+- Regardless of how much SOL the taker has, the payer covers all fees
+- Temporary wSOL ATA rent is covered by the payer and returned in the same transaction
+- Other ATAs are covered by the payer but not returned (they hold tokens post-swap)
+- Routes through Metis only
+
+### On `/build`
+
+Pass `payer` to change the fee payer on all returned instructions. The payer address replaces the default `taker` as the fee payer for the transaction.
+
+```typescript
+const params = new URLSearchParams({
+  inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  outputMint: "So11111111111111111111111111111111111111112",
+  amount: "1000000",
+  taker: userWallet,
+  payer: integratorPayerWallet,
+});
+
+const response = await fetch(
+  `https://api.jup.ag/swap/v2/build?${params}`,
+  { headers: { "x-api-key": API_KEY } }
+);
+```
+
+The returned instructions will have fee payer accounts set to the `payer` address. You are responsible for building the transaction, collecting both signatures (taker + payer), and sending via your own RPC.
+
+## Related
+
+- [Order & Execute](/docs/swap/order-and-execute) for the default swap flow
+- [Build Custom Transactions](/docs/swap/build) for the advanced path
+- [Routing](/docs/swap/routing) for how `payer` affects routing
+- [Fees](/docs/swap/fees) for how gasless affects the fee calculation

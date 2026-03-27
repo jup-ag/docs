@@ -1,420 +1,366 @@
 #!/usr/bin/env node
 
 /**
- * Generate llms.txt from docs.json structure
- * Dynamically parses navigation structure - no hardcoding
+ * Generate llms.txt from docs.json navigation structure.
+ * Walks the nav tree directly (tabs → products → versions → groups → pages)
+ * so output mirrors the site structure. Deprecated pages are skipped.
  * Follows llms.txt standard: https://llmstxt.org/#format
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const BASE_URL = 'https://dev.jup.ag';
+const BASE_URL = "https://dev.jup.ag";
 const baseFolder = __dirname;
 
-const folders = [
-  'get-started',
-  'portal',
-  'guides',
-  'docs',
-  'openapi-spec',
-  'tool-kits',
-  'ai',
-  'resources',
-  'updates',
-];
+const docsJson = JSON.parse(
+  fs.readFileSync(path.join(baseFolder, "docs.json"), "utf8"),
+);
+const navigation = docsJson.navigation || {};
+const topLevelNav = navigation.tabs;
+
+if (!topLevelNav) {
+  throw new Error("No navigation.tabs found in docs.json");
+}
+
+// --- Section summaries ---
+// Used for both tabs (Get Started, AI, Tool Kits, etc.) and menu items (Swap, Tokens, etc.)
 
 const SECTION_SUMMARIES = {
-  'get-started': 'Setup guides for environment, tooling, and first API calls.',
-  'portal': 'API key management, rate limits, tiers, and billing at portal.jup.ag.',
-  'guides': 'Outcome-focused developer guides answering "How do I do X on Solana?" with working code examples.',
-  'docs': 'Core product documentation covering each Jupiter API with usage guides and code examples.',
-  'api-reference': 'OpenAPI specifications for every Jupiter endpoint.',
-  'tool-kits': 'Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.',
-  'ai': 'AI-first developer experience — AI-friendly docs, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.',
-  'resources': 'Support channels and community resources.',
-  'updates': 'Changelog and release notes.',
+  // Docs tab menu items
+  Swap: "Token swap API with managed execution (/order) and custom transaction building (/build).",
+  Tokens: "Token metadata, search, verification, and organic score APIs.",
+  Price: "Real-time heuristics-based USD token pricing.",
+  Lend: "Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and Flashloans.",
+  Perps:
+    "Leveraged perpetuals trading on Solana (on-chain program, no REST API).",
+  Trigger:
+    "Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.",
+  Recurring:
+    "Automated dollar-cost averaging (DCA) with time-based recurring orders.",
+  Prediction: "Binary prediction markets for real-world events.",
+  More: "Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).",
+  // Tabs
+  "Get Started": "Setup guides for environment, tooling, and first API calls.",
+  AI: "AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.",
+  "Tool Kits":
+    "Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.",
+  Changelog: "Changelog, release notes, and developer blog.",
+  Resources: "Support channels, brand assets, and community resources.",
 };
 
-// Process all folders and generate output
-const data = folders.flatMap(folder => {
-  const folderPath = path.join(baseFolder, folder);
-  return folder === 'openapi-spec'
-    ? processApiReference(folderPath)
-    : processData(folderPath);
-});
+// --- Frontmatter extraction (cached) ---
 
-const nestedData = buildNestedStructure(data);
-const sortedData = sortNestedData(nestedData);
-const output = generateLlmsTxt(sortedData);
+const frontmatterCache = new Map();
 
-fs.writeFileSync(path.join(baseFolder, 'llms.txt'), output, 'utf8');
-console.log(`✅ Generated llms.txt at: ${path.join(baseFolder, 'llms.txt')}`);
+function extractFrontmatter(pagePath) {
+  if (frontmatterCache.has(pagePath)) return frontmatterCache.get(pagePath);
 
-function generateLlmsTxt(sortedData) {
-  let output = '# Jupiter\n\n';
-  output += `> Jupiter is DeFi infrastructure on Solana providing swap, lending, perpetuals, limit-order, DCA, and portfolio APIs.\n`;
-  output += `> **Swap API V2** (recommended): \`/order\` for managed execution, \`/build\` for custom transactions. Base URL: \`https://api.jup.ag/swap/v2\`.\n`;
-  output += `> All endpoints require an \`x-api-key\` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).\n\n`;
+  const candidates = [
+    path.join(baseFolder, pagePath + ".mdx"),
+    path.join(baseFolder, pagePath + ".md"),
+    path.join(baseFolder, pagePath, "index.mdx"),
+    path.join(baseFolder, pagePath, "index.md"),
+  ];
 
-  output += `## Quick Reference\n\n`;
-  output += `- Swap API V2 (recommended): \`GET /swap/v2/order\` + \`POST /swap/v2/execute\` or \`GET /swap/v2/build\`\n`;
-  output += `- Trigger (limit orders): \`POST /trigger/v1/createOrder\`\n`;
-  output += `- Recurring (DCA): \`POST /recurring/v1/createOrder\`\n`;
-  output += `- Lend: \`POST /lend/v1/earn/deposit\`\n`;
-  output += `- Price: \`GET /price/v3?ids={mints}\`\n`;
-  output += `- Tokens: \`GET /tokens/v2/search?query={query}\`\n`;
-  output += `- Portfolio: \`GET /portfolio/v1/positions?wallet={address}\`\n\n`;
-
-  const formatHeading = (key) =>
-    key.replace(/-/g, ' ')
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
-
-  const processSection = (data, depth = 2) => {
-    if (typeof data === 'string') {
-      output += data + '\n';
-      return;
+  let filePath;
+  for (const c of candidates) {
+    if (fs.existsSync(c)) {
+      filePath = c;
+      break;
     }
-    if (typeof data !== 'object' || data === null) return;
-
-    const keys = Object.keys(data);
-    if (keys.length === 0) return;
-
-    let hasStringItems = false;
-    let previousWasSubsection = false;
-
-    keys.forEach(key => {
-      const value = data[key];
-      if (typeof value === 'string') {
-        if (previousWasSubsection) output += '\n';
-        output += value + '\n';
-        hasStringItems = true;
-        previousWasSubsection = false;
-      } else if (typeof value === 'object' && value !== null) {
-        if (hasStringItems || previousWasSubsection) output += '\n';
-        output += `${'#'.repeat(depth)} ${formatHeading(key)}\n\n`;
-        processSection(value, depth + 1);
-        previousWasSubsection = true;
-        hasStringItems = false;
-      }
-    });
-  };
-
-  const topLevelKeys = Object.keys(sortedData);
-  topLevelKeys.forEach((key, index) => {
-    const value = sortedData[key];
-    const formattedKey = formatHeading(key);
-    output += `## ${formattedKey}\n\n`;
-
-    if (SECTION_SUMMARIES[key]) {
-      output += `${SECTION_SUMMARIES[key]}\n\n`;
-    }
-
-    if (typeof value === 'string') {
-      output += value + '\n';
-    } else if (typeof value === 'object' && value !== null) {
-      processSection(value, 3);
-    }
-
-    if (index < topLevelKeys.length - 1) output += '\n';
-  });
-
-  output += `\n## Optional\n\n`;
-  output += `- [Dev Portal](https://portal.jup.ag/): Access the Jupiter Portal to manage API key, access to metrics and logs\n`;
-  output += `- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs\n`;
-  output += `- [Stay Updated](${BASE_URL}/resources/support): Get support and stay updated with Jupiter\n`;
-
-  return output;
-}
-
-function sortNestedData(nestedData) {
-  const docsJson = JSON.parse(fs.readFileSync(path.join(baseFolder, 'docs.json'), 'utf8'));
-  const navigation = docsJson.navigation;
-  
-  if (!navigation?.tabs) {
-    throw new Error('No navigation found in docs.json');
   }
 
-  const sortedData = {};
+  if (!filePath) {
+    console.error(`File not found: ${pagePath}`);
+    frontmatterCache.set(pagePath, null);
+    return null;
+  }
 
-  const getNestedValue = (obj, pathSegments) => {
-    let current = obj;
-    for (const segment of pathSegments) {
-      if (current && typeof current === 'object' && segment in current) {
-        current = current[segment];
-      } else {
-        return null;
-      }
+  try {
+    const content = fs.readFileSync(filePath, "utf8");
+    const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
+    if (!match) {
+      console.error(`No frontmatter: ${filePath}`);
+      frontmatterCache.set(pagePath, null);
+      return null;
     }
-    return current;
-  };
 
-  const setNestedValue = (obj, pathSegments, value) => {
-    let current = obj;
-    for (let i = 0; i < pathSegments.length - 1; i++) {
-      const segment = pathSegments[i];
-      if (!(segment in current)) {
-        current[segment] = {};
-      }
-      if (typeof current[segment] === 'string') return;
-      current = current[segment];
-    }
-    const last = pathSegments[pathSegments.length - 1];
-    if (typeof current[last] !== 'string') {
-      current[last] = value;
-    }
-  };
-
-  const findValueForApiReference = (pathSegments) => {
-    if (pathSegments.length === 0 || pathSegments[0] !== 'api-reference') {
-      return getNestedValue(nestedData, pathSegments);
-    }
-    
-    const apiRefPath = pathSegments.slice(1);
-    if (apiRefPath.length === 0) {
-      return getNestedValue(nestedData, pathSegments);
-    }
-    
-    let value = getNestedValue(nestedData, pathSegments);
-    if (value !== null) return value;
-    
-    const firstSegment = apiRefPath[0];
-    return getNestedValue(nestedData, ['api-reference', firstSegment]);
-  };
-
-  const processPage = (pagePath) => {
-    if (typeof pagePath !== 'string') return;
-    
-    const normalizedPath = pagePath
-      .replace(/^\//, '')
-      .replace(/\.(mdx?|md|yaml)$/i, '');
-    
-    const pathSegments = normalizedPath.split('/').filter(seg => seg);
-    const value = findValueForApiReference(pathSegments);
-    
-    if (value !== null) {
-      setNestedValue(sortedData, pathSegments, value);
-    }
-  };
-
-  const processNavElement = (element) => {
-    if (!element || typeof element !== 'object') return;
-    
-    if (element.pages?.forEach) {
-      element.pages.forEach(page => {
-        if (typeof page === 'string') {
-          processPage(page);
-        } else if (typeof page === 'object' && page.pages) {
-          processNavElement(page);
+    let title,
+      description,
+      llmsDescription,
+      openapi,
+      deprecated = false;
+    match[1].split("\n").forEach((line) => {
+      line = line.trim();
+      if (!line || line.startsWith("#")) return;
+      const colonIndex = line.indexOf(":");
+      if (colonIndex > 0) {
+        const key = line.substring(0, colonIndex).trim();
+        let value = line.substring(colonIndex + 1).trim();
+        if (
+          (value.startsWith('"') && value.endsWith('"')) ||
+          (value.startsWith("'") && value.endsWith("'"))
+        ) {
+          value = value.slice(1, -1);
         }
-      });
-    }
-    
-    if (element.groups?.forEach) {
-      element.groups.forEach(group => processNavElement(group));
-    }
-    
-    if (element.menu?.forEach) {
-      element.menu.forEach(menuItem => processNavElement(menuItem));
-    }
-  };
+        if (key === "title") title = value;
+        if (key === "description") description = value;
+        if (key === "llmsDescription") llmsDescription = value;
+        if (key === "openapi") openapi = value;
+        if (key === "deprecated" && value === "true") deprecated = true;
+      }
+    });
 
-  navigation.tabs.forEach(tab => processNavElement(tab));
-  
-  return sortedData;
+    if (deprecated) {
+      frontmatterCache.set(pagePath, null);
+      return null;
+    }
+
+    if (!title || !description) {
+      console.error(`Missing title or description: ${filePath}`);
+      frontmatterCache.set(pagePath, null);
+      return null;
+    }
+
+    const result = { title, description: llmsDescription || description, openapi };
+    frontmatterCache.set(pagePath, result);
+    return result;
+  } catch (e) {
+    console.error(e.message);
+    frontmatterCache.set(pagePath, null);
+    return null;
+  }
 }
 
-function buildNestedStructure(data) {
-  const result = {};
-  for (const item of data) {
-    const pathSegments = item.path
-      .replace(/^\//, '')
-      .replace(/\.(mdx?|md|yaml)$/i, '')
-      .split(path.sep)
-      .flatMap(seg => seg.split('/'));
-    
-    let curr = result;
-    for (let i = 0; i < pathSegments.length - 1; i++) {
-      const key = pathSegments[i];
-      curr[key] = curr[key] || {};
-      curr = curr[key];
+// --- Output building ---
+
+let output = "";
+const seenUrls = new Set();
+
+function emit(text) {
+  output += text;
+}
+
+function emitHeading(text, depth) {
+  if (output && !output.endsWith("\n\n")) {
+    emit(output.endsWith("\n") ? "\n" : "\n\n");
+  }
+  emit(`${"#".repeat(Math.min(depth, 6))} ${text}\n\n`);
+}
+
+function emitEntry(pagePath) {
+  if (pagePath === "index") return false; // skip root homepage
+  if (seenUrls.has(pagePath)) return false;
+  const fm = extractFrontmatter(pagePath);
+  if (!fm) return false;
+  seenUrls.add(pagePath);
+  // Skip API ref overview pages (no openapi field = just navigation cards, no real content)
+  if (pagePath.startsWith("api-reference/") && !fm.openapi) {
+    console.warn(`Skipped API ref page (no openapi field): ${pagePath}`);
+    return false;
+  }
+  // API ref pages with openapi field link to the spec YAML instead of .md
+  let url;
+  if (fm.openapi) {
+    const specPath = fm.openapi.split(/\s+/)[0]; // e.g. "/openapi-spec/swap/v2/swap.yaml"
+    url = `${BASE_URL}${specPath}`;
+  } else {
+    url = `${BASE_URL}/${pagePath}.md`;
+  }
+  emit(`- [${fm.title}](${url}): ${fm.description}\n`);
+  return true;
+}
+
+// --- Nav tree walkers ---
+
+function walkPages(pages, headingDepth) {
+  let count = 0;
+  let afterSubgroup = false;
+
+  for (const page of pages) {
+    if (typeof page === "string") {
+      if (afterSubgroup) {
+        emit("\n");
+        afterSubgroup = false;
+      }
+      if (emitEntry(page)) count++;
+    } else if (page?.pages) {
+      emitHeading(page.group, headingDepth);
+      count += walkPages(page.pages, headingDepth + 1);
+      afterSubgroup = true;
     }
-    curr[pathSegments[pathSegments.length - 1]] = item.copy;
+  }
+  return count;
+}
+
+function walkGroup(group, headingDepth) {
+  const name = group.group?.trim();
+  if (name) {
+    emitHeading(name, headingDepth);
+    return walkPages(group.pages || [], headingDepth + 1);
+  }
+  return walkPages(group.pages || [], headingDepth);
+}
+
+function walkVersion(version, headingDepth) {
+  if (version.tag === "Unmaintained") return 0;
+  emitHeading(version.version, headingDepth);
+  let count = 0;
+  for (const group of version.groups || []) {
+    count += walkGroup(group, headingDepth + 1);
+  }
+  return count;
+}
+
+function walkProduct(product) {
+  emitHeading(product.product, 2);
+  if (SECTION_SUMMARIES[product.product]) {
+    emit(`${SECTION_SUMMARIES[product.product]}\n\n`);
+  }
+  let count = 0;
+  if (product.versions) {
+    for (const version of product.versions) {
+      count += walkVersion(version, 3);
+    }
+  }
+  if (product.groups) {
+    for (const group of product.groups) {
+      count += walkGroup(group, 3);
+    }
+  }
+  return count;
+}
+
+function walkTopLevel(item) {
+  if (item.products) {
+    // Anchors/products-based nav (legacy)
+    for (const product of item.products) {
+      walkProduct(product);
+    }
+  } else if (item.menu) {
+    // Tabs with dropdown menu (e.g. Docs tab) — each menu item is like a product
+    for (const menuItem of item.menu) {
+      emitHeading(menuItem.item, 2);
+      if (SECTION_SUMMARIES[menuItem.item]) {
+        emit(`${SECTION_SUMMARIES[menuItem.item]}\n\n`);
+      }
+      let count = 0;
+      for (const group of menuItem.groups || []) {
+        count += walkGroup(group, 3);
+      }
+    }
+  } else if (item.groups) {
+    // Tabs with flat groups (e.g. Get Started, AI, Tool Kits)
+    const sectionName = item.tab;
+    emitHeading(sectionName, 2);
+    if (SECTION_SUMMARIES[sectionName]) {
+      emit(`${SECTION_SUMMARIES[sectionName]}\n\n`);
+    }
+    for (const group of item.groups) {
+      walkGroup(group, 3);
+    }
+  }
+}
+
+// --- Build output ---
+
+// Header
+emit("# Jupiter\n\n");
+emit(
+  "> Jupiter is DeFi infrastructure on Solana providing swap, lending, perpetuals, limit-order, DCA, and portfolio APIs.\n",
+);
+emit(
+  "> **Swap API V2** (recommended): `/order` for managed execution, `/build` for custom transactions. Base URL: `https://api.jup.ag/swap/v2`.\n",
+);
+emit(
+  "> All endpoints require an `x-api-key` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).\n\n",
+);
+
+emit("## Quick Reference\n\n");
+emit(
+  "- Swap API V2 (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`\n",
+);
+emit("- Trigger (limit orders): `POST /trigger/v2/orders/price`\n");
+emit("- Recurring (DCA): `POST /recurring/v1/createOrder`\n");
+emit("- Lend: `POST /lend/v1/earn/deposit`\n");
+emit("- Price: `GET /price/v3?ids={mints}`\n");
+emit("- Tokens: `GET /tokens/v2/search?query={query}`\n");
+emit("- Portfolio: `GET /portfolio/v1/positions?wallet={address}`\n\n");
+
+// Walk navigation
+for (const item of topLevelNav) {
+  walkTopLevel(item);
+}
+
+// Footer
+emitHeading("Optional", 2);
+emit(
+  "- [Dev Portal](https://portal.jup.ag/): Access the Jupiter Portal to manage API key, access to metrics and logs\n",
+);
+emit(
+  "- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs\n",
+);
+emit(
+  `- [Stay Updated](${BASE_URL}/resources/support): Get support and stay updated with Jupiter\n`,
+);
+
+// --- Clean up empty sections ---
+// A section is empty if it has no `- [` entries before the next same-or-higher-level heading.
+
+function removeEmptySections(text) {
+  let result = text;
+  for (let pass = 0; pass < 10; pass++) {
+    const lines = result.split("\n");
+    const kept = [];
+    let changed = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const headingMatch = lines[i].match(/^(#{2,6}) /);
+      if (!headingMatch) {
+        kept.push(lines[i]);
+        continue;
+      }
+
+      const level = headingMatch[1].length;
+      let hasEntries = false;
+      for (let j = i + 1; j < lines.length; j++) {
+        const nextMatch = lines[j].match(/^(#{1,6}) /);
+        if (nextMatch && nextMatch[1].length <= level) break;
+        if (lines[j].startsWith("- [")) {
+          hasEntries = true;
+          break;
+        }
+      }
+
+      if (hasEntries) {
+        kept.push(lines[i]);
+      } else {
+        changed = true;
+        // Also skip non-heading, non-entry lines that belong to this empty section
+        // (summary text, blank lines) until the next heading or entry
+        while (
+          i + 1 < lines.length &&
+          !lines[i + 1].match(/^#{1,6} /) &&
+          !lines[i + 1].startsWith("- [")
+        ) {
+          i++;
+        }
+      }
+    }
+
+    result = kept.join("\n");
+    if (!changed) break;
   }
   return result;
 }
 
-function processData(folderPath) {
-  const collectedData = [];
-  const entries = fs.readdirSync(folderPath, { withFileTypes: true });
-  
-  for (const entry of entries) {
-    const entryPath = path.join(folderPath, entry.name);
-    if (entry.isDirectory()) {
-      collectedData.push(...processData(entryPath));
-    } else if (entry.isFile()) {
-      const frontmatter = extractFrontmatter(entryPath);
-      if (frontmatter) {
-        const relativePath = `/${path.relative(baseFolder, entryPath)}`;
-        // Use .md extension for LLM-friendly markdown export (not .mdx which returns 404)
-        const markdownLink = relativePath.replace(/\.mdx?$/, '.md');
-        frontmatter.path = relativePath;
-        frontmatter.link = BASE_URL + markdownLink;
-        frontmatter.copy = `- [${frontmatter.title}](${frontmatter.link}): ${frontmatter.description}`;
-        collectedData.push(frontmatter);
-      }
-    }
-  }
-  return collectedData;
-}
+output = removeEmptySections(output);
+output = output.replace(/\n{3,}/g, "\n\n").trim() + "\n";
 
-function processApiReference(folderPath) {
-  const collectedData = [];
-  const entries = fs.readdirSync(folderPath, { withFileTypes: true });
-  
-  for (const entry of entries) {
-    const entryPath = path.join(folderPath, entry.name);
-    if (entry.isDirectory()) {
-      collectedData.push(...processApiReference(entryPath));
-    } else if (entry.isFile() && entry.name.endsWith('.yaml')) {
-      const yamlInfo = extractYamlInfo(entryPath);
-      if (!yamlInfo || yamlInfo.xDeprecated === true) continue;
-      
-      const filename = path.basename(entryPath, '.yaml');
-      const fullPath = `/${path.relative(baseFolder, entryPath)}`;
-      const relativePath = path.relative(folderPath, entryPath);
-      const pathParts = relativePath.split(path.sep);
-      
-      let apiRefPath;
-      if (pathParts.length > 1) {
-        const parentFolder = pathParts[pathParts.length - 2];
-        const isVersion = /^v\d+$/.test(parentFolder);
-        apiRefPath = isVersion 
-          ? `/api-reference/${filename}/${parentFolder}`
-          : `/api-reference/${filename}`;
-      } else {
-        apiRefPath = `/api-reference/${filename}`;
-      }
-      
-      yamlInfo.path = apiRefPath;
-      yamlInfo.link = BASE_URL + fullPath;
-      yamlInfo.copy = `- [${yamlInfo.title}](${yamlInfo.link}): ${yamlInfo.description}`;
-      collectedData.push(yamlInfo);
-    }
-  }
-  return collectedData;
-}
+// --- Write ---
 
-function extractFrontmatter(filePath) {
-  try {
-    const content = fs.readFileSync(filePath, 'utf8');
-    const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*(?:\n|$)/);
-    if (!match) throw new Error('No frontmatter found in file: ' + filePath);
+fs.writeFileSync(path.join(baseFolder, "llms.txt"), output, "utf8");
 
-    let title, description, llmsDescription, deprecated = false;
-    match[1].split('\n').forEach(line => {
-      line = line.trim();
-      if (!line || line.startsWith('#')) return;
-
-      const colonIndex = line.indexOf(':');
-      if (colonIndex > 0) {
-        const key = line.substring(0, colonIndex).trim();
-        let value = line.substring(colonIndex + 1).trim();
-
-        if ((value.startsWith('"') && value.endsWith('"')) ||
-            (value.startsWith("'") && value.endsWith("'"))) {
-          value = value.slice(1, -1);
-        }
-        if (key === 'title') title = value;
-        if (key === 'description') description = value;
-        if (key === 'llmsDescription') llmsDescription = value;
-        if (key === 'deprecated' && value === 'true') deprecated = true;
-      }
-    });
-
-    if (deprecated) return null;
-
-    if (!title || !description) {
-      throw new Error(`Missing frontmatter 'title' or 'description' in file: ${filePath}`);
-    }
-
-    return { title, description: llmsDescription || description };
-  } catch (e) {
-    console.error(e.message || e);
-    return null;
-  }
-}
-
-function extractYamlInfo(filePath) {
-  try {
-    const content = fs.readFileSync(filePath, 'utf8');
-    const lines = content.split('\n');
-    let title = null, description = null, xDeprecated = false;
-    let inInfoSection = false;
-    let indentLevel = 0;
-    
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const trimmed = line.trim();
-      
-      if (trimmed === 'info:' || trimmed.startsWith('info:')) {
-        inInfoSection = true;
-        indentLevel = line.indexOf('info:');
-        continue;
-      }
-      
-      if (inInfoSection) {
-        const currentIndent = line.search(/\S/);
-        if (currentIndent !== -1 && currentIndent <= indentLevel && !line.startsWith(' ') && !line.startsWith('\t')) {
-          break;
-        }
-
-        if (trimmed.startsWith('x-deprecated:')) {
-          const match = line.match(/x-deprecated:\s*(true|false|\w+)/i);
-          if (match && match[1].trim().toLowerCase() === 'true') {
-            xDeprecated = true;
-          }
-        }
-        
-        if (trimmed.startsWith('title:')) {
-          const match = line.match(/title:\s*(.+)/);
-          if (match) {
-            let value = match[1].trim();
-            if ((value.startsWith('"') && value.endsWith('"')) ||
-                (value.startsWith("'") && value.endsWith("'"))) {
-              value = value.slice(1, -1);
-            }
-            title = value;
-          }
-        }
-
-        if (trimmed.startsWith('description:')) {
-          const match = line.match(/description:\s*(.+)/);
-          if (match) {
-            let value = match[1].trim();
-            if ((value.startsWith('"') && value.endsWith('"')) ||
-                (value.startsWith("'") && value.endsWith("'"))) {
-              value = value.slice(1, -1);
-            }
-            description = value;
-          }
-        }
-      }
-    }
-    
-    if (!title || !description) {
-      throw new Error(`Missing 'title' or 'description' in YAML file: ${filePath}`);
-    }
-
-    if (xDeprecated) {
-      console.error(`'x-deprecated' is true in YAML file: ${filePath}`);
-    }
-
-    return { title, description, xDeprecated };
-  } catch (e) {
-    console.error(e.message || e);
-    return null;
-  }
-}
+const entries = output.match(/^- \[/gm);
+console.log(`✅ Generated llms.txt: ${entries ? entries.length : 0} entries`);

@@ -1,8 +1,12 @@
 ---
 title: "Cancel Order"
 description: "Cancel an open trigger order and reclaim unfilled tokens."
-llmsDescription: "POST /trigger/v1/cancelOrder cancels an open trigger order and returns unfilled tokens to the maker."
+llmsDescription: "UNMAINTAINED: POST /trigger/v1/cancelOrder cancels a single open trigger order. POST /trigger/v1/cancelOrders cancels multiple orders in batched transactions (groups of 5). Both return unfilled tokens to the maker."
 ---
+
+<Warning>
+**Trigger V1** is no longer actively maintained and has been superseded by [Trigger V2](/docs/trigger).
+</Warning>
 
 The `POST /trigger/v1/cancelOrder` endpoint cancels an open trigger order and returns any unfilled tokens to the maker. Use `/cancelOrders` to cancel multiple orders in batched transactions. You can retrieve order accounts to cancel via the `/getTriggerOrders` endpoint.
 

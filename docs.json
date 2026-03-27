@@ -1,5 +1,8 @@
 {
   "$schema": "https://mintlify.com/docs.json",
+  "banner": {
+    "content": "The existing Portal is being replaced by the **Jupiter Developer Platform** with new pricing, rate limits, and features. We will share more details about the migration plan soon."
+  },
   "theme": "mint",
   "name": "Jupiter",
   "colors": {
@@ -14,36 +17,23 @@
   "appearance": {
     "default": "dark"
   },
-  "background": {
-    "decoration": "gradient"
-  },
   "api": {
     "playground": {
-      "display": "interactive",
-      "prefill": true
+      "display": "interactive"
     }
   },
   "navigation": {
     "tabs": [
       {
-        "tab": "Home",
-        "groups": [
-          {
-            "group": " ",
-            "pages": ["index"]
-          }
-        ]
-      },
-      {
         "tab": "Get Started",
         "groups": [
           {
-            "group": " ",
+            "group": "Get Started",
             "pages": [
               "get-started/index",
-              "get-started/overview",
               "get-started/environment-setup",
-              "get-started/development-basics"
+              "get-started/development-basics",
+              "guides/index"
             ]
           },
           {
@@ -68,30 +58,49 @@
             "icon": "arrow-right-arrow-left",
             "groups": [
               {
-                "group": "Swap API",
+                "group": "Swap",
                 "pages": [
                   "docs/swap/index",
-                  "docs/swap/v2/order-and-execute",
+                  "docs/swap/order-and-execute",
                   {
                     "group": "Build Custom Transactions",
                     "pages": [
-                      "docs/swap/v2/build/index",
-                      "docs/swap/v2/build/other-instructions"
+                      "docs/swap/build/index",
+                      "docs/swap/build/other-instructions"
                     ]
                   },
-                  "docs/swap/v2/routing",
-                  "docs/swap/v2/fees",
-                  "docs/swap/v2/migration"
+                  "docs/swap/fees",
+                  "docs/swap/migration"
+                ]
+              },
+              {
+                "group": "Routing",
+                "pages": [
+                  "docs/swap/routing/index",
+                  "docs/swap/routing/dex-integration",
+                  "docs/swap/routing/rfq-integration"
                 ]
               },
               {
                 "group": "Advanced",
                 "pages": [
-                  "docs/swap/v2/advanced/index",
-                  "docs/swap/v2/advanced/gasless",
-                  "docs/swap/v2/advanced/compute-units",
-                  "docs/swap/v2/advanced/reduce-transaction-size",
-                  "docs/swap/v2/advanced/reduce-latency"
+                  "docs/swap/advanced/index",
+                  "docs/swap/advanced/gasless",
+                  "docs/swap/advanced/compute-units",
+                  "docs/swap/advanced/reduce-transaction-size",
+                  "docs/swap/advanced/reduce-latency"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": ["guides/how-to-embed-a-swap-widget"]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "api-reference/swap/order",
+                  "api-reference/swap/build",
+                  "api-reference/swap/execute"
                 ]
               }
             ]
@@ -101,18 +110,27 @@
             "icon": "coin",
             "groups": [
               {
-                "group": "Tokens API",
+                "group": "Tokens",
                 "pages": [
                   "docs/tokens/index",
-                  {
-                    "group": "V2",
-                    "pages": [
-                      "docs/tokens/v2/token-information",
-                      "docs/tokens/v2/content"
-                    ]
-                  },
-                  "docs/tokens/organic-score",
-                  "docs/tokens/token-tag-standard"
+                  "docs/tokens/token-information",
+                  "docs/tokens/content"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": ["guides/how-to-get-token-information"]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "api-reference/tokens/search",
+                  "api-reference/tokens/tag",
+                  "api-reference/tokens/category",
+                  "api-reference/tokens/recent",
+                  "api-reference/tokens/get-content",
+                  "api-reference/tokens/get-content-cooking",
+                  "api-reference/tokens/get-content-feed"
                 ]
               }
             ]
@@ -122,8 +140,16 @@
             "icon": "dollar-sign",
             "groups": [
               {
-                "group": "Price API",
-                "pages": ["docs/price/index", "docs/price/v3"]
+                "group": "Price",
+                "pages": ["docs/price/index"]
+              },
+              {
+                "group": "Guides",
+                "pages": ["guides/how-to-get-token-price"]
+              },
+              {
+                "group": "API Reference",
+                "pages": ["api-reference/price/index"]
               }
             ]
           },
@@ -132,7 +158,7 @@
             "icon": "piggy-bank",
             "groups": [
               {
-                "group": " ",
+                "group": "Lend",
                 "pages": [
                   "docs/lend/index",
                   "docs/lend/architecture",
@@ -225,6 +251,28 @@
                   "docs/lend/idl-and-types",
                   "docs/lend/dune"
                 ]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  {
+                    "group": "Earn",
+                    "tag": "BETA",
+                    "pages": [
+                      "api-reference/lend/earn/deposit",
+                      "api-reference/lend/earn/withdraw",
+                      "api-reference/lend/earn/mint",
+                      "api-reference/lend/earn/redeem",
+                      "api-reference/lend/earn/deposit-instructions",
+                      "api-reference/lend/earn/withdraw-instructions",
+                      "api-reference/lend/earn/mint-instructions",
+                      "api-reference/lend/earn/redeem-instructions",
+                      "api-reference/lend/earn/tokens",
+                      "api-reference/lend/earn/positions",
+                      "api-reference/lend/earn/earnings"
+                    ]
+                  }
+                ]
               }
             ]
           },
@@ -234,72 +282,18 @@
             "groups": [
               {
                 "group": " ",
-                "pages": [
-                  "docs/jupusd/index",
-                  "docs/jupusd/juiced"
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Prediction",
-            "icon": "check-to-slot",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/prediction/index"]
-              },
-              {
-                "group": "Trading Guides",
-                "tag": "BETA",
-                "pages": [
-                  "docs/prediction/events-and-markets",
-                  "docs/prediction/open-positions",
-                  "docs/prediction/manage-positions",
-                  "docs/prediction/claim-payouts"
-                ]
-              },
-              {
-                "group": "Data & Analytics",
-                "tag": "BETA",
-                "pages": [
-                  "docs/prediction/position-data",
-                  "docs/prediction/social-features"
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Perps",
-            "icon": "chart-line",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/perps/index"]
-              },
-              {
-                "group": "Perps Program",
-                "pages": [
-                  "docs/perps/position-account",
-                  "docs/perps/position-request-account",
-                  "docs/perps/pool-account",
-                  "docs/perps/custody-account"
-                ]
+                "pages": ["docs/jupusd/index", "docs/jupusd/juiced"]
               }
             ]
           },
           {
             "item": "Trigger",
-            "icon": "bullseye",
+            "icon": "crosshairs",
             "groups": [
               {
-                "group": " ",
-                "pages": ["docs/trigger/index"]
-              },
-              {
-                "group": "Trigger Order API",
-                "tag": "BETA",
+                "group": "Trigger",
                 "pages": [
+                  "docs/trigger/index",
                   "docs/trigger/authentication",
                   "docs/trigger/create-order",
                   "docs/trigger/manage-orders",
@@ -308,19 +302,31 @@
                 ]
               },
               {
-                "group": " ",
+                "group": "API Reference",
                 "pages": [
                   {
-                    "group": "Trigger Order API V1",
-                    "expanded": false,
+                    "group": "Authenticate",
                     "pages": [
-                      "docs/trigger/v1/index",
-                      "docs/trigger/v1/create-order",
-                      "docs/trigger/v1/execute-order",
-                      "docs/trigger/v1/cancel-order",
-                      "docs/trigger/v1/get-trigger-orders",
-                      "docs/trigger/v1/best-practices"
+                      "api-reference/trigger/challenge",
+                      "api-reference/trigger/verify",
+                      "api-reference/trigger/verify-token",
+                      "api-reference/trigger/vault",
+                      "api-reference/trigger/vault-register"
                     ]
+                  },
+                  {
+                    "group": "Order Management",
+                    "pages": [
+                      "api-reference/trigger/deposit-craft",
+                      "api-reference/trigger/create-order",
+                      "api-reference/trigger/update-order",
+                      "api-reference/trigger/cancel-order",
+                      "api-reference/trigger/confirm-cancel"
+                    ]
+                  },
+                  {
+                    "group": "History",
+                    "pages": ["api-reference/trigger/order-history"]
                   }
                 ]
               }
@@ -331,12 +337,9 @@
             "icon": "clock-rotate-left",
             "groups": [
               {
-                "group": " ",
-                "pages": ["docs/recurring/index"]
-              },
-              {
-                "group": "Recurring API",
+                "group": "Recurring",
                 "pages": [
+                  "docs/recurring/index",
                   "docs/recurring/create-order",
                   "docs/recurring/execute-order"
                 ]
@@ -353,186 +356,53 @@
               {
                 "group": "Debugging",
                 "pages": ["docs/recurring/best-practices"]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "api-reference/recurring/create-order",
+                  "api-reference/recurring/execute",
+                  "api-reference/recurring/cancel-order",
+                  "api-reference/recurring/price-deposit",
+                  "api-reference/recurring/price-withdraw",
+                  "api-reference/recurring/get-recurring-orders"
+                ]
               }
             ]
           },
           {
-            "item": "Portfolio",
-            "icon": "wallet",
+            "item": "Prediction",
+            "icon": "check-to-slot",
             "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/portfolio/index"]
-              },
-              {
-                "group": "Portfolio API",
-                "tag": "BETA",
-                "pages": ["docs/portfolio/jupiter-positions"]
-              }
-            ]
-          },
-          {
-            "item": "Send",
-            "icon": "paper-plane",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/send/index"]
-              },
-              {
-                "group": "Send API",
-                "tag": "BETA",
-                "pages": [
-                  "docs/send/invite-code",
-                  "docs/send/craft-send",
-                  "docs/send/craft-clawback",
-                  "docs/send/manage-invites"
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Studio",
-            "icon": "building-columns",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/studio/index"]
-              },
-              {
-                "group": "Studio API",
-                "tag": "BETA",
-                "pages": ["docs/studio/create-token", "docs/studio/claim-fee"]
-              }
-            ]
-          },
-          {
-            "item": "Lock",
-            "icon": "lock",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/lock/index"]
-              }
-            ]
-          },
-          {
-            "item": "Routing",
-            "icon": "route",
-            "groups": [
-              {
-                "group": " ",
-                "pages": ["docs/routing/index"]
-              },
-              {
-                "group": "Routing Integrations",
-                "pages": [
-                  "docs/routing/dex-integration",
-                  "docs/routing/rfq-integration"
-                ]
-              },
-              {
-                "group": "Creating Markets & Tokens",
-                "pages": [
-                  "docs/routing/market-listing",
-                  "docs/routing/token-listing"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": " ",
-            "pages": ["guides/index"]
-          },
-          {
-            "group": "Developer Guides",
-            "pages": [
-              "guides/how-to-build-a-swap-with-ultra",
-              "guides/how-to-get-token-information",
-              "guides/how-to-get-token-price",
-              "guides/how-to-embed-a-swap-widget",
-              "guides/how-to-build-a-custom-swap-with-metis",
-              "guides/how-to-build-a-prediction-market-app-on-solana"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": " ",
-            "pages": ["api-reference/index"]
-          },
-          {
-            "group": "API Reference",
-            "pages": [
-              {
-                "group": "Swap",
-                "pages": [
-                  "api-reference/swap",
-                  "api-reference/swap/v2/order",
-                  "api-reference/swap/v2/build",
-                  "api-reference/swap/v2/execute"
-                ]
-              },
-              {
-                "group": "Tokens",
-                "pages": [
-                  "api-reference/tokens",
-                  "api-reference/tokens/v2/search",
-                  "api-reference/tokens/v2/tag",
-                  "api-reference/tokens/v2/category",
-                  "api-reference/tokens/v2/recent",
-                  "api-reference/tokens/v2/get-content",
-                  "api-reference/tokens/v2/get-content-cooking",
-                  "api-reference/tokens/v2/get-content-feed"
-                ]
-              },
-              {
-                "group": "Price",
-                "pages": ["api-reference/price", "api-reference/price/v3/price"]
-              }
-            ]
-          },
-          {
-            "group": "More",
-            "pages": [
-              {
-                "group": "Lend",
-                "tag": "BETA",
-                "pages": [
-                  "api-reference/lend",
-                  {
-                    "group": "Earn",
-                    "tag": "BETA",
-                    "pages": [
-                      "api-reference/lend/earn",
-                      "api-reference/lend/earn/deposit",
-                      "api-reference/lend/earn/withdraw",
-                      "api-reference/lend/earn/mint",
-                      "api-reference/lend/earn/redeem",
-                      "api-reference/lend/earn/deposit-instructions",
-                      "api-reference/lend/earn/withdraw-instructions",
-                      "api-reference/lend/earn/mint-instructions",
-                      "api-reference/lend/earn/redeem-instructions",
-                      "api-reference/lend/earn/tokens",
-                      "api-reference/lend/earn/positions",
-                      "api-reference/lend/earn/earnings"
-                    ]
-                  }
-                ]
-              },
               {
                 "group": "Prediction",
                 "tag": "BETA",
                 "pages": [
-                  "api-reference/prediction",
+                  "docs/prediction/index",
+                  "docs/prediction/events-and-markets",
+                  "docs/prediction/open-positions",
+                  "docs/prediction/manage-positions",
+                  "docs/prediction/claim-payouts"
+                ]
+              },
+              {
+                "group": "Data & Analytics",
+                "tag": "BETA",
+                "pages": [
+                  "docs/prediction/position-data",
+                  "docs/prediction/social-features"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "guides/how-to-build-a-prediction-market-app-on-solana"
+                ]
+              },
+              {
+                "group": "API Reference",
+                "tag": "BETA",
+                "pages": [
                   {
                     "group": "Events",
                     "pages": [
@@ -591,87 +461,108 @@
                     "pages": ["api-reference/prediction/get-vault-info"]
                   }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "item": "Perps",
+            "icon": "chart-line",
+            "groups": [
               {
-                "group": "Trigger",
+                "group": "Perps",
                 "pages": [
-                  "api-reference/trigger",
-                  {
-                    "group": "V2",
-                    "tag": "BETA",
-                    "pages": [
-                      "api-reference/trigger/v2",
-                      "api-reference/trigger/v2/challenge",
-                      "api-reference/trigger/v2/verify",
-                      "api-reference/trigger/v2/verify-token",
-                      "api-reference/trigger/v2/vault",
-                      "api-reference/trigger/v2/vault-register",
-                      "api-reference/trigger/v2/deposit-craft",
-                      "api-reference/trigger/v2/create-order",
-                      "api-reference/trigger/v2/update-order",
-                      "api-reference/trigger/v2/cancel-order",
-                      "api-reference/trigger/v2/confirm-cancel",
-                      "api-reference/trigger/v2/order-history"
-                    ]
-                  },
-                  {
-                    "group": "V1",
-                    "pages": [
-                      "api-reference/trigger/v1",
-                      "api-reference/trigger/v1/create-order",
-                      "api-reference/trigger/v1/execute",
-                      "api-reference/trigger/v1/cancel-order",
-                      "api-reference/trigger/v1/cancel-orders",
-                      "api-reference/trigger/v1/get-trigger-orders"
-                    ]
-                  }
+                  "docs/perps/index",
+                  "docs/perps/position-account",
+                  "docs/perps/position-request-account",
+                  "docs/perps/pool-account",
+                  "docs/perps/custody-account"
                 ]
-              },
-              {
-                "group": "Recurring",
-                "pages": [
-                  "api-reference/recurring",
-                  "api-reference/recurring/create-order",
-                  "api-reference/recurring/execute",
-                  "api-reference/recurring/cancel-order",
-                  "api-reference/recurring/price-deposit",
-                  "api-reference/recurring/price-withdraw",
-                  "api-reference/recurring/get-recurring-orders"
-                ]
-              },
+              }
+            ]
+          },
+          {
+            "item": "More",
+            "icon": "ellipsis",
+            "groups": [
               {
                 "group": "Portfolio",
                 "tag": "BETA",
                 "pages": [
-                  "api-reference/portfolio",
-                  "api-reference/portfolio/get-positions",
-                  "api-reference/portfolio/get-staked-jup",
-                  "api-reference/portfolio/get-platforms"
+                  "docs/portfolio/index",
+                  "docs/portfolio/jupiter-positions"
                 ]
               },
               {
                 "group": "Send",
                 "tag": "BETA",
                 "pages": [
-                  "api-reference/send",
-                  "api-reference/send/craft-send",
-                  "api-reference/send/craft-clawback",
-                  "api-reference/send/pending-invites",
-                  "api-reference/send/invite-history"
+                  "docs/send/index",
+                  "docs/send/invite-code",
+                  "docs/send/craft-send",
+                  "docs/send/craft-clawback",
+                  "docs/send/manage-invites"
                 ]
               },
               {
                 "group": "Studio",
                 "tag": "BETA",
                 "pages": [
-                  "api-reference/studio",
-                  "api-reference/studio/dbc-pool-create-tx",
-                  "api-reference/studio/dbc-pool-submit",
-                  "api-reference/studio/dbc-pool-addresses-by-mint",
-                  "api-reference/studio/dbc-fee",
-                  "api-reference/studio/dbc-fee-create-tx"
+                  "docs/studio/index",
+                  "docs/studio/create-token",
+                  "docs/studio/claim-fee"
+                ]
+              },
+              {
+                "group": "Lock",
+                "pages": ["docs/lock/index"]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  {
+                    "group": "Portfolio",
+                    "pages": [
+                      "api-reference/portfolio/get-positions",
+                      "api-reference/portfolio/get-staked-jup",
+                      "api-reference/portfolio/get-platforms"
+                    ]
+                  },
+                  {
+                    "group": "Send",
+                    "pages": [
+                      "api-reference/send/craft-send",
+                      "api-reference/send/craft-clawback",
+                      "api-reference/send/pending-invites",
+                      "api-reference/send/invite-history"
+                    ]
+                  },
+                  {
+                    "group": "Studio",
+                    "pages": [
+                      "api-reference/studio/dbc-pool-create-tx",
+                      "api-reference/studio/dbc-pool-submit",
+                      "api-reference/studio/dbc-pool-addresses-by-mint",
+                      "api-reference/studio/dbc-fee",
+                      "api-reference/studio/dbc-fee-create-tx"
+                    ]
+                  }
                 ]
               }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "AI",
+        "groups": [
+          {
+            "group": " ",
+            "pages": [
+              "ai/index",
+              "ai/llms-txt",
+              "ai/skills",
+              "ai/mcp",
+              "ai/cli"
             ]
           }
         ]
@@ -680,7 +571,7 @@
         "tab": "Tool Kits",
         "groups": [
           {
-            "group": " ",
+            "group": "Tool Kits",
             "pages": ["tool-kits/index"]
           },
           {
@@ -714,36 +605,22 @@
         ]
       },
       {
-        "tab": "AI",
+        "tab": "Changelog",
         "groups": [
           {
             "group": " ",
-            "pages": ["ai/index"]
+            "pages": ["changelog/index"]
           },
           {
-            "group": "AI Resources",
-            "pages": ["ai/skills", "ai/llms-txt", "ai/mcp", "ai/ecosystem"]
-          }
-        ]
-      },
-      {
-        "tab": "Updates",
-        "groups": [
-          {
-            "group": " ",
+            "group": "Blog",
             "pages": [
-              "updates/index",
-              {
-                "group": "Blog",
-                "pages": [
-                  "blog/index",
-                  "blog/building-ai-friendly-docs",
-                  "blog/ultra-vs-metis",
-                  "blog/ultra-v3",
-                  "blog/why-ultra-v3",
-                  "blog/metis-v7"
-                ]
-              }
+              "blog/index",
+              "blog/building-ai-friendly-docs",
+              "blog/ultra-vs-metis",
+              "blog/ultra-v3",
+              "blog/why-ultra-v3",
+              "blog/how-jupiter-prices-a-token",
+              "blog/metis-v7"
             ]
           }
         ]
@@ -772,37 +649,18 @@
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Dev Portal",
-          "href": "https://portal.jup.ag/",
-          "icon": "key"
-        },
-        {
-          "anchor": "API Status",
-          "href": "https://status.jup.ag/",
-          "icon": "signal"
-        },
-        {
-          "anchor": "Stay Updated",
-          "href": "https://dev.jup.ag/resources/support",
-          "icon": "bell"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/logo.png",
     "dark": "/logo/logo.png",
-    "href": "https://dev.jup.ag/"
+    "href": "https://jup.ag/"
   },
   "navbar": {
     "primary": {
       "type": "button",
-      "label": "Blog",
-      "href": "https://dev.jup.ag/blog"
+      "label": "Dashboard",
+      "href": "https://portal.jup.ag/"
     }
   },
   "footer": {
@@ -831,6 +689,10 @@
           {
             "label": "Brand Kit",
             "href": "https://dev.jup.ag/resources/brand-kit"
+          },
+          {
+            "label": "Status",
+            "href": "https://status.jup.ag"
           }
         ]
       }
@@ -839,21 +701,73 @@
   "seo": {
     "metatags": {
       "og:title": "Jupiter Developers",
-      "og:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
+      "og:description": "Build with the most comprehensive set of APIs, tool kits, and technical deep dives across Jupiter's full product suite - Swap, Lend, Perps, and beyond.",
       "og:image": "/logo/og.png",
       "og:type": "website",
       "og:url": "https://dev.jup.ag/",
       "og:site_name": "Jupiter Developers",
-      "description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
-      "keywords": "Jupiter, Jupiter Developer Documentation, Jupiter API, Jupiter SDK, Jupiter Swap, Jupiter V6, Jupiter Lend, Jupiter Perps, Jupiter Studio, Jupiter Tool Kits, Jupiter Plugin, Jupiter Terminal, Jupiter Mobile Adapter, Jupiter Wallet Kit, Jupiter Referral Program, Jupiter Routing, Solana, Crypto, Solana Swap, Crypto Swap",
+      "description": "Build with the most comprehensive set of APIs, tool kits, and technical deep dives across Jupiter's full product suite - Swap, Tokens, Price, Lend, Spot, and beyond.",
+      "keywords": "Jupiter, Jupiter Developer Documentation, Jupiter API, Jupiter SDK, Jupiter Swap, Jupiter Lend, Jupiter Perps, Jupiter Studio, Jupiter Tool Kits, Jupiter Plugin, Jupiter Wallet Kit, Jupiter Referral Program, Jupiter Routing, Solana, Crypto, Solana Swap, Crypto Swap, Jupiter Utlra",
       "twitter:card": "summary_large_image",
       "twitter:site": "@JupiterExchange",
       "twitter:title": "Jupiter Developers",
-      "twitter:description": "Build with the most comprehensive set of APIs, tool kits and technical deep dives across Jupiter's full product suite, from Ultra Swap, Lend, Perps and beyond.",
+      "twitter:description": "Build with the most comprehensive set of APIs, tool kits, and technical deep dives across Jupiter's full product suite - Swap, Lend, Perps, and beyond.",
       "twitter:image": "/logo/og.png"
     }
   },
   "redirects": [
+    {
+      "source": "/docs/tokens/v2/token-information",
+      "destination": "/docs/tokens/token-information"
+    },
+    {
+      "source": "/docs/tokens/v2/content",
+      "destination": "/docs/tokens/content"
+    },
+    {
+      "source": "/docs/tokens/organic-score",
+      "destination": "/docs/tokens"
+    },
+    {
+      "source": "/docs/tokens/token-tag-standard",
+      "destination": "/docs/tokens"
+    },
+    {
+      "source": "/api-reference/tokens/v2/:slug*",
+      "destination": "/api-reference/tokens/:slug*"
+    },
+    {
+      "source": "/api-reference/price/v3/price",
+      "destination": "/api-reference/price"
+    },
+    {
+      "source": "/docs/price/v3",
+      "destination": "/docs/price"
+    },
+    {
+      "source": "/docs/routing",
+      "destination": "/docs/swap/routing"
+    },
+    {
+      "source": "/docs/routing/dex-integration",
+      "destination": "/docs/swap/routing/dex-integration"
+    },
+    {
+      "source": "/docs/routing/rfq-integration",
+      "destination": "/docs/swap/routing/rfq-integration"
+    },
+    {
+      "source": "/docs/routing/market-listing",
+      "destination": "/docs/swap/routing"
+    },
+    {
+      "source": "/docs/routing/token-listing",
+      "destination": "/docs/swap/routing"
+    },
+    {
+      "source": "/get-started/overview",
+      "destination": "/get-started"
+    },
     {
       "source": "/docs/environment-setup",
       "destination": "/get-started/environment-setup"
@@ -885,6 +799,14 @@
     {
       "source": "/docs/api",
       "destination": "/api-reference"
+    },
+    {
+      "source": "/api-reference/ultra",
+      "destination": "/api-reference/ultra/order"
+    },
+    {
+      "source": "/api-reference/swap/v1",
+      "destination": "/api-reference/swap/v1/quote"
     },
     {
       "source": "/docs/api/ultra-api/:slug*",
@@ -1088,7 +1010,15 @@
     },
     {
       "source": "/docs#whats-new",
-      "destination": "/updates"
+      "destination": "/changelog"
+    },
+    {
+      "source": "/updates",
+      "destination": "/changelog"
+    },
+    {
+      "source": "/updates/:slug*",
+      "destination": "/changelog/:slug*"
     },
     {
       "source": "/docs/tool-kits/swap-terminal",
@@ -1120,7 +1050,7 @@
     },
     {
       "source": "/docs/tokens/v2",
-      "destination": "/docs/tokens/v2/token-information"
+      "destination": "/docs/tokens/token-information"
     },
     {
       "source": "/resources/ai-workflow",
@@ -1181,6 +1111,58 @@
     {
       "source": "/api-reference/swap/program-id-to-label",
       "destination": "/api-reference/swap/v1/program-id-to-label"
+    },
+    {
+      "source": "/docs/swap/v2/order-and-execute",
+      "destination": "/docs/swap/order-and-execute"
+    },
+    {
+      "source": "/docs/swap/v2/build/:slug*",
+      "destination": "/docs/swap/build/:slug*"
+    },
+    {
+      "source": "/docs/swap/v2/build",
+      "destination": "/docs/swap/build"
+    },
+    {
+      "source": "/docs/swap/v2/routing",
+      "destination": "/docs/swap/routing"
+    },
+    {
+      "source": "/docs/swap/v2/fees",
+      "destination": "/docs/swap/fees"
+    },
+    {
+      "source": "/docs/swap/v2/migration",
+      "destination": "/docs/swap/migration"
+    },
+    {
+      "source": "/docs/swap/v2/advanced/:slug*",
+      "destination": "/docs/swap/advanced/:slug*"
+    },
+    {
+      "source": "/docs/swap/v2/advanced",
+      "destination": "/docs/swap/advanced"
+    },
+    {
+      "source": "/api-reference/swap/v2/order",
+      "destination": "/api-reference/swap/order"
+    },
+    {
+      "source": "/api-reference/swap/v2/build",
+      "destination": "/api-reference/swap/build"
+    },
+    {
+      "source": "/api-reference/swap/v2/execute",
+      "destination": "/api-reference/swap/execute"
+    },
+    {
+      "source": "/api-reference/trigger/v2/:slug*",
+      "destination": "/api-reference/trigger/:slug*"
+    },
+    {
+      "source": "/api-reference/trigger/v2",
+      "destination": "/api-reference/trigger/index"
     }
   ]
 }

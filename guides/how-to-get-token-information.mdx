@@ -246,7 +246,6 @@ interface TokenInfo {
   priceBlockId: number | null;   // Solana block for price recency
   liquidity: number | null;      // Total liquidity in USD
   holderCount: number | null;
-  fees: number | null;           // Trading fees in USD
   apy?: { jupEarn: number };     // APY from Jupiter Lend's Earn (only present for listed assets)
 
   // Quality & verification
@@ -273,9 +272,6 @@ interface TokenInfo {
   stats1h?: SwapStats | null;
   stats6h?: SwapStats | null;
   stats24h?: SwapStats | null;
-  stats7d?: SwapStats | null;    // Typically just priceChange, but may include volume
-  stats30d?: SwapStats | null;
-
   updatedAt: string;             // Last data update timestamp
 }
 
@@ -346,9 +342,6 @@ interface SwapStats {
     "numOrganicBuyers": 291,
     "numNetBuyers": 1201
   },
-  "stats7d": { "priceChange": -12.21 },
-  "stats30d": { "priceChange": -27.43 },
-  "fees": 53.51,
   "updatedAt": "2026-02-23T03:54:14.460Z"
 }
 ```
@@ -403,7 +396,7 @@ Note: `audit` fields are conditional. `isSus` is only present when the token is 
   </Accordion>
 
   <Accordion title="What does organic score mean?">
-    Organic score (0-100) measures real trading activity vs wash trading. Higher = more legitimate trading. See [Organic Score docs](/docs/tokens/organic-score) for methodology.
+    Organic score (0-100) measures real trading activity vs wash trading. Higher = more legitimate trading. See [Organic Score docs](/docs/tokens#organic-score) for methodology.
   </Accordion>
 
   <Accordion title="How often is data updated?">
@@ -423,8 +416,8 @@ Note: `audit` fields are conditional. `isSus` is only present when the token is 
 
 ## Next steps
 
-- **[Tokens API Reference](/api-reference/tokens/v2)** — Full endpoint schemas
-- **[Organic Score](/docs/tokens/organic-score)** — Scoring methodology
+- **[Tokens API Reference](/api-reference/tokens/search)** — Full endpoint schemas
+- **[Organic Score](/docs/tokens#organic-score)** — Scoring methodology
 - **[Get Token Prices](/guides/how-to-get-token-price)** — USD prices for tokens
 - **[Jupiter Developer Portal](https://portal.jup.ag)** — Get your API key
 - **[Jupiter Dev Notifications](https://t.me/jup_dev)** — API updates and announcements

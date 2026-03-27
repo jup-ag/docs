@@ -4,57 +4,50 @@ description: "Install required libraries, configure an RPC connection, and set u
 llmsDescription: "Install Solana web3.js and spl-token libraries, configure an RPC connection, and set up a development wallet to build with the Jupiter API."
 ---
 
-<Info>
-  **ABOUT THE DOCUMENTATION**
+## Libraries
 
-  In the documentation, we are using the Solana `web3.js` library to set up connection, sign transactions, etc.
-</Info>
-
-## Useful Libraries
-
-**JavaScript Libraries**
-
-* `@solana/web3.js`
-* `@solana/spl-token`
-
-## Useful Scripts
-
-**Set up RPC Connection**
-
-<Info>
-  Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters). However, as your application grows, we recommend you to always use your own or provision a 3rd party provider’s RPC endpoint such as [Helius](https://helius.dev/) or [Triton](https://triton.one/).
-</Info>
+Install `@solana/web3.js` (v1) for transaction handling and `@solana/spl-token` for SPL token operations:
 
 ```bash
+npm install @solana/web3.js@1 @solana/spl-token bs58
+```
+
+<Note>
+This documentation uses `@solana/web3.js` **v1**. Version 2 has a different API for transaction handling.
+</Note>
+
+## RPC Connection
+
+```javascript
+import { Connection } from '@solana/web3.js';
+
 const connection = new Connection('https://api.mainnet-beta.solana.com');
 ```
 
-**Set up Development Wallet**
-
 <Info>
-  You can paste in your private key for testing but this is not recommended for production.
-  * Either use your private key in the project directly, you can do it via a `.env` file.
-  * Or set up your private key in the [Solana CLI](https://solana.com/docs/intro/installation#create-wallet).
+Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters), but as your application grows, use a dedicated provider like [Helius](https://helius.dev/) or [Triton](https://triton.one/).
 </Info>
 
+## Development Wallet
+
+<Warning>Never hardcode private keys in source code. Use environment variables or the Solana CLI keyfile.</Warning>
+
 <CodeGroup>
-```javascript Store private key in .env
-// In your .env file
-PRIVATE_KEY=""
-
-// In your index.js (or any file that needs the private key)
+```javascript .env file
 import { Keypair } from '@solana/web3.js';
-import dotenv from 'dotenv';
-require('dotenv').config();
+import bs58 from 'bs58';
+import 'dotenv/config';
 
-const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || '')));
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY));
 ```
 
-```javascript Store private key in Solana CLI
+```javascript Solana CLI keyfile
 import { Keypair } from '@solana/web3.js';
 import fs from 'fs';
 
-const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+const privateKeyArray = JSON.parse(
+  fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim()
+);
 const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
 ```
 </CodeGroup>

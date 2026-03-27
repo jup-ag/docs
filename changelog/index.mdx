@@ -1,0 +1,404 @@
+---
+title: "Changelog"
+description: "Latest announcements and breaking changes across Jupiter APIs."
+---
+
+<Card title="Stay Updated">
+  Follow our various announcements channels to stay up to date with recent updates and announcements.
+
+  <Columns cols={2}>
+  <Card href="https://discord.com/channels/897540204506775583/1115543693005430854" icon="discord" horizontal>
+  Discord
+  </Card>
+  <Card href="https://t.me/jup_dev" icon="telegram" horizontal>
+  Telegram
+  </Card>
+  </Columns>
+</Card>
+
+---
+
+<Update label="March 2026" description="">
+
+## Swap API V2
+
+The unified Swap API consolidates Ultra and Metis into a single entry point at `api.jup.ag/swap/v2`. Three endpoints:
+
+* **`GET /order`**: default path. Returns an assembled transaction with the best price across all routers (Metis, JupiterZ, Dflow, OKX). Includes RTSE, Jupiter Beam, gasless, and RFQ competition. Sign and send to `/execute`.
+* **`GET /build`**: advanced path. Returns raw swap instructions for building custom transactions (add custom instructions, CPI, composability). Metis-only routing, no Jupiter swap fees.
+* **`POST /execute`**: managed transaction landing for `/order` transactions.
+
+Start with `/order`. It gives the best price because all routers compete, including JupiterZ market makers who often beat onchain routing on major pairs. Only use `/build` if you need to modify the transaction.
+
+Ultra and Metis APIs remain available. New integrations should use the Swap API, and existing integrations are encouraged to migrate when convenient. See the [migration guide](/docs/swap/migration) for details.
+
+- [Swap API overview](/docs/swap)
+- [Order & Execute](/docs/swap/order-and-execute)
+- [Build Custom Transactions](/docs/swap/build)
+- [API Reference](/api-reference/swap)
+
+---
+
+### Lend Earn API: Earnings endpoint schema change
+
+The `GET /lend/v1/earn/earnings` response schema has been updated:
+
+* **Removed:** `totalDeposits`, `totalWithdraws`, `totalBalance`, `totalAssets` fields
+* **Changed:** `earnings` type from `string` to `number`
+* **Added:** `slot` field (`number`) indicating the slot at which earnings were computed
+
+---
+
+## Jupiter Lend Documentation
+
+Comprehensive documentation for Jupiter Lend (powered by Fluid Protocol) is now available, covering the full Lend product suite.
+
+* **Earn:** Deposit and withdraw via the Lend SDK or REST API, with read-data helpers for jlToken shares and balances
+* **Borrow:** Create positions, deposit collateral, borrow, repay, and withdraw, including combined single-transaction operations
+* **Flash Loans:** Borrow and repay within the same transaction for arbitrage, liquidation, or collateral swaps
+* **Liquidity & Analytics:** Reserve data, utilisation curves, and on-chain analytics queries
+* **Advanced Recipes:** Multiply (leveraged long), Unwind (deleverage), Repay-with-Collateral, and Vault Swap, all using CPI + Jupiter swap in a single transaction
+* **Architecture:** Three-program design (Liquidity Layer, Lending/Earn, Vaults/Borrow) with oracle integration (Pyth, SwitchboardV2, ScopePrices)
+
+<Card title="Lend Documentation" href="/docs/lend" icon="building-columns" iconType="solid" horizontal/>
+
+</Update>
+
+---
+
+<Update label="February 2026" description="">
+
+## Prediction Market API
+
+Jupiter Prediction Market API is now available in beta. Trade on the outcomes of real-world events across categories like Sports, Crypto, Politics, E-sports, Culture, Economics, and Tech.
+
+* Binary prediction markets on Solana with YES/NO contracts
+* Buy and sell contracts at dynamic prices reflecting market sentiment
+* Track positions, P&L, and trading history via dedicated endpoints
+* Claim JupUSD payouts when predictions are correct
+
+<Note>
+The Prediction Market API is currently in beta and subject to breaking changes.
+</Note>
+
+<Card title="Prediction Market Docs" href="/docs/prediction" icon="magnifying-glass" iconType="solid" horizontal/>
+
+</Update>
+
+---
+
+<Update label="January 2026" description="">
+
+## Ultra Manual Mode
+
+Ultra now supports manual mode for integrators building user-facing trading UIs. Override automatic slippage, priority fee, and broadcast settings when explicit control over execution behaviour is needed.
+
+* Intended for manual trading experiences (similar to jup.ag's manual mode) or personal, self-directed usage
+* Default Ultra behaviour remains recommended for production integrations
+* Transactions with manual overrides fall outside Jupiter's supported execution model
+
+<Card title="Manual Mode Docs" href="/docs/ultra/manual-mode" icon="sliders" iconType="solid" horizontal/>
+
+</Update>
+
+---
+
+<Update label="December 2025" description="">
+
+## Portfolio API (Beta)
+
+The Jupiter Portfolio API is now available in beta, providing comprehensive portfolio tracking across the Solana ecosystem.
+
+* Query user DeFi positions across protocols on Solana (lending, staking, LP positions)
+* Retrieve staked JUP amounts
+* Built by the Sonarwatch team, now part of Jupiter
+
+<Card title="Portfolio API Docs" href="/docs/portfolio" icon="chart-pie" iconType="solid" horizontal/>
+
+</Update>
+
+---
+
+<Update label="November 2025" description="">
+
+## Deprecate Lite API URL
+
+<Info>
+**Update (February 2026):** The deprecation has been postponed for a few months while we implement a new pricing structure. There is no immediate deadline, but we recommend migrating at your convenience.
+</Info>
+
+* We'll be deprecating the Lite API URL `lite-api.jup.ag`.
+* ~~This will take effect on 31st January 2026.~~ Postponed - new date TBA.
+* Please migrate to the API URL `api.jup.ag`.
+* The paths remain unchanged, only domain/hostname changes.
+* Generate an API key for free at [https://portal.jup.ag](https://portal.jup.ag).
+
+**Action Required**
+* **For free users**: Migrate to `api.jup.ag` **and use with an API key**.
+* **For paid users**: No action is required.
+* **For Ultra users**: If you are using `lite-api.jup.ag/ultra`, please migrate to `api.jup.ag/ultra` and use with an API key.
+
+<Card title="Migration Guide" href="/portal/migrate-from-lite-api" icon="arrow-right" iconType="solid" horizontal/>
+
+--- 
+
+## Metis Binary Migration
+
+<Card title="Read about the migration and release" href="/blog/metis-v7" icon="book" iconType="solid" horizontal/>
+<Card title="Refer to documentation" href="https://metis.builders" icon="code" iconType="solid" horizontal/>
+
+* [Tweet announcement](https://x.com/jupiterexchange/status/1990479870502031424?s=46)
+
+**Breaking Changes**
+* Migrated self-hosted binary to https://metis.builders
+* Renamed to `Metis Binary`
+* Requires a `BINARY_KEY` or `--binary-key` to authenticate the usage of the binary
+* Refer to [Binary Key](https://metis.builders/docs/binary-key) for more details
+
+---
+
+### Ultra API
+
+### Deprecate `ctLikes` and `smartCtLikes` response field in search endpoint
+* We'll be deprecating the `ctLikes` and `smartCtLikes` response field in the search endpoints.
+* This will take effect next week and it affects the search endpoints in Ultra API.
+* If you are using the field for any purpose, please move off and stop using it.
+
+---
+
+### Tokens API
+
+### Deprecate `ctLikes` and `smartCtLikes` response field in search endpoint
+* We'll be deprecating the `ctLikes` and `smartCtLikes` response field in the search endpoints.
+* This will take effect next week and it affects the search endpoints in Tokens API.
+* If you are using the field for any purpose, please move off and stop using it.
+
+---
+
+## Metis Swap API
+
+### `routePlan[].percent` may return null
+* The `routePlan[].percent` field in the Metis Swap API quote response may return `null` - due to an an upgrade on the routing algorithm.
+* Please update your code to handle null values for this field.
+* This change will affect `instructionVersion=V2` only and has taken effect.
+* [npm package version 6.0.47](https://www.npmjs.com/package/@jup-ag/api/v/6.0.47) 
+  has been released with the latest schema.
+
+### Deprecate `feeAmount` and `feeMint` fields in `SwapInfo`
+* We will be deprecating the `feeAmount` and `feeMint` fields from the `routePlan[].swapInfo` schema in a quote response.
+* Since `outAmount` already factor in these fees.
+* These fees are related to each AMM's own fee, not to any Jupiter or platform fees you may add.
+* To smooth the migration, we will just show `0` for `feeAmount` and the input mint as the `feeMint`.
+* Refer to [`SwapInfo` API Reference](/api-reference/swap/v1/quote#response-route-plan-swap-info) for more details.
+* [npm package version 6.0.47](https://www.npmjs.com/package/@jup-ag/api/v/6.0.47) 
+  has been released with the latest schema.
+
+### `nativeDestinationAccount`
+* We've added a new parameter to the Metis Swap API that lets you send native SOL 
+  directly to any account.
+* This is similar to `destinationTokenAccount`, but instead of receiving 
+  WSOL in a token account, you receive native SOL in a regular account.
+* Refer to [`nativeDestinationAccount` API Reference](/api-reference/swap/v1/swap#body-native-destination-account) 
+  for more details.  
+* [npm package version 6.0.46](https://www.npmjs.com/package/@jup-ag/api/v/6.0.46)
+  has been released with the latest schema.
+
+---
+
+## Ultra Swap API
+
+### `receiver` parameter
+* A new `receiver` parameter has been added to the Ultra Swap API.
+* This allows specifying a different wallet to receive the output tokens, decoupling the payer from the recipient.
+* Refer to the [Ultra API Reference](/api-reference/ultra) for details.
+
+</Update>
+
+<Update label="October 2025" description="">
+
+## Ultra V3
+We're excited to introduce Ultra V3, featuring major improvements on quoting 
+and swap execution for the Ultra Swap API.  
+
+* [Read the full technical deep dive in the Jupiter Developers Blog](/blog/ultra-v3).
+
+* **Improved Routers in Meta Aggregation**: Granular splitting of 0.01%; and began usage 
+of Golden-section and Brent's method for routing algorithms.
+
+* **Ultra Signaling for Tighter Prop AMM Quotes**: Ultra signals to Prop AMMs, allowing 
+them to confidently provide tighter quotes by distinguishing Ultra trades as "non-toxic" 
+order flow from other "toxic" order flow - 3 bps tighter (50% better) quotes for our Ultra 
+users compared to other platforms.
+
+* **Predictive Execution to Simulate Executable Price & Potential Slippage**: Simulates routes 
+on-chain to verify executable price versus quote and predict potential slippage to select the 
+route with the least overall incurred slippage at the time of execution.
+
+* **Jupiter Beam: Sub-Second Transaction Landing & MEV Protection**: Transaction sending 
+infrastructure helps reduce landing time by 50-66% compared to traditional methods and 
+significantly reduces MEV opportunities by 34x.
+
+* **Real-Time Slippage Estimator (RTSE) Optimizations**: Automatically prioritize 
+slippage-protected routes over purely price-optimized routes and increase volatility 
+sensitivity for tokens with high historical volatility patterns.
+
+* **Gasless Support Coverage**: Expanded gasless support coverage to Token2022 tokens, 
+memecoin-to-memecoin swaps (when liquidity permits), and reduced minimum trade size to ~$10 USD.
+
+* **Just-In-Time Market Revival**: Dynamically re-indexes markets to enable tradability for all tokens.
+
+* **Reduce Pre-Graduation Quote Latency**: Optimized pre-graduated bonding curve markets routing logic 
+by skipping multi-route aggregation to improve quote latency from 200ms to 10ms - a 90% improvement.
+
+* **[Try Ultra Swap API](/docs/ultra)**: Ultra V3 features are live in the Ultra Swap API V1, try it and let us know your feedback!
+
+---
+
+## Jupiter Aggregator V6 Program Update
+* 4 new instruction types are introduced:
+    * `route_v2`
+    * `exact_out_route_v2`
+    * `shared_accounts_route_v2`
+    * `shared_accounts_exact_out_route_v2`
+* You can find the details in the latest IDL: [Solscan](https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#programIdl).
+* V1 instructions will continue to be valid and usable.
+* This enables:
+    * Collect fees when the swap pair consists of a Token2022 mint.
+    * Set fee beyond the previous cap of 255 bps.
+
+## Integrator Fee
+**Ultra Swap API**
+* Integrator fee for Ultra now supports Token2022 tokens.
+* No additional parameters are required, simply create Token2022 referral token accounts for your referral account.
+* You can find the details in the [Add Fees To Ultra Swap](/docs/ultra/add-fees-to-ultra) guide.
+
+**Metis Swap API**
+* Integrator fee for Metis Swap now supports Token2022 tokens.
+* New [`instructionVersion` parameter](/api-reference/swap/v1/quote#parameter-instruction-version) is introduced to the Metis Swap API's Quote endpoint to support the new instruction types.
+* To collect fees in Token2022 tokens, create Token2022 token accounts and pass in via `feeAccount`.
+* You can find the details in the [Add Fees To Swap](/docs/swap/v1/add-fees-to-swap) guide.
+
+</Update>
+
+---
+
+<Update label="August 2025" description="">
+## Sunsetting Legacy Endpoints
+
+We’re sunsetting several legacy endpoints over the next few weeks by gradually reducing access/rate limits. Please migrate to the latest versions ASAP.
+
+<Danger>
+**Action Required**
+* Old Quote API V6: `http://quote-api.jup.ag/v6/`
+* Old Tokens API: `http://tokens.jup.ag`
+* Old Price API: `http://price.jup.ag`
+* Tokens V1: `http://lite-api.jup.ag/tokens/v1`
+* Price V2: `http://lite-api.jup.ag/price/v2`
+</Danger>
+</Update>
+
+---
+
+<Update label="June 2025" description="">
+## Deprecation of Price API V2 and Tokens API V1
+
+[**Price API upgrades to V3**](/docs/price/v3) to support more reliable and timely pricing data - derived by the last swap price (across all transactions) and a set of heuristics to ensure the accuracy of the price and eliminate any outliers.
+
+[**Tokens API upgrades to V2**](/docs/tokens/v2) to support an easier and reliable usage with new data addition such as [Organic Score](/docs/tokens/organic-score), more trading categories like toporganicscore, and more.
+
+<Danger>
+**Action Required**
+* If you are using **Price API V2** and **Tokens API V1**
+* Please migrate to their new versions respectively
+* The older versions will be deprecated by 30 September 2025
+</Danger>
+</Update>
+
+---
+
+<Update label="March 2025" description="">
+## API Gateway: Improvements
+
+**Improved API Gateway!**
+
+For those that have been using the new hostnames at `api.jup.ag/**`, we have made improvements to the infrastructure
+
+* Reduced latency in responses and much more consistent now
+* Infrastructure costs reduction (will help us look into reducing costs of the plans with higher rate limits)
+
+**Dual endpoint moving forward.**
+
+We will be deploying 2 different endpoints, 1 for free usage and 1 for plans with higher rate limits via [https://portal.jup.ag/](https://portal.jup.ag/)
+
+* `api.jup.ag` will serve only pro/paid users
+* `lite-api.jup.ag` will be the endpoint to provide free usage
+
+<Danger>
+**Action Required (Free plan)**
+
+* Migrate to `lite-api.jup.ag` **BY 1 MAY 2025**
+* The paths remain unchanged, only domain/hostname changes
+* The same rate limits still apply
+* You do not need an API Key to use the APIs for free
+* If you are still on `api.jup.ag` without an API key, you will get a 401 response
+
+**NO Action Required (Pro plan)**
+
+* Your usage on `api.jup.ag` remains unchanged
+* You can only use `api.jup.ag` with an API Key
+</Danger>
+</Update>
+
+---
+
+<Update label="March 2025" description="">
+## Trigger API: New Hostname and Breaking Changes
+
+* The `/limit/v2` path will be deprecated soon, please update your API calls to use the `/trigger/v1` path immediately.
+* `/execute` endpoint is introduced.
+* `/createOrder` endpoint now includes an additional `requestId` parameter to be used with the `/execute` endpoint.
+* `/cancelOrder` endpoint only builds the transaction for 1 order, while `/cancelOrders` endpoint builds the transaction for multiple orders.
+* The `tx` field in the responses are now `transaction` or `transactions`.
+* `/getTriggerOrders` endpoint is introduces a new format to get either active or historical orders (based on the query parameters).
+* [Please refer to the documentation for usage](/docs/trigger/create-order).
+
+<Accordion title="Path Changes">
+| Old Paths | New Paths |
+| :--- | :--- |
+| `/limit/v2/createOrder` | `/trigger/v1/createOrder` |
+| `/limit/v2/executeOrder` | `/trigger/v1/executeOrder` |
+| `/limit/v2/cancelOrder` | `/trigger/v1/cancelOrder`   `/trigger/v1/cancelOrders` |
+| `/limit/v2/openOrders`   `/limit/v2/orderHistory` | `/trigger/v1/getTriggerOrders` |
+</Accordion>
+</Update>
+
+---
+
+<Update label="January 2025" description="">
+## API Gateway: New Hostnames and API Keys
+
+* API will now be served through new hostnames.
+* API will now be served through API keys.
+* API Keys will be distributed via [https://portal.jup.ag](https://portal.jup.ag) (Refer to [API Setup](/portal/setup) to get started).
+* Old hostnames will be slowly phased out.
+* Old hostnames during this period will have reduced rate limits to facilitate migration to the new API.
+
+| <span class="dark:text-white text-black">Service Types</span>          | <span class="dark:text-white text-black">Description</span>                                              |
+| :---------------------- | :-------------------------------------------------------- |
+| Free with no API key   | Decreased rate limits to only accommodate for testing.   |
+| Paid plan with API key | Fixed rate limits, self served through an API dashboard. |
+
+<Accordion title="Hostname Changes">
+
+| Old Hostnames                                     | New Hostnames                                         |
+| :------------------------------------------------- | :----------------------------------------------------- |
+| `quote-api.jup.ag/v6/quote`               | `lite-api.jup.ag/swap/v1/quote`               |
+| `quote-api.jup.ag/v6/swap`                | `lite-api.jup.ag/swap/v1/swap`                |
+| `quote-api.jup.ag/v6/swap-instructions`   | `lite-api.jup.ag/swap/v1/swap-instructions`   |
+| `quote-api.jup.ag/v6/program-id-to-label` | `lite-api.jup.ag/swap/v1/program-id-to-label` |
+| `price.jup.ag/v6` | `lite-api.jup.ag/price/v2` |
+| `tokens.jup.ag/token/:mint`         | `lite-api.jup.ag/tokens/v1/token/:mint`    |
+| `tokens.jup.ag/tokens?tags=:tags`   | `lite-api.jup.ag/tokens/v1/tagged/:tag`    |
+| `tokens.jup.ag/tokens_with_markets` | `lite-api.jup.ag/tokens/v1/mints/tradable` |
+</Accordion>
+</Update>

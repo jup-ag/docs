@@ -101,9 +101,9 @@ Reference these when deciding where new content belongs:
 | Section         | Purpose                          | Format                  | Example                                    |
 |-----------------|----------------------------------|-------------------------|--------------------------------------------|
 | `get-started/`  | Onboarding, first steps          | Sequential, short       | "Get your API key", "Choose your product"  |
-| `docs/`         | Core product documentation       | Explanatory, deep       | "How Ultra Swap works", "Routing engine"   |
+| `docs/`         | Core product documentation       | Explanatory, deep       | "How Swap API works", "Routing engine"   |
 | `guides/`       | Task completion, how-to          | Step-by-step, hands-on  | "Integrate Ultra in 10 min", "Add fees"    |
-| `api-reference/`| Endpoint specs, params, schemas  | Generated from OpenAPI  | GET /ultra/v1/order                        |
+| `api-reference/`| Endpoint specs, params, schemas  | Generated from OpenAPI  | GET /swap/v2/order                        |
 | `tool-kits/`    | SDK/toolkit integration          | Setup + usage           | Plugin embed, Wallet Kit                   |
 | `portal/`       | Platform features                | Feature-oriented        | API key management, pricing, rate limits, usage dashboard        |
 | `ai/`           | AI workflow and agent resources  | Reference + how-to      | llms.txt, skill.md, AI agent integration   |
@@ -121,3 +121,34 @@ Track all redirects added to `vercel.json` here for visibility:
 | `/api-reference/trigger/cancel-order` | `/api-reference/trigger/v1/cancel-order` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
 | `/api-reference/trigger/cancel-orders` | `/api-reference/trigger/v1/cancel-orders` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
 | `/api-reference/trigger/get-trigger-orders` | `/api-reference/trigger/v1/get-trigger-orders` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
+| `/ai/ecosystem` | `/ai` | 2026-03-23 | Ecosystem page removed in AI section rework (PR #857) |
+
+### [2026-03-23] Tabs-based navigation with per-product dropdown menu
+**Status:** implemented
+**Scope:** navigation | folder-structure | redirect
+**Files affected:** `docs.json`, `generate-llms-from-docs.js`, `llms.txt`, `docs/swap/`, `api-reference/swap/`, `docs/trigger/`, `api-reference/trigger/`
+**Linear issue:** DEVREL-115
+
+**Context:** Original tabs-based nav with separate Docs, API Reference, Guides, and Tool Kits tabs didn't scale. Developers had to jump between tabs to understand one product. AI/LLM retrieval got fragmented context. Anchors-based nav was tried but Mintlify's product switcher had UX issues, so we switched to tabs with a dropdown menu.
+**Decision:**
+- Root nav uses tabs (mint theme): Get Started, Docs, AI, Tool Kits, Changelog, Resources
+- Docs tab uses dropdown menu (`menu` with `item` entries) for product selection (Swap, Tokens, Price, Lend, Trigger, Recurring, Prediction, Perps, More)
+- Docs + guides + API ref colocated per product within each menu item
+- API versioning: latest version has no URL prefix, legacy keeps prefix (Next.js pattern)
+- Swap: two versions (Swap V2 Latest, Swap V1 Unmaintained - Ultra V1 and Metis merged into single Swap V1)
+- Trigger: two versions (Trigger V2 Latest, Trigger V1 Unmaintained)
+- Routing merged into Swap as a group (not a standalone product)
+- Tokens and Price split into separate menu items
+- Thin products (Portfolio, Send, Studio, Lock) combined into "More"
+- Consistent group naming: no "API" suffix on first groups (Swap, Trigger, Recurring)
+- Guides distributed to parent products; guides index page in Get Started for browse-all
+- AI section uses environment-based tool guide (local agents vs hosted agents)
+- llms.txt generator rewritten to walk nav tree directly (tabs -> groups/menu -> pages)
+- get-started/overview deprecated (redundant with landing page)
+- Get Started is a tab with groups (Portal, setup pages), not a product
+- Tool Kits is a tab with groups (Plugin, Wallet Kit, Referral Program)
+**Rationale:** Tabs with dropdown menu gives product-centric navigation without the UX issues of anchors/product switcher. Single retrieval gets full product context for both humans and LLMs.
+**Alternatives considered:**
+1. Anchors with product switcher - tried, reverted due to Mintlify UX issues with version selectors.
+2. Keep separate tabs with cross-linking - rejected because it fragments product context.
+**Migration notes:** Redirects added for all old /v2/ swap and trigger URLs, old /docs/routing/* paths. Two orphaned guides (Ultra swap, Metis custom swap) deprecated with Warning callouts. Theme: mint.

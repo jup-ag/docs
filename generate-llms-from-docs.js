@@ -11,6 +11,8 @@ const fs = require("fs");
 const path = require("path");
 
 const BASE_URL = "https://dev.jup.ag";
+const DOCS_URL = `${BASE_URL}/docs`;
+const ROOT_PREFIXES = ["blog/", "changelog/", "resources/", "legal/"];
 const baseFolder = __dirname;
 
 const docsJson = JSON.parse(
@@ -161,12 +163,14 @@ function emitEntry(pagePath) {
     return false;
   }
   // API ref pages with openapi field link to the spec YAML instead of .md
+  const isRoot = ROOT_PREFIXES.some((p) => pagePath.startsWith(p));
+  const urlBase = isRoot ? BASE_URL : DOCS_URL;
   let url;
   if (fm.openapi) {
     const specPath = fm.openapi.split(/\s+/)[0]; // e.g. "/openapi-spec/swap/v2/swap.yaml"
-    url = `${BASE_URL}${specPath}`;
+    url = `${urlBase}${specPath}`;
   } else {
-    url = `${BASE_URL}/${pagePath}.md`;
+    url = `${urlBase}/${pagePath}.md`;
   }
   emit(`- [${fm.title}](${url}): ${fm.description}\n`);
   return true;

@@ -137,7 +137,7 @@ Multiple price fields meant different platforms were showing different numbers f
 
 `blockId` is a Solana block reference, compare it to the current block and you know how fresh the price is. `decimals` saves you a `getAccountInfo` call that I've seen in way too many codebases. And `priceChange24h` covers the thing most integrators were computing themselves, badly, because everyone rolls their own 24h window slightly differently.
 
-One thing to keep in mind, and this comes up a lot especially from traders and arbers using our APIs: what the Price API returns is a lagging indicator, it's the last trade that already happened. If you need the exact execution price for a specific amount right now, use the `/quote` endpoint on the [Swap API](/docs/swap). Price API is for display and reference, `/quote` is what you use when you're actually about to swap.
+One thing to keep in mind, and this comes up a lot especially from traders and arbers using our APIs: what the Price API returns is a lagging indicator, it's the last trade that already happened. If you need the exact execution price for a specific amount right now, use the `/quote` endpoint on the [Swap API](/swap). Price API is for display and reference, `/quote` is what you use when you're actually about to swap.
 
 ---
 
@@ -159,6 +159,6 @@ But there's a difference between using a tool and understanding it. Everything I
 
 If you use an API every day, try this: explain, from memory, what happens between the request and the response. Not what params to pass. Not how the response looks. What the system does. If you hit a gap, that's a good weekend.
 
-[`api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112`](/docs/price/v3) if you want to look for yourself.
+[`api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112`](/price/v3) if you want to look for yourself.
 
 **Price API Guide:** [Video walkthrough on X](https://x.com/JupDevRel/status/2030100801805328443)

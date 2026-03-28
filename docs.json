@@ -738,56 +738,8 @@
   },
   "redirects": [
     {
-      "source": "/tokens/v2/token-information",
-      "destination": "/tokens/token-information"
-    },
-    {
-      "source": "/tokens/v2/content",
-      "destination": "/tokens/content"
-    },
-    {
-      "source": "/tokens/organic-score",
-      "destination": "/tokens"
-    },
-    {
-      "source": "/tokens/token-tag-standard",
-      "destination": "/tokens"
-    },
-    {
-      "source": "/api-reference/tokens/v2/:slug*",
-      "destination": "/api-reference/tokens/:slug*"
-    },
-    {
-      "source": "/api-reference/price/v3/price",
-      "destination": "/api-reference/price"
-    },
-    {
-      "source": "/price/v3",
-      "destination": "/price"
-    },
-    {
       "source": "/routing",
       "destination": "/swap/routing"
-    },
-    {
-      "source": "/routing/dex-integration",
-      "destination": "/swap/routing/dex-integration"
-    },
-    {
-      "source": "/routing/rfq-integration",
-      "destination": "/swap/routing/rfq-integration"
-    },
-    {
-      "source": "/routing/market-listing",
-      "destination": "/swap/routing"
-    },
-    {
-      "source": "/routing/token-listing",
-      "destination": "/swap/routing"
-    },
-    {
-      "source": "/get-started/overview",
-      "destination": "/get-started"
     },
     {
       "source": "/environment-setup",
@@ -822,28 +774,68 @@
       "destination": "/api-reference"
     },
     {
+      "source": "/misc",
+      "destination": "/legal"
+    },
+    {
+      "source": "/docs#whats-new",
+      "destination": "/changelog"
+    },
+    {
+      "source": "/updates",
+      "destination": "/changelog"
+    },
+    {
+      "source": "/partners?category=Wallets",
+      "destination": "/tool-kits/wallet-kit"
+    },
+    {
+      "source": "/skills",
+      "destination": "/skill"
+    },
+    {
       "source": "/api-reference/ultra",
       "destination": "/api-reference/ultra/order"
+    },
+    {
+      "source": "/api-reference/price/v3/price",
+      "destination": "/api-reference/price"
     },
     {
       "source": "/api-reference/swap/v1",
       "destination": "/api-reference/swap/v1/quote"
     },
     {
-      "source": "/api/ultra-api/:slug*",
-      "destination": "/api-reference/ultra/:slug*"
+      "source": "/api-reference/swap/quote",
+      "destination": "/api-reference/swap/v1/quote"
     },
     {
-      "source": "/api/swap-api/:slug*",
-      "destination": "/api-reference/swap/:slug*"
+      "source": "/api-reference/swap/swap",
+      "destination": "/api-reference/swap/v1/swap"
     },
     {
-      "source": "/api/lend-api/:slug*",
-      "destination": "/api-reference/lend/:slug*"
+      "source": "/api-reference/swap/swap-instructions",
+      "destination": "/api-reference/swap/v1/swap-instructions"
     },
     {
-      "source": "/api/trigger-api/:slug*",
-      "destination": "/api-reference/trigger/:slug*"
+      "source": "/api-reference/swap/program-id-to-label",
+      "destination": "/api-reference/swap/v1/program-id-to-label"
+    },
+    {
+      "source": "/api-reference/swap/v2/order",
+      "destination": "/api-reference/swap/order"
+    },
+    {
+      "source": "/api-reference/swap/v2/build",
+      "destination": "/api-reference/swap/build"
+    },
+    {
+      "source": "/api-reference/swap/v2/execute",
+      "destination": "/api-reference/swap/execute"
+    },
+    {
+      "source": "/api-reference/tokens/v2/:slug*",
+      "destination": "/api-reference/tokens/:slug*"
     },
     {
       "source": "/api-reference/trigger/create-order",
@@ -866,140 +858,96 @@
       "destination": "/api-reference/trigger/v1/get-trigger-orders"
     },
     {
-      "source": "/api/token-api/:slug*",
-      "destination": "/api-reference/tokens/:slug*"
+      "source": "/api-reference/trigger/v2",
+      "destination": "/api-reference/trigger/index"
     },
     {
-      "source": "/api/price-api/:slug*",
-      "destination": "/api-reference/price/:slug*"
-    },
-    {
-      "source": "/api/send-api/:slug*",
-      "destination": "/api-reference/send/:slug*"
-    },
-    {
-      "source": "/api/studio-api/:slug*",
-      "destination": "/api-reference/studio/:slug*"
-    },
-    {
-      "source": "/api/ultra-api/",
-      "destination": "/api-reference/ultra/"
-    },
-    {
-      "source": "/api/swap-api/",
-      "destination": "/api-reference/swap/"
+      "source": "/api-reference/trigger/v2/:slug*",
+      "destination": "/api-reference/trigger/:slug*"
     },
     {
       "source": "/api/lend-api/",
       "destination": "/api-reference/lend/"
     },
     {
-      "source": "/api/trigger-api/",
-      "destination": "/api-reference/trigger/"
-    },
-    {
-      "source": "/api/token-api/",
-      "destination": "/api-reference/tokens/"
+      "source": "/api/lend-api/:slug*",
+      "destination": "/api-reference/lend/:slug*"
     },
     {
       "source": "/api/price-api/",
       "destination": "/api-reference/price/"
     },
     {
+      "source": "/api/price-api/:slug*",
+      "destination": "/api-reference/price/:slug*"
+    },
+    {
       "source": "/api/send-api/",
       "destination": "/api-reference/send/"
+    },
+    {
+      "source": "/api/send-api/:slug*",
+      "destination": "/api-reference/send/:slug*"
     },
     {
       "source": "/api/studio-api/",
       "destination": "/api-reference/studio/"
     },
     {
-      "source": "/ultra-api/:slug*",
-      "destination": "/ultra/:slug*"
+      "source": "/api/studio-api/:slug*",
+      "destination": "/api-reference/studio/:slug*"
     },
     {
-      "source": "/swap-api/:slug*",
-      "destination": "/swap/v1/:slug*"
+      "source": "/api/swap-api/",
+      "destination": "/api-reference/swap/"
     },
     {
-      "source": "/lend-api/:slug*",
-      "destination": "/lend/:slug*"
+      "source": "/api/swap-api/:slug*",
+      "destination": "/api-reference/swap/:slug*"
     },
     {
-      "source": "/perp-api/:slug*",
-      "destination": "/perps/:slug*"
+      "source": "/api/token-api/",
+      "destination": "/api-reference/tokens/"
     },
     {
-      "source": "/trigger-api/:slug*",
-      "destination": "/trigger/:slug*"
+      "source": "/api/token-api/:slug*",
+      "destination": "/api-reference/tokens/:slug*"
     },
     {
-      "source": "/recurring-api/:slug*",
-      "destination": "/recurring/:slug*"
+      "source": "/api/trigger-api/",
+      "destination": "/api-reference/trigger/"
     },
     {
-      "source": "/token-api/:slug*",
-      "destination": "/tokens/:slug*"
+      "source": "/api/trigger-api/:slug*",
+      "destination": "/api-reference/trigger/:slug*"
     },
     {
-      "source": "/price-api/:slug*",
-      "destination": "/price/:slug*"
+      "source": "/api/ultra-api/",
+      "destination": "/api-reference/ultra/"
     },
     {
-      "source": "/send-api/:slug*",
-      "destination": "/send/:slug*"
+      "source": "/api/ultra-api/:slug*",
+      "destination": "/api-reference/ultra/:slug*"
     },
     {
-      "source": "/studio-api/:slug*",
-      "destination": "/studio/:slug*"
+      "source": "/get-started/overview",
+      "destination": "/get-started"
     },
     {
-      "source": "/ultra-api/",
-      "destination": "/ultra/"
+      "source": "/lend/sdk",
+      "destination": "/lend/api-vs-sdk"
     },
     {
-      "source": "/swap-api/",
-      "destination": "/swap/"
+      "source": "/lend/liquidation",
+      "destination": "/lend/borrow/liquidation"
     },
     {
       "source": "/lend-api/",
       "destination": "/lend/"
     },
     {
-      "source": "/perp-api/",
-      "destination": "/perps/"
-    },
-    {
-      "source": "/trigger-api/",
-      "destination": "/trigger/"
-    },
-    {
-      "source": "/recurring-api/",
-      "destination": "/recurring/"
-    },
-    {
-      "source": "/token-api/",
-      "destination": "/tokens/"
-    },
-    {
-      "source": "/price-api/",
-      "destination": "/price/"
-    },
-    {
-      "source": "/send-api/",
-      "destination": "/send/"
-    },
-    {
-      "source": "/studio-api/",
-      "destination": "/studio/"
-    },
-    {
-      "source": "/misc",
-      "destination": "/legal"
-    },
-    {
-      "source": "/misc/:slug*",
-      "destination": "/legal"
+      "source": "/lend-api/:slug*",
+      "destination": "/lend/:slug*"
     },
     {
       "source": "/misc/integrators-guidelines",
@@ -1022,52 +970,72 @@
       "destination": "/resources/audits"
     },
     {
-      "source": "/docs#whats-new",
-      "destination": "/changelog"
+      "source": "/misc/:slug*",
+      "destination": "/legal"
     },
     {
-      "source": "/updates",
-      "destination": "/changelog"
+      "source": "/perp-api/",
+      "destination": "/perps/"
     },
     {
-      "source": "/updates/:slug*",
-      "destination": "/changelog/:slug*"
+      "source": "/perp-api/:slug*",
+      "destination": "/perps/:slug*"
     },
     {
-      "source": "/tool-kits/swap-terminal",
-      "destination": "/tool-kits/plugin"
+      "source": "/price/v3",
+      "destination": "/price"
     },
     {
-      "source": "/tool-kits/terminal",
-      "destination": "/tool-kits/plugin"
+      "source": "/price-api/",
+      "destination": "/price/"
     },
     {
-      "source": "/tool-kits/terminal/:slug*",
-      "destination": "/tool-kits/plugin/:slug*"
+      "source": "/price-api/:slug*",
+      "destination": "/price/:slug*"
     },
     {
-      "source": "/partners?category=Wallets",
-      "destination": "/tool-kits/wallet-kit"
+      "source": "/recurring-api/",
+      "destination": "/recurring/"
     },
     {
-      "source": "/tokens/v2",
-      "destination": "/tokens/token-information"
+      "source": "/recurring-api/:slug*",
+      "destination": "/recurring/:slug*"
     },
     {
       "source": "/resources/ai-workflow",
       "destination": "/ai"
     },
     {
-      "source": "/lend/sdk",
-      "destination": "/lend/api-vs-sdk"
+      "source": "/routing/dex-integration",
+      "destination": "/swap/routing/dex-integration"
     },
     {
-      "source": "/lend/liquidation",
-      "destination": "/lend/borrow/liquidation"
+      "source": "/routing/rfq-integration",
+      "destination": "/swap/routing/rfq-integration"
     },
     {
-      "source": "/skills",
-      "destination": "/skill"
+      "source": "/routing/market-listing",
+      "destination": "/swap/routing"
+    },
+    {
+      "source": "/routing/token-listing",
+      "destination": "/swap/routing"
+    },
+    {
+      "source": "/send-api/",
+      "destination": "/send/"
+    },
+    {
+      "source": "/send-api/:slug*",
+      "destination": "/send/:slug*"
+    },
+    {
+      "source": "/studio-api/",
+      "destination": "/studio/"
+    },
+    {
+      "source": "/studio-api/:slug*",
+      "destination": "/studio/:slug*"
     },
     {
       "source": "/swap/get-quote",
@@ -1098,28 +1066,16 @@
       "destination": "/swap/v1/common-errors"
     },
     {
-      "source": "/api-reference/swap/quote",
-      "destination": "/api-reference/swap/v1/quote"
+      "source": "/swap-api/",
+      "destination": "/swap/"
     },
     {
-      "source": "/api-reference/swap/swap",
-      "destination": "/api-reference/swap/v1/swap"
-    },
-    {
-      "source": "/api-reference/swap/swap-instructions",
-      "destination": "/api-reference/swap/v1/swap-instructions"
-    },
-    {
-      "source": "/api-reference/swap/program-id-to-label",
-      "destination": "/api-reference/swap/v1/program-id-to-label"
+      "source": "/swap-api/:slug*",
+      "destination": "/swap/v1/:slug*"
     },
     {
       "source": "/swap/v2/order-and-execute",
       "destination": "/swap/order-and-execute"
-    },
-    {
-      "source": "/swap/v2/build/:slug*",
-      "destination": "/swap/build/:slug*"
     },
     {
       "source": "/swap/v2/build",
@@ -1138,32 +1094,76 @@
       "destination": "/swap/migration"
     },
     {
-      "source": "/swap/v2/advanced/:slug*",
-      "destination": "/swap/advanced/:slug*"
-    },
-    {
       "source": "/swap/v2/advanced",
       "destination": "/swap/advanced"
     },
     {
-      "source": "/api-reference/swap/v2/order",
-      "destination": "/api-reference/swap/order"
+      "source": "/swap/v2/advanced/:slug*",
+      "destination": "/swap/advanced/:slug*"
     },
     {
-      "source": "/api-reference/swap/v2/build",
-      "destination": "/api-reference/swap/build"
+      "source": "/swap/v2/build/:slug*",
+      "destination": "/swap/build/:slug*"
     },
     {
-      "source": "/api-reference/swap/v2/execute",
-      "destination": "/api-reference/swap/execute"
+      "source": "/token-api/",
+      "destination": "/tokens/"
     },
     {
-      "source": "/api-reference/trigger/v2/:slug*",
-      "destination": "/api-reference/trigger/:slug*"
+      "source": "/token-api/:slug*",
+      "destination": "/tokens/:slug*"
     },
     {
-      "source": "/api-reference/trigger/v2",
-      "destination": "/api-reference/trigger/index"
+      "source": "/tokens/organic-score",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/tokens/token-tag-standard",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/tokens/v2",
+      "destination": "/tokens/token-information"
+    },
+    {
+      "source": "/tokens/v2/token-information",
+      "destination": "/tokens/token-information"
+    },
+    {
+      "source": "/tokens/v2/content",
+      "destination": "/tokens/content"
+    },
+    {
+      "source": "/tool-kits/swap-terminal",
+      "destination": "/tool-kits/plugin"
+    },
+    {
+      "source": "/tool-kits/terminal",
+      "destination": "/tool-kits/plugin"
+    },
+    {
+      "source": "/tool-kits/terminal/:slug*",
+      "destination": "/tool-kits/plugin/:slug*"
+    },
+    {
+      "source": "/trigger-api/",
+      "destination": "/trigger/"
+    },
+    {
+      "source": "/trigger-api/:slug*",
+      "destination": "/trigger/:slug*"
+    },
+    {
+      "source": "/ultra-api/",
+      "destination": "/ultra/"
+    },
+    {
+      "source": "/ultra-api/:slug*",
+      "destination": "/ultra/:slug*"
+    },
+    {
+      "source": "/updates/:slug*",
+      "destination": "/changelog/:slug*"
     }
   ]
 }

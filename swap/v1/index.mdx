@@ -1,0 +1,32 @@
+---
+title: "Metis Swap API Overview"
+sidebarTitle: "About Metis Swap API"
+description: "Low-level routing engine for developers who need CPI, custom instructions, or full transaction control. Requires your own RPC."
+llmsDescription: "UNMAINTAINED: Metis Swap API V1 overview for low-level routing with CPI, custom instructions, and full transaction control. Three-step flow: get a quote, build a transaction, sign and send via your own RPC."
+---
+
+<Warning>
+**Metis Swap API** is no longer actively maintained and has been superseded by [Swap V2](/swap).
+</Warning>
+
+Metis is Jupiter's low-level routing engine for developers who need CPI, custom instructions, or full transaction control. Three steps: get a quote (`GET /swap/v1/quote`), build a transaction (`POST /swap/v1/swap`), then sign and send via your own RPC.
+
+## We recommend using Swap API V2
+
+The [Swap API V2](/swap) unifies Ultra and Metis into a single API. Use [`/order`](/swap/order-and-execute) for the simplest flow with managed execution, or [`/build`](/swap/build) if you need custom transactions (the replacement for Metis `/swap-instructions`).
+
+## Getting Started with Metis Swap API
+
+1. [**Get Quote**](/swap/v1/get-quote): Request for a quote which consists of the route plan, and other params such as integrator fee, slippage, etc.
+
+2. [**Build Swap Transaction**](/swap/v1/build-swap-transaction): Post the quote to build a swap transaction.
+
+   * You can utilize other methods to return swap instructions or use CPI rather than the default swap transaction.
+   * You can utilize other parameters such as priority fee, dynamic slippage, etc to customize the transaction.
+
+3. [**Send Swap Transaction**](/swap/v1/send-swap-transaction): Sign and send the swap transaction to the network via your own RPC or other methods.
+
+**Other Guides**
+
+* [**Adding Fees to Metis Swap API**](/swap/v1/add-fees-to-swap): Add custom integrator fees to the swap transaction.
+* [**Requote with Lower Max Accounts**](/swap/v1/requote-with-lower-max-accounts): Requote with a lower max accounts to reduce the transaction size to fit more instructions or other use cases.

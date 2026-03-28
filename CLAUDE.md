@@ -27,19 +27,26 @@ jup-ag/docs/
 ├── vercel.json            # Deployment config
 │
 ├── openapi-spec/          # OpenAPI spec files (source of truth for API reference)
-├── docs/                  # Core product documentation
-│   ├── ultra/             # Ultra Swap API
-│   ├── swap/              # Metis Swap API
-│   ├── tokens/            # Tokens API
-│   ├── price/             # Price API
-│   └── ...                # All other APIs and products
 ├── get-started/           # Getting started/onboarding
 ├── portal/                # Developer Portal docs (portal.jup.ag)
 ├── ai/                    # AI-first developer experience
-├── guide/                 # Guides and tutorials
+├── guides/                # Guides and tutorials
+├── ultra/                 # Ultra Swap API
+├── swap/                  # Metis Swap API
+├── tokens/                # Tokens API
+├── price/                 # Price API
+├── lend/                  # Lend API
+├── perps/                 # Perpetuals
+├── trigger/               # Trigger (limit orders) API
+├── recurring/             # Recurring (DCA) API
+├── prediction/            # Prediction markets
+├── portfolio/             # Portfolio API
+├── lock/                  # Lock (token vesting)
+├── send/                  # Send API
+├── studio/                # Studio (token creation)
 ├── blog/                  # Developer blog posts
+├── changelog/             # Changelog / developer updates
 ├── resources/             # Support, brand kit, and community resources
-├── updates/               # Changelog / developer updates
 ├── snippets/              # Reusable MDX snippet components
 ├── static/                # Static assets (images, etc.)
 │
@@ -67,24 +74,28 @@ jup-ag/docs/
 |---------------------|----------------------------------------------------|-----------------|
 | Get Started         | A quick start and resources for getting started    | `get-started/`  |
 | Portal              | API key management, price, rate limit, dashboard   | `portal/`       |
-| Docs                | Core product documentation covering each API       | `docs/`         |
 | Guides              | Step-by-step guides for developer intent tasks     | `guides/`       |
 | API Reference       | OpenAPI specifications for every API endpoint      | `api-reference/`|
 | Tool Kits           | SDKs and toolkits for developers                   | `tool-kits/`    |
-| AI                  | AI workflow and resources for AI agents            | `ai/`           |
-| Resources           | Support, brand kit, and community resources        | `resources/`    |
-| Updates             | Changelog / developer updates                      | `updates/`      |
+| AI                  | AI workflow and resources for AI agents             | `ai/`           |
+| Blog                | Developer blog posts                                | `blog/`         |
+| Changelog           | Changelog / developer updates                       | `changelog/`    |
+| Resources           | Support, brand kit, and community resources         | `resources/`    |
 
 ## Products & APIs
 
 | Product             | Description                                        | Folder          |
 |---------------------|----------------------------------------------------|-----------------|
 | Developer Portal    | API key management, price, rate limit, dashboard   | `portal/`       |
-| Ultra Swap API      | Flagship swap — RPC-less, gasless, MEV-protected   | `docs/ultra`    |
-| Metis Swap API      | Legacy swap API - customizable and composable      | `docs/swap`     |
-| Tokens API          | Comprehensive token information                    | `docs/tokens`   |
-| Price API           | Heuristics-based token pricing                     | `docs/price`    |
-| More APIs           | More APIs and products                             | `docs/*`        |
+| Ultra Swap API      | Flagship swap — RPC-less, gasless, MEV-protected   | `ultra/`        |
+| Metis Swap API      | Legacy swap API - customisable and composable      | `swap/`         |
+| Tokens API          | Comprehensive token information                    | `tokens/`       |
+| Price API           | Heuristics-based token pricing                     | `price/`        |
+| Lend API            | Lending protocol with Earn, Borrow, Flashloans     | `lend/`         |
+| Perps               | Leveraged perpetuals trading                       | `perps/`        |
+| Trigger API         | Vault-based limit orders                           | `trigger/`      |
+| Recurring API       | Automated dollar-cost averaging (DCA)              | `recurring/`    |
+| Prediction          | Binary prediction markets                          | `prediction/`   |
 | Plugin              | Drop-in swap widget embed                          | `tool-kits/plugin`    |
 | Wallet Kit          | Wallet adapter toolkit                             | `tool-kits/wallet-kit`    |
 | Referral Program    | Integrator fee earning via Ultra                   | `tool-kits/referral-program`    |
@@ -194,7 +205,7 @@ Do the work following the Writing and Reviewing guidelines below. After writing:
 
 #### Changelog
 
-If your changes affect a public API or product, add a changelog entry to `updates/index.mdx`.
+If your changes affect a public API or product, add a changelog entry to `changelog/index.mdx`.
 
 **When to add an entry:**
 - New API endpoints or products
@@ -424,7 +435,7 @@ Always run/check before committing:
 6. No placeholder text like "TODO" or "Lorem ipsum" left in content
 7. OpenAPI spec changes in `openapi-spec/` are reflected in `api-reference/` pages
 8. Images/assets added to `static/` are actually referenced somewhere
-9. Changelog entry in `updates/index.mdx` if changes affect a public API or product
+9. Changelog entry in `changelog/index.mdx` if changes affect a public API or product
 10. `.claude/rules/` updated if you discovered product behaviour, made IA decisions, or established conventions
 
 ## Pull Requests
@@ -470,7 +481,7 @@ gh pr diff
 - [ ] All pages have `title`, `description`, `llmsDescription`
 - [ ] `docs.json` navigation updated (if applicable)
 - [ ] Redirects added (if paths changed)
-- [ ] Changelog entry added to `updates/index.mdx` (if API/product change)
+- [ ] Changelog entry added to `changelog/index.mdx` (if API/product change)
 - [ ] `.claude/rules/` updated with any learnings or decisions
 ```
 
@@ -603,8 +614,8 @@ Add a `<Warning>` immediately after the frontmatter pointing to the replacement:
 
 ```mdx
 <Warning>
-The Ultra Swap API has been superseded by the [Swap API V2](/docs/swap).
-Use [Order & Execute](/docs/swap/order-and-execute) for the recommended swap flow.
+The Ultra Swap API has been superseded by the [Swap API V2](/swap).
+Use [Order & Execute](/swap/order-and-execute) for the recommended swap flow.
 </Warning>
 ```
 
@@ -621,7 +632,7 @@ This catches AI agents that read the page directly (not via llms.txt).
 
 #### 6. Update top-level overview pages
 
-Overview pages (e.g. `api-reference/swap.mdx`, `docs/swap/index.mdx`) should only show
+Overview pages (e.g. `api-reference/swap.mdx`, `swap/index.mdx`) should only show
 cards and links for the current version. Remove references to deprecated versions so new
 readers are not confused by multiple options.
 

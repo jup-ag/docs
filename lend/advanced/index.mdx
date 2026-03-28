@@ -1,0 +1,32 @@
+---
+title: "Advanced Guides"
+description: "Advanced recipes combining flashloans, swaps, and vault operations."
+llmsDescription: "Index of advanced Jupiter Lend recipes that compose multiple primitives (flashloans, Jupiter Swap via Lite API, and vault operations) into single atomic transactions. Includes Multiply (leverage), Unwind (deleverage), Repay and Withdraw with Collateral, Vault Swap (move between vaults), Utilisation After Deposit (read-only calculation), and Native Staked Vaults (use staked SOL as collateral)."
+---
+
+Advanced recipes that compose Jupiter Lend flashloans, Jupiter Swap (Lite API), and vault operations into single atomic transactions.
+
+<Info>
+  These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
+</Info>
+
+<CardGroup cols={2}>
+  <Card icon="chart-line" href="/lend/advanced/multiply" title="Multiply (Leverage)">
+    Build leveraged positions: flashloan debt → swap → deposit collateral + borrow → payback.
+  </Card>
+  <Card icon="chart-line-down" href="/lend/advanced/unwind" title="Unwind (Deleverage)">
+    Close or reduce leveraged positions: flashloan collateral → swap → repay + withdraw → payback.
+  </Card>
+  <Card icon="arrow-right-arrow-left" href="/lend/advanced/repay-with-collateral-max-withdraw" title="Repay with Collateral and Max Withdraw">
+    Close a position when you only hold the collateral token.
+  </Card>
+  <Card icon="repeat" href="/lend/advanced/vault-swap" title="Vault Swap">
+    Move a position from one vault to another atomically.
+  </Card>
+  <Card icon="calculator" href="/lend/advanced/utilization-after-deposit" title="Utilisation After Deposit">
+    Calculate how utilisation changes after a hypothetical deposit (read-only).
+  </Card>
+  <Card icon="lock" href="/lend/advanced/native-staked-vault" title="Native Staked Vaults">
+    Use staked SOL as collateral via Single Pool tokens.
+  </Card>
+</CardGroup>

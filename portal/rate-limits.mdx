@@ -1,0 +1,48 @@
+---
+title: "Rate Limits"
+description: "Rate limits for Jupiter APIs by plan tier."
+llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per account, not per API key. Rate limit response headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset. Returns HTTP 429 when exceeded."
+---
+
+## Overview
+
+All Jupiter APIs use a fixed rate limit based on your plan tier. Rate limits are enforced using a **60-second sliding window**.
+
+| Tier | Requests per second | Requests per minute | API key required |
+| :--- | :--- | :--- | :--- |
+| Keyless | 0.5 | 30 | No |
+| Free | 1 | 60 | Yes |
+| Developer | 10 | 600 | Yes |
+| Launch | 50 | 3,000 | Yes |
+| Pro | 150 | 9,000 | Yes |
+
+<Note>
+Rate limits apply **per account**, not per API key. Creating multiple API keys does not increase your rate limit.
+</Note>
+
+## Rate limit headers
+
+Every API response includes rate limit headers:
+
+| Header | Description |
+| :--- | :--- |
+| `x-ratelimit-limit` | Maximum requests allowed in the current window |
+| `x-ratelimit-remaining` | Requests remaining in the current window |
+| `x-ratelimit-reset` | Unix timestamp when the current window resets |
+
+## Handling rate limits
+
+If you exceed your rate limit, the API returns a `429 Too Many Requests` response. To handle this:
+
+1. **Check the headers**: Use `x-ratelimit-remaining` to throttle requests before hitting the limit
+2. **Implement backoff**: Use exponential backoff in your retry logic
+3. **Upgrade your plan**: If you consistently hit limits, consider upgrading to a higher tier
+
+<Warning>
+Aggressive retry patterns without backoff may extend your rate limit window. Always wait before retrying after a 429 response.
+</Warning>
+
+## Need higher limits?
+
+- See [Plans and Pricing](/portal/plans) to compare tiers
+- For limits above 150 RPS, [contact us](https://support.jup.ag) for an enterprise plan

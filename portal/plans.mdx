@@ -1,0 +1,87 @@
+---
+title: "Plans and Pricing"
+description: "Choose a plan that fits your project - from free to enterprise."
+llmsDescription: "Jupiter Developer Platform pricing tiers: Free (1 RPS, no payment), Developer ($25/mo, 10 RPS, 25M credits), Launch ($100/mo, 50 RPS, 100M credits), Pro ($500/mo, 150 RPS, 500M credits). Credit-based billing at $1 per million credits for overages. Annual billing available with 2 months free. Per-endpoint credit costs vary from 0 (execute endpoints) to 100 (portfolio positions). Keyless access available at 0.5 RPS."
+---
+
+## Plans
+
+All plans use the same API (`api.jup.ag`) and have the same data freshness and latency. Upgrading a plan only increases your rate limit and included credits.
+
+| | Free | Developer | Launch | Pro |
+| :--- | :--- | :--- | :--- | :--- |
+| **Price (monthly)** | $0 | $25 | $100 | $500 |
+| **Price (annual)** | $0 | $250 | $1,000 | $5,000 |
+| **Requests per second** | 1 | 10 | 50 | 150 |
+| **Included credits** | Unlimited | 25M / month | 100M / month | 500M / month |
+| **Overage** | - | $1 per 1M credits | $1 per 1M credits | $1 per 1M credits |
+| **Support** | Community | Community | Community | Priority |
+
+<Tip>
+Annual plans save 2 months compared to monthly billing.
+</Tip>
+
+### Keyless access
+
+You can make requests without an API key at a reduced rate of 0.5 requests per second (30 requests per minute). This replaces the old `lite-api.jup.ag` endpoint. To unlock higher rate limits, [sign up and generate an API key](/portal/setup).
+
+### Enterprise
+
+Need higher rate limits, custom SLAs, or volume pricing? [Contact us](https://support.jup.ag).
+
+## Credits
+
+Credits measure your API usage. Each API request costs a certain number of credits depending on the endpoint.
+
+- **Free tier**: Unlimited credits, rate-limited only
+- **Paid tiers**: Included credits reset each billing period. Usage beyond your allowance is billed at **$1 per 1M credits**
+- **Execute endpoints are free**: Swap, trigger, and recurring execute calls cost 0 credits
+
+### Per-endpoint credit costs
+
+| Credits | Endpoints |
+| :--- | :--- |
+| 0 | `/swap/v2/execute`, `/ultra/v1/execute`, `/trigger/v1/execute`, `/recurring/v1/execute` |
+| 1 | All other endpoints (default) |
+| 3 | `/ultra/v1/holdings` |
+| 5 | `/tokens/v2/category`, `/portfolio/v1/platforms` |
+| 10 | `/ultra/v1/search`, `/tokens/v2/search` |
+| 50 | `/tokens/v2/tag` |
+| 100 | `/portfolio/v1/positions` |
+
+<Note>
+Credit costs are subject to change. The latest costs are always reflected in your dashboard usage metrics.
+</Note>
+
+### Monitoring usage
+
+Track your credit consumption in real time from your [dashboard](https://portal.jup.ag). The usage card shows:
+
+- Included credits used vs remaining
+- Overage accrual (if applicable)
+- Billing period end date
+
+## Billing
+
+### Payment methods
+
+All paid plans are billed via Stripe. You can pay by:
+
+- **Credit card** (USD, auto-renewing)
+- **Crypto** (USDC on Solana)
+
+### Upgrades and downgrades
+
+- **Upgrades** take effect immediately. The amount is pro-rated for the remainder of the billing period.
+- **Downgrades** take effect at the end of the current billing period.
+- You can change your plan at any time from the dashboard.
+
+### Annual billing
+
+Annual plans include 12 months of credits upfront at the price of 10 months (2 months free). Annual credits are available for the full year, not allocated monthly.
+
+| Plan | Monthly | Annual | Annual credits |
+| :--- | :--- | :--- | :--- |
+| Developer | $25/mo (25M credits) | $250/yr (300M credits) | 2 months free |
+| Launch | $100/mo (100M credits) | $1,000/yr (1.2B credits) | 2 months free |
+| Pro | $500/mo (500M credits) | $5,000/yr (6B credits) | 2 months free |

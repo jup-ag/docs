@@ -1,0 +1,115 @@
+---
+title: "Migrating to Developer Platform"
+description: "How to migrate from the old Jupiter Portal to the new Developer Platform."
+llmsDescription: "Migration guide from the old Jupiter Portal to the new Developer Platform. Covers legacy organisation setup, API key preservation, tier mapping (Free/Pro/Ultra to new Free/Developer/Launch/Pro tiers), 3-month grace period with equivalent rate limits, billing transition from Helio/CoinFlow to Stripe, Ultra dynamic rate limit removal, and Lite API deprecation. No breaking changes to the API itself."
+---
+
+## What's changing
+
+The Jupiter Portal is being replaced by the **Jupiter Developer Platform** with:
+
+- **New pricing tiers**: Free, Developer, Launch, and Pro (replaces Free, Pro, and Ultra)
+- **Credit-based billing**: Usage is measured in credits, billed at $1 per 1M credits for overages
+- **No more dynamic rate limits**: The Ultra tier's volume-based rate scaling has been removed. All tiers now have fixed rate limits
+- **New billing provider**: Stripe replaces Helio and CoinFlow
+- **Keyless access**: Replaces `lite-api.jup.ag` with keyless requests on `api.jup.ag` at 0.5 RPS
+- **Improved API key security**: New API keys use a new format and cannot be fully viewed after creation
+
+## What stays the same
+
+- **Your API keys are preserved** and will continue to work
+- **Same base URL**: `api.jup.ag` (no endpoint changes)
+- **No breaking changes**: All existing API calls work exactly as before
+- **Same data freshness and latency** across all tiers
+
+## Setting up your legacy organisation
+
+When you sign in to the new Developer Platform with your existing email:
+
+1. You will be prompted to set up a **legacy organisation** that includes your existing API keys
+2. You can customise the organisation name and settings
+3. Your API keys will be available immediately in the new dashboard
+
+If you prefer to start fresh, you can create a new organisation instead. You can always set up your legacy organisation later from the **Manage Organisations** settings.
+
+<Note>
+New API keys created on the new platform use a new format with improved security. After creation, you can only see the first and last few characters of the key. Make sure to copy it when it is first shown.
+</Note>
+
+## Tier mapping and grace period
+
+All existing users receive their **equivalent rate limits for free for 3 months** after the new platform launches. This gives you time to evaluate the new plans and choose the right tier.
+
+| Old tier | New platform (during grace period) | After grace period |
+| :--- | :--- | :--- |
+| Free | Free (1 RPS) | Free (1 RPS) |
+| Pro I (10 RPS) | Equivalent rate limit | Choose a paid plan or drop to Free |
+| Pro II (50 RPS) | Equivalent rate limit | Choose a paid plan or drop to Free |
+| Pro III (100 RPS) | Equivalent rate limit | Choose a paid plan or drop to Free |
+| Pro IV (500 RPS) | Equivalent rate limit | Enterprise/custom plan required |
+| Ultra (dynamic) | Equivalent to your current RPS | Choose a paid plan or drop to Free |
+
+<Tip>
+If you were on Ultra with dynamic rate limits (not a custom rate limit), the **Developer plan** ($25/month, 10 RPS) is a good starting point. You can scale up as needed.
+</Tip>
+
+### Recommended plan mapping
+
+| Old tier | Recommended new plan |
+| :--- | :--- |
+| Free | Free |
+| Pro I (~10 RPS) | Developer ($25/mo) |
+| Pro II (~50 RPS) | Launch ($100/mo) |
+| Pro III (~100 RPS) | Pro ($500/mo) |
+| Pro IV (~500 RPS) | [Contact us](https://support.jup.ag) for Enterprise |
+| Ultra (low volume) | Developer ($25/mo) |
+| Ultra (high volume) | Launch or Pro, depending on RPS needs |
+
+## Billing transition
+
+### Helio (USDC on Solana)
+
+Helio subscriptions are paid manually each month. Since the old Portal UI is no longer accessible, your subscription will naturally expire at the end of your current billing period. No action needed.
+
+### CoinFlow (credit card)
+
+CoinFlow subscriptions require manual cancellation on Jupiter's end since the old Portal UI is no longer accessible. If you notice continued charges after the transition, please [contact support](https://support.jup.ag) and we will resolve it.
+
+### New billing
+
+All billing on the new platform is handled via **Stripe**. You can pay by credit card (USD) or crypto (USDC on Solana). See [Plans and Pricing](/portal/plans) for details.
+
+## Lite API migration
+
+`lite-api.jup.ag` has been deprecated. The new platform supports keyless access on the standard `api.jup.ag` endpoint at 0.5 RPS (30 requests per minute).
+
+To migrate:
+
+1. Update your base URL from `lite-api.jup.ag` to `api.jup.ag`
+2. (Optional) [Sign up](https://portal.jup.ag) and add an API key via `x-api-key` header to get 1 RPS on the free tier
+
+All endpoints remain the same. Only the base URL changes.
+
+| Service | Old URL | New URL |
+| :--- | :--- | :--- |
+| Price API | `https://lite-api.jup.ag/price/v3` | `https://api.jup.ag/price/v3` |
+| Swap API | `https://lite-api.jup.ag/swap/v2` | `https://api.jup.ag/swap/v2` |
+| Tokens API | `https://lite-api.jup.ag/tokens/v2` | `https://api.jup.ag/tokens/v2` |
+| All other APIs | `https://lite-api.jup.ag/...` | `https://api.jup.ag/...` |
+
+## Timeline
+
+| Event | Timing |
+| :--- | :--- |
+| New Developer Platform launches | Now |
+| Grace period (equivalent rate limits for free) | 3 months from launch |
+| Grace period ends, new pricing enforced | 3 months from launch |
+| Old API gateway deprecated | When new gateway is stable |
+
+## Support
+
+If you have questions about the migration or need help choosing a plan:
+
+- [Open a support ticket](https://support.jup.ag)
+- Join the [Telegram developer channel](https://t.me/jup_dev)
+- Join the [Discord developer channel](https://discord.com/channels/897540204506775583/1115543693005430854)

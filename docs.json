@@ -40,11 +40,10 @@
             "group": "Portal",
             "pages": [
               "portal/setup",
-              "portal/migrate-from-lite-api",
-              "portal/payment",
+              "portal/plans",
+              "portal/rate-limits",
               "portal/responses",
-              "portal/rate-limit",
-              "portal/latency",
+              "portal/migration",
               "portal/faq"
             ]
           }
@@ -706,6 +705,22 @@
     }
   },
   "redirects": [
+    {
+      "source": "/portal/rate-limit",
+      "destination": "/portal/rate-limits"
+    },
+    {
+      "source": "/portal/payment",
+      "destination": "/portal/plans"
+    },
+    {
+      "source": "/portal/latency",
+      "destination": "/portal/faq"
+    },
+    {
+      "source": "/portal/migrate-from-lite-api",
+      "destination": "/portal/migration"
+    },
     {
       "source": "/docs/tokens/v2/token-information",
       "destination": "/docs/tokens/token-information"

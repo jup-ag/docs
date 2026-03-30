@@ -1,40 +1,43 @@
 ---
 title: "Response Codes"
-description: "Response codes for Jupiter APIs"
-llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized, 429 rate limited, and 5xx server errors with debugging guidance."
+description: "HTTP response codes and rate limit headers for Jupiter APIs."
+llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized, 429 rate limited, and 5xx server errors with debugging guidance. Includes rate limit response headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset."
 ---
 
-<Note>
-The Developer Portal is being replaced by the Jupiter Developer Platform with new pricing, rate limits, and features. These pages will be updated when the new platform launches.
-</Note>
-
-{/* <Warning>
-`lite-api.jup.ag` will be deprecated on 31st January 2026.
-
-[Refer to migration guide for more details](/portal/migrate-from-lite-api).
-</Warning> */}
 <Tip>
   **Help Us Debug**
 
-  If you face any issues, please provide clear and concise description of the error/issue.
+  If you face any issues, please provide a clear and concise description of the error.
 
-  Additionally, **logging the response headers** will be helpful for us to identify your requests.
+  **Logging the response headers** will help us identify your requests.
 </Tip>
 
 <Note>
-  **Product Specific Error Codes**
-
-  For product-level response codes, please refer to each product pages for more information.
+  For product-specific error codes, refer to each product's documentation.
 </Note>
 
-| Common Codes | Description           | Debug                                                                                       |
-| :------------ | :--------------------- | :------------------------------------------------------------------------------------------- |
-| 200          | Good                  | Success!                                                                                    |
-| 400          | Bad Request           | Likely a problem with the request, check the request parameters, syntax, etc.               |
-| 401          | Unauthorized          | Likely a problem with the API key, check if the API key is correct.                         |
-| 404          | Not Found             | Likely a broken or invalid endpoint.                                                        |
-| 429          | Rate Limited          | You are being rate limited. Either slow down requests, reduce bursts, or upgrade your plan. |
-| 500          | Internal Server Error | Please reach out in [Discord](https://discord.gg/jup).                                      |
-| 502          | Bad Gateway           | Please reach out in [Discord](https://discord.gg/jup).                                      |
-| 503          | Service Unavailable   | Please reach out in [Discord](https://discord.gg/jup).                                      |
-| 504          | Gateway Timeout       | Please reach out in [Discord](https://discord.gg/jup).                                      |
+## HTTP status codes
+
+| Code | Description           | Debug                                                                                       |
+| :--- | :--------------------- | :------------------------------------------------------------------------------------------- |
+| 200  | Success               | Request completed successfully.                                                             |
+| 400  | Bad Request           | Check the request parameters and syntax.                                                    |
+| 401  | Unauthorised          | Check that your API key is correct and active.                                              |
+| 404  | Not Found             | Check the endpoint URL.                                                                     |
+| 429  | Rate Limited          | You have exceeded your rate limit. Slow down requests, implement backoff, or [upgrade your plan](/portal/plans). |
+| 500  | Internal Server Error | [Contact support](https://support.jup.ag) or reach out in [Discord](https://discord.gg/jup). |
+| 502  | Bad Gateway           | [Contact support](https://support.jup.ag) or reach out in [Discord](https://discord.gg/jup). |
+| 503  | Service Unavailable   | [Contact support](https://support.jup.ag) or reach out in [Discord](https://discord.gg/jup). |
+| 504  | Gateway Timeout       | [Contact support](https://support.jup.ag) or reach out in [Discord](https://discord.gg/jup). |
+
+## Rate limit headers
+
+Every response includes headers to help you manage your request rate:
+
+| Header | Description |
+| :--- | :--- |
+| `x-ratelimit-limit` | Maximum requests allowed in the current window |
+| `x-ratelimit-remaining` | Requests remaining in the current window |
+| `x-ratelimit-reset` | Unix timestamp when the current window resets |
+
+See [Rate Limits](/portal/rate-limits) for details on limits per plan tier.

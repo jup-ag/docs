@@ -12,14 +12,7 @@
   },
   "favicon": "/favicon.png",
   "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "cursor",
-      "vscode"
-    ]
+    "options": ["copy", "view", "chatgpt", "claude", "cursor", "vscode"]
   },
   "appearance": {
     "default": "dark"
@@ -100,9 +93,7 @@
               },
               {
                 "group": "Guides",
-                "pages": [
-                  "guides/how-to-embed-a-swap-widget"
-                ]
+                "pages": ["guides/how-to-embed-a-swap-widget"]
               },
               {
                 "group": "API Reference",
@@ -128,9 +119,7 @@
               },
               {
                 "group": "Guides",
-                "pages": [
-                  "guides/how-to-get-token-information"
-                ]
+                "pages": ["guides/how-to-get-token-information"]
               },
               {
                 "group": "API Reference",
@@ -152,21 +141,15 @@
             "groups": [
               {
                 "group": "Price",
-                "pages": [
-                  "price/index"
-                ]
+                "pages": ["price/index"]
               },
               {
                 "group": "Guides",
-                "pages": [
-                  "guides/how-to-get-token-price"
-                ]
+                "pages": ["guides/how-to-get-token-price"]
               },
               {
                 "group": "API Reference",
-                "pages": [
-                  "api-reference/price/index"
-                ]
+                "pages": ["api-reference/price/index"]
               }
             ]
           },
@@ -222,17 +205,11 @@
               },
               {
                 "group": "Flashloan",
-                "pages": [
-                  "lend/flashloan/index",
-                  "lend/flashloan/execute"
-                ]
+                "pages": ["lend/flashloan/index", "lend/flashloan/execute"]
               },
               {
                 "group": "Liquidity",
-                "pages": [
-                  "lend/liquidity/index",
-                  "lend/liquidity/analytics"
-                ]
+                "pages": ["lend/liquidity/index", "lend/liquidity/analytics"]
               },
               {
                 "group": "Advanced",
@@ -332,9 +309,7 @@
                   },
                   {
                     "group": "History",
-                    "pages": [
-                      "api-reference/trigger/order-history"
-                    ]
+                    "pages": ["api-reference/trigger/order-history"]
                   }
                 ]
               }
@@ -363,9 +338,7 @@
               },
               {
                 "group": "Debugging",
-                "pages": [
-                  "recurring/best-practices"
-                ]
+                "pages": ["recurring/best-practices"]
               },
               {
                 "group": "API Reference",
@@ -468,9 +441,7 @@
                   },
                   {
                     "group": "Vault",
-                    "pages": [
-                      "api-reference/prediction/get-vault-info"
-                    ]
+                    "pages": ["api-reference/prediction/get-vault-info"]
                   }
                 ]
               }
@@ -499,10 +470,7 @@
               {
                 "group": "Portfolio",
                 "tag": "BETA",
-                "pages": [
-                  "portfolio/index",
-                  "portfolio/jupiter-positions"
-                ]
+                "pages": ["portfolio/index", "portfolio/jupiter-positions"]
               },
               {
                 "group": "Send",
@@ -526,9 +494,7 @@
               },
               {
                 "group": "Lock",
-                "pages": [
-                  "lock/index"
-                ]
+                "pages": ["lock/index"]
               },
               {
                 "group": "API Reference",
@@ -586,9 +552,7 @@
         "groups": [
           {
             "group": "Tool Kits",
-            "pages": [
-              "tool-kits/index"
-            ]
+            "pages": ["tool-kits/index"]
           },
           {
             "group": "Jupiter Plugin",
@@ -616,9 +580,7 @@
           },
           {
             "group": "Jupiter Referral Program",
-            "pages": [
-              "tool-kits/referral-program"
-            ]
+            "pages": ["tool-kits/referral-program"]
           }
         ]
       },
@@ -627,9 +589,7 @@
         "groups": [
           {
             "group": " ",
-            "pages": [
-              "changelog/index"
-            ]
+            "pages": ["changelog/index"]
           },
           {
             "group": "Blog",
@@ -738,72 +698,12 @@
   },
   "redirects": [
     {
-      "source": "/routing",
-      "destination": "/swap/routing"
-    },
-    {
-      "source": "/environment-setup",
-      "destination": "/get-started/environment-setup"
-    },
-    {
-      "source": "/development-basics",
-      "destination": "/get-started/development-basics"
-    },
-    {
-      "source": "/api-setup",
-      "destination": "/portal/setup"
-    },
-    {
-      "source": "/api-payment-method",
-      "destination": "/portal/payment"
-    },
-    {
-      "source": "/api-responses",
-      "destination": "/portal/responses"
-    },
-    {
-      "source": "/api-rate-limit",
-      "destination": "/portal/rate-limit"
-    },
-    {
-      "source": "/api-faq",
-      "destination": "/portal/faq"
-    },
-    {
-      "source": "/api",
-      "destination": "/api-reference"
-    },
-    {
-      "source": "/misc",
-      "destination": "/legal"
-    },
-    {
-      "source": "/docs#whats-new",
-      "destination": "/changelog"
-    },
-    {
-      "source": "/updates",
-      "destination": "/changelog"
-    },
-    {
-      "source": "/partners?category=Wallets",
-      "destination": "/tool-kits/wallet-kit"
-    },
-    {
-      "source": "/skills",
-      "destination": "/skill"
-    },
-    {
-      "source": "/api-reference/ultra",
-      "destination": "/api-reference/ultra/order"
-    },
-    {
       "source": "/api-reference/price/v3/price",
       "destination": "/api-reference/price"
     },
     {
-      "source": "/api-reference/swap/v1",
-      "destination": "/api-reference/swap/v1/quote"
+      "source": "/api-reference/swap/program-id-to-label",
+      "destination": "/api-reference/swap/v1/program-id-to-label"
     },
     {
       "source": "/api-reference/swap/quote",
@@ -818,12 +718,8 @@
       "destination": "/api-reference/swap/v1/swap-instructions"
     },
     {
-      "source": "/api-reference/swap/program-id-to-label",
-      "destination": "/api-reference/swap/v1/program-id-to-label"
-    },
-    {
-      "source": "/api-reference/swap/v2/order",
-      "destination": "/api-reference/swap/order"
+      "source": "/api-reference/swap/v1",
+      "destination": "/api-reference/swap/v1/quote"
     },
     {
       "source": "/api-reference/swap/v2/build",
@@ -834,16 +730,12 @@
       "destination": "/api-reference/swap/execute"
     },
     {
+      "source": "/api-reference/swap/v2/order",
+      "destination": "/api-reference/swap/order"
+    },
+    {
       "source": "/api-reference/tokens/v2/:slug*",
       "destination": "/api-reference/tokens/:slug*"
-    },
-    {
-      "source": "/api-reference/trigger/create-order",
-      "destination": "/api-reference/trigger/v1/create-order"
-    },
-    {
-      "source": "/api-reference/trigger/execute",
-      "destination": "/api-reference/trigger/v1/execute"
     },
     {
       "source": "/api-reference/trigger/cancel-order",
@@ -852,6 +744,14 @@
     {
       "source": "/api-reference/trigger/cancel-orders",
       "destination": "/api-reference/trigger/v1/cancel-orders"
+    },
+    {
+      "source": "/api-reference/trigger/create-order",
+      "destination": "/api-reference/trigger/v1/create-order"
+    },
+    {
+      "source": "/api-reference/trigger/execute",
+      "destination": "/api-reference/trigger/v1/execute"
     },
     {
       "source": "/api-reference/trigger/get-trigger-orders",
@@ -866,192 +766,24 @@
       "destination": "/api-reference/trigger/:slug*"
     },
     {
-      "source": "/api/lend-api/",
-      "destination": "/api-reference/lend/"
+      "source": "/api-reference/ultra",
+      "destination": "/api-reference/ultra/order"
     },
     {
-      "source": "/api/lend-api/:slug*",
-      "destination": "/api-reference/lend/:slug*"
-    },
-    {
-      "source": "/api/price-api/",
-      "destination": "/api-reference/price/"
-    },
-    {
-      "source": "/api/price-api/:slug*",
-      "destination": "/api-reference/price/:slug*"
-    },
-    {
-      "source": "/api/send-api/",
-      "destination": "/api-reference/send/"
-    },
-    {
-      "source": "/api/send-api/:slug*",
-      "destination": "/api-reference/send/:slug*"
-    },
-    {
-      "source": "/api/studio-api/",
-      "destination": "/api-reference/studio/"
-    },
-    {
-      "source": "/api/studio-api/:slug*",
-      "destination": "/api-reference/studio/:slug*"
-    },
-    {
-      "source": "/api/swap-api/",
-      "destination": "/api-reference/swap/"
-    },
-    {
-      "source": "/api/swap-api/:slug*",
-      "destination": "/api-reference/swap/:slug*"
-    },
-    {
-      "source": "/api/token-api/",
-      "destination": "/api-reference/tokens/"
-    },
-    {
-      "source": "/api/token-api/:slug*",
-      "destination": "/api-reference/tokens/:slug*"
-    },
-    {
-      "source": "/api/trigger-api/",
-      "destination": "/api-reference/trigger/"
-    },
-    {
-      "source": "/api/trigger-api/:slug*",
-      "destination": "/api-reference/trigger/:slug*"
-    },
-    {
-      "source": "/api/ultra-api/",
-      "destination": "/api-reference/ultra/"
-    },
-    {
-      "source": "/api/ultra-api/:slug*",
-      "destination": "/api-reference/ultra/:slug*"
-    },
-    {
-      "source": "/get-started/overview",
-      "destination": "/get-started"
-    },
-    {
-      "source": "/lend/sdk",
-      "destination": "/lend/api-vs-sdk"
-    },
-    {
-      "source": "/lend/liquidation",
-      "destination": "/lend/borrow/liquidation"
-    },
-    {
-      "source": "/lend-api/",
-      "destination": "/lend/"
-    },
-    {
-      "source": "/lend-api/:slug*",
-      "destination": "/lend/:slug*"
-    },
-    {
-      "source": "/misc/integrators-guidelines",
-      "destination": "/legal"
-    },
-    {
-      "source": "/misc/sdk-api-license-agreement",
-      "destination": "/legal/sdk-api-license-agreement"
-    },
-    {
-      "source": "/misc/terms-of-use",
-      "destination": "/legal/terms-of-use"
-    },
-    {
-      "source": "/misc/privacy-policy",
-      "destination": "/legal/privacy-policy"
-    },
-    {
-      "source": "/misc/audits",
-      "destination": "/resources/audits"
-    },
-    {
-      "source": "/misc/:slug*",
-      "destination": "/legal"
-    },
-    {
-      "source": "/perp-api/",
-      "destination": "/perps/"
-    },
-    {
-      "source": "/perp-api/:slug*",
-      "destination": "/perps/:slug*"
-    },
-    {
-      "source": "/price/v3",
-      "destination": "/price"
-    },
-    {
-      "source": "/price-api/",
-      "destination": "/price/"
-    },
-    {
-      "source": "/price-api/:slug*",
-      "destination": "/price/:slug*"
-    },
-    {
-      "source": "/recurring-api/",
-      "destination": "/recurring/"
-    },
-    {
-      "source": "/recurring-api/:slug*",
-      "destination": "/recurring/:slug*"
-    },
-    {
-      "source": "/resources/ai-workflow",
-      "destination": "/ai"
-    },
-    {
-      "source": "/routing/dex-integration",
-      "destination": "/swap/routing/dex-integration"
-    },
-    {
-      "source": "/routing/rfq-integration",
-      "destination": "/swap/routing/rfq-integration"
-    },
-    {
-      "source": "/routing/market-listing",
-      "destination": "/swap/routing"
-    },
-    {
-      "source": "/routing/token-listing",
-      "destination": "/swap/routing"
-    },
-    {
-      "source": "/send-api/",
-      "destination": "/send/"
-    },
-    {
-      "source": "/send-api/:slug*",
-      "destination": "/send/:slug*"
-    },
-    {
-      "source": "/studio-api/",
-      "destination": "/studio/"
-    },
-    {
-      "source": "/studio-api/:slug*",
-      "destination": "/studio/:slug*"
-    },
-    {
-      "source": "/swap/get-quote",
-      "destination": "/swap/v1/get-quote"
+      "source": "/swap/add-fees-to-swap",
+      "destination": "/swap/v1/add-fees-to-swap"
     },
     {
       "source": "/swap/build-swap-transaction",
       "destination": "/swap/v1/build-swap-transaction"
     },
     {
-      "source": "/swap/send-swap-transaction",
-      "destination": "/swap/v1/send-swap-transaction"
+      "source": "/swap/common-errors",
+      "destination": "/swap/v1/common-errors"
     },
     {
-      "source": "/swap/add-fees-to-swap",
-      "destination": "/swap/v1/add-fees-to-swap"
+      "source": "/swap/get-quote",
+      "destination": "/swap/v1/get-quote"
     },
     {
       "source": "/swap/payments-through-swap",
@@ -1062,36 +794,8 @@
       "destination": "/swap/v1/requote-with-lower-max-accounts"
     },
     {
-      "source": "/swap/common-errors",
-      "destination": "/swap/v1/common-errors"
-    },
-    {
-      "source": "/swap-api/",
-      "destination": "/swap/"
-    },
-    {
-      "source": "/swap-api/:slug*",
-      "destination": "/swap/v1/:slug*"
-    },
-    {
-      "source": "/swap/v2/order-and-execute",
-      "destination": "/swap/order-and-execute"
-    },
-    {
-      "source": "/swap/v2/build",
-      "destination": "/swap/build"
-    },
-    {
-      "source": "/swap/v2/routing",
-      "destination": "/swap/routing"
-    },
-    {
-      "source": "/swap/v2/fees",
-      "destination": "/swap/fees"
-    },
-    {
-      "source": "/swap/v2/migration",
-      "destination": "/swap/migration"
+      "source": "/swap/send-swap-transaction",
+      "destination": "/swap/v1/send-swap-transaction"
     },
     {
       "source": "/swap/v2/advanced",
@@ -1102,16 +806,28 @@
       "destination": "/swap/advanced/:slug*"
     },
     {
+      "source": "/swap/v2/build",
+      "destination": "/swap/build"
+    },
+    {
       "source": "/swap/v2/build/:slug*",
       "destination": "/swap/build/:slug*"
     },
     {
-      "source": "/token-api/",
-      "destination": "/tokens/"
+      "source": "/swap/v2/fees",
+      "destination": "/swap/fees"
     },
     {
-      "source": "/token-api/:slug*",
-      "destination": "/tokens/:slug*"
+      "source": "/swap/v2/migration",
+      "destination": "/swap/migration"
+    },
+    {
+      "source": "/swap/v2/order-and-execute",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/v2/routing",
+      "destination": "/swap/routing"
     },
     {
       "source": "/tokens/organic-score",
@@ -1126,12 +842,32 @@
       "destination": "/tokens/token-information"
     },
     {
+      "source": "/tokens/v2/content",
+      "destination": "/tokens/content"
+    },
+    {
       "source": "/tokens/v2/token-information",
       "destination": "/tokens/token-information"
     },
     {
-      "source": "/tokens/v2/content",
-      "destination": "/tokens/content"
+      "source": "/price/v3",
+      "destination": "/price"
+    },
+    {
+      "source": "/lend/liquidation",
+      "destination": "/lend/borrow/liquidation"
+    },
+    {
+      "source": "/lend/sdk",
+      "destination": "/lend/api-vs-sdk"
+    },
+    {
+      "source": "/get-started/overview",
+      "destination": "/get-started"
+    },
+    {
+      "source": "/resources/ai-workflow",
+      "destination": "/ai"
     },
     {
       "source": "/tool-kits/swap-terminal",
@@ -1146,24 +882,64 @@
       "destination": "/tool-kits/plugin/:slug*"
     },
     {
-      "source": "/trigger-api/",
-      "destination": "/trigger/"
-    },
-    {
-      "source": "/trigger-api/:slug*",
-      "destination": "/trigger/:slug*"
-    },
-    {
-      "source": "/ultra-api/",
-      "destination": "/ultra/"
-    },
-    {
-      "source": "/ultra-api/:slug*",
-      "destination": "/ultra/:slug*"
+      "source": "/updates",
+      "destination": "/changelog"
     },
     {
       "source": "/updates/:slug*",
       "destination": "/changelog/:slug*"
+    },
+    {
+      "source": "/misc",
+      "destination": "/legal"
+    },
+    {
+      "source": "/misc/:slug*",
+      "destination": "/legal"
+    },
+    {
+      "source": "/misc/audits",
+      "destination": "/resources/audits"
+    },
+    {
+      "source": "/misc/integrators-guidelines",
+      "destination": "/legal"
+    },
+    {
+      "source": "/misc/privacy-policy",
+      "destination": "/legal/privacy-policy"
+    },
+    {
+      "source": "/misc/sdk-api-license-agreement",
+      "destination": "/legal/sdk-api-license-agreement"
+    },
+    {
+      "source": "/misc/terms-of-use",
+      "destination": "/legal/terms-of-use"
+    },
+    {
+      "source": "/routing",
+      "destination": "/swap/routing"
+    },
+    {
+      "source": "/routing/dex-integration",
+      "destination": "/swap/routing/dex-integration"
+    },
+    {
+      "source": "/routing/market-listing",
+      "destination": "/swap/routing"
+    },
+    {
+      "source": "/routing/rfq-integration",
+      "destination": "/swap/routing/rfq-integration"
+    },
+    {
+      "source": "/routing/token-listing",
+      "destination": "/swap/routing"
+    },
+    {
+      "source": "/skills",
+      "destination": "/skill"
     }
   ]
 }

@@ -6,7 +6,7 @@ llmsDescription: "Technical guide for integrating JUICED as a collateral asset. 
 
 ## Overview
 
-JUICED is a yield-bearing SPL token issued by Jupiter Lend. It represents a deposit of [JupUSD](/docs/jupusd) (a reserve-backed stablecoin pegged to \$1) into the Jupiter Lend Earn protocol.
+JUICED is a yield-bearing SPL token issued by Jupiter Lend. It represents a deposit of [JupUSD](/jupusd) (a reserve-backed stablecoin pegged to \$1) into the Jupiter Lend Earn protocol.
 
 JUICED follows a vault share model: the JUICED/JupUSD exchange rate increases monotonically as yield accrues. The rate never decreases.
 
@@ -66,7 +66,7 @@ The exchange rate is monotonically increasing. It does not decrease under normal
 
 ## Deposit and withdraw
 
-Protocols can deposit JupUSD to receive JUICED, or withdraw JupUSD by redeeming JUICED. Two integration paths are available: the [Lend API](/docs/lend/earn/api) (HTTP) and the [Lend SDK](/docs/lend/earn/deposit) (TypeScript).
+Protocols can deposit JupUSD to receive JUICED, or withdraw JupUSD by redeeming JUICED. Two integration paths are available: the [Lend API](/lend/earn/api) (HTTP) and the [Lend SDK](/lend/earn/deposit) (TypeScript).
 
 <Tabs>
   <Tab title="Lend API">
@@ -135,7 +135,7 @@ Protocols can deposit JupUSD to receive JUICED, or withdraw JupUSD by redeeming 
     The Lend SDK provides instruction-level access, useful for building custom transactions or CPI integrations.
 
     <Note>
-      The Lend SDK uses `@solana/web3.js` v1. The JupUSD SDK (for [minting and redeeming](/docs/jupusd)) uses `@solana/kit` (v2).
+      The Lend SDK uses `@solana/web3.js` v1. The JupUSD SDK (for [minting and redeeming](/jupusd)) uses `@solana/kit` (v2).
     </Note>
 
     **Installation**
@@ -184,7 +184,7 @@ Protocols can deposit JupUSD to receive JUICED, or withdraw JupUSD by redeeming 
     import { getDepositContext, getWithdrawContext } from "@jup-ag/lend/earn";
     ```
 
-    These return the account contexts needed for Cross-Program Invocation. See the [Lend Earn CPI documentation](/docs/lend/earn/cpi) for full details.
+    These return the account contexts needed for Cross-Program Invocation. See the [Lend Earn CPI documentation](/lend/earn/cpi) for full details.
   </Tab>
 </Tabs>
 
@@ -253,8 +253,8 @@ Protocols integrating JUICED as collateral should evaluate the following:
 
 ## Related
 
-- [JupUSD Mint & Redeem](/docs/jupusd) for minting and redeeming JupUSD
-- [Lend Earn API](/docs/lend/earn/api) for the full Earn API reference
-- [Lend Earn SDK: Deposit](/docs/lend/earn/deposit) for SDK deposit documentation
-- [Lend Earn SDK: Withdraw](/docs/lend/earn/withdraw) for SDK withdrawal documentation
-- [Lend Earn CPI](/docs/lend/earn/cpi) for Cross-Program Invocation integration
+- [JupUSD Mint & Redeem](/jupusd) for minting and redeeming JupUSD
+- [Lend Earn API](/lend/earn/api) for the full Earn API reference
+- [Lend Earn SDK: Deposit](/lend/earn/deposit) for SDK deposit documentation
+- [Lend Earn SDK: Withdraw](/lend/earn/withdraw) for SDK withdrawal documentation
+- [Lend Earn CPI](/lend/earn/cpi) for Cross-Program Invocation integration

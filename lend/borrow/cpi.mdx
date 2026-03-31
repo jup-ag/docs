@@ -1,0 +1,427 @@
+---
+title: "Borrow CPI Integration"
+description: "Cross-Program Invocation integration for Jupiter Lend Borrow vault operations."
+llmsDescription: "How to integrate Jupiter Lend Borrow vaults via Cross-Program Invocation (CPI) from an on-chain Solana program. Covers init_position and operate function discriminators (sha256 global:init_position and global:operate), complete Rust InitPositionParams and OperateParams structs with all account fields and mutability, account explanation tables for core vault, position management, and liquidity integration accounts, remaining_accounts structure (oracle sources, branches, tick debt arrays), signed-amount convention (positive = deposit/borrow, negative = withdraw/payback, i128::MIN = max), transfer types (Normal vs Claim), operation patterns (deposit, borrow, payback, withdraw, max variants), error codes, return values (nft_id, new_col_final, new_debt_final), and TypeScript CPI integration using getOperateIx from @jup-ag/lend/borrow with setup instructions pattern. Programs: Vaults jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi (mainnet), Ho32sUQ4NzuAQgkPkHuNDG3G18rgHmYtXFA8EBmqQrAu (devnet)."
+---
+
+This guide covers Cross-Program Invocation (CPI) integration for the Borrow protocol's vault operations. Use this when your on-chain program needs to call Jupiter Lend Borrow directly.
+
+For TypeScript SDK integration (off-chain), see [Create Position](/lend/borrow/create-position), [Deposit](/lend/borrow/deposit), [Borrow](/lend/borrow/borrow), [Repay](/lend/borrow/repay), and [Withdraw](/lend/borrow/withdraw).
+
+## Program Addresses
+
+| Program | Mainnet | Devnet |
+|---------|---------|--------|
+| Vaults | `jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi` | `Ho32sUQ4NzuAQgkPkHuNDG3G18rgHmYtXFA8EBmqQrAu` |
+
+---
+
+## Core Operation Flow
+
+Vault CPI requires two steps:
+
+1. **Initialise Position NFT:** creates the on-chain position (one-time per position)
+2. **Operate:** a single function for all deposit, withdraw, borrow, and payback operations
+
+---
+
+## 1. Initialise Position NFT
+
+### Discriminator
+
+```rust
+fn get_init_position_discriminator() -> Vec<u8> {
+    // discriminator = sha256("global:init_position")[0..8]
+    vec![197, 20, 10, 1, 97, 160, 177, 91]
+}
+```
+
+### Init Position CPI Struct
+
+```rust
+pub struct InitPositionParams<'info> {
+    pub signer: AccountInfo<'info>,
+    pub vault_admin: AccountInfo<'info>,
+    pub vault_state: AccountInfo<'info>,
+    pub position: AccountInfo<'info>,
+    pub position_mint: AccountInfo<'info>,
+    pub position_token_account: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+    pub associated_token_program: AccountInfo<'info>,
+    pub system_program: AccountInfo<'info>,
+    pub vaults_program: UncheckedAccount<'info>,
+}
+```
+
+### Init Position Implementation
+
+```rust
+impl<'info> InitPositionParams<'info> {
+    pub fn init_position(&self, vault_id: u16, position_id: u32) -> Result<()> {
+        let mut instruction_data = get_init_position_discriminator();
+        instruction_data.extend_from_slice(&vault_id.to_le_bytes());
+        instruction_data.extend_from_slice(&position_id.to_le_bytes());
+
+        let account_metas = vec![
+            AccountMeta::new(*self.signer.key, true),
+            AccountMeta::new(*self.vault_admin.key, false),
+            AccountMeta::new(*self.vault_state.key, false),
+            AccountMeta::new(*self.position.key, false),
+            AccountMeta::new(*self.position_mint.key, false),
+            AccountMeta::new(*self.position_token_account.key, false),
+            AccountMeta::new_readonly(*self.token_program.key, false),
+            AccountMeta::new_readonly(*self.associated_token_program.key, false),
+            AccountMeta::new_readonly(*self.system_program.key, false),
+        ];
+
+        let instruction = Instruction {
+            program_id: *self.vaults_program.key,
+            accounts: account_metas,
+            data: instruction_data,
+        };
+
+        invoke(&instruction, &[
+            self.signer.clone(), self.vault_admin.clone(),
+            self.vault_state.clone(), self.position.clone(),
+            self.position_mint.clone(), self.position_token_account.clone(),
+            self.token_program.clone(), self.associated_token_program.clone(),
+            self.system_program.clone(),
+        ]).map_err(|_| ErrorCodes::CpiToVaultsProgramFailed.into())
+    }
+}
+```
+
+### Init Position Account Explanations
+
+| Account | Purpose | Mutability |
+|---------|---------|------------|
+| `signer` | User creating the position | Mutable, signer |
+| `vault_admin` | Vault admin configuration PDA | Mutable |
+| `vault_state` | Vault state PDA | Mutable |
+| `position` | New position PDA | Mutable |
+| `position_mint` | NFT mint for the position | Mutable |
+| `position_token_account` | User's ATA for the position NFT | Mutable |
+| `token_program` | SPL Token program | Immutable |
+| `associated_token_program` | Associated Token program | Immutable |
+| `system_program` | System program | Immutable |
+
+---
+
+## 2. Operate Function
+
+The `operate` function handles all vault operations through signed amounts:
+- **Positive `new_col`** = deposit collateral
+- **Negative `new_col`** = withdraw collateral
+- **Positive `new_debt`** = borrow
+- **Negative `new_debt`** = payback
+- **`i128::MIN`** = max withdraw or max payback
+
+### Discriminator
+
+```rust
+fn get_operate_discriminator() -> Vec<u8> {
+    // discriminator = sha256("global:operate")[0..8]
+    vec![217, 106, 208, 99, 116, 151, 42, 135]
+}
+```
+
+### Operate CPI Struct
+
+```rust
+pub struct OperateParams<'info> {
+    // User accounts
+    pub signer: AccountInfo<'info>,
+    pub signer_supply_token_account: AccountInfo<'info>,
+    pub signer_borrow_token_account: AccountInfo<'info>,
+    pub recipient: AccountInfo<'info>,
+    pub recipient_borrow_token_account: AccountInfo<'info>,
+    pub recipient_supply_token_account: AccountInfo<'info>,
+
+    // Vault accounts
+    pub vault_config: AccountInfo<'info>,
+    pub vault_state: AccountInfo<'info>,
+    pub supply_token: AccountInfo<'info>,
+    pub borrow_token: AccountInfo<'info>,
+    pub oracle: AccountInfo<'info>,
+
+    // Position accounts
+    pub position: AccountInfo<'info>,
+    pub position_token_account: AccountInfo<'info>,
+    pub current_position_tick: AccountInfo<'info>,
+    pub final_position_tick: AccountInfo<'info>,
+    pub current_position_tick_id: AccountInfo<'info>,
+    pub final_position_tick_id: AccountInfo<'info>,
+    pub new_branch: AccountInfo<'info>,
+
+    // Liquidity protocol accounts
+    pub supply_token_reserves_liquidity: AccountInfo<'info>,
+    pub borrow_token_reserves_liquidity: AccountInfo<'info>,
+    pub vault_supply_position_on_liquidity: AccountInfo<'info>,
+    pub vault_borrow_position_on_liquidity: AccountInfo<'info>,
+    pub supply_rate_model: AccountInfo<'info>,
+    pub borrow_rate_model: AccountInfo<'info>,
+    pub vault_supply_token_account: AccountInfo<'info>,
+    pub vault_borrow_token_account: AccountInfo<'info>,
+    pub supply_token_claim_account: Option<AccountInfo<'info>>,
+    pub borrow_token_claim_account: Option<AccountInfo<'info>>,
+    pub liquidity: AccountInfo<'info>,
+    pub liquidity_program: AccountInfo<'info>,
+    pub oracle_program: AccountInfo<'info>,
+
+    // Programs
+    pub supply_token_program: AccountInfo<'info>,
+    pub borrow_token_program: AccountInfo<'info>,
+    pub associated_token_program: AccountInfo<'info>,
+    pub system_program: AccountInfo<'info>,
+    pub vaults_program: UncheckedAccount<'info>,
+}
+```
+
+### Operate Account Explanations
+
+#### User Accounts
+
+| Account | Purpose | Mutability |
+|---------|---------|------------|
+| `signer` | User performing the operation | Mutable, signer |
+| `signer_supply_token_account` | User's supply token account (source for deposits) | Mutable |
+| `signer_borrow_token_account` | User's borrow token account (source for paybacks) | Mutable |
+| `recipient` | Destination wallet for withdrawals/borrows | Immutable |
+| `recipient_borrow_token_account` | Destination for borrowed tokens | Mutable |
+| `recipient_supply_token_account` | Destination for withdrawn supply tokens | Mutable |
+
+#### Vault Accounts
+
+| Account | Purpose | Mutability |
+|---------|---------|------------|
+| `vault_config` | Vault configuration PDA (risk parameters, oracle) | Mutable |
+| `vault_state` | Vault state PDA (totals, exchange prices) | Mutable |
+| `supply_token` | Supply (collateral) token mint | Immutable |
+| `borrow_token` | Borrow token mint | Immutable |
+| `oracle` | Price oracle account for the vault | Immutable |
+
+#### Position Accounts
+
+| Account | Purpose | Mutability |
+|---------|---------|------------|
+| `position` | User's position PDA (collateral/debt data) | Mutable |
+| `position_token_account` | User's position NFT token account | Immutable |
+| `current_position_tick` | Current tick where position sits | Mutable |
+| `final_position_tick` | Tick after operation completes | Mutable |
+| `current_position_tick_id` | Current position ID within tick | Mutable |
+| `final_position_tick_id` | Final position ID within tick | Mutable |
+| `new_branch` | Branch account for tick organisation | Mutable |
+
+#### Liquidity Integration
+
+| Account | Purpose | Mutability |
+|---------|---------|------------|
+| `supply_token_reserves_liquidity` | Liquidity protocol supply reserves | Mutable |
+| `borrow_token_reserves_liquidity` | Liquidity protocol borrow reserves | Mutable |
+| `vault_supply_position_on_liquidity` | Vault's supply position in liquidity layer | Mutable |
+| `vault_borrow_position_on_liquidity` | Vault's borrow position in liquidity layer | Mutable |
+| `supply_rate_model` | Supply interest rate model | Mutable |
+| `borrow_rate_model` | Borrow interest rate model | Mutable |
+| `vault_supply_token_account` | Vault's supply token holding account | Mutable |
+| `vault_borrow_token_account` | Vault's borrow token holding account | Mutable |
+| `supply_token_claim_account` | Optional, for claim-type transfers on supply side | Mutable |
+| `borrow_token_claim_account` | Optional, for claim-type transfers on borrow side | Mutable |
+| `liquidity` | Main liquidity protocol PDA | Mutable |
+| `liquidity_program` | Liquidity protocol program ID | Mutable |
+| `oracle_program` | Oracle program ID | Immutable |
+
+### Remaining Accounts
+
+The `remaining_accounts_indices` vector specifies the count of each dynamic account type:
+
+| Index | Account Type | Description |
+|-------|-------------|-------------|
+| `[0]` | Oracle sources | Price feed accounts for the vault oracle |
+| `[1]` | Branch accounts | Tick tree branch nodes |
+| `[2]` | Tick debt arrays | Tick-level debt tracking accounts |
+
+Accounts in `remaining_accounts` are ordered sequentially: oracle sources first, then branches, then tick debt arrays.
+
+### Transfer Types
+
+| Value | Type | Description |
+|-------|------|-------------|
+| `None` | Normal | Standard token transfer |
+| `Some(1)` | Claim | Claim-type transfer (requires claim accounts) |
+
+---
+
+## Operation Patterns
+
+### Deposit Only
+
+```rust
+operate_params.operate(
+    100_000_000, // new_col: deposit 100 tokens (scaled to 1e9)
+    0,           // new_debt: no debt change
+    None,        // transfer_type: normal
+    vec![oracle_sources_count, branch_count, tick_debt_arrays_count],
+    remaining_accounts,
+)?;
+```
+
+### Deposit + Borrow
+
+```rust
+operate_params.operate(
+    100_000_000, // new_col: deposit 100 tokens
+    50_000_000,  // new_debt: borrow 50 tokens
+    None,
+    vec![oracle_sources_count, branch_count, tick_debt_arrays_count],
+    remaining_accounts,
+)?;
+```
+
+### Payback + Withdraw
+
+```rust
+operate_params.operate(
+    -50_000_000, // new_col: withdraw 50 tokens
+    -25_000_000, // new_debt: payback 25 tokens
+    None,
+    vec![oracle_sources_count, branch_count, tick_debt_arrays_count],
+    remaining_accounts,
+)?;
+```
+
+### Max Withdraw
+
+```rust
+operate_params.operate(
+    i128::MIN, // new_col: withdraw all available collateral
+    0,
+    None,
+    vec![oracle_sources_count, branch_count, tick_debt_arrays_count],
+    remaining_accounts,
+)?;
+```
+
+### Max Payback
+
+```rust
+operate_params.operate(
+    0,
+    i128::MIN, // new_debt: payback all debt
+    None,
+    vec![oracle_sources_count, branch_count, tick_debt_arrays_count],
+    remaining_accounts,
+)?;
+```
+
+---
+
+## Context Helpers (TypeScript)
+
+For frontend/client code that needs to resolve CPI accounts, use `getOperateIx` from the SDK. For CPI integration, execute the setup instructions before your program's CPI call:
+
+```typescript
+import { getOperateIx } from "@jup-ag/lend/borrow";
+import { BN } from "bn.js";
+
+const {
+  ixs,
+  addressLookupTableAccounts,
+  nftId,
+  accounts,
+  remainingAccounts,
+  remainingAccountsIndices,
+} = await getOperateIx({
+  colAmount: new BN(1000000000),
+  debtAmount: new BN(500000000),
+  connection,
+  positionId: nftId,
+  signer: userPublicKey,
+  vaultId: vaultId,
+  cluster: "mainnet",
+});
+
+// Setup instructions = all except the last (environment preparation)
+// The last instruction is the direct operate call — not needed for CPI
+const setupInstructions = ixs.slice(0, -1);
+
+// Build a v0 transaction with setup instructions + your CPI instruction
+const messageV0 = new TransactionMessage({
+  payerKey: userPublicKey,
+  recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+  instructions: [
+    ...setupInstructions,
+    // your program instruction that makes the CPI call
+  ],
+}).compileToV0Message(addressLookupTableAccounts);
+
+const versionedTx = new VersionedTransaction(messageV0);
+```
+
+Then pass the resolved accounts into your Anchor program:
+
+```typescript
+await program.methods
+  .yourVaultOperateMethod(colAmount, debtAmount, remainingAccountsIndices)
+  .accounts({
+    signer: accounts.signer,
+    signerSupplyTokenAccount: accounts.signerSupplyTokenAccount,
+    signerBorrowTokenAccount: accounts.signerBorrowTokenAccount,
+    recipient: accounts.recipient,
+    recipientBorrowTokenAccount: accounts.recipientBorrowTokenAccount,
+    recipientSupplyTokenAccount: accounts.recipientSupplyTokenAccount,
+    vaultConfig: accounts.vaultConfig,
+    vaultState: accounts.vaultState,
+    supplyToken: accounts.supplyToken,
+    borrowToken: accounts.borrowToken,
+    oracle: accounts.oracle,
+    position: accounts.position,
+    positionTokenAccount: accounts.positionTokenAccount,
+    currentPositionTick: accounts.currentPositionTick,
+    finalPositionTick: accounts.finalPositionTick,
+    currentPositionTickId: accounts.currentPositionTickId,
+    finalPositionTickId: accounts.finalPositionTickId,
+    newBranch: accounts.newBranch,
+    // ... liquidity accounts from context
+    vaultsProgram: new PublicKey("jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi"),
+  })
+  .remainingAccounts(remainingAccounts)
+  .rpc();
+```
+
+<Info>
+  CPI calls to the vaults program require **v0 (versioned) transactions** with address lookup tables. The SDK provides `addressLookupTableAccounts` for this purpose.
+</Info>
+
+---
+
+## Key Notes
+
+### Amount Scaling
+
+- All amounts are scaled to 1e9 decimals internally
+- Use `i128::MIN` for max withdraw/payback operations
+- Positive values = deposit/borrow, negative values = withdraw/payback
+
+### Position Management
+
+- Each position is represented by an NFT
+- Position NFT must be owned by the signer for withdraw/borrow operations
+- Anyone can deposit to any position or payback debt for any position
+- Pass `positionId: 0` to `getOperateIx` to auto-create a new position
+
+### Error Codes
+
+| Error | Description |
+|-------|-------------|
+| `VaultInvalidOperateAmount` | Operation amount too small or invalid |
+| `VaultInvalidDecimals` | Token decimals exceed maximum |
+| `VaultTickIsEmpty` | Position tick has no debt |
+| `VaultInvalidPaybackOrDeposit` | Invalid payback operation |
+| `CpiToVaultsProgramFailed` | CPI call failed |
+
+### Return Values
+
+The `operate` function returns:
+- `nft_id`: position NFT ID
+- `new_col_final`: final collateral change amount (unscaled)
+- `new_debt_final`: final debt change amount (unscaled)

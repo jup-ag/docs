@@ -7,7 +7,7 @@ llmsDescription: "DEPRECATED — use Swap API V2 /order at api.jup.ag/swap/v2/or
 ---
 
 <Warning>
-Ultra V1 is deprecated. Use [Swap API V2](/docs/swap/index) instead - it unifies Ultra and Metis into a single API with `/order` (managed execution) and `/build` (custom transactions). See the [Migration Guide](/docs/swap/migration).
+Ultra V1 is deprecated. Use [Swap API V2](/swap/index) instead - it unifies Ultra and Metis into a single API with `/order` (managed execution) and `/build` (custom transactions). See the [Migration Guide](/swap/migration).
 </Warning>
 
 {/* Alternative search terms for AI discovery:
@@ -140,10 +140,10 @@ print(f"Swap {order['inAmount']} → {order['outAmount']}")
 | `outputMint` | Yes | Output token mint address |
 | `amount` | Yes | Amount in native token units (before decimals) |
 | `taker` | No | User's wallet address. Required to get a signable transaction. Omit to get a quote only (useful for showing price before wallet connect). |
-| `referralAccount` | No | Referral account for [integrator fees](/docs/ultra/add-fees-to-ultra) |
+| `referralAccount` | No | Referral account for [integrator fees](/ultra/add-fees-to-ultra) |
 | `referralFee` | No | Referral fee in basis points (50-255) |
-| `excludeRouters` | No | [Manual mode](/docs/ultra/gasless) only. Comma-separated routers to exclude: `iris`, `jupiterz`, `dflow`, `okx` |
-| `excludeDexes` | No | [Manual mode](/docs/ultra/gasless) only. Comma-separated DEXs to exclude (applies to Iris router only). [Full list of DEXs](/api-reference/swap/program-id-to-label). |
+| `excludeRouters` | No | [Manual mode](/ultra/gasless) only. Comma-separated routers to exclude: `iris`, `jupiterz`, `dflow`, `okx` |
+| `excludeDexes` | No | [Manual mode](/ultra/gasless) only. Comma-separated DEXs to exclude (applies to Iris router only). [Full list of DEXs](/api-reference/swap/v1/program-id-to-label). |
 
 **What you get back:**
 
@@ -416,7 +416,7 @@ Show the quote even when there's an error. Users want to see the price. Just dis
 | -1006 | Timed out | Get a new order and try again |
 | 6001 | Slippage exceeded | Market moved. Retry with a new order. |
 
-For the full list of error codes including aggregator and RFQ-specific codes, see [Response docs](/docs/ultra/response).
+For the full list of error codes including aggregator and RFQ-specific codes, see [Response docs](/ultra/response).
 
 ---
 
@@ -428,7 +428,7 @@ Ultra handles gasless automatically. You don't configure anything.
 
 **JupiterZ (RFQ).** When a market maker provides the route, the market maker pays network and priority fees. But they don't cover token account rent, so the user still needs enough SOL for that.
 
-Check `gasless: true` in the order response to know if it kicked in. For the full breakdown of scenarios, see [Gasless Support](/docs/ultra/gasless).
+Check `gasless: true` in the order response to know if it kicked in. For the full breakdown of scenarios, see [Gasless Support](/ultra/gasless).
 
 ---
 
@@ -458,9 +458,9 @@ const orderResponse = await (
 console.log(`Fee: ${orderResponse.feeBps} bps in ${orderResponse.feeMint}`);
 ```
 
-Fees range from 50 to 255 bps. Jupiter takes 20% of your integrator fee (no additional Ultra base fee on top). Ultra decides which token to collect fees in based on a [priority list](/docs/ultra/fees#priority-list). If the referral token account for that mint isn't initialised, the swap still goes through, but without your fee. So always check that `feeBps` matches what you set.
+Fees range from 50 to 255 bps. Jupiter takes 20% of your integrator fee (no additional Ultra base fee on top). Ultra decides which token to collect fees in based on a [priority list](/ultra/fees#priority-list). If the referral token account for that mint isn't initialised, the swap still goes through, but without your fee. So always check that `feeBps` matches what you set.
 
-Full setup walkthrough: [Add Integrator Fees](/docs/ultra/add-fees-to-ultra).
+Full setup walkthrough: [Add Integrator Fees](/ultra/add-fees-to-ultra).
 
 ---
 
@@ -477,7 +477,7 @@ Ultra charges 0-10 bps on most swaps, 50 bps for new tokens. Lower than the indu
 | Everything else | 10 bps |
 | New tokens (< 24h old) | 50 bps |
 
-Full breakdown: [Fees](/docs/ultra/fees).
+Full breakdown: [Fees](/ultra/fees).
 
 ---
 
@@ -497,7 +497,7 @@ Full breakdown: [Fees](/docs/ultra/fees).
   </Accordion>
 
   <Accordion title="What's the rate limit?">
-    Dynamic. Base is 50 requests per 10-second sliding window, and it scales up with your swap volume. $1M in daily volume gets you ~165 req/10s. No paid tiers. Just get a free API key at [portal.jup.ag](https://portal.jup.ag). Details: [Rate Limits](/docs/ultra/rate-limit).
+    Dynamic. Base is 50 requests per 10-second sliding window, and it scales up with your swap volume. $1M in daily volume gets you ~165 req/10s. No paid tiers. Just get a free API key at [portal.jup.ag](https://portal.jup.ag). Details: [Rate Limits](/ultra/rate-limit).
   </Accordion>
 
   <Accordion title="Can I get a quote without connecting a wallet?">
@@ -514,8 +514,8 @@ Full breakdown: [Fees](/docs/ultra/fees).
 ## Next steps
 
 - **[Ultra API Reference](/api-reference/ultra).** Full endpoint schema and playground.
-- **[Gasless Support](/docs/ultra/gasless).** Deep dive into gasless mechanisms.
-- **[Add Integrator Fees](/docs/ultra/add-fees-to-ultra).** Set up referral accounts and earn on swaps.
+- **[Gasless Support](/ultra/gasless).** Deep dive into gasless mechanisms.
+- **[Add Integrator Fees](/ultra/add-fees-to-ultra).** Set up referral accounts and earn on swaps.
 - **[Embed Swap Widget](/guides/how-to-embed-a-swap-widget).** Want a drop-in UI instead of an API? Use Plugin.
 - **[Ultra V3 Blog](/blog/ultra-v3).** What makes Ultra the best execution engine on Solana.
 - **[Jupiter Developer Portal](https://portal.jup.ag).** Get your API key.

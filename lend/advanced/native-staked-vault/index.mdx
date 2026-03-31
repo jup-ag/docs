@@ -1,0 +1,40 @@
+---
+title: "Native Staked Vaults"
+description: "Use staked SOL as collateral via Single Pool tokens."
+llmsDescription: "Overview of Jupiter Lend Native Staked Vaults, which allow using staked SOL as collateral. Deposit validator stake accounts into the Single Pool program (SVSPxpvHdN29nkVg9rPapPNDddN5DipNLRUFhyjFThE) to receive pool tokens (e.g. nsHELIUS, nsJUPITER, nsNANSEN, nsEMERALD, nsSHIFT, nsKILN), then deposit those tokens into the corresponding Jupiter Lend vault to borrow against them while continuing to earn staking rewards. Lists all supported pools with vote accounts and pool mints."
+---
+
+<Info>
+  These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
+</Info>
+
+Native Staked Vaults let you use **staked SOL** (in a validator stake account) as collateral. You deposit your stake into the Single Pool program, receive pool tokens (e.g. nsHELIUS, nsJUPITER), then deposit those tokens into the corresponding Jupiter Lend vault to borrow against them, all while your SOL continues to earn staking rewards.
+
+## Supported Pools
+
+| Pool | Vote Account | Pool Mint |
+|------|--------------|-----------|
+| nsHELIUS | `BTST6Wy5XeDoM8UxSdGgqRkQXuae2i7jzF8CJpcr56v1` | `2k79y8CApbU9jAvWhLS2j6uRbaVjpLJTUzstBTho9vGq` |
+| nsJUPITER | `6Ff5x2bBDKXC3sdnMManfUjpKgtFSYTAGjfgEaW5CKrQ` | `98B1NMLYaNJQNxiQGr53vbjNFMNTYFmDqoCgj7qD9Vhm` |
+| nsNANSEN | `D41RqNXhP2fM9mV9gV2D8GzscQ2kTwqoNwAc7qZubDjQ` | `9yQLxEzusZ7QiZNafDNdzbEaTCPuJToGjMhLRJtZbgsd` |
+| nsEMERALD | `3hoeLpYL2bL91SrQHG8ciz3h6iMmZfkLx6j6P9TsZbWg` | `38ZUTefZnKSUJU3wxpUe3xpiw2j5WQPnmzSTNbS1JqLA` |
+| nsSHIFT | `38KWgsh4yRrnZuKzfPUYveUWHQMw8aFN5YwnReTcDQnX` | `C1KwBJZNwUaodUcP5kXqD52NCuZzThNAG2cw3vt5H6iE` |
+| nsKILN | `9cVM7z5AwmH1Dd5aatYyUoGaus8RtM2r3jf557NCtfGB` | `PhxXAYTkFZS23ZWvFcz6H6Uq4VnVBMa6hniiAyudjaW` |
+
+Discover vaults at runtime with `client.vault.getAllVaults()` and match `supplyToken` to the pool mint.
+
+## Single Pool Program
+
+- **Program ID**: `SVSPxpvHdN29nkVg9rPapPNDddN5DipNLRUFhyjFThE`
+- **SDK**: `@solana/spl-single-pool-classic`
+
+## Guides
+
+<CardGroup cols={2}>
+  <Card icon="arrow-down" href="/lend/advanced/native-staked-vault/deposit" title="Deposit">
+    Split stake, deposit into Single Pool, then deposit pool tokens into a vault.
+  </Card>
+  <Card icon="arrow-up" href="/lend/advanced/native-staked-vault/withdraw" title="Withdraw">
+    Withdraw pool tokens from vault, then burn them to receive stake back.
+  </Card>
+</CardGroup>

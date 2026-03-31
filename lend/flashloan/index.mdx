@@ -1,0 +1,31 @@
+---
+title: "Flashloans"
+description: "Borrow assets with no collateral and no fees using Jupiter Lend Flashloans."
+llmsDescription: "Overview of Jupiter Lend Flashloans: borrow any supported asset with no collateral and no fees, as long as the borrowed amount is returned within the same transaction. Covers use cases (arbitrage, liquidations, collateral swapping), how the atomic borrow-execute-payback flow works on Solana, and links to the execute guide for SDK integration with getFlashloanIx, getFlashBorrowIx, and getFlashPaybackIx from @jup-ag/lend/flashloan."
+---
+
+Jupiter Lend offers Flashloans with **no fees**, enabling developers to borrow liquidity from the protocol without requiring upfront collateral. Return the borrowed amount within the exact same transaction.
+
+Flashloans are a powerful DeFi tool. **Borrow the asset you need directly**. Use cases include:
+- **Arbitrage**: Capture pricing discrepancies between markets by borrowing assets for trades that profit from short-lived opportunities.
+- **Liquidations**: Repay debt for undercollateralised positions by flashloaning the debt asset, repaying, and claiming the liquidation bonus.
+- **Collateral Swapping**: Swap the underlying collateral of a loan without needing extra capital.
+
+## How it works
+
+1. **Borrow**: Request the asset you need from Jupiter Lend (e.g. USDC to repay debt, SOL to add collateral).
+2. **Execute**: Use the borrowed funds in your custom instructions.
+3. **Payback**: Return the same borrowed amount to Jupiter Lend (no fees).
+
+Because Solana processes transactions atomically, if the payback fails the entire transaction reverts. This keeps the protocol risk-free for liquidity providers.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card icon="bolt" href="/lend/flashloan/execute" title="Execute a Flashloan">
+    Build and send a flashloan transaction using the SDK.
+  </Card>
+  <Card icon="layer-group" href="/lend/advanced/multiply" title="Multiply (Leverage)">
+    Combine flashloans with vault operations and swaps to build leveraged positions.
+  </Card>
+</CardGroup>

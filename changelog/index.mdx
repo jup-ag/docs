@@ -30,11 +30,11 @@ The unified Swap API consolidates Ultra and Metis into a single entry point at `
 
 Start with `/order`. It gives the best price because all routers compete, including JupiterZ market makers who often beat onchain routing on major pairs. Only use `/build` if you need to modify the transaction.
 
-Ultra and Metis APIs remain available. New integrations should use the Swap API, and existing integrations are encouraged to migrate when convenient. See the [migration guide](/docs/swap/migration) for details.
+Ultra and Metis APIs remain available. New integrations should use the Swap API, and existing integrations are encouraged to migrate when convenient. See the [migration guide](/swap/migration) for details.
 
-- [Swap API overview](/docs/swap)
-- [Order & Execute](/docs/swap/order-and-execute)
-- [Build Custom Transactions](/docs/swap/build)
+- [Swap API overview](/swap)
+- [Order & Execute](/swap/order-and-execute)
+- [Build Custom Transactions](/swap/build)
 - [API Reference](/api-reference/swap)
 
 ---
@@ -60,7 +60,7 @@ Comprehensive documentation for Jupiter Lend (powered by Fluid Protocol) is now 
 * **Advanced Recipes:** Multiply (leveraged long), Unwind (deleverage), Repay-with-Collateral, and Vault Swap, all using CPI + Jupiter swap in a single transaction
 * **Architecture:** Three-program design (Liquidity Layer, Lending/Earn, Vaults/Borrow) with oracle integration (Pyth, SwitchboardV2, ScopePrices)
 
-<Card title="Lend Documentation" href="/docs/lend" icon="building-columns" iconType="solid" horizontal/>
+<Card title="Lend Documentation" href="/lend" icon="building-columns" iconType="solid" horizontal/>
 
 </Update>
 
@@ -81,7 +81,7 @@ Jupiter Prediction Market API is now available in beta. Trade on the outcomes of
 The Prediction Market API is currently in beta and subject to breaking changes.
 </Note>
 
-<Card title="Prediction Market Docs" href="/docs/prediction" icon="magnifying-glass" iconType="solid" horizontal/>
+<Card title="Prediction Market Docs" href="/prediction" icon="magnifying-glass" iconType="solid" horizontal/>
 
 </Update>
 
@@ -97,7 +97,7 @@ Ultra now supports manual mode for integrators building user-facing trading UIs.
 * Default Ultra behaviour remains recommended for production integrations
 * Transactions with manual overrides fall outside Jupiter's supported execution model
 
-<Card title="Manual Mode Docs" href="/docs/ultra/manual-mode" icon="sliders" iconType="solid" horizontal/>
+<Card title="Manual Mode Docs" href="/ultra/manual-mode" icon="sliders" iconType="solid" horizontal/>
 
 </Update>
 
@@ -113,7 +113,7 @@ The Jupiter Portfolio API is now available in beta, providing comprehensive port
 * Retrieve staked JUP amounts
 * Built by the Sonarwatch team, now part of Jupiter
 
-<Card title="Portfolio API Docs" href="/docs/portfolio" icon="chart-pie" iconType="solid" horizontal/>
+<Card title="Portfolio API Docs" href="/portfolio" icon="chart-pie" iconType="solid" horizontal/>
 
 </Update>
 
@@ -250,7 +250,7 @@ memecoin-to-memecoin swaps (when liquidity permits), and reduced minimum trade s
 * **Reduce Pre-Graduation Quote Latency**: Optimized pre-graduated bonding curve markets routing logic 
 by skipping multi-route aggregation to improve quote latency from 200ms to 10ms - a 90% improvement.
 
-* **[Try Ultra Swap API](/docs/ultra)**: Ultra V3 features are live in the Ultra Swap API V1, try it and let us know your feedback!
+* **[Try Ultra Swap API](/ultra)**: Ultra V3 features are live in the Ultra Swap API V1, try it and let us know your feedback!
 
 ---
 
@@ -270,13 +270,13 @@ by skipping multi-route aggregation to improve quote latency from 200ms to 10ms 
 **Ultra Swap API**
 * Integrator fee for Ultra now supports Token2022 tokens.
 * No additional parameters are required, simply create Token2022 referral token accounts for your referral account.
-* You can find the details in the [Add Fees To Ultra Swap](/docs/ultra/add-fees-to-ultra) guide.
+* You can find the details in the [Add Fees To Ultra Swap](/ultra/add-fees-to-ultra) guide.
 
 **Metis Swap API**
 * Integrator fee for Metis Swap now supports Token2022 tokens.
 * New [`instructionVersion` parameter](/api-reference/swap/v1/quote#parameter-instruction-version) is introduced to the Metis Swap API's Quote endpoint to support the new instruction types.
 * To collect fees in Token2022 tokens, create Token2022 token accounts and pass in via `feeAccount`.
-* You can find the details in the [Add Fees To Swap](/docs/swap/v1/add-fees-to-swap) guide.
+* You can find the details in the [Add Fees To Swap](/swap/v1/add-fees-to-swap) guide.
 
 </Update>
 
@@ -302,9 +302,9 @@ We’re sunsetting several legacy endpoints over the next few weeks by gradually
 <Update label="June 2025" description="">
 ## Deprecation of Price API V2 and Tokens API V1
 
-[**Price API upgrades to V3**](/docs/price/v3) to support more reliable and timely pricing data - derived by the last swap price (across all transactions) and a set of heuristics to ensure the accuracy of the price and eliminate any outliers.
+[**Price API upgrades to V3**](/price/v3) to support more reliable and timely pricing data - derived by the last swap price (across all transactions) and a set of heuristics to ensure the accuracy of the price and eliminate any outliers.
 
-[**Tokens API upgrades to V2**](/docs/tokens/v2) to support an easier and reliable usage with new data addition such as [Organic Score](/docs/tokens/organic-score), more trading categories like toporganicscore, and more.
+[**Tokens API upgrades to V2**](/tokens/v2) to support an easier and reliable usage with new data addition such as [Organic Score](/tokens/organic-score), more trading categories like toporganicscore, and more.
 
 <Danger>
 **Action Required**
@@ -360,7 +360,7 @@ We will be deploying 2 different endpoints, 1 for free usage and 1 for plans wit
 * `/cancelOrder` endpoint only builds the transaction for 1 order, while `/cancelOrders` endpoint builds the transaction for multiple orders.
 * The `tx` field in the responses are now `transaction` or `transactions`.
 * `/getTriggerOrders` endpoint is introduces a new format to get either active or historical orders (based on the query parameters).
-* [Please refer to the documentation for usage](/docs/trigger/create-order).
+* [Please refer to the documentation for usage](/trigger/create-order).
 
 <Accordion title="Path Changes">
 | Old Paths | New Paths |

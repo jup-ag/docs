@@ -10,7 +10,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const BASE_URL = "https://dev.jup.ag";
+const DOCS_URL = "https://dev.jup.ag/docs";
 const baseFolder = __dirname;
 
 const docsJson = JSON.parse(
@@ -164,9 +164,9 @@ function emitEntry(pagePath) {
   let url;
   if (fm.openapi) {
     const specPath = fm.openapi.split(/\s+/)[0]; // e.g. "/openapi-spec/swap/v2/swap.yaml"
-    url = `${BASE_URL}${specPath}`;
+    url = `${DOCS_URL}${specPath}`;
   } else {
-    url = `${BASE_URL}/${pagePath}.md`;
+    url = `${DOCS_URL}/${pagePath}.md`;
   }
   emit(`- [${fm.title}](${url}): ${fm.description}\n`);
   return true;
@@ -302,7 +302,7 @@ emit(
   "- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs\n",
 );
 emit(
-  `- [Stay Updated](${BASE_URL}/resources/support): Get support and stay updated with Jupiter\n`,
+  `- [Stay Updated](${DOCS_URL}/resources/support): Get support and stay updated with Jupiter\n`,
 );
 
 // --- Clean up empty sections ---

@@ -1,0 +1,181 @@
+---
+title: "How does Jupiter decide if a token is real?"
+description: "Organic score powers token verification, price filtering, and ranking - but most integrators treat it as a display field. Here's what it actually does."
+llmsDescription: "Investigation into Jupiter's organic score infrastructure: wallet classification system, comparative scoring methodology, organic volume decomposition, and how the score drives Price API inclusion, token verification, and ranking across Jupiter's stack."
+"og:title": "The Number Behind Every Token on Jupiter"
+"og:description": "Organic score powers token verification, price filtering, and ranking - but most integrators treat it as a display field. Here's what it actually does."
+"og:type": "article"
+"og:image": "/static/blog/what-is-organic-score/organic-score.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![Organic Score Deep Dive](/static/blog/what-is-organic-score/organic-score.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/yy.jpg" alt="YY" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">YY</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 26, 2026</span>
+  </div>
+</div>
+
+A few weeks ago Anmol published [How hard can it be to price a token on-chain?](/blog/how-jupiter-prices-a-token) and it broke something in my brain. Not the content itself - though that was great - but the approach. He'd been using the Price API every day and one weekend just decided to figure out what was actually happening behind the endpoint. Came back with a bunch of stuff I didn't know either.
+
+It got me wanting to do the same thing. And the target was obvious almost immediately.
+
+Organic score has been around since we first announced it at [Catstanbul](https://www.youtube.com/playlist?list=PLoLarUqyl583WmujmXe9xqbYB3OCBmZXO) back in January 2025 - our very first community conference in Istanbul. It's become a quiet but important part of how Jupiter surfaces tokens - not just in the API, but in our own frontend.
+
+A lot of my time is spent helping teams integrate our APIs - debugging, onboarding, writing code alongside partners, answering the same questions in Discord until the answers haunt me in my sleep.
+
+One of those questions comes up constantly. A project launches a token, starts getting traction, and then messages us: "Why is our organic score sitting at 23 when we clearly have real volume?" I check their token on the Tokens V2 API, see the number, and... I don't actually have a good answer. I tell them what the docs say - holder count, volume, liquidity, real wallets - and it's not wrong, but it's also four sentences and a diagram. I'm basically just reading the page back to them.
+
+The organic score is one of those things I come across every single day without understanding. I filter by it. I tell integrators to filter by it. I know high is good. I know low is not good. If you asked me to explain why a specific token got the score it got, I'd fumble.
+
+So I went digging.
+
+---
+
+## First guess
+
+My assumption was simple: organic score is a composite of the obvious stuff. Take holder count, trading volume, and liquidity, normalise them, spit out a number between 0 and 100. More holders and more volume and more liquidity = higher score. Weighted average vibes.
+
+To test this I pulled a spread of tokens from the Tokens V2 API and compared their stats side by side.
+
+| Token | Organic Score | 24h Buy Volume | Holders | Liquidity |
+|-------|--------------|----------------|---------|-----------|
+| SOL | 98.9 | \$7.36B | 3.8M | \$710M |
+| Fartcoin | 96.5 | \$4.66M | 165K | - |
+| JUP | 93.6 | \$1.66M | 850K | \$3.2M |
+| TRUMP | 85.3 | \$10.4M | 650K | - |
+| ASPEN | 45.1 | \$1.61M | - | - |
+
+For the top tokens, it kinda held. SOL, JUP, Fartcoin - high holders, decent volume, high scores. But then TRUMP broke the pattern. \$10.4 million in 24h buy volume. 650,000 holders. And it scores lower than Fartcoin, which has a quarter of the holders and less than half the volume.
+
+If organic score were just a weighted sum of the obvious metrics, TRUMP should be comfortably above 90. It's not. Something else is going on.
+
+---
+
+## Hidden in the response
+
+Here's what I should have noticed a long time ago.
+
+Every stats window in the Tokens V2 response has two sets of volume numbers. There's `buyVolume` and `sellVolume` - that's total volume. And then right below, `buyOrganicVolume` and `sellOrganicVolume`.
+
+I'd been looking at `buyVolume` this entire time. Let me show you what the organic numbers actually look like.
+
+| Token | Score | 24h Buy Volume | 24h Organic Buy Volume | Organic Ratio |
+|-------|-------|----------------|----------------------|---------------|
+| SOL | 98.9 | \$7,357,875,684 | \$36,584,166 | 0.5% |
+| Fartcoin | 96.5 | \$4,656,639 | \$537,810 | 11.5% |
+| JUP | 93.6 | \$1,658,934 | \$226,044 | 13.6% |
+| TRUMP | 85.3 | \$10,401,625 | \$73,959 | 0.7% |
+| ASPEN | 45.1 | \$1,606,055 | \$1,034 | 0.06% |
+
+Read that SOL row again. Out of \$7.36 billion in buy volume over 24 hours, about \$36.6 million was organic. That's 0.5%. For SOL. The most traded token on Solana.
+
+The rest is bots, arbitrage, MEV, market making - all classified as non-organic. And that's not a problem. Bots provide liquidity, arb keeps prices efficient. The point is that Jupiter isn't just tracking volume. It's classifying every single trade.
+
+Now look at TRUMP. \$10.4 million in total buy volume but only \$74,000 organic. A 0.7% organic ratio. Compare that with Fartcoin at 11.5% or JUP at 13.6%. TRUMP has over twice the total volume of Fartcoin but Fartcoin has 7x the organic volume. That's why Fartcoin scores higher. And then there's ASPEN - \$1.6 million in volume but only \$1,034 organic. That's 0.06%.
+
+But here's where it gets interesting. SOL also has a tiny organic ratio - 0.5% - yet it scores 98.9. Higher than everything else. How?
+
+Because the score doesn't care about the ratio. It cares about the absolute organic numbers, measured relative to the rest of the ecosystem.
+
+\$36.6 million in organic buy volume in 24 hours is still enormous. In absolute terms, SOL's organic market dwarfs everything else on the chain.
+
+One thing worth noting: the organic ratio I calculated above isn't a metric Jupiter exposes or recommends using. I computed it to understand the data, and it made the TRUMP anomaly click for me. But for actual filtering and ranking, use the score itself.
+
+---
+
+## How the score actually works
+
+This is where I went beyond the docs.
+
+The organic score is a composite of several metrics - organic volume, organic holders, organic traders, organic buyers - each contributing to the final number. Nothing surprising so far. But the way they're combined is what makes it work.
+
+Each component is scored in a way that rewards early growth heavily. Going from 10 organic buyers to 100 matters a lot more than going from 10,000 to 10,100. Once you're past a certain scale, additional organic activity adds less and less to the score. This is why SOL and USDC both sit near 100 - at their scale, the differences flatten out.
+
+But here's the thing I didn't expect. The scores are normalised against the rest of the ecosystem. Your token's organic metrics aren't measured in isolation - they're measured relative to what other tokens are doing. The system looks at where the top of the distribution is and scales accordingly.
+
+This leads to an important subtlety. One of the engineers who built the scoring system put it this way: the system doesn't try to capture every single organic wallet on Solana. Instead, it focuses on wallets it can confirm are organic. It might miss some, which means the absolute numbers might undercount. But because every token is measured the same way, the relative ordering holds. If token A scores higher than token B, you can trust that token A has more confirmed organic activity than token B.
+
+The score isn't saying "this token has X amount of organic activity." It's saying "this token is more organic than that one." That distinction matters.
+
+![Score response curve](/static/blog/what-is-organic-score/score-curve.png)
+
+---
+
+## What makes a wallet "organic"
+
+This is the part I couldn't reverse-engineer from the API.
+
+Everything I've described so far - organic volume, organic buyers, organic traders - all of it depends on one upstream classification: is this wallet organic or not? The entire scoring system sits on top of that determination.
+
+The classification is binary. A wallet is either organic or it isn't. And it's determined per-wallet, not per-trade. When a swap happens, the system checks the signer against this classification. If the wallet is organic, the volume counts towards organic metrics. If not, it only counts towards totals.
+
+How does a wallet get classified? The system detects trading through known accounts/pipelines or automated platforms - the tools people use for sniping, copy-trading, and automated execution. These accounts conduct trades through identifiable on-chain patterns, and the system recognises them. There are more of these accounts being tracked than I expected.
+
+If a trade doesn't go through one of these known channels, the wallet is considered organic. It's a conservative approach - rather than trying to identify every organic wallet through behavioural analysis, the system identifies the non-organic ones and treats the remainder as organic.
+
+That's a lot of machinery behind one number.
+
+It's been running for over a year now, and there are still a lot of improvements to be made and experiments to try. The team knows this. The wallet classification could be more dynamic, the detection could be broader, and there are edge cases that haven't been addressed yet. But the foundation is solid enough that it powers not just the score, but several other systems across Jupiter.
+
+---
+
+## Three numbers that sound the same and aren't
+
+While I was in the response, I noticed something else I'd been ignoring. Every stats window has three different trader counts:
+
+| Metric | SOL (24h) | TRUMP (24h) | ASPEN (24h) |
+|--------|-----------|-------------|-------------|
+| `numTraders` | 812,709 | 2,947 | 3,034 |
+| `numOrganicBuyers` | 12,944 | 52 | 11 |
+| `numNetBuyers` | 63,009 | - | 1,516 |
+
+I'd been treating these interchangeably. They're wildly different.
+
+`numTraders` is every unique wallet that traded the token in the window - buyers and sellers, bots and humans, everything. It's the biggest number and the least useful one for measuring genuine interest.
+
+`numOrganicBuyers` is the count of organic wallets that are net buyers in the window - meaning their total buys exceeded their total sells. This isn't just "organic wallets that bought something." It's organic wallets that bought more than they sold. That's a tighter signal. When a partner asks "is there real interest in this token," this is the number.
+
+`numNetBuyers` is the same concept - wallets where buys exceeded sells - but across all traders, not just organic ones. It's a broader sentiment indicator. Directionally it tells you whether the market is accumulating or distributing, but it's noisier because it includes bots and market makers.
+
+Look at SOL: 812,709 traders, but 12,944 organic net buyers. That's 1.6% of traders classified as organic buyers. For TRUMP, it's even starker - 2,947 traders but only 52 organic buyers. Fifty-two real people, net buying, in \$10.4 million of volume.
+
+![Trader funnel: SOL vs TRUMP vs ASPEN](/static/blog/what-is-organic-score/trader-funnel.png)
+
+---
+
+## Where organic score shows up when you're not looking
+
+I initially thought organic score was a Tokens V2 thing. It's not. It's infrastructure that runs across multiple APIs.
+
+**Price API.** In Anmol's blog, there's a section on heuristic filters - the system that decides whether a price is trustworthy enough to serve. It checks liquidity depth, trading patterns, holder distribution. A token with poor organic metrics doesn't just get a low score in the Tokens API. It can get excluded from the Price API response entirely. When a token is "missing" from the Price API, organic score is one of the reasons.
+
+**Verification.** Jupiter's token verification has evolved from a manual GitHub repo with 4,800 pull requests reviewed by hand, to community-maintained lists, to a data-assisted system. Organic score is a core input for verification. When tens of thousands of new tokens are created every day, you can't have humans research every token. The score is part of how we do verification today.
+
+One metric. Used in different ways. If you're building on Jupiter and only looking at organic score as a display field in a token list, you're missing the point. It's the trust layer that decides whether a token gets priced, gets verified, and gets traded.
+
+---
+
+## Things worth knowing if you're integrating
+
+**On "recent" tokens.** The `/tokens/v2/recent` endpoint returns tokens by first pool creation time, not token mint time. A token can be minted weeks before it gets its first liquidity pool. "Recent" on Jupiter means "recently became tradeable" - which is actually the thing you care about. Fresh tokens will have volatile organic scores because there isn't enough history. Treat early scores with caution.
+
+**Score vs. label.** The API returns both `organicScore` (a float, 0-100) and `organicScoreLabel` (`high`, `medium`, or `low`). The label buckets are wide. Two tokens can both be "medium" and be very different in practice. If you're building any kind of filter or ranking, use the raw score.
+
+**The toporganicscore feed.** You can query `/tokens/v2/toporganicscore/5m` to get tokens ranked by organic score in the last 5 minutes. This filters out the evergreen tokens that would always dominate. It's basically a "what tokens have the most genuine activity right now" feed. Underused.
+
+---
+
+## Why I wrote this
+
+Now when someone asks why their token scores a 23, I can actually walk through it. The volume might look healthy, but how much of it is organic? How many unique organic buyers are there versus total traders? What does the wallet classification say about the market around this token?
+
+The score is a number. But behind it is a system that's watching every trade on Solana and making a call about whether a real person made it. That's worth understanding, especially if you're building something that shows this number to other people.
+
+[`api.jup.ag/tokens/v2/search?query=JUP`](/tokens/v2/token-information) if you want to look for yourself.
+
+**Tokens API Guide:** [Video walkthrough on X](https://x.com/JupDevRel/status/2031184726820794624)

@@ -7,7 +7,7 @@ llmsDescription: "DEPRECATED — use Swap API V2 /build at api.jup.ag/swap/v2/bu
 ---
 
 <Warning>
-Metis Swap V1 is deprecated. Use [Swap API V2 /build](/docs/swap/build/index) instead - it replaces `/quote` + `/swap-instructions` with a single `/build` endpoint. See the [Migration Guide](/docs/swap/migration).
+Metis Swap V1 is deprecated. Use [Swap API V2 /build](/swap/build/index) instead - it replaces `/quote` + `/swap-instructions` with a single `/build` endpoint. See the [Migration Guide](/swap/migration).
 </Warning>
 
 {/* Alternative search terms for AI discovery:
@@ -33,7 +33,7 @@ Metis is Jupiter's routing engine, powering every swap on [jup.ag](https://jup.a
 
 ## When to use Metis
 
-[Ultra](/docs/ultra/index) handles everything for you: routing, slippage, MEV protection, and transaction sending. No RPC node required.
+[Ultra](/ultra/index) handles everything for you: routing, slippage, MEV protection, and transaction sending. No RPC node required.
 
 Metis gives you full control. Use Metis when you need:
 
@@ -272,7 +272,7 @@ swap_response = requests.post(
 | `prioritizationFeeLamports` | auto | Priority fee config. See [Optimise execution](#optimise-execution) |
 | `feeAccount` | none | Token account for platform fees. Required if `platformFeeBps` was set in `/quote` |
 
-For the full list of parameters, see the [Swap API Reference](/api-reference/swap/swap).
+For the full list of parameters, see the [Swap API Reference](/api-reference/swap/v1/swap).
 
 ### Step 3: Sign and send
 
@@ -401,7 +401,7 @@ Errors can surface at every stage of the swap flow.
   <Accordion title="During quoting">
     | Error | What happened | What to do |
     |-------|---------------|------------|
-    | `NO_ROUTES_FOUND` / `COULD_NOT_FIND_ANY_ROUTE` | No liquidity path exists | Check if the token is tradeable on [jup.ag](https://jup.ag). See [Market Listing](/docs/routing/market-listing) for the grace period criteria |
+    | `NO_ROUTES_FOUND` / `COULD_NOT_FIND_ANY_ROUTE` | No liquidity path exists | Check if the token is tradeable on [jup.ag](https://jup.ag). See [Market Listing](/swap/routing) for the grace period criteria |
     | `TOKEN_NOT_TRADABLE` | Token mint not available for trading | Verify the token has sufficient liquidity on supported DEXes |
     | `ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT` | Route cannot process the full input amount | Reduce input amount for a better output |
     | Invalid parameters | Bad `amount`, `slippageBps`, or mint address | Validate inputs before calling `/quote` |
@@ -429,7 +429,7 @@ Errors can surface at every stage of the swap flow.
     | `IncorrectTokenProgramID` (6014) | Attempted platform fees on a Token2022 token without `instructionVersion=V2` | Pass `instructionVersion=V2` in `/quote` |
     | DEX program errors | A CPI-ed AMM returned an error during the swap. Each AMM in the route is invoked via CPI, so errors can come from any program along the path | If the AMM's IDL is public, decode the error code on a block explorer like [Solscan](https://solscan.io). If the error is obscure, reach out on [Jupiter Discord](https://discord.gg/jup) |
 
-    Jupiter swap program error codes come from the <a href="https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#programIdl">Anchor IDL on Solscan</a>. For the full error reference, see [Common Errors](/docs/swap/common-errors).
+    Jupiter swap program error codes come from the <a href="https://solscan.io/account/JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4#programIdl">Anchor IDL on Solscan</a>. For the full error reference, see [Common Errors](/swap/common-errors).
   </Accordion>
 </AccordionGroup>
 
@@ -538,31 +538,31 @@ Each key is an AMM address, each value is the quoted output amount. Compare with
 
 ## Optimise execution
 
-Priority fees, compute units, slippage, and your RPC setup all affect whether transactions land. For the full deep dive, see [Send Swap Transaction](/docs/swap/send-swap-transaction).
+Priority fees, compute units, slippage, and your RPC setup all affect whether transactions land. For the full deep dive, see [Send Swap Transaction](/swap/send-swap-transaction).
 
 <AccordionGroup>
   <Accordion title="Priority fees">
     Use `prioritizationFeeLamports` with `priorityLevelWithMaxLamports` to set a fee level (`medium`, `high`, `veryHigh`) with a cap to prevent overpaying. Alternatively, use `jitoTipLamports` for Jito bundle tips (requires a Jito RPC). You cannot use both in the same `/swap` call.
 
-    See [how Jupiter estimates priority fees](/docs/swap/send-swap-transaction#how-jupiter-estimates-priority-fee).
+    See [how Jupiter estimates priority fees](/swap/send-swap-transaction#how-jupiter-estimates-priority-fee).
   </Accordion>
 
   <Accordion title="Compute units">
     Always pass `dynamicComputeUnitLimit: true` in `/swap` or `/swap-instructions`. This simulates the swap to set an accurate compute unit limit, which directly reduces the priority fee you pay since fees are proportional to the compute budget requested.
 
-    See [how Jupiter estimates compute unit limit](/docs/swap/send-swap-transaction#how-jupiter-estimates-compute-unit-limit).
+    See [how Jupiter estimates compute unit limit](/swap/send-swap-transaction#how-jupiter-estimates-compute-unit-limit).
   </Accordion>
 
   <Accordion title="Slippage">
     `slippageBps` should match the volatility of the token pair. Too tight and transactions fail with `SlippageToleranceExceeded`; too loose and you lose value.
 
-    See [how Jupiter estimates slippage](/docs/swap/send-swap-transaction#how-jupiter-estimates-slippage).
+    See [how Jupiter estimates slippage](/swap/send-swap-transaction#how-jupiter-estimates-slippage).
   </Accordion>
 
   <Accordion title="RPC and broadcasting">
     A fast, well-connected RPC with stake-weighted connections will land transactions more reliably. Bad RPCs or poor fee calibration lead to delayed, expired, or dropped transactions.
 
-    See [how Jupiter broadcasts transactions](/docs/swap/send-swap-transaction#how-jupiter-broadcast-transactions).
+    See [how Jupiter broadcasts transactions](/swap/send-swap-transaction#how-jupiter-broadcast-transactions).
   </Accordion>
 </AccordionGroup>
 
@@ -573,7 +573,7 @@ Priority fees, compute units, slippage, and your RPC setup all affect whether tr
 
 <AccordionGroup>
   <Accordion title="Why is there no route found for this token?">
-    Jupiter routes through 74+ DEXes, but not every token has a routable market. New markets on supported DEXes get instant routing with a grace period based on token age (up to 30 days). After the grace period, the market must meet liquidity criteria. If no route is found, the token may not have graduated from its bonding curve, or its market doesn't meet the requirements. See [Market Listing](/docs/routing/market-listing) for the full criteria.
+    Jupiter routes through 74+ DEXes, but not every token has a routable market. New markets on supported DEXes get instant routing with a grace period based on token age (up to 30 days). After the grace period, the market must meet liquidity criteria. If no route is found, the token may not have graduated from its bonding curve, or its market doesn't meet the requirements. See [Market Listing](/swap/routing) for the full criteria.
   </Accordion>
 
   <Accordion title="What does priceImpactPct mean and when should I block swaps?">
@@ -601,7 +601,7 @@ Priority fees, compute units, slippage, and your RPC setup all affect whether tr
 
 ## Next steps
 
-- **[Add Fees to Swap](/docs/swap/add-fees-to-swap).** Collect platform fees on swaps through your integration.
+- **[Add Fees to Swap](/swap/add-fees-to-swap).** Collect platform fees on swaps through your integration.
 - **[Swap API Reference](/api-reference/swap).** Full endpoint schema and playground.
-- **[Market Listing](/docs/routing/market-listing).** How tokens and markets get listed in Jupiter's routing engine.
-- **[Ultra Swap API](/docs/ultra/index).** Want simpler? Ultra handles everything for you.
+- **[Market Listing](/swap/routing).** How tokens and markets get listed in Jupiter's routing engine.
+- **[Ultra Swap API](/ultra/index).** Want simpler? Ultra handles everything for you.

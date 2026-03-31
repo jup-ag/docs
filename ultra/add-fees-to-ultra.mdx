@@ -1,0 +1,424 @@
+---
+title: "Add Integrator Fees"
+description: "Add custom integrator fees to Ultra Swap using the Referral Program."
+llmsDescription: "UNMAINTAINED: Four-step setup to add custom fees (50–255 bps) to Ultra Swap: install referral SDK, create referralAccount, create referralTokenAccount per mint, then pass referralAccount and referralFee to /order."
+---
+
+
+<Warning>
+**Ultra Swap API** is no longer actively maintained and has been superseded by [Swap V2](/swap).
+</Warning>
+
+<Note>
+    If you are unfamiliar with [Ultra Swap Fees](/ultra/fees), please refer to the doc.
+</Note>
+
+## Key Points
+
+The Jupiter Ultra Swap API allows you to add integrator fees to the orders.
+
+**Key points summary:** Fees require Referral Program accounts, Jupiter takes 20% of your integrator fees, Ultra decides which mint to take fees in (based on a priority list), you must create referralTokenAccount for each expected feeMint, and fees enforce routing to Iris only.
+
+<AccordionGroup>
+    <Accordion title="Requires specific Referral Program Accounts">
+        The Ultra Swap Integrator Fees are governed by the [Referral Program](/tool-kits/referral-program).
+        
+        It is required to create a valid **referral account** and it's **referral token accounts** for the specific token mints to collect fees in. These accounts are initalized under the [**Jupiter Ultra Referral Project**](https://solscan.io/account/DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc).
+
+        Refer to the rest of the guide for more details on the set up.
+    </Accordion>
+
+    <Accordion title="Fee split when adding fees">
+        If you plan to take 100bps, Jupiter will take 20bps for the fee split (there will be no Ultra base fee).
+
+        | Type | Fee |
+        | :--- | :--- |
+        | Ultra default fees | 5 to 10 bps |
+        | Added integrator fees | Ultra takes 20% of your integrator fees |
+    </Accordion>
+
+    <Accordion title="Ultra decides which mint to take fees in">
+        In the `/order` response, you will see the `feeMint` field which is the token mint we will collect the fees in for that particular order.
+
+        Since Jupiter will always dictate which token mint to collect the fees in, you must ensure that you have the valid referral token account created for the specific fee mint.
+
+        <Info>
+            The `feeMint` is based on a priority list, you can refer to the [Ultra Fees](/ultra/fees) doc for more details.
+
+            | inputMint  | outputMint | feeMint | Reason                                  |
+            |------------|------------|---------|-----------------------------------------|
+            | SOL        | USDC       | SOL     | SOL is of highest priority              |
+            | USDC       | SOL        | SOL     | SOL is of highest priority, regardless of side |
+            | MEME       | USDC       | USDC    | Stablecoin (USDC) has higher priority   |
+        </Info>
+        
+        <Warning>
+            If the `referralTokenAccount` for the `feeMint` is not initialized, the order will still return and can be executed without your fees. This is to ensure your user still receives a quote to proceed with the swap.
+
+            For example, if the `feeMint` is `SOL`, but the `referralTokenAccount` for `SOL` is not initialized, the order will still return but will be executed without your fees.
+            
+            You can refer to if `feeBps` tallies with what you specified in `referralFee`, in this case, the `feeBps` will default to Jupiter Ultra's default fees.
+        </Warning>
+    </Accordion>
+
+    <Accordion title="Check the feeBps field">
+        You can configure `referralFee` to be between 50bps to 255bps. The `/order` response will show the total fee in `feeBps` field which should be exactly what you specified in `referralFee`.
+
+        <Warning>
+            If the `referralTokenAccount` for the `feeMint` is not initialized, the order will still return and can be executed without your fees. This is to ensure your user still receives a quote to proceed with the swap.
+
+            For example, if the `feeMint` is `SOL`, but the `referralTokenAccount` for `SOL` is not initialized, the order will still return but will be executed without your fees.
+            
+            You can refer to if `feeBps` tallies with what you specified in `referralFee`, in this case, the `feeBps` will default to Jupiter Ultra's default fees.
+        </Warning>
+    </Accordion>
+
+    <Accordion title="Token support">
+        You can now take fees in SPL or Token2022 tokens. As long as you have the referral token account initialized before calling `/order`, and the `feeMint` is one of the token mints you have initialized for, your fees will apply.
+
+        | Only initialized for this token mint | feeMint | Are your fees applied?        |
+        |:-------------------------------------|:--------|:------------------------------|
+        | SOL                                  | SOL     | Yes                           |
+        | USDC                                 | JupSOL  | No                            |
+        | XYZ                                  | USDC    | No                            |
+    </Accordion>
+    
+    <Accordion title="Enforces routing to Iris and other DEX aggregator routes">
+        When integrator fees are being added, it defaults routing to Iris and other DEX aggregator routes.
+        
+        JupiterZ does not support integrator fees currently.
+    </Accordion>
+</AccordionGroup>
+
+## Step-by-step
+
+<Steps>
+  <Step>
+  Install additional dependencies or if you prefer, you can use the [Referral Dashboard](https://referral.jup.ag/), a simple interface to create referral accounts.
+  </Step>
+  <Step>
+  Create `referralAccount`.
+  </Step>
+  <Step>
+  Create `referralTokenAccount` for each token mint.
+  </Step>
+  <Step>
+  Add `referralAccount` and `referralFee` to Ultra Swap `/order` endpoint.
+  </Step>
+  <Step>
+  Sign and send the transaction via Ultra Swap `/execute` endpoint.
+  </Step>
+  <Step>
+  Verify transaction and fees.
+  </Step>
+</Steps>
+
+<Accordion title="Full Code Example">
+```js
+import { ReferralProvider } from "@jup-ag/referral-sdk";
+import { Connection, Keypair, PublicKey, sendAndConfirmTransaction, sendAndConfirmRawTransaction } from "@solana/web3.js";
+import fs from 'fs';
+
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
+
+const provider = new ReferralProvider(connection);
+const projectPubKey = new PublicKey('DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc');
+
+async function initReferralAccount() {
+  const transaction = await provider.initializeReferralAccountWithName({
+    payerPubKey: wallet.publicKey,
+    partnerPubKey: wallet.publicKey,
+    projectPubKey: projectPubKey,
+    name: "insert-name-here",
+  });
+
+  const referralAccount = await connection.getAccountInfo(
+    transaction.referralAccountPubKey,
+  );
+
+  if (!referralAccount) {
+    const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
+    console.log('signature:', `https://solscan.io/tx/${signature}`);
+    console.log('created referralAccountPubkey:', transaction.referralAccountPubKey.toBase58());
+  } else {
+    console.log(
+      `referralAccount ${transaction.referralAccountPubKey.toBase58()} already exists`,
+    );
+  }
+}
+
+async function initReferralTokenAccount() {
+  const mint = new PublicKey("So11111111111111111111111111111111111111112"); // the token mint you want to collect fees in
+
+  const transaction = await provider.initializeReferralTokenAccountV2({
+    payerPubKey: wallet.publicKey,
+    referralAccountPubKey: new PublicKey("insert-referral-account-pubkey-here"), // you get this from the initReferralAccount function
+    mint,
+  });
+
+    const referralTokenAccount = await connection.getAccountInfo(
+      transaction.tokenAccount,
+    );
+
+    if (!referralTokenAccount) {
+      const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
+      console.log('signature:', `https://solscan.io/tx/${signature}`);
+      console.log('created referralTokenAccountPubKey:', transaction.tokenAccount.toBase58());
+      console.log('mint:', mint.toBase58());
+    } else {
+      console.log(
+        `referralTokenAccount ${transaction.tokenAccount.toBase58()} for mint ${mint.toBase58()} already exists`,
+      );
+    }
+}
+
+async function claimAllTokens() {
+  const transactions = await provider.claimAllV2({
+    payerPubKey: wallet.publicKey,
+    referralAccountPubKey: new PublicKey("insert-referral-account-pubkey-here"),
+  })
+
+  // Send each claim transaction one by one.
+  for (const transaction of transactions) {
+    transaction.sign([wallet]);
+
+    const signature = await sendAndConfirmRawTransaction(connection, transaction.serialize(), [wallet]);
+    console.log('signature:', `https://solscan.io/tx/${signature}`);
+  }
+}
+
+// initReferralAccount(); // you should only run this once
+// initReferralTokenAccount();
+// claimAllTokens();
+  ```
+</Accordion>
+
+### Dependencies
+
+```bash
+npm install @jup-ag/referral-sdk
+npm install @solana/web3.js@1 # Using v1 of web3.js instead of v2
+```
+
+<Accordion title="RPC Connection and Wallet Setup">
+
+  **Set up RPC Connection**
+  <Info>
+    Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters). However, as your application grows, we recommend you to always use your own or provision a 3rd party provider’s RPC endpoint such as [Helius](https://helius.dev/) or [Triton](https://triton.one/).
+  </Info>
+
+  ```bash
+  const connection = new Connection('https://api.mainnet-beta.solana.com');
+  ```
+
+  **Set up Development Wallet**
+  <Info>
+    You can paste in your private key for testing but this is not recommended for production.
+    * Either use your private key in the project directly, you can do it via a `.env` file.
+    * Or set up your private key in the [Solana CLI](https://solana.com/docs/intro/installation#create-wallet).
+  </Info>
+
+  <CodeGroup>
+  ```javascript Store private key in .env
+  // In your .env file
+  PRIVATE_KEY=""
+
+  // In your index.js (or any file that needs the private key)
+  import { Keypair } from '@solana/web3.js';
+  import dotenv from 'dotenv';
+  require('dotenv').config();
+
+  const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || '')));
+  ```
+
+  ```javascript Store private key in Solana CLI
+  import { Keypair } from '@solana/web3.js';
+  import fs from 'fs';
+
+  const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+  const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
+  ```
+  </CodeGroup>
+</Accordion>
+
+### Create `referralAccount`
+
+* You should only need to create the referral account once.
+* After this step, you need to [create the referral token accounts for each token mint](#create-referraltokenaccount).
+
+```js expandable
+import { ReferralProvider } from "@jup-ag/referral-sdk";
+import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
+
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
+const provider = new ReferralProvider(connection);
+const projectPubKey = new PublicKey('DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc'); // Jupiter Ultra Referral Project
+
+async function initReferralAccount() {
+  const transaction = await provider.initializeReferralAccountWithName({
+    payerPubKey: wallet.publicKey,
+    partnerPubKey: wallet.publicKey,
+    projectPubKey: projectPubKey,
+    name: "insert-name-here",
+  });
+
+  const referralAccount = await connection.getAccountInfo(
+    transaction.referralAccountPubKey,
+  );
+
+  if (!referralAccount) {
+    const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
+    console.log('signature:', `https://solscan.io/tx/${signature}`);
+    console.log('created referralAccountPubkey:', transaction.referralAccountPubKey.toBase58());
+  } else {
+    console.log(
+      `referralAccount ${transaction.referralAccountPubKey.toBase58()} already exists`,
+    );
+  }
+}
+```
+
+### Create `referralTokenAccount`
+
+* You need to [create the `referralAccount` first](#create-referralaccount).
+* You need to create a `referralTokenAccount` for each token mint you want to collect fees in.
+* We don't recommend creating a token account for **every** token mint, as it costs rent and most tokens might not be valuable, instead created token accounts for top mints to begin with (you can always add more later).
+
+```js expandable
+import { ReferralProvider } from "@jup-ag/referral-sdk";
+import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
+
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
+const provider = new ReferralProvider(connection);
+
+async function initReferralTokenAccount() {
+  const mint = new PublicKey("So11111111111111111111111111111111111111112"); // the token mint you want to collect fees in
+
+  const transaction = await provider.initializeReferralTokenAccountV2({
+    payerPubKey: wallet.publicKey,
+    referralAccountPubKey: new PublicKey("insert-referral-account-pubkey-here"),
+    mint,
+  });
+
+    const referralTokenAccount = await connection.getAccountInfo(
+      transaction.tokenAccount,
+    );
+
+    if (!referralTokenAccount) {
+      const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
+      console.log('signature:', `https://solscan.io/tx/${signature}`);
+      console.log('created referralTokenAccountPubKey:', transaction.tokenAccount.toBase58());
+      console.log('mint:', mint.toBase58());
+    } else {
+      console.log(
+        `referralTokenAccount ${transaction.tokenAccount.toBase58()} for mint ${mint.toBase58()} already exists`,
+      );
+    }
+}
+```
+
+### Usage in Ultra Swap
+
+* After creating the necessary accounts, you can now add the `referralAccount` and `referralFee` to the Ultra Swap `/order` endpoint.
+* From the order response, you should see the `feeMint` field, which is the token mint we will collect the fees in for that particular order.
+* From the order response, you should see the `feeBps` field, which is the total fee in bps, which should be exactly what you specified in `referralFee`.
+* Then, you can sign and send the transaction via the Ultra Swap `/execute` endpoint.
+
+<Warning>
+    If the `referralTokenAccount` for the `feeMint` is not initialized, the order will still return and can be executed without your fees. This is to ensure your user still receives a quote to proceed with the swap.
+
+    For example, if the `feeMint` is `SOL`, but the `referralTokenAccount` for `SOL` is not initialized, the order will still return but will be executed without your fees.
+    
+    You can refer to if `feeBps` tallies with what you specified in `referralFee`, in this case, the `feeBps` will default to Jupiter Ultra's default fees.
+</Warning>
+
+```js expandable
+import { Keypair, VersionedTransaction } from "@solana/web3.js";
+import fs from 'fs';
+
+const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
+
+const orderResponse = await (
+  await fetch(
+    'https://api.jup.ag/ultra/v1/order?' +
+    'inputMint=So11111111111111111111111111111111111111112&' +
+    'outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&' +
+    'amount=100000000&' +
+    'taker=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3&' +
+    'referralAccount=&' + // insert referral account public key here
+    'referralFee=50', // insert referral fee in basis points (bps)
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
+).json();
+
+console.log(JSON.stringify(orderResponse, null, 2));
+
+const transactionBase64 = orderResponse.transaction // Extract the transaction from the order response
+const transaction = VersionedTransaction.deserialize(Buffer.from(transactionBase64, 'base64')); // Deserialize the transaction
+transaction.sign([wallet]); // Sign the transaction
+const signedTransaction = Buffer.from(transaction.serialize()).toString('base64'); // Serialize the transaction to base64 format
+
+const executeResponse = await (
+    await fetch('https://api.jup.ag/ultra/v1/execute', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': 'your-api-key',
+        },
+        body: JSON.stringify({
+            signedTransaction: signedTransaction,
+            requestId: orderResponse.requestId,
+        }),
+    })
+).json();
+
+if (executeResponse.status === "Success") {
+    console.log('Swap successful:', JSON.stringify(executeResponse, null, 2));
+    console.log(`https://solscan.io/tx/${executeResponse.signature}`);
+} else {
+    console.error('Swap failed:', JSON.stringify(executeResponse, null, 2));
+    console.log(`https://solscan.io/tx/${executeResponse.signature}`);
+}
+```
+
+## Claim All Fees
+
+* The `claimAllV2` method will return a list of transactions to claim all fees and are batched by 5 claims for each transaction.
+* The code signs and sends the transactions one by one - you can also Jito Bundle to send multiple at once, if preferred.
+* When claiming fees, the transaction will include the transfer of the fees to both your referral account and Jupiter's (20% of your integrator fees).
+
+```js expandable
+import { ReferralProvider } from "@jup-ag/referral-sdk";
+import { Connection, Keypair, PublicKey, sendAndConfirmRawTransaction } from "@solana/web3.js";
+
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+const privateKeyArray = JSON.parse(fs.readFileSync('/Path/to/.config/solana/id.json', 'utf8').trim());
+const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
+const provider = new ReferralProvider(connection);
+
+async function claimAllTokens() {
+  const transactions = await provider.claimAllV2({
+    payerPubKey: wallet.publicKey,
+    referralAccountPubKey: new PublicKey("insert-referral-account-pubkey-here"),
+  })
+
+  // Send each claim transaction one by one.
+  for (const transaction of transactions) {
+    transaction.sign([wallet]);
+
+    const signature = await sendAndConfirmRawTransaction(connection, transaction.serialize(), [wallet]);
+    console.log('signature:', `https://solscan.io/tx/${signature}`);
+  }
+}
+```

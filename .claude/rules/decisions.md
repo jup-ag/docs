@@ -152,3 +152,40 @@ Track all redirects added to `vercel.json` here for visibility:
 1. Anchors with product switcher - tried, reverted due to Mintlify UX issues with version selectors.
 2. Keep separate tabs with cross-linking - rejected because it fragments product context.
 **Migration notes:** Redirects added for all old /v2/ swap and trigger URLs, old /docs/routing/* paths. Two orphaned guides (Ultra swap, Metis custom swap) deprecated with Warning callouts. Theme: mint.
+
+### [2026-03-28] Move all doc paths under /docs/* via Mintlify toggle
+**Status:** implemented
+**Scope:** folder-structure | redirect
+**Files affected:** `docs.json`, 120+ MDX files, `generate-llms-from-docs.js`, `llms.txt`, `CLAUDE.md`, 13 product folders moved
+**Linear issue:** DEVREL-133
+
+**Context:** Developer Platform is taking over `dev.jup.ag`. All docs URLs need to move under `/docs/*` so the gateway can route with a single prefix instead of 9 separate ones.
+**Decision:**
+- Use Mintlify's "Host at /docs" toggle instead of moving folders into a `docs/` subfolder
+- Move 13 product folders (swap, tokens, price, lend, lock, perps, portfolio, prediction, recurring, send, studio, trigger, ultra) OUT of `docs/` to repo root so the toggle doesn't cause `/docs/docs/...` double-prefixing
+- All internal links and redirects use unprefixed paths (Mintlify handles the `/docs/` prefix automatically)
+- Root URL holdouts (blog, changelog, resources, legal) stay at root URLs via gateway path rewriting
+- `llms.txt` generator updated with `/docs/` subpath for content URLs, root URLs for holdouts
+- Gateway switches from `mintlify.app` to `mintlify.dev` endpoint
+**Rationale:** The toggle approach is the only way to serve `llms.txt` and `skill.md` at `/docs/llms.txt` and `/docs/skill.md` (Mintlify only serves these from repo root). Moving content into a `docs/` folder would cause double-prefixing.
+**Alternatives considered:**
+1. Move content folders into `docs/` subfolder (Option A) — rejected because it causes `/docs/docs/...` with the toggle, and without the toggle `llms.txt` can't be served under `/docs/`.
+2. No toggle, just folder moves — rejected because `llms.txt` and `skill.md` would only be accessible at root, not at `/docs/llms.txt`.
+
+## Redirect Log
+
+| Old path | New path | Date | Reason |
+|----------|----------|------|--------|
+| `/docs/swap/*` | `/swap/*` | 2026-03-28 | Product folders moved to root for toggle compatibility (DEVREL-133) |
+| `/docs/tokens/*` | `/tokens/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/price/*` | `/price/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/lend/*` | `/lend/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/lock/*` | `/lock/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/perps/*` | `/perps/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/portfolio/*` | `/portfolio/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/prediction/*` | `/prediction/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/recurring/*` | `/recurring/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/send/*` | `/send/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/studio/*` | `/studio/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/trigger/*` | `/trigger/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/docs/ultra/*` | `/ultra/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |

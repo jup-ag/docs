@@ -1,0 +1,269 @@
+---
+title: "Earn CPI Integration"
+description: "Cross-Program Invocation integration for Jupiter Lend Earn deposit and withdraw."
+llmsDescription: "How to integrate Jupiter Lend Earn via Cross-Program Invocation (CPI) from an on-chain Solana program. Covers deposit and withdraw function discriminators (sha256 global:deposit and global:withdraw), complete Rust DepositParams and WithdrawParams structs with all account fields and mutability, account explanation tables, PDA derivation patterns (LENDING_SEED, F_TOKEN_MINT_SEED, LENDING_ADMIN_SEED), error codes (FTokenMinAmountOut, FTokenMaxAmount, etc.), and TypeScript context helpers (getDepositContext, getWithdrawContext) from @jup-ag/lend/earn for resolving CPI accounts from the frontend. Programs: Lending jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9, Liquidity jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC."
+---
+
+This guide covers Cross-Program Invocation (CPI) integration for the Earn protocol's deposit and withdraw functions. Use this when your on-chain program needs to call Jupiter Lend Earn directly.
+
+For TypeScript SDK integration (off-chain), see [Deposit](/lend/earn/deposit) and [Withdraw](/lend/earn/withdraw).
+
+## Program Addresses
+
+| Program | Mainnet | Devnet |
+|---------|---------|--------|
+| Lending | `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9` | `7tjE28izRUjzmxC1QNXnNwcc4N82CNYCexf3k8mw67s3` |
+| Liquidity | `jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC` | `5uDkCoM96pwGYhAUucvCzLfm5UcjVRuxz6gH81RnRBmL` |
+
+---
+
+## Deposit CPI
+
+### Discriminator
+
+```rust
+fn get_deposit_discriminator() -> Vec<u8> {
+    // discriminator = sha256("global:deposit")[0..8]
+    vec![242, 35, 198, 137, 82, 225, 242, 182]
+}
+```
+
+### Deposit CPI Struct
+
+```rust
+pub struct DepositParams<'info> {
+    // User accounts
+    pub signer: AccountInfo<'info>,
+    pub depositor_token_account: AccountInfo<'info>,
+    pub recipient_token_account: AccountInfo<'info>,
+
+    pub mint: AccountInfo<'info>,
+
+    // Protocol accounts
+    pub lending_admin: AccountInfo<'info>,
+    pub lending: AccountInfo<'info>,
+    pub f_token_mint: AccountInfo<'info>,
+
+    // Liquidity protocol accounts
+    pub supply_token_reserves_liquidity: AccountInfo<'info>,
+    pub lending_supply_position_on_liquidity: AccountInfo<'info>,
+    pub rate_model: AccountInfo<'info>,
+    pub vault: AccountInfo<'info>,
+    pub liquidity: AccountInfo<'info>,
+    pub liquidity_program: AccountInfo<'info>,
+
+    // Rewards and programs
+    pub rewards_rate_model: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+    pub associated_token_program: AccountInfo<'info>,
+    pub system_program: AccountInfo<'info>,
+
+    // Target lending program
+    pub lending_program: UncheckedAccount<'info>,
+}
+```
+
+### Deposit Implementation
+
+```rust
+impl<'info> DepositParams<'info> {
+    pub fn deposit(&self, amount: u64) -> Result<()> {
+        let mut instruction_data = get_deposit_discriminator();
+        instruction_data.extend_from_slice(&amount.to_le_bytes());
+
+        let account_metas = vec![
+            AccountMeta::new(*self.signer.key, true),
+            AccountMeta::new(*self.depositor_token_account.key, false),
+            AccountMeta::new(*self.recipient_token_account.key, false),
+            AccountMeta::new_readonly(*self.mint.key, false),
+            AccountMeta::new_readonly(*self.lending_admin.key, false),
+            AccountMeta::new(*self.lending.key, false),
+            AccountMeta::new(*self.f_token_mint.key, false),
+            AccountMeta::new(*self.supply_token_reserves_liquidity.key, false),
+            AccountMeta::new(*self.lending_supply_position_on_liquidity.key, false),
+            AccountMeta::new_readonly(*self.rate_model.key, false),
+            AccountMeta::new(*self.vault.key, false),
+            AccountMeta::new(*self.liquidity.key, false),
+            AccountMeta::new(*self.liquidity_program.key, false),
+            AccountMeta::new_readonly(*self.rewards_rate_model.key, false),
+            AccountMeta::new_readonly(*self.token_program.key, false),
+            AccountMeta::new_readonly(*self.associated_token_program.key, false),
+            AccountMeta::new_readonly(*self.system_program.key, false),
+        ];
+
+        let instruction = Instruction {
+            program_id: *self.lending_program.key,
+            accounts: account_metas,
+            data: instruction_data,
+        };
+
+        invoke(&instruction, &[
+            self.signer.clone(), self.depositor_token_account.clone(),
+            self.recipient_token_account.clone(), self.mint.clone(),
+            self.lending_admin.clone(), self.lending.clone(),
+            self.f_token_mint.clone(), self.supply_token_reserves_liquidity.clone(),
+            self.lending_supply_position_on_liquidity.clone(), self.rate_model.clone(),
+            self.vault.clone(), self.liquidity.clone(),
+            self.liquidity_program.clone(), self.rewards_rate_model.clone(),
+            self.token_program.clone(), self.associated_token_program.clone(),
+            self.system_program.clone(),
+        ]).map_err(|_| ErrorCodes::CpiToLendingProgramFailed.into())
+    }
+}
+```
+
+### Deposit Account Explanations
+
+| Account | Purpose | Mutability |
+|---------|---------|------------|
+| `signer` | User performing deposit | Mutable, signer |
+| `depositor_token_account` | User's underlying token account (source) | Mutable |
+| `recipient_token_account` | User's jlToken account (destination) | Mutable |
+| `mint` | Underlying token mint | Immutable |
+| `lending_admin` | Protocol configuration PDA | Immutable |
+| `lending` | Pool-specific configuration PDA | Mutable |
+| `f_token_mint` | jlToken mint account | Mutable |
+| `supply_token_reserves_liquidity` | Liquidity protocol token reserves | Mutable |
+| `lending_supply_position_on_liquidity` | Protocol's position in liquidity pool | Mutable |
+| `rate_model` | Interest rate calculation model | Immutable |
+| `vault` | Protocol vault holding deposited tokens | Mutable |
+| `liquidity` | Main liquidity protocol PDA | Mutable |
+| `liquidity_program` | Liquidity protocol program ID | Mutable |
+| `rewards_rate_model` | Rewards calculation model PDA | Immutable |
+
+---
+
+## Withdraw CPI
+
+### Discriminator
+
+```rust
+fn get_withdraw_discriminator() -> Vec<u8> {
+    // discriminator = sha256("global:withdraw")[0..8]
+    vec![183, 18, 70, 156, 148, 109, 161, 34]
+}
+```
+
+### Withdraw CPI Struct
+
+```rust
+pub struct WithdrawParams<'info> {
+    // User accounts
+    pub signer: AccountInfo<'info>,
+    pub owner_token_account: AccountInfo<'info>,
+    pub recipient_token_account: AccountInfo<'info>,
+
+    // Protocol accounts
+    pub lending_admin: AccountInfo<'info>,
+    pub lending: AccountInfo<'info>,
+    pub mint: AccountInfo<'info>,
+    pub f_token_mint: AccountInfo<'info>,
+
+    // Liquidity protocol accounts
+    pub supply_token_reserves_liquidity: AccountInfo<'info>,
+    pub lending_supply_position_on_liquidity: AccountInfo<'info>,
+    pub rate_model: AccountInfo<'info>,
+    pub vault: AccountInfo<'info>,
+    pub claim_account: AccountInfo<'info>,
+    pub liquidity: AccountInfo<'info>,
+    pub liquidity_program: AccountInfo<'info>,
+
+    // Rewards and programs
+    pub rewards_rate_model: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+    pub associated_token_program: AccountInfo<'info>,
+    pub system_program: AccountInfo<'info>,
+
+    // Target lending program
+    pub lending_program: UncheckedAccount<'info>,
+}
+```
+
+### Withdraw Account Explanations
+
+| Account | Purpose | Mutability |
+|---------|---------|------------|
+| `signer` | User performing withdrawal | Mutable, signer |
+| `owner_token_account` | User's jlToken account (source, burned) | Mutable |
+| `recipient_token_account` | User's underlying token account (destination) | Mutable |
+| `lending_admin` | Protocol configuration PDA | Immutable |
+| `lending` | Pool-specific configuration PDA | Mutable |
+| `mint` | Underlying token mint | Immutable |
+| `f_token_mint` | jlToken mint account (burned from supply) | Mutable |
+| `supply_token_reserves_liquidity` | Liquidity protocol token reserves | Mutable |
+| `lending_supply_position_on_liquidity` | Protocol's position in liquidity pool | Mutable |
+| `rate_model` | Interest rate calculation model | Immutable |
+| `vault` | Protocol vault (source of withdrawn tokens) | Mutable |
+| `claim_account` | Handles withdrawal claim processing | Mutable |
+| `liquidity` | Main liquidity protocol PDA | Mutable |
+| `liquidity_program` | Liquidity protocol program ID | Mutable |
+| `rewards_rate_model` | Rewards calculation model PDA | Immutable |
+
+---
+
+## Context Helpers (TypeScript)
+
+For frontend/client code that needs to resolve CPI accounts, the SDK provides context helpers that return all required account addresses:
+
+```typescript
+import { getDepositContext, getWithdrawContext } from "@jup-ag/lend/earn";
+
+// Get all accounts needed for a deposit CPI
+const depositContext = await getDepositContext({
+  asset: usdcMint,
+  signer: userPublicKey,
+});
+
+// Get all accounts needed for a withdraw CPI
+const withdrawContext = await getWithdrawContext({
+  asset: usdcMint,
+  signer: userPublicKey,
+});
+
+// Pass these accounts to your Anchor program
+await program.methods
+  .yourDepositMethod(amount)
+  .accounts({
+    signer: depositContext.signer,
+    depositorTokenAccount: depositContext.depositorTokenAccount,
+    recipientTokenAccount: depositContext.recipientTokenAccount,
+    lendingAdmin: depositContext.lendingAdmin,
+    lending: depositContext.lending,
+    fTokenMint: depositContext.fTokenMint,
+    // ... all other accounts from context
+    lendingProgram: new PublicKey("jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"),
+  })
+  .rpc();
+```
+
+---
+
+## Key Notes
+
+### Account Derivation
+
+Most accounts follow standard PDA derivation patterns:
+- Lending PDA: `[LENDING_SEED, mint.key(), f_token_mint.key()]`
+- jlToken Mint: `[F_TOKEN_MINT_SEED, mint.key()]`
+- Lending Admin: `[LENDING_ADMIN_SEED]`
+
+### Special Considerations
+
+- **Amount = u64::MAX**: Deposits/withdraws the entire balance
+- **Account Creation**: ATA accounts are created automatically when needed (`init_if_needed`)
+- **Claim Account**: Only present in withdraw operations for processing withdrawal claims
+
+### Error Codes
+
+| Error | Description |
+|-------|-------------|
+| `FTokenMinAmountOut` | Slippage protection triggered |
+| `FTokenMaxAmount` | Maximum amount exceeded |
+| `FTokenOnlyAuth` | Unauthorised operation |
+| `FTokenOnlyRebalancer` | Rebalancer-only operation |
+| `CpiToLendingProgramFailed` | CPI call failed |
+
+### Return Values
+
+- `deposit()` returns shares minted
+- `withdraw()` returns shares burned

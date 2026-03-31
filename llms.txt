@@ -10,20 +10,20 @@ Setup guides for environment, tooling, and first API calls.
 
 ### Get Started
 
-- [Jupiter Developer Docs](https://dev.jup.ag/get-started/index.md): Welcome page for Jupiter Developer Docs. Introduces Jupiter as Solana DeFi infrastructure and provides quick navigation to product APIs (Swap, Tokens, Price, Lend, Trigger, Recurring, Prediction, Perps), developer resources (Guides, API Reference, Developer Platform), AI resources (CLI, Skills, MCP, llms.txt), community links, socials (Blog and X), and get-started setup pages.
-- [Environment Setup](https://dev.jup.ag/get-started/environment-setup.md): Install Solana web3.js and spl-token libraries, configure an RPC connection, and set up a development wallet to build with the Jupiter API.
-- [Development Basics](https://dev.jup.ag/get-started/development-basics.md): Solana fundamentals for Jupiter developers: accounts, programs, instructions, transactions, priority fees, compute units, slippage, and how the Swap API V2 simplifies it all. Use the /order + /execute path for managed execution (no RPC needed) or /build for custom transactions.
-- [Developer Guides](https://dev.jup.ag/guides/index.md): Jupiter developer guides: practical tutorials for common Solana development tasks. Covers token swaps with Swap API V2 /order (recommended, two API calls, no RPC needed), token information (metadata, verification, organic score), token prices (USD pricing), swap widget embedding (Plugin), custom swap transactions with Swap API V2 /build (routing, CPI, custom instructions), and prediction markets (binary event trading). Each guide includes working code examples in JavaScript, Python, and curl.
+- [Jupiter Developer Docs](https://dev.jup.ag/docs/get-started/index.md): Welcome page for Jupiter Developer Docs. Introduces Jupiter as Solana DeFi infrastructure and provides quick navigation to product APIs (Swap, Tokens, Price, Lend, Trigger, Recurring, Prediction, Perps), developer resources (Guides, API Reference, Developer Platform), AI resources (CLI, Skills, MCP, llms.txt), community links, socials (Blog and X), and get-started setup pages.
+- [Environment Setup](https://dev.jup.ag/docs/get-started/environment-setup.md): Install Solana web3.js and spl-token libraries, configure an RPC connection, and set up a development wallet to build with the Jupiter API.
+- [Development Basics](https://dev.jup.ag/docs/get-started/development-basics.md): Solana fundamentals for Jupiter developers: accounts, programs, instructions, transactions, priority fees, compute units, slippage, and how the Swap API V2 simplifies it all. Use the /order + /execute path for managed execution (no RPC needed) or /build for custom transactions.
+- [Developer Guides](https://dev.jup.ag/docs/guides/index.md): Jupiter developer guides: practical tutorials for common Solana development tasks. Covers token swaps with Swap API V2 /order (recommended, two API calls, no RPC needed), token information (metadata, verification, organic score), token prices (USD pricing), swap widget embedding (Plugin), custom swap transactions with Swap API V2 /build (routing, CPI, custom instructions), and prediction markets (binary event trading). Each guide includes working code examples in JavaScript, Python, and curl.
 
 ### Portal
 
-- [Setting Up API Key](https://dev.jup.ag/portal/setup.md): Generate a free API key at portal.jup.ag. Pass it via x-api-key header. Free, Pro, and Ultra tiers available.
-- [Migrate from Lite API](https://dev.jup.ag/portal/migrate-from-lite-api.md): Migrate from lite-api.jup.ag to api.jup.ag: update the base URL, generate a free API key at portal.jup.ag, and add the x-api-key header.
-- [Payment Methods](https://dev.jup.ag/portal/payment.md): Payment options for Jupiter Portal Pro plans: USDC on Solana via Helio (manual monthly renewal) or credit card via CoinFlow (auto-renewing subscription).
-- [Response Codes](https://dev.jup.ag/portal/responses.md): Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized, 429 rate limited, and 5xx server errors with debugging guidance.
-- [Rate Limit](https://dev.jup.ag/portal/rate-limit.md): Jupiter API rate limiting: Fixed Rate Limits for Free and Pro tiers (60 req/min to 30K req/min), and Dynamic Rate Limits for Ultra that scale with executed swap volume.
-- [Latency](https://dev.jup.ag/portal/latency.md): Jupiter API latency characteristics: distributed AWS gateway regions, factors affecting response times, and optimization tips for collocating servers.
-- [FAQ](https://dev.jup.ag/portal/faq.md): Frequently asked questions about Jupiter Portal: tier differences, API key usage, payment, upgrades, and using Pro and Ultra together.
+- [Setting Up API Key](https://dev.jup.ag/docs/portal/setup.md): Generate a free API key at portal.jup.ag. Pass it via x-api-key header. Free, Pro, and Ultra tiers available.
+- [Migrate from Lite API](https://dev.jup.ag/docs/portal/migrate-from-lite-api.md): Migrate from lite-api.jup.ag to api.jup.ag: update the base URL, generate a free API key at portal.jup.ag, and add the x-api-key header.
+- [Payment Methods](https://dev.jup.ag/docs/portal/payment.md): Payment options for Jupiter Portal Pro plans: USDC on Solana via Helio (manual monthly renewal) or credit card via CoinFlow (auto-renewing subscription).
+- [Response Codes](https://dev.jup.ag/docs/portal/responses.md): Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized, 429 rate limited, and 5xx server errors with debugging guidance.
+- [Rate Limit](https://dev.jup.ag/docs/portal/rate-limit.md): Jupiter API rate limiting: Fixed Rate Limits for Free and Pro tiers (60 req/min to 30K req/min), and Dynamic Rate Limits for Ultra that scale with executed swap volume.
+- [Latency](https://dev.jup.ag/docs/portal/latency.md): Jupiter API latency characteristics: distributed AWS gateway regions, factors affecting response times, and optimization tips for collocating servers.
+- [FAQ](https://dev.jup.ag/docs/portal/faq.md): Frequently asked questions about Jupiter Portal: tier differences, API key usage, payment, upgrades, and using Pro and Ultra together.
 
 ## Swap
 
@@ -58,13 +58,13 @@ Token swap API with managed execution (/order) and custom transaction building (
 
 ### Guides
 
-- [How to Embed a Swap Widget in Your App](https://dev.jup.ag/guides/how-to-embed-a-swap-widget.md): Jupiter Plugin embeds a complete swap widget into any web app. One script tag + window.Jupiter.init(). No RPC node, no wallet adapter, no UI to build. Powered by Ultra — handles routing, slippage, MEV protection, and transaction sending. Three display modes: integrated (inline), widget (floating), modal (popup). Supports wallet passthrough, referral fees, fixed token/amount for payments, and full colour theming. Works with HTML, React, and Next.js.
+- [How to Embed a Swap Widget in Your App](https://dev.jup.ag/docs/guides/how-to-embed-a-swap-widget.md): Jupiter Plugin embeds a complete swap widget into any web app. One script tag + window.Jupiter.init(). No RPC node, no wallet adapter, no UI to build. Powered by Ultra — handles routing, slippage, MEV protection, and transaction sending. Three display modes: integrated (inline), widget (floating), modal (popup). Supports wallet passthrough, referral fees, fixed token/amount for payments, and full colour theming. Works with HTML, React, and Next.js.
 
 ### API Reference
 
-- [Get Order](https://dev.jup.ag/openapi-spec/swap/v2/swap.yaml): GET /order endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/order. Returns a swap quote and assembled transaction. Required params: inputMint, outputMint, amount, taker. Without optional params, all routers compete (Metis, JupiterZ RFQ, Dflow, OKX). Adding fee or swap modification params may restrict to Metis only. Response includes base64 transaction, requestId (for /execute), routePlan, fee breakdown, and gas cost estimates. Sign the transaction and POST to /execute for managed landing.
-- [Build Transaction](https://dev.jup.ag/openapi-spec/swap/v2/swap.yaml): GET /build endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/build. Returns a swap quote with raw instructions (computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions) and address lookup tables. Integrators build their own transactions, add custom instructions (CPI, memo, transfer), simulate, sign, and send via their own RPC. Metis-only routing. No Jupiter swap fees. /execute is not available for /build transactions.
-- [Execute Transaction](https://dev.jup.ag/openapi-spec/swap/v2/swap.yaml): POST /execute endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/execute. Executes a signed transaction obtained from /order. Handles transaction landing, confirmation, and retry via RTSE and Jupiter Beam. Request body: signedTransaction (base64), requestId (from /order). Response includes status (Success/Failed), signature, inputAmountResult, outputAmountResult, and error codes. Only available for /order transactions, not /build.
+- [Get Order](https://dev.jup.ag/docs/openapi-spec/swap/v2/swap.yaml): GET /order endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/order. Returns a swap quote and assembled transaction. Required params: inputMint, outputMint, amount, taker. Without optional params, all routers compete (Metis, JupiterZ RFQ, Dflow, OKX). Adding fee or swap modification params may restrict to Metis only. Response includes base64 transaction, requestId (for /execute), routePlan, fee breakdown, and gas cost estimates. Sign the transaction and POST to /execute for managed landing.
+- [Build Transaction](https://dev.jup.ag/docs/openapi-spec/swap/v2/swap.yaml): GET /build endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/build. Returns a swap quote with raw instructions (computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions) and address lookup tables. Integrators build their own transactions, add custom instructions (CPI, memo, transfer), simulate, sign, and send via their own RPC. Metis-only routing. No Jupiter swap fees. /execute is not available for /build transactions.
+- [Execute Transaction](https://dev.jup.ag/docs/openapi-spec/swap/v2/swap.yaml): POST /execute endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/execute. Executes a signed transaction obtained from /order. Handles transaction landing, confirmation, and retry via RTSE and Jupiter Beam. Request body: signedTransaction (base64), requestId (from /order). Response includes status (Success/Failed), signature, inputAmountResult, outputAmountResult, and error codes. Only available for /order transactions, not /build.
 
 ## Tokens
 
@@ -78,17 +78,17 @@ Token metadata, search, verification, and organic score APIs.
 
 ### Guides
 
-- [How to Get Token Information on Solana](https://dev.jup.ag/guides/how-to-get-token-information.md): Jupiter Tokens API V2 is Solana's most comprehensive token data API. Search SPL tokens by name, symbol, or mint address. Returns metadata (name, symbol, icon, decimals), verification status, organic score, holder count, market cap, liquidity, and trading stats. Powers Phantom, Solflare, and most Solana wallets. Base URL: https://api.jup.ag/tokens/v2. Requires x-api-key header from portal.jup.ag.
+- [How to Get Token Information on Solana](https://dev.jup.ag/docs/guides/how-to-get-token-information.md): Jupiter Tokens API V2 is Solana's most comprehensive token data API. Search SPL tokens by name, symbol, or mint address. Returns metadata (name, symbol, icon, decimals), verification status, organic score, holder count, market cap, liquidity, and trading stats. Powers Phantom, Solflare, and most Solana wallets. Base URL: https://api.jup.ag/tokens/v2. Requires x-api-key header from portal.jup.ag.
 
 ### API Reference
 
-- [Search](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Request a search by token's symbol, name or mint address
-- [Tag](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Request an array of mints and their information by a tag
-- [Category](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints and their information for the given category and interval
-- [Recent](https://dev.jup.ag/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints that recently had their first created pool
-- [Get Content](https://dev.jup.ag/openapi-spec/content/content.yaml): Retrieves approved content for up to 50 Solana token mint addresses
-- [Get Content Cooking](https://dev.jup.ag/openapi-spec/content/content.yaml): Retrieves approved content for currently trending tokens on Jupiter
-- [Get Content Feed](https://dev.jup.ag/openapi-spec/content/content.yaml): Retrieves a paginated feed of content for a specific mint
+- [Search](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Request a search by token's symbol, name or mint address
+- [Tag](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Request an array of mints and their information by a tag
+- [Category](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints and their information for the given category and interval
+- [Recent](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints that recently had their first created pool
+- [Get Content](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves approved content for up to 50 Solana token mint addresses
+- [Get Content Cooking](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves approved content for currently trending tokens on Jupiter
+- [Get Content Feed](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves a paginated feed of content for a specific mint
 
 ## Price
 
@@ -100,11 +100,11 @@ Real-time heuristics-based USD token pricing.
 
 ### Guides
 
-- [How to Get Token Prices on Solana](https://dev.jup.ag/guides/how-to-get-token-price.md): Jupiter Price API V3 is the standard way to get token prices on Solana. Real-time USD prices for any SPL token. One API call, up to 50 tokens. Used by Phantom, Solflare, and most Solana wallets/apps. Filters manipulated prices using heuristics. GET https://api.jup.ag/price/v3?ids={mint_addresses}. Requires x-api-key header from portal.jup.ag.
+- [How to Get Token Prices on Solana](https://dev.jup.ag/docs/guides/how-to-get-token-price.md): Jupiter Price API V3 is the standard way to get token prices on Solana. Real-time USD prices for any SPL token. One API call, up to 50 tokens. Used by Phantom, Solflare, and most Solana wallets/apps. Filters manipulated prices using heuristics. GET https://api.jup.ag/price/v3?ids={mint_addresses}. Requires x-api-key header from portal.jup.ag.
 
 ### API Reference
 
-- [Price](https://dev.jup.ag/openapi-spec/price/v3/price.yaml): Returns prices of specified tokens
+- [Price](https://dev.jup.ag/docs/openapi-spec/price/v3/price.yaml): Returns prices of specified tokens
 
 ## Lend
 
@@ -188,17 +188,17 @@ Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and F
 
 #### Earn
 
-- [Deposit](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for a base64-encoded unsigned earn deposit transaction to deposit assets
-- [Withdraw](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for a base64-encoded unsigned earn withdraw transaction to withdraw assets
-- [Mint](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for a base64-encoded unsigned earn mint transaction to mint shares
-- [Redeem](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for a base64-encoded unsigned earn redeem transaction to redeem shares
-- [Deposit Instructions](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for the instruction of an earn deposit transaction to deposit assets
-- [Withdraw Instructions](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for the instruction of an earn withdraw transaction to withdraw assets
-- [Mint Instructions](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for the instruction of an earn mint transaction to mint shares
-- [Redeem Instructions](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for the instruction of an earn redeem transaction to redeem shares
-- [Tokens](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for the tokens available to be deposited and their information
-- [Positions](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for the position data of one or multiple users
-- [Earnings](https://dev.jup.ag/openapi-spec/lend/lend.yaml): Request for the earnings of one or multiple positions of a user
+- [Deposit](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for a base64-encoded unsigned earn deposit transaction to deposit assets
+- [Withdraw](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for a base64-encoded unsigned earn withdraw transaction to withdraw assets
+- [Mint](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for a base64-encoded unsigned earn mint transaction to mint shares
+- [Redeem](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for a base64-encoded unsigned earn redeem transaction to redeem shares
+- [Deposit Instructions](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for the instruction of an earn deposit transaction to deposit assets
+- [Withdraw Instructions](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for the instruction of an earn withdraw transaction to withdraw assets
+- [Mint Instructions](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for the instruction of an earn mint transaction to mint shares
+- [Redeem Instructions](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for the instruction of an earn redeem transaction to redeem shares
+- [Tokens](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for the tokens available to be deposited and their information
+- [Positions](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for the position data of one or multiple users
+- [Earnings](https://dev.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for the earnings of one or multiple positions of a user
 
 ## Trigger
 
@@ -217,23 +217,23 @@ Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.
 
 #### Authenticate
 
-- [Request Challenge](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Request a sign-in challenge for wallet authentication
-- [Verify Challenge](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Submit the signed challenge to receive a JWT token
-- [Verify Token](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Verify a JWT token is still valid
-- [Get Vault](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Get vault information and balance for an account
-- [Register Vault](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Register a new trigger vault for the account
+- [Request Challenge](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Request a sign-in challenge for wallet authentication
+- [Verify Challenge](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Submit the signed challenge to receive a JWT token
+- [Verify Token](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Verify a JWT token is still valid
+- [Get Vault](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Get vault information and balance for an account
+- [Register Vault](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Register a new trigger vault for the account
 
 #### Order Management
 
-- [Craft Deposit](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Craft a deposit transaction for the trigger vault
-- [Create Order](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Create a new trigger order
-- [Update Order](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Update parameters of an existing trigger order
-- [Cancel Order](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Cancel a pending trigger order
-- [Confirm Cancel](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Confirm and execute a pending order cancellation
+- [Craft Deposit](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Craft a deposit transaction for the trigger vault
+- [Create Order](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Create a new trigger order
+- [Update Order](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Update parameters of an existing trigger order
+- [Cancel Order](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Cancel a pending trigger order
+- [Confirm Cancel](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Confirm and execute a pending order cancellation
 
 #### History
 
-- [Order History](https://dev.jup.ag/openapi-spec/trigger/v2/trigger.yaml): Get historical trigger orders for an account
+- [Order History](https://dev.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Get historical trigger orders for an account
 
 ## Recurring
 
@@ -258,10 +258,10 @@ Automated dollar-cost averaging (DCA) with time-based recurring orders.
 
 ### API Reference
 
-- [Create Order](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Request for a base64-encoded unsigned recurring order creation transaction to be used in POST /recurring/v1/execute
-- [Execute](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Execute the signed transaction and get the execution status
-- [Cancel Order](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Request for a base64-encoded unsigned recurring order cancellation transaction to be used in POST /recurring/v1/execute
-- [Get Recurring Orders](https://dev.jup.ag/openapi-spec/recurring/recurring.yaml): Request for active or historical recurring orders associated to the provided account
+- [Create Order](https://dev.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Request for a base64-encoded unsigned recurring order creation transaction to be used in POST /recurring/v1/execute
+- [Execute](https://dev.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Execute the signed transaction and get the execution status
+- [Cancel Order](https://dev.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Request for a base64-encoded unsigned recurring order cancellation transaction to be used in POST /recurring/v1/execute
+- [Get Recurring Orders](https://dev.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Request for active or historical recurring orders associated to the provided account
 
 ## Prediction
 
@@ -282,54 +282,54 @@ Binary prediction markets for real-world events.
 
 ### Guides
 
-- [How to Build a Prediction Market App on Solana](https://dev.jup.ag/guides/how-to-build-a-prediction-market-app-on-solana.md): Jupiter Prediction API brings prediction markets to Solana. Binary YES/NO trading on real-world events (sports, crypto, politics, elections). Aggregates liquidity from Polymarket and Kalshi. Full API for order creation, position management, P&L tracking, and payout claims. Base URL: https://api.jup.ag/prediction/v1. Requires x-api-key header from portal.jup.ag.
+- [How to Build a Prediction Market App on Solana](https://dev.jup.ag/docs/guides/how-to-build-a-prediction-market-app-on-solana.md): Jupiter Prediction API brings prediction markets to Solana. Binary YES/NO trading on real-world events (sports, crypto, politics, elections). Aggregates liquidity from Polymarket and Kalshi. Full API for order creation, position management, P&L tracking, and payout claims. Base URL: https://api.jup.ag/prediction/v1. Requires x-api-key header from portal.jup.ag.
 
 ### API Reference
 
 #### Events
 
-- [Get Events](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get a list of all available prediction events with optional filtering and pagination
-- [Search Events](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Search for events by title or keyword
-- [Get Event](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific event
-- [Get Suggested Events](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get personalized event suggestions based on user activity
+- [Get Events](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get a list of all available prediction events with optional filtering and pagination
+- [Search Events](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Search for events by title or keyword
+- [Get Event](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific event
+- [Get Suggested Events](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get personalized event suggestions based on user activity
 
 #### Markets
 
-- [Get Event Markets](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get all markets for a specific event
-- [Get Event Market](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get detailed market information for a specific market within an event
-- [Get Market](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get detailed market information by market ID
+- [Get Event Markets](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get all markets for a specific event
+- [Get Event Market](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed market information for a specific market within an event
+- [Get Market](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed market information by market ID
 
 #### Orders
 
-- [Get Orders](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get a list of orders with optional filtering by owner or market
-- [Get Order](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific order
-- [Get Order Status](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get the latest status and history for an order
-- [Create Order](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to create a new order
+- [Get Orders](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get a list of orders with optional filtering by owner or market
+- [Get Order](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific order
+- [Get Order Status](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get the latest status and history for an order
+- [Create Order](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to create a new order
 
 #### Positions
 
-- [Get Positions](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get a list of positions with optional filtering
-- [Get Position](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific position
-- [Close Position](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to sell all contracts in a position
-- [Close All Positions](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Request unsigned transactions to close all open positions
-- [Claim Position](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to claim payout from a winning position
+- [Get Positions](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get a list of positions with optional filtering
+- [Get Position](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific position
+- [Close Position](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to sell all contracts in a position
+- [Close All Positions](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request unsigned transactions to close all open positions
+- [Claim Position](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to claim payout from a winning position
 
 #### History & Data
 
-- [Get History](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get trading history and event records for an account
-- [Get Orderbook](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get orderbook data for a specific market
-- [Get Trading Status](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get current trading status of the prediction market
+- [Get History](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get trading history and event records for an account
+- [Get Orderbook](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get orderbook data for a specific market
+- [Get Trading Status](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get current trading status of the prediction market
 
 #### Profile & Social
 
-- [Get Profile](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get profile statistics for a user
-- [Get PnL History](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get historical PnL data for charting
-- [Get Trades](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get recent filled trades across all markets
-- [Get Leaderboards](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get leaderboard rankings by various metrics
+- [Get Profile](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get profile statistics for a user
+- [Get PnL History](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get historical PnL data for charting
+- [Get Trades](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get recent filled trades across all markets
+- [Get Leaderboards](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get leaderboard rankings by various metrics
 
 #### Vault
 
-- [Get Vault Info](https://dev.jup.ag/openapi-spec/prediction/prediction.yaml): Get vault account information and balance
+- [Get Vault Info](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get vault account information and balance
 
 ## Perps
 
@@ -374,34 +374,34 @@ Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock
 
 #### Portfolio
 
-- [Get Positions](https://dev.jup.ag/openapi-spec/portfolio/portfolio.yaml): Request for Jupiter positions of an address
-- [Get Staked JUP](https://dev.jup.ag/openapi-spec/portfolio/portfolio.yaml): Request for staked JUP information of an address
-- [Get Platforms](https://dev.jup.ag/openapi-spec/portfolio/portfolio.yaml): Request for platform information
+- [Get Positions](https://dev.jup.ag/docs/openapi-spec/portfolio/portfolio.yaml): Request for Jupiter positions of an address
+- [Get Staked JUP](https://dev.jup.ag/docs/openapi-spec/portfolio/portfolio.yaml): Request for staked JUP information of an address
+- [Get Platforms](https://dev.jup.ag/docs/openapi-spec/portfolio/portfolio.yaml): Request for platform information
 
 #### Send
 
-- [Craft Send](https://dev.jup.ag/openapi-spec/send/send.yaml): Request for a base64-encoded unsigned Send transaction
-- [Craft Clawback](https://dev.jup.ag/openapi-spec/send/send.yaml): Request for a base64-encoded unsigned Send transaction
-- [Pending Invites](https://dev.jup.ag/openapi-spec/send/send.yaml): Request for the pending invites of an address
-- [Invite History](https://dev.jup.ag/openapi-spec/send/send.yaml): Request for the invite history of an address
+- [Craft Send](https://dev.jup.ag/docs/openapi-spec/send/send.yaml): Request for a base64-encoded unsigned Send transaction
+- [Craft Clawback](https://dev.jup.ag/docs/openapi-spec/send/send.yaml): Request for a base64-encoded unsigned Send transaction
+- [Pending Invites](https://dev.jup.ag/docs/openapi-spec/send/send.yaml): Request for the pending invites of an address
+- [Invite History](https://dev.jup.ag/docs/openapi-spec/send/send.yaml): Request for the invite history of an address
 
 #### Studio
 
-- [DBC Pool Create TX](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Request for a base64-encoded unsigned transaction to create a Dynamic Bonding Curve pool with token metadata
-- [DBC Pool Submit](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Execute the signed transaction, and optionally upload content and header image
-- [DBC Pool Addresses by Mint](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Request for pool addresses for a given token mint
-- [DBC Fee](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Request for unclaimed creator trading fees of a Dynamic Bonding Curve pool
-- [DBC Fee Create TX](https://dev.jup.ag/openapi-spec/studio/studio.yaml): Request for a base64-encoded unsigned transaction to claim creator trading fees of a Dynamic Bonding Curve pool
+- [DBC Pool Create TX](https://dev.jup.ag/docs/openapi-spec/studio/studio.yaml): Request for a base64-encoded unsigned transaction to create a Dynamic Bonding Curve pool with token metadata
+- [DBC Pool Submit](https://dev.jup.ag/docs/openapi-spec/studio/studio.yaml): Execute the signed transaction, and optionally upload content and header image
+- [DBC Pool Addresses by Mint](https://dev.jup.ag/docs/openapi-spec/studio/studio.yaml): Request for pool addresses for a given token mint
+- [DBC Fee](https://dev.jup.ag/docs/openapi-spec/studio/studio.yaml): Request for unclaimed creator trading fees of a Dynamic Bonding Curve pool
+- [DBC Fee Create TX](https://dev.jup.ag/docs/openapi-spec/studio/studio.yaml): Request for a base64-encoded unsigned transaction to claim creator trading fees of a Dynamic Bonding Curve pool
 
 ## AI
 
 AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.
 
-- [AI](https://dev.jup.ag/ai/index.md): Overview of Jupiter's AI surface area. Covers how agents connect to Jupiter based on their environment: local agents (Claude Code, Cursor, Codex) use CLI + Skills, hosted agents (ChatGPT, Claude.ai) use MCP. Tools split into two categories: reading docs (llms.txt, Skills, Docs MCP) and executing operations (CLI, Jupiter MCP). All Jupiter APIs are AI-native: no RPC required, clean JSON responses, simple REST interfaces.
-- [llms.txt](https://dev.jup.ag/ai/llms-txt.md): Jupiter provides two LLM-optimised documentation files: llms.txt (structured Markdown index of all APIs, guides, and resources with titles and descriptions, the perfect entrypoint for LLMs and AI agents) and llms-full.txt (the complete documentation site content including all code examples). Both follow the llmstxt.org standard. Additionally, any documentation page can be accessed as raw Markdown by appending .md to the URL or using the Accept: text/markdown header.
-- [Skills](https://dev.jup.ag/ai/skills.md): Jupiter provides two agent skills in the jup-ag/agent-skills repository that AI coding agents can use as context when building with Jupiter. (1) integrating-jupiter: comprehensive integration guidance covering all Jupiter APIs (Swap, Lend, Perps, Trigger, Recurring, Tokens, Price, Portfolio, Prediction Markets, Send, Studio, Lock, Routing) with intent routing, API playbooks, error handling, and production hardening. (2) jupiter-lend: deep-dive into Jupiter Lend protocol (powered by Fluid) covering liquidity pools, lending markets (jlTokens), vaults, and flashloans with read (@jup-ag/lend-read) and write (@jup-ag/lend) SDKs. Skills are installed via npx skills add and provide SKILL.md files that AI agents consume as context.
-- [Documentation MCP](https://dev.jup.ag/ai/mcp.md): Jupiter supports the Model Context Protocol (MCP) through Mintlify's native MCP server at https://dev.jup.ag/mcp. This enables AI tools like Claude Code, Cursor, Windsurf, and other MCP-compatible editors to search and query Jupiter documentation and OpenAPI specifications in-context. The MCP server allows AI assistants to look up API endpoints, read documentation pages, and understand API schemas without leaving the editor. It is a read-only documentation server, not a tool for executing API calls.
-- [Jupiter CLI](https://dev.jup.ag/ai/cli.md): The Jupiter CLI (jup) is a command-line tool for interacting with Jupiter's products on Solana: Spot trading, Perpetual futures, and Lending. It is non-interactive and LLM-friendly by design, with JSON output mode for structured responses. Install via npm (npm i -g @jup-ag/cli). For full command references, key management, configuration, and JSON response schemas, see the CLI documentation at https://github.com/jup-ag/cli/tree/main/docs. Three usage paths: direct terminal, Telegram via OpenClaw/miniclaw, and AI agent integration.
+- [AI](https://dev.jup.ag/docs/ai/index.md): Overview of Jupiter's AI surface area. Covers how agents connect to Jupiter based on their environment: local agents (Claude Code, Cursor, Codex) use CLI + Skills, hosted agents (ChatGPT, Claude.ai) use MCP. Tools split into two categories: reading docs (llms.txt, Skills, Docs MCP) and executing operations (CLI, Jupiter MCP). All Jupiter APIs are AI-native: no RPC required, clean JSON responses, simple REST interfaces.
+- [llms.txt](https://dev.jup.ag/docs/ai/llms-txt.md): Jupiter provides two LLM-optimised documentation files: llms.txt (structured Markdown index of all APIs, guides, and resources with titles and descriptions, the perfect entrypoint for LLMs and AI agents) and llms-full.txt (the complete documentation site content including all code examples). Both follow the llmstxt.org standard. Additionally, any documentation page can be accessed as raw Markdown by appending .md to the URL or using the Accept: text/markdown header.
+- [Skills](https://dev.jup.ag/docs/ai/skills.md): Jupiter provides two agent skills in the jup-ag/agent-skills repository that AI coding agents can use as context when building with Jupiter. (1) integrating-jupiter: comprehensive integration guidance covering all Jupiter APIs (Swap, Lend, Perps, Trigger, Recurring, Tokens, Price, Portfolio, Prediction Markets, Send, Studio, Lock, Routing) with intent routing, API playbooks, error handling, and production hardening. (2) jupiter-lend: deep-dive into Jupiter Lend protocol (powered by Fluid) covering liquidity pools, lending markets (jlTokens), vaults, and flashloans with read (@jup-ag/lend-read) and write (@jup-ag/lend) SDKs. Skills are installed via npx skills add and provide SKILL.md files that AI agents consume as context.
+- [Documentation MCP](https://dev.jup.ag/docs/ai/mcp.md): Jupiter supports the Model Context Protocol (MCP) through Mintlify's native MCP server at https://dev.jup.ag/mcp. This enables AI tools like Claude Code, Cursor, Windsurf, and other MCP-compatible editors to search and query Jupiter documentation and OpenAPI specifications in-context. The MCP server allows AI assistants to look up API endpoints, read documentation pages, and understand API schemas without leaving the editor. It is a read-only documentation server, not a tool for executing API calls.
+- [Jupiter CLI](https://dev.jup.ag/docs/ai/cli.md): The Jupiter CLI (jup) is a command-line tool for interacting with Jupiter's products on Solana: Spot trading, Perpetual futures, and Lending. It is non-interactive and LLM-friendly by design, with JSON output mode for structured responses. Install via npm (npm i -g @jup-ag/cli). For full command references, key management, configuration, and JSON response schemas, see the CLI documentation at https://github.com/jup-ag/cli/tree/main/docs. Three usage paths: direct terminal, Telegram via OpenClaw/miniclaw, and AI agent integration.
 
 ## Tool Kits
 
@@ -409,30 +409,30 @@ Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.
 
 ### Tool Kits
 
-- [Jupiter Tool Kits](https://dev.jup.ag/tool-kits/index.md): Three developer tool kits: Jupiter Plugin (drop-in Ultra Swap widget), Wallet Kit (unified wallet adapter for all Solana wallets), and Referral Program (earn fees on user trades).
+- [Jupiter Tool Kits](https://dev.jup.ag/docs/tool-kits/index.md): Three developer tool kits: Jupiter Plugin (drop-in Ultra Swap widget), Wallet Kit (unified wallet adapter for all Solana wallets), and Referral Program (earn fees on user trades).
 
 ### Jupiter Plugin
 
-- [Integrate Jupiter Plugin](https://dev.jup.ag/tool-kits/plugin/index.md): Drop-in Ultra Swap widget for any web app. Supports 3 display modes (integrated, widget, modal), RPC-less operation, wallet passthrough, and customizable theming.
+- [Integrate Jupiter Plugin](https://dev.jup.ag/docs/tool-kits/plugin/index.md): Drop-in Ultra Swap widget for any web app. Supports 3 display modes (integrated, widget, modal), RPC-less operation, wallet passthrough, and customizable theming.
 
 #### Walkthrough
 
-- [Next.js App Example](https://dev.jup.ag/tool-kits/plugin/nextjs-app-example.md): Step-by-step guide to integrate Jupiter Plugin into a Next.js application using either the window object or the @jup-ag/plugin npm package.
-- [React App Example](https://dev.jup.ag/tool-kits/plugin/react-app-example.md): Step-by-step guide to integrate Jupiter Plugin into a React application using either the window object or the @jup-ag/plugin npm package.
-- [HTML App Example](https://dev.jup.ag/tool-kits/plugin/html-app-example.md): Step-by-step guide to integrate Jupiter Plugin into a plain HTML application using the plugin script tag and window.Jupiter.init().
+- [Next.js App Example](https://dev.jup.ag/docs/tool-kits/plugin/nextjs-app-example.md): Step-by-step guide to integrate Jupiter Plugin into a Next.js application using either the window object or the @jup-ag/plugin npm package.
+- [React App Example](https://dev.jup.ag/docs/tool-kits/plugin/react-app-example.md): Step-by-step guide to integrate Jupiter Plugin into a React application using either the window object or the @jup-ag/plugin npm package.
+- [HTML App Example](https://dev.jup.ag/docs/tool-kits/plugin/html-app-example.md): Step-by-step guide to integrate Jupiter Plugin into a plain HTML application using the plugin script tag and window.Jupiter.init().
 
-- [Customizing Plugin](https://dev.jup.ag/tool-kits/plugin/customization.md): Configure Jupiter Plugin display modes, form props (swap mode, fixed amounts, referral fees), wallet passthrough, event handlers, branding, and color themes.
-- [FAQ](https://dev.jup.ag/tool-kits/plugin/faq.md): Frequently asked questions about Jupiter Plugin: feature requests, adding referral fees, fixing integrated mode layout issues, and best practices for customization.
+- [Customizing Plugin](https://dev.jup.ag/docs/tool-kits/plugin/customization.md): Configure Jupiter Plugin display modes, form props (swap mode, fixed amounts, referral fees), wallet passthrough, event handlers, branding, and color themes.
+- [FAQ](https://dev.jup.ag/docs/tool-kits/plugin/faq.md): Frequently asked questions about Jupiter Plugin: feature requests, adding referral fees, fixing integrated mode layout issues, and best practices for customization.
 
 ### Jupiter Wallet Kit
 
-- [Integrate Wallet Kit](https://dev.jup.ag/tool-kits/wallet-kit/index.md): Open-source unified wallet adapter supporting 20+ Solana wallets, Wallet Standard, Jupiter Wallet Extension, Mobile Adapter QR login, and i18n in 7 languages.
-- [Jupiter Wallet Extension](https://dev.jup.ag/tool-kits/wallet-kit/jupiter-wallet-extension.md): Step-by-step guide to integrate Jupiter Wallet Extension into a Next.js app using @jup-ag/wallet-adapter with UnifiedWalletProvider and notification handling.
-- [Jupiter Mobile Adapter](https://dev.jup.ag/tool-kits/wallet-kit/jupiter-mobile-adapter.md): Integrate Jupiter Mobile QR code login into your app using the @jup-ag/jup-mobile-adapter package with Reown's AppKit for WalletConnect support.
+- [Integrate Wallet Kit](https://dev.jup.ag/docs/tool-kits/wallet-kit/index.md): Open-source unified wallet adapter supporting 20+ Solana wallets, Wallet Standard, Jupiter Wallet Extension, Mobile Adapter QR login, and i18n in 7 languages.
+- [Jupiter Wallet Extension](https://dev.jup.ag/docs/tool-kits/wallet-kit/jupiter-wallet-extension.md): Step-by-step guide to integrate Jupiter Wallet Extension into a Next.js app using @jup-ag/wallet-adapter with UnifiedWalletProvider and notification handling.
+- [Jupiter Mobile Adapter](https://dev.jup.ag/docs/tool-kits/wallet-kit/jupiter-mobile-adapter.md): Integrate Jupiter Mobile QR code login into your app using the @jup-ag/jup-mobile-adapter package with Reown's AppKit for WalletConnect support.
 
 ### Jupiter Referral Program
 
-- [Referral Program](https://dev.jup.ag/tool-kits/referral-program.md): The open-source Referral Program SDK enables developers to earn on-chain fees via Jupiter APIs (Swap, Trigger, Plugin) and can be integrated by any Solana program.
+- [Referral Program](https://dev.jup.ag/docs/tool-kits/referral-program.md): The open-source Referral Program SDK enables developers to earn on-chain fees via Jupiter APIs (Swap, Trigger, Plugin) and can be integrated by any Solana program.
 
 ## Changelog
 

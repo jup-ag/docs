@@ -698,6 +698,190 @@
   },
   "redirects": [
     {
+      "source": "/ai",
+      "destination": "/docs/ai"
+    },
+    {
+      "source": "/ai/:slug*",
+      "destination": "/docs/ai/:slug*"
+    },
+    {
+      "source": "/api-reference",
+      "destination": "/docs/api-reference"
+    },
+    {
+      "source": "/api-reference/:slug*",
+      "destination": "/docs/api-reference/:slug*"
+    },
+    {
+      "source": "/blog",
+      "destination": "/docs/blog"
+    },
+    {
+      "source": "/blog/:slug*",
+      "destination": "/docs/blog/:slug*"
+    },
+    {
+      "source": "/changelog",
+      "destination": "/docs/changelog"
+    },
+    {
+      "source": "/changelog/:slug*",
+      "destination": "/docs/changelog/:slug*"
+    },
+    {
+      "source": "/get-started",
+      "destination": "/docs/get-started"
+    },
+    {
+      "source": "/get-started/:slug*",
+      "destination": "/docs/get-started/:slug*"
+    },
+    {
+      "source": "/guides",
+      "destination": "/docs/guides"
+    },
+    {
+      "source": "/guides/:slug*",
+      "destination": "/docs/guides/:slug*"
+    },
+    {
+      "source": "/legal",
+      "destination": "/docs/legal"
+    },
+    {
+      "source": "/legal/:slug*",
+      "destination": "/docs/legal/:slug*"
+    },
+    {
+      "source": "/lend",
+      "destination": "/docs/lend"
+    },
+    {
+      "source": "/lend/:slug*",
+      "destination": "/docs/lend/:slug*"
+    },
+    {
+      "source": "/lock",
+      "destination": "/docs/lock"
+    },
+    {
+      "source": "/lock/:slug*",
+      "destination": "/docs/lock/:slug*"
+    },
+    {
+      "source": "/perps",
+      "destination": "/docs/perps"
+    },
+    {
+      "source": "/perps/:slug*",
+      "destination": "/docs/perps/:slug*"
+    },
+    {
+      "source": "/portal",
+      "destination": "/docs/portal"
+    },
+    {
+      "source": "/portal/:slug*",
+      "destination": "/docs/portal/:slug*"
+    },
+    {
+      "source": "/portfolio",
+      "destination": "/docs/portfolio"
+    },
+    {
+      "source": "/portfolio/:slug*",
+      "destination": "/docs/portfolio/:slug*"
+    },
+    {
+      "source": "/prediction",
+      "destination": "/docs/prediction"
+    },
+    {
+      "source": "/prediction/:slug*",
+      "destination": "/docs/prediction/:slug*"
+    },
+    {
+      "source": "/price",
+      "destination": "/docs/price"
+    },
+    {
+      "source": "/price/:slug*",
+      "destination": "/docs/price/:slug*"
+    },
+    {
+      "source": "/recurring",
+      "destination": "/docs/recurring"
+    },
+    {
+      "source": "/recurring/:slug*",
+      "destination": "/docs/recurring/:slug*"
+    },
+    {
+      "source": "/resources",
+      "destination": "/docs/resources"
+    },
+    {
+      "source": "/resources/:slug*",
+      "destination": "/docs/resources/:slug*"
+    },
+    {
+      "source": "/send",
+      "destination": "/docs/send"
+    },
+    {
+      "source": "/send/:slug*",
+      "destination": "/docs/send/:slug*"
+    },
+    {
+      "source": "/studio",
+      "destination": "/docs/studio"
+    },
+    {
+      "source": "/studio/:slug*",
+      "destination": "/docs/studio/:slug*"
+    },
+    {
+      "source": "/swap",
+      "destination": "/docs/swap"
+    },
+    {
+      "source": "/swap/:slug*",
+      "destination": "/docs/swap/:slug*"
+    },
+    {
+      "source": "/tokens",
+      "destination": "/docs/tokens"
+    },
+    {
+      "source": "/tokens/:slug*",
+      "destination": "/docs/tokens/:slug*"
+    },
+    {
+      "source": "/tool-kits",
+      "destination": "/docs/tool-kits"
+    },
+    {
+      "source": "/tool-kits/:slug*",
+      "destination": "/docs/tool-kits/:slug*"
+    },
+    {
+      "source": "/trigger",
+      "destination": "/docs/trigger"
+    },
+    {
+      "source": "/trigger/:slug*",
+      "destination": "/docs/trigger/:slug*"
+    },
+    {
+      "source": "/ultra",
+      "destination": "/docs/ultra"
+    },
+    {
+      "source": "/ultra/:slug*",
+      "destination": "/docs/ultra/:slug*"
+    },
+    {
       "source": "/api-reference/price/v3/price",
       "destination": "/api-reference/price"
     },
@@ -759,7 +943,7 @@
     },
     {
       "source": "/api-reference/trigger/v2",
-      "destination": "/api-reference/trigger/index"
+      "destination": "/api-reference/trigger/challenge"
     },
     {
       "source": "/api-reference/trigger/v2/:slug*",
@@ -883,63 +1067,63 @@
     },
     {
       "source": "/updates",
-      "destination": "/changelog"
+      "destination": "/docs/changelog"
     },
     {
       "source": "/updates/:slug*",
-      "destination": "/changelog/:slug*"
+      "destination": "/docs/changelog/:slug*"
     },
     {
       "source": "/misc",
-      "destination": "/legal"
+      "destination": "/docs/legal"
     },
     {
       "source": "/misc/:slug*",
-      "destination": "/legal"
+      "destination": "/docs/legal"
     },
     {
       "source": "/misc/audits",
-      "destination": "/resources/audits"
+      "destination": "/docs/resources/audits"
     },
     {
       "source": "/misc/integrators-guidelines",
-      "destination": "/legal"
+      "destination": "/docs/legal"
     },
     {
       "source": "/misc/privacy-policy",
-      "destination": "/legal/privacy-policy"
+      "destination": "/docs/legal/privacy-policy"
     },
     {
       "source": "/misc/sdk-api-license-agreement",
-      "destination": "/legal/sdk-api-license-agreement"
+      "destination": "/docs/legal/sdk-api-license-agreement"
     },
     {
       "source": "/misc/terms-of-use",
-      "destination": "/legal/terms-of-use"
+      "destination": "/docs/legal/terms-of-use"
     },
     {
       "source": "/routing",
-      "destination": "/swap/routing"
+      "destination": "/docs/swap/routing"
     },
     {
       "source": "/routing/dex-integration",
-      "destination": "/swap/routing/dex-integration"
+      "destination": "/docs/swap/routing/dex-integration"
     },
     {
       "source": "/routing/market-listing",
-      "destination": "/swap/routing"
+      "destination": "/docs/swap/routing"
     },
     {
       "source": "/routing/rfq-integration",
-      "destination": "/swap/routing/rfq-integration"
+      "destination": "/docs/swap/routing/rfq-integration"
     },
     {
       "source": "/routing/token-listing",
-      "destination": "/swap/routing"
+      "destination": "/docs/swap/routing"
     },
     {
       "source": "/skills",
-      "destination": "/skill"
+      "destination": "/docs/ai/skills"
     }
   ]
 }

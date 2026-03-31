@@ -1,7 +1,7 @@
 ---
 title: "Rate Limits"
 description: "Rate limits for Jupiter APIs by plan tier."
-llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per account, not per API key. Rate limit response headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset. Returns HTTP 429 when exceeded."
+llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per account, not per API key. All API requests share the same rate limit bucket. Returns HTTP 429 when exceeded."
 ---
 
 ## Overview
@@ -20,22 +20,16 @@ All Jupiter APIs use a fixed rate limit based on your plan tier. Rate limits are
 Rate limits apply **per account**, not per API key. Creating multiple API keys does not increase your rate limit.
 </Note>
 
-## Rate limit headers
-
-Every API response includes rate limit headers:
-
-| Header | Description |
-| :--- | :--- |
-| `x-ratelimit-limit` | Maximum requests allowed in the current window |
-| `x-ratelimit-remaining` | Requests remaining in the current window |
-| `x-ratelimit-reset` | Unix timestamp when the current window resets |
+<Note>
+Rate limits are **bucketed** - all API requests across all endpoints share the same rate limit bucket. For example, if you are on the Developer plan (10 RPS), a mix of Swap, Price, and Token requests all count towards the same 10 RPS limit.
+</Note>
 
 ## Handling rate limits
 
 If you exceed your rate limit, the API returns a `429 Too Many Requests` response. To handle this:
 
-1. **Check the headers**: Use `x-ratelimit-remaining` to throttle requests before hitting the limit
-2. **Implement backoff**: Use exponential backoff in your retry logic
+1. **Implement backoff**: Use exponential backoff in your retry logic
+2. **Spread requests**: Distribute requests evenly rather than bursting
 3. **Upgrade your plan**: If you consistently hit limits, consider upgrading to a higher tier
 
 <Warning>
@@ -45,4 +39,5 @@ Aggressive retry patterns without backoff may extend your rate limit window. Alw
 ## Need higher limits?
 
 - See [Plans and Pricing](/portal/plans) to compare tiers
-- For limits above 150 RPS, [contact us](https://support.jup.ag) for an enterprise plan
+- For limits above 150 RPS, [contact us](https://airtable.com/apppC9l7PaT9XG8jN/pagjXGV6PFNwUd9P2/form) for an enterprise plan
+- Visit our [support page](/resources/support) for further assistance

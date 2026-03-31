@@ -1,7 +1,7 @@
 ---
 title: "Response Codes"
-description: "HTTP response codes and rate limit headers for Jupiter APIs."
-llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized, 429 rate limited, and 5xx server errors with debugging guidance. Includes rate limit response headers: x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset."
+description: "HTTP response codes for Jupiter APIs."
+llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized, 429 rate limited, and 5xx server errors with debugging guidance."
 ---
 
 <Tip>
@@ -24,20 +24,8 @@ llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400
 | 400  | Bad Request           | Check the request parameters and syntax.                                                    |
 | 401  | Unauthorised          | Check that your API key is correct and active.                                              |
 | 404  | Not Found             | Check the endpoint URL.                                                                     |
-| 429  | Rate Limited          | You have exceeded your rate limit. Slow down requests, implement backoff, or [upgrade your plan](/portal/plans). |
-| 500  | Internal Server Error | [Contact support](https://support.jup.ag) or reach out in [Discord](https://discord.gg/jup). |
-| 502  | Bad Gateway           | [Contact support](https://support.jup.ag) or reach out in [Discord](https://discord.gg/jup). |
-| 503  | Service Unavailable   | [Contact support](https://support.jup.ag) or reach out in [Discord](https://discord.gg/jup). |
-| 504  | Gateway Timeout       | [Contact support](https://support.jup.ag) or reach out in [Discord](https://discord.gg/jup). |
-
-## Rate limit headers
-
-Every response includes headers to help you manage your request rate:
-
-| Header | Description |
-| :--- | :--- |
-| `x-ratelimit-limit` | Maximum requests allowed in the current window |
-| `x-ratelimit-remaining` | Requests remaining in the current window |
-| `x-ratelimit-reset` | Unix timestamp when the current window resets |
-
-See [Rate Limits](/portal/rate-limits) for details on limits per plan tier.
+| 429  | Rate Limited          | You have exceeded your rate limit. Slow down requests or implement backoff. See [Rate Limits](/portal/rate-limits) for details. |
+| 500  | Internal Server Error | Submit a [Portal Enquiry](https://support.jup.ag/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer) or reach out in [Discord Dev Support](https://discord.com/channels/897540204506775583/910250162402779146). |
+| 502  | Bad Gateway           | Submit a [Portal Enquiry](https://support.jup.ag/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer) or reach out in [Discord Dev Support](https://discord.com/channels/897540204506775583/910250162402779146). |
+| 503  | Service Unavailable   | Submit a [Portal Enquiry](https://support.jup.ag/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer) or reach out in [Discord Dev Support](https://discord.com/channels/897540204506775583/910250162402779146). |
+| 504  | Gateway Timeout       | Submit a [Portal Enquiry](https://support.jup.ag/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer) or reach out in [Discord Dev Support](https://discord.com/channels/897540204506775583/910250162402779146). |

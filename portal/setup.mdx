@@ -1,9 +1,14 @@
 ---
+title: "Getting Started"
 description: "Set up your Jupiter API key and start building."
 llmsDescription: "How to get started with the Jupiter Developer Platform: sign up, generate an API key, and make your first request. API key is passed via x-api-key header. Four tiers available: Free (1 RPS), Developer ($25/mo, 10 RPS), Launch ($100/mo, 50 RPS), Pro ($500/mo, 150 RPS). Keyless access available at 0.5 RPS without sign-up."
 ---
 
 ## Quick start
+
+You can start making requests to `api.jup.ag` immediately - no sign-up required. Keyless requests are rate-limited to 0.5 RPS, which is ideal for testing, prototyping, or agentic use cases.
+
+For production applications, [sign up](https://portal.jup.ag) for an API key to unlock higher rate limits and access Developer Platform features like analytics and usage monitoring.
 
 <Steps>
   <Step>
@@ -16,10 +21,6 @@ llmsDescription: "How to get started with the Jupiter Developer Platform: sign u
     Pass the key via the `x-api-key` header in your requests to `api.jup.ag`
   </Step>
 </Steps>
-
-<Tip>
-You can also make requests without an API key at 0.5 RPS. Adding a free API key doubles your rate limit to 1 RPS.
-</Tip>
 
 ## Choose a plan
 
@@ -68,4 +69,4 @@ New API keys may take 2-5 minutes to become active.
 
 ## Migrating from the old Portal?
 
-If you had an account on the old Jupiter Portal, your API keys are preserved. See the [Migration Guide](/portal/migration) for details on setting up your legacy organisation and the 3-month grace period.
+Your API keys are preserved. See the [Migration Guide](/portal/migration) for details.

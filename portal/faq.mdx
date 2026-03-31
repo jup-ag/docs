@@ -1,7 +1,7 @@
 ---
 title: "FAQ"
 description: "Frequently asked questions about the Jupiter Developer Platform."
-llmsDescription: "Frequently asked questions about the Jupiter Developer Platform: plan differences, API key usage, billing, upgrades and downgrades, credit overages, annual billing, migration from old Portal, and support channels."
+llmsDescription: "Frequently asked questions about the Jupiter Developer Platform: plan differences, API key usage, billing, upgrades and downgrades, credit overages, migration from old Portal, and support channels."
 ---
 
 <AccordionGroup>
@@ -10,7 +10,7 @@ llmsDescription: "Frequently asked questions about the Jupiter Developer Platfor
   </Accordion>
 
   <Accordion title="What do I get by upgrading from Free?">
-    Higher rate limits and included credits. All plans use the same API with the same data freshness and latency. See [Plans and Pricing](/portal/plans) for a full comparison.
+    Higher rate limits, included credits, and priority support on the Pro plan. All plans use the same API with the same data freshness and latency. See [Plans and Pricing](/portal/plans) for a full comparison.
   </Accordion>
 
   <Accordion title="Can I use the same API key for all endpoints?">
@@ -21,16 +21,20 @@ llmsDescription: "Frequently asked questions about the Jupiter Developer Platfor
     New keys may take 2-5 minutes to become active after creation.
   </Accordion>
 
+  <Accordion title="Do all API requests share the same rate limit?">
+    Yes. Rate limits are bucketed - all requests across all endpoints count towards the same limit. For example, on the Developer plan (10 RPS), Swap, Price, and Token requests all share the same 10 RPS bucket.
+  </Accordion>
+
   <Accordion title="What happens if I exceed my included credits?">
     Paid plans are billed for overage at **$1 per 1M credits**. You will not be cut off - requests continue to work and the overage is added to your next invoice.
   </Accordion>
 
   <Accordion title="Do execute endpoints really cost 0 credits?">
-    Yes. Swap, trigger, and recurring execute endpoints (`/swap/v2/execute`, `/ultra/v1/execute`, `/trigger/v1/execute`, `/recurring/v1/execute`) cost 0 credits.
+    Yes. All execute endpoints cost 0 credits. See [Plans and Pricing](/portal/plans) for the full per-endpoint credit breakdown.
   </Accordion>
 
   <Accordion title="Can I switch between monthly and annual billing?">
-    Yes. You can switch at any time from the dashboard. Annual plans include 2 months free compared to monthly billing.
+    Plan changes keep your current billing cadence. To switch between monthly and annual billing, cancel your current subscription at the end of the billing period and re-subscribe with the new cadence.
   </Accordion>
 
   <Accordion title="What happens if I upgrade or downgrade my plan?">
@@ -38,11 +42,11 @@ llmsDescription: "Frequently asked questions about the Jupiter Developer Platfor
   </Accordion>
 
   <Accordion title="I had an account on the old Portal. What do I do?">
-    Your API keys are preserved. When you sign in to the new platform, you will be prompted to set up a legacy organisation. You get your equivalent rate limits for free for 3 months. See the [Migration Guide](/portal/migration) for full details.
+    Your API keys are preserved. Sign in to the new platform and set up your legacy organisation. You get your equivalent rate limits for free during the 3-month grace period. See the [Migration Guide](/portal/migration) for full details.
   </Accordion>
 
   <Accordion title="I was on the Ultra tier with dynamic rate limits. What now?">
-    Dynamic rate limits have been removed. During the 3-month grace period, you keep your equivalent RPS. After that, choose a paid plan that matches your needs. If you had standard dynamic rate limits (not custom), the [Developer plan](/portal/plans) ($25/mo, 10 RPS) is a good starting point.
+    Dynamic rate limits have been removed. During the 3-month grace period, you keep your equivalent RPS. After that, choose a paid plan that matches your needs.
   </Accordion>
 
   <Accordion title="What about latency? Does my location affect performance?">
@@ -50,12 +54,10 @@ llmsDescription: "Frequently asked questions about the Jupiter Developer Platfor
   </Accordion>
 
   <Accordion title="I need more than 150 RPS.">
-    [Contact us](https://support.jup.ag) for an enterprise plan with custom rate limits, SLAs, and volume pricing.
+    [Contact us](https://airtable.com/apppC9l7PaT9XG8jN/pagjXGV6PFNwUd9P2/form) for an enterprise plan with custom rate limits, SLAs, and volume pricing.
   </Accordion>
 </AccordionGroup>
 
 ## Support
 
-- [Open a support ticket](https://support.jup.ag)
-- Join the [Telegram developer channel](https://t.me/jup_dev)
-- Join the [Discord developer channel](https://discord.com/channels/897540204506775583/1115543693005430854)
+For further assistance, visit our [support page](/resources/support).

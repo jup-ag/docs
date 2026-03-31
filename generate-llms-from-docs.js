@@ -10,9 +10,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const BASE_URL = "https://dev.jup.ag";
-const DOCS_URL = `${BASE_URL}/docs`;
-const ROOT_PREFIXES = ["blog/", "changelog/", "resources/", "legal/"];
+const DOCS_URL = "https://dev.jup.ag/docs";
 const baseFolder = __dirname;
 
 const docsJson = JSON.parse(
@@ -163,14 +161,12 @@ function emitEntry(pagePath) {
     return false;
   }
   // API ref pages with openapi field link to the spec YAML instead of .md
-  const isRoot = ROOT_PREFIXES.some((p) => pagePath.startsWith(p));
-  const urlBase = isRoot ? BASE_URL : DOCS_URL;
   let url;
   if (fm.openapi) {
     const specPath = fm.openapi.split(/\s+/)[0]; // e.g. "/openapi-spec/swap/v2/swap.yaml"
-    url = `${urlBase}${specPath}`;
+    url = `${DOCS_URL}${specPath}`;
   } else {
-    url = `${urlBase}/${pagePath}.md`;
+    url = `${DOCS_URL}/${pagePath}.md`;
   }
   emit(`- [${fm.title}](${url}): ${fm.description}\n`);
   return true;
@@ -306,7 +302,7 @@ emit(
   "- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs\n",
 );
 emit(
-  `- [Stay Updated](${BASE_URL}/resources/support): Get support and stay updated with Jupiter\n`,
+  `- [Stay Updated](${DOCS_URL}/resources/support): Get support and stay updated with Jupiter\n`,
 );
 
 // --- Clean up empty sections ---

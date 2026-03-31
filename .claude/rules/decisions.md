@@ -164,13 +164,24 @@ Track all redirects added to `vercel.json` here for visibility:
 - Use Mintlify's "Host at /docs" toggle instead of moving folders into a `docs/` subfolder
 - Move 13 product folders (swap, tokens, price, lend, lock, perps, portfolio, prediction, recurring, send, studio, trigger, ultra) OUT of `docs/` to repo root so the toggle doesn't cause `/docs/docs/...` double-prefixing
 - All internal links and redirects use unprefixed paths (Mintlify handles the `/docs/` prefix automatically)
-- Root URL holdouts (blog, changelog, resources, legal) stay at root URLs via gateway path rewriting
-- `llms.txt` generator updated with `/docs/` subpath for content URLs, root URLs for holdouts
-- Gateway switches from `mintlify.app` to `mintlify.dev` endpoint
-**Rationale:** The toggle approach is the only way to serve `llms.txt` and `skill.md` at `/docs/llms.txt` and `/docs/skill.md` (Mintlify only serves these from repo root). Moving content into a `docs/` folder would cause double-prefixing.
+- All Mintlify-managed pages live under `/docs/` prefix, no exceptions. No gateway path rewriting.
+- `llms.txt` generator updated with `/docs/` subpath for all content URLs
+- Only `developers.jup.ag/docs` points to Mintlify
+**Rationale:** The toggle approach is the only way to serve `llms.txt` and `skill.md` at `/docs/llms.txt` and `/docs/skill.md` (Mintlify only serves these from repo root). Moving content into a `docs/` folder would cause double-prefixing. Keeping all Mintlify content strictly under `/docs/` with no holdouts simplifies gateway routing to a single prefix rule.
 **Alternatives considered:**
 1. Move content folders into `docs/` subfolder (Option A) — rejected because it causes `/docs/docs/...` with the toggle, and without the toggle `llms.txt` can't be served under `/docs/`.
 2. No toggle, just folder moves — rejected because `llms.txt` and `skill.md` would only be accessible at root, not at `/docs/llms.txt`.
+3. Gateway path rewriting for root URL holdouts (blog, changelog, resources, legal) — initially implemented, then rejected in favor of the simpler approach of putting everything under `/docs/`.
+
+### [2026-03-31] Cloudflare domain-level redirects for old paths
+**Status:** implemented
+**Scope:** redirect
+**Files affected:** Cloudflare redirect rules (external to this repo)
+**Linear issue:** DEVREL-133
+
+**Context:** After deploying PR #864 (DEVREL-133), old URLs without the `/docs/` prefix (e.g. `/get-started`, `/swap/order-and-execute`) would 404 since all content now lives under `/docs/*`. These old paths are shared in bookmarks, indexed by search engines (Google), and cached by AI agents.
+**Decision:** Add Cloudflare domain-level redirects on `dev.jup.ag` to redirect old root paths to their `/docs/` equivalents (e.g. `/get-started` -> `/docs/get-started`). This is handled outside the docs repo at the infrastructure level.
+**Rationale:** Domain-level redirects are the cleanest solution: they catch all traffic before it hits Mintlify, preserve SEO link equity, and don't require maintaining redirect rules in `docs.json` or `vercel.json`. Keeps the docs repo focused on content, infrastructure concerns handled at the edge.
 
 ## Redirect Log
 

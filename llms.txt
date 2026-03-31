@@ -438,18 +438,18 @@ Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.
 
 Changelog, release notes, and developer blog.
 
-- [Changelog](https://dev.jup.ag/changelog/index.md): Latest announcements and breaking changes across Jupiter APIs.
+- [Changelog](https://dev.jup.ag/docs/changelog/index.md): Latest announcements and breaking changes across Jupiter APIs.
 
 ### Blog
 
-- [Overview](https://dev.jup.ag/blog/index.md): Technical deep dives into Jupiter products, team's research and learnings
-- [Building the Most AI-Friendly Developer Resource](https://dev.jup.ag/blog/building-ai-friendly-docs.md): "Blog post detailing how Jupiter built AI-friendly developer
-- [Ultra vs Metis: Execution Engine or Routing Primitive](https://dev.jup.ag/blog/ultra-vs-metis.md): A technical comparison between Jupiter's Swap APIs offering both execution engine or routing primitive options.
-- [Ultra V3: The Ultimate Trading Engine](https://dev.jup.ag/blog/ultra-v3.md): A technical deep dive into Jupiter's most comprehensive trading engine, featuring exclusive new capabilities: Iris, Jupiter Beam, Predictive Execution and more.
-- [600 Lines of Code Nobody Asked For](https://dev.jup.ag/blog/why-ultra-v3.md): Better execution, zero infrastructure, faster shipping. Why teams should just use Ultra V3
-- [How hard can it be to price a token on-chain? (very)](https://dev.jup.ag/blog/how-jupiter-prices-a-token.md): Blog post exploring how Jupiter's Price API V3 derives token prices on Solana. Covers why pool-state pricing fails at scale, the last-swap-price methodology, path-based price derivation through swap ratio chains anchored to oracle-priced tokens like SOL, heuristic quality filters (liquidity depth, trading patterns, holder distribution), the V3 response format (usdPrice, blockId, decimals, priceChange24h), and practical integration notes on missing tokens, price freshness, and discrepancies with other price sources.
-- [How does Jupiter decide if a token is real?](https://dev.jup.ag/blog/what-is-organic-score.md): Investigation into Jupiter's organic score infrastructure: wallet classification system, comparative scoring methodology, organic volume decomposition, and how the score drives Price API inclusion, token verification, and ranking across Jupiter's stack.
-- [Metis v7: Migration to Metis.builders](https://dev.jup.ag/blog/metis-v7.md): Metis is now an independent public good at metis.builders with a new access model for v7. This separation establishes Metis as a standalone instruction-level swap primitive for builders who need full control over transaction execution. Additionally, Metis Binary moving forward will require authenticated access with a staked JUP requirement.
+- [Overview](https://dev.jup.ag/docs/blog/index.md): Technical deep dives into Jupiter products, team's research and learnings
+- [Building the Most AI-Friendly Developer Resource](https://dev.jup.ag/docs/blog/building-ai-friendly-docs.md): "Blog post detailing how Jupiter built AI-friendly developer
+- [Ultra vs Metis: Execution Engine or Routing Primitive](https://dev.jup.ag/docs/blog/ultra-vs-metis.md): A technical comparison between Jupiter's Swap APIs offering both execution engine or routing primitive options.
+- [Ultra V3: The Ultimate Trading Engine](https://dev.jup.ag/docs/blog/ultra-v3.md): A technical deep dive into Jupiter's most comprehensive trading engine, featuring exclusive new capabilities: Iris, Jupiter Beam, Predictive Execution and more.
+- [600 Lines of Code Nobody Asked For](https://dev.jup.ag/docs/blog/why-ultra-v3.md): Better execution, zero infrastructure, faster shipping. Why teams should just use Ultra V3
+- [How hard can it be to price a token on-chain? (very)](https://dev.jup.ag/docs/blog/how-jupiter-prices-a-token.md): Blog post exploring how Jupiter's Price API V3 derives token prices on Solana. Covers why pool-state pricing fails at scale, the last-swap-price methodology, path-based price derivation through swap ratio chains anchored to oracle-priced tokens like SOL, heuristic quality filters (liquidity depth, trading patterns, holder distribution), the V3 response format (usdPrice, blockId, decimals, priceChange24h), and practical integration notes on missing tokens, price freshness, and discrepancies with other price sources.
+- [How does Jupiter decide if a token is real?](https://dev.jup.ag/docs/blog/what-is-organic-score.md): Investigation into Jupiter's organic score infrastructure: wallet classification system, comparative scoring methodology, organic volume decomposition, and how the score drives Price API inclusion, token verification, and ranking across Jupiter's stack.
+- [Metis v7: Migration to Metis.builders](https://dev.jup.ag/docs/blog/metis-v7.md): Metis is now an independent public good at metis.builders with a new access model for v7. This separation establishes Metis as a standalone instruction-level swap primitive for builders who need full control over transaction execution. Additionally, Metis Binary moving forward will require authenticated access with a staked JUP requirement.
 
 ## Resources
 
@@ -457,21 +457,21 @@ Support channels, brand assets, and community resources.
 
 ### Resources
 
-- [Support](https://dev.jup.ag/resources/support.md): Technical and customer support platforms for Jupiter
-- [Brand Kit](https://dev.jup.ag/resources/brand-kit.md): Logos, labelling guidelines, and brand assets for Jupiter integrations.
-- [Stats](https://dev.jup.ag/resources/stats.md): Jupiter product metrics, revenue, and usage statistics on Dune.
-- [Audits](https://dev.jup.ag/resources/audits.md): Formal audit reports for Jupiter programs
-- [References](https://dev.jup.ag/resources/references.md): Links and references to Jupiter's GitHub repositories.
+- [Support](https://dev.jup.ag/docs/resources/support.md): Technical and customer support platforms for Jupiter
+- [Brand Kit](https://dev.jup.ag/docs/resources/brand-kit.md): Logos, labelling guidelines, and brand assets for Jupiter integrations.
+- [Stats](https://dev.jup.ag/docs/resources/stats.md): Jupiter product metrics, revenue, and usage statistics on Dune.
+- [Audits](https://dev.jup.ag/docs/resources/audits.md): Formal audit reports for Jupiter programs
+- [References](https://dev.jup.ag/docs/resources/references.md): Links and references to Jupiter's GitHub repositories.
 
 ### Legal
 
-- [Guidelines](https://dev.jup.ag/legal/index.md): Important legal documentation and guidelines that governs the use of our services and platform. Please review these documents carefully.
-- [SDK & API License Agreement](https://dev.jup.ag/legal/sdk-api-license-agreement.md): Jupiter API & SDK License Agreement
-- [Terms of Use](https://dev.jup.ag/legal/terms-of-use.md): Jupiter Terms of Use
-- [Privacy Policy](https://dev.jup.ag/legal/privacy-policy.md): Privacy Policy for Jupiter
+- [Guidelines](https://dev.jup.ag/docs/legal/index.md): Important legal documentation and guidelines that governs the use of our services and platform. Please review these documents carefully.
+- [SDK & API License Agreement](https://dev.jup.ag/docs/legal/sdk-api-license-agreement.md): Jupiter API & SDK License Agreement
+- [Terms of Use](https://dev.jup.ag/docs/legal/terms-of-use.md): Jupiter Terms of Use
+- [Privacy Policy](https://dev.jup.ag/docs/legal/privacy-policy.md): Privacy Policy for Jupiter
 
 ## Optional
 
 - [Dev Portal](https://portal.jup.ag/): Access the Jupiter Portal to manage API key, access to metrics and logs
 - [API Status](https://status.jup.ag/): Check the status of Jupiter APIs
-- [Stay Updated](https://dev.jup.ag/resources/support): Get support and stay updated with Jupiter
+- [Stay Updated](https://dev.jup.ag/docs/resources/support): Get support and stay updated with Jupiter

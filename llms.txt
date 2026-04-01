@@ -73,12 +73,8 @@ Token metadata, search, verification, and organic score APIs.
 
 - [Tokens API](https://dev.jup.ag/docs/tokens/index.md): Jupiter Tokens API V2 for programmatic token discovery and metadata. Search by name/symbol/mint, get verification status, organic score, holder count, market cap, and trading stats. Covers verification levels (verified, unverified, banned), organic score methodology, and token tag standard.
 - [Tokens API V2](https://dev.jup.ag/docs/tokens/token-information.md): GET /tokens/v2 endpoints for retrieving token metadata by mint address, symbol search, tag, category, or recency. Returns name, symbol, icon, organic score, holder count, and trading stats.
-- [Content API (BETA)](https://dev.jup.ag/docs/tokens/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD.
-
-### VRFD
-
-- [Why VRFD](https://dev.jup.ag/docs/tokens/why-vrfd.md): Explains why Jupiter VRFD exists and what it means for developers building on Solana. Covers the problem of permissionless token minting and imposters, how VRFD separates mint verification from trading filters (Jup Shield), the open contribution model where anyone can submit verification signals, and the open system where all data is available via APIs. Relevant for developers deciding how to display token trust levels, filter tokens, or integrate verification into their apps.
 - [Express Verification API](https://dev.jup.ag/docs/tokens/verification.md): Jupiter VRFD Express Verification API for programmatic token verification and metadata updates. Three-step flow: check eligibility (GET /tokens/v2/verify/express/check-eligibility), craft a 1000 JUP payment transaction (GET /tokens/v2/verify/express/craft-txn), then execute with signed transaction and token details (POST /tokens/v2/verify/express/execute). Used by launchpads, agents, and projects to submit tokens for Jupiter verification without the UI. Requires an API key from portal.jup.ag. Verification and metadata updates are reviewed independently by the VRFD team.
+- [Content API (BETA)](https://dev.jup.ag/docs/tokens/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD.
 
 ### Guides
 
@@ -86,21 +82,13 @@ Token metadata, search, verification, and organic score APIs.
 
 ### API Reference
 
-#### Tokens
-
 - [Search](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Request a search by token's symbol, name or mint address
 - [Tag](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Request an array of mints and their information by a tag
 - [Category](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints and their information for the given category and interval
 - [Recent](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints that recently had their first created pool
-
-#### VRFD
-
 - [Check Eligibility](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Check if a token is eligible for express verification and metadata updates
 - [Craft Transaction](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Craft an unsigned 1000 JUP payment transaction for express verification
 - [Execute](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Submit signed transaction with verification and metadata details
-
-#### Content
-
 - [Get Content](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves approved content for up to 50 Solana token mint addresses
 - [Get Content Cooking](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves approved content for currently trending tokens on Jupiter
 - [Get Content Feed](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves a paginated feed of content for a specific mint

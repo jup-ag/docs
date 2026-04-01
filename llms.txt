@@ -75,16 +75,32 @@ Token metadata, search, verification, and organic score APIs.
 - [Tokens API V2](https://dev.jup.ag/docs/tokens/token-information.md): GET /tokens/v2 endpoints for retrieving token metadata by mint address, symbol search, tag, category, or recency. Returns name, symbol, icon, organic score, holder count, and trading stats.
 - [Content API (BETA)](https://dev.jup.ag/docs/tokens/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD.
 
+### VRFD
+
+- [Why VRFD](https://dev.jup.ag/docs/tokens/why-vrfd.md): Explains why Jupiter VRFD exists and what it means for developers building on Solana. Covers the problem of permissionless token minting and imposters, how VRFD separates mint verification from trading filters (Jup Shield), the open contribution model where anyone can submit verification signals, and the open system where all data is available via APIs. Relevant for developers deciding how to display token trust levels, filter tokens, or integrate verification into their apps.
+- [Express Verification API](https://dev.jup.ag/docs/tokens/verification.md): Jupiter VRFD Express Verification API for programmatic token verification and metadata updates. Three-step flow: check eligibility (GET /tokens/v2/verify/express/check-eligibility), craft a 1000 JUP payment transaction (GET /tokens/v2/verify/express/craft-txn), then execute with signed transaction and token details (POST /tokens/v2/verify/express/execute). Used by launchpads, agents, and projects to submit tokens for Jupiter verification without the UI. Requires an API key from portal.jup.ag. Verification and metadata updates are reviewed independently by the VRFD team.
+
 ### Guides
 
 - [How to Get Token Information on Solana](https://dev.jup.ag/docs/guides/how-to-get-token-information.md): Jupiter Tokens API V2 is Solana's most comprehensive token data API. Search SPL tokens by name, symbol, or mint address. Returns metadata (name, symbol, icon, decimals), verification status, organic score, holder count, market cap, liquidity, and trading stats. Powers Phantom, Solflare, and most Solana wallets. Base URL: https://api.jup.ag/tokens/v2. Requires x-api-key header from portal.jup.ag.
 
 ### API Reference
 
+#### Tokens
+
 - [Search](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Request a search by token's symbol, name or mint address
 - [Tag](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Request an array of mints and their information by a tag
 - [Category](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints and their information for the given category and interval
 - [Recent](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints that recently had their first created pool
+
+#### VRFD
+
+- [Check Eligibility](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Check if a token is eligible for express verification and metadata updates
+- [Craft Transaction](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Craft an unsigned 1000 JUP payment transaction for express verification
+- [Execute](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Submit signed transaction with verification and metadata details
+
+#### Content
+
 - [Get Content](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves approved content for up to 50 Solana token mint addresses
 - [Get Content Cooking](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves approved content for currently trending tokens on Jupiter
 - [Get Content Feed](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves a paginated feed of content for a specific mint
@@ -335,18 +351,6 @@ Binary prediction markets for real-world events.
 
 - [Get Vault Info](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get vault account information and balance
 
-## Perps
-
-Leveraged perpetuals trading on Solana (on-chain program, no REST API).
-
-### Perps
-
-- [Jupiter Perpetuals Overview](https://dev.jup.ag/docs/perps/index.md): Jupiter Perpetuals program for leveraged trading on Solana. Work-in-progress documentation covering account structures and the Anchor IDL.
-- [Position Account](https://dev.jup.ag/docs/perps/position-account.md): The Position account stores trade position data including owner, side (long/short), entry price, size, collateral, PNL, and borrow fee snapshot. Derived from the trader's wallet, custody, and collateral custody.
-- [PositionRequest Account](https://dev.jup.ag/docs/perps/position-request-account.md): The PositionRequest account represents a pending request to open, close, or modify a position, including TP/SL triggers. It is a PDA derived from the Position account with a unique random seed.
-- [Pool Account](https://dev.jup.ag/docs/perps/pool-account.md): The Pool account stores JLP pool configuration including AUM (aumUsd), custody public keys, position limits, fee schedules (open/close/swap), and APR calculation data. Only one Pool account exists.
-- [Custody Account](https://dev.jup.ag/docs/perps/custody-account.md): The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state.
-
 ## More
 
 Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).
@@ -373,6 +377,14 @@ Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock
 ### Lock
 
 - [Jupiter Lock Overview](https://dev.jup.ag/docs/lock/index.md): Jupiter Lock (Program ID: LocpQgucEQHbqNABEYvBvwoxCPsSbG91A1QaQhQQqjn) is an open-source, audited, and free tool for locking and vesting tokens over time on Solana.
+
+### Perps
+
+- [Jupiter Perpetuals Overview](https://dev.jup.ag/docs/perps/index.md): Jupiter Perpetuals program for leveraged trading on Solana. Work-in-progress documentation covering account structures and the Anchor IDL.
+- [Position Account](https://dev.jup.ag/docs/perps/position-account.md): The Position account stores trade position data including owner, side (long/short), entry price, size, collateral, PNL, and borrow fee snapshot. Derived from the trader's wallet, custody, and collateral custody.
+- [PositionRequest Account](https://dev.jup.ag/docs/perps/position-request-account.md): The PositionRequest account represents a pending request to open, close, or modify a position, including TP/SL triggers. It is a PDA derived from the Position account with a unique random seed.
+- [Pool Account](https://dev.jup.ag/docs/perps/pool-account.md): The Pool account stores JLP pool configuration including AUM (aumUsd), custody public keys, position limits, fee schedules (open/close/swap), and APR calculation data. Only one Pool account exists.
+- [Custody Account](https://dev.jup.ag/docs/perps/custody-account.md): The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state.
 
 ### API Reference
 
@@ -447,12 +459,12 @@ Changelog, release notes, and developer blog.
 ### Blog
 
 - [Overview](https://dev.jup.ag/docs/blog/index.md): Technical deep dives into Jupiter products, team's research and learnings
+- [How does Jupiter decide if a token is real?](https://dev.jup.ag/docs/blog/what-is-organic-score.md): Investigation into Jupiter's organic score infrastructure: wallet classification system, comparative scoring methodology, organic volume decomposition, and how the score drives Price API inclusion, token verification, and ranking across Jupiter's stack.
+- [How hard can it be to price a token on-chain? (very)](https://dev.jup.ag/docs/blog/how-jupiter-prices-a-token.md): Blog post exploring how Jupiter's Price API V3 derives token prices on Solana. Covers why pool-state pricing fails at scale, the last-swap-price methodology, path-based price derivation through swap ratio chains anchored to oracle-priced tokens like SOL, heuristic quality filters (liquidity depth, trading patterns, holder distribution), the V3 response format (usdPrice, blockId, decimals, priceChange24h), and practical integration notes on missing tokens, price freshness, and discrepancies with other price sources.
 - [Building the Most AI-Friendly Developer Resource](https://dev.jup.ag/docs/blog/building-ai-friendly-docs.md): "Blog post detailing how Jupiter built AI-friendly developer
 - [Ultra vs Metis: Execution Engine or Routing Primitive](https://dev.jup.ag/docs/blog/ultra-vs-metis.md): A technical comparison between Jupiter's Swap APIs offering both execution engine or routing primitive options.
 - [Ultra V3: The Ultimate Trading Engine](https://dev.jup.ag/docs/blog/ultra-v3.md): A technical deep dive into Jupiter's most comprehensive trading engine, featuring exclusive new capabilities: Iris, Jupiter Beam, Predictive Execution and more.
 - [600 Lines of Code Nobody Asked For](https://dev.jup.ag/docs/blog/why-ultra-v3.md): Better execution, zero infrastructure, faster shipping. Why teams should just use Ultra V3
-- [How hard can it be to price a token on-chain? (very)](https://dev.jup.ag/docs/blog/how-jupiter-prices-a-token.md): Blog post exploring how Jupiter's Price API V3 derives token prices on Solana. Covers why pool-state pricing fails at scale, the last-swap-price methodology, path-based price derivation through swap ratio chains anchored to oracle-priced tokens like SOL, heuristic quality filters (liquidity depth, trading patterns, holder distribution), the V3 response format (usdPrice, blockId, decimals, priceChange24h), and practical integration notes on missing tokens, price freshness, and discrepancies with other price sources.
-- [How does Jupiter decide if a token is real?](https://dev.jup.ag/docs/blog/what-is-organic-score.md): Investigation into Jupiter's organic score infrastructure: wallet classification system, comparative scoring methodology, organic volume decomposition, and how the score drives Price API inclusion, token verification, and ranking across Jupiter's stack.
 - [Metis v7: Migration to Metis.builders](https://dev.jup.ag/docs/blog/metis-v7.md): Metis is now an independent public good at metis.builders with a new access model for v7. This separation establishes Metis as a standalone instruction-level swap primitive for builders who need full control over transaction execution. Additionally, Metis Binary moving forward will require authenticated access with a staked JUP requirement.
 
 ## Resources

@@ -1,0 +1,54 @@
+---
+title: "Why VRFD"
+sidebarTitle: "Why VRFD"
+description: "Why Jupiter built an open token verification system and how it helps developers"
+llmsDescription: "Explains why Jupiter VRFD exists and what it means for developers building on Solana. Covers the problem of permissionless token minting and imposters, how VRFD separates mint verification from trading filters (Jup Shield), the open contribution model where anyone can submit verification signals, and the open system where all data is available via APIs. Relevant for developers deciding how to display token trust levels, filter tokens, or integrate verification into their apps."
+---
+
+Solana is permissionless. Anyone can mint a token and name it whatever they want. With tens of thousands of new tokens created daily, distinguishing legitimate tokens from imposters is a real problem for any app that displays tokens to users.
+
+## The Problem
+
+Most token verification systems are centralized and opaque. Jupiter's own verified tokens list was originally built for its trading platforms. Over time, wallets, DEXes, and apps across Solana adopted it as a trust signal. That created a tension: tokens that are legitimate but don't meet trading-volume thresholds can't get verified, which affects their discoverability across the ecosystem.
+
+This conflates two different things:
+
+1. **Is this token legitimate?** (correct mint, not an imposter, real project)
+2. **Does it meet trading quality thresholds?** (liquidity, volume, holder distribution)
+
+A token can be real and still have low volume. VRFD separates these concerns.
+
+## What VRFD Does
+
+[Jupiter VRFD](https://verified.jup.ag) is an open token verification platform. It provides:
+
+**Verification status**: whether a token has been reviewed and confirmed as legitimate. This is the `isVerified` field in the [Tokens API](/tokens/token-information) response. Use it to show trust badges, filter search results, or gate features in your app.
+
+**Token metadata**: name, symbol, icon, socials, description, and supply data. Submitted by token creators and reviewed by the VRFD team. Available via the [Tokens API](/tokens/token-information).
+
+**Community content**: text posts, tweets, summaries, and news for tokens. Available via the [Content API](/tokens/content).
+
+**Dynamic trading data (Jup Shield)**: liquidity, volume, holder distribution, and organic score. These are separate from verification status. A token can be verified but have low volume, or unverified but highly traded.
+
+## Open System
+
+Nothing is locked behind the VRFD UI. All verification data, metadata, submissions, and review decisions are available through APIs:
+
+- **[Tokens API](/tokens/token-information)**: query verification status, metadata, organic score, and trading stats for any token
+- **[Express Verification API](/tokens/verification)**: submit tokens for verification and update metadata programmatically
+- **[Content API](/tokens/content)**: retrieve community-submitted content for tokens
+
+Any wallet, explorer, agent, or app can consume this data and apply their own filters and thresholds. Jupiter's verified list is just one consumer of the same data.
+
+## Open Contribution
+
+Verification is a social process. VRFD allows anyone to submit token review requests, contribute verification signals, and flag inaccurate data, backed by their reputation. All submissions, decisions, and rejection reasons are public so the process is auditable.
+
+## What This Means for Developers
+
+- **Display trust signals**: use `isVerified` and `organicScore` from the Tokens API to help users distinguish legitimate tokens from imposters
+- **Filter tokens**: apply your own criteria using verification status, organic score, and Jup Shield data
+- **Automate verification**: if you run a launchpad or token creation tool, use the [Express Verification API](/tokens/verification) to submit tokens for verification as part of your flow
+- **Surface metadata**: pull verified token names, icons, and socials from the Tokens API instead of maintaining your own database
+
+For verification levels and scoring methodology, see [About Tokens](/tokens).

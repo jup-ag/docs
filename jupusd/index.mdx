@@ -32,6 +32,8 @@ Three integration methods are available:
 
 The mint/redeem Solana program is source-available under the BSL licence: [GitHub repository](https://github.com/jup-ag/jupusd-program/tree/main/programs/jup-stable).
 
+For real-time reserve composition, backing ratio, and audit data, see the [JupUSD Transparency Page](https://jupusd.money/transparency).
+
 ### Key addresses
 
 | Field                           | Address                                                                                                                   |
@@ -41,6 +43,7 @@ The mint/redeem Solana program is source-available under the BSL licence: [GitHu
 | **Custodian (reserves)**        | [`B3q4P4XSmycvoHLaiEjchsGDafFPhKokvHvNRuW29N1y`](https://solscan.io/account/B3q4P4XSmycvoHLaiEjchsGDafFPhKokvHvNRuW29N1y) |
 | **Program reserves**            | [`CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA`](https://solscan.io/account/CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA) |
 | **Multisig (update authority)** | [`31wgH9Czzd3qgquTGxVxtxJuzBd8Fm4xEo8rPX7CNfhM`](https://solscan.io/account/31wgH9Czzd3qgquTGxVxtxJuzBd8Fm4xEo8rPX7CNfhM) |
+| **Anchorage subaccount (custody)** | [`7i6ELgCKhZewDPg4P91w9FYpWKrSx7ptiNrUCrBarHff`](https://solscan.io/account/7i6ELgCKhZewDPg4P91w9FYpWKrSx7ptiNrUCrBarHff) |
 
 ---
 
@@ -52,7 +55,7 @@ A **benefactor** is a wallet authorised to mint and redeem JupUSD through the pr
 
 ### Oracle
 
-The JupUSD program uses [Pyth](https://pyth.network/) as its oracle provider. Oracles serve two purposes in the mint/redeem flow:
+The JupUSD program uses oracle price feeds from [Pyth](https://pyth.network/), [Chainlink](https://chain.link/), and [Chaos Labs](https://chaoslabs.xyz/). Oracles serve two purposes in the mint/redeem flow:
 
 1. **Peg validation**: verify that the collateral (USDC, USDtb) has not depegged before allowing the operation.
 2. **Exchange rate**: the oracle price is used in the calculation of the mint/redeem exchange rate.
@@ -361,5 +364,6 @@ The following errors may occur when calling the Mint or Redeem instructions.
 
 ## Related
 
+- [JupUSD Transparency Page](https://jupusd.money/transparency) for real-time reserve and backing data
 - [JUICED Collateral Integration](/jupusd/juiced) for integrating JUICED as a collateral asset
 - [Jupiter Lend Earn](/lend/earn) for the underlying Earn protocol

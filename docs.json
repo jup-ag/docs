@@ -118,19 +118,44 @@
                 ]
               },
               {
+                "group": "VRFD",
+                "pages": [
+                  "tokens/why-vrfd",
+                  "tokens/verification"
+                ]
+              },
+              {
                 "group": "Guides",
                 "pages": ["guides/how-to-get-token-information"]
               },
               {
                 "group": "API Reference",
                 "pages": [
-                  "api-reference/tokens/search",
-                  "api-reference/tokens/tag",
-                  "api-reference/tokens/category",
-                  "api-reference/tokens/recent",
-                  "api-reference/tokens/get-content",
-                  "api-reference/tokens/get-content-cooking",
-                  "api-reference/tokens/get-content-feed"
+                  {
+                    "group": "Tokens",
+                    "pages": [
+                      "api-reference/tokens/search",
+                      "api-reference/tokens/tag",
+                      "api-reference/tokens/category",
+                      "api-reference/tokens/recent"
+                    ]
+                  },
+                  {
+                    "group": "VRFD",
+                    "pages": [
+                      "api-reference/tokens/verify-check-eligibility",
+                      "api-reference/tokens/verify-craft-txn",
+                      "api-reference/tokens/verify-execute"
+                    ]
+                  },
+                  {
+                    "group": "Content",
+                    "pages": [
+                      "api-reference/tokens/get-content",
+                      "api-reference/tokens/get-content-cooking",
+                      "api-reference/tokens/get-content-feed"
+                    ]
+                  }
                 ]
               }
             ]
@@ -595,12 +620,24 @@
             "group": "Blog",
             "pages": [
               "blog/index",
+              "blog/how-jupiter-routes-your-swap",
+              "blog/how-jupiter-lands-your-transaction",
+              "blog/how-jupiter-knows-what-slippage-to-set",
+              "blog/what-happens-when-you-swap-without-sol",
+              "blog/the-1232-byte-puzzle",
+              "blog/how-jupiter-fee-priority-works",
+              "blog/how-jupiter-lend-95-ltv",
+              "blog/how-jupiter-decides-if-a-token-is-safe",
+              "blog/how-a-dex-gets-listed-on-jupiter",
+              "blog/how-jupiter-runs-dca-orders",
+              "blog/how-prediction-markets-settle",
+              "blog/why-studio-locks-lp",
+              "blog/what-is-organic-score",
+              "blog/how-jupiter-prices-a-token",
               "blog/building-ai-friendly-docs",
               "blog/ultra-vs-metis",
               "blog/ultra-v3",
               "blog/why-ultra-v3",
-              "blog/how-jupiter-prices-a-token",
-              "blog/what-is-organic-score",
               "blog/metis-v7"
             ]
           }

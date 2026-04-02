@@ -202,6 +202,14 @@ All paid plans are billed via Stripe. You can pay by:
 - **Downgrades** take effect at the end of the current billing period.
 - You can change your plan at any time from the dashboard.
 
+### Cancellations
+
+Cancellations take effect at the end of the current billing period. You keep your paid plan's rate limits and credits until the period ends, then your account downgrades to the Free tier.
+
+### Failed payments
+
+If your payment fails at renewal, Stripe retries up to 8 times over 2 weeks. You receive an email on each failed attempt. If payment succeeds during the retry period, your subscription continues on its existing billing cycle. If all retries fail, your account downgrades to the Free tier.
+
 ### Annual billing
 
 Annual plans are available at the price of 10 months. Annual credits are available for the full year, not allocated monthly.

@@ -217,5 +217,3 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 - [2026-03-12] All Lend SDK code examples use the same boilerplate: load keypair from file, initialise Connection, define mint constants. Consistent across all pages for copy-paste reliability.
 - [2026-03-12] Import Private Key accordion uses base58 decode pattern (`bs58.decode(privateKey)` with `Keypair.fromSecretKey`), not file-read. This matches how browser wallets export keys.
-
-<!-- Please add sections for the other APIs or products when necessary -->

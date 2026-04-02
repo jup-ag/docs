@@ -4,6 +4,15 @@ description: "How to migrate from the old Jupiter Portal to the new Developer Pl
 llmsDescription: "Migration guide from the old Jupiter Portal to the new Developer Platform. Covers legacy organisation setup, API key preservation, tier mapping (Free/Pro/Ultra to new Free/Developer/Launch/Pro tiers), grace period with equivalent rate limits, billing transition to Stripe, and Lite API phase-out. No breaking changes to the API itself."
 ---
 
+## Timeline
+
+| Event | Timing |
+| :--- | :--- |
+| Scheduled maintenance on the old Portal (No access to API key generation and plan management) | 3rd - 6th April 2026 |
+| Developer Platform launches and grace period begins | 6th April 2026 |
+| Grace period ends and new payment method needs to be already set up | 30th June 2026 |
+| Old API gateway (including `lite-api`) progressively deprecated | When new gateway is stable. This should not affect any usage, as API keys and requests are seamlessly migrated to the new API gateway under the new Developer Platform |
+
 ## What stays the same
 
 - **Your API keys are preserved** and will continue to work
@@ -86,14 +95,6 @@ To migrate:
 2. (Recommended) [Sign up](https://portal.jup.ag) and add an API key via `x-api-key` header to unlock higher rate limits and access Developer Platform features like analytics and usage monitoring
 
 All endpoints remain the same. Only the base URL changes.
-
-## Timeline
-
-| Event | Timing |
-| :--- | :--- |
-| New Developer Platform launches | April 2026 |
-| Grace period ends, new pricing enforced | July 2026 |
-| Old API gateway (including `lite-api`) progressively deprecated | When new gateway is stable. This should not affect any usage, as API keys and requests are seamlessly migrated to the new API gateway under the new Developer Platform |
 
 ## Support
 

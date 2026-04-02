@@ -1,0 +1,101 @@
+---
+title: "Migrating to Developer Platform"
+description: "How to migrate from the old Jupiter Portal to the new Developer Platform."
+llmsDescription: "Migration guide from the old Jupiter Portal to the new Developer Platform. Covers legacy organisation setup, API key preservation, tier mapping (Free/Pro/Ultra to new Free/Developer/Launch/Pro tiers), grace period with equivalent rate limits, billing transition to Stripe, and Lite API phase-out. No breaking changes to the API itself."
+---
+
+## Timeline
+
+| Event | Timing |
+| :--- | :--- |
+| Scheduled maintenance on the old Portal (No access to API key generation and plan management) | 3rd - 6th April 2026 |
+| Developer Platform launches and grace period begins | 6th April 2026 |
+| Grace period ends and new payment method needs to be already set up | 30th June 2026 |
+| Old API gateway (including `lite-api`) progressively deprecated | When new gateway is stable. This should not affect any usage, as API keys and requests are seamlessly migrated to the new API gateway under the new Developer Platform |
+
+## What stays the same
+
+- **Your API keys are preserved** and will continue to work
+- **Same base URL**: `api.jup.ag` (no endpoint changes)
+- **No breaking changes**: All existing API calls work exactly as before
+- **Same data freshness and latency** across all tiers
+
+## What's new
+
+- **Analytics and monitoring**: Real-time usage dashboards, request logs, and credit tracking
+- **Keyless access**: Replaces `lite-api.jup.ag` with keyless requests on `api.jup.ag` at 0.5 RPS
+- **Improved API key security**: New API keys use a new format and cannot be fully viewed after creation
+
+## What's changed
+
+- **New pricing tiers**: Free, Developer, Launch, and Pro (replaces Free, Pro, and Ultra)
+- **Credit-based billing**: Usage is measured in credits, billed at $1 per 1M credits for overages
+- **Fixed rate limits across all APIs**: No more dynamic rate limits
+- **Billing via Stripe**: Payments are now handled via Stripe (credit card or USDC on Solana via Moonpay)
+
+## Setting up your legacy organisation
+
+When you sign in to the new Developer Platform with your existing email:
+
+1. You will be prompted to set up a **legacy organisation** that includes your existing API keys
+2. You can customise the organisation name and settings
+3. Your API keys will be available immediately in the new dashboard
+
+If you prefer to start fresh, you can create a new organisation instead. You can always set up your legacy organisation later from the **Manage Organisations** settings.
+
+<Warning>
+API keys on the new platform cannot be fully viewed after creation - you will only see the first and last few characters. This applies to both new keys and existing legacy keys once your legacy organisation is set up. Ensure you have your existing API keys saved securely before migrating.
+</Warning>
+
+## Tier mapping
+
+All existing users are mapped to their equivalent rate limits on the new platform.
+
+| Old tier | New platform equivalent |
+| :--- | :--- |
+| Free | Free (1 RPS) |
+| Pro I (10 RPS) | Equivalent rate limit |
+| Pro II (50 RPS) | Equivalent rate limit |
+| Pro III (100 RPS) | Equivalent rate limit |
+| Pro IV (500 RPS) | Custom/Enterprise plan - the team will reach out to you. If we do not reach out, please [contact us](https://airtable.com/apppC9l7PaT9XG8jN/pagjXGV6PFNwUd9P2/form) immediately |
+| Ultra (dynamic) | Equivalent to your current RPS |
+
+## Grace period
+
+<Warning>
+All existing users receive their equivalent rate limits for free for **3 months** after the new platform launches. After this period, new pricing will be enforced. You must choose a paid plan before the grace period ends or your rate limit will drop to the Free tier (1 RPS).
+</Warning>
+
+Use the grace period to:
+1. Explore the new [Developer Platform dashboard](https://developers.jup.ag/portal) and its features
+2. Review the [plans and pricing](/portal/plans) to choose the right tier
+3. Set up your billing before the grace period ends
+
+## Billing transition
+
+### Helio (USDC on Solana)
+
+Helio subscriptions are paid manually each month. Your subscription will naturally expire at the end of your current billing period, but the grace period extends your access - you will continue to have your equivalent rate limits during this time. Purchase your new plan before the grace period ends.
+
+### CoinFlow (credit card)
+
+CoinFlow subscriptions will be cancelled on Jupiter's end. If you notice continued charges, please reach out via our [support page](/resources/support) and we will resolve it. You will need to set up your card again on the new platform as billing is now handled via Stripe.
+
+### New billing
+
+All billing on the new platform is handled via **Stripe**. You can pay by credit card (USD) or crypto (USDC on Solana, powered by Moonpay). See [Plans and Pricing](/portal/plans) for details.
+
+## Lite API migration
+
+`lite-api.jup.ag` will be phased out once the new API gateway is stable. The rate limit on `lite-api.jup.ag` will be reduced progressively until it is fully retired.
+
+To migrate:
+
+1. Update your base URL from `lite-api.jup.ag` to `api.jup.ag`
+2. (Recommended) [Sign up](https://portal.jup.ag) and add an API key via `x-api-key` header to unlock higher rate limits and access Developer Platform features like analytics and usage monitoring
+
+All endpoints remain the same. Only the base URL changes.
+
+## Support
+
+For questions about the migration or help choosing a plan, visit our [support page](/resources/support).

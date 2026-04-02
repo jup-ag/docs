@@ -79,14 +79,14 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 - If showing multiple languages, use Mintlify's `<CodeGroup>`:
 
 ```mdx
-<CodeGroup>
-```typescript TypeScript
-// example
-```
-```python Python
-# example
-```
-</CodeGroup>
+    <CodeGroup>
+    ```typescript TypeScript
+    // example
+    ```
+    ```python Python
+    # example
+    ```
+    </CodeGroup>
 ```
 
 ### API Endpoints

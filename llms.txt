@@ -17,13 +17,12 @@ Setup guides for environment, tooling, and first API calls.
 
 ### Portal
 
-- [Setting Up API Key](https://dev.jup.ag/docs/portal/setup.md): Generate a free API key at portal.jup.ag. Pass it via x-api-key header. Free, Pro, and Ultra tiers available.
-- [Migrate from Lite API](https://dev.jup.ag/docs/portal/migrate-from-lite-api.md): Migrate from lite-api.jup.ag to api.jup.ag: update the base URL, generate a free API key at portal.jup.ag, and add the x-api-key header.
-- [Payment Methods](https://dev.jup.ag/docs/portal/payment.md): Payment options for Jupiter Portal Pro plans: USDC on Solana via Helio (manual monthly renewal) or credit card via CoinFlow (auto-renewing subscription).
+- [Getting Started](https://dev.jup.ag/docs/portal/setup.md): How to get started with the Jupiter Developer Platform: sign up, generate an API key, and make your first request. API key is passed via x-api-key header. Four tiers available: Free (1 RPS), Developer ($25/mo, 10 RPS), Launch ($100/mo, 50 RPS), Pro ($500/mo, 150 RPS). Keyless access available at 0.5 RPS without sign-up.
+- [Plans and Pricing](https://dev.jup.ag/docs/portal/plans.md): Jupiter Developer Platform pricing tiers: Free (1 RPS, no payment), Developer ($25/mo, 10 RPS, 25M credits), Launch ($100/mo, 50 RPS, 100M credits), Pro ($500/mo, 150 RPS, 500M credits). Credit-based billing at $1 per million credits for overages. Per-endpoint credit costs vary from 0 (execute endpoints) to 100 (portfolio positions). Keyless access available at 0.5 RPS.
+- [Rate Limits](https://dev.jup.ag/docs/portal/rate-limits.md): Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per account, not per API key. All API requests share the same rate limit bucket. Returns HTTP 429 when exceeded.
 - [Response Codes](https://dev.jup.ag/docs/portal/responses.md): Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized, 429 rate limited, and 5xx server errors with debugging guidance.
-- [Rate Limit](https://dev.jup.ag/docs/portal/rate-limit.md): Jupiter API rate limiting: Fixed Rate Limits for Free and Pro tiers (60 req/min to 30K req/min), and Dynamic Rate Limits for Ultra that scale with executed swap volume.
-- [Latency](https://dev.jup.ag/docs/portal/latency.md): Jupiter API latency characteristics: distributed AWS gateway regions, factors affecting response times, and optimization tips for collocating servers.
-- [FAQ](https://dev.jup.ag/docs/portal/faq.md): Frequently asked questions about Jupiter Portal: tier differences, API key usage, payment, upgrades, and using Pro and Ultra together.
+- [Migrating to Developer Platform](https://dev.jup.ag/docs/portal/migration.md): Migration guide from the old Jupiter Portal to the new Developer Platform. Covers legacy organisation setup, API key preservation, tier mapping (Free/Pro/Ultra to new Free/Developer/Launch/Pro tiers), grace period with equivalent rate limits, billing transition to Stripe, and Lite API phase-out. No breaking changes to the API itself.
+- [FAQ](https://dev.jup.ag/docs/portal/faq.md): Frequently asked questions about the Jupiter Developer Platform: plan differences, API key usage, billing, upgrades and downgrades, credit overages, migration from old Portal, and support channels.
 
 ## Swap
 
@@ -74,7 +73,7 @@ Token metadata, search, verification, and organic score APIs.
 
 - [Tokens API](https://dev.jup.ag/docs/tokens/index.md): Jupiter Tokens API V2 for programmatic token discovery and metadata. Search by name/symbol/mint, get verification status, organic score, holder count, market cap, and trading stats. Covers verification levels (verified, unverified, banned), organic score methodology, and token tag standard.
 - [Tokens API V2](https://dev.jup.ag/docs/tokens/token-information.md): GET /tokens/v2 endpoints for retrieving token metadata by mint address, symbol search, tag, category, or recency. Returns name, symbol, icon, organic score, holder count, and trading stats.
-- [Content API (BETA)](https://dev.jup.ag/docs/tokens/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD. Pro tier only.
+- [Content API (BETA)](https://dev.jup.ag/docs/tokens/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD.
 
 ### Guides
 

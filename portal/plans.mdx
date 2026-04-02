@@ -1,0 +1,215 @@
+---
+title: "Plans and Pricing"
+description: "Choose a plan that fits your project - from free to enterprise."
+llmsDescription: "Jupiter Developer Platform pricing tiers: Free (1 RPS, no payment), Developer ($25/mo, 10 RPS, 25M credits), Launch ($100/mo, 50 RPS, 100M credits), Pro ($500/mo, 150 RPS, 500M credits). Credit-based billing at $1 per million credits for overages. Per-endpoint credit costs vary from 0 (execute endpoints) to 100 (portfolio positions). Keyless access available at 0.5 RPS."
+---
+
+## Plans
+
+All plans use the same API (`api.jup.ag`) and have the same data freshness and latency. Upgrading a plan only increases your rate limit and included credits.
+
+| | Free | Developer | Launch | Pro |
+| :--- | :--- | :--- | :--- | :--- |
+| **Price (monthly)** | $0 | $25 | $100 | $250 |
+| **Price (annual)** | $0 | $250 | $1,000 | $2,500 |
+| **Requests per second** | 1 | 10 | 50 | 150 |
+| **Included credits** | Unlimited | 25M / month | 100M / month | 250M / month |
+| **Overage** | - | $1 per 1M credits | $1 per 1M credits | $1 per 1M credits |
+| **Support** | Community | Community | Community | Priority |
+
+### Keyless access
+
+You can make requests without an API key at 0.5 requests per second (30 requests per minute). Keyless access is great for AI agent or test use cases, but for applications running in production for users, you should use the APIs with an API key - this unlocks higher rate limits and access to all Developer Platform features such as analytics, usage monitoring, and more.
+
+### Enterprise
+
+Need higher rate limits, custom SLAs, or volume pricing? [Contact us](https://airtable.com/apppC9l7PaT9XG8jN/pagjXGV6PFNwUd9P2/form).
+
+## Credits
+
+Credits measure your API usage. Each API request costs a certain number of credits depending on the endpoint.
+
+- **Free tier**: Unlimited credits, rate-limited only
+- **Paid tiers**: Included credits reset each billing period. Usage beyond your allowance is billed at **$1 per 1M credits**
+- **Execute endpoints are free**: All execute calls cost 0 credits
+
+| Credits per request | Cost per request |
+| :--- | :--- |
+| 0 | Free |
+| 1 | $0.000001 |
+| 3 | $0.000003 |
+| 5 | $0.000005 |
+| 10 | $0.00001 |
+| 50 | $0.00005 |
+| 100 | $0.0001 |
+
+### Per-endpoint credit costs
+
+Execute endpoints are always free (0 credits). All other endpoints default to **1 credit** unless listed otherwise.
+
+<Note>
+Credit costs are subject to change. The latest costs are always reflected in your dashboard usage metrics. When new endpoints are added, this list will be updated accordingly.
+</Note>
+
+<AccordionGroup>
+  <Accordion title="Swap">
+    | Endpoint | Credits |
+    | :--- | :--- |
+    | `/swap/v2/order` | 1 |
+    | `/swap/v2/build` | 1 |
+    | `/swap/v2/execute` | 0 |
+    | `/swap/v1/quote` | 1 |
+    | `/swap/v1/swap` | 1 |
+    | `/swap/v1/swap-instructions` | 1 |
+    | `/swap/v1/program-id-to-label` | 1 |
+    | `/ultra/v1/order` | 1 |
+    | `/ultra/v1/execute` | 0 |
+    | `/ultra/v1/holdings/{address}` | 3 |
+    | `/ultra/v1/holdings/{address}/native` | 3 |
+    | `/ultra/v1/shield` | 1 |
+    | `/ultra/v1/order/routers` | 1 |
+    | `/ultra/v1/search` | 10 |
+  </Accordion>
+
+  <Accordion title="Trigger">
+    | Endpoint | Credits |
+    | :--- | :--- |
+    | `/trigger/v2/auth/challenge` | 1 |
+    | `/trigger/v2/auth/verify` | 1 |
+    | `/trigger/v2/auth/verify-token` | 1 |
+    | `/trigger/v2/vault` | 1 |
+    | `/trigger/v2/vault/register` | 1 |
+    | `/trigger/v2/deposit/craft` | 1 |
+    | `/trigger/v2/orders/price` | 1 |
+    | `/trigger/v2/orders/price/{orderId}` | 1 |
+    | `/trigger/v2/orders/price/cancel/{orderId}` | 1 |
+    | `/trigger/v2/orders/price/confirm-cancel/{orderId}` | 1 |
+    | `/trigger/v2/orders/history` | 1 |
+    | `/trigger/v1/createOrder` | 1 |
+    | `/trigger/v1/cancelOrders` | 1 |
+    | `/trigger/v1/execute` | 0 |
+  </Accordion>
+
+  <Accordion title="Recurring">
+    | Endpoint | Credits |
+    | :--- | :--- |
+    | `/recurring/v1/createOrder` | 1 |
+    | `/recurring/v1/cancelOrder` | 1 |
+    | `/recurring/v1/execute` | 0 |
+    | `/recurring/v1/getRecurringOrders` | 1 |
+  </Accordion>
+
+  <Accordion title="Tokens">
+    | Endpoint | Credits |
+    | :--- | :--- |
+    | `/tokens/v2/search` | 10 |
+    | `/tokens/v2/tag` | 50 |
+    | `/tokens/v2/{category}/{interval}` | 5 |
+    | `/tokens/v2/recent` | 1 |
+    | `/tokens/v2/content` | 1 |
+    | `/tokens/v2/content/feed` | 1 |
+    | `/tokens/v2/content/cooking` | 1 |
+  </Accordion>
+
+  <Accordion title="Price">
+    | Endpoint | Credits |
+    | :--- | :--- |
+    | `/price/v3` | 1 |
+  </Accordion>
+
+  <Accordion title="Portfolio">
+    | Endpoint | Credits |
+    | :--- | :--- |
+    | `/portfolio/v1/positions/{address}` | 100 |
+    | `/portfolio/v1/platforms` | 5 |
+  </Accordion>
+
+  <Accordion title="Lend">
+    | Endpoint | Credits |
+    | :--- | :--- |
+    | `/lend/v1/earn/deposit` | 1 |
+    | `/lend/v1/earn/deposit-instructions` | 1 |
+    | `/lend/v1/earn/withdraw` | 1 |
+    | `/lend/v1/earn/withdraw-instructions` | 1 |
+    | `/lend/v1/earn/mint` | 1 |
+    | `/lend/v1/earn/mint-instructions` | 1 |
+    | `/lend/v1/earn/redeem` | 1 |
+    | `/lend/v1/earn/redeem-instructions` | 1 |
+    | `/lend/v1/earn/tokens` | 1 |
+    | `/lend/v1/earn/positions` | 1 |
+    | `/lend/v1/earn/earnings` | 1 |
+  </Accordion>
+
+  <Accordion title="Send">
+    | Endpoint | Credits |
+    | :--- | :--- |
+    | `/send/v1/craft-send` | 1 |
+    | `/send/v1/craft-clawback` | 1 |
+    | `/send/v1/pending-invites` | 1 |
+    | `/send/v1/invite-history` | 1 |
+  </Accordion>
+
+  <Accordion title="Studio">
+    | Endpoint | Credits |
+    | :--- | :--- |
+    | `/studio/v1/dbc-pool/create-tx` | 1 |
+    | `/studio/v1/dbc-pool/submit` | 1 |
+    | `/studio/v1/dbc-pool/addresses/{mint}` | 1 |
+    | `/studio/v1/dbc/fee` | 1 |
+    | `/studio/v1/dbc/fee/create-tx` | 1 |
+  </Accordion>
+
+  <Accordion title="Prediction">
+    | Endpoint | Credits |
+    | :--- | :--- |
+    | `/prediction/v1/events` | 1 |
+    | `/prediction/v1/events/{eventId}` | 1 |
+    | `/prediction/v1/markets` | 1 |
+    | `/prediction/v1/markets/{marketId}` | 1 |
+    | `/prediction/v1/orders` | 1 |
+    | `/prediction/v1/orders/{orderId}` | 1 |
+    | `/prediction/v1/positions` | 1 |
+    | `/prediction/v1/positions/{positionId}` | 1 |
+    | `/prediction/v1/history/trades` | 1 |
+    | `/prediction/v1/trading/place-order` | 1 |
+    | `/prediction/v1/trading/cancel-order` | 1 |
+    | `/prediction/v1/orderbook/{marketId}` | 1 |
+    | `/prediction/v1/milestones` | 1 |
+    | `/prediction/v1/vault` | 1 |
+  </Accordion>
+</AccordionGroup>
+
+### Monitoring usage
+
+Track your credit consumption in real time from your [dashboard](https://developers.jup.ag/portal). The usage card shows:
+
+- Included credits used vs remaining
+- Overage accrual (if applicable)
+- Billing period end date
+
+## Billing
+
+### Payment methods
+
+All paid plans are billed via Stripe. You can pay by:
+
+- **Credit card** (USD, auto-renewing)
+- **Crypto** (USDC on Solana, powered by Moonpay)
+
+### Upgrades and downgrades
+
+- **Upgrades** take effect immediately. The amount is pro-rated for the remainder of the billing period.
+- **Downgrades** take effect at the end of the current billing period.
+- You can change your plan at any time from the dashboard.
+
+### Cancellations
+
+Cancellations take effect at the end of the current billing period. You keep your paid plan's rate limits and credits until the period ends, then your account downgrades to the Free tier.
+
+### Failed payments
+
+If your payment fails at renewal, Stripe retries up to 8 times over 2 weeks. You receive an email on each failed attempt. If payment succeeds during the retry period, your subscription continues on its existing billing cycle. If all retries fail, your account downgrades to the Free tier.
+
+### Annual billing
+
+Annual plans are available at the price of 10 months. Annual credits are available for the full year, not allocated monthly.

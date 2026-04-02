@@ -613,19 +613,6 @@
           {
             "group": " ",
             "pages": ["changelog/index"]
-          },
-          {
-            "group": "Blog",
-            "pages": [
-              "blog/index",
-              "blog/building-ai-friendly-docs",
-              "blog/ultra-vs-metis",
-              "blog/ultra-v3",
-              "blog/why-ultra-v3",
-              "blog/how-jupiter-prices-a-token",
-              "blog/what-is-organic-score",
-              "blog/metis-v7"
-            ]
           }
         ]
       },
@@ -979,6 +966,10 @@
     {
       "source": "/skills",
       "destination": "/skill"
+    },
+    {
+      "source": "/blog/:slug*",
+      "destination": "https://dev.jup.ag/blog/:slug*"
     }
   ]
 }

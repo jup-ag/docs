@@ -8,7 +8,7 @@ hidden: true
 `/submit` lets you send signed transactions through Jupiter's transaction landing infrastructure with SOL tips for priority processing. It runs on the same pipeline as Jupiter Beam, giving you performant transaction landing for any transaction type.
 
 <Note>
-This endpoint is currently shared privately with close partners. It is not a public-facing endpoint.
+This endpoint is currently shared privately. It is not a public-facing endpoint.
 </Note>
 
 ## How /submit differs from /execute
@@ -20,14 +20,14 @@ Both endpoints submit transactions, but they serve different flows:
 | **Paired with** | `/order` (order-and-execute flow) | `/build` or any signed transaction |
 | **Fee model** | Jupiter swap fees (included in the order) | SOL tips (minimum 0.001 SOL) |
 | **Transaction source** | Must match the exact transaction from `/order` | Any valid signed Solana transaction |
-| **Routing** | All routers (Metis + RFQ) | N/A (you build the transaction yourself) |
-| **Use case** | Recommended swap happy path | Custom transactions, `/build` transactions, non-Jupiter swaps |
 
 When `/submit` goes public, the two may converge into a unified submission flow since they share the same underlying infrastructure.
 
 ## Quick start
 
-The flow builds on the [`/build` endpoint](/swap/build). Call `/build` with `tipAmount`, build and sign the transaction, then submit via `/submit`.
+The example code builds on the [`/build` endpoint](/swap/build).
+
+Call `/build` with `tipAmount`, build and sign the transaction, then submit via `/submit`.
 
 <CodeGroup>
 ```typescript @solana/web3.js
@@ -267,7 +267,7 @@ const tipIx = getTransferSolInstruction({
 | Tip currency      | SOL only (for now)                                                  |
 | Tip recipients    | 16 Jupiter V6 program authorities                                   |
 | Minimum tip       | 1,000,000 lamports (0.001 SOL)                                      |
-| Transaction types | Any signed Solana transaction (private distribution)                |
+| Transaction types | Any signed Solana transaction                                       |
 | API interface     | Follows `/execute` pattern, not Solana RPC `sendTransaction`        |
 
 ## Related

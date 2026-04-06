@@ -1,34 +1,48 @@
 ---
 title: "Slippage Estimation"
-description: "Use RTSE for dynamic slippage on /order and /build"
-llmsDescription: "How Jupiter's Real-Time Slippage Estimator (RTSE) works across both /order and /build endpoints. On /order, RTSE is automatic and adjusts slippage at execution time. On /build, pass slippageBps=rtse to opt in. RTSE uses heuristics (token categories, historical data), algorithms (EMA on slippage data), and real-time monitoring (failure rate tracking) to balance trade success and price protection. Covers when to use RTSE vs a fixed slippageBps value, and edge cases like volatile tokens and thin liquidity."
+description: "Use RTSE for optimal slippage on /order and /build"
+llmsDescription: "How Jupiter's Real-Time Slippage Estimator (RTSE) works across both /order and /build endpoints. On /order, RTSE is applied automatically at order time (not execute time). On /build, pass slippageBps=rtse to opt in. RTSE uses two estimation methods: failed transaction analysis and exponential moving average (EMA) on observed slippage. Token categories (stable, bluechip, lst) determine ranges. RTSE is bypassed for stable-to-stable swaps. Covers when to use RTSE vs a fixed slippageBps value, and edge cases like memecoins, thin liquidity, and stablecoins."
 ---
 
 Slippage is the difference between the quoted output amount and what you actually receive. It depends on token pair volatility, trade size relative to pool liquidity, and time between quoting and execution.
 
-Jupiter's **Real-Time Slippage Estimator (RTSE)** dynamically calculates the optimal slippage tolerance for each swap, balancing trade success against price protection.
+Jupiter's **Real-Time Slippage Estimator (RTSE)** calculates the optimal slippage tolerance for each swap, balancing trade success against price protection.
+
+<Note>
+RTSE is not the same as "dynamic slippage" (a legacy feature that is no longer maintained). RTSE is a fundamentally different system with better estimation and results.
+</Note>
 
 ## How RTSE works
 
-RTSE estimates slippage using three inputs:
+RTSE estimates slippage at **order time** (when you call `/order` or `/build`), not at execution time. The estimated slippage is baked into the transaction.
 
-- **Heuristics:** token categories (stablecoin, blue-chip, long-tail), historical slippage data, and real-time market conditions
-- **Algorithms:** Exponential Moving Average (EMA) on observed slippage data to smooth out noise and track trends
-- **Monitoring:** real-time failure rate tracking to reactively increase slippage when market conditions deteriorate
+RTSE uses two estimation methods:
 
-The result is a per-swap slippage value that is tight enough to protect against MEV and price impact, but loose enough for the transaction to land.
+- **Failed transaction analysis:** analyses historical failed transactions for the token pair to identify slippage thresholds that cause failures
+- **Exponential Moving Average (EMA):** tracks observed slippage over time to smooth out noise and follow trends
+
+These are combined with **token category heuristics**. Each token is assigned a category (stable, bluechip, LST, etc.) that determines the min/max slippage range. RTSE's estimate is clamped within this range.
+
+| Category | RTSE used? | Typical range | Examples |
+|---|---|---|---|
+| Stable | No (bypassed) | 5-15 bps | USDC, USDT, PYUSD |
+| Bluechip | Yes | 50-500+ bps | JUP, BONK, RAY |
+| LST | Yes | 30-10,000+ bps | mSOL, bSOL, jitoSOL |
+| Other | Yes | 80-500+ bps (default) | Long-tail tokens |
+
+For **stable-to-stable swaps** (e.g. USDC to USDT), RTSE is intentionally bypassed. These swaps have predictable, low slippage, so category-based heuristic ranges are used instead.
 
 ## RTSE on `/order` vs `/build`
 
 | | `/order` | `/build` |
 |---|---|---|
-| **RTSE** | Automatic. Applied at execution time by `/execute`. | Opt-in. Pass `slippageBps=rtse`. |
+| **RTSE** | Automatic. Applied at order time. | Opt-in. Pass `slippageBps=rtse`. |
 | **Default** | RTSE (no param needed) | `slippageBps=50` (fixed 0.5%) |
-| **Override** | Pass `slippageBps` for a fixed value (restricts to Metis-only routing) | Pass a number for fixed, or `"rtse"` for dynamic |
+| **Override** | Pass `slippageBps` for a fixed value (restricts to Metis-only routing) | Pass a number for fixed, or `"rtse"` for RTSE |
 
 ### /order (automatic)
 
-On the `/order` + `/execute` path, RTSE is applied automatically at execution time. You do not need to set any slippage parameter. Jupiter adjusts slippage dynamically when the transaction is executed via `/execute`, using real-time market data at that moment.
+On the `/order` path, RTSE is applied automatically when the order is created. You do not need to set any slippage parameter. The estimated slippage is embedded in the transaction returned by `/order`.
 
 If you pass `slippageBps` to `/order`, it overrides RTSE with a fixed value. This also restricts routing to Metis-only (see [Routing](/swap/routing)).
 
@@ -40,7 +54,7 @@ On the `/build` path, slippage defaults to 50 bps (0.5%). To enable RTSE, pass t
 GET https://api.jup.ag/swap/v2/build?inputMint=...&outputMint=...&amount=...&taker=...&slippageBps=rtse
 ```
 
-When `slippageBps=rtse` is set, the API simulates the transaction and estimates optimal slippage using the same RTSE engine that powers `/order`. The estimated slippage is reflected in `otherAmountThreshold` in the response.
+The API estimates optimal slippage using the same RTSE engine that powers `/order`. The estimated slippage is reflected in `otherAmountThreshold` in the response.
 
 ## When to use RTSE
 
@@ -50,18 +64,21 @@ When `slippageBps=rtse` is set, the API simulates the transaction and estimates 
 - You want to minimise failed transactions without overpaying on slippage
 
 **Use a fixed `slippageBps` value when:**
-- You have specific slippage requirements (e.g. stablecoin swaps where 5-10 bps is sufficient)
+- You want to guarantee a higher success rate by accepting more slippage on the final output amount, e.g. trading memecoins or exiting a position as quickly as possible
+- You are swapping stablecoins where 5-10 bps is sufficient
 - You are building a UI that lets users set their own slippage
 - You need deterministic behaviour for testing or simulation
 
 ## Edge cases
 
-- **Volatile tokens:** RTSE increases slippage tolerance for tokens with high recent price movement. This reduces transaction failures but means you accept more slippage on volatile pairs.
-- **Thin liquidity:** for tokens with very thin pool liquidity, slippage depends heavily on trade size. RTSE accounts for this, but very large trades relative to pool depth may still exceed tolerance.
-- **Stablecoins:** RTSE typically assigns very low slippage (5-15 bps) for stablecoin pairs, since their price is predictable. A fixed 10-20 bps is also reasonable for these pairs.
+- **Memecoins and volatile tokens:** RTSE increases slippage tolerance for tokens with high recent price movement. If you need to guarantee the swap succeeds (e.g. exiting a position fast), consider a fixed `slippageBps` of 300-1000+ instead of relying on RTSE.
+- **Thin liquidity:** for tokens with very thin pool liquidity, slippage depends heavily on trade size relative to pool depth. RTSE accounts for this using per-pool metrics, but very large trades may still exceed tolerance.
+- **Stablecoins:** RTSE is bypassed for stable-to-stable swaps (e.g. USDC to USDT). Category-based heuristics assign 5-15 bps, which is typically sufficient. A fixed 10-20 bps also works well.
+- **New tokens:** RTSE has limited historical data for newly created tokens or pools. It falls back to default category ranges, which may be more conservative than necessary.
+- **RTSE unavailability:** if the RTSE service is temporarily unavailable, the API falls back to category-based heuristic slippage. No transaction will fail because of RTSE unavailability.
 
 ## Related
 
 - [Routing](/swap/routing): how parameters like `slippageBps` affect which routers are available
 - [Order & Execute](/swap/order-and-execute): the default swap flow where RTSE is automatic
-- [Get Swap Instructions](/swap/build): the advanced path where RTSE is opt-in
+- [Get Swap Instructions](/swap/build): the advanced path where RTSE is opt-in via `slippageBps=rtse`

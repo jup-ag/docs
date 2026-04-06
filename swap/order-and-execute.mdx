@@ -308,7 +308,7 @@ For the full parameter reference and how each parameter affects routing, see [Ro
 
 `POST /execute` takes the signed transaction and the `requestId` from the order response. Jupiter handles:
 
-- Optimised slippage via RTSE (Real-Time Slippage Estimator), which adjusts slippage at execution time to balance trade success and price protection
+- Optimised slippage via [RTSE](/swap/advanced/slippage) (Real-Time Slippage Estimator), applied at order time to balance trade success and price protection
 - Optimised priority fee strategy for current network conditions
 - Jupiter Beam (our own proprietary transaction execution pipeline) for accelerated transaction sending and landing across multiple RPC providers
 - Confirmation polling

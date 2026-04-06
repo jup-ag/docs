@@ -1,10 +1,12 @@
 ---
 title: "Transaction Submission"
-description: "Submit signed transactions through Jupiter's infrastructure with SOL tips"
-llmsDescription: "How to submit signed transactions through Jupiter's transaction landing infrastructure using POST api.jup.ag/submit. Accepts any signed Solana transaction with a SOL tip (minimum 0.001 SOL) to one of 16 Jupiter V6 program authorities. Designed for /build transactions and non-Jupiter transactions that want access to Jupiter Beam's landing pipeline. Differs from /execute which is tied to the /order flow and uses swap fees. Includes TypeScript code examples for both @solana/kit and @solana/web3.js, standalone tip instruction examples for non-Jupiter transactions, and the full list of tip recipient addresses."
+description: "Send transactions through Jupiter's landing infrastructure with SOL tips"
+llmsDescription: "How to submit signed transactions through Jupiter's transaction landing infrastructure using POST api.jup.ag/submit. Accepts any signed Solana transaction with a SOL tip (minimum 0.001 SOL) to one of 16 Jupiter V6 program authorities. Designed for /build transactions and non-Jupiter transactions that want access to Jupiter's transaction landing pipeline. Differs from /execute which is tied to the /order flow and uses swap fees. Includes TypeScript code examples for both @solana/kit and @solana/web3.js, standalone tip instruction examples for non-Jupiter transactions, and the full list of tip recipient addresses."
 ---
 
-`/submit` lets you send signed transactions through Jupiter's transaction landing infrastructure with SOL tips for priority processing. It runs on the same pipeline as Jupiter Beam, giving you performant transaction landing for any transaction type.
+`/submit` lets you send signed transactions through Jupiter's transaction landing infrastructure with SOL tips for priority processing. It runs on the same pipeline that powers Jupiter's own swap execution, giving you performant transaction landing for any transaction type.
+
+Transaction submission can make or break your integration. If you are building with `/build` and managing your own transaction submission, consider running `/submit` alongside your existing submission path. If Jupiter's pipeline delivers even marginally better landing rates, that compounds into meaningful gains at scale.
 
 
 ## How /submit differs from /execute
@@ -16,6 +18,7 @@ Both endpoints submit transactions, but they serve different flows:
 | **Paired with** | `/order` (order-and-execute flow) | `/build` or any signed transaction |
 | **Fee model** | Jupiter swap fees (included in the order) | SOL tips (minimum 0.001 SOL) |
 | **Transaction source** | Must match the exact transaction from `/order` | Any valid signed Solana transaction |
+| **Use case** | Recommended swap happy path | Custom transactions, `/build` transactions, non-Jupiter swaps |
 
 ## Quick start
 

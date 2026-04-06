@@ -18,12 +18,12 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 
 ## Choosing a path
 
-| | `/order` + `/execute` | `/build` |
+| | `/order` + `/execute` | `/build` + `/submit` |
 | --- | --- | --- |
 | **Returns** | Assembled transaction | Raw swap instructions |
 | **Routers** | All (Metis, RFQ, Dflow, OKX) | Metis only |
 | **Best for** | Most integrations. Best price, simplest flow. | Custom transactions, CPI, composability. |
-| **Execution** | Managed via `/execute` (optimised slippage, priority fees, accelerated landing) | Self-managed via your own RPC |
+| **Execution** | Managed via `/execute` (optimised slippage, priority fees, accelerated landing) | Self-managed via your own RPC, or via [`/submit`](/swap/submit) with SOL tips for Jupiter Beam landing |
 | **Swap fees** | Yes (Jupiter platform fee) | No |
 | **Integrator fees** | Referral fees (referralAccount + referralFee) | Platform fee only (platformFeeBps) or DIY |
 | **Gasless** | [Automatic gasless, or your own `payer`](/swap/advanced/gasless) | Use your own `payer` |
@@ -36,10 +36,11 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 | Endpoint | Method | Description |
 | --- | --- | --- |
 | [`/order`](/swap/order-and-execute) | GET | Get a quote and assembled transaction |
+| [`/execute`](/swap/order-and-execute#execute-the-transaction) | POST | Execute a signed `/order` transaction with managed landing |
 | [`/build`](/swap/build) | GET | Get a quote and raw swap instructions |
-| [`/execute`](/swap/order-and-execute#execute-the-transaction) | POST | Execute a signed `/order` transaction |
+| [`/submit`](/swap/submit) | POST | Submit any signed transaction through Jupiter's landing infrastructure with SOL tips |
 
-**Base URL:** `https://api.jup.ag/swap/v2`
+**Base URL:** `https://api.jup.ag/swap/v2` (except `/submit` which is at `https://api.jup.ag/submit`)
 
 All endpoints require an API key via the `x-api-key` header. Get one at [portal.jup.ag](https://portal.jup.ag).
 

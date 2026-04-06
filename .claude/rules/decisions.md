@@ -200,3 +200,19 @@ Track all redirects added to `vercel.json` here for visibility:
 | `/docs/studio/*` | `/studio/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
 | `/docs/trigger/*` | `/trigger/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
 | `/docs/ultra/*` | `/ultra/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+
+### [2026-04-06] Hidden pages for private integrator docs
+**Status:** implemented
+**Scope:** new-section
+**Files affected:** `swap/multisig.mdx`, `swap/submit.mdx`
+**Linear issue:** DEVREL-165
+
+**Context:** Private integrator docs lived in Notion, outside the docs repo. No PR review, inconsistent formatting, no path to graduate into public docs.
+**Decision:**
+- Use Mintlify `hidden: true` frontmatter for private integrator docs
+- Place hidden pages flat under their product section (e.g. `/swap/multisig`, `/swap/submit`), not in a separate `/integrations/` or `/partners/` directory
+- Do NOT add hidden pages to `docs.json` navigation
+- Hidden pages are excluded from llms.txt by the generator script (it walks the nav tree, hidden pages aren't in it)
+- Use generic titles that can accommodate future expansion (e.g. "Multisig Swap" not "Squads Integration") while being specific in the body content
+**Rationale:** Flat placement means graduation to public requires only removing `hidden: true` with no URL change. Generic titles avoid path renames if support expands to other protocols. Mintlify's hidden page feature handles nav/search/SEO exclusion automatically.
+**Alternatives considered:** `/swap/partners/*` prefix — rejected because it creates a URL migration problem when features graduate to public. `/swap/integrations/*` — same issue.

@@ -1,12 +1,22 @@
 ---
 title: "Slippage Estimation"
 description: "Use RTSE for optimal slippage on /order and /build"
-llmsDescription: "How to use Jupiter's Real-Time Slippage Estimator (RTSE) on both /order and /build endpoints. On /order, RTSE is applied automatically at order time. On /build, pass slippageBps=rtse to opt in. Covers when to use RTSE vs a fixed slippageBps value."
+llmsDescription: "How to use Jupiter's Real-Time Slippage Estimator (RTSE) on both /order and /build endpoints. On /order, RTSE is applied automatically at order time. On /build, pass slippageBps=rtse to opt in. RTSE uses heuristics (token categories, historical and real-time slippage data), algorithms (EMA), and real-time failure rate monitoring to estimate optimal slippage. Covers when to use RTSE vs a fixed slippageBps value."
 ---
 
 Slippage is the difference between the quoted output amount and what you actually receive. It depends on token pair volatility, trade size relative to pool liquidity, and time between quoting and execution.
 
 Jupiter's **Real-Time Slippage Estimator (RTSE)** estimates the optimal slippage tolerance for each swap, balancing trade success against price protection.
+
+## How RTSE works
+
+RTSE estimates slippage at **order time** (when you call `/order` or `/build`), not at execution time. The estimated slippage is baked into the transaction.
+
+RTSE uses a variety of heuristics, algorithms, and monitoring to estimate the best possible slippage:
+
+- **Heuristics:** token categories, historical and real-time slippage data. Uses token categories to intelligently estimate slippage for different token types, with increased sensitivity for tokens with high historical volatility patterns.
+- **Algorithms:** Exponential Moving Average (EMA) on slippage data to smooth out noise and follow trends.
+- **Monitoring:** real-time monitoring of failure rates to reactively increase slippage when necessary.
 
 ## RTSE on `/order` vs `/build`
 

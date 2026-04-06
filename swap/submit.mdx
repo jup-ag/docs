@@ -1,15 +1,11 @@
 ---
 title: "Transaction Submission"
 description: "Submit signed transactions through Jupiter's infrastructure with SOL tips"
-llmsDescription: "How to submit signed transactions through Jupiter's transaction landing infrastructure using POST /swap/v2/submit. Accepts any signed Solana transaction with a SOL tip (minimum 0.001 SOL) to one of 16 Jupiter V6 program authorities. Designed for /build transactions and non-Jupiter transactions that want access to Jupiter Beam's landing pipeline. Differs from /execute which is tied to the /order flow and uses swap fees. Includes TypeScript code examples for both @solana/kit and @solana/web3.js, standalone tip instruction examples for non-Jupiter transactions, and the full list of tip recipient addresses."
-hidden: true
+llmsDescription: "How to submit signed transactions through Jupiter's transaction landing infrastructure using POST api.jup.ag/submit. Accepts any signed Solana transaction with a SOL tip (minimum 0.001 SOL) to one of 16 Jupiter V6 program authorities. Designed for /build transactions and non-Jupiter transactions that want access to Jupiter Beam's landing pipeline. Differs from /execute which is tied to the /order flow and uses swap fees. Includes TypeScript code examples for both @solana/kit and @solana/web3.js, standalone tip instruction examples for non-Jupiter transactions, and the full list of tip recipient addresses."
 ---
 
 `/submit` lets you send signed transactions through Jupiter's transaction landing infrastructure with SOL tips for priority processing. It runs on the same pipeline as Jupiter Beam, giving you performant transaction landing for any transaction type.
 
-<Note>
-This endpoint is currently shared privately. It is not a public-facing endpoint.
-</Note>
 
 ## How /submit differs from /execute
 
@@ -21,13 +17,9 @@ Both endpoints submit transactions, but they serve different flows:
 | **Fee model** | Jupiter swap fees (included in the order) | SOL tips (minimum 0.001 SOL) |
 | **Transaction source** | Must match the exact transaction from `/order` | Any valid signed Solana transaction |
 
-When `/submit` goes public, the two may converge into a unified submission flow since they share the same underlying infrastructure.
-
 ## Quick start
 
-The example code builds on the [`/build` endpoint](/swap/build).
-
-Call `/build` with `tipAmount`, build and sign the transaction, then submit via `/submit`.
+The flow builds on the [`/build` endpoint](/swap/build). Call `/build` with `tipAmount`, build and sign the transaction, then submit via `/submit`.
 
 <CodeGroup>
 ```typescript @solana/web3.js
@@ -74,7 +66,7 @@ const transaction = new VersionedTransaction(message);
 transaction.sign([signer]);
 
 // Step 3: Submit via /submit
-const submitRes = await fetch(`${BASE_URL}/submit`, {
+const submitRes = await fetch("https://api.jup.ag/submit", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -127,7 +119,7 @@ const compiledTx = buildTransaction(instructions, blockhash, alts, signer.addres
 const signedTransaction = await signTransaction([signer.keyPair], compiledTx);
 
 // Step 3: Submit via /submit
-const submitRes = await fetch(`${BASE_URL}/submit`, {
+const submitRes = await fetch("https://api.jup.ag/submit", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -152,7 +144,7 @@ See the [Get Swap Instructions](/swap/build) page for the full transaction assem
 ### POST /submit
 
 ```
-POST https://api.jup.ag/swap/v2/submit
+POST https://api.jup.ag/submit
 ```
 
 #### Request

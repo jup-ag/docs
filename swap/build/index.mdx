@@ -587,7 +587,8 @@ Sign the transaction with your wallet and send via your own RPC.
 
 | Parameter | Default | Description |
 | --- | --- | --- |
-| `slippageBps` | 50 | Slippage tolerance in basis points |
+| `slippageBps` | 50 | Slippage tolerance in basis points, or `"rtse"` for [dynamic slippage](/swap/advanced/slippage) |
+| `tipAmount` | - | SOL tip amount in lamports. Adds a tip instruction for use with [`/submit`](/swap/submit) |
 | `mode` | (default) | "fast" for reduced latency routing |
 | `maxAccounts` | 64 | Maximum accounts for the swap route (1-64) |
 | `platformFeeBps` | 0 | Integrator platform fee in bps (requires `feeAccount`) |

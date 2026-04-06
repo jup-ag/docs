@@ -1,7 +1,7 @@
 ---
 title: "Multisig Swap"
 description: "Swap through a Squads V5 multisig vault with managed landing"
-llmsDescription: "How to execute token swaps through a Squads V5 multisig vault using the Jupiter Swap API. Covers the two-endpoint flow: GET /swap/v2/squads/v5/order to get a wrapped transaction with Squads executeTransactionSyncV2 CPI, and POST /swap/v2/squads/v5/execute to submit the signed transaction. Only Metis routing is supported. Parameters include inputMint, outputMint, amount, taker (vault PDA), settingPda, signers (comma-separated, first = fee payer). The vault signs via CPI, not as a transaction-level signer. Includes TypeScript code examples for multi-signer and single-signer flows."
+llmsDescription: "How to execute token swaps through a Squads V5 multisig vault using the Jupiter Swap API. Covers the two-endpoint flow: GET /swap/v2/squads/v5/order to get a wrapped transaction with Squads executeTransactionSyncV2 CPI, and POST /swap/v2/squads/v5/execute to submit the signed transaction. Only Metis routing is supported. Parameters include inputMint, outputMint, amount, taker (vault PDA), settingsPda, signers (comma-separated, first = fee payer). The vault signs via CPI, not as a transaction-level signer. Includes TypeScript code examples for multi-signer and single-signer flows."
 hidden: true
 ---
 
@@ -9,7 +9,7 @@ The Swap API supports swapping through Squads V5 multisig vaults. The server wra
 
 Two endpoints:
 
-1. **`GET /squads/v5/order`**: pass the vault PDA as `taker`, along with `settingPda` and `signers`. Returns a wrapped transaction ready for signing.
+1. **`GET /squads/v5/order`**: pass the vault PDA as `taker`, along with `settingsPda` and `signers`. Returns a wrapped transaction ready for signing.
 2. **`POST /squads/v5/execute`**: submit the fully signed transaction. Jupiter validates and executes via Jupiter Beam.
 
 The vault never signs directly. It "signs" via CPI through the Squads program. Multisig members sign the outer transaction, and the Squads program enforces the threshold.
@@ -22,7 +22,7 @@ Only **Metis routing** is currently supported for multisig swaps. RFQ is not sup
 
 <Steps>
   <Step title="Request a wrapped order">
-    Call `GET /squads/v5/order` with swap parameters, vault as `taker`, `settingPda`, and `signers`.
+    Call `GET /squads/v5/order` with swap parameters, vault as `taker`, `settingsPda`, and `signers`.
   </Step>
   <Step title="Validate signers on-chain">
     The API fetches multisig settings on-chain and validates the provided signers against the member list and threshold.
@@ -55,7 +55,7 @@ GET https://api.jup.ag/swap/v2/squads/v5/order
 | `outputMint`| `string` | Yes      | Mint address of the token to buy                                            |
 | `amount`    | `string` | Yes      | Amount in smallest units (e.g. lamports)                                    |
 | `taker`     | `string` | Yes      | Vault PDA (the account holding the tokens being swapped)                    |
-| `settingPda`| `string` | Yes      | Squads V5 settings account address                                          |
+| `settingsPda`| `string` | Yes      | Squads V5 settings account address                                          |
 | `signers`   | `string` | Yes      | Comma-separated signer pubkeys. **First signer = fee payer.** Order matters |
 | `useWsol`   | `string` | No       | `true` to use wrapped SOL. Defaults to `false`                              |
 
@@ -106,7 +106,7 @@ const orderRes = await fetch(
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "10000000",
       taker: vaultPda.toBase58(),
-      settingPda: settingsPda.toBase58(),
+      settingsPda: settingsPda.toBase58(),
       signers: `${walletPubkey.toBase58()},${deviceKey.publicKey.toBase58()}`,
     })
 );
@@ -152,7 +152,7 @@ const orderRes = await fetch(
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "10000000",
       taker: vaultPda.toBase58(),
-      settingPda: settingsPda.toBase58(),
+      settingsPda: settingsPda.toBase58(),
       signers: walletPubkey.toBase58(),
     })
 );

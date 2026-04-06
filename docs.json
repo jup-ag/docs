@@ -458,22 +458,6 @@
             ]
           },
           {
-            "item": "Perps",
-            "icon": "chart-line",
-            "groups": [
-              {
-                "group": "Perps",
-                "pages": [
-                  "perps/index",
-                  "perps/position-account",
-                  "perps/position-request-account",
-                  "perps/pool-account",
-                  "perps/custody-account"
-                ]
-              }
-            ]
-          },
-          {
             "item": "More",
             "icon": "ellipsis",
             "groups": [
@@ -505,6 +489,16 @@
               {
                 "group": "Lock",
                 "pages": ["lock/index"]
+              },
+              {
+                "group": "Perps",
+                "pages": [
+                  "perps/index",
+                  "perps/position-account",
+                  "perps/position-request-account",
+                  "perps/pool-account",
+                  "perps/custody-account"
+                ]
               },
               {
                 "group": "API Reference",

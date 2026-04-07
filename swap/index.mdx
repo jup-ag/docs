@@ -1,7 +1,7 @@
 ---
 title: "Overview"
 description: "One API for all swap use cases on Jupiter"
-llmsDescription: "Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Two paths: /order (default happy path with managed execution, all routers including RFQ, gasless, MEV protection) and /build (advanced path returning raw swap instructions for custom transactions, CPI, composability). Covers when to use which path, routing trade-offs, and links to all sub-pages. /execute is managed execution for /order only. /build has no swap fees and uses Metis-only routing."
+llmsDescription: "Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Four endpoints: GET /order (default path, all routers including RFQ, RTSE slippage, gasless, MEV protection), POST /execute (managed landing for /order transactions), GET /build (raw swap instructions for custom transactions, CPI, composability, Metis-only routing, no swap fees), and POST /submit at api.jup.ag/submit (transaction landing via Jupiter's infrastructure with SOL tips, for /build or any signed transaction). Comparison table of /order vs /build covering routing, fees, execution, and gasless support. Start with /order unless you need transaction modification."
 ---
 
 The Swap API unifies Jupiter's swap capabilities into a single entry point at `https://api.jup.ag/swap/v2`. Two paths cover every use case: a default happy path for the best swap experience, and an advanced path for full transaction control.

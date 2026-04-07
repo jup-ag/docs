@@ -23,7 +23,7 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 | **Returns** | Assembled transaction | Raw swap instructions |
 | **Routers** | All (Metis, RFQ, Dflow, OKX) | Metis only |
 | **Best for** | Most integrations. Best price, simplest flow. | Custom transactions, CPI, composability. |
-| **Execution** | Managed via `/execute` (optimised slippage, priority fees, our proprietary landing pipeline) | Self-managed via your own RPC, or via [`/submit`](/swap/submit) with SOL tips for Jupiter Beam landing (our proprietary landing pipeline) |
+| **Transaction landing** | Managed via `/execute` (optimised slippage, priority fees, our proprietary landing pipeline) | Self-managed via your own RPC, or via [`/submit`](/swap/submit) with SOL tips for Jupiter Beam landing (our proprietary landing pipeline) |
 | **Swap fees** | Yes (Jupiter platform fee) | No |
 | **Integrator fees** | Referral fees (referralAccount + referralFee) | Platform fee only (platformFeeBps) or DIY |
 | **Gasless** | [Automatic gasless, or your own `payer`](/swap/advanced/gasless) | Use your own `payer` |

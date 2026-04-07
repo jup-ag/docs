@@ -72,7 +72,8 @@ Token metadata, search, verification, and organic score APIs.
 ### Tokens
 
 - [Tokens API](https://dev.jup.ag/docs/tokens/index.md): Jupiter Tokens API V2 for programmatic token discovery and metadata. Search by name/symbol/mint, get verification status, organic score, holder count, market cap, and trading stats. Covers verification levels (verified, unverified, banned), organic score methodology, and token tag standard.
-- [Tokens API V2](https://dev.jup.ag/docs/tokens/token-information.md): GET /tokens/v2 endpoints for retrieving token metadata by mint address, symbol search, tag, category, or recency. Returns name, symbol, icon, organic score, holder count, and trading stats.
+- [Token Information](https://dev.jup.ag/docs/tokens/token-information.md): GET /tokens/v2 endpoints for retrieving token metadata by mint address, symbol search, tag, category, or recency. Returns name, symbol, icon, organic score, holder count, and trading stats.
+- [Express Verification API](https://dev.jup.ag/docs/tokens/verification.md): Jupiter VRFD Express Verification API for programmatic token verification and metadata updates. Three-step flow: check eligibility (GET /tokens/v2/verify/express/check-eligibility), craft a 1000 JUP payment transaction (GET /tokens/v2/verify/express/craft-txn), then execute with signed transaction and token details (POST /tokens/v2/verify/express/execute). Used by launchpads, agents, and projects to submit tokens for Jupiter verification without the UI. Requires an API key from portal.jup.ag. Verification and metadata updates are reviewed independently by the VRFD team.
 - [Content API (BETA)](https://dev.jup.ag/docs/tokens/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD.
 
 ### Guides
@@ -85,6 +86,9 @@ Token metadata, search, verification, and organic score APIs.
 - [Tag](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Request an array of mints and their information by a tag
 - [Category](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints and their information for the given category and interval
 - [Recent](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints that recently had their first created pool
+- [Check Eligibility](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Check if a token is eligible for express verification and metadata updates
+- [Craft Transaction](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Craft an unsigned 1000 JUP payment transaction for express verification
+- [Execute](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Submit signed transaction with verification and metadata details
 - [Get Content](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves approved content for up to 50 Solana token mint addresses
 - [Get Content Cooking](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves approved content for currently trending tokens on Jupiter
 - [Get Content Feed](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves a paginated feed of content for a specific mint
@@ -335,18 +339,6 @@ Binary prediction markets for real-world events.
 
 - [Get Vault Info](https://dev.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get vault account information and balance
 
-## Perps
-
-Leveraged perpetuals trading on Solana (on-chain program, no REST API).
-
-### Perps
-
-- [Jupiter Perpetuals Overview](https://dev.jup.ag/docs/perps/index.md): Jupiter Perpetuals program for leveraged trading on Solana. Work-in-progress documentation covering account structures and the Anchor IDL.
-- [Position Account](https://dev.jup.ag/docs/perps/position-account.md): The Position account stores trade position data including owner, side (long/short), entry price, size, collateral, PNL, and borrow fee snapshot. Derived from the trader's wallet, custody, and collateral custody.
-- [PositionRequest Account](https://dev.jup.ag/docs/perps/position-request-account.md): The PositionRequest account represents a pending request to open, close, or modify a position, including TP/SL triggers. It is a PDA derived from the Position account with a unique random seed.
-- [Pool Account](https://dev.jup.ag/docs/perps/pool-account.md): The Pool account stores JLP pool configuration including AUM (aumUsd), custody public keys, position limits, fee schedules (open/close/swap), and APR calculation data. Only one Pool account exists.
-- [Custody Account](https://dev.jup.ag/docs/perps/custody-account.md): The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state.
-
 ## More
 
 Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).
@@ -373,6 +365,14 @@ Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock
 ### Lock
 
 - [Jupiter Lock Overview](https://dev.jup.ag/docs/lock/index.md): Jupiter Lock (Program ID: LocpQgucEQHbqNABEYvBvwoxCPsSbG91A1QaQhQQqjn) is an open-source, audited, and free tool for locking and vesting tokens over time on Solana.
+
+### Perps
+
+- [Jupiter Perpetuals Overview](https://dev.jup.ag/docs/perps/index.md): Jupiter Perpetuals program for leveraged trading on Solana. Work-in-progress documentation covering account structures and the Anchor IDL.
+- [Position Account](https://dev.jup.ag/docs/perps/position-account.md): The Position account stores trade position data including owner, side (long/short), entry price, size, collateral, PNL, and borrow fee snapshot. Derived from the trader's wallet, custody, and collateral custody.
+- [PositionRequest Account](https://dev.jup.ag/docs/perps/position-request-account.md): The PositionRequest account represents a pending request to open, close, or modify a position, including TP/SL triggers. It is a PDA derived from the Position account with a unique random seed.
+- [Pool Account](https://dev.jup.ag/docs/perps/pool-account.md): The Pool account stores JLP pool configuration including AUM (aumUsd), custody public keys, position limits, fee schedules (open/close/swap), and APR calculation data. Only one Pool account exists.
+- [Custody Account](https://dev.jup.ag/docs/perps/custody-account.md): The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state.
 
 ### API Reference
 

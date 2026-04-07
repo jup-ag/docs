@@ -113,6 +113,7 @@
                 "pages": [
                   "tokens/index",
                   "tokens/token-information",
+                  "tokens/verification",
                   "tokens/content"
                 ]
               },
@@ -123,13 +124,31 @@
               {
                 "group": "API Reference",
                 "pages": [
-                  "api-reference/tokens/search",
-                  "api-reference/tokens/tag",
-                  "api-reference/tokens/category",
-                  "api-reference/tokens/recent",
-                  "api-reference/tokens/get-content",
-                  "api-reference/tokens/get-content-cooking",
-                  "api-reference/tokens/get-content-feed"
+                  {
+                    "group": "Token Information",
+                    "pages": [
+                      "api-reference/tokens/search",
+                      "api-reference/tokens/tag",
+                      "api-reference/tokens/category",
+                      "api-reference/tokens/recent"
+                    ]
+                  },
+                  {
+                    "group": "Express Verification",
+                    "pages": [
+                      "api-reference/tokens/verify-check-eligibility",
+                      "api-reference/tokens/verify-craft-txn",
+                      "api-reference/tokens/verify-execute"
+                    ]
+                  },
+                  {
+                    "group": "Content",
+                    "pages": [
+                      "api-reference/tokens/get-content",
+                      "api-reference/tokens/get-content-cooking",
+                      "api-reference/tokens/get-content-feed"
+                    ]
+                  }
                 ]
               }
             ]

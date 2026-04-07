@@ -22,7 +22,11 @@ Both endpoints submit transactions, but they serve different flows:
 
 ## Quick start
 
-The flow builds on the [`/build` endpoint](/swap/build). Call `/build` with `tipAmount`, build and sign the transaction, then submit via `/submit`.
+The code example builds on the [`/build` endpoint](/swap/build). 
+
+<Tip>
+    The `/build` endpoint has a built-in param `tipAmount` to automatically add a transfer instruction to a randomised tip account.
+</Tip>
 
 <CodeGroup>
 ```typescript @solana/web3.js

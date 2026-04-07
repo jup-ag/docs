@@ -6,6 +6,8 @@ llmsDescription: "How to use Jupiter's Swap API V2 /build endpoint to get raw sw
 
 The `/build` endpoint returns raw swap instructions instead of an assembled transaction. You build the transaction yourself, which gives you full control to add custom instructions, CPI, or modify any part of the transaction.
 
+Once built and signed, you can submit transactions via your own RPC, or use [`/submit`](/swap/submit) to land them through Jupiter's transaction infrastructure with SOL tips.
+
 ## Quick start
 
 ### Prerequisites
@@ -567,10 +569,12 @@ The response includes address lookup tables in `addressesByLookupTableAddress`. 
 
 ### 5. Sign and send
 
-Sign the transaction with your wallet and send via your own RPC.
+Sign the transaction with your wallet and send via your own RPC, or use [`/submit`](/swap/submit) to land them through Jupiter's transaction infrastructure with SOL tips.
 
 <Note>
-`/build` transactions cannot use `/execute`. You are responsible for sending the transaction via your own RPC and handling confirmation. Jupiter does not charge swap fees on `/build`.
+`/build` transactions cannot use `/execute`.
+- `/build` does not have the required `requestId`
+- `/build` is intended for customisations, and `/execute` validates the transaction
 </Note>
 
 ## Key differences from `/order`

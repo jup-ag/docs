@@ -4,14 +4,17 @@ description: "Send transactions through Jupiter's landing infrastructure with SO
 llmsDescription: "How to submit signed transactions through Jupiter's transaction landing infrastructure using POST api.jup.ag/submit. Jupiter runs one of the top validators on Solana and opens its landing pipeline to integrators. Accepts any signed Solana transaction with a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 Jupiter V6 program authorities. Designed for /build transactions and non-Jupiter transactions. Can run in parallel with your existing RPC submission for zero-risk comparison. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees. Includes standalone tip instruction examples for non-Jupiter transactions."
 ---
 
-`/submit` lets you send signed transactions through Jupiter's transaction landing infrastructure with SOL tips for priority processing. It runs on the same pipeline that powers Jupiter's own swap execution, giving you performant transaction landing for any transaction type.
+`/submit` lets you send signed transactions through Jupiter's transaction landing infrastructure with SOL tips for priority processing. [Jupiter runs one of the top validators on Solana](https://solanabeach.io/validators) and uses it to power the same pipeline that lands Jupiter's own swap transactions with sub-second execution. `/submit` opens this pipeline to integrators.
 
-Transaction submission can make or break your integration. If you are building with `/build` and managing your own transaction submission, consider running `/submit` alongside your existing submission path. If Jupiter's pipeline delivers even marginally better landing rates, that compounds into meaningful gains at scale.
+## Use /submit in parallel
 
+Transaction submission can make a significant impact to your integration. Even marginal improvements in landing rate or latency can compound into meaningful gains at scale. You do not need to switch entirely to `/submit`, it is a value add. Run it alongside your existing submission path and compare results.
+
+Attempt via all paths, then poll for confirmation. Whichever lands first wins. This gives you a direct comparison of landing rates with zero risk: if `/submit` does not improve your results, you lose nothing.
+
+Regardless, if Jupiter's pipeline delivers better results, share your landing rate and latency data with us so we can continue optimising.
 
 ## How /submit differs from /execute
-
-Both endpoints submit transactions, but they serve different flows:
 
 | | `/execute` | `/submit` |
 |---|---|---|
@@ -22,57 +25,24 @@ Both endpoints submit transactions, but they serve different flows:
 
 ## Quick start
 
-The code example builds on the [`/build` endpoint](/swap/build). 
+The quickest way to use `/submit` is with `/build`'s built-in `tipAmount` parameter, which automatically adds a tip instruction to the response.
 
-<Tip>
-    The `/build` endpoint has a built-in param `tipAmount` to automatically add a transfer instruction to a randomised tip account.
-</Tip>
-
-<CodeGroup>
-```typescript @solana/web3.js
-const API_KEY = process.env.JUPITER_API_KEY!;
-const BASE_URL = "https://api.jup.ag/swap/v2";
-
-// Step 1: Call /build with tipAmount - tip instruction is auto-included
+```typescript
+// 1. Call /build with tipAmount
 const buildRes = await fetch(
-  `${BASE_URL}/build?` +
+  "https://api.jup.ag/swap/v2/build?" +
     new URLSearchParams({
       inputMint: "So11111111111111111111111111111111111111112",
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
-      taker: signer.publicKey.toString(),
+      taker: walletAddress,
       tipAmount: "1000000", // 0.001 SOL minimum
     }),
   { headers: { "x-api-key": API_KEY } },
 );
 const build = await buildRes.json();
 
-// Step 2: Assemble instructions - tipInstruction is already in the response
-const instructions = [
-  ComputeBudgetProgram.setComputeUnitLimit({ units: estimatedCUL }),
-  ...build.computeBudgetInstructions.map(toInstruction),
-  ...build.setupInstructions.map(toInstruction),
-  toInstruction(build.swapInstruction),
-  ...(build.cleanupInstruction
-    ? [toInstruction(build.cleanupInstruction)]
-    : []),
-  ...build.otherInstructions.map(toInstruction),
-  ...(build.tipInstruction
-    ? [toInstruction(build.tipInstruction)]
-    : []),
-];
-
-// Build and sign (see /build docs for full transaction assembly)
-const message = new TransactionMessage({
-  payerKey: signer.publicKey,
-  recentBlockhash,
-  instructions,
-}).compileToV0Message(addressLookupTableAccounts);
-
-const transaction = new VersionedTransaction(message);
-transaction.sign([signer]);
-
-// Step 3: Submit via /submit
+// 2. Build, sign, and submit (see /build docs for full tx assembly)
 const submitRes = await fetch("https://api.jup.ag/submit", {
   method: "POST",
   headers: {
@@ -80,70 +50,15 @@ const submitRes = await fetch("https://api.jup.ag/submit", {
     "x-api-key": API_KEY,
   },
   body: JSON.stringify({
-    signedTransaction: Buffer.from(transaction.serialize()).toString("base64"),
+    signedTransaction: base64EncodedSignedTransaction,
   }),
 });
 
 const { signature } = await submitRes.json();
-console.log(`Transaction submitted: https://solscan.io/tx/${signature}`);
 ```
-
-```typescript @solana/kit
-const API_KEY = process.env.JUPITER_API_KEY!;
-const BASE_URL = "https://api.jup.ag/swap/v2";
-
-// Step 1: Call /build with tipAmount - tip instruction is auto-included
-const buildRes = await fetch(
-  `${BASE_URL}/build?` +
-    new URLSearchParams({
-      inputMint: "So11111111111111111111111111111111111111112",
-      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-      amount: "100000000",
-      taker: signer.address,
-      tipAmount: "1000000", // 0.001 SOL minimum
-    }),
-  { headers: { "x-api-key": API_KEY } },
-);
-const build = await buildRes.json();
-
-// Step 2: Assemble instructions - tipInstruction is already in the response
-const instructions = [
-  createInstruction(makeSetComputeUnitLimitIx(estimatedCUL)),
-  ...build.computeBudgetInstructions.map(createInstruction),
-  ...build.setupInstructions.map(createInstruction),
-  createInstruction(build.swapInstruction),
-  ...(build.cleanupInstruction
-    ? [createInstruction(build.cleanupInstruction)]
-    : []),
-  ...build.otherInstructions.map(createInstruction),
-  ...(build.tipInstruction
-    ? [createInstruction(build.tipInstruction)]
-    : []),
-];
-
-// Build and sign (see /build docs for full transaction assembly)
-const compiledTx = buildTransaction(instructions, blockhash, alts, signer.address);
-const signedTransaction = await signTransaction([signer.keyPair], compiledTx);
-
-// Step 3: Submit via /submit
-const submitRes = await fetch("https://api.jup.ag/submit", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "x-api-key": API_KEY,
-  },
-  body: JSON.stringify({
-    signedTransaction: getBase64EncodedWireTransaction(signedTransaction),
-  }),
-});
-
-const { signature } = await submitRes.json();
-console.log(`Transaction submitted: https://solscan.io/tx/${signature}`);
-```
-</CodeGroup>
 
 <Tip>
-See the [Get Swap Instructions](/swap/build) page for the full transaction assembly code, including imports, types, helpers, and address lookup table handling.
+See the [Get Swap Instructions](/swap/build) page for complete transaction assembly code, including imports, instruction ordering, and address lookup table handling.
 </Tip>
 
 ## API reference
@@ -188,7 +103,7 @@ POST https://api.jup.ag/submit
 If you are submitting a non-Jupiter transaction (e.g. another swap protocol), add a tip instruction yourself. It is a standard SOL transfer to any one of the permitted tip receivers.
 
 <Tip>
-Randomise which authority you send to across transactions to reduce write-lock contention.
+Randomise which account you send to, to reduce write-lock contention.
 </Tip>
 
 <CodeGroup>
@@ -258,16 +173,6 @@ const tipIx = getTransferSolInstruction({
 // Add tipIx to your transaction, sign, then submit via /submit
 ```
 </CodeGroup>
-
-## Design decisions
-
-| Decision          | Detail                                                              |
-|-------------------|---------------------------------------------------------------------|
-| Tip currency      | SOL only (for now)                                                  |
-| Tip recipients    | 16 Jupiter V6 program authorities                                   |
-| Minimum tip       | 1,000,000 lamports (0.001 SOL)                                      |
-| Transaction types | Any signed Solana transaction                                       |
-| API interface     | Follows `/execute` pattern, not Solana RPC `sendTransaction`        |
 
 ## Related
 

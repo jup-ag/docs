@@ -18,6 +18,95 @@ description: "Latest announcements and breaking changes across Jupiter APIs."
 
 ---
 
+<Update label="April 2026" description="">
+
+## Prediction Markets API: Breaking Changes
+
+<Danger>
+**Action Required** - Two breaking changes are rolling out in April 2026. Update your integration before the deadlines below.
+</Danger>
+
+### `markets[].metadata` removal - April 10, 2026
+
+All fields previously nested under `markets[].metadata` are moving to the top level of the market object. This affects all `/events/*` and `/markets` GET endpoints.
+
+| Old path | New path |
+| :--- | :--- |
+| `markets[].metadata.title` | `markets[].title` |
+| `markets[].metadata.isTeamMarket` | `markets[].isTeamMarket` |
+| `markets[].metadata.rulesPrimary` | `markets[].rulesPrimary` |
+| `markets[].metadata.rulesSecondary` | `markets[].rulesSecondary` |
+| `markets[].metadata.openTime` | `markets[].openTime` |
+| `markets[].metadata.closeTime` | `markets[].closeTime` |
+
+After April 10, `markets[].metadata` will no longer be included in responses. Update your code to read these fields from the top-level market object.
+
+### Minimum order size increase to $5 - April 14, 2026
+
+The minimum order amount is increasing from $1 to $5. Orders below $5 will be rejected starting April 14. Ensure all order amounts in your integration are at least $5.
+
+- [Prediction Market Docs](/prediction)
+- [API Reference](/api-reference/prediction/create-order)
+
+---
+
+## Transaction Submission API
+
+`POST https://api.jup.ag/tx/v1/submit` is now publicly available. Submit any signed Solana transaction through Jupiter's optimised landing infrastructure, including Jupiter Beam for sub-second landing and MEV protection.
+
+* Requires a minimum tip of 0.001 SOL to one of the supported tip receiver addresses
+* Works with any signed Solana transaction, not just Jupiter swaps
+* New Real-Time Slippage Estimation (RTSE) documentation covering how Jupiter estimates and protects against slippage
+
+- [Transaction Submission Docs](/swap/submit)
+- [API Reference](/api-reference/swap)
+
+---
+
+## VRFD Express Verification API
+
+The VRFD Express Verification API lets token projects verify their tokens on Jupiter through a three-step flow:
+
+1. **Check eligibility** - confirm the token meets verification requirements
+2. **Craft transaction** - build the verification transaction
+3. **Execute verification** - submit and complete verification
+
+New Tokens documentation, API reference pages, and verification OpenAPI spec are now available.
+
+- [Verification Docs](/tokens/verification)
+- [Tokens Overview](/tokens)
+
+---
+
+## Jupiter Developer Platform
+
+Portal documentation has been rewritten for the Jupiter Developer Platform launch, covering the full platform experience:
+
+* **Setup** - creating an account and generating API keys
+* **Plans** - free and paid tiers with rate limits and features
+* **Rate Limits** - per-endpoint limits and how throttling works
+* **Migration** - moving from `lite-api.jup.ag` to `api.jup.ag`
+* **Responses** - standard response formats and error codes
+* **FAQ** - common questions and troubleshooting
+
+<Card title="Developer Platform Docs" href="/portal/setup" icon="key" iconType="solid" horizontal/>
+
+---
+
+## JupUSD and JUICED Developer Documentation
+
+Developer documentation for JupUSD and JUICED is now available:
+
+* **JupUSD** - mint and redeem Jupiter's native stablecoin, with API integration guides
+* **JUICED** - collateral integration documentation for leveraged vault positions
+
+- [JupUSD Docs](/jupusd)
+- [JUICED Docs](/jupusd/juiced)
+
+</Update>
+
+---
+
 <Update label="March 2026" description="">
 
 ## Swap API V2
@@ -61,6 +150,42 @@ Comprehensive documentation for Jupiter Lend (powered by Fluid Protocol) is now 
 * **Architecture:** Three-program design (Liquidity Layer, Lending/Earn, Vaults/Borrow) with oracle integration (Pyth, SwitchboardV2, ScopePrices)
 
 <Card title="Lend Documentation" href="/lend" icon="building-columns" iconType="solid" horizontal/>
+
+---
+
+## Trigger Order API V2
+
+The Trigger Order API has been upgraded to V2 with a new authentication model and expanded capabilities:
+
+* **Authentication flow** - challenge-response auth using wallet signatures instead of API keys
+* **Vault registration** - register a vault to hold funds for trigger orders
+* **Create and manage orders** - create, update, and cancel limit and DCA orders
+* **Order history** - query active and historical orders with filtering
+
+The V1 API remains available but is no longer actively maintained. New integrations should use V2.
+
+- [Trigger Order V2 Docs](/trigger)
+- [API Reference](/api-reference/trigger/challenge)
+
+---
+
+## Jupiter CLI
+
+A new Jupiter CLI page is now available, along with a reworked AI section focused on trading and building workflows:
+
+* Use Jupiter APIs directly from the command line for swaps, price checks, and token lookups
+* AI docs reorganised around practical trading and building use cases
+
+- [Jupiter CLI](/ai/cli)
+- [AI Overview](/ai)
+
+---
+
+### Metis Swap API: `forJitoBundle` Parameter
+
+A new `forJitoBundle` parameter is available on the Metis Swap quote endpoint. When set to `true`, it excludes DEXes that are incompatible with Jito bundles, ensuring the resulting transaction can be submitted as part of a Jito bundle.
+
+- [Quote API Reference](/api-reference/swap/v1/quote)
 
 </Update>
 

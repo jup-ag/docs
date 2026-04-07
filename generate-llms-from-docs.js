@@ -274,7 +274,7 @@ emit(
   "> **Swap API V2** (recommended): `/order` for managed execution, `/build` for custom transactions. Base URL: `https://api.jup.ag/swap/v2`.\n",
 );
 emit(
-  "> All endpoints require an `x-api-key` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).\n\n",
+  "> All endpoints require an `x-api-key` header — generate a free key at [Portal](https://developers.jup.ag/portal).\n\n",
 );
 
 emit("## Quick Reference\n\n");
@@ -296,7 +296,7 @@ for (const item of topLevelNav) {
 // Footer
 emitHeading("Optional", 2);
 emit(
-  "- [Dev Portal](https://portal.jup.ag/): Access the Jupiter Portal to manage API key, access to metrics and logs\n",
+  "- [Developer Platform](https://developers.jup.ag/portal): Manage API keys, view analytics, and monitor usage\n",
 );
 emit(
   "- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs\n",

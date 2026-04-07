@@ -2,7 +2,7 @@
 title: "Express Verification API"
 sidebarTitle: "Express Verification"
 description: "Programmatically submit tokens for verification and update metadata via API"
-llmsDescription: "Jupiter VRFD Express Verification API for programmatic token verification and metadata updates. Three-step flow: check eligibility (GET /tokens/v2/verify/express/check-eligibility), craft a 1000 JUP payment transaction (GET /tokens/v2/verify/express/craft-txn), then execute with signed transaction and token details (POST /tokens/v2/verify/express/execute). Used by launchpads, agents, and projects to submit tokens for Jupiter verification without the UI. Requires an API key from portal.jup.ag. Verification and metadata updates are reviewed independently by the VRFD team."
+llmsDescription: "Jupiter VRFD Express Verification API for programmatic token verification and metadata updates. Three-step flow: check eligibility (GET /tokens/v2/verify/express/check-eligibility), craft a 1000 JUP payment transaction (GET /tokens/v2/verify/express/craft-txn), then execute with signed transaction and token details (POST /tokens/v2/verify/express/execute). Used by launchpads, agents, and projects to submit tokens for Jupiter verification without the UI. Requires an API key from developers.jup.ag/portal. Verification and metadata updates are reviewed independently by the VRFD team."
 ---
 
 The Express Verification API lets you submit tokens for [Jupiter VRFD](https://verified.jup.ag) verification and update token metadata programmatically. This is the same Express flow available on the VRFD UI, exposed as an API for launchpads, agents, and projects that need to integrate verification into their token creation pipelines.
@@ -13,7 +13,7 @@ You can request verification and metadata updates together. Each is reviewed ind
 
 ## Prerequisites
 
-1. Get an API key at [portal.jup.ag](https://portal.jup.ag). All requests require the `x-api-key` header.
+1. Get an API key at [Portal](https://developers.jup.ag/portal). All requests require the `x-api-key` header.
 2. The submitting wallet needs at least 1000 JUP. Transactions are gasless, so no SOL is required for fees.
 
 ## Flow
@@ -169,7 +169,7 @@ The `tokenMetadata` object in the execute request is optional. Include it to upd
 
 ## Known Projects and Launchpads
 
-If you are a known project or launchpad on Solana, DM [@jup_vrfd](https://x.com/jup_vrfd) from your organization account on X. This lets the VRFD team connect your Jupiter Portal OrgId, which adds credibility and supports your submissions.
+If you are a known project or launchpad on Solana, DM [@jup_vrfd](https://x.com/jup_vrfd) from your organization account on X. This lets the VRFD team connect your Developer Platform OrgId, which adds credibility and supports your submissions.
 
 ## API Reference
 

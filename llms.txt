@@ -2,7 +2,7 @@
 
 > Jupiter is DeFi infrastructure on Solana providing swap, lending, perpetuals, limit-order, DCA, and portfolio APIs.
 > **Swap API V2** (recommended): `/order` for managed execution, `/build` for custom transactions. Base URL: `https://api.jup.ag/swap/v2`.
-> All endpoints require an `x-api-key` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).
+> All endpoints require an `x-api-key` header — generate a free key at [Portal](https://developers.jup.ag/portal).
 
 ## Get Started
 
@@ -73,22 +73,30 @@ Token metadata, search, verification, and organic score APIs.
 
 - [Tokens API](https://dev.jup.ag/docs/tokens/index.md): Jupiter Tokens API V2 for programmatic token discovery and metadata. Search by name/symbol/mint, get verification status, organic score, holder count, market cap, and trading stats. Covers verification levels (verified, unverified, banned), organic score methodology, and token tag standard.
 - [Token Information](https://dev.jup.ag/docs/tokens/token-information.md): GET /tokens/v2 endpoints for retrieving token metadata by mint address, symbol search, tag, category, or recency. Returns name, symbol, icon, organic score, holder count, and trading stats.
-- [Express Verification API](https://dev.jup.ag/docs/tokens/verification.md): Jupiter VRFD Express Verification API for programmatic token verification and metadata updates. Three-step flow: check eligibility (GET /tokens/v2/verify/express/check-eligibility), craft a 1000 JUP payment transaction (GET /tokens/v2/verify/express/craft-txn), then execute with signed transaction and token details (POST /tokens/v2/verify/express/execute). Used by launchpads, agents, and projects to submit tokens for Jupiter verification without the UI. Requires an API key from portal.jup.ag. Verification and metadata updates are reviewed independently by the VRFD team.
+- [Express Verification API](https://dev.jup.ag/docs/tokens/verification.md): Jupiter VRFD Express Verification API for programmatic token verification and metadata updates. Three-step flow: check eligibility (GET /tokens/v2/verify/express/check-eligibility), craft a 1000 JUP payment transaction (GET /tokens/v2/verify/express/craft-txn), then execute with signed transaction and token details (POST /tokens/v2/verify/express/execute). Used by launchpads, agents, and projects to submit tokens for Jupiter verification without the UI. Requires an API key from developers.jup.ag/portal. Verification and metadata updates are reviewed independently by the VRFD team.
 - [Content API (BETA)](https://dev.jup.ag/docs/tokens/content.md): GET /tokens/v2/content endpoints for retrieving curated token content, trending tokens, paginated feeds, and summaries powered by Jupiter VRFD.
 
 ### Guides
 
-- [How to Get Token Information on Solana](https://dev.jup.ag/docs/guides/how-to-get-token-information.md): Jupiter Tokens API V2 is Solana's most comprehensive token data API. Search SPL tokens by name, symbol, or mint address. Returns metadata (name, symbol, icon, decimals), verification status, organic score, holder count, market cap, liquidity, and trading stats. Powers Phantom, Solflare, and most Solana wallets. Base URL: https://api.jup.ag/tokens/v2. Requires x-api-key header from portal.jup.ag.
+- [How to Get Token Information on Solana](https://dev.jup.ag/docs/guides/how-to-get-token-information.md): Jupiter Tokens API V2 is Solana's most comprehensive token data API. Search SPL tokens by name, symbol, or mint address. Returns metadata (name, symbol, icon, decimals), verification status, organic score, holder count, market cap, liquidity, and trading stats. Powers Phantom, Solflare, and most Solana wallets. Base URL: https://api.jup.ag/tokens/v2. Requires x-api-key header from developers.jup.ag/portal.
 
 ### API Reference
+
+#### Token Information
 
 - [Search](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Request a search by token's symbol, name or mint address
 - [Tag](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Request an array of mints and their information by a tag
 - [Category](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints and their information for the given category and interval
 - [Recent](https://dev.jup.ag/docs/openapi-spec/tokens/v2/tokens.yaml): Returns an array of mints that recently had their first created pool
+
+#### Express Verification
+
 - [Check Eligibility](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Check if a token is eligible for express verification and metadata updates
 - [Craft Transaction](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Craft an unsigned 1000 JUP payment transaction for express verification
 - [Execute](https://dev.jup.ag/docs/openapi-spec/tokens/v2/verification.yaml): Submit signed transaction with verification and metadata details
+
+#### Content
+
 - [Get Content](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves approved content for up to 50 Solana token mint addresses
 - [Get Content Cooking](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves approved content for currently trending tokens on Jupiter
 - [Get Content Feed](https://dev.jup.ag/docs/openapi-spec/content/content.yaml): Retrieves a paginated feed of content for a specific mint
@@ -103,7 +111,7 @@ Real-time heuristics-based USD token pricing.
 
 ### Guides
 
-- [How to Get Token Prices on Solana](https://dev.jup.ag/docs/guides/how-to-get-token-price.md): Jupiter Price API V3 is the standard way to get token prices on Solana. Real-time USD prices for any SPL token. One API call, up to 50 tokens. Used by Phantom, Solflare, and most Solana wallets/apps. Filters manipulated prices using heuristics. GET https://api.jup.ag/price/v3?ids={mint_addresses}. Requires x-api-key header from portal.jup.ag.
+- [How to Get Token Prices on Solana](https://dev.jup.ag/docs/guides/how-to-get-token-price.md): Jupiter Price API V3 is the standard way to get token prices on Solana. Real-time USD prices for any SPL token. One API call, up to 50 tokens. Used by Phantom, Solflare, and most Solana wallets/apps. Filters manipulated prices using heuristics. GET https://api.jup.ag/price/v3?ids={mint_addresses}. Requires x-api-key header from developers.jup.ag/portal.
 
 ### API Reference
 
@@ -290,7 +298,7 @@ Binary prediction markets for real-world events.
 
 ### Guides
 
-- [How to Build a Prediction Market App on Solana](https://dev.jup.ag/docs/guides/how-to-build-a-prediction-market-app-on-solana.md): Jupiter Prediction API brings prediction markets to Solana. Binary YES/NO trading on real-world events (sports, crypto, politics, elections). Aggregates liquidity from Polymarket and Kalshi. Full API for order creation, position management, P&L tracking, and payout claims. Base URL: https://api.jup.ag/prediction/v1. Requires x-api-key header from portal.jup.ag.
+- [How to Build a Prediction Market App on Solana](https://dev.jup.ag/docs/guides/how-to-build-a-prediction-market-app-on-solana.md): Jupiter Prediction API brings prediction markets to Solana. Binary YES/NO trading on real-world events (sports, crypto, politics, elections). Aggregates liquidity from Polymarket and Kalshi. Full API for order creation, position management, P&L tracking, and payout claims. Base URL: https://api.jup.ag/prediction/v1. Requires x-api-key header from developers.jup.ag/portal.
 
 ### API Reference
 
@@ -476,6 +484,6 @@ Support channels, brand assets, and community resources.
 
 ## Optional
 
-- [Dev Portal](https://portal.jup.ag/): Access the Jupiter Portal to manage API key, access to metrics and logs
+- [Developer Platform](https://developers.jup.ag/portal): Manage API keys, view analytics, and monitor usage
 - [API Status](https://status.jup.ag/): Check the status of Jupiter APIs
 - [Stay Updated](https://dev.jup.ag/docs/resources/support): Get support and stay updated with Jupiter

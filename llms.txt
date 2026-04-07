@@ -1,8 +1,19 @@
 # Jupiter
 
-> Jupiter is DeFi infrastructure on Solana providing swap, lending, perpetuals, limit-order, DCA, and portfolio APIs.
+> Jupiter is DeFi infrastructure on Solana. All APIs are REST/JSON, require no RPC node, and return clean responses that LLMs and AI agents can parse directly.
 > **Swap API V2** (recommended): `/order` for managed execution, `/build` for custom transactions. Base URL: `https://api.jup.ag/swap/v2`.
-> All endpoints require an `x-api-key` header — generate a free key at [Portal](https://developers.jup.ag/portal).
+
+> **Authentication**: Keyless access is available at 0.5 RPS on `api.jup.ag` with no sign-up - ideal for prototyping and lightweight agent use cases (no analytics or usage tracking). For production, sign up at [developers.jup.ag/portal](https://developers.jup.ag/portal), generate a free API key, and pass it via the `x-api-key` header to unlock higher rate limits and analytics.
+> **AI tools**: Jupiter CLI (`npm i -g @jup-ag/cli`) for terminal and agent use, agent skills via `npx skills add`, MCP server at dev.jup.ag/mcp for in-editor docs, and llms-full.txt for complete documentation content.
+
+- [Swap API V2](https://dev.jup.ag/docs/swap/index.md) (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`
+- [Trigger](https://dev.jup.ag/docs/trigger/index.md) (limit orders): `POST /trigger/v2/orders/price`
+- [Recurring](https://dev.jup.ag/docs/recurring/index.md) (DCA): `POST /recurring/v1/createOrder`
+- [Lend](https://dev.jup.ag/docs/lend/index.md): `POST /lend/v1/earn/deposit`
+- [Price](https://dev.jup.ag/docs/price/index.md): `GET /price/v3?ids={mints}`
+- [Tokens](https://dev.jup.ag/docs/tokens/index.md): `GET /tokens/v2/search?query={query}`
+- [Portfolio](https://dev.jup.ag/docs/portfolio/index.md): `GET /portfolio/v1/positions?wallet={address}`
+- [Prediction](https://dev.jup.ag/docs/prediction/index.md): `POST /prediction/v1/order`
 
 ## Get Started
 
@@ -23,6 +34,16 @@ Setup guides for environment, tooling, and first API calls.
 - [Response Codes](https://dev.jup.ag/docs/portal/responses.md): Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized, 429 rate limited, and 5xx server errors with debugging guidance.
 - [Migrating to Developer Platform](https://dev.jup.ag/docs/portal/migration.md): Migration guide from the old Jupiter Portal to the new Developer Platform. Covers legacy organisation setup, API key preservation, tier mapping (Free/Pro/Ultra to new Free/Developer/Launch/Pro tiers), grace period with equivalent rate limits, billing transition to Stripe, and Lite API phase-out. No breaking changes to the API itself.
 - [FAQ](https://dev.jup.ag/docs/portal/faq.md): Frequently asked questions about the Jupiter Developer Platform: plan differences, API key usage, billing, upgrades and downgrades, credit overages, migration from old Portal, and support channels.
+
+## AI
+
+AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.
+
+- [AI](https://dev.jup.ag/docs/ai/index.md): Overview of Jupiter's AI surface area. Covers how agents connect to Jupiter based on their environment: local agents (Claude Code, Cursor, Codex) use CLI + Skills, hosted agents (ChatGPT, Claude.ai) use MCP. Tools split into two categories: reading docs (llms.txt, Skills, Docs MCP) and executing operations (CLI, Jupiter MCP). All Jupiter APIs are AI-native: no RPC required, clean JSON responses, simple REST interfaces.
+- [llms.txt](https://dev.jup.ag/docs/ai/llms-txt.md): Jupiter provides two LLM-optimised documentation files: llms.txt (structured Markdown index of all APIs, guides, and resources with titles and descriptions, the perfect entrypoint for LLMs and AI agents) and llms-full.txt (the complete documentation site content including all code examples). Both follow the llmstxt.org standard. Additionally, any documentation page can be accessed as raw Markdown by appending .md to the URL or using the Accept: text/markdown header.
+- [Skills](https://dev.jup.ag/docs/ai/skills.md): Jupiter provides two agent skills in the jup-ag/agent-skills repository that AI coding agents can use as context when building with Jupiter. (1) integrating-jupiter: comprehensive integration guidance covering all Jupiter APIs (Swap, Lend, Perps, Trigger, Recurring, Tokens, Price, Portfolio, Prediction Markets, Send, Studio, Lock, Routing) with intent routing, API playbooks, error handling, and production hardening. (2) jupiter-lend: deep-dive into Jupiter Lend protocol (powered by Fluid) covering liquidity pools, lending markets (jlTokens), vaults, and flashloans with read (@jup-ag/lend-read) and write (@jup-ag/lend) SDKs. Skills are installed via npx skills add and provide SKILL.md files that AI agents consume as context.
+- [Documentation MCP](https://dev.jup.ag/docs/ai/mcp.md): Jupiter supports the Model Context Protocol (MCP) through Mintlify's native MCP server at https://dev.jup.ag/mcp. This enables AI tools like Claude Code, Cursor, Windsurf, and other MCP-compatible editors to search and query Jupiter documentation and OpenAPI specifications in-context. The MCP server allows AI assistants to look up API endpoints, read documentation pages, and understand API schemas without leaving the editor. It is a read-only documentation server, not a tool for executing API calls.
+- [Jupiter CLI](https://dev.jup.ag/docs/ai/cli.md): The Jupiter CLI (jup) is a command-line tool for interacting with Jupiter's products on Solana: Spot trading, Perpetual futures, and Lending. It is non-interactive and LLM-friendly by design, with JSON output mode for structured responses. Install via npm (npm i -g @jup-ag/cli). For full command references, key management, configuration, and JSON response schemas, see the CLI documentation at https://github.com/jup-ag/cli/tree/main/docs. Three usage paths: direct terminal, Telegram via OpenClaw/miniclaw, and AI agent integration.
 
 ## Swap
 
@@ -404,16 +425,6 @@ Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock
 - [DBC Pool Addresses by Mint](https://dev.jup.ag/docs/openapi-spec/studio/studio.yaml): Request for pool addresses for a given token mint
 - [DBC Fee](https://dev.jup.ag/docs/openapi-spec/studio/studio.yaml): Request for unclaimed creator trading fees of a Dynamic Bonding Curve pool
 - [DBC Fee Create TX](https://dev.jup.ag/docs/openapi-spec/studio/studio.yaml): Request for a base64-encoded unsigned transaction to claim creator trading fees of a Dynamic Bonding Curve pool
-
-## AI
-
-AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.
-
-- [AI](https://dev.jup.ag/docs/ai/index.md): Overview of Jupiter's AI surface area. Covers how agents connect to Jupiter based on their environment: local agents (Claude Code, Cursor, Codex) use CLI + Skills, hosted agents (ChatGPT, Claude.ai) use MCP. Tools split into two categories: reading docs (llms.txt, Skills, Docs MCP) and executing operations (CLI, Jupiter MCP). All Jupiter APIs are AI-native: no RPC required, clean JSON responses, simple REST interfaces.
-- [llms.txt](https://dev.jup.ag/docs/ai/llms-txt.md): Jupiter provides two LLM-optimised documentation files: llms.txt (structured Markdown index of all APIs, guides, and resources with titles and descriptions, the perfect entrypoint for LLMs and AI agents) and llms-full.txt (the complete documentation site content including all code examples). Both follow the llmstxt.org standard. Additionally, any documentation page can be accessed as raw Markdown by appending .md to the URL or using the Accept: text/markdown header.
-- [Skills](https://dev.jup.ag/docs/ai/skills.md): Jupiter provides two agent skills in the jup-ag/agent-skills repository that AI coding agents can use as context when building with Jupiter. (1) integrating-jupiter: comprehensive integration guidance covering all Jupiter APIs (Swap, Lend, Perps, Trigger, Recurring, Tokens, Price, Portfolio, Prediction Markets, Send, Studio, Lock, Routing) with intent routing, API playbooks, error handling, and production hardening. (2) jupiter-lend: deep-dive into Jupiter Lend protocol (powered by Fluid) covering liquidity pools, lending markets (jlTokens), vaults, and flashloans with read (@jup-ag/lend-read) and write (@jup-ag/lend) SDKs. Skills are installed via npx skills add and provide SKILL.md files that AI agents consume as context.
-- [Documentation MCP](https://dev.jup.ag/docs/ai/mcp.md): Jupiter supports the Model Context Protocol (MCP) through Mintlify's native MCP server at https://dev.jup.ag/mcp. This enables AI tools like Claude Code, Cursor, Windsurf, and other MCP-compatible editors to search and query Jupiter documentation and OpenAPI specifications in-context. The MCP server allows AI assistants to look up API endpoints, read documentation pages, and understand API schemas without leaving the editor. It is a read-only documentation server, not a tool for executing API calls.
-- [Jupiter CLI](https://dev.jup.ag/docs/ai/cli.md): The Jupiter CLI (jup) is a command-line tool for interacting with Jupiter's products on Solana: Spot trading, Perpetual futures, and Lending. It is non-interactive and LLM-friendly by design, with JSON output mode for structured responses. Install via npm (npm i -g @jup-ag/cli). For full command references, key management, configuration, and JSON response schemas, see the CLI documentation at https://github.com/jup-ag/cli/tree/main/docs. Three usage paths: direct terminal, Telegram via OpenClaw/miniclaw, and AI agent integration.
 
 ## Tool Kits
 

@@ -4,14 +4,23 @@ info:
   version: "1.0"
 servers:
   - url: https://api.jup.ag/tx/v1
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Jupiter API key from portal.jup.ag
 paths:
   /submit:
     post:
       operationId: postSubmit
       tags:
         - Submit
-      summary: Submit a swap transaction
-      description: Submits a signed transaction to Beam if it contains a tip instruction and a Jupiter Swap instruction
+      summary: Submit a transaction
+      description: Submits a signed transaction through Jupiter's transaction landing infrastructure. Requires a SOL tip (minimum 0.001 SOL) to one of the permitted tip receivers. Accepts any valid signed Solana transaction.
       requestBody:
         content:
           application/json:
@@ -20,6 +29,7 @@ paths:
               properties:
                 signedTransaction:
                   type: string
+                  description: Base64-encoded signed transaction
               required:
                 - signedTransaction
       responses:
@@ -32,6 +42,7 @@ paths:
                 properties:
                   signature:
                     type: string
+                    description: Transaction signature
                 required:
                   - signature
         "400":
@@ -43,5 +54,6 @@ paths:
                 properties:
                   error:
                     type: string
+                    description: Error message
                 required:
                   - error

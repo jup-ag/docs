@@ -33,14 +33,19 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 
 ## Endpoints
 
+**Swap API** at `https://api.jup.ag/swap/v2`:
+
 | Endpoint | Method | Description |
 | --- | --- | --- |
 | [`/order`](/swap/order-and-execute) | GET | Get a quote and assembled transaction |
 | [`/execute`](/swap/order-and-execute#execute-the-transaction) | POST | Execute a signed `/order` transaction with managed landing |
 | [`/build`](/swap/build) | GET | Get a quote and raw swap instructions |
-| [`/submit`](/transaction/submit) | POST | Submit any signed transaction through Jupiter's landing infrastructure with SOL tips |
 
-**Base URL:** `https://api.jup.ag/swap/v2` (except `/submit` which is at `https://api.jup.ag/tx/v1/submit`)
+**Transaction API** at `https://api.jup.ag/tx/v1`:
+
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| [`/submit`](/transaction/submit) | POST | Submit any signed transaction through Jupiter's landing infrastructure with SOL tips |
 
 All endpoints require an API key via the `x-api-key` header. Get one at [portal.jup.ag](https://portal.jup.ag).
 

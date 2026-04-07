@@ -242,7 +242,21 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 ## Architecture
 
-- [2026-04-06] `POST /swap/v2/submit` accepts any signed Solana transaction with a SOL tip (min 1M lamports / 0.001 SOL) to one of 16 Jupiter V6 program authorities.
+- [2026-04-06] `POST api.jup.ag/tx/v1/submit` accepts any signed Solana transaction with a SOL tip (min 1M lamports / 0.001 SOL) to one of 16 Jupiter V6 program authorities.
 - [2026-04-06] `/submit` is for `/build` transactions and non-Jupiter transactions. `/execute` is for `/order` transactions only. Different fee models: tips vs swap fees.
-- [2026-04-06] Currently private/partner-only. When it goes public, `/execute` and `/submit` may converge since they share the same Jupiter Beam infrastructure.
+- [2026-04-07] `/submit` is now public. API path is `api.jup.ag/tx/v1/submit` (deliberately outside the `/swap/v2/` namespace since it accepts any transaction). Docs page at `/transaction/submit`.
 - [2026-04-06] `/build` supports a `tipAmount` param that auto-includes the tip instruction in the response. For non-Jupiter transactions, integrators add a standard SOL transfer instruction manually.
+- [2026-04-07] Jupiter runs one of the top 3 validators on Solana. `/submit` opens this landing pipeline to integrators. Key selling point for the docs.
+- [2026-04-07] Recommended integration pattern: run `/submit` in parallel with existing RPC submission for zero-risk comparison. Whichever lands first wins.
+
+---
+
+# Swap API V2 — RTSE (Real-Time Slippage Estimator)
+
+## Architecture
+
+- [2026-04-07] RTSE is applied at **order time** (when `/order` or `/build` is called), not at execution time. The estimated slippage is baked into the transaction.
+- [2026-04-07] RTSE uses: heuristics (token categories, historical/real-time slippage data), algorithms (EMA on slippage data), and real-time failure rate monitoring.
+- [2026-04-07] On `/order`, RTSE is automatic (no param needed). Passing `slippageBps` overrides RTSE with a fixed value and restricts to Metis-only routing.
+- [2026-04-07] On `/build`, RTSE is opt-in via `slippageBps=rtse` (literal string). Default is 50 bps fixed.
+- [2026-04-07] Do not use "dynamic slippage" or "auto slippage" as naming conventions. The canonical name is RTSE (Real-Time Slippage Estimator).

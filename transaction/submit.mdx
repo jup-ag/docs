@@ -1,7 +1,7 @@
 ---
 title: "Transaction Submission"
 description: "Send transactions through Jupiter's landing infrastructure with SOL tips"
-llmsDescription: "How to submit signed transactions through Jupiter's transaction landing infrastructure using POST api.jup.ag/submit. Jupiter runs one of the top validators on Solana and opens its landing pipeline to integrators. Accepts any signed Solana transaction with a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 Jupiter V6 program authorities. Designed for /build transactions and non-Jupiter transactions. Can run in parallel with your existing RPC submission for zero-risk comparison. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees. Includes standalone tip instruction examples for non-Jupiter transactions."
+llmsDescription: "How to submit signed transactions through Jupiter's transaction landing infrastructure using POST api.jup.ag/tx/v1/submit. Jupiter runs one of the top validators on Solana and opens its landing pipeline to integrators. Accepts any signed Solana transaction with a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 Jupiter V6 program authorities. Designed for /build transactions and non-Jupiter transactions. Can run in parallel with your existing RPC submission for zero-risk comparison. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees. Includes standalone tip instruction examples for non-Jupiter transactions."
 ---
 
 `/submit` lets you send signed transactions through Jupiter's transaction landing infrastructure with SOL tips for priority processing. [Jupiter runs one of the top validators on Solana](https://solanabeach.io/validators) and uses it to power the same pipeline that lands Jupiter's own swap transactions with sub-second execution. `/submit` opens this pipeline to integrators.
@@ -27,7 +27,10 @@ Regardless, if Jupiter's pipeline delivers better results, share your landing ra
 
 The quickest way to use `/submit` is with `/build`'s built-in `tipAmount` parameter, which automatically adds a tip instruction to the response.
 
-```typescript
+<CodeGroup>
+```typescript @solana/web3.js
+const API_KEY = process.env.JUPITER_API_KEY!;
+
 // 1. Call /build with tipAmount
 const buildRes = await fetch(
   "https://api.jup.ag/swap/v2/build?" +
@@ -35,27 +38,98 @@ const buildRes = await fetch(
       inputMint: "So11111111111111111111111111111111111111112",
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
-      taker: walletAddress,
+      taker: signer.publicKey.toString(),
       tipAmount: "1000000", // 0.001 SOL minimum
     }),
   { headers: { "x-api-key": API_KEY } },
 );
 const build = await buildRes.json();
 
-// 2. Build, sign, and submit (see /build docs for full tx assembly)
-const submitRes = await fetch("https://api.jup.ag/submit", {
+// 2. Assemble instructions (tipInstruction is included in the response)
+const instructions = [
+  ComputeBudgetProgram.setComputeUnitLimit({ units: estimatedCUL }),
+  ...build.computeBudgetInstructions.map(toInstruction),
+  ...build.setupInstructions.map(toInstruction),
+  toInstruction(build.swapInstruction),
+  ...(build.cleanupInstruction ? [toInstruction(build.cleanupInstruction)] : []),
+  ...build.otherInstructions.map(toInstruction),
+  ...(build.tipInstruction ? [toInstruction(build.tipInstruction)] : []),
+];
+
+// 3. Build, sign (see /build docs for full tx assembly, ALTs, and CU simulation)
+const message = new TransactionMessage({
+  payerKey: signer.publicKey,
+  recentBlockhash,
+  instructions,
+}).compileToV0Message(addressLookupTableAccounts);
+
+const transaction = new VersionedTransaction(message);
+transaction.sign([signer]);
+
+// 4. Submit via /submit
+const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
     "x-api-key": API_KEY,
   },
   body: JSON.stringify({
-    signedTransaction: base64EncodedSignedTransaction,
+    signedTransaction: Buffer.from(transaction.serialize()).toString("base64"),
   }),
 });
 
 const { signature } = await submitRes.json();
 ```
+
+```typescript @solana/kit
+const API_KEY = process.env.JUPITER_API_KEY!;
+
+// 1. Call /build with tipAmount
+const buildRes = await fetch(
+  "https://api.jup.ag/swap/v2/build?" +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112",
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      amount: "100000000",
+      taker: signer.address,
+      tipAmount: "1000000", // 0.001 SOL minimum
+    }),
+  { headers: { "x-api-key": API_KEY } },
+);
+const build = await buildRes.json();
+
+// 2. Assemble instructions (tipInstruction is included in the response)
+const instructions = [
+  createInstruction(makeSetComputeUnitLimitIx(estimatedCUL)),
+  ...build.computeBudgetInstructions.map(createInstruction),
+  ...build.setupInstructions.map(createInstruction),
+  createInstruction(build.swapInstruction),
+  ...(build.cleanupInstruction ? [createInstruction(build.cleanupInstruction)] : []),
+  ...build.otherInstructions.map(createInstruction),
+  ...(build.tipInstruction ? [createInstruction(build.tipInstruction)] : []),
+];
+
+// 3. Build, sign (see /build docs for full tx assembly, ALTs, and CU simulation)
+const blockhash = transformBlockhash(build.blockhashWithMetadata);
+const alts = transformALTs(build.addressesByLookupTableAddress);
+const compiledTx = buildTransaction(instructions, blockhash, alts, signer.address);
+const signedTransaction = await signTransaction([signer.keyPair], compiledTx);
+
+// 4. Submit via /submit
+const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    signedTransaction: getBase64EncodedWireTransaction(signedTransaction),
+  }),
+});
+
+const { signature } = await submitRes.json();
+```
+</CodeGroup>
 
 <Tip>
 See the [Get Swap Instructions](/swap/build) page for complete transaction assembly code, including imports, instruction ordering, and address lookup table handling.
@@ -63,33 +137,9 @@ See the [Get Swap Instructions](/swap/build) page for complete transaction assem
 
 ## API reference
 
-### POST /submit
+**Base URL:** `https://api.jup.ag/tx/v1`
 
-```
-POST https://api.jup.ag/submit
-```
-
-#### Request
-
-| Field                | Type     | Description                              |
-|---------------------|----------|------------------------------------------|
-| `signedTransaction` | `string` | Base64-encoded signed transaction        |
-
-#### Response (200)
-
-```json
-{
-  "signature": "5UfDuX..."
-}
-```
-
-#### Error response (400)
-
-```json
-{
-  "error": "Transaction must contain at least 1000000 lamports tip to one of [...]"
-}
-```
+See the [POST /submit API reference](/api-reference/transaction/submit) for the full specification.
 
 #### Validation
 

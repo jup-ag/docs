@@ -1,7 +1,7 @@
 ---
 title: "Overview"
 description: "One API for all swap use cases on Jupiter"
-llmsDescription: "Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Four endpoints: GET /order (default path, all routers including RFQ, RTSE slippage, gasless, MEV protection), POST /execute (managed landing for /order transactions), GET /build (raw swap instructions for custom transactions, CPI, composability, Metis-only routing, no swap fees), and POST /submit at api.jup.ag/submit (transaction landing via Jupiter's infrastructure with SOL tips, for /build or any signed transaction). Comparison table of /order vs /build covering routing, fees, execution, and gasless support. Start with /order unless you need transaction modification."
+llmsDescription: "Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Four endpoints: GET /order (default path, all routers including RFQ, RTSE slippage, gasless, MEV protection), POST /execute (managed landing for /order transactions), GET /build (raw swap instructions for custom transactions, CPI, composability, Metis-only routing, no swap fees), and POST /submit at api.jup.ag/tx/v1/submit (transaction landing via Jupiter's infrastructure with SOL tips, for /build or any signed transaction). Comparison table of /order vs /build covering routing, fees, execution, and gasless support. Start with /order unless you need transaction modification."
 ---
 
 The Swap API unifies Jupiter's swap capabilities into a single entry point at `https://api.jup.ag/swap/v2`. Two paths cover every use case: a default happy path for the best swap experience, and an advanced path for full transaction control.
@@ -23,7 +23,7 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 | **Returns** | Assembled transaction | Raw swap instructions |
 | **Routers** | All (Metis, RFQ, Dflow, OKX) | Metis only |
 | **Best for** | Most integrations. Best price, simplest flow. | Custom transactions, CPI, composability. |
-| **Transaction landing** | Managed via `/execute` (optimised slippage, priority fees, our proprietary landing pipeline) | Self-managed via your own RPC, or via [`/submit`](/swap/submit) with SOL tips for Jupiter Beam landing (our proprietary landing pipeline) |
+| **Transaction landing** | Managed via `/execute` (optimised slippage, priority fees, our proprietary landing pipeline) | Self-managed via your own RPC, or via [`/submit`](/transaction/submit) with SOL tips for Jupiter Beam landing (our proprietary landing pipeline) |
 | **Swap fees** | Yes (Jupiter platform fee) | No |
 | **Integrator fees** | Referral fees (referralAccount + referralFee) | Platform fee only (platformFeeBps) or DIY |
 | **Gasless** | [Automatic gasless, or your own `payer`](/swap/advanced/gasless) | Use your own `payer` |
@@ -38,9 +38,9 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 | [`/order`](/swap/order-and-execute) | GET | Get a quote and assembled transaction |
 | [`/execute`](/swap/order-and-execute#execute-the-transaction) | POST | Execute a signed `/order` transaction with managed landing |
 | [`/build`](/swap/build) | GET | Get a quote and raw swap instructions |
-| [`/submit`](/swap/submit) | POST | Submit any signed transaction through Jupiter's landing infrastructure with SOL tips |
+| [`/submit`](/transaction/submit) | POST | Submit any signed transaction through Jupiter's landing infrastructure with SOL tips |
 
-**Base URL:** `https://api.jup.ag/swap/v2` (except `/submit` which is at `https://api.jup.ag/submit`)
+**Base URL:** `https://api.jup.ag/swap/v2` (except `/submit` which is at `https://api.jup.ag/tx/v1/submit`)
 
 All endpoints require an API key via the `x-api-key` header. Get one at [portal.jup.ag](https://portal.jup.ag).
 

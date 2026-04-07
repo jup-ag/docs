@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: Jupiter Transaction API
+  version: "1.0"
+servers:
+  - url: https://api.jup.ag/tx/v1
+paths:
+  /submit:
+    post:
+      operationId: postSubmit
+      tags:
+        - Submit
+      summary: Submit a swap transaction
+      description: Submits a signed transaction to Beam if it contains a tip instruction and a Jupiter Swap instruction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signedTransaction:
+                  type: string
+              required:
+                - signedTransaction
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  signature:
+                    type: string
+                required:
+                  - signature
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error

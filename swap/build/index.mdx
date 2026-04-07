@@ -6,7 +6,7 @@ llmsDescription: "How to use Jupiter's Swap API V2 GET /swap/v2/build endpoint t
 
 The `/build` endpoint returns raw swap instructions instead of an assembled transaction. You build the transaction yourself, which gives you full control to add custom instructions, CPI, or modify any part of the transaction.
 
-Once built and signed, you can submit transactions via your own RPC, or use [`/submit`](/swap/submit) to land them through Jupiter's transaction infrastructure with SOL tips.
+Once built and signed, you can submit transactions via your own RPC, or use [`/submit`](/transaction/submit) to land them through Jupiter's transaction infrastructure with SOL tips.
 
 ## Quick start
 
@@ -569,7 +569,7 @@ The response includes address lookup tables in `addressesByLookupTableAddress`. 
 
 ### 5. Sign and send
 
-Sign the transaction with your wallet and send via your own RPC, or use [`/submit`](/swap/submit) to land them through Jupiter's transaction infrastructure with SOL tips.
+Sign the transaction with your wallet and send via your own RPC, or use [`/submit`](/transaction/submit) to land them through Jupiter's transaction infrastructure with SOL tips.
 
 <Note>
 `/build` transactions cannot use `/execute`.
@@ -583,7 +583,7 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 | --- | --- | --- |
 | **Routing** | All routers (Metis + RFQ) | Metis only |
 | **Swap fees** | Jupiter platform fee | None |
-| **Transaction landing** | Managed via `/execute` | Self-managed or use our proprietary landing pipeline |
+| **Transaction landing** | Managed via `/execute` | Self-managed or use our proprietary landing pipeline via [`/submit`](/transaction/submit) |
 | **Transaction control** | None | Full |
 | **Compute budget** | Included in transaction | Included as instructions (you can override) |
 
@@ -592,7 +592,7 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 | Parameter | Default | Description |
 | --- | --- | --- |
 | `slippageBps` | 50 | Slippage tolerance in basis points, or `"rtse"` for [dynamic slippage](/swap/advanced/slippage) |
-| `tipAmount` | - | SOL tip amount in lamports. Adds a tip instruction for use with [`/submit`](/swap/submit) |
+| `tipAmount` | - | SOL tip amount in lamports. Adds a tip instruction for use with [`/submit`](/transaction/submit) |
 | `mode` | (default) | "fast" for reduced latency routing |
 | `maxAccounts` | 64 | Maximum accounts for the swap route (1-64) |
 | `platformFeeBps` | 0 | Integrator platform fee in bps (requires `feeAccount`) |

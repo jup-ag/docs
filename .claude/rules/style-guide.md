@@ -24,13 +24,14 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 | Ultra Swap API        | Ultra API, Ultra Swap                    | Full product name in first mention, then "Ultra" is OK |
 | Metis Swap API        | Metis API, Metis Swap                    | Don't call it "legacy" in docs — still supported |
 | Jupiter               | Jup, jup.ag                              | Always "Jupiter" in prose. "jup.ag" only for URLs |
-| Developer Portal      | Portal, Dev Portal, Dashboard            | Full name first, then "Portal" is OK     |
+| Developer Platform    | Portal, Dev Portal, Dashboard            | Full name first, then "Portal" is OK     |
 | API key               | api key, API Key, apiKey                  | Lowercase "key" in prose, camelCase only in code |
 | Solana                | SOL (when referring to the chain)         | "SOL" only for the token                 |
 | Swap API          | Unified Swap API, Swap V2             | "Swap API" in prose. Use "V2" only when contrasting with V1 |
 | `/order`          | order endpoint, order API              | Always backtick the path in prose              |
 | `/build`          | build endpoint, build API              | Always backtick the path in prose              |
 | `/execute`        | execute endpoint, execute API          | Always backtick the path in prose              |
+| `/submit`          | submit endpoint, submit API            | Always backtick. API at `api.jup.ag/tx/v1/submit`, not under `/swap/v2/` |
 
 ### Product-Specific Terms
 
@@ -192,3 +193,6 @@ Format: `- [YYYY-MM-DD] Decision: rationale`
 - [2026-03-17] Swap V2 code examples always show both @solana/kit and @solana/web3.js in `<CodeGroup>` tabs, with kit listed first. Prerequisites (imports, types, helpers) go in a collapsible `<Accordion>` to keep the main example clean.
 - [2026-03-19] When `/build` returns ALT data (`addressesByLookupTableAddress`), never make RPC calls to resolve ALTs. Construct lookup table objects locally from the response data. Both kit and web3.js examples should use a `transformALTs` helper for consistency.
 - [2026-03-19] For @solana/web3.js `AddressLookupTableAccount` construction: `compileToV0Message` only uses `key` and `state.addresses`. Other state fields (`deactivationSlot`, `lastExtendedSlot`, `lastExtendedSlotStartIndex`) are TypeScript requirements only. Encapsulate in a helper rather than exposing placeholder values in the main code example.
+- [2026-04-07] `/submit` is a product-neutral endpoint at `api.jup.ag/tx/v1/submit`. Always use the full API URL in code examples (`https://api.jup.ag/tx/v1/submit`), not a `BASE_URL` variable. The docs path is `/transaction/submit`. In prose, reference as `/submit` with backticks.
+- [2026-04-07] RTSE terminology: always use "RTSE" or "Real-Time Slippage Estimator". Never use "dynamic slippage" or "auto slippage" — these were legacy names that are no longer used.
+- [2026-04-07] Docs file path does not need to mirror the API URL path. Mintlify's docs.json decouples sidebar placement from file location. A page can live at `transaction/submit.mdx` but appear in the Swap sidebar. Choose file paths based on product scope, not discovery context.

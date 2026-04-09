@@ -34,7 +34,7 @@ jup-ag/docs/
 │   ├── price/             # Price API
 │   └── ...                # All other APIs and products
 ├── get-started/           # Getting started/onboarding
-├── portal/                # Developer Portal docs (portal.jup.ag)
+├── portal/                # Developer Platform docs (developers.jup.ag/portal)
 ├── ai/                    # AI-first developer experience
 ├── guide/                 # Guides and tutorials
 ├── blog/                  # Developer blog posts
@@ -55,7 +55,7 @@ jup-ag/docs/
 | Resource        | URL                              |
 |-----------------|----------------------------------|
 | Live docs       | https://dev.jup.ag               |
-| Developer Portal| https://portal.jup.ag            |
+| Developer Platform| https://developers.jup.ag/portal            |
 | API (Lite)      | https://lite-api.jup.ag          |
 | API (Dynamic)   | https://api.jup.ag               |
 | API Status      | https://status.jup.ag            |
@@ -79,7 +79,7 @@ jup-ag/docs/
 
 | Product             | Description                                        | Folder          |
 |---------------------|----------------------------------------------------|-----------------|
-| Developer Portal    | API key management, price, rate limit, dashboard   | `portal/`       |
+| Developer Platform    | API key management, price, rate limit, dashboard   | `portal/`       |
 | Ultra Swap API      | Flagship swap — RPC-less, gasless, MEV-protected   | `docs/ultra`    |
 | Metis Swap API      | Legacy swap API - customizable and composable      | `docs/swap`     |
 | Tokens API          | Comprehensive token information                    | `docs/tokens`   |

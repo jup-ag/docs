@@ -1,10 +1,12 @@
 ---
 title: "Get Swap Instructions"
 description: "Get raw swap instructions and build your own transaction"
-llmsDescription: "How to use Jupiter's Swap API V2 /build endpoint to get raw swap instructions for building custom transactions. Returns computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions, and address lookup tables. Integrators assemble their own transaction, add custom instructions (CPI, memo, SOL transfer, etc.), simulate for compute units, compile to v0 transaction, sign, and send via their own RPC. /execute is not available for /build transactions. Uses Metis-only routing. No Jupiter swap fees. Full @solana/kit TypeScript code example included."
+llmsDescription: "How to use Jupiter's Swap API V2 GET /swap/v2/build endpoint to get raw swap instructions for building custom transactions. Returns computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions, tipInstruction, and address lookup tables. Integrators assemble their own transaction, add custom instructions (CPI, memo, SOL transfer, etc.), simulate for compute units, compile to v0 transaction, sign, and send via their own RPC or via /submit for Jupiter's transaction landing. Optional parameters include slippageBps (number or 'rtse' for RTSE), tipAmount (for /submit), mode='fast', maxAccounts, platformFeeBps, payer (gasless). /execute is not available for /build. Metis-only routing. No Jupiter swap fees. Full @solana/kit and @solana/web3.js TypeScript code examples included."
 ---
 
 The `/build` endpoint returns raw swap instructions instead of an assembled transaction. You build the transaction yourself, which gives you full control to add custom instructions, CPI, or modify any part of the transaction.
+
+Once built and signed, you can submit transactions via your own RPC, or use [`/submit`](/transaction/submit) to land them through Jupiter's transaction infrastructure with SOL tips.
 
 ## Quick start
 
@@ -40,13 +42,10 @@ import {
 import { getTransferSolInstruction } from "@solana-program/system"; // For adding custom instructions
 
 // ── Config ──────────────────────────────────────────────────────────────────
-const BASE_URL = "https://api.jup.ag/swap/v2";
 const COMPUTE_BUDGET_PROGRAM: Address = address(
   "ComputeBudget111111111111111111111111111111",
 );
 const COMPUTE_UNIT_LIMIT_MAX = 1_400_000;
-const CU_BUFFER_NUMERATOR = 120n;
-const CU_BUFFER_DENOMINATOR = 100n; // 120% of simulated CUs
 
 // ── Instruction types ───────────────────────────────────────────────────────
 
@@ -62,24 +61,19 @@ type ApiInstruction = {
   data: Base64EncodedBytes;
 };
 
-function toAccountMeta(acc: Account): AccountMeta {
-  const role =
-    acc.isSigner && acc.isWritable
-      ? AccountRole.WRITABLE_SIGNER
-      : acc.isSigner
-        ? AccountRole.READONLY_SIGNER
-        : acc.isWritable
-          ? AccountRole.WRITABLE
-          : AccountRole.READONLY;
-  return { address: acc.pubkey, role };
-}
-
-function createInstruction(
-  ix: ApiInstruction,
-): Instruction<string, readonly AccountMeta[]> {
+function createInstruction(ix: ApiInstruction): Instruction {
   return {
     programAddress: ix.programId,
-    accounts: ix.accounts.map(toAccountMeta),
+    accounts: ix.accounts.map((acc) => ({
+      address: acc.pubkey,
+      role: acc.isSigner && acc.isWritable
+        ? AccountRole.WRITABLE_SIGNER
+        : acc.isSigner
+          ? AccountRole.READONLY_SIGNER
+          : acc.isWritable
+            ? AccountRole.WRITABLE
+            : AccountRole.READONLY,
+    })),
     data: Uint8Array.from(getBase64Codec().encode(ix.data)),
   };
 }
@@ -111,6 +105,7 @@ type BuildResponse = {
   swapInstruction: ApiInstruction;
   cleanupInstruction: ApiInstruction | null;
   otherInstructions: ApiInstruction[];
+  tipInstruction: ApiInstruction | null;
   addressesByLookupTableAddress: Record<string, string[]> | null;
   blockhashWithMetadata: {
     blockhash: number[];
@@ -156,7 +151,7 @@ function transformALTs(
 }
 
 function buildTransaction(
-  ixs: Instruction<string, readonly AccountMeta[]>[],
+  ixs: Instruction[],
   blockhash: { blockhash: Blockhash; lastValidBlockHeight: bigint },
   alts: AddressesByLookupTableAddress,
   feePayer: Address,
@@ -187,8 +182,6 @@ import {
 import bs58 from "bs58";
 
 const COMPUTE_UNIT_LIMIT_MAX = 1_400_000;
-
-const BASE_URL = "https://api.jup.ag/swap/v2";
 
 // ── API response types ──────────────────────────────────────────────────────
 
@@ -229,6 +222,7 @@ type BuildResponse = {
   swapInstruction: ApiInstruction;
   cleanupInstruction: ApiInstruction | null;
   otherInstructions: ApiInstruction[];
+  tipInstruction: ApiInstruction | null;
   addressesByLookupTableAddress: Record<string, string[]> | null;
   blockhashWithMetadata: {
     blockhash: number[];
@@ -287,13 +281,14 @@ const rpc = createSolanaRpc(RPC_URL);
 
 // Step 1: Get swap instructions from /build
 const buildRes = await fetch(
-  `${BASE_URL}/build?` +
+  "https://api.jup.ag/swap/v2/build?" +
     new URLSearchParams({
       inputMint: "So11111111111111111111111111111111111111112",
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
       taker: signer.address,
       slippageBps: "100",
+      tipAmount: "1000000", // 0.001 SOL tip for /submit (omit if using your own RPC)
     }),
   { headers: { "x-api-key": API_KEY } },
 );
@@ -320,6 +315,9 @@ const instructions = [
     ? [createInstruction(build.cleanupInstruction)]
     : []),
   ...build.otherInstructions.map(createInstruction),
+  ...(build.tipInstruction
+    ? [createInstruction(build.tipInstruction)]
+    : []),
 ];
 
 // Step 3: Prepare blockhash and address lookup tables
@@ -352,16 +350,10 @@ if (simulationResult.value.err) {
 // Set 1.2x buffer on simulated CU, capped at max
 const estimatedCUL = simulationResult.value.unitsConsumed
   ? Math.min(
-      Number(
-        (simulationResult.value.unitsConsumed * CU_BUFFER_NUMERATOR) /
-          CU_BUFFER_DENOMINATOR,
-      ),
+      Math.ceil(Number(simulationResult.value.unitsConsumed) * 1.2),
       COMPUTE_UNIT_LIMIT_MAX,
     )
   : COMPUTE_UNIT_LIMIT_MAX;
-console.log(
-  `Simulated CUs: ${simulationResult.value.unitsConsumed}, using limit: ${estimatedCUL}`,
-);
 
 // Step 5: Build final transaction with estimated CU limit + CU price from response
 const compiledTx = buildTransaction(
@@ -375,19 +367,22 @@ const compiledTx = buildTransaction(
   signer.address,
 );
 
-// Step 6: Sign
+// Step 6: Sign and submit via /submit (or use your own RPC / transaction pipeline)
 const signedTransaction = await signTransaction([signer.keyPair], compiledTx);
 
-// Step 7: Send via your own RPC
-const wireTransaction = getBase64EncodedWireTransaction(signedTransaction);
-const signature = await rpc
-  .sendTransaction(wireTransaction, {
-    encoding: "base64",
-    skipPreflight: true,
-  })
-  .send();
+const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    signedTransaction: getBase64EncodedWireTransaction(signedTransaction),
+  }),
+});
 
-console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
+const { signature } = await submitRes.json();
+console.log("Transaction:", `https://solscan.io/tx/${signature}`);
 ```
 
 ```typescript expandable title="@solana/web3.js"
@@ -403,13 +398,14 @@ const signer = Keypair.fromSecretKey(
 
 // Step 1: Get swap instructions from /build
 const buildRes = await fetch(
-  `${BASE_URL}/build?` +
+  "https://api.jup.ag/swap/v2/build?" +
     new URLSearchParams({
       inputMint: "So11111111111111111111111111111111111111112",
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
       taker: signer.publicKey.toString(),
       slippageBps: "100",
+      tipAmount: "1000000", // 0.001 SOL tip for /submit (omit if using your own RPC)
     }),
   { headers: { "x-api-key": API_KEY } },
 );
@@ -436,6 +432,9 @@ const instructions = [
     ? [toInstruction(build.cleanupInstruction)]
     : []),
   ...build.otherInstructions.map(toInstruction),
+  ...(build.tipInstruction
+    ? [toInstruction(build.tipInstruction)]
+    : []),
 ];
 
 // Step 3: Resolve address lookup tables (from /build response, no RPC needed)
@@ -472,9 +471,6 @@ const estimatedCUL = simulationResult.value.unitsConsumed
       COMPUTE_UNIT_LIMIT_MAX,
     )
   : COMPUTE_UNIT_LIMIT_MAX;
-console.log(
-  `Simulated CUs: ${simulationResult.value.unitsConsumed}, using limit: ${estimatedCUL}`,
-);
 
 // Step 5: Build final transaction with estimated CU limit + CU price from response
 const finalMessage = new TransactionMessage({
@@ -487,15 +483,23 @@ const finalMessage = new TransactionMessage({
   ],
 }).compileToV0Message(addressLookupTableAccounts);
 
+// Step 6: Sign and submit via /submit (or use your own RPC / transaction pipeline)
 const transaction = new VersionedTransaction(finalMessage);
 transaction.sign([signer]);
 
-// Step 6: Send and confirm
-const signature = await connection.sendRawTransaction(transaction.serialize(), {
-  skipPreflight: true,
+const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    signedTransaction: Buffer.from(transaction.serialize()).toString("base64"),
+  }),
 });
 
-console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
+const { signature } = await submitRes.json();
+console.log("Transaction:", `https://solscan.io/tx/${signature}`);
 ```
 </CodeGroup>
 
@@ -523,6 +527,7 @@ console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
 | `swapInstruction` | The main swap instruction |
 | `cleanupInstruction` | Post-swap cleanup (may be null) |
 | `otherInstructions` | Additional instructions |
+| `tipInstruction` | SOL tip transfer instruction (present when `tipAmount` is provided) |
 | `addressesByLookupTableAddress` | Address lookup tables for v0 transactions |
 | `blockhashWithMetadata` | Recent blockhash and expiry height |
 
@@ -567,10 +572,12 @@ The response includes address lookup tables in `addressesByLookupTableAddress`. 
 
 ### 5. Sign and send
 
-Sign the transaction with your wallet and send via your own RPC.
+Sign the transaction with your wallet and send via your own RPC, or use [`/submit`](/transaction/submit) to land them through Jupiter's transaction infrastructure with SOL tips.
 
 <Note>
-`/build` transactions cannot use `/execute`. You are responsible for sending the transaction via your own RPC and handling confirmation. Jupiter does not charge swap fees on `/build`.
+`/build` transactions cannot use `/execute`.
+- `/build` does not have the required `requestId`
+- `/build` is intended for customisations, and `/execute` validates the transaction to prevent any changes
 </Note>
 
 ## Key differences from `/order`
@@ -579,7 +586,7 @@ Sign the transaction with your wallet and send via your own RPC.
 | --- | --- | --- |
 | **Routing** | All routers (Metis + RFQ) | Metis only |
 | **Swap fees** | Jupiter platform fee | None |
-| **Execution** | Managed via `/execute` | Self-managed |
+| **Transaction landing** | Managed via `/execute` | Self-managed or use our proprietary landing pipeline via [`/submit`](/transaction/submit) |
 | **Transaction control** | None | Full |
 | **Compute budget** | Included in transaction | Included as instructions (you can override) |
 
@@ -587,7 +594,9 @@ Sign the transaction with your wallet and send via your own RPC.
 
 | Parameter | Default | Description |
 | --- | --- | --- |
-| `slippageBps` | 50 | Slippage tolerance in basis points |
+| `slippageBps` | 50 | Slippage tolerance in basis points, or `"rtse"` for [RTSE](/swap/advanced/slippage) |
+| `tipAmount` | - | SOL tip amount in lamports. Adds a tip instruction for use with [`/submit`](/transaction/submit) |
+| `computeUnitPricePercentile` | - | Priority fee percentile for the CU price instruction. Named levels: `"medium"` (25th), `"high"` (50th), `"veryHigh"` (75th), or an integer 0-10000 in bps. See [Compute Units](/swap/advanced/compute-units) |
 | `mode` | (default) | "fast" for reduced latency routing |
 | `maxAccounts` | 64 | Maximum accounts for the swap route (1-64) |
 | `platformFeeBps` | 0 | Integrator platform fee in bps (requires `feeAccount`) |
@@ -604,8 +613,8 @@ For the full parameter reference, see the [API reference](/api-reference/swap). 
 
 ## Related
 
+- [Transaction Submission](/transaction/submit) to submit via Jupiter's transaction landing infrastructure with SOL tips for priority processing
 - [Other Instructions](/swap/build/other-instructions) for common instructions to compose with your swap
-- [Routing](/swap/routing) for how parameters affect routing
 - [Fees](/swap/fees) for adding platform fees to `/build`
 - [Advanced Techniques](/swap/advanced) for CU simulation, `mode: "fast"`, and `maxAccounts`
 - [API Reference: GET /build](/api-reference/swap/build) for the full OpenAPI specification

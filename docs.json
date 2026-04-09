@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "banner": {
-    "content": "The Jupiter Developer Platform is launching on **6 April 2026**, with new pricing, rate limits, and features. Read the [**Migration Guide**](/portal/migration) to get started."
+    "content": "The Jupiter Developer Platform is live. Previous portal users keep their rate limits for free until **30 June 2026** — set up billing on the [**new platform**](https://developers.jup.ag/portal) before then. See the [**Migration Guide**](/portal/migration) for details."
   },
   "theme": "mint",
   "name": "Jupiter",
@@ -65,7 +65,8 @@
                     "group": "Build Custom Transactions",
                     "pages": [
                       "swap/build/index",
-                      "swap/build/other-instructions"
+                      "swap/build/other-instructions",
+                      "transaction/submit"
                     ]
                   },
                   "swap/fees",
@@ -84,6 +85,7 @@
                 "group": "Advanced",
                 "pages": [
                   "swap/advanced/index",
+                  "swap/advanced/slippage",
                   "swap/advanced/gasless",
                   "swap/advanced/compute-units",
                   "swap/advanced/reduce-transaction-size",
@@ -99,7 +101,8 @@
                 "pages": [
                   "api-reference/swap/order",
                   "api-reference/swap/build",
-                  "api-reference/swap/execute"
+                  "api-reference/swap/execute",
+                  "api-reference/transaction/submit"
                 ]
               }
             ]
@@ -664,7 +667,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://portal.jup.ag"
+      "href": "https://developers.jup.ag/portal"
     }
   },
   "footer": {

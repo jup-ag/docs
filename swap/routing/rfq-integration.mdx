@@ -1,7 +1,7 @@
 ---
 title: "Integrate MM into JupiterZ (RFQ)"
 description: "Integrate your market maker into the JupiterZ RFQ system with webhook-based quoting."
-llmsDescription: "Host a webhook implementing the RFQ API schema, pass fulfillment and response time requirements, and onboard your market maker into JupiterZ."
+llmsDescription: "How to integrate a market maker into Jupiter's JupiterZ RFQ (Request for Quote) system. Market makers host a webhook implementing the RFQ API schema, pass fulfillment rate and response time requirements, and onboard into JupiterZ. RFQ liquidity is available on the /order path only (not /build). Covers webhook requirements, the quoting and settlement flow, fulfillment expectations, and how to contact Jupiter for onboarding."
 ---
 
 This guide covers how to integrate your market maker into JupiterZ, Jupiter's RFQ (Request For Quote) system. You will host a webhook implementing the RFQ API schema with quote, swap, and tokens endpoints, meet fulfillment requirements (95% fill rate, 250ms response time), and complete end-to-end testing before going live.

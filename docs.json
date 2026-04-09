@@ -65,7 +65,8 @@
                     "group": "Build Custom Transactions",
                     "pages": [
                       "swap/build/index",
-                      "swap/build/other-instructions"
+                      "swap/build/other-instructions",
+                      "transaction/submit"
                     ]
                   },
                   "swap/fees",
@@ -84,6 +85,7 @@
                 "group": "Advanced",
                 "pages": [
                   "swap/advanced/index",
+                  "swap/advanced/slippage",
                   "swap/advanced/gasless",
                   "swap/advanced/compute-units",
                   "swap/advanced/reduce-transaction-size",
@@ -99,7 +101,8 @@
                 "pages": [
                   "api-reference/swap/order",
                   "api-reference/swap/build",
-                  "api-reference/swap/execute"
+                  "api-reference/swap/execute",
+                  "api-reference/transaction/submit"
                 ]
               }
             ]

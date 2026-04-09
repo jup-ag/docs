@@ -1,0 +1,6 @@
+---
+openapi: /openapi-spec/transaction/transaction.yaml post /submit
+title: "Submit Transaction"
+description: "Submit a signed transaction through Jupiter's landing infrastructure"
+llmsDescription: "POST /submit endpoint for Jupiter Transaction API at api.jup.ag/tx/v1/submit. Submits any valid signed Solana transaction through Jupiter's transaction landing infrastructure. Requires a SOL tip of at least 0.001 SOL (1,000,000 lamports) to one of the 16 permitted tip receivers. Request body: signedTransaction (base64-encoded signed transaction). Response: signature (transaction signature). Works with /build swap transactions, non-Jupiter transactions, or any other signed transaction. Requires x-api-key header."
+---

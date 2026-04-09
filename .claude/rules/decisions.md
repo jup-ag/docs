@@ -204,7 +204,7 @@ Track all redirects added to `vercel.json` here for visibility:
 ### [2026-04-06] Hidden pages for private integrator docs
 **Status:** implemented
 **Scope:** new-section
-**Files affected:** `swap/multisig.mdx`, `swap/submit.mdx`
+**Files affected:** `swap/multisig.mdx`
 **Linear issue:** DEVREL-165
 
 **Context:** Private integrator docs lived in Notion, outside the docs repo. No PR review, inconsistent formatting, no path to graduate into public docs.
@@ -216,3 +216,21 @@ Track all redirects added to `vercel.json` here for visibility:
 - Use generic titles that can accommodate future expansion (e.g. "Multisig Swap" not "Squads Integration") while being specific in the body content
 **Rationale:** Flat placement means graduation to public requires only removing `hidden: true` with no URL change. Generic titles avoid path renames if support expands to other protocols. Mintlify's hidden page feature handles nav/search/SEO exclusion automatically.
 **Alternatives considered:** `/swap/partners/*` prefix — rejected because it creates a URL migration problem when features graduate to public. `/swap/integrations/*` — same issue.
+
+### [2026-04-07] Move /submit to product-neutral path with dedicated API reference
+**Status:** implemented
+**Scope:** folder-structure | navigation | new-section
+**Files affected:** `transaction/submit.mdx`, `api-reference/transaction/submit.mdx`, `openapi-spec/transaction/transaction.yaml`, `docs.json`, `swap/index.mdx`, `swap/build/index.mdx`
+**Linear issue:** DEVREL-166
+
+**Context:** `/submit` was originally nested under `swap/submit.mdx` during DEVREL-165 (as a hidden page). When making it public, the API endpoint was placed at `api.jup.ag/tx/v1/submit` (not under `/swap/v2/`), and the endpoint accepts any signed Solana transaction, not just swaps. Nesting it under `/swap/` contradicted both the API path and the product scope.
+**Decision:**
+- Docs page at `transaction/submit.mdx` (URL: `/transaction/submit`), aligning with the `tx/v1` API namespace
+- Still appears in the Swap sidebar under "Build Custom Transactions" group (primary discovery path for now)
+- Dedicated OpenAPI spec at `openapi-spec/transaction/transaction.yaml` with server `api.jup.ag/tx/v1`
+- API reference page at `api-reference/transaction/submit.mdx`, added to Swap API Reference group
+- Mintlify's docs.json decouples file path from sidebar placement - the page can be cross-referenced from multiple sidebars later (Trigger, Recurring, etc.) without moving the file
+**Rationale:** The docs path should reflect the product scope, not the discovery context. `/transaction/submit` is product-neutral and won't need a redirect when other products reference it. Keeping it in the Swap sidebar preserves the current primary discovery path.
+**Alternatives considered:**
+1. `/submit` at repo root - too generic, no namespace for future transaction endpoints.
+2. Keep at `/swap/submit` - contradicts the API path and the endpoint's product-neutral scope. A non-swap developer wouldn't look under `/swap/` for transaction submission.

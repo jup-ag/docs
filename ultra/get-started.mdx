@@ -51,11 +51,12 @@ Ultra Swap uses a two-step flow: first call `GET /ultra/v1/order` to receive a b
 </Accordion>
 
 <Accordion title="What is the rate limit for Ultra Swap API?">
-* Dynamic Rate Limits are now applied to Ultra Swap API.
+<Warning>
+Dynamic rate limits have been replaced by fixed rate limits under the new Developer Platform. See [Rate Limits](/portal/rate-limits) and the [Migration Guide](/portal/migration) for details.
+</Warning>
 
-  * No Pro plans or payment needed.
-  * Simply generate the universal API Key via [Portal](https://portal.jup.ag)
-  * Rate limits scale together with your swap volume.
-  * [Read more about Ultra Swap API Dynamic Rate Limit](/portal/rate-limit).
+* Generate an API key via [Developer Platform](https://developers.jup.ag/portal)
+* Rate limits are fixed per tier (Free: 1 RPS, Developer: 10 RPS, Launch: 50 RPS, Pro: 150 RPS)
+* See [Plans and Pricing](/portal/plans) for full details
 </Accordion>
 </AccordionGroup>

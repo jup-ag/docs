@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "banner": {
-    "content": "The existing Portal is being replaced by the **Jupiter Developer Platform** with new pricing, rate limits, and features. We will share more details about the migration plan soon."
+    "content": "The Jupiter Developer Platform is live. Previous portal users keep their rate limits for free until **30 June 2026** — set up billing on the [**new platform**](https://developers.jup.ag/portal) before then. See the [**Migration Guide**](/portal/migration) for details."
   },
   "theme": "mint",
   "name": "Jupiter",
@@ -40,11 +40,10 @@
             "group": "Portal",
             "pages": [
               "portal/setup",
-              "portal/migrate-from-lite-api",
-              "portal/payment",
+              "portal/plans",
+              "portal/rate-limits",
               "portal/responses",
-              "portal/rate-limit",
-              "portal/latency",
+              "portal/migration",
               "portal/faq"
             ]
           }
@@ -114,6 +113,7 @@
                 "pages": [
                   "tokens/index",
                   "tokens/token-information",
+                  "tokens/verification",
                   "tokens/content"
                 ]
               },
@@ -124,13 +124,31 @@
               {
                 "group": "API Reference",
                 "pages": [
-                  "api-reference/tokens/search",
-                  "api-reference/tokens/tag",
-                  "api-reference/tokens/category",
-                  "api-reference/tokens/recent",
-                  "api-reference/tokens/get-content",
-                  "api-reference/tokens/get-content-cooking",
-                  "api-reference/tokens/get-content-feed"
+                  {
+                    "group": "Token Information",
+                    "pages": [
+                      "api-reference/tokens/search",
+                      "api-reference/tokens/tag",
+                      "api-reference/tokens/category",
+                      "api-reference/tokens/recent"
+                    ]
+                  },
+                  {
+                    "group": "Express Verification",
+                    "pages": [
+                      "api-reference/tokens/verify-check-eligibility",
+                      "api-reference/tokens/verify-craft-txn",
+                      "api-reference/tokens/verify-execute"
+                    ]
+                  },
+                  {
+                    "group": "Content",
+                    "pages": [
+                      "api-reference/tokens/get-content",
+                      "api-reference/tokens/get-content-cooking",
+                      "api-reference/tokens/get-content-feed"
+                    ]
+                  }
                 ]
               }
             ]
@@ -459,22 +477,6 @@
             ]
           },
           {
-            "item": "Perps",
-            "icon": "chart-line",
-            "groups": [
-              {
-                "group": "Perps",
-                "pages": [
-                  "perps/index",
-                  "perps/position-account",
-                  "perps/position-request-account",
-                  "perps/pool-account",
-                  "perps/custody-account"
-                ]
-              }
-            ]
-          },
-          {
             "item": "More",
             "icon": "ellipsis",
             "groups": [
@@ -506,6 +508,16 @@
               {
                 "group": "Lock",
                 "pages": ["lock/index"]
+              },
+              {
+                "group": "Perps",
+                "pages": [
+                  "perps/index",
+                  "perps/position-account",
+                  "perps/position-request-account",
+                  "perps/pool-account",
+                  "perps/custody-account"
+                ]
               },
               {
                 "group": "API Reference",
@@ -652,7 +664,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://portal.jup.ag"
+      "href": "https://developers.jup.ag/portal"
     }
   },
   "footer": {
@@ -708,6 +720,22 @@
     }
   },
   "redirects": [
+    {
+      "source": "/portal/rate-limit",
+      "destination": "/portal/rate-limits"
+    },
+    {
+      "source": "/portal/payment",
+      "destination": "/portal/plans"
+    },
+    {
+      "source": "/portal/latency",
+      "destination": "/portal/faq"
+    },
+    {
+      "source": "/portal/migrate-from-lite-api",
+      "destination": "/portal/migration"
+    },
     {
       "source": "/api-reference/price/v3/price",
       "destination": "/api-reference/price"

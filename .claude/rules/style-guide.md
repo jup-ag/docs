@@ -24,7 +24,7 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 | Ultra Swap API        | Ultra API, Ultra Swap                    | Full product name in first mention, then "Ultra" is OK |
 | Metis Swap API        | Metis API, Metis Swap                    | Don't call it "legacy" in docs — still supported |
 | Jupiter               | Jup, jup.ag                              | Always "Jupiter" in prose. "jup.ag" only for URLs |
-| Developer Portal      | Portal, Dev Portal, Dashboard            | Full name first, then "Portal" is OK     |
+| Developer Platform    | Portal, Dev Portal, Dashboard            | Full name first, then "Portal" is OK     |
 | API key               | api key, API Key, apiKey                  | Lowercase "key" in prose, camelCase only in code |
 | Solana                | SOL (when referring to the chain)         | "SOL" only for the token                 |
 | Swap API          | Unified Swap API, Swap V2             | "Swap API" in prose. Use "V2" only when contrasting with V1 |
@@ -79,14 +79,14 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 - If showing multiple languages, use Mintlify's `<CodeGroup>`:
 
 ```mdx
-<CodeGroup>
-```typescript TypeScript
-// example
-```
-```python Python
-# example
-```
-</CodeGroup>
+    <CodeGroup>
+    ```typescript TypeScript
+    // example
+    ```
+    ```python Python
+    # example
+    ```
+    </CodeGroup>
 ```
 
 ### API Endpoints

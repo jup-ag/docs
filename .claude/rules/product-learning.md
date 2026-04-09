@@ -113,7 +113,7 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 ---
 
-# Developer Portal
+# Developer Platform
 
 ## Undocumented Behavior
 
@@ -218,4 +218,31 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 - [2026-03-12] All Lend SDK code examples use the same boilerplate: load keypair from file, initialise Connection, define mint constants. Consistent across all pages for copy-paste reliability.
 - [2026-03-12] Import Private Key accordion uses base58 decode pattern (`bs58.decode(privateKey)` with `Keypair.fromSecretKey`), not file-read. This matches how browser wallets export keys.
 
-<!-- Please add sections for the other APIs or products when necessary -->
+---
+
+# Swap API V2 — Squads Multisig
+
+## Architecture
+
+- [2026-04-06] Two endpoints for Squads V5 multisig swaps: `GET /swap/v2/squads/v5/order` and `POST /swap/v2/squads/v5/execute`. The API wraps swap instructions in Squads `executeTransactionSyncV2` CPI server-side.
+- [2026-04-06] Only Metis routing is supported for multisig swaps. RFQ is not supported because wrapping breaks exact transaction bytes required by RFQ.
+- [2026-04-06] `signers` is a param on `/order` only, not `/execute`. The execute endpoint validates against the cached transaction from `/order`.
+- [2026-04-06] `excludeRouters` is NOT a param on the squads `/order` endpoint (unlike the regular `/order`). Router restriction is handled server-side.
+- [2026-04-06] First signer in the `signers` param becomes the fee payer. Signer order matters.
+- [2026-04-06] The vault PDA signs via CPI through the Squads program, never as a transaction-level signer.
+
+## Source of Truth
+
+- [2026-04-06] Canonical endpoint docs: `github.com/jup-ag/squads-integration-ultra-test/blob/main/app/squads-endpoint-docs.md`
+- [2026-04-06] API source code: `github.com/jup-ag/ultra-api/tree/main/src/routes/squads`
+
+---
+
+# Swap API V2 — Transaction Submission
+
+## Architecture
+
+- [2026-04-06] `POST /swap/v2/submit` accepts any signed Solana transaction with a SOL tip (min 1M lamports / 0.001 SOL) to one of 16 Jupiter V6 program authorities.
+- [2026-04-06] `/submit` is for `/build` transactions and non-Jupiter transactions. `/execute` is for `/order` transactions only. Different fee models: tips vs swap fees.
+- [2026-04-06] Currently private/partner-only. When it goes public, `/execute` and `/submit` may converge since they share the same Jupiter Beam infrastructure.
+- [2026-04-06] `/build` supports a `tipAmount` param that auto-includes the tip instruction in the response. For non-Jupiter transactions, integrators add a standard SOL transfer instruction manually.

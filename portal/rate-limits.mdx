@@ -1,0 +1,43 @@
+---
+title: "Rate Limits"
+description: "Rate limits for Jupiter APIs by plan tier."
+llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per account, not per API key. All API requests share the same rate limit bucket. Returns HTTP 429 when exceeded."
+---
+
+## Overview
+
+All Jupiter APIs use a fixed rate limit based on your plan tier. Rate limits are enforced using a **60-second sliding window**.
+
+| Tier | Requests per second | Requests per minute | API key required |
+| :--- | :--- | :--- | :--- |
+| Keyless | 0.5 | 30 | No |
+| Free | 1 | 60 | Yes |
+| Developer | 10 | 600 | Yes |
+| Launch | 50 | 3,000 | Yes |
+| Pro | 150 | 9,000 | Yes |
+
+<Note>
+Rate limits apply **per account**, not per API key. Creating multiple API keys does not increase your rate limit.
+</Note>
+
+<Note>
+Rate limits are **bucketed** - all API requests across all endpoints share the same rate limit bucket. For example, if you are on the Developer plan (10 RPS), a mix of Swap, Price, and Token requests all count towards the same 10 RPS limit.
+</Note>
+
+## Handling rate limits
+
+If you exceed your rate limit, the API returns a `429 Too Many Requests` response. To handle this:
+
+1. **Implement backoff**: Use exponential backoff in your retry logic
+2. **Spread requests**: Distribute requests evenly rather than bursting
+3. **Upgrade your plan**: If you consistently hit limits, consider upgrading to a higher tier
+
+<Warning>
+Aggressive retry patterns without backoff may extend your rate limit window. Always wait before retrying after a 429 response.
+</Warning>
+
+## Need higher limits?
+
+- See [Plans and Pricing](/portal/plans) to compare tiers
+- For limits above 150 RPS, [contact us](https://airtable.com/apppC9l7PaT9XG8jN/pagjXGV6PFNwUd9P2/form) for an enterprise plan
+- Visit our [support page](/resources/support) for further assistance

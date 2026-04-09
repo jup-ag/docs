@@ -406,11 +406,14 @@ paths:
         - name: slippageBps
           in: query
           schema:
-            type: integer
-            minimum: 0
-            maximum: 10000
+            anyOf:
+              - type: string
+                const: rtse
+              - type: number
+                minimum: 0
+                maximum: 10000
           description: Slippage tolerance in basis points. Defaults to 50.
-          example: 50
+          default: 50
         - name: mode
           in: query
           schema:
@@ -484,6 +487,24 @@ paths:
             minimum: 1
             maximum: 300
           description: Number of slots until the blockhash expires. Defaults to 150.
+        - name: tipAmount
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: computeUnitPricePercentile
+          in: query
+          schema:
+            anyOf:
+              - type: string
+                enum:
+                  - medium
+                  - high
+                  - veryHigh
+              - type: integer
+                minimum: 0
+                maximum: 10000
+          required: false
       responses:
         "200":
           description: Quote with raw swap instructions
@@ -529,6 +550,12 @@ paths:
                     description: Post-swap cleanup instruction
                   otherInstructions:
                     type: array
+                    items:
+                      $ref: "#/components/schemas/Instruction"
+                  tipInstruction:
+                    type:
+                      - object
+                      - 'null'
                     items:
                       $ref: "#/components/schemas/Instruction"
                   addressesByLookupTableAddress:

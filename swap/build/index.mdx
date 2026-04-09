@@ -42,13 +42,10 @@ import {
 import { getTransferSolInstruction } from "@solana-program/system"; // For adding custom instructions
 
 // ── Config ──────────────────────────────────────────────────────────────────
-const BASE_URL = "https://api.jup.ag/swap/v2";
 const COMPUTE_BUDGET_PROGRAM: Address = address(
   "ComputeBudget111111111111111111111111111111",
 );
 const COMPUTE_UNIT_LIMIT_MAX = 1_400_000;
-const CU_BUFFER_NUMERATOR = 120n;
-const CU_BUFFER_DENOMINATOR = 100n; // 120% of simulated CUs
 
 // ── Instruction types ───────────────────────────────────────────────────────
 
@@ -64,24 +61,19 @@ type ApiInstruction = {
   data: Base64EncodedBytes;
 };
 
-function toAccountMeta(acc: Account): AccountMeta {
-  const role =
-    acc.isSigner && acc.isWritable
-      ? AccountRole.WRITABLE_SIGNER
-      : acc.isSigner
-        ? AccountRole.READONLY_SIGNER
-        : acc.isWritable
-          ? AccountRole.WRITABLE
-          : AccountRole.READONLY;
-  return { address: acc.pubkey, role };
-}
-
-function createInstruction(
-  ix: ApiInstruction,
-): Instruction<string, readonly AccountMeta[]> {
+function createInstruction(ix: ApiInstruction): Instruction {
   return {
     programAddress: ix.programId,
-    accounts: ix.accounts.map(toAccountMeta),
+    accounts: ix.accounts.map((acc) => ({
+      address: acc.pubkey,
+      role: acc.isSigner && acc.isWritable
+        ? AccountRole.WRITABLE_SIGNER
+        : acc.isSigner
+          ? AccountRole.READONLY_SIGNER
+          : acc.isWritable
+            ? AccountRole.WRITABLE
+            : AccountRole.READONLY,
+    })),
     data: Uint8Array.from(getBase64Codec().encode(ix.data)),
   };
 }
@@ -113,6 +105,7 @@ type BuildResponse = {
   swapInstruction: ApiInstruction;
   cleanupInstruction: ApiInstruction | null;
   otherInstructions: ApiInstruction[];
+  tipInstruction: ApiInstruction | null;
   addressesByLookupTableAddress: Record<string, string[]> | null;
   blockhashWithMetadata: {
     blockhash: number[];
@@ -158,7 +151,7 @@ function transformALTs(
 }
 
 function buildTransaction(
-  ixs: Instruction<string, readonly AccountMeta[]>[],
+  ixs: Instruction[],
   blockhash: { blockhash: Blockhash; lastValidBlockHeight: bigint },
   alts: AddressesByLookupTableAddress,
   feePayer: Address,
@@ -189,8 +182,6 @@ import {
 import bs58 from "bs58";
 
 const COMPUTE_UNIT_LIMIT_MAX = 1_400_000;
-
-const BASE_URL = "https://api.jup.ag/swap/v2";
 
 // ── API response types ──────────────────────────────────────────────────────
 
@@ -231,6 +222,7 @@ type BuildResponse = {
   swapInstruction: ApiInstruction;
   cleanupInstruction: ApiInstruction | null;
   otherInstructions: ApiInstruction[];
+  tipInstruction: ApiInstruction | null;
   addressesByLookupTableAddress: Record<string, string[]> | null;
   blockhashWithMetadata: {
     blockhash: number[];
@@ -289,13 +281,14 @@ const rpc = createSolanaRpc(RPC_URL);
 
 // Step 1: Get swap instructions from /build
 const buildRes = await fetch(
-  `${BASE_URL}/build?` +
+  "https://api.jup.ag/swap/v2/build?" +
     new URLSearchParams({
       inputMint: "So11111111111111111111111111111111111111112",
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
       taker: signer.address,
       slippageBps: "100",
+      tipAmount: "1000000", // 0.001 SOL tip for /submit (omit if using your own RPC)
     }),
   { headers: { "x-api-key": API_KEY } },
 );
@@ -322,6 +315,9 @@ const instructions = [
     ? [createInstruction(build.cleanupInstruction)]
     : []),
   ...build.otherInstructions.map(createInstruction),
+  ...(build.tipInstruction
+    ? [createInstruction(build.tipInstruction)]
+    : []),
 ];
 
 // Step 3: Prepare blockhash and address lookup tables
@@ -354,16 +350,10 @@ if (simulationResult.value.err) {
 // Set 1.2x buffer on simulated CU, capped at max
 const estimatedCUL = simulationResult.value.unitsConsumed
   ? Math.min(
-      Number(
-        (simulationResult.value.unitsConsumed * CU_BUFFER_NUMERATOR) /
-          CU_BUFFER_DENOMINATOR,
-      ),
+      Math.ceil(Number(simulationResult.value.unitsConsumed) * 1.2),
       COMPUTE_UNIT_LIMIT_MAX,
     )
   : COMPUTE_UNIT_LIMIT_MAX;
-console.log(
-  `Simulated CUs: ${simulationResult.value.unitsConsumed}, using limit: ${estimatedCUL}`,
-);
 
 // Step 5: Build final transaction with estimated CU limit + CU price from response
 const compiledTx = buildTransaction(
@@ -377,19 +367,22 @@ const compiledTx = buildTransaction(
   signer.address,
 );
 
-// Step 6: Sign
+// Step 6: Sign and submit via /submit (or use your own RPC / transaction pipeline)
 const signedTransaction = await signTransaction([signer.keyPair], compiledTx);
 
-// Step 7: Send via your own RPC
-const wireTransaction = getBase64EncodedWireTransaction(signedTransaction);
-const signature = await rpc
-  .sendTransaction(wireTransaction, {
-    encoding: "base64",
-    skipPreflight: true,
-  })
-  .send();
+const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    signedTransaction: getBase64EncodedWireTransaction(signedTransaction),
+  }),
+});
 
-console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
+const { signature } = await submitRes.json();
+console.log("Transaction:", `https://solscan.io/tx/${signature}`);
 ```
 
 ```typescript expandable title="@solana/web3.js"
@@ -405,13 +398,14 @@ const signer = Keypair.fromSecretKey(
 
 // Step 1: Get swap instructions from /build
 const buildRes = await fetch(
-  `${BASE_URL}/build?` +
+  "https://api.jup.ag/swap/v2/build?" +
     new URLSearchParams({
       inputMint: "So11111111111111111111111111111111111111112",
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
       taker: signer.publicKey.toString(),
       slippageBps: "100",
+      tipAmount: "1000000", // 0.001 SOL tip for /submit (omit if using your own RPC)
     }),
   { headers: { "x-api-key": API_KEY } },
 );
@@ -438,6 +432,9 @@ const instructions = [
     ? [toInstruction(build.cleanupInstruction)]
     : []),
   ...build.otherInstructions.map(toInstruction),
+  ...(build.tipInstruction
+    ? [toInstruction(build.tipInstruction)]
+    : []),
 ];
 
 // Step 3: Resolve address lookup tables (from /build response, no RPC needed)
@@ -474,9 +471,6 @@ const estimatedCUL = simulationResult.value.unitsConsumed
       COMPUTE_UNIT_LIMIT_MAX,
     )
   : COMPUTE_UNIT_LIMIT_MAX;
-console.log(
-  `Simulated CUs: ${simulationResult.value.unitsConsumed}, using limit: ${estimatedCUL}`,
-);
 
 // Step 5: Build final transaction with estimated CU limit + CU price from response
 const finalMessage = new TransactionMessage({
@@ -489,15 +483,23 @@ const finalMessage = new TransactionMessage({
   ],
 }).compileToV0Message(addressLookupTableAccounts);
 
+// Step 6: Sign and submit via /submit (or use your own RPC / transaction pipeline)
 const transaction = new VersionedTransaction(finalMessage);
 transaction.sign([signer]);
 
-// Step 6: Send and confirm
-const signature = await connection.sendRawTransaction(transaction.serialize(), {
-  skipPreflight: true,
+const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    signedTransaction: Buffer.from(transaction.serialize()).toString("base64"),
+  }),
 });
 
-console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
+const { signature } = await submitRes.json();
+console.log("Transaction:", `https://solscan.io/tx/${signature}`);
 ```
 </CodeGroup>
 
@@ -525,6 +527,7 @@ console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
 | `swapInstruction` | The main swap instruction |
 | `cleanupInstruction` | Post-swap cleanup (may be null) |
 | `otherInstructions` | Additional instructions |
+| `tipInstruction` | SOL tip transfer instruction (present when `tipAmount` is provided) |
 | `addressesByLookupTableAddress` | Address lookup tables for v0 transactions |
 | `blockhashWithMetadata` | Recent blockhash and expiry height |
 

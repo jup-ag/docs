@@ -29,9 +29,67 @@ The quickest way to use `/submit` is with `/build`'s built-in `tipAmount` parame
 
 <CodeGroup>
 ```typescript @solana/web3.js
-const API_KEY = process.env.JUPITER_API_KEY!;
+import {
+  AddressLookupTableAccount,
+  ComputeBudgetProgram,
+  Connection,
+  Keypair,
+  PublicKey,
+  TransactionInstruction,
+  TransactionMessage,
+  VersionedTransaction,
+} from "@solana/web3.js";
+import bs58 from "bs58";
 
-// 1. Call /build with tipAmount
+// ── Types matching the /build response ───────────────────────────────────────
+
+type ApiAccount = { pubkey: string; isSigner: boolean; isWritable: boolean };
+
+type ApiInstruction = {
+  programId: string;
+  accounts: ApiAccount[];
+  data: string; // base64
+};
+
+type BuildResponse = {
+  computeBudgetInstructions: ApiInstruction[];
+  setupInstructions: ApiInstruction[];
+  swapInstruction: ApiInstruction;
+  cleanupInstruction: ApiInstruction | null;
+  otherInstructions: ApiInstruction[];
+  tipInstruction: ApiInstruction;
+  addressesByLookupTableAddress: Record<string, string[]> | null;
+  blockhashWithMetadata: {
+    blockhash: number[];
+    lastValidBlockHeight: number;
+  };
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+const CU_LIMIT_MAX = 1_400_000;
+
+function toInstruction(ix: ApiInstruction): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: new PublicKey(ix.programId),
+    keys: ix.accounts.map((acc) => ({
+      pubkey: new PublicKey(acc.pubkey),
+      isSigner: acc.isSigner,
+      isWritable: acc.isWritable,
+    })),
+    data: Buffer.from(ix.data, "base64"),
+  });
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────────
+
+const API_KEY = process.env.JUPITER_API_KEY!;
+const connection = new Connection(process.env.RPC_URL!);
+const signer = Keypair.fromSecretKey(
+  bs58.decode(process.env.BS58_PRIVATE_KEY!),
+);
+
+// 1. Call /build with your swap parameters
 const buildRes = await fetch(
   "https://api.jup.ag/swap/v2/build?" +
     new URLSearchParams({
@@ -39,34 +97,76 @@ const buildRes = await fetch(
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
       taker: signer.publicKey.toString(),
-      tipAmount: "1000000", // 0.001 SOL minimum
+      tipAmount: "1000000",
     }),
   { headers: { "x-api-key": API_KEY } },
 );
-const build = await buildRes.json();
+const build: BuildResponse = await buildRes.json();
 
-// 2. Assemble instructions (tipInstruction is included in the response)
+// 2. Collect instructions (excluding compute budget — we handle CU limit ourselves)
 const instructions = [
-  ComputeBudgetProgram.setComputeUnitLimit({ units: estimatedCUL }),
-  ...build.computeBudgetInstructions.map(toInstruction),
   ...build.setupInstructions.map(toInstruction),
   toInstruction(build.swapInstruction),
-  ...(build.cleanupInstruction ? [toInstruction(build.cleanupInstruction)] : []),
+  ...(build.cleanupInstruction
+    ? [toInstruction(build.cleanupInstruction)]
+    : []),
   ...build.otherInstructions.map(toInstruction),
-  ...(build.tipInstruction ? [toInstruction(build.tipInstruction)] : []),
+  toInstruction(build.tipInstruction),
 ];
 
-// 3. Build, sign (see /build docs for full tx assembly, ALTs, and CU simulation)
-const message = new TransactionMessage({
+// 3. Resolve address lookup tables
+const addressLookupTableAccounts: AddressLookupTableAccount[] = [];
+for (const addr of Object.keys(build.addressesByLookupTableAddress ?? {})) {
+  const result = await connection.getAddressLookupTable(new PublicKey(addr));
+  if (result.value) addressLookupTableAccounts.push(result.value);
+}
+
+// 4. Transform blockhash from byte array to base58
+const recentBlockhash = bs58.encode(
+  Buffer.from(build.blockhashWithMetadata.blockhash),
+);
+const { lastValidBlockHeight } = build.blockhashWithMetadata;
+
+// 5. Simulate with max CU limit to estimate actual usage
+const simMessage = new TransactionMessage({
   payerKey: signer.publicKey,
   recentBlockhash,
-  instructions,
+  instructions: [
+    ComputeBudgetProgram.setComputeUnitLimit({ units: CU_LIMIT_MAX }),
+    ...instructions,
+  ],
 }).compileToV0Message(addressLookupTableAccounts);
 
-const transaction = new VersionedTransaction(message);
+const sim = await connection.simulateTransaction(
+  new VersionedTransaction(simMessage),
+  { sigVerify: false, replaceRecentBlockhash: true },
+);
+
+if (sim.value.err) {
+  console.error("Simulation failed:", sim.value.err);
+  process.exit(1);
+}
+
+// 6. Set CU limit to 120% of simulated usage (capped at max)
+const estimatedCUL = sim.value.unitsConsumed
+  ? Math.min(Math.ceil(sim.value.unitsConsumed * 1.2), CU_LIMIT_MAX)
+  : CU_LIMIT_MAX;
+
+// 7. Build final transaction: our CU limit + API's CU price + swap instructions
+const messageV0 = new TransactionMessage({
+  payerKey: signer.publicKey,
+  recentBlockhash,
+  instructions: [
+    ComputeBudgetProgram.setComputeUnitLimit({ units: estimatedCUL }),
+    ...build.computeBudgetInstructions.map(toInstruction),
+    ...instructions,
+  ],
+}).compileToV0Message(addressLookupTableAccounts);
+
+const transaction = new VersionedTransaction(messageV0);
 transaction.sign([signer]);
 
-// 4. Submit via /submit
+// 8. Submit via /submit
 const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
   method: "POST",
   headers: {
@@ -79,12 +179,140 @@ const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
 });
 
 const { signature } = await submitRes.json();
+console.log("Transaction:", `https://solscan.io/tx/${signature}`);
 ```
 
 ```typescript @solana/kit
-const API_KEY = process.env.JUPITER_API_KEY!;
+import {
+  AccountRole,
+  Address,
+  address,
+  AddressesByLookupTableAddress,
+  appendTransactionMessageInstructions,
+  Base64EncodedBytes,
+  Blockhash,
+  compileTransaction,
+  compressTransactionMessageUsingAddressLookupTables,
+  createKeyPairSignerFromBytes,
+  createSolanaRpc,
+  createTransactionMessage,
+  getBase58Decoder,
+  getBase58Encoder,
+  getBase64Codec,
+  getBase64EncodedWireTransaction,
+  AccountMeta,
+  Instruction,
+  pipe,
+  setTransactionMessageFeePayer,
+  setTransactionMessageLifetimeUsingBlockhash,
+  signTransaction,
+} from "@solana/kit";
 
-// 1. Call /build with tipAmount
+// ── Types matching the /build response ───────────────────────────────────────
+
+type Account = { pubkey: Address; isSigner: boolean; isWritable: boolean };
+
+type ApiInstruction = {
+  programId: Address;
+  accounts: Account[];
+  data: Base64EncodedBytes;
+};
+
+type BuildResponse = {
+  computeBudgetInstructions: ApiInstruction[];
+  setupInstructions: ApiInstruction[];
+  swapInstruction: ApiInstruction;
+  cleanupInstruction: ApiInstruction | null;
+  otherInstructions: ApiInstruction[];
+  tipInstruction: ApiInstruction;
+  addressesByLookupTableAddress: Record<string, string[]> | null;
+  blockhashWithMetadata: {
+    blockhash: number[];
+    lastValidBlockHeight: number;
+  };
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+const COMPUTE_BUDGET_PROGRAM = address(
+  "ComputeBudget111111111111111111111111111111",
+);
+const CU_LIMIT_MAX = 1_400_000;
+
+function createInstruction(ix: ApiInstruction): Instruction {
+  return {
+    programAddress: ix.programId,
+    accounts: ix.accounts.map((acc) => ({
+      address: acc.pubkey,
+      role: acc.isSigner && acc.isWritable
+        ? AccountRole.WRITABLE_SIGNER
+        : acc.isSigner
+          ? AccountRole.READONLY_SIGNER
+          : acc.isWritable
+            ? AccountRole.WRITABLE
+            : AccountRole.READONLY,
+    })),
+    data: Uint8Array.from(getBase64Codec().encode(ix.data)),
+  };
+}
+
+function makeSetComputeUnitLimitIx(units: number): ApiInstruction {
+  const data = Buffer.alloc(5);
+  data.writeUInt8(0x02, 0);
+  data.writeUInt32LE(units, 1);
+  return {
+    programId: COMPUTE_BUDGET_PROGRAM,
+    accounts: [],
+    data: data.toString("base64") as ApiInstruction["data"],
+  };
+}
+
+function transformBlockhash(meta: BuildResponse["blockhashWithMetadata"]) {
+  return {
+    blockhash: getBase58Decoder().decode(
+      Uint8Array.from(meta.blockhash),
+    ) as Blockhash,
+    lastValidBlockHeight: BigInt(meta.lastValidBlockHeight),
+  };
+}
+
+function transformALTs(
+  raw: Record<string, string[]> | null,
+): AddressesByLookupTableAddress {
+  if (!raw) return {};
+  return Object.fromEntries(
+    Object.entries(raw).map(([key, addrs]) => [
+      address(key),
+      addrs.map((a) => address(a)),
+    ]),
+  );
+}
+
+function buildTransaction(
+  ixs: Instruction[],
+  blockhash: { blockhash: Blockhash; lastValidBlockHeight: bigint },
+  alts: AddressesByLookupTableAddress,
+  feePayer: Address,
+) {
+  return pipe(
+    createTransactionMessage({ version: 0 }),
+    (msg) => appendTransactionMessageInstructions(ixs, msg),
+    (msg) => compressTransactionMessageUsingAddressLookupTables(msg, alts),
+    (msg) => setTransactionMessageFeePayer(feePayer, msg),
+    (msg) => setTransactionMessageLifetimeUsingBlockhash(blockhash, msg),
+    (msg) => compileTransaction(msg),
+  );
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────────
+
+const API_KEY = process.env.JUPITER_API_KEY!;
+const rpc = createSolanaRpc(process.env.RPC_URL!);
+const signer = await createKeyPairSignerFromBytes(
+  getBase58Encoder().encode(process.env.BS58_PRIVATE_KEY!),
+);
+
+// 1. Call /build with your swap parameters
 const buildRes = await fetch(
   "https://api.jup.ag/swap/v2/build?" +
     new URLSearchParams({
@@ -92,30 +320,70 @@ const buildRes = await fetch(
       outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       amount: "100000000",
       taker: signer.address,
-      tipAmount: "1000000", // 0.001 SOL minimum
+      tipAmount: "1000000",
     }),
   { headers: { "x-api-key": API_KEY } },
 );
-const build = await buildRes.json();
+const build: BuildResponse = await buildRes.json();
 
-// 2. Assemble instructions (tipInstruction is included in the response)
+// 2. Collect instructions (excluding compute budget — we handle CU limit ourselves)
 const instructions = [
-  createInstruction(makeSetComputeUnitLimitIx(estimatedCUL)),
-  ...build.computeBudgetInstructions.map(createInstruction),
   ...build.setupInstructions.map(createInstruction),
   createInstruction(build.swapInstruction),
-  ...(build.cleanupInstruction ? [createInstruction(build.cleanupInstruction)] : []),
+  ...(build.cleanupInstruction
+    ? [createInstruction(build.cleanupInstruction)]
+    : []),
   ...build.otherInstructions.map(createInstruction),
-  ...(build.tipInstruction ? [createInstruction(build.tipInstruction)] : []),
+  createInstruction(build.tipInstruction),
 ];
 
-// 3. Build, sign (see /build docs for full tx assembly, ALTs, and CU simulation)
+// 3. Transform blockhash and address lookup tables from API format to Kit format
 const blockhash = transformBlockhash(build.blockhashWithMetadata);
 const alts = transformALTs(build.addressesByLookupTableAddress);
-const compiledTx = buildTransaction(instructions, blockhash, alts, signer.address);
-const signedTransaction = await signTransaction([signer.keyPair], compiledTx);
 
-// 4. Submit via /submit
+// 4. Simulate with max CU limit to estimate actual usage
+const simTx = buildTransaction(
+  [createInstruction(makeSetComputeUnitLimitIx(CU_LIMIT_MAX)), ...instructions],
+  blockhash,
+  alts,
+  signer.address,
+);
+const sim = await rpc
+  .simulateTransaction(getBase64EncodedWireTransaction(simTx), {
+    encoding: "base64",
+    commitment: "confirmed",
+    replaceRecentBlockhash: true,
+  })
+  .send();
+
+if (sim.value.err) {
+  console.error("Simulation failed:", sim.value.err);
+  process.exit(1);
+}
+
+// 5. Set CU limit to 120% of simulated usage (capped at max)
+const estimatedCUL = sim.value.unitsConsumed
+  ? Math.min(
+      Math.ceil(Number(sim.value.unitsConsumed) * 1.2),
+      CU_LIMIT_MAX,
+    )
+  : CU_LIMIT_MAX;
+
+// 6. Build the final transaction: our CU limit + API's CU price + swap instructions
+const compiledTx = buildTransaction(
+  [
+    createInstruction(makeSetComputeUnitLimitIx(estimatedCUL)),
+    ...build.computeBudgetInstructions.map(createInstruction),
+    ...instructions,
+  ],
+  blockhash,
+  alts,
+  signer.address,
+);
+
+// 7. Sign and submit
+const signedTx = await signTransaction([signer.keyPair], compiledTx);
+
 const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
   method: "POST",
   headers: {
@@ -123,11 +391,12 @@ const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
     "x-api-key": API_KEY,
   },
   body: JSON.stringify({
-    signedTransaction: getBase64EncodedWireTransaction(signedTransaction),
+    signedTransaction: getBase64EncodedWireTransaction(signedTx),
   }),
 });
 
 const { signature } = await submitRes.json();
+console.log("Transaction:", `https://solscan.io/tx/${signature}`);
 ```
 </CodeGroup>
 

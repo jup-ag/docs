@@ -1,7 +1,7 @@
 ---
-title: "Estimate Compute Units"
-description: "Simulate transactions to set accurate compute unit limits"
-llmsDescription: "How to estimate compute units for Jupiter Swap API V2 /build transactions. The /build response includes computeBudgetInstructions with only the compute unit price, not the limit. Integrators must simulate to determine the correct limit because custom instructions change CU usage. Pattern: build with max CU limit (1,400,000), simulate, set limit to 1.2x simulated value. This directly reduces priority fee costs since priority fee = CU price x CU limit."
+title: "Compute Units & Priority Fees"
+description: "Control compute unit limits and priority fee percentiles on /build"
+llmsDescription: "How to control compute units and priority fees for Jupiter Swap API V2 /build transactions. The /build response includes computeBudgetInstructions with only the compute unit price, not the limit. Integrators must simulate to determine the correct CU limit (pattern: build with max 1,400,000, simulate, set to 1.2x). Priority fee = CU price x CU limit. Use the computeUnitPricePercentile parameter to control the CU price: named levels 'medium' (25th), 'high' (50th), 'veryHigh' (75th), or an integer 0-10000 in basis points. Defaults to 50th percentile, or 90th in mode=fast."
 ---
 
 The `/build` response includes `computeBudgetInstructions` with the **compute unit price** but not the **compute unit limit**. You need to simulate to determine the correct limit.
@@ -18,7 +18,22 @@ priority fee = compute unit price × compute unit limit
 
 A tighter CU limit directly reduces the priority fee you pay. Setting it to the maximum (1,400,000) when you only use 200,000 means you pay 7x more than necessary. See [Solana fee structure](https://solana.com/docs/core/fees/fee-structure) for details.
 
-## Pattern
+## Customise compute unit price
+
+The `/build` response bakes a compute unit price into `computeBudgetInstructions` based on recent network priority fees. Use `computeUnitPricePercentile` to control how aggressively you bid:
+
+| Value | Percentile | Use case |
+| --- | --- | --- |
+| `"medium"` | 25th | Lower fees, may land slower during congestion |
+| `"high"` | 50th | Balanced (default) |
+| `"veryHigh"` | 75th | Higher fees, better chance of landing quickly |
+| Integer 0-10000 | Custom (in bps) | Fine-grained control |
+
+When `mode=fast` is set and no `computeUnitPricePercentile` is provided, the default is the 90th percentile instead of the 50th.
+
+You can also override entirely by replacing the `computeBudgetInstructions` from the response with your own `setComputeUnitPrice` instruction.
+
+## Estimate compute unit limit
 
 1. Build the transaction with all your instructions + **max CU limit** (1,400,000)
 2. Simulate with `replaceRecentBlockhash: true` to get actual CU consumed

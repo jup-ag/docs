@@ -113,7 +113,7 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 ---
 
-# Developer Portal
+# Developer Platform
 
 ## Undocumented Behavior
 

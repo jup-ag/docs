@@ -466,17 +466,6 @@ Changelog, release notes, and developer blog.
 
 - [Changelog](https://dev.jup.ag/docs/changelog/index.md): Latest announcements and breaking changes across Jupiter APIs.
 
-### Blog
-
-- [Overview](https://dev.jup.ag/docs/blog/index.md): Technical deep dives into Jupiter products, team's research and learnings
-- [Building the Most AI-Friendly Developer Resource](https://dev.jup.ag/docs/blog/building-ai-friendly-docs.md): "Blog post detailing how Jupiter built AI-friendly developer
-- [Ultra vs Metis: Execution Engine or Routing Primitive](https://dev.jup.ag/docs/blog/ultra-vs-metis.md): A technical comparison between Jupiter's Swap APIs offering both execution engine or routing primitive options.
-- [Ultra V3: The Ultimate Trading Engine](https://dev.jup.ag/docs/blog/ultra-v3.md): A technical deep dive into Jupiter's most comprehensive trading engine, featuring exclusive new capabilities: Iris, Jupiter Beam, Predictive Execution and more.
-- [600 Lines of Code Nobody Asked For](https://dev.jup.ag/docs/blog/why-ultra-v3.md): Better execution, zero infrastructure, faster shipping. Why teams should just use Ultra V3
-- [How hard can it be to price a token on-chain? (very)](https://dev.jup.ag/docs/blog/how-jupiter-prices-a-token.md): Blog post exploring how Jupiter's Price API V3 derives token prices on Solana. Covers why pool-state pricing fails at scale, the last-swap-price methodology, path-based price derivation through swap ratio chains anchored to oracle-priced tokens like SOL, heuristic quality filters (liquidity depth, trading patterns, holder distribution), the V3 response format (usdPrice, blockId, decimals, priceChange24h), and practical integration notes on missing tokens, price freshness, and discrepancies with other price sources.
-- [How does Jupiter decide if a token is real?](https://dev.jup.ag/docs/blog/what-is-organic-score.md): Investigation into Jupiter's organic score infrastructure: wallet classification system, comparative scoring methodology, organic volume decomposition, and how the score drives Price API inclusion, token verification, and ranking across Jupiter's stack.
-- [Metis v7: Migration to Metis.builders](https://dev.jup.ag/docs/blog/metis-v7.md): Metis is now an independent public good at metis.builders with a new access model for v7. This separation establishes Metis as a standalone instruction-level swap primitive for builders who need full control over transaction execution. Additionally, Metis Binary moving forward will require authenticated access with a staked JUP requirement.
-
 ## Resources
 
 Support channels, brand assets, and community resources.

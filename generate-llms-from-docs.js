@@ -268,35 +268,51 @@ function walkTopLevel(item) {
 // Header
 emit("# Jupiter\n\n");
 emit(
-  "> Jupiter is DeFi infrastructure on Solana providing swap, lending, perpetuals, limit-order, DCA, and portfolio APIs.\n",
+  "> Jupiter is DeFi infrastructure on Solana. All APIs are REST/JSON, require no RPC node, and return clean responses that LLMs and AI agents can parse directly.\n",
 );
 emit(
-  "> **Swap API V2** (recommended): `/order` for managed execution, `/build` for custom transactions. Base URL: `https://api.jup.ag/swap/v2`.\n",
-);
-emit(
-  "> All endpoints require an `x-api-key` header — generate a free key at [portal.jup.ag](https://portal.jup.ag).\n\n",
+  "> **Swap API V2** (recommended): `/order` for managed execution, `/build` for custom transactions. Base URL: `https://api.jup.ag/swap/v2`.\n\n",
 );
 
-emit("## Quick Reference\n\n");
 emit(
-  "- Swap API V2 (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`\n",
+  "> **Authentication**: Keyless access is available at 0.5 RPS on `api.jup.ag` with no sign-up - ideal for prototyping and lightweight agent use cases (no analytics or usage tracking). For production, sign up at [developers.jup.ag/portal](https://developers.jup.ag/portal), generate a free API key, and pass it via the `x-api-key` header to unlock higher rate limits and analytics.\n",
 );
-emit("- Trigger (limit orders): `POST /trigger/v2/orders/price`\n");
-emit("- Recurring (DCA): `POST /recurring/v1/createOrder`\n");
-emit("- Lend: `POST /lend/v1/earn/deposit`\n");
-emit("- Price: `GET /price/v3?ids={mints}`\n");
-emit("- Tokens: `GET /tokens/v2/search?query={query}`\n");
-emit("- Portfolio: `GET /portfolio/v1/positions?wallet={address}`\n\n");
+emit(
+  "> **AI tools**: Jupiter CLI (`npm i -g @jup-ag/cli`) for terminal and agent use, agent skills via `npx skills add`, MCP server at dev.jup.ag/mcp for in-editor docs, and llms-full.txt for complete documentation content.\n\n",
+);
 
-// Walk navigation
+emit(
+  "- [Swap API V2](https://dev.jup.ag/docs/swap/index.md) (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`\n",
+);
+emit("- [Trigger](https://dev.jup.ag/docs/trigger/index.md) (limit orders): `POST /trigger/v2/orders/price`\n");
+emit("- [Recurring](https://dev.jup.ag/docs/recurring/index.md) (DCA): `POST /recurring/v1/createOrder`\n");
+emit("- [Lend](https://dev.jup.ag/docs/lend/index.md): `POST /lend/v1/earn/deposit`\n");
+emit("- [Price](https://dev.jup.ag/docs/price/index.md): `GET /price/v3?ids={mints}`\n");
+emit("- [Tokens](https://dev.jup.ag/docs/tokens/index.md): `GET /tokens/v2/search?query={query}`\n");
+emit("- [Portfolio](https://dev.jup.ag/docs/portfolio/index.md): `GET /portfolio/v1/positions?wallet={address}`\n");
+emit("- [Prediction](https://dev.jup.ag/docs/prediction/index.md): `POST /prediction/v1/order`\n\n");
+
+// Walk navigation in custom order: Get Started, AI, then product docs and the rest
+const TAB_ORDER = ["Get Started", "AI", "Docs", "Tool Kits", "Changelog", "Resources"];
+const tabsByName = new Map();
 for (const item of topLevelNav) {
-  walkTopLevel(item);
+  const name = item.tab || item.url || "unknown";
+  tabsByName.set(name, item);
+}
+for (const tabName of TAB_ORDER) {
+  const item = tabsByName.get(tabName);
+  if (item) walkTopLevel(item);
+}
+// Walk any remaining tabs not in the explicit order
+for (const item of topLevelNav) {
+  const name = item.tab || item.url || "unknown";
+  if (!TAB_ORDER.includes(name)) walkTopLevel(item);
 }
 
 // Footer
 emitHeading("Optional", 2);
 emit(
-  "- [Dev Portal](https://portal.jup.ag/): Access the Jupiter Portal to manage API key, access to metrics and logs\n",
+  "- [Developer Platform](https://developers.jup.ag/portal): Manage API keys, view analytics, and monitor usage\n",
 );
 emit(
   "- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs\n",

@@ -16,7 +16,7 @@ components:
       type: apiKey
       in: header
       name: x-api-key
-      description: Get API key via https://portal.jup.ag
+      description: Get API key via https://developers.jup.ag/portal
 
   schemas:
     Instruction:
@@ -99,6 +99,35 @@ components:
           type: string
 
   parameters:
+    BuildSlippageBpsParameter:
+      name: slippageBps
+      in: query
+      schema:
+        anyOf:
+          - type: string
+            enum:
+              - rtse
+          - type: number
+            minimum: 0
+            maximum: 10000
+        default: 50
+      description: Slippage tolerance in basis points. Defaults to 50.
+
+    BuildComputeUnitPricePercentileParameter:
+      name: computeUnitPricePercentile
+      in: query
+      schema:
+        anyOf:
+          - type: string
+            enum:
+              - medium
+              - high
+              - veryHigh
+          - type: integer
+            minimum: 0
+            maximum: 10000
+      description: 'Percentile of compute unit price to use. Named levels: "medium" (25th), "high" (50th), "veryHigh" (75th), or a number 0-10000 in basis points.'
+
     InputMintParameter:
       name: inputMint
       in: query
@@ -403,14 +432,7 @@ paths:
             type: string
           description: Public key of the user initiating the swap.
           example: GkwFnmMDvn3HGMpJpWBg8tgJxr3NxNvg3AXxvXVPbRGJ
-        - name: slippageBps
-          in: query
-          schema:
-            type: integer
-            minimum: 0
-            maximum: 10000
-          description: Slippage tolerance in basis points. Defaults to 50.
-          example: 50
+        - $ref: "#/components/parameters/BuildSlippageBpsParameter"
         - name: mode
           in: query
           schema:
@@ -484,6 +506,13 @@ paths:
             minimum: 1
             maximum: 300
           description: Number of slots until the blockhash expires. Defaults to 150.
+        - name: tipAmount
+          in: query
+          schema:
+            type: string
+          description: SOL tip amount in lamports. Adds a tip instruction for use with /submit. The tip payer is the taker (or payer if specified).
+          required: false
+        - $ref: "#/components/parameters/BuildComputeUnitPricePercentileParameter"
       responses:
         "200":
           description: Quote with raw swap instructions
@@ -531,6 +560,10 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Instruction"
+                  tipInstruction:
+                    nullable: true
+                    allOf:
+                      - $ref: "#/components/schemas/Instruction"
                   addressesByLookupTableAddress:
                     type: object
                     additionalProperties:

@@ -1,7 +1,7 @@
 ---
 title: "Rate Limit"
 description: "The Ultra Swap API uses a unique rate limiting mechanism that scales with your executed swap volume over time."
-llmsDescription: "UNMAINTAINED: Ultra Swap API uses dynamic rate limiting: 50 base requests per 10-second window, scaling with executed swap volume. Free API key required from portal.jup.ag."
+llmsDescription: "UNMAINTAINED: Ultra Swap API uses dynamic rate limiting: 50 base requests per 10-second window, scaling with executed swap volume. Free API key required from developers.jup.ag/portal."
 ---
 
 
@@ -13,7 +13,7 @@ llmsDescription: "UNMAINTAINED: Ultra Swap API uses dynamic rate limiting: 50 ba
 Dynamic rate limits have been replaced by fixed rate limits under the new Developer Platform. The information below is outdated. See [Rate Limits](/portal/rate-limits) and the [Migration Guide](/portal/migration) for the current system.
 </Warning>
 
-Ultra Swap uses dynamic rate limiting that scales with your executed swap volume. The base quota is 50 requests per 10-second sliding window, and additional quota is added based on your rolling 24-hour volume from `/execute`. A free API key from [portal.jup.ag](https://portal.jup.ag) is required.
+Ultra Swap uses dynamic rate limiting that scales with your executed swap volume. The base quota is 50 requests per 10-second sliding window, and additional quota is added based on your rolling 24-hour volume from `/execute`. A free API key from [Portal](https://developers.jup.ag/portal) is required.
 
 ## Overview
 
@@ -26,7 +26,7 @@ Ultra Swap uses dynamic rate limiting that scales with your executed swap volume
 
 ## API Key Rules
 
-The Ultra Swap API requires an API key to be used and can be generated via [Portal](https://portal.jup.ag).
+The Ultra Swap API requires an API key to be used and can be generated via [Portal](https://developers.jup.ag/portal).
 * It is required to be used for the Dynamic Rate Limit.
 * The API Key is free to generate and is universal, the API Key will work for all APIs.
 * Upgrading to a Pro plan only applies to other APIs, does not work with Ultra Swap API.

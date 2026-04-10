@@ -1,7 +1,7 @@
 ---
 title: "Documentation MCP"
 description: "Search and query Jupiter docs and APIs from your AI editor via Model Context Protocol."
-llmsDescription: "Jupiter supports the Model Context Protocol (MCP) through Mintlify's native MCP server at https://dev.jup.ag/mcp. This enables AI tools like Claude Code, Cursor, Windsurf, and other MCP-compatible editors to search and query Jupiter documentation and OpenAPI specifications in-context. The MCP server allows AI assistants to look up API endpoints, read documentation pages, and understand API schemas without leaving the editor. It is a read-only documentation server, not a tool for executing API calls."
+llmsDescription: "Jupiter supports the Model Context Protocol (MCP) through Mintlify's native MCP server at https://dev.jup.ag/docs/mcp. This enables AI tools like Claude Code, Cursor, Windsurf, and other MCP-compatible editors to search and query Jupiter documentation and OpenAPI specifications in-context. The MCP server allows AI assistants to look up API endpoints, read documentation pages, and understand API schemas without leaving the editor. It is a read-only documentation server, not a tool for executing API calls."
 ---
 
 Jupiter supports the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) through Mintlify's native integration. This lets AI tools search and query Jupiter's documentation and API specifications directly from your editor.
@@ -23,7 +23,7 @@ This is a read-only documentation server. It helps your AI assistant understand 
 Every Mintlify documentation site includes a built-in MCP server. Jupiter's is available at:
 
 ```
-https://dev.jup.ag/mcp
+https://dev.jup.ag/docs/mcp
 ```
 
 This server exposes all Jupiter documentation and OpenAPI specifications through the MCP protocol, with no additional setup required.
@@ -52,7 +52,7 @@ Combine MCP with [llms.txt](/ai/llms-txt) for the best results: use MCP for in-e
   2. Add Jupiter's MCP server by running:
 
     ```bash
-    claude mcp add --scope user --transport http jupiter https://dev.jup.ag/mcp
+    claude mcp add --scope user --transport http jupiter https://dev.jup.ag/docs/mcp
     ```
   3. Launch Claude Code and start chatting with Jupiter.
 
@@ -61,7 +61,7 @@ Combine MCP with [llms.txt](/ai/llms-txt) for the best results: use MCP for in-e
   {
     "mcpServers": {
       "jupiter": {
-        "url": "https://dev.jup.ag/mcp"
+        "url": "https://dev.jup.ag/docs/mcp"
       }
     }
   }
@@ -78,7 +78,7 @@ Combine MCP with [llms.txt](/ai/llms-txt) for the best results: use MCP for in-e
 
   1. Go to [**Connectors**](https://claude.ai/settings/connectors) in your Claude settings.
   2. Select **Add custom connector**.
-  3. Set the name to **Jupiter** and the URL to **https://dev.jup.ag/mcp**.
+  3. Set the name to **Jupiter** and the URL to **https://dev.jup.ag/docs/mcp**.
   4. When chatting, click the attachments button (plus icon) and select the Jupiter connector.
   </Tab>
 
@@ -93,7 +93,7 @@ Combine MCP with [llms.txt](/ai/llms-txt) for the best results: use MCP for in-e
     {
       "mcpServers": {
         "jupiter": {
-          "url": "https://dev.jup.ag/mcp"
+          "url": "https://dev.jup.ag/docs/mcp"
         }
       }
     }
@@ -112,7 +112,7 @@ Combine MCP with [llms.txt](/ai/llms-txt) for the best results: use MCP for in-e
    {
      "mcpServers": {
        "jupiter": {
-         "serverUrl": "https://dev.jup.ag/mcp"
+         "serverUrl": "https://dev.jup.ag/docs/mcp"
        }
      }
    }
@@ -123,4 +123,4 @@ Combine MCP with [llms.txt](/ai/llms-txt) for the best results: use MCP for in-e
 
 ### Other MCP-Compatible Tools
 
-Any tool that supports the MCP protocol can connect to `https://dev.jup.ag/mcp` using HTTP transport.
+Any tool that supports the MCP protocol can connect to `https://dev.jup.ag/docs/mcp` using HTTP transport.

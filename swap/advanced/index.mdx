@@ -1,15 +1,18 @@
 ---
 title: "Overview"
 description: "Advanced techniques for both /order and /build"
-llmsDescription: "Index of advanced techniques for Jupiter Swap API V2. Sub-pages cover: gasless swaps (automatic and integrator payer on both /order and /build), compute unit estimation (/build), reducing transaction size (maxAccounts + removing no-op instructions), and reducing latency (fast mode). Also notes that circular arbitrage routes are not supported and require the Metis binary."
+llmsDescription: "Index of advanced techniques for Jupiter Swap API V2. Sub-pages cover: slippage estimation via RTSE (automatic on /order, opt-in on /build with slippageBps=rtse), gasless swaps (automatic and integrator payer on both /order and /build), compute unit estimation (/build), reducing transaction size (maxAccounts + removing no-op instructions), and reducing latency (fast mode on /build). Also notes that circular arbitrage routes are not supported and require the Metis binary."
 ---
 
 <CardGroup cols={2}>
+  <Card title="Slippage Estimation" icon="chart-line" href="/swap/advanced/slippage">
+    Use RTSE (Real-Time Slippage Estimator) for optimal slippage on `/order` and `/build`.
+  </Card>
   <Card title="Gasless Swaps" icon="gas-pump" href="/swap/advanced/gasless">
     Let users swap without holding SOL. Automatic gasless on `/order`, integrator payer on both paths.
   </Card>
-  <Card title="Estimate Compute Units" icon="microchip" href="/swap/advanced/compute-units">
-    Simulate transactions to set accurate CU limits on `/build`.
+  <Card title="Compute Units & Priority Fees" icon="microchip" href="/swap/advanced/compute-units">
+    Control CU limits and priority fee percentiles on `/build`.
   </Card>
   <Card title="Reduce Transaction Size" icon="compress" href="/swap/advanced/reduce-transaction-size">
     Control account count and remove unnecessary instructions on `/build`.

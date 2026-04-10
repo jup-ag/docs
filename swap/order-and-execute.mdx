@@ -1,7 +1,7 @@
 ---
 title: "Order & Execute"
 description: "Get a swap quote, sign, and execute with managed landing"
-llmsDescription: "How to perform a swap using Jupiter's Swap API V2 default path: GET /order to get a quote and assembled transaction, sign it with your wallet, and POST /execute for managed transaction landing. Covers the minimal happy path with no optional parameters (all routers compete for best price including RFQ), the full request/response shapes, and a complete @solana/kit TypeScript code example. /execute handles landing, confirmation, and retry. Error codes documented for both aggregator and RFQ swap types."
+llmsDescription: "How to perform a swap using Jupiter's Swap API V2 default path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routers compete for best price (Metis, JupiterZ RFQ, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter Beam, confirmation polling, and retry. Covers the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types."
 ---
 
 The `/order` + `/execute` flow is the recommended way to swap on Jupiter. You get the best price (all routers compete, including RFQ market makers), and Jupiter handles transaction landing for you.
@@ -308,7 +308,7 @@ For the full parameter reference and how each parameter affects routing, see [Ro
 
 `POST /execute` takes the signed transaction and the `requestId` from the order response. Jupiter handles:
 
-- Optimised slippage via RTSE (Real-Time Slippage Estimator), which adjusts slippage at execution time to balance trade success and price protection
+- Optimised slippage via [RTSE](/swap/advanced/slippage) (Real-Time Slippage Estimator), applied at order time to balance trade success and price protection
 - Optimised priority fee strategy for current network conditions
 - Jupiter Beam (our own proprietary transaction execution pipeline) for accelerated transaction sending and landing across multiple RPC providers
 - Confirmation polling

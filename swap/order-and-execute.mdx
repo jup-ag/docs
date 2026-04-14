@@ -1,10 +1,10 @@
 ---
-title: "Order & Execute"
-description: "Get a swap quote, sign, and execute with managed landing"
-llmsDescription: "How to perform a swap using Jupiter's Swap API V2 default path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routers compete for best price (Metis, JupiterZ RFQ, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter Beam, confirmation polling, and retry. Covers the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types."
+title: "Meta-Aggregator (Order & Execute)"
+description: "Best price across all routers with managed transaction landing"
+llmsDescription: "How to perform a swap using Jupiter's Meta-Aggregator path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routing engines compete for best price (Metis onchain routing, JupiterZ RFQ market makers, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter Beam, confirmation polling, and retry. Covers the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types."
 ---
 
-The `/order` + `/execute` flow is the recommended way to swap on Jupiter. You get the best price (all routers compete, including RFQ market makers), and Jupiter handles transaction landing for you.
+The Meta-Aggregator is the recommended way to swap on Jupiter. All routing engines compete for the best price (Metis, JupiterZ RFQ, Dflow, OKX), and Jupiter handles transaction landing for you via `/order` + `/execute`.
 
 ## Quick start
 

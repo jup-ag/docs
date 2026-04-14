@@ -127,13 +127,13 @@ The unified Swap API consolidates Ultra and Metis into a single entry point at `
 * **`GET /order`**: default path. Returns an assembled transaction with the best price across all routers (Metis, JupiterZ, Dflow, OKX). Includes RTSE, Jupiter Beam, gasless, and RFQ competition. Sign and send to `/execute`.
 * **`GET /build`**: advanced path. Returns raw swap instructions for building custom transactions (add custom instructions, CPI, composability). Metis-only routing, no Jupiter swap fees.
 * **`POST /execute`**: managed transaction landing for `/order` transactions.
-Start with `/order`. It gives the best price because all routers compete, including JupiterZ market makers who often beat onchain routing on major pairs. Only use `/build` if you need to modify the transaction.
+Start with the Meta-Aggregator (`/order`). It gives the best price because all routers compete, including JupiterZ market makers who often beat onchain routing on major pairs. Only use the Metis Router (`/build`) if you need to modify the transaction.
 
 Ultra and Metis APIs remain available. New integrations should use the Swap API, and existing integrations are encouraged to migrate when convenient. See the [migration guide](/swap/migration) for details.
 
 - [Swap API overview](/swap)
-- [Order & Execute](/swap/order-and-execute)
-- [Build Custom Transactions](/swap/build)
+- [Meta-Aggregator (Order & Execute)](/swap/order-and-execute)
+- [Metis Router (Build)](/swap/build)
 - [API Reference](/api-reference/swap)
 
 ---

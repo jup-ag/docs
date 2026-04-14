@@ -1,42 +1,47 @@
 ---
 title: "Routing"
 description: "How routing works and what affects it"
-llmsDescription: "How routing works on Jupiter Swap API V2. Covers the routing architecture (Metis, JupiterZ RFQ, Dflow, OKX), which routers are available on each endpoint (/order uses all routers, /build uses Metis only, Swap V1 uses Metis only), the routing impact matrix showing which optional parameters disable which routers, and ultra vs manual mode. Integrators building DEXes can integrate into Metis; market makers can integrate into JupiterZ via RFQ."
+llmsDescription: "How routing works on Jupiter Swap API V2. Covers the routing architecture with four engines (Metis, JupiterZ RFQ, Dflow, OKX), router availability per path (Meta-Aggregator uses all routers, Metis Router uses Metis only), why JupiterZ is Meta-Aggregator exclusive (safety mechanisms and market maker last-look execution), the routing impact matrix showing which optional parameters disable which routers on /order, and ultra vs manual mode. Integrators building DEXes can integrate into Metis; market makers can integrate into JupiterZ via RFQ."
 ---
 
-The Swap API V2 routes through multiple liquidity sources. Which endpoint you use and which parameters you pass determines which routers are eligible, directly affecting the price you get.
+The Swap API V2 routes through multiple liquidity sources. Which path you use (Meta-Aggregator or Metis Router) and which parameters you pass determines which routing engines are eligible, directly affecting the price you get.
 
-## Routing architecture
+## Routing engines
 
 Jupiter's routing combines multiple engines and selects the best execution price across all of them, with a self-learning mechanism that automatically sidelines underperforming sources.
 
 | Engine | Role |
 | --- | --- |
 | **Metis** | Jupiter's onchain routing engine. Multi-hop, multi-split swaps across Solana DEXes. Also available as an [independent public good](https://metis.builders). |
-| **JupiterZ** | RFQ (Request for Quote) system where market makers compete to provide off-chain liquidity. Often beats onchain by 5-20bps on major pairs. |
+| **JupiterZ** | RFQ (Request for Quote) system where market makers compete to provide off-chain liquidity. Often beats onchain by 5-20bps on major pairs. Meta-Aggregator exclusive. |
 | **Dflow** | Third-party decentralised order flow. |
 | **OKX** | Third-party OKX liquidity. |
 
-## Router Availability
+## Router availability by path
 
-Not all routers are available on every endpoint. This is the most common source of confusion for integrators:
+Which routers you get depends on which path you use:
 
-| Endpoint | Routers | Notes |
-| --- | --- | --- |
-| **`/swap/v2/order`** (no optional params) | Metis, JupiterZ, Dflow, OKX, etc | All routers compete. Best price. |
-| **`/swap/v2/order`** (with optional params) | Depends on params | See [routing impact matrix](#routing-impact-matrix) below. |
-| **`/swap/v2/build`** | Metis only | Returns raw instructions. No JupiterZ (RFQ), no third-party routers. |
-| **Swap V1** (`/v6/quote` + `/v6/swap`) | Metis only | Legacy endpoint. Same Metis engine, no aggregation. |
+| Path | Endpoint | Routers | Notes |
+| --- | --- | --- | --- |
+| **Meta-Aggregator** | `/swap/v2/order` (no optional params) | Metis, JupiterZ, Dflow, OKX | All engines compete. Best price. |
+| **Meta-Aggregator** | `/swap/v2/order` (with optional params) | Depends on params | See [routing impact matrix](#routing-impact-matrix) below. |
+| **Metis Router** | `/swap/v2/build` | Metis only | Onchain routing. No JupiterZ, no third-party routers. |
+| **Swap V1** | `/v6/quote` + `/v6/swap` | Metis only | Legacy endpoint. Same Metis engine, no aggregation. |
 
-<Warning>
-If you are using `/build`, you are only getting Metis routing. You cannot access JupiterZ (RFQ) because MMs in JupiterZ only accepts orders coming from our backend.
+## Why JupiterZ is Meta-Aggregator exclusive
 
-For use cases that involve modifying of transactions, such as CPI, adding/changing instructions or any part of a transaction are not allowed for JupiterZ, since validation is not trivial and not all MM will/can support today.
-</Warning>
+JupiterZ (RFQ) is only available through the Meta-Aggregator path. Jupiter runs safety and validation mechanisms between integrators and market makers. Market makers have last-look execution rights, which requires controlled transaction handling to ensure validity and prevent spam. This means:
 
-## Routing Impact Matrix
+- Transactions routed through JupiterZ cannot be modified after `/order` returns them
+- Use cases that require CPI, custom instructions, or any transaction modification must use the Metis Router path
 
-Adding optional parameters to `/order` can restrict which routers are eligible. This table shows the impact:
+<Note>
+This is why choosing between Meta-Aggregator and Metis Router matters: the Meta-Aggregator gets you access to all liquidity sources (including RFQ market makers who often beat onchain by 5-20bps), but you give up transaction modification. The Metis Router gives you full control, but only through onchain routing.
+</Note>
+
+## Routing impact matrix
+
+When using the Meta-Aggregator (`/order`), adding optional parameters can restrict which routers are eligible:
 
 | Parameter | Metis | JupiterZ (RFQ) | Dflow | OKX |
 | --- | --- | --- | --- | --- |
@@ -48,11 +53,13 @@ Adding optional parameters to `/order` can restrict which routers are eligible. 
 
 **Key takeaway:** adding `receiver`, `referralAccount`, `referralFee` or `payer` disables JupiterZ (RFQ), which may result in worse pricing on major pairs where market makers often beat onchain routing by 5-20bps.
 
+This matrix only applies to the Meta-Aggregator. The Metis Router always uses Metis only, regardless of parameters.
+
 For the full parameter reference, see the [API reference](/api-reference/swap).
 
-## Order Mode
+## Order mode
 
-The `/order` response includes a `mode` field that tells you which routing behaviour was applied:
+The Meta-Aggregator `/order` response includes a `mode` field that tells you which routing behaviour was applied:
 
 | Mode | Meaning | Routers |
 | --- | --- | --- |
@@ -62,10 +69,10 @@ The `/order` response includes a `mode` field that tells you which routing behav
 Use `mode` to verify your request got the routing behaviour you expected. If you see `"mode": "manual"` but didn't intend to restrict routing, check which optional parameters you are passing.
 
 <Note>
-This is similar to how our jup.ag frontend behaves, when you use custom settings like slippage, priority fee strategy or dex/router exclusions, you will get a different `mode`.
+This is similar to how the jup.ag frontend behaves: when you use custom settings like slippage, priority fee strategy, or dex/router exclusions, you get a different `mode`.
 </Note>
 
-## Integrate into Routing
+## Integrate into routing
 
 If you want your liquidity routed through Jupiter:
 
@@ -76,5 +83,5 @@ If you want your liquidity routed through Jupiter:
 
 - [Fees](/swap/fees) for fee models and how referral fees affect routing
 - [Gasless Swaps](/swap/advanced/gasless) for how `payer` affects routing
-- [Order & Execute](/swap/order-and-execute) for the default swap flow
+- [Meta-Aggregator (Order & Execute)](/swap/order-and-execute) for the default swap flow
 - [API Reference: GET /order](/api-reference/swap/order) for the full parameter specification

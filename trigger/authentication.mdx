@@ -163,21 +163,3 @@ An attacker **cannot**:
 
 All operations involving funds (deposits, withdrawals) require the wallet owner to sign a transaction. A leaked JWT alone cannot result in loss of funds. However, if the wallet private key is also compromised, an attacker could sign transactions and withdraw funds from the vault.
 
-## Verify Token (Optional)
-
-To check if a token is still valid without making an authenticated request:
-
-```typescript
-const verifyTokenResponse = await fetch('https://api.jup.ag/trigger/v2/auth/verify-token', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'your-api-key',
-    'Authorization': `Bearer ${token}`,
-  },
-  body: JSON.stringify({
-    walletPubkey: walletAddress,
-  }),
-});
-// Returns 200 if valid, 401 if expired or invalid
-```

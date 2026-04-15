@@ -497,13 +497,10 @@ const confirmation = await connection.confirmTransaction(
 
 ## Best practices
 
-**Randomize tip accounts.** There are 16 permitted tip accounts. Randomize which one you send to on each transaction to reduce write-lock contention across concurrent submissions.
-
-**Use `tipAmount` parameter with `/build`.** When using Jupiter's `/build` endpoint, pass `tipAmount` as a query parameter to have the tip instruction included automatically. This is simpler and less error-prone than adding the tip instruction manually.
-
-**Set `maxRetries: 0` on RPC fallback.** If you run `/submit` in parallel with `sendRawTransaction`, set `maxRetries: 0` on the RPC call. Let your application control retry logic rather than the RPC node, so you can refresh the blockhash between attempts.
-
-**Poll for confirmation.** After submitting, poll for transaction confirmation using `confirmTransaction` with the blockhash and `lastValidBlockHeight` from your transaction. If the blockhash expires without confirmation, rebuild the transaction with a fresh blockhash and resubmit.
+- **Randomize tip accounts:** there are 16 permitted tip accounts. Randomize which one you send to on each transaction to reduce write-lock contention across concurrent submissions.
+- **Use `tipAmount` with `/build`:** pass `tipAmount` as a query parameter to have the tip instruction included automatically, rather than adding it manually.
+- **Set `maxRetries: 0` on RPC fallback:** if you run `/submit` in parallel with `sendRawTransaction`, let your application control retry logic rather than the RPC node, so you can refresh the blockhash between attempts.
+- **Poll for confirmation:** use `confirmTransaction` with the blockhash and `lastValidBlockHeight` from your transaction. If the blockhash expires without confirmation, rebuild with a fresh blockhash and resubmit.
 
 ## Standalone tip instructions
 

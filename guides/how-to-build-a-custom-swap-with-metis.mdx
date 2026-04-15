@@ -401,7 +401,7 @@ Errors can surface at every stage of the swap flow.
   <Accordion title="During quoting">
     | Error | What happened | What to do |
     |-------|---------------|------------|
-    | `NO_ROUTES_FOUND` / `COULD_NOT_FIND_ANY_ROUTE` | No liquidity path exists | Check if the token is tradeable on [jup.ag](https://jup.ag). See [Market Listing](/swap/routing) for the grace period criteria |
+    | `NO_ROUTES_FOUND` / `COULD_NOT_FIND_ANY_ROUTE` | No liquidity path exists | Check if the token is tradeable on [jup.ag](https://jup.ag). See [Integrate DEX into Metis](/swap/routing/dex-integration) for the grace period criteria |
     | `TOKEN_NOT_TRADABLE` | Token mint not available for trading | Verify the token has sufficient liquidity on supported DEXes |
     | `ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT` | Route cannot process the full input amount | Reduce input amount for a better output |
     | Invalid parameters | Bad `amount`, `slippageBps`, or mint address | Validate inputs before calling `/quote` |
@@ -573,7 +573,7 @@ Priority fees, compute units, slippage, and your RPC setup all affect whether tr
 
 <AccordionGroup>
   <Accordion title="Why is there no route found for this token?">
-    Jupiter routes through 74+ DEXes, but not every token has a routable market. New markets on supported DEXes get instant routing with a grace period based on token age (up to 30 days). After the grace period, the market must meet liquidity criteria. If no route is found, the token may not have graduated from its bonding curve, or its market doesn't meet the requirements. See [Market Listing](/swap/routing) for the full criteria.
+    Jupiter routes through 74+ DEXes, but not every token has a routable market. New markets on supported DEXes get instant routing with a grace period based on token age (up to 30 days). After the grace period, the market must meet liquidity criteria. If no route is found, the token may not have graduated from its bonding curve, or its market doesn't meet the requirements. See [Integrate DEX into Metis](/swap/routing/dex-integration) for the full criteria.
   </Accordion>
 
   <Accordion title="What does priceImpactPct mean and when should I block swaps?">
@@ -603,5 +603,5 @@ Priority fees, compute units, slippage, and your RPC setup all affect whether tr
 
 - **[Add Fees to Swap](/swap/add-fees-to-swap).** Collect platform fees on swaps through your integration.
 - **[Swap API Reference](/api-reference/swap).** Full endpoint schema and playground.
-- **[Market Listing](/swap/routing).** How tokens and markets get listed in Jupiter's routing engine.
+- **[Integrate DEX into Metis](/swap/routing/dex-integration).** How tokens and markets get listed in Jupiter's routing engine.
 - **[Ultra Swap API](/ultra/index).** Want simpler? Ultra handles everything for you.

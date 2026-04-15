@@ -143,14 +143,14 @@ The request parameters and response format are identical. Update the base URL an
 ### What you gain
 
 - Unified documentation and API reference
-- Same endpoint for both Meta-Aggregator and Metis Router paths
+- Same endpoint for both Meta-Aggregator and Router paths
 - Future improvements shipped to V2 first
 
 ---
 
 ## Metis to Meta-Aggregator
 
-If you currently use Metis but don't need transaction modification, consider migrating to the Meta-Aggregator (`/order`) instead of the Metis Router (`/build`). You get:
+If you currently use Metis but don't need transaction modification, consider migrating to the Meta-Aggregator (`/order`) instead of the Router (`/build`). You get:
 
 - All routers including RFQ (better pricing)
 - Managed execution via `/execute` (no RPC management)
@@ -161,6 +161,6 @@ The trade-off: you cannot modify the transaction.
 
 ## Related
 
-- [Meta-Aggregator (Order & Execute)](/swap/order-and-execute) for the default swap flow
-- [Metis Router (Build)](/swap/build) for full transaction control
-- [Routing](/swap/routing) for how parameters affect routing
+- [Order & Execute](/swap/order-and-execute) for the default swap flow
+- [Build](/swap/build) for full transaction control
+- [Routing impact matrix](/swap/order-and-execute#routing-impact-matrix) for how parameters affect routing

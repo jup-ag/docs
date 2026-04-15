@@ -1,7 +1,7 @@
 ---
-title: "Meta-Aggregator (Order & Execute)"
+title: "Order & Execute"
 description: "Best price across all routers with managed transaction landing"
-llmsDescription: "How to perform a swap using Jupiter's Meta-Aggregator path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routing engines compete for best price (Metis onchain routing, JupiterZ RFQ market makers, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter Beam, confirmation polling, and retry. Covers the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types."
+llmsDescription: "How to perform a swap using Jupiter's Meta-Aggregator path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routing engines compete for best price (Metis onchain routing, JupiterZ RFQ market makers, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter's proprietary landing pipeline, with confirmation polling and retry. Includes routing impact matrix showing which optional parameters disable which routers, order mode (ultra vs manual), the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types."
 ---
 
 The Meta-Aggregator is the recommended way to swap on Jupiter. All routing engines compete for the best price (Metis, JupiterZ RFQ, Dflow, OKX), and Jupiter handles transaction landing for you via `/order` + `/execute`.
@@ -275,7 +275,7 @@ if (result.status === "Success") {
 `GET /order` returns a quote and an assembled transaction in a single call. All routers compete for the best price: Metis, JupiterZ, Dflow, and OKX.
 
 <Note>
-  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See [Routing](/swap/routing) for details.
+  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See the [routing impact matrix](#routing-impact-matrix) below for details.
 </Note>
 
 **Required parameters:**
@@ -297,7 +297,7 @@ if (result.status === "Success") {
 | `router` | Which router won the quote (iris, jupiterz, dflow, okx). |
 | `mode` | "ultra" (no optional params) or "manual" (optional params used). |
 
-For the full parameter reference and how each parameter affects routing, see [Routing](/swap/routing).
+For the full parameter reference, see the [API reference](/api-reference/swap/order). For how each parameter affects routing, see the [routing impact matrix](#routing-impact-matrix) below.
 
 ### 2. Sign the transaction
 
@@ -351,9 +351,39 @@ For the full parameter reference and how each parameter affects routing, see [Ro
 | `-2003` | RFQ | Quote expired |
 | `-2004` | RFQ | Swap rejected |
 
+## Routing impact matrix
+
+Adding optional parameters to `/order` can restrict which routers are eligible:
+
+| Parameter | Metis | JupiterZ (RFQ) | Dflow | OKX |
+| --- | --- | --- | --- | --- |
+| **(no optional params)** | Yes | Yes | Yes | Yes |
+| `receiver` | Yes | **No** | Yes | Yes |
+| `referralAccount` & `referralFee` | Yes | **No** | Yes | Yes |
+| `payer` (integrator gasless) | Yes | **No** | **No** | **No** |
+| `excludeRouters: jupiterz` | Yes | **No** | Yes | Yes |
+
+**Key takeaway:** adding `receiver`, `referralAccount`, `referralFee` or `payer` disables JupiterZ (RFQ), which may result in worse pricing on major pairs where market makers often beat onchain routing by 5-20bps.
+
+For the full parameter reference, see the [API reference](/api-reference/swap/order).
+
+## Order mode
+
+The `/order` response includes a `mode` field that indicates whether optional parameters were applied that may affect routing or swap behaviour:
+
+| Mode | Meaning |
+| --- | --- |
+| **ultra** | No optional params used. Default behaviour with all routers eligible. |
+| **manual** | Optional params detected (e.g. `slippageBps`, `referralAccount`, `payer`). These modifications may restrict routing or change swap behaviour. |
+
+`mode` does not indicate which router was used for the swap. It signals whether you adjusted parameters that could affect price or swap success. This is useful for debugging: if a swap fails in `manual` mode, the parameter modifications you applied may be the cause.
+
+<Note>
+This is similar to how the jup.ag frontend behaves: when you use custom settings like slippage, priority fee strategy, or dex/router exclusions, the swap is handled differently. Since you opted into custom parameters, you take responsibility for the impact on swap outcomes.
+</Note>
+
 ## Related
 
-- [Routing](/swap/routing) for optional parameters and their routing impact
 - [Fees](/swap/fees) for adding integrator fees to `/order`
 - [Advanced Techniques](/swap/advanced) for gasless swaps, priority fees, and CU optimisation
 - [API Reference: GET /order](/api-reference/swap/order) for the full OpenAPI specification

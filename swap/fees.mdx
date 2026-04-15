@@ -1,14 +1,14 @@
 ---
 title: "Fees"
-description: "Fee models for Meta-Aggregator and Metis Router"
-llmsDescription: "Documentation of Jupiter Swap API V2 fee models. Meta-Aggregator (/order) charges a Jupiter platform fee and supports integrator referral fees (referralAccount + referralFee via the Jupiter referral program). Metis Router (/build) charges no Jupiter swap fees, only integrator platform fees via platformFeeBps + feeAccount. Adding referral fee parameters to /order disables RFQ routing (JupiterZ), restricting to Metis-only quotes. Covers fee response fields, fee calculation, and code examples for both paths."
+description: "Fee models for Meta-Aggregator and Router"
+llmsDescription: "Documentation of Jupiter Swap API V2 fee models. Meta-Aggregator (/order) charges a Jupiter platform fee and supports integrator referral fees (referralAccount + referralFee via the Jupiter referral program). Router (/build) charges no Jupiter swap fees, only integrator platform fees via platformFeeBps + feeAccount. Adding referral fee parameters to /order disables RFQ routing (JupiterZ), restricting to Metis-only quotes. Covers fee response fields, fee calculation, and code examples for both paths."
 ---
 
 The two Swap API paths have different fee models. This page covers both.
 
 ## Fee comparison
 
-| | Meta-Aggregator (`/order`) | Metis Router (`/build`) |
+| | Meta-Aggregator (`/order`) | Router (`/build`) |
 | --- | --- | --- |
 | **Jupiter swap fee** | Yes (platform fee) | **No** |
 | **Integrator fees** | Referral fees (referralAccount + referralFee) | Platform fee only (platformFeeBps) or DIY |
@@ -184,7 +184,7 @@ The `/order` response includes these fee-related fields:
 
 ## Related
 
-- [Routing](/swap/routing) for how fee params affect routing
+- [Routing impact matrix](/swap/order-and-execute#routing-impact-matrix) for how fee params affect routing
 - [Jupiter Referral Program](/tool-kits/referral-program) for setting up a referral account
-- [Meta-Aggregator (Order & Execute)](/swap/order-and-execute) for the default swap flow
-- [Metis Router (Build)](/swap/build) for full transaction control
+- [Order & Execute](/swap/order-and-execute) for the default swap flow
+- [Build](/swap/build) for full transaction control

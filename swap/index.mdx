@@ -37,21 +37,21 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 
 ## Endpoints
 
-**Swap API** at `https://api.jup.ag/swap/v2`:
-
-| Endpoint | Method | Path | Description |
-| --- | --- | --- | --- |
-| Meta-Aggregator | GET | [`/order`](/swap/order-and-execute) | Get a quote and assembled transaction |
-| Meta-Aggregator | POST | [`/execute`](/swap/order-and-execute#execute-the-transaction) | Execute a signed `/order` transaction with managed landing |
-| Metis Router | GET | [`/build`](/swap/build) | Get a quote and raw swap instructions |
-
-**Transaction API** at `https://api.jup.ag/tx/v1`:
-
-| Method | Path | Description |
-| --- | --- | --- |
-| POST | [`/submit`](/transaction/submit) | Submit any signed transaction through Jupiter's landing infrastructure with SOL tips |
-
 All endpoints require an API key via the `x-api-key` header. Get one at [Portal](https://developers.jup.ag/portal).
+
+### Meta-Aggregator
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | [`/swap/v2/order`](/swap/order-and-execute) | Get a quote and assembled transaction |
+| POST | [`/swap/v2/execute`](/swap/order-and-execute#execute-the-transaction) | Execute a signed `/order` transaction with managed landing |
+
+### Metis Router
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | [`/swap/v2/build`](/swap/build) | Get a quote and raw swap instructions |
+| POST | [`/tx/v1/submit`](/transaction/submit) | Submit any signed transaction through Jupiter's proprietary landing pipeline with SOL tips |
 
 ## API Reference
 

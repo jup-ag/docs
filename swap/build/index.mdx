@@ -1,7 +1,7 @@
 ---
 title: "Metis Router (Build)"
 description: "Raw swap instructions with full transaction control via Metis onchain routing"
-llmsDescription: "How to use Jupiter's Metis Router path via the GET /swap/v2/build endpoint to get raw swap instructions for building custom transactions. Uses Metis onchain routing only (no RFQ market makers). Returns computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions, tipInstruction, and address lookup tables. Integrators assemble their own transaction, add custom instructions (CPI, memo, SOL transfer, etc.), simulate for compute units, compile to v0 transaction, sign, and send via their own RPC or via /submit for Jupiter's transaction landing. Optional parameters include slippageBps (number or 'rtse' for RTSE), tipAmount (for /submit), mode='fast', maxAccounts, platformFeeBps, payer (gasless). /execute is not available for /build. No Jupiter swap fees. Full @solana/kit and @solana/web3.js TypeScript code examples included."
+llmsDescription: "How to use Jupiter's Metis Router path via the GET /swap/v2/build endpoint to get raw swap instructions for building custom transactions. Uses Metis onchain routing only (no JupiterZ RFQ market makers). Returns computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions, tipInstruction, and address lookup tables. Integrators assemble their own transaction, add custom instructions (CPI, memo, SOL transfer, etc.), simulate for compute units, compile to v0 transaction, sign, and send via their own RPC or via /submit for Jupiter's transaction landing. Optional parameters include slippageBps (number or 'rtse' for RTSE), tipAmount (for /submit), mode='fast', maxAccounts, platformFeeBps, payer (gasless). /execute is not available for /build. No Jupiter swap fees. Full @solana/kit and @solana/web3.js TypeScript code examples included."
 ---
 
 The Metis Router path uses the `/build` endpoint to return raw swap instructions instead of an assembled transaction. Routing is handled by Metis, Jupiter's onchain routing engine, which finds the best path across Solana DEXes.
@@ -586,7 +586,7 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 | --- | --- | --- |
 | **Routing** | All engines (Metis, JupiterZ, Dflow, OKX) | Metis only |
 | **Swap fees** | Jupiter platform fee | None |
-| **Transaction landing** | Managed via `/execute` | Self-managed or use Jupiter Beam via [`/submit`](/transaction/submit) |
+| **Transaction landing** | Managed via `/execute` | Self-managed or use Jupiter's proprietary transaction landing pipeline via [`/submit`](/transaction/submit) |
 | **Transaction control** | None | Full |
 | **Compute budget** | Included in transaction | Included as instructions (you can override) |
 

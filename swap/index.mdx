@@ -27,7 +27,7 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 | **Returns** | Assembled transaction | Raw swap instructions |
 | **Routers** | All (Metis, JupiterZ, Dflow, OKX) | Metis only |
 | **Best for** | Most integrations. Best price, simplest flow. | Custom transactions, CPI, composability. |
-| **Transaction landing** | Managed via `/execute` (optimised slippage, priority fees, Jupiter Beam landing pipeline) | Self-managed via your own RPC, or via [`/submit`](/transaction/submit) with SOL tips for Jupiter Beam landing |
+| **Transaction landing** | Managed via `/execute` (optimised slippage, priority fees, proprietary landing pipeline) | Self-managed via your own RPC, or via [`/submit`](/transaction/submit) with SOL tips for Jupiter's proprietary landing pipeline |
 | **Swap fees** | Yes (Jupiter platform fee) | No |
 | **Integrator fees** | Referral fees (referralAccount + referralFee) | Platform fee only (platformFeeBps) or DIY |
 | **Gasless** | [Automatic gasless, or your own `payer`](/swap/advanced/gasless) | Use your own `payer` |
@@ -47,9 +47,9 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
 
 **Transaction API** at `https://api.jup.ag/tx/v1`:
 
-| Endpoint | Method | Path | Description |
-| --- | --- | --- | --- |
-| Metis Router | POST | [`/submit`](/transaction/submit) | Submit any signed transaction through Jupiter's landing infrastructure with SOL tips |
+| Method | Path | Description |
+| --- | --- | --- |
+| POST | [`/submit`](/transaction/submit) | Submit any signed transaction through Jupiter's landing infrastructure with SOL tips |
 
 All endpoints require an API key via the `x-api-key` header. Get one at [Portal](https://developers.jup.ag/portal).
 
@@ -60,12 +60,12 @@ All endpoints require an API key via the `x-api-key` header. Get one at [Portal]
     Meta-Aggregator: get a quote and assembled transaction
   </Card>
 
-  <Card title="GET /build" icon="code" href="/api-reference/swap/build">
-    Metis Router: get a quote and raw swap instructions
-  </Card>
-
   <Card title="POST /execute" icon="play" href="/api-reference/swap/execute">
     Meta-Aggregator: execute a signed /order transaction
+  </Card>
+
+  <Card title="GET /build" icon="code" href="/api-reference/swap/build">
+    Metis Router: get a quote and raw swap instructions
   </Card>
 </CardGroup>
 

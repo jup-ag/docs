@@ -24,22 +24,14 @@ Which routers you get depends on which path you use:
 | Path | Endpoint | Routers | Notes |
 | --- | --- | --- | --- |
 | **Meta-Aggregator** | `/swap/v2/order` (no optional params) | Metis, JupiterZ, Dflow, OKX | All engines compete. Best price. |
-| **Meta-Aggregator** | `/swap/v2/order` (with optional params) | Depends on params | See [routing impact matrix](#routing-impact-matrix) below. |
+| **Meta-Aggregator** | `/swap/v2/order` (with optional params) | Depends on params | See [routing impact matrix](#meta-aggregator-routing-impact-matrix) below. |
 | **Metis Router** | `/swap/v2/build` | Metis only | Onchain routing. No JupiterZ, no third-party routers. |
-| **Swap V1** | `/v6/quote` + `/v6/swap` | Metis only | Legacy endpoint. Same Metis engine, no aggregation. |
-
-## Why JupiterZ is Meta-Aggregator exclusive
-
-JupiterZ (RFQ) is only available through the Meta-Aggregator path. Jupiter runs safety and validation mechanisms between integrators and market makers. Market makers have last-look execution rights, which requires controlled transaction handling to ensure validity and prevent spam. This means:
-
-- Transactions routed through JupiterZ cannot be modified after `/order` returns them
-- Use cases that require CPI, custom instructions, or any transaction modification must use the Metis Router path
 
 <Note>
-This is why choosing between Meta-Aggregator and Metis Router matters: the Meta-Aggregator gets you access to all liquidity sources (including RFQ market makers who often beat onchain by 5-20bps), but you give up transaction modification. The Metis Router gives you full control, but only through onchain routing.
+JupiterZ (RFQ) is only available through the Meta-Aggregator. Jupiter runs safety and validation mechanisms between integrators and market makers, and market makers have last-look execution rights, which requires controlled transaction handling to ensure validity and prevent spam. Transactions routed through JupiterZ cannot be modified after `/order` returns them, so use cases that require CPI, custom instructions, or any transaction modification must use the Metis Router path.
 </Note>
 
-## Routing impact matrix
+## Meta-Aggregator routing impact matrix
 
 When using the Meta-Aggregator (`/order`), adding optional parameters can restrict which routers are eligible:
 
@@ -59,17 +51,17 @@ For the full parameter reference, see the [API reference](/api-reference/swap).
 
 ## Order mode
 
-The Meta-Aggregator `/order` response includes a `mode` field that tells you which routing behaviour was applied:
+The Meta-Aggregator `/order` response includes a `mode` field that indicates whether optional parameters were applied that may affect routing or swap behaviour:
 
-| Mode | Meaning | Routers |
-| --- | --- | --- |
-| **ultra** | No optional params used. All routers competed. Best price. | Metis, JupiterZ, Dflow, OKX |
-| **manual** | Optional params detected. Routing may be restricted. | Depends on which params are set |
+| Mode | Meaning |
+| --- | --- |
+| **ultra** | No optional params used. Default behaviour with all routers eligible. |
+| **manual** | Optional params detected (e.g. `slippageBps`, `referralAccount`, `payer`). These modifications may restrict routing or change swap behaviour. |
 
-Use `mode` to verify your request got the routing behaviour you expected. If you see `"mode": "manual"` but didn't intend to restrict routing, check which optional parameters you are passing.
+`mode` does not indicate which router was used for the swap. It signals whether you adjusted parameters that could affect price or swap success. This is useful for debugging: if a swap fails in `manual` mode, the parameter modifications you applied may be the cause.
 
 <Note>
-This is similar to how the jup.ag frontend behaves: when you use custom settings like slippage, priority fee strategy, or dex/router exclusions, you get a different `mode`.
+This is similar to how the jup.ag frontend behaves: when you use custom settings like slippage, priority fee strategy, or dex/router exclusions, the swap is handled differently. Since you opted into custom parameters, you take responsibility for the impact on swap outcomes.
 </Note>
 
 ## Integrate into routing

@@ -47,7 +47,9 @@ Jupiter's routing combines multiple engines and selects the best execution price
 | **OKX** | Third-party OKX liquidity. | Meta-Aggregator only |
 
 <Note>
-JupiterZ (RFQ) is only available through the Meta-Aggregator. Jupiter runs safety and validation mechanisms between integrators and market makers, and market makers have last-look execution rights, which requires controlled transaction handling to ensure validity and prevent spam. Transactions routed through JupiterZ cannot be modified after `/order` returns them, so use cases that require CPI, custom instructions, or any transaction modification must use the Router path.
+JupiterZ (RFQ) is only available through the Meta-Aggregator.
+- Jupiter runs safety and validation mechanisms between integrators and market makers, and market makers have last-look execution rights, which requires controlled transaction handling to ensure validity and prevent spam.
+- Transactions routed through JupiterZ cannot be modified after `/order` returns them, so use cases that require CPI, custom instructions, or any transaction modification must use the Router path.
 </Note>
 
 ## Endpoints

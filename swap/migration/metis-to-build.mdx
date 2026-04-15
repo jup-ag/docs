@@ -1,16 +1,12 @@
 ---
-title: "Migration Guide"
-description: "Migrate from Metis or Ultra to the Swap API V2"
-llmsDescription: "Migration guide for moving from Jupiter Metis Swap API (V1) or Ultra Swap API to the unified Swap API V2. Covers: Metis to /build migration (parameter mapping from /quote + /swap-instructions to /build, V1 to V2 instruction differences including no fee events and percent to bps change in routePlan), Ultra to /order migration (minimal changes, same /order + /execute flow), and breaking changes. Includes side-by-side parameter mapping tables and response format differences."
+title: "Metis to Router"
+description: "Migrate from Metis /quote + /swap-instructions to /build"
+llmsDescription: "Migration guide for moving from Jupiter Metis Swap API V1 (/quote + /swap-instructions) to the Swap API V2 Router path (/build). Covers parameter mapping from /quote to /build, response mapping from /swap-instructions to /build, V1 to V2 instruction differences (no fee events, percent to bps change in routePlan, ALT format change), complete before-and-after TypeScript code examples, and what you gain from migrating."
 ---
-
-This guide covers migrating from the Metis Swap API or Ultra Swap API to the unified Swap API V2.
-
-## Metis to `/build`
 
 If you currently use Metis `/quote` + `/swap-instructions`, migrate to `/build` which combines both into a single call with better routing.
 
-### What changes
+## What changes
 
 | Before (Metis) | After (Swap V2) |
 | --- | --- |
@@ -19,7 +15,7 @@ If you currently use Metis `/quote` + `/swap-instructions`, migrate to `/build` 
 | V1 instruction format | V2 instruction format |
 | `percent` in routePlan | `bps` in routePlan (V2) |
 
-### Parameter mapping
+## Parameter mapping
 
 | Metis (`/quote`) | Swap V2 (`/build`) | Notes |
 | --- | --- | --- |
@@ -36,7 +32,7 @@ If you currently use Metis `/quote` + `/swap-instructions`, migrate to `/build` 
 | - | `mode` | New. Set to "fast" for reduced latency. |
 | - | `feeAccount` | New. Required if `platformFeeBps` is positive. |
 
-### Response mapping
+## Response mapping
 
 | Metis (`/swap-instructions`) | Swap V2 (`/build`) | Notes |
 | --- | --- | --- |
@@ -48,7 +44,7 @@ If you currently use Metis `/quote` + `/swap-instructions`, migrate to `/build` 
 | `addressLookupTableAddresses` | `addressesByLookupTableAddress` | New format: object mapping ALT address to account arrays (no separate RPC fetch needed) |
 | - | `blockhashWithMetadata` | New: blockhash included in response |
 
-### V1 to V2 instruction differences
+## V1 to V2 instruction differences
 
 Swap V2 defaults to `instructionVersion=V2` or the V2 routing instructions in the Jupiter Aggregator Program. Key differences:
 
@@ -64,7 +60,7 @@ routePlan[0].percent  // 100
 routePlan[0].bps      // 10000
 ```
 
-### Before and after
+## Before and after
 
 **Before (Metis: two calls)**
 
@@ -114,7 +110,7 @@ const build = await fetch(
 ).then((r) => r.json());
 ```
 
-### What you gain
+## What you gain
 
 - **Single call** instead of two
 - **Dynamic intermediate tokens** for better routing on long-tail pairs
@@ -124,43 +120,7 @@ const build = await fetch(
 - **Blockhash included** in the response
 - And much more
 
----
-
-## Ultra to `/order`
-
-If you currently use Ultra `/order` + `/execute`, migration is minimal. The endpoints are the same, with a new base URL.
-
-### What changes
-
-| Before (Ultra) | After (Swap V2) |
-| --- | --- |
-| Base URL: `https://ultra-api.jup.ag` | Base URL: `https://api.jup.ag/swap/v2` |
-| `GET /order` | `GET /order` |
-| `POST /execute` | `POST /execute` |
-
-The request parameters and response format are identical. Update the base URL and you are done.
-
-### What you gain
-
-- Unified documentation and API reference
-- Same endpoint for both happy path and advanced path
-- Future improvements shipped to V2 first
-
----
-
-## Metis to `/order`
-
-If you currently use Metis but don't need transaction modification, consider migrating to `/order` instead of `/build`. You get:
-
-- All routers including RFQ (better pricing)
-- Managed execution via `/execute` (no RPC management)
-- Gasless support
-- Simpler integration (one call + sign + execute)
-
-The trade-off: you cannot modify the transaction.
-
 ## Related
 
-- [Order & Execute](/swap/order-and-execute) for the default swap flow
-- [Build Custom Transactions](/swap/build) for the advanced path
-- [Routing](/swap/routing) for how parameters affect routing
+- [Build](/swap/build) for the full `/build` workflow and code examples
+- [Common Instructions](/swap/build/common-instructions) for composing custom instructions with your swap

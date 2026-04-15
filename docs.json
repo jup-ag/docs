@@ -59,26 +59,25 @@
               {
                 "group": "Swap",
                 "pages": [
-                  "swap/index",
-                  "swap/order-and-execute",
-                  {
-                    "group": "Build Custom Transactions",
-                    "pages": [
-                      "swap/build/index",
-                      "swap/build/other-instructions",
-                      "transaction/submit"
-                    ]
-                  },
-                  "swap/fees",
-                  "swap/migration"
+                  "swap/index"
                 ]
               },
               {
-                "group": "Routing",
+                "group": "Meta-Aggregator",
                 "pages": [
-                  "swap/routing/index",
-                  "swap/routing/dex-integration",
-                  "swap/routing/rfq-integration"
+                  "swap/order-and-execute",
+                  "api-reference/swap/order",
+                  "api-reference/swap/execute"
+                ]
+              },
+              {
+                "group": "Router",
+                "pages": [
+                  "swap/build/index",
+                  "swap/build/common-instructions",
+                  "transaction/submit",
+                  "api-reference/swap/build",
+                  "api-reference/transaction/submit"
                 ]
               },
               {
@@ -93,16 +92,22 @@
                 ]
               },
               {
+                "group": "Routing Integration",
+                "pages": [
+                  "swap/routing/dex-integration",
+                  "swap/routing/rfq-integration"
+                ]
+              },
+              {
                 "group": "Guides",
                 "pages": ["guides/how-to-embed-a-swap-widget"]
               },
               {
-                "group": "API Reference",
+                "group": "Migration",
                 "pages": [
-                  "api-reference/swap/order",
-                  "api-reference/swap/build",
-                  "api-reference/swap/execute",
-                  "api-reference/transaction/submit"
+                  "swap/migration/metis-to-build",
+                  "swap/migration/metis-to-meta-aggregator",
+                  "swap/migration/ultra-to-order"
                 ]
               }
             ]
@@ -843,11 +848,15 @@
     },
     {
       "source": "/swap/v2/fees",
-      "destination": "/swap/fees"
+      "destination": "/swap/order-and-execute"
     },
     {
       "source": "/swap/v2/migration",
-      "destination": "/swap/migration"
+      "destination": "/swap/migration/metis-to-build"
+    },
+    {
+      "source": "/swap/migration",
+      "destination": "/swap/migration/metis-to-build"
     },
     {
       "source": "/swap/v2/order-and-execute",
@@ -855,7 +864,19 @@
     },
     {
       "source": "/swap/v2/routing",
-      "destination": "/swap/routing"
+      "destination": "/swap"
+    },
+    {
+      "source": "/swap/routing",
+      "destination": "/swap"
+    },
+    {
+      "source": "/swap/fees",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/build/other-instructions",
+      "destination": "/swap/build/common-instructions"
     },
     {
       "source": "/tokens/organic-score",
@@ -947,7 +968,7 @@
     },
     {
       "source": "/routing",
-      "destination": "/swap/routing"
+      "destination": "/swap"
     },
     {
       "source": "/routing/dex-integration",
@@ -955,7 +976,7 @@
     },
     {
       "source": "/routing/market-listing",
-      "destination": "/swap/routing"
+      "destination": "/swap"
     },
     {
       "source": "/routing/rfq-integration",
@@ -963,7 +984,7 @@
     },
     {
       "source": "/routing/token-listing",
-      "destination": "/swap/routing"
+      "destination": "/swap"
     },
     {
       "source": "/skills",

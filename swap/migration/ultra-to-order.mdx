@@ -1,0 +1,27 @@
+---
+title: "Ultra to Meta-Aggregator"
+description: "Migrate from Ultra /order + /execute to Swap V2"
+llmsDescription: "Migration guide for moving from Jupiter Ultra Swap API (/order + /execute at ultra-api.jup.ag) to the Swap API V2 Meta-Aggregator path (/order + /execute at api.jup.ag/swap/v2). Minimal migration: same endpoints, same request/response format, just a base URL change. Covers what changes, what stays the same, and what you gain from migrating."
+---
+
+If you currently use Ultra `/order` + `/execute`, migration is minimal. The endpoints are the same, with a new base URL.
+
+## What changes
+
+| Before (Ultra) | After (Swap V2) |
+| --- | --- |
+| Base URL: `https://ultra-api.jup.ag` | Base URL: `https://api.jup.ag/swap/v2` |
+| `GET /order` | `GET /order` |
+| `POST /execute` | `POST /execute` |
+
+The request parameters and response format are identical. Update the base URL and you are done.
+
+## What you gain
+
+- Unified documentation and API reference
+- Same endpoint for both Meta-Aggregator and Router paths
+- Future improvements shipped to V2 first
+
+## Related
+
+- [Order & Execute](/swap/order-and-execute) for the full Meta-Aggregator workflow and code examples

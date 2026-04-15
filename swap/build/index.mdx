@@ -1,12 +1,12 @@
 ---
-title: "Get Swap Instructions"
-description: "Get raw swap instructions and build your own transaction"
-llmsDescription: "How to use Jupiter's Swap API V2 GET /swap/v2/build endpoint to get raw swap instructions for building custom transactions. Returns computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions, tipInstruction, and address lookup tables. Integrators assemble their own transaction, add custom instructions (CPI, memo, SOL transfer, etc.), simulate for compute units, compile to v0 transaction, sign, and send via their own RPC or via /submit for Jupiter's transaction landing. Optional parameters include slippageBps (number or 'rtse' for RTSE), tipAmount (for /submit), mode='fast', maxAccounts, platformFeeBps, payer (gasless). /execute is not available for /build. Metis-only routing. No Jupiter swap fees. Full @solana/kit and @solana/web3.js TypeScript code examples included."
+title: "Build"
+description: "Raw swap instructions with full transaction control via Metis onchain routing"
+llmsDescription: "How to use Jupiter's Router path via the GET /swap/v2/build endpoint to get raw swap instructions for building custom transactions. Uses Metis onchain routing only (no JupiterZ RFQ market makers). Returns computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions, tipInstruction, and address lookup tables. Integrators assemble their own transaction, add custom instructions (CPI, memo, SOL transfer, etc.), simulate for compute units, compile to v0 transaction, sign, and send via their own RPC or via /submit for Jupiter's transaction landing. Optional parameters include slippageBps (number or 'rtse' for RTSE), tipAmount (for /submit), mode='fast', maxAccounts, platformFeeBps, payer (gasless). /execute is not available for /build. No Jupiter swap fees. Full @solana/kit and @solana/web3.js TypeScript code examples included."
 ---
 
-The `/build` endpoint returns raw swap instructions instead of an assembled transaction. You build the transaction yourself, which gives you full control to add custom instructions, CPI, or modify any part of the transaction.
+The Router path uses the `/build` endpoint to return raw swap instructions instead of an assembled transaction. Routing is handled by Metis, Jupiter's onchain routing engine, which finds the best path across Solana DEXes.
 
-Once built and signed, you can submit transactions via your own RPC, or use [`/submit`](/transaction/submit) to land them through Jupiter's transaction infrastructure with SOL tips.
+You build the transaction yourself, giving you full control to add custom instructions, CPI, or modify any part of the transaction. Once built and signed, submit via your own RPC or use [`/submit`](/transaction/submit) to land through Jupiter's transaction infrastructure with SOL tips.
 
 ## Quick start
 
@@ -556,7 +556,7 @@ Insert custom instructions alongside the swap instructions. Common examples:
 - Create or close token accounts
 - Custom program CPI
 
-See [Other Instructions](/swap/build/other-instructions) for a reference of common instructions.
+See [Common Instructions](/swap/build/common-instructions) for a reference of common instructions.
 
 ### 3. Simulate compute unit limit
 
@@ -580,13 +580,13 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 - `/build` is intended for customisations, and `/execute` validates the transaction to prevent any changes
 </Note>
 
-## Key differences from `/order`
+## Router vs Meta-Aggregator
 
-| | `/order` | `/build` |
+| | Meta-Aggregator (`/order`) | Router (`/build`) |
 | --- | --- | --- |
-| **Routing** | All routers (Metis + RFQ) | Metis only |
+| **Routing** | All engines (Metis, JupiterZ, Dflow, OKX) | Metis only |
 | **Swap fees** | Jupiter platform fee | None |
-| **Transaction landing** | Managed via `/execute` | Self-managed or use our proprietary landing pipeline via [`/submit`](/transaction/submit) |
+| **Transaction landing** | Managed via `/execute` | Self-managed or use Jupiter's proprietary transaction landing pipeline via [`/submit`](/transaction/submit) |
 | **Transaction control** | None | Full |
 | **Compute budget** | Included in transaction | Included as instructions (you can override) |
 
@@ -609,12 +609,33 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 | `nativeDestinationAccount` | - | Native SOL account for output |
 | `blockhashSlotsToExpiry` | 150 | Slots until blockhash expires (1-300) |
 
-For the full parameter reference, see the [API reference](/api-reference/swap). For how parameters affect routing, see [Routing](/swap/routing).
+For the full parameter reference, see the [API reference](/api-reference/swap).
+
+## Fees
+
+Jupiter does not charge swap fees on `/build`. The only fee mechanism is integrator platform fees via `platformFeeBps` and `feeAccount`:
+
+```typescript
+const params = new URLSearchParams({
+  inputMint: "So11111111111111111111111111111111111111112",
+  outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  amount: "1000000000",
+  taker: walletAddress,
+  platformFeeBps: "50",          // 0.5%
+  feeAccount: "YOUR_FEE_TOKEN_ACCOUNT",
+});
+
+const response = await fetch(
+  `https://api.jup.ag/swap/v2/build?${params}`,
+  { headers: { "x-api-key": API_KEY } }
+);
+```
+
+Your fee is added as part of the swap instruction. The `feeAccount` can be any SPL token account you control (it does not need to be a referral program account). You are responsible for creating and managing this account.
 
 ## Related
 
 - [Transaction Submission](/transaction/submit) to submit via Jupiter's transaction landing infrastructure with SOL tips for priority processing
-- [Other Instructions](/swap/build/other-instructions) for common instructions to compose with your swap
-- [Fees](/swap/fees) for adding platform fees to `/build`
+- [Common Instructions](/swap/build/common-instructions) for common instructions to compose with your swap
 - [Advanced Techniques](/swap/advanced) for CU simulation, `mode: "fast"`, and `maxAccounts`
 - [API Reference: GET /build](/api-reference/swap/build) for the full OpenAPI specification

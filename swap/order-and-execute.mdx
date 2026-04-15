@@ -1,10 +1,10 @@
 ---
 title: "Order & Execute"
-description: "Get a swap quote, sign, and execute with managed landing"
-llmsDescription: "How to perform a swap using Jupiter's Swap API V2 default path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routers compete for best price (Metis, JupiterZ RFQ, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter Beam, confirmation polling, and retry. Covers the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types."
+description: "Best price across all routers with managed transaction landing"
+llmsDescription: "How to perform a swap using Jupiter's Meta-Aggregator path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routing engines compete for best price (Metis onchain routing, JupiterZ RFQ market makers, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter's proprietary landing pipeline, with confirmation polling and retry. Includes routing impact matrix showing which optional parameters disable which routers, order mode (ultra vs manual), fee documentation (Jupiter platform fee breakdown by token pair, fee mint priority, referral fee setup with code examples), the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types."
 ---
 
-The `/order` + `/execute` flow is the recommended way to swap on Jupiter. You get the best price (all routers compete, including RFQ market makers), and Jupiter handles transaction landing for you.
+The Meta-Aggregator is the recommended way to swap on Jupiter. All routing engines compete for the best price (Metis, JupiterZ RFQ, Dflow, OKX), and Jupiter handles transaction landing for you via `/order` + `/execute`.
 
 ## Quick start
 
@@ -275,7 +275,7 @@ if (result.status === "Success") {
 `GET /order` returns a quote and an assembled transaction in a single call. All routers compete for the best price: Metis, JupiterZ, Dflow, and OKX.
 
 <Note>
-  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See [Routing](/swap/routing) for details.
+  Adding optional parameters to `/order` (such as fee or slippage overrides) may restrict routing. See the [routing impact matrix](#routing-impact-matrix) below for details.
 </Note>
 
 **Required parameters:**
@@ -297,7 +297,7 @@ if (result.status === "Success") {
 | `router` | Which router won the quote (iris, jupiterz, dflow, okx). |
 | `mode` | "ultra" (no optional params) or "manual" (optional params used). |
 
-For the full parameter reference and how each parameter affects routing, see [Routing](/swap/routing).
+For the full parameter reference, see the [API reference](/api-reference/swap/order). For how each parameter affects routing, see the [routing impact matrix](#routing-impact-matrix) below.
 
 ### 2. Sign the transaction
 
@@ -351,10 +351,186 @@ For the full parameter reference and how each parameter affects routing, see [Ro
 | `-2003` | RFQ | Quote expired |
 | `-2004` | RFQ | Swap rejected |
 
+## Routing impact matrix
+
+Adding optional parameters to `/order` can restrict which routers are eligible:
+
+| Parameter | Metis | JupiterZ (RFQ) | Dflow | OKX |
+| --- | --- | --- | --- | --- |
+| **(no optional params)** | Yes | Yes | Yes | Yes |
+| `receiver` | Yes | **No** | Yes | Yes |
+| `referralAccount` & `referralFee` | Yes | **No** | Yes | Yes |
+| `payer` (integrator gasless) | Yes | **No** | **No** | **No** |
+| `excludeRouters: jupiterz` | Yes | **No** | Yes | Yes |
+
+**Key takeaway:** adding `receiver`, `referralAccount`, `referralFee` or `payer` disables JupiterZ (RFQ), which may result in worse pricing on major pairs where market makers often beat onchain routing by 5-20bps.
+
+For the full parameter reference, see the [API reference](/api-reference/swap/order).
+
+## Order mode
+
+The `/order` response includes a `mode` field that indicates whether optional parameters were applied that may affect routing or swap behaviour:
+
+| Mode | Meaning |
+| --- | --- |
+| **ultra** | No optional params used. Default behaviour with all routers eligible. |
+| **manual** | Optional params detected (e.g. `slippageBps`, `referralAccount`, `payer`). These modifications may restrict routing or change swap behaviour. |
+
+`mode` does not indicate which router was used for the swap. It signals whether you adjusted parameters that could affect price or swap success. This is useful for debugging: if a swap fails in `manual` mode, the parameter modifications you applied may be the cause.
+
+<Note>
+This is similar to how the jup.ag frontend behaves: when you use custom settings like slippage, priority fee strategy, or dex/router exclusions, the swap is handled differently. Since you opted into custom parameters, you take responsibility for the impact on swap outcomes.
+</Note>
+
+## Fees
+
+### Jupiter platform fee
+
+Jupiter charges a platform fee on `/order` swaps. This fee is included in the quote and deducted automatically. The `platformFee` field in the response shows the fee amount and rate:
+
+```json
+{
+  "platformFee": {
+    "amount": "8529",
+    "feeBps": 5,
+    "feeMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+  }
+}
+```
+
+#### Fee breakdown
+
+The platform fee varies by token pair:
+
+| Token Pair | Fee (bps) |
+|------------|-----------|
+| Buying Jupiter tokens (SOL/Stable to JUP/JLP/jupSOL) | 0 |
+| Pegged assets (LST-LST, Stable-Stable) | 0 |
+| SOL-Stable | 2 |
+| LST-Stable | 5 |
+| Everything else | 10 |
+| New tokens (within 24 hours of token age) | 50 |
+
+#### Fee mint priority
+
+Jupiter determines which token to collect fees in based on a priority list:
+
+1. **SOL**
+2. **Stablecoins** (USDC, USDT, etc.)
+3. **Liquid staked tokens** (jupSOL, etc.)
+4. **Bluechips** (large market cap tokens)
+5. **Others**
+
+Check the `feeBps` and `feeMint` fields in the `/order` response to see which token and rate apply to your swap.
+
+### Referral fees
+
+Use the [Jupiter Referral Program](/tool-kits/referral-program) to earn fees on `/order` swaps. This requires setting up referral accounts before you can collect fees.
+
+#### How it works
+
+- Jupiter takes 20% of your integrator fee (no separate platform fee when referral is active)
+- Jupiter decides which token mint to collect fees in based on the [fee mint priority](#fee-mint-priority) list
+- You must create a `referralTokenAccount` for each mint you expect to receive fees in
+- If the `referralTokenAccount` for the `feeMint` is not initialised, the order still returns but executes without your fees (the user still gets their swap)
+- Fee range: 50 to 255 bps
+- Supports SPL and Token2022 tokens
+
+#### Setup
+
+Three one-time steps before you can collect fees:
+
+1. **Install the Referral SDK**
+
+```bash
+npm install @jup-ag/referral-sdk
+```
+
+2. **Create a `referralAccount`** (once)
+
+```typescript expandable
+import { ReferralProvider } from "@jup-ag/referral-sdk";
+import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.BS58_PRIVATE_KEY!));
+const provider = new ReferralProvider(connection);
+
+// Jupiter Ultra Referral Project
+const projectPubKey = new PublicKey("DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc");
+
+const transaction = await provider.initializeReferralAccountWithName({
+  payerPubKey: wallet.publicKey,
+  partnerPubKey: wallet.publicKey,
+  projectPubKey: projectPubKey,
+  name: "your-app-name",
+});
+
+const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
+console.log("referralAccount:", transaction.referralAccountPubKey.toBase58());
+```
+
+3. **Create `referralTokenAccount` for each fee mint**
+
+Create a token account for each mint you expect to collect fees in. Start with SOL and USDC. You can add more later.
+
+```typescript expandable
+const mint = new PublicKey("So11111111111111111111111111111111111111112"); // SOL
+
+const transaction = await provider.initializeReferralTokenAccountV2({
+  payerPubKey: wallet.publicKey,
+  referralAccountPubKey: new PublicKey("YOUR_REFERRAL_ACCOUNT"),
+  mint,
+});
+
+const signature = await sendAndConfirmTransaction(connection, transaction.tx, [wallet]);
+console.log("referralTokenAccount:", transaction.tokenAccount.toBase58());
+```
+
+You can also use the [Referral Dashboard](https://referral.jup.ag/) to create accounts via a web interface.
+
+#### Usage
+
+Pass `referralAccount` and `referralFee` to `/order`:
+
+```typescript
+const params = new URLSearchParams({
+  inputMint: "So11111111111111111111111111111111111111112",
+  outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  amount: "1000000000",
+  taker: walletAddress,
+  referralAccount: "YOUR_REFERRAL_ACCOUNT",
+  referralFee: "50", // 50 bps = 0.5%
+});
+
+const response = await fetch(
+  `https://api.jup.ag/swap/v2/order?${params}`,
+  { headers: { "x-api-key": API_KEY } }
+);
+```
+
+Verify your fees are applied by checking the `feeBps` field in the response matches your `referralFee` value. If it falls back to the default platform fee, the `referralTokenAccount` for that `feeMint` is likely not initialised.
+
+<Warning>
+  Adding `referralAccount` disables RFQ routing. You will only get Metis quotes. See the [routing impact matrix](#routing-impact-matrix) above.
+</Warning>
+
+### Fee response fields
+
+The `/order` response includes these fee-related fields:
+
+| Field | Description |
+| --- | --- |
+| `feeBps` | Total fees including platform and other fees (basis points) |
+| `feeMint` | Token fees are collected in |
+| `platformFee.amount` | Jupiter platform fee amount |
+| `platformFee.feeBps` | Jupiter platform fee rate |
+| `referralAccount` | Referral account used (if set) |
+
 ## Related
 
-- [Routing](/swap/routing) for optional parameters and their routing impact
-- [Fees](/swap/fees) for adding integrator fees to `/order`
+- [Jupiter Referral Program](/tool-kits/referral-program) for the full referral program documentation
 - [Advanced Techniques](/swap/advanced) for gasless swaps, priority fees, and CU optimisation
 - [API Reference: GET /order](/api-reference/swap/order) for the full OpenAPI specification
 - [API Reference: POST /execute](/api-reference/swap/execute) for the full OpenAPI specification

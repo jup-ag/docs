@@ -1,7 +1,7 @@
 ---
 title: "Slippage Estimation"
-description: "Use RTSE for optimal slippage on /order and /build"
-llmsDescription: "How to use Jupiter's Real-Time Slippage Estimator (RTSE) on both /order and /build endpoints. On /order, RTSE is applied automatically at order time. On /build, pass slippageBps=rtse to opt in. RTSE uses heuristics (token categories, historical and real-time slippage data), algorithms (EMA), and real-time failure rate monitoring to estimate optimal slippage. Covers when to use RTSE vs a fixed slippageBps value."
+description: "Use RTSE for optimal slippage on Meta-Aggregator and Router"
+llmsDescription: "How to use Jupiter's Real-Time Slippage Estimator (RTSE) on both the Meta-Aggregator (/order) and Router (/build) paths. On the Meta-Aggregator, RTSE is applied automatically at order time. On the Router, pass slippageBps=rtse to opt in. RTSE uses heuristics (token categories, historical and real-time slippage data), algorithms (EMA), and real-time failure rate monitoring to estimate optimal slippage. Covers when to use RTSE vs a fixed slippageBps value."
 ---
 
 Slippage is the difference between the quoted output amount and what you actually receive. It depends on token pair volatility, trade size relative to pool liquidity, and time between quoting and execution.
@@ -18,23 +18,23 @@ RTSE uses a variety of heuristics, algorithms, and monitoring to estimate the be
 - **Algorithms:** Exponential Moving Average (EMA) on slippage data to smooth out noise and follow trends.
 - **Monitoring:** real-time monitoring of failure rates to reactively increase slippage when necessary.
 
-## RTSE on `/order` vs `/build`
+## RTSE on Meta-Aggregator vs Router
 
-| | `/order` | `/build` |
+| | Meta-Aggregator (`/order`) | Router (`/build`) |
 |---|---|---|
 | **RTSE** | Automatic. Applied at order time. | Opt-in. Pass `slippageBps=rtse`. |
 | **Default** | RTSE (no param needed) | `slippageBps=50` (fixed 0.5%) |
 | **Override** | Pass `slippageBps` for a fixed value (restricts to Metis-only routing) | Pass a number for fixed, or `"rtse"` for RTSE |
 
-### /order (automatic)
+### Meta-Aggregator (automatic)
 
-On the `/order` path, RTSE is applied automatically when the order is created. You do not need to set any slippage parameter. The estimated slippage is embedded in the transaction returned by `/order`.
+On the Meta-Aggregator path (`/order`), RTSE is applied automatically when the order is created. You do not need to set any slippage parameter. The estimated slippage is embedded in the transaction returned by `/order`.
 
-If you pass `slippageBps` to `/order`, it overrides RTSE with a fixed value. This also restricts routing to Metis-only (see [Routing](/swap/routing)).
+If you pass `slippageBps` to `/order`, it overrides RTSE with a fixed value. This also restricts routing to Metis-only (see the [routing impact matrix](/swap/order-and-execute#routing-impact-matrix)).
 
-### /build (opt-in)
+### Router (opt-in)
 
-On the `/build` path, slippage defaults to 50 bps (0.5%). To enable RTSE, pass the literal string `"rtse"`:
+On the Router path (`/build`), slippage defaults to 50 bps (0.5%). To enable RTSE, pass the literal string `"rtse"`:
 
 ```
 GET https://api.jup.ag/swap/v2/build?inputMint=...&outputMint=...&amount=...&taker=...&slippageBps=rtse
@@ -56,6 +56,6 @@ The estimated slippage is reflected in `otherAmountThreshold` in the response.
 
 ## Related
 
-- [Routing](/swap/routing): how parameters like `slippageBps` affect which routers are available
+- [Routing impact matrix](/swap/order-and-execute#routing-impact-matrix): how parameters like `slippageBps` affect which routers are available
 - [Order & Execute](/swap/order-and-execute): the default swap flow where RTSE is automatic
-- [Get Swap Instructions](/swap/build): the advanced path where RTSE is opt-in via `slippageBps=rtse`
+- [Build](/swap/build): full transaction control, RTSE is opt-in via `slippageBps=rtse`

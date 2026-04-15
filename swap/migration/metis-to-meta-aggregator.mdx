@@ -1,0 +1,82 @@
+---
+title: "Metis to Meta-Aggregator"
+description: "Upgrade from Metis to the Meta-Aggregator for better pricing"
+llmsDescription: "Migration guide for Metis Swap API users who don't need transaction modification to upgrade to the Swap API V2 Meta-Aggregator path (/order + /execute). The Meta-Aggregator gives access to all routing engines (Metis, JupiterZ RFQ, Dflow, OKX) for better pricing, managed execution via /execute, and gasless support. Covers the trade-offs, what you gain, and a before-and-after code comparison."
+---
+
+If you currently use Metis but don't need to modify the transaction, consider upgrading to the Meta-Aggregator (`/order` + `/execute`) instead of migrating to the Router (`/build`). You get better pricing because all routing engines compete, not just Metis.
+
+## What you gain
+
+- **All routers** including JupiterZ RFQ market makers (often 5-20bps better on major pairs)
+- **Managed execution** via `/execute` (no RPC management, no priority fee tuning)
+- **Gasless support** (automatic for users with < 0.01 SOL)
+- **Simpler integration** (one call + sign + execute)
+
+## The trade-off
+
+You cannot modify the transaction. If you need CPI, custom instructions, or any transaction modification, use the [Router (`/build`)](/swap/build) path instead. See [Metis to Router](/swap/migration/metis-to-build) for that migration.
+
+## Before and after
+
+**Before (Metis: two calls + self-managed sending)**
+
+```typescript
+// 1. Get quote
+const quote = await fetch(
+  "https://api.jup.ag/swap/v1/quote?" +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112",
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      amount: "100000000",
+      slippageBps: "50",
+    }),
+  { headers: { "x-api-key": API_KEY } }
+).then((r) => r.json());
+
+// 2. Get swap transaction
+const swap = await fetch("https://api.jup.ag/swap/v1/swap", {
+  method: "POST",
+  headers: { "Content-Type": "application/json", "x-api-key": API_KEY },
+  body: JSON.stringify({
+    quoteResponse: quote,
+    userPublicKey: walletAddress,
+  }),
+}).then((r) => r.json());
+
+// 3. Sign and send yourself via RPC
+```
+
+**After (Meta-Aggregator: one call + managed execution)**
+
+```typescript
+// 1. Get order (all routers compete)
+const order = await fetch(
+  "https://api.jup.ag/swap/v2/order?" +
+    new URLSearchParams({
+      inputMint: "So11111111111111111111111111111111111111112",
+      outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      amount: "100000000",
+      taker: walletAddress,
+    }),
+  { headers: { "x-api-key": API_KEY } }
+).then((r) => r.json());
+
+// 2. Sign the transaction
+// ... (sign order.transaction with your wallet)
+
+// 3. Execute with managed landing
+const result = await fetch("https://api.jup.ag/swap/v2/execute", {
+  method: "POST",
+  headers: { "Content-Type": "application/json", "x-api-key": API_KEY },
+  body: JSON.stringify({
+    signedTransaction: signedTxBase64,
+    requestId: order.requestId,
+  }),
+}).then((r) => r.json());
+```
+
+## Related
+
+- [Order & Execute](/swap/order-and-execute) for the full Meta-Aggregator workflow and code examples
+- [Metis to Router](/swap/migration/metis-to-build) if you need transaction modification

@@ -74,7 +74,7 @@
                 "group": "Router",
                 "pages": [
                   "swap/build/index",
-                  "swap/build/other-instructions",
+                  "swap/build/common-instructions",
                   "transaction/submit",
                   "api-reference/swap/build",
                   "api-reference/transaction/submit"
@@ -105,7 +105,9 @@
               {
                 "group": "Migration",
                 "pages": [
-                  "swap/migration"
+                  "swap/migration/metis-to-build",
+                  "swap/migration/metis-to-meta-aggregator",
+                  "swap/migration/ultra-to-order"
                 ]
               }
             ]
@@ -850,7 +852,11 @@
     },
     {
       "source": "/swap/v2/migration",
-      "destination": "/swap/migration"
+      "destination": "/swap/migration/metis-to-build"
+    },
+    {
+      "source": "/swap/migration",
+      "destination": "/swap/migration/metis-to-build"
     },
     {
       "source": "/swap/v2/order-and-execute",
@@ -867,6 +873,10 @@
     {
       "source": "/swap/fees",
       "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/build/other-instructions",
+      "destination": "/swap/build/common-instructions"
     },
     {
       "source": "/tokens/organic-score",

@@ -59,8 +59,7 @@
               {
                 "group": "Swap",
                 "pages": [
-                  "swap/index",
-                  "swap/fees"
+                  "swap/index"
                 ]
               },
               {
@@ -847,7 +846,7 @@
     },
     {
       "source": "/swap/v2/fees",
-      "destination": "/swap/fees"
+      "destination": "/swap/order-and-execute"
     },
     {
       "source": "/swap/v2/migration",
@@ -864,6 +863,10 @@
     {
       "source": "/swap/routing",
       "destination": "/swap"
+    },
+    {
+      "source": "/swap/fees",
+      "destination": "/swap/order-and-execute"
     },
     {
       "source": "/tokens/organic-score",

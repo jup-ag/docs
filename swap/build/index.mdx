@@ -611,10 +611,31 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 
 For the full parameter reference, see the [API reference](/api-reference/swap).
 
+## Fees
+
+Jupiter does not charge swap fees on `/build`. The only fee mechanism is integrator platform fees via `platformFeeBps` and `feeAccount`:
+
+```typescript
+const params = new URLSearchParams({
+  inputMint: "So11111111111111111111111111111111111111112",
+  outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  amount: "1000000000",
+  taker: walletAddress,
+  platformFeeBps: "50",          // 0.5%
+  feeAccount: "YOUR_FEE_TOKEN_ACCOUNT",
+});
+
+const response = await fetch(
+  `https://api.jup.ag/swap/v2/build?${params}`,
+  { headers: { "x-api-key": API_KEY } }
+);
+```
+
+Your fee is added as part of the swap instruction. The `feeAccount` can be any SPL token account you control (it does not need to be a referral program account). You are responsible for creating and managing this account.
+
 ## Related
 
 - [Transaction Submission](/transaction/submit) to submit via Jupiter's transaction landing infrastructure with SOL tips for priority processing
 - [Other Instructions](/swap/build/other-instructions) for common instructions to compose with your swap
-- [Fees](/swap/fees) for adding platform fees to `/build`
 - [Advanced Techniques](/swap/advanced) for CU simulation, `mode: "fast"`, and `maxAccounts`
 - [API Reference: GET /build](/api-reference/swap/build) for the full OpenAPI specification

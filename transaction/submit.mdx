@@ -32,7 +32,7 @@ llmsDescription: "How to submit signed transactions through Jupiter's transactio
 2. Include a SOL tip (minimum 0.001 SOL) to one of 16 permitted accounts
 3. Sign the transaction
 4. POST the base64-encoded signed transaction to `https://api.jup.ag/tx/v1/submit`
-5. Jupiter's validator pipeline lands the transaction
+5. Jupiter lands the transaction through its validator pipeline
 
 For `/build` transactions, use the `tipAmount` parameter to have the tip instruction included automatically. For non-Jupiter transactions, add a standard SOL transfer instruction to one of the [permitted tip accounts](#standalone-tip-instructions).
 
@@ -49,7 +49,7 @@ For `/build` transactions, use the `tipAmount` parameter to have the tip instruc
 
 | | `/execute` | `/submit` |
 |---|---|---|
-| **Paired with** | `/order` (meta-aggregator and router flows) | `/build` or any signed transaction |
+| **Paired with** | `/order` (meta-aggregator flow) | `/build` or any signed transaction |
 | **Fee model** | Jupiter swap fees (included in the order) | SOL tips (minimum 0.001 SOL) |
 | **Transaction source** | Must match the exact transaction from `/order` | Any valid signed Solana transaction |
 | **Credit cost** | 0 credits | 0 credits |
@@ -158,7 +158,7 @@ const recentBlockhash = bs58.encode(
 );
 const { lastValidBlockHeight } = build.blockhashWithMetadata;
 
-// 4. Simulate with max CU limit to estimate actual usage
+// 4. Simulate to estimate CU usage, then apply 1.2x buffer
 const simMessage = new TransactionMessage({
   payerKey: signer.publicKey,
   recentBlockhash,
@@ -178,7 +178,6 @@ if (sim.value.err) {
   process.exit(1);
 }
 
-// Set 1.2x buffer on simulated CU, capped at max
 const estimatedCUL = sim.value.unitsConsumed
   ? Math.min(Math.ceil(sim.value.unitsConsumed * 1.2), CU_LIMIT_MAX)
   : CU_LIMIT_MAX;
@@ -385,7 +384,7 @@ const instructions = [
 const blockhash = transformBlockhash(build.blockhashWithMetadata);
 const alts = transformALTs(build.addressesByLookupTableAddress);
 
-// 4. Simulate with max CU limit to estimate actual usage
+// 4. Simulate to estimate CU usage, then apply 1.2x buffer
 const simTx = buildTransaction(
   [createInstruction(makeSetComputeUnitLimitIx(CU_LIMIT_MAX)), ...instructions],
   blockhash,
@@ -405,7 +404,6 @@ if (sim.value.err) {
   process.exit(1);
 }
 
-// Set 1.2x buffer on simulated CU, capped at max
 const estimatedCUL = sim.value.unitsConsumed
   ? Math.min(
       Math.ceil(Number(sim.value.unitsConsumed) * 1.2),
@@ -488,7 +486,15 @@ const [submitResult, rpcResult] = await Promise.allSettled([
   }),
 ]);
 
-// Poll for confirmation — whichever path landed it, you'll see the same signature
+// Both paths return the same signature (the tx hash is deterministic)
+const signature =
+  submitResult.status === "fulfilled"
+    ? submitResult.value.signature
+    : rpcResult.status === "fulfilled"
+      ? bs58.encode(rpcResult.value)
+      : null;
+
+// Poll for confirmation, whichever path landed it
 const confirmation = await connection.confirmTransaction(
   { signature, blockhash, lastValidBlockHeight },
   "confirmed",
@@ -497,7 +503,7 @@ const confirmation = await connection.confirmTransaction(
 
 ## Best practices
 
-- **Randomize tip accounts:** there are 16 permitted tip accounts. Randomize which one you send to on each transaction to reduce write-lock contention across concurrent submissions.
+- **Randomise tip accounts:** there are 16 permitted tip accounts. Randomise which one you send to on each transaction to reduce write-lock contention across concurrent submissions.
 - **Use `tipAmount` with `/build`:** pass `tipAmount` as a query parameter to have the tip instruction included automatically, rather than adding it manually.
 - **Set `maxRetries: 0` on RPC fallback:** if you run `/submit` in parallel with `sendRawTransaction`, let your application control retry logic rather than the RPC node, so you can refresh the blockhash between attempts.
 - **Poll for confirmation:** use `confirmTransaction` with the blockhash and `lastValidBlockHeight` from your transaction. If the blockhash expires without confirmation, rebuild with a fresh blockhash and resubmit.
@@ -507,7 +513,7 @@ const confirmation = await connection.confirmTransaction(
 If you are submitting a non-Jupiter transaction (another swap protocol, a program call, a transfer), add a tip instruction yourself. It is a standard SOL transfer to any one of the 16 permitted tip accounts.
 
 <Tip>
-Randomize which account you send to, to reduce write-lock contention.
+Randomise which account you send to, to reduce write-lock contention.
 </Tip>
 
 <CodeGroup>

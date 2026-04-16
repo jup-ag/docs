@@ -517,6 +517,7 @@ const tipIx = getTransferSolInstruction({
 - **Set `maxRetries: 0` on RPC fallback:** if you run `/submit` in parallel with `sendRawTransaction`, let your application control retry logic rather than the RPC node, so you can refresh the blockhash between attempts.
 - **Poll for confirmation:** use `confirmTransaction` with the blockhash and `lastValidBlockHeight` from your transaction. If the blockhash expires without confirmation, rebuild with a fresh blockhash and resubmit.
 - **`/submit` does not simulate:** we send directly to the TPU for fastest possible delivery. If you require simulation, do it before making a request to `/submit`.
+- **Colocate for lowest latency:** Jupiter's API gateway runs in [six AWS regions](/portal/latency). Deploy your servers in the nearest region to minimise round-trip time.
 
 ## How /submit differs from /execute
 

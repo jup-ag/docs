@@ -1,27 +1,20 @@
 ---
 title: "Transaction Submission"
-description: "Submit transactions through Jupiter's validator for fast landing and MEV protection"
-llmsDescription: "How to submit signed transactions through Jupiter's transaction landing infrastructure using POST api.jup.ag/tx/v1/submit. Jupiter operates one of the highest-staked validators on Solana and opens its landing pipeline to integrators. Accepts any signed Solana transaction (swaps, transfers, program calls) with a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 permitted accounts. Zero credit cost, available on all plans including free and keyless access. Provides MEV protection (transactions are not exposed to public mempools), sub-second landing through direct block production, and the same infrastructure that powers Jupiter's own products. Can run in parallel with existing RPC submission for zero-risk comparison. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips."
+description: "Submit transactions through Jupiter's proprietary infrastructure for fast landing and MEV protection"
+llmsDescription: "How to submit signed transactions through Jupiter's proprietary transaction landing infrastructure using POST api.jup.ag/tx/v1/submit. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) with a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 permitted accounts. Zero credit cost, available on all plans including free and keyless access. Provides MEV protection by removing all intermediaries between your transaction and the leader. Can run in parallel with existing RPC submission for zero-risk comparison. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips."
 ---
 
-`/submit` sends your signed transactions through Jupiter's transaction landing infrastructure. Jupiter operates [one of the highest-staked validators on Solana](https://solanabeach.io/validators), and `/submit` opens the same pipeline that lands Jupiter's own swap transactions to any integrator. Your transactions go directly to Jupiter's validator with MEV protection, sub-second landing, and zero credit cost.
+`/submit` sends your signed transactions through Jupiter's proprietary transaction landing infrastructure. This is the same infrastructure that powers Jupiter's own swap products, now open to any integrator. It accepts any valid signed Solana transaction with a SOL tip, costs zero API credits, and works on all plans including keyless access.
 
-## Overview
+## Why /submit is competitive
 
-<CardGroup cols={2}>
-  <Card title="High-Stake Validator" icon="tower-broadcast">
-    One of the most staked validators on Solana. More stake means more leader slots and more chances to include your transaction directly in a block.
-  </Card>
-  <Card title="MEV Protection" icon="shield-halved">
-    Transactions go directly to Jupiter's validator, removing all intermediaries that could be malicious actors. The same infrastructure that protects millions of Jupiter swaps daily.
-  </Card>
-  <Card title="Sub-Second Landing" icon="bolt">
-    When Jupiter's validator is the current leader, your transaction can be included in the very next block.
-  </Card>
-  <Card title="Free to Use" icon="circle-check">
-    Zero API credits on all plans, including free and keyless access. The only cost is the SOL tip in your transaction.
-  </Card>
-</CardGroup>
+Jupiter's transaction landing stack is purpose-built for high throughput and low latency:
+
+- **SWQoS via high-stake validator.** Jupiter operates [one of the highest-staked validators on Solana](https://solanabeach.io/validators). Solana's Stake-Weighted Quality of Service (SWQoS) reserves ~80% of a leader's TPU capacity for staked validators proportional to their stake. Higher stake means more reserved bandwidth when forwarding transactions to the current leader.
+- **Beam (custom TPU forwarder).** Jupiter's own TPU client bypasses standard RPC nodes and sends transactions directly to leaders via staked QUIC connections. This removes intermediaries that could be malicious actors and eliminates RPC processing overhead.
+- **DoubleZero.** Dedicated fiber network for validator communication, with FPGA-based spam filtering and transaction deduplication at the network edge. Cleaner transaction set, faster propagation between validators.
+- **Ultra-low-latency fiber.** Private fiber links from Tokyo to Frankfurt reduce physical propagation time between Jupiter's infrastructure and leader validators globally.
+- **High-performance, scalable infrastructure.** Built to handle the volume of Jupiter's own products, where millions of swaps land daily.
 
 ## How it works
 
@@ -29,7 +22,6 @@ llmsDescription: "How to submit signed transactions through Jupiter's transactio
 2. Include a SOL tip (minimum 0.001 SOL) to one of 16 permitted accounts
 3. Sign the transaction
 4. POST the base64-encoded signed transaction to `https://api.jup.ag/tx/v1/submit`
-5. Jupiter lands the transaction through its validator pipeline
 
 For `/build` transactions, use the `tipAmount` parameter to have the tip instruction included automatically. For non-Jupiter transactions, add a standard SOL transfer instruction to one of the [permitted tip accounts](#standalone-tip-instructions).
 

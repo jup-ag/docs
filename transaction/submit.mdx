@@ -10,7 +10,7 @@ llmsDescription: "How to submit signed transactions through Jupiter's proprietar
 
 Jupiter's transaction landing stack is purpose-built for high throughput and low latency:
 
-- **SWQoS via high-stake validator.** Jupiter operates [one of the highest-staked validators on Solana](https://solanabeach.io/validators). Solana's [Stake-Weighted Quality of Service (SWQoS)](https://solana.com/developers/guides/advanced/stake-weighted-qos) reserves ~80% of a leader's TPU capacity for staked validators proportional to their stake. Higher stake means more reserved bandwidth when forwarding transactions to the current leader.
+- **[SWQoS via high-stake validator](https://solana.com/developers/guides/advanced/stake-weighted-qos).** Jupiter operates [one of the highest-staked validators on Solana](https://solanabeach.io/validators). Solana's Stake-Weighted Quality of Service (SWQoS) reserves ~80% of a leader's TPU capacity for staked validators proportional to their stake. Higher stake means more reserved bandwidth when forwarding transactions to the current leader.
 - **Beam (custom TPU forwarder).** Jupiter's own TPU client bypasses standard RPC nodes and sends transactions directly to leaders via staked QUIC connections. This removes intermediaries that could be malicious actors and eliminates RPC processing overhead.
 - **[DoubleZero](https://doublezero.xyz/).** Dedicated fiber network for validator communication, with FPGA-based spam filtering and transaction deduplication at the network edge. Cleaner transaction set, faster propagation between validators.
 - **Ultra-low-latency fiber.** Private fiber links from Tokyo to Frankfurt reduce physical propagation time between Jupiter's infrastructure and leader validators globally.
@@ -443,7 +443,7 @@ console.log("Confirmed:", signature);
 For non-Jupiter transactions (another swap protocol, a program call, a transfer), add a standard SOL transfer to one of the 16 permitted tip accounts. Randomise which account you send to on each transaction to reduce write-lock contention.
 
 <CodeGroup>
-```typescript @solana/web3.js
+```typescript @solana/web3.js expandable
 import { SystemProgram, PublicKey } from "@solana/web3.js";
 
 const TIP_ACCOUNTS = [
@@ -476,7 +476,7 @@ const tipIx = SystemProgram.transfer({
 // Add tipIx to your transaction, sign, then submit via /submit
 ```
 
-```typescript @solana/kit
+```typescript @solana/kit expandable
 import { getTransferSolInstruction } from "@solana-program/system";
 
 const TIP_ACCOUNTS = [
@@ -516,6 +516,7 @@ const tipIx = getTransferSolInstruction({
 - **Use `tipAmount` with `/build`:** pass `tipAmount` as a query parameter to have the tip instruction included automatically, rather than adding it manually.
 - **Set `maxRetries: 0` on RPC fallback:** if you run `/submit` in parallel with `sendRawTransaction`, let your application control retry logic rather than the RPC node, so you can refresh the blockhash between attempts.
 - **Poll for confirmation:** use `confirmTransaction` with the blockhash and `lastValidBlockHeight` from your transaction. If the blockhash expires without confirmation, rebuild with a fresh blockhash and resubmit.
+- **`/submit` does not simulate:** we send directly to the TPU for fastest possible delivery. If you require simulation, do it before making a request to `/submit`.
 
 ## How /submit differs from /execute
 
@@ -526,44 +527,6 @@ const tipIx = getTransferSolInstruction({
 | **Transaction source** | Must match the exact transaction from `/order` | Any valid signed Solana transaction |
 | **Credit cost** | 0 credits | 0 credits |
 | **Use case** | Managed swap execution for `/order` transactions | Any transaction: `/build` swaps, non-Jupiter transactions |
-
-## Use /submit in parallel
-
-You do not need to switch entirely to `/submit`. Run it alongside your existing submission path and compare results directly. Submit via all paths simultaneously, then poll for confirmation. Whichever lands first wins.
-
-```typescript
-// Submit via /submit and your existing RPC in parallel
-const [submitResult, rpcResult] = await Promise.allSettled([
-  // Path 1: Jupiter's landing pipeline
-  fetch("https://api.jup.ag/tx/v1/submit", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      signedTransaction: base64SignedTx,
-    }),
-  }).then((res) => res.json()),
-
-  // Path 2: Your existing RPC
-  connection.sendRawTransaction(serializedTx, {
-    skipPreflight: true,
-    maxRetries: 0,
-  }),
-]);
-
-// Both paths return the same signature (the tx hash is deterministic)
-const signature =
-  submitResult.status === "fulfilled"
-    ? submitResult.value.signature
-    : rpcResult.status === "fulfilled"
-      ? bs58.encode(rpcResult.value)
-      : null;
-
-// Poll for confirmation, whichever path landed it
-const confirmation = await connection.confirmTransaction(
-  { signature, blockhash, lastValidBlockHeight },
-  "confirmed",
-);
-```
 
 ## API reference
 

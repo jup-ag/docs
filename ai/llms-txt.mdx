@@ -18,7 +18,7 @@ A plain Markdown file containing a structured index of all Jupiter documentation
 - **Sections** for each major area (Docs, API References, Guides, Tool Kits, etc)
 - **Links with descriptions** for every page
 
-<Card title="llms.txt" href="https://dev.jup.ag/docs/llms.txt" icon="file" horizontal>
+<Card title="llms.txt" href="https://developers.jup.ag/docs/llms.txt" icon="file" horizontal>
   Open the llms.txt for Jupiter docs
 </Card>
 
@@ -27,17 +27,17 @@ A plain Markdown file containing a structured index of all Jupiter documentation
 
 ## Docs
 
-- [Build with Jupiter](https://dev.jup.ag/docs/index.md)
-- [Get Started](https://dev.jup.ag/docs/get-started/index.md): Welcome to Jupiter's Developer Docs...
-- [Overview](https://dev.jup.ag/docs/swap/index.md): One API for all swap use cases on Jupiter.
-- [API Reference](https://dev.jup.ag/docs/api-reference/index.md): Overview of Jupiter API Reference
+- [Build with Jupiter](https://developers.jup.ag/docs/index.md)
+- [Get Started](https://developers.jup.ag/docs/get-started/index.md): Welcome to Jupiter's Developer Docs...
+- [Overview](https://developers.jup.ag/docs/swap/index.md): One API for all swap use cases on Jupiter.
+- [API Reference](https://developers.jup.ag/docs/api-reference/index.md): Overview of Jupiter API Reference
 ```
 
 This is the perfect entrypoint for LLMs and AI agents to get started. It allows them to efficiently locate relevant content at a high level without processing the entire documentation.
 
 ## llms-full.txt
 
-<Card title="llms-full.txt" href="https://dev.jup.ag/docs/llms-full.txt" icon="file" horizontal>
+<Card title="llms-full.txt" href="https://developers.jup.ag/docs/llms-full.txt" icon="file" horizontal>
   Open the llms-full.txt for Jupiter docs
 </Card>
 
@@ -56,14 +56,14 @@ Any documentation page can be accessed as raw markdown, making it easy for AI ag
 **Method 1: Append `.md` to the URL**
 
 ```bash
-curl https://dev.jup.ag/docs/swap.md
-curl https://dev.jup.ag/docs/swap/order-and-execute.md
+curl https://developers.jup.ag/docs/swap.md
+curl https://developers.jup.ag/docs/swap/order-and-execute.md
 ```
 
 **Method 2: Use the `Accept` header**
 
 ```bash
-curl -H "Accept: text/markdown" https://dev.jup.ag/docs/swap
+curl -H "Accept: text/markdown" https://developers.jup.ag/docs/swap
 ```
 
 Both methods return the page content as `text/markdown`.

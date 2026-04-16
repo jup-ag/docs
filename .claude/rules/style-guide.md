@@ -126,7 +126,7 @@ structure needs rethinking or ask human for permission.
 
 ### Links
 
-- Internal links: use relative paths (`/docs/ultra` not `https://dev.jup.ag/docs/ultra`)
+- Internal links: use relative paths (`/docs/ultra` not `https://developers.jup.ag/docs/ultra`)
 - External links: always use full URLs
 - Link text should describe the destination: "see the [Ultra API reference](/api-reference/ultra)" not "[click here](/api-reference/ultra)"
 

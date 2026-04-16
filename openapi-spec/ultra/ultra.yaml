@@ -375,7 +375,7 @@ paths:
         - in: query
           name: excludeDexes
           description: |
-            - [Full list of DEXes here](https://dev.jup.ag/api-reference/swap/program-id-to-label), for example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
+            - [Full list of DEXes here](https://developers.jup.ag/docs/api-reference/swap/program-id-to-label), for example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
             - **Important**: This only excludes DEXes on the Iris router, does not apply to other routers
             - For example:
               - **Exclude** Raydium: `excludeRouters=<all-except-Iris>` and `excludeDexes=Raydium`

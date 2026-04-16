@@ -1,0 +1,34 @@
+---
+title: "Latency and Server Locations"
+description: "API gateway regions and colocation guidance for lowest latency"
+llmsDescription: "Jupiter's API gateway server locations and colocation guidance for integrators optimising latency. The API gateway runs on AWS in six regions: Singapore (ap-southeast-1), Frankfurt (eu-central-1), Virginia (us-east-1), São Paulo (sa-east-1), Tokyo (ap-northeast-1), and Oregon (us-west-2). Covers how to choose the closest region for your servers, general colocation recommendations, and how latency varies by proximity. Applies to all Jupiter API products accessed via api.jup.ag and lite-api.jup.ag."
+---
+
+Jupiter's API gateway is distributed across six AWS regions worldwide. Latency to the API depends primarily on the physical distance between your servers and the nearest gateway region. Colocating your servers in or near one of these regions gives you the lowest possible round-trip time.
+
+## Gateway regions
+
+| Region | AWS Region ID | Location |
+|---|---|---|
+| Singapore | `ap-southeast-1` | Southeast Asia |
+| Frankfurt | `eu-central-1` | Europe |
+| Virginia | `us-east-1` | US East |
+| São Paulo | `sa-east-1` | South America |
+| Tokyo | `ap-northeast-1` | East Asia |
+| Oregon | `us-west-2` | US West |
+
+All regions serve the same API surface with the same data freshness. There is no difference in functionality between regions.
+
+## Colocation guidance
+
+For the lowest API latency, deploy your servers in the same AWS region (or the same availability zone) as one of the gateway regions listed above. If your infrastructure runs on a different cloud provider, choose a data centre in the same city or metro area.
+
+If your users are globally distributed:
+
+- **Asia-Pacific:** Singapore (`ap-southeast-1`) or Tokyo (`ap-northeast-1`)
+- **Europe:** Frankfurt (`eu-central-1`)
+- **Americas:** Virginia (`us-east-1`), Oregon (`us-west-2`), or São Paulo (`sa-east-1`)
+
+<Note>
+These regions cover the API gateway (request routing and rate limiting). Transaction submission infrastructure (`/submit`, `/execute`) uses a separate network stack. See [Transaction Submission](/transaction/submit) for details on that pipeline.
+</Note>

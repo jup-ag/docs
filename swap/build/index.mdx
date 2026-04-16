@@ -382,7 +382,22 @@ const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
 });
 
 const { signature } = await submitRes.json();
-console.log("Transaction:", `https://solscan.io/tx/${signature}`);
+console.log("Submitted:", `https://solscan.io/tx/${signature}`);
+
+// Step 7: Confirm the transaction landed
+const confirmation = await rpc
+  .confirmTransaction(signature, {
+    strategy: { type: "blockhash", ...blockhash },
+    commitment: "confirmed",
+  })
+  .send();
+
+if (confirmation.value.err) {
+  console.error("Transaction failed:", confirmation.value.err);
+  process.exit(1);
+}
+
+console.log("Confirmed:", signature);
 ```
 
 ```typescript expandable title="@solana/web3.js"
@@ -499,7 +514,20 @@ const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
 });
 
 const { signature } = await submitRes.json();
-console.log("Transaction:", `https://solscan.io/tx/${signature}`);
+console.log("Submitted:", `https://solscan.io/tx/${signature}`);
+
+// Step 7: Confirm the transaction landed
+const confirmation = await connection.confirmTransaction(
+  { signature, blockhash: recentBlockhash, lastValidBlockHeight },
+  "confirmed",
+);
+
+if (confirmation.value.err) {
+  console.error("Transaction failed:", confirmation.value.err);
+  process.exit(1);
+}
+
+console.log("Confirmed:", signature);
 ```
 </CodeGroup>
 

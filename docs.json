@@ -43,6 +43,7 @@
               "portal/plans",
               "portal/rate-limits",
               "portal/responses",
+              "portal/latency",
               "portal/migration",
               "portal/faq"
             ]
@@ -721,10 +722,6 @@
     {
       "source": "/portal/payment",
       "destination": "/portal/plans"
-    },
-    {
-      "source": "/portal/latency",
-      "destination": "/portal/faq"
     },
     {
       "source": "/portal/migrate-from-lite-api",

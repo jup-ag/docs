@@ -1,34 +1,47 @@
 ---
 title: "Transaction Submission"
-description: "Send transactions through Jupiter's landing infrastructure with SOL tips"
-llmsDescription: "How to submit signed transactions through Jupiter's transaction landing infrastructure using POST api.jup.ag/tx/v1/submit. Jupiter runs one of the top validators on Solana and opens its landing pipeline to integrators. Accepts any signed Solana transaction with a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 Jupiter V6 program authorities. Designed for /build transactions and non-Jupiter transactions. Can run in parallel with your existing RPC submission for zero-risk comparison. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees. Includes standalone tip instruction examples for non-Jupiter transactions."
+description: "Submit transactions through Jupiter's proprietary infrastructure for fast landing and MEV protection"
+llmsDescription: "How to submit signed transactions through Jupiter's proprietary transaction landing infrastructure using POST api.jup.ag/tx/v1/submit. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) with a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 permitted accounts. Zero credit cost, available on all plans including free and keyless access. Provides MEV protection by removing all intermediaries between your transaction and the leader. Can run in parallel with existing RPC submission for zero-risk comparison. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips."
 ---
 
-`/submit` lets you send signed transactions through Jupiter's transaction landing infrastructure with SOL tips for priority processing. [Jupiter runs one of the top validators on Solana](https://solanabeach.io/validators) and uses it to power the same pipeline that lands Jupiter's own swap transactions with sub-second execution. `/submit` opens this pipeline to integrators.
+`/submit` sends your signed transactions through Jupiter's proprietary transaction landing infrastructure. This is the same infrastructure that powers Jupiter's own swap products, now open to any integrator. It accepts any valid signed Solana transaction with a SOL tip, costs zero API credits, and works on all plans including keyless access.
 
-## Use /submit in parallel
+## Why /submit is competitive
 
-Transaction submission can make a significant impact to your integration. Even marginal improvements in landing rate or latency can compound into meaningful gains at scale. You do not need to switch entirely to `/submit`, it is a value add. Run it alongside your existing submission path and compare results.
+Jupiter's transaction landing stack is purpose-built for high throughput and low latency:
 
-Attempt via all paths, then poll for confirmation. Whichever lands first wins. This gives you a direct comparison of landing rates with zero risk: if `/submit` does not improve your results, you lose nothing.
+- **[SWQoS via high-stake validator](https://solana.com/developers/guides/advanced/stake-weighted-qos).** Jupiter operates [one of the highest-staked validators on Solana](https://solanabeach.io/validators). Solana's Stake-Weighted Quality of Service (SWQoS) reserves ~80% of a leader's TPU capacity for staked validators proportional to their stake. Higher stake means more reserved bandwidth when forwarding transactions to the current leader.
+- **Beam (custom TPU forwarder).** Jupiter's own TPU client bypasses standard RPC nodes and sends transactions directly to leaders via staked QUIC connections. This removes intermediaries that could be malicious actors and eliminates RPC processing overhead.
+- **[DoubleZero](https://doublezero.xyz/).** Dedicated fiber network for validator communication, with FPGA-based spam filtering and transaction deduplication at the network edge. Cleaner transaction set, faster propagation between validators.
+- **Ultra-low-latency fiber.** Private fiber links from Tokyo to Frankfurt reduce physical propagation time between Jupiter's infrastructure and leader validators globally.
+- **High-performance, scalable infrastructure.** Built to handle the volume of Jupiter's own products, where millions of swaps land daily.
 
-Regardless, if Jupiter's pipeline delivers better results, share your landing rate and latency data with us so we can continue optimising.
+## How it works
 
-## How /submit differs from /execute
+1. Build your transaction (using `/build`, or assemble your own)
+2. Include a SOL tip (minimum 0.001 SOL) to one of 16 permitted accounts
+3. Sign the transaction
+4. POST the base64-encoded signed transaction to `https://api.jup.ag/tx/v1/submit`
 
-| | `/execute` | `/submit` |
-|---|---|---|
-| **Paired with** | `/order` (order-and-execute flow) | `/build` or any signed transaction |
-| **Fee model** | Jupiter swap fees (included in the order) | SOL tips (minimum 0.001 SOL) |
-| **Transaction source** | Must match the exact transaction from `/order` | Any valid signed Solana transaction |
-| **Use case** | Recommended swap happy path | Custom transactions, `/build` transactions, non-Jupiter swaps |
+For `/build` transactions, use the `tipAmount` parameter to have the tip instruction included automatically. For non-Jupiter transactions, add a standard SOL transfer instruction to one of the [permitted tip accounts](#standalone-tip-instructions).
 
-## Quick start
+## Requirements
 
-The quickest way to use `/submit` is with `/build`'s built-in `tipAmount` parameter, which automatically adds a tip instruction to the response.
+| Requirement | Details |
+|---|---|
+| **Valid signed transaction** | Must be a valid Solana transaction with all required signatures |
+| **SOL tip** | Minimum 1,000,000 lamports (0.001 SOL) transferred to one of the 16 permitted tip accounts |
+| **Transaction size** | Must not exceed the Solana transaction size limit (1232 bytes) |
+| **API access** | Works with any API key (free, Developer, Launch, Pro) or keyless at 0.5 RPS |
+
+## Code example
+
+### Using /build
+
+Use [`/build`](/swap/build) with the `tipAmount` parameter to automatically include a tip instruction in the response.
 
 <CodeGroup>
-```typescript @solana/web3.js
+```typescript @solana/web3.js expandable
 import {
   AddressLookupTableAccount,
   ComputeBudgetProgram,
@@ -114,20 +127,19 @@ const instructions = [
   toInstruction(build.tipInstruction),
 ];
 
-// 3. Resolve address lookup tables
+// 3. Prepare blockhash and address lookup tables
 const addressLookupTableAccounts: AddressLookupTableAccount[] = [];
 for (const addr of Object.keys(build.addressesByLookupTableAddress ?? {})) {
   const result = await connection.getAddressLookupTable(new PublicKey(addr));
   if (result.value) addressLookupTableAccounts.push(result.value);
 }
 
-// 4. Transform blockhash from byte array to base58
 const recentBlockhash = bs58.encode(
   Buffer.from(build.blockhashWithMetadata.blockhash),
 );
 const { lastValidBlockHeight } = build.blockhashWithMetadata;
 
-// 5. Simulate with max CU limit to estimate actual usage
+// 4. Simulate to estimate CU usage, then apply 1.2x buffer
 const simMessage = new TransactionMessage({
   payerKey: signer.publicKey,
   recentBlockhash,
@@ -147,12 +159,11 @@ if (sim.value.err) {
   process.exit(1);
 }
 
-// 6. Set CU limit to 120% of simulated usage (capped at max)
 const estimatedCUL = sim.value.unitsConsumed
   ? Math.min(Math.ceil(sim.value.unitsConsumed * 1.2), CU_LIMIT_MAX)
   : CU_LIMIT_MAX;
 
-// 7. Build final transaction: our CU limit + API's CU price + swap instructions
+// 5. Build final transaction with estimated CU limit + CU price from response
 const messageV0 = new TransactionMessage({
   payerKey: signer.publicKey,
   recentBlockhash,
@@ -166,7 +177,7 @@ const messageV0 = new TransactionMessage({
 const transaction = new VersionedTransaction(messageV0);
 transaction.sign([signer]);
 
-// 8. Submit via /submit
+// 6. Sign and submit via /submit (or use your own RPC / transaction pipeline)
 const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
   method: "POST",
   headers: {
@@ -179,10 +190,23 @@ const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
 });
 
 const { signature } = await submitRes.json();
-console.log("Transaction:", `https://solscan.io/tx/${signature}`);
+console.log("Submitted:", `https://solscan.io/tx/${signature}`);
+
+// 7. Confirm the transaction landed
+const confirmation = await connection.confirmTransaction(
+  { signature, blockhash: recentBlockhash, lastValidBlockHeight },
+  "confirmed",
+);
+
+if (confirmation.value.err) {
+  console.error("Transaction failed:", confirmation.value.err);
+  process.exit(1);
+}
+
+console.log("Confirmed:", signature);
 ```
 
-```typescript @solana/kit
+```typescript @solana/kit expandable
 import {
   AccountRole,
   Address,
@@ -337,11 +361,11 @@ const instructions = [
   createInstruction(build.tipInstruction),
 ];
 
-// 3. Transform blockhash and address lookup tables from API format to Kit format
+// 3. Prepare blockhash and address lookup tables
 const blockhash = transformBlockhash(build.blockhashWithMetadata);
 const alts = transformALTs(build.addressesByLookupTableAddress);
 
-// 4. Simulate with max CU limit to estimate actual usage
+// 4. Simulate to estimate CU usage, then apply 1.2x buffer
 const simTx = buildTransaction(
   [createInstruction(makeSetComputeUnitLimitIx(CU_LIMIT_MAX)), ...instructions],
   blockhash,
@@ -361,7 +385,6 @@ if (sim.value.err) {
   process.exit(1);
 }
 
-// 5. Set CU limit to 120% of simulated usage (capped at max)
 const estimatedCUL = sim.value.unitsConsumed
   ? Math.min(
       Math.ceil(Number(sim.value.unitsConsumed) * 1.2),
@@ -369,7 +392,7 @@ const estimatedCUL = sim.value.unitsConsumed
     )
   : CU_LIMIT_MAX;
 
-// 6. Build the final transaction: our CU limit + API's CU price + swap instructions
+// 5. Build final transaction with estimated CU limit + CU price from response
 const compiledTx = buildTransaction(
   [
     createInstruction(makeSetComputeUnitLimitIx(estimatedCUL)),
@@ -381,7 +404,7 @@ const compiledTx = buildTransaction(
   signer.address,
 );
 
-// 7. Sign and submit
+// 6. Sign and submit via /submit (or use your own RPC / transaction pipeline)
 const signedTx = await signTransaction([signer.keyPair], compiledTx);
 
 const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
@@ -396,37 +419,31 @@ const submitRes = await fetch("https://api.jup.ag/tx/v1/submit", {
 });
 
 const { signature } = await submitRes.json();
-console.log("Transaction:", `https://solscan.io/tx/${signature}`);
+console.log("Submitted:", `https://solscan.io/tx/${signature}`);
+
+// 7. Confirm the transaction landed
+const confirmation = await rpc
+  .confirmTransaction(signature, {
+    strategy: { type: "blockhash", ...blockhash },
+    commitment: "confirmed",
+  })
+  .send();
+
+if (confirmation.value.err) {
+  console.error("Transaction failed:", confirmation.value.err);
+  process.exit(1);
+}
+
+console.log("Confirmed:", signature);
 ```
 </CodeGroup>
 
-<Tip>
-See the [Build](/swap/build) page for complete transaction assembly code, including imports, instruction ordering, and address lookup table handling.
-</Tip>
+### Adding tip instruction manually
 
-## API reference
-
-**Base URL:** `https://api.jup.ag/tx/v1`
-
-See the [POST /submit API reference](/api-reference/transaction/submit) for the full specification.
-
-#### Validation
-
-- Transaction must be a valid signed Solana transaction
-- All signatures must be valid
-- Transaction must contain a SOL transfer of >= 1,000,000 lamports (0.001 SOL) to one of the 16 permitted tip receivers
-- Transaction must not exceed max transaction size
-
-## Standalone tip instructions
-
-If you are submitting a non-Jupiter transaction (e.g. another swap protocol), add a tip instruction yourself. It is a standard SOL transfer to any one of the permitted tip receivers.
-
-<Tip>
-Randomise which account you send to, to reduce write-lock contention.
-</Tip>
+For non-Jupiter transactions (another swap protocol, a program call, a transfer), add a standard SOL transfer to one of the 16 permitted tip accounts. Randomise which account you send to on each transaction to reduce write-lock contention.
 
 <CodeGroup>
-```typescript @solana/web3.js
+```typescript @solana/web3.js expandable
 import { SystemProgram, PublicKey } from "@solana/web3.js";
 
 const TIP_ACCOUNTS = [
@@ -459,7 +476,7 @@ const tipIx = SystemProgram.transfer({
 // Add tipIx to your transaction, sign, then submit via /submit
 ```
 
-```typescript @solana/kit
+```typescript @solana/kit expandable
 import { getTransferSolInstruction } from "@solana-program/system";
 
 const TIP_ACCOUNTS = [
@@ -493,7 +510,35 @@ const tipIx = getTransferSolInstruction({
 ```
 </CodeGroup>
 
+## Best practices
+
+- **Randomise tip accounts:** there are 16 permitted tip accounts. Randomise which one you send to on each transaction to reduce write-lock contention across concurrent submissions.
+- **Use `tipAmount` with `/build`:** pass `tipAmount` as a query parameter to have the tip instruction included automatically, rather than adding it manually.
+- **Set `maxRetries: 0` on RPC fallback:** if you run `/submit` in parallel with `sendRawTransaction`, let your application control retry logic rather than the RPC node, so you can refresh the blockhash between attempts.
+- **Poll for confirmation:** use `confirmTransaction` with the blockhash and `lastValidBlockHeight` from your transaction. If the blockhash expires without confirmation, rebuild with a fresh blockhash and resubmit.
+- **`/submit` does not simulate:** we send directly to the TPU for fastest possible delivery. If you require simulation, do it before making a request to `/submit`.
+- **Colocate for lowest latency:** Jupiter's API gateway runs in [six AWS regions](/portal/latency). Deploy your servers in the nearest region to minimise round-trip time.
+
+## How /submit differs from /execute
+
+| | `/execute` | `/submit` |
+|---|---|---|
+| **Paired with** | `/order` (meta-aggregator flow) | `/build` or any signed transaction |
+| **Fee model** | Jupiter swap fees (included in the order) | SOL tips (minimum 0.001 SOL) |
+| **Transaction source** | Must match the exact transaction from `/order` | Any valid signed Solana transaction |
+| **Credit cost** | 0 credits | 0 credits |
+| **Use case** | Managed swap execution for `/order` transactions | Any transaction: `/build` swaps, non-Jupiter transactions |
+
+## API reference
+
+**Endpoint:** `POST https://api.jup.ag/tx/v1/submit`
+
+See the [POST /submit API reference](/api-reference/transaction/submit) for the full specification.
+
 ## Related
 
 - [Build](/swap/build): build custom transactions with `/build` (use `tipAmount` for automatic tip inclusion)
 - [Order & Execute](/swap/order-and-execute): the standard swap flow using `/order` + `/execute`
+- [Reduce Latency](/swap/advanced/reduce-latency): use `mode=fast` on `/build` for faster routing
+- [Plans and Pricing](/portal/plans): all plans include `/submit` at zero credit cost
+- [Latency and Server Locations](/portal/latency): API gateway regions and colocation guidance

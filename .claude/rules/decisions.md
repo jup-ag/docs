@@ -234,3 +234,21 @@ Track all redirects added to `vercel.json` here for visibility:
 **Alternatives considered:**
 1. `/submit` at repo root - too generic, no namespace for future transaction endpoints.
 2. Keep at `/swap/submit` - contradicts the API path and the endpoint's product-neutral scope. A non-swap developer wouldn't look under `/swap/` for transaction submission.
+
+### [2026-04-16] Reframe swap overview as Meta-Aggregator vs Router
+**Status:** implemented
+**Scope:** navigation | folder-structure | redirect
+**Files affected:** `swap/index.mdx`, `swap/order-and-execute.mdx`, `swap/build/index.mdx`, `swap/fees.mdx` (deleted), `swap/routing/index.mdx` (deleted), `swap/build/common-instructions.mdx` (renamed from other-instructions), `swap/migration/` (split into 3 pages), `docs.json`
+**Linear issue:** PR #884
+
+**Context:** The swap overview lacked a clear framing for the two integration paths. Developers had to piece together the relationship between `/order`, `/build`, `/execute`, and `/submit` across multiple pages. Fees and routing were standalone pages that fragmented the narrative.
+**Decision:**
+- Reframe overview around two paths: **Meta-Aggregator** (`/order` + `/execute`) and **Router** (`/build` + `/submit`)
+- Absorb `swap/fees.mdx` into `order-and-execute.mdx` and `build/index.mdx` (fees are path-specific)
+- Absorb `swap/routing/index.mdx` into `swap/index.mdx` (routing context belongs in overview)
+- Rename "Metis Router" to just "Router" in most contexts (Metis mentioned only when explaining internals)
+- Rename `other-instructions.mdx` to `common-instructions.mdx` with redirect
+- Split monolithic `migration.mdx` into 3 profile-targeted pages: `metis-to-build`, `metis-to-meta-aggregator`, `ultra-to-order`
+- Reorganise sidebar: Swap (overview), Meta-Aggregator (order-and-execute + API refs), Router (build + submit + API refs), Advanced, Routing Integration, Guides, Migration
+**Rationale:** Two clear paths reduce decision fatigue. Absorbing fees and routing eliminates page-hopping for core concepts. Profile-targeted migration pages let developers find their specific upgrade path without reading irrelevant content.
+**Migration notes:** Redirects added for `swap/fees` → `swap/order-and-execute`, `swap/routing` → `swap`, `swap/build/other-instructions` → `swap/build/common-instructions`.

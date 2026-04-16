@@ -32,6 +32,8 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 | `/build`          | build endpoint, build API              | Always backtick the path in prose              |
 | `/execute`        | execute endpoint, execute API          | Always backtick the path in prose              |
 | `/submit`          | submit endpoint, submit API            | Always backtick. API at `api.jup.ag/tx/v1/submit`, not under `/swap/v2/` |
+| Meta-Aggregator    | meta aggregator, MetaAggregator        | The `/order` + `/execute` integration path. Capitalised, hyphenated. |
+| Router             | Metis Router (in most contexts)        | The `/build` + `/submit` integration path. Say "Router" in prose, mention Metis only when explaining what the Router uses under the hood. |
 
 ### Product-Specific Terms
 
@@ -196,3 +198,6 @@ Format: `- [YYYY-MM-DD] Decision: rationale`
 - [2026-04-07] `/submit` is a product-neutral endpoint at `api.jup.ag/tx/v1/submit`. Always use the full API URL in code examples (`https://api.jup.ag/tx/v1/submit`), not a `BASE_URL` variable. The docs path is `/transaction/submit`. In prose, reference as `/submit` with backticks.
 - [2026-04-07] RTSE terminology: always use "RTSE" or "Real-Time Slippage Estimator". Never use "dynamic slippage" or "auto slippage" — these were legacy names that are no longer used.
 - [2026-04-07] Docs file path does not need to mirror the API URL path. Mintlify's docs.json decouples sidebar placement from file location. A page can live at `transaction/submit.mdx` but appear in the Swap sidebar. Choose file paths based on product scope, not discovery context.
+- [2026-04-16] Swap API overview uses "Meta-Aggregator" and "Router" as the two integration paths. "Meta-Aggregator" = `/order` + `/execute` (Jupiter handles everything). "Router" = `/build` + `/submit` or own RPC (integrator builds the transaction). Use these terms consistently in swap docs.
+- [2026-04-16] When absorbing a standalone page into another page, delete the original and add a redirect. Done for `swap/fees.mdx` (absorbed into order-and-execute and build) and `swap/routing/index.mdx` (absorbed into overview). Keeps URL space clean.
+- [2026-04-16] British English spelling for docs prose (e.g. "randomise", "optimise", "colour"). Do not Americanise existing British spellings.

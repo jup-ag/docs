@@ -8,21 +8,18 @@ llmsDescription: "How to submit signed transactions through Jupiter's transactio
 
 ## Overview
 
-<CardGroup cols={1}>
+<CardGroup cols={2}>
   <Card title="High-Stake Validator" icon="tower-broadcast">
-    Jupiter's validator is one of the most staked on Solana. Higher stake means more frequent leader slots and more opportunities to include your transaction in a block directly, without relying on propagation through the gossip network.
+    One of the most staked validators on Solana. More stake means more leader slots and more chances to include your transaction directly in a block.
   </Card>
   <Card title="MEV Protection" icon="shield-halved">
-    Transactions are routed directly to Jupiter's validator, removing all intermediaries that could potentially be malicious actors. This is the same anti-sandwich infrastructure that protects Jupiter's own swap products, where millions of swaps land daily without MEV extraction.
+    Transactions go directly to Jupiter's validator, removing all intermediaries that could be malicious actors. The same infrastructure that protects millions of Jupiter swaps daily.
   </Card>
   <Card title="Sub-Second Landing" icon="bolt">
-    The pipeline is purpose-built for fast transaction landing. When Jupiter's validator is the current leader, your transaction can be included in the very next block.
+    When Jupiter's validator is the current leader, your transaction can be included in the very next block.
   </Card>
   <Card title="Free to Use" icon="circle-check">
-    `/submit` costs zero API credits on all plans, including the free tier. Keyless access (no API key) also works. The only cost is the SOL tip included in your transaction.
-  </Card>
-  <Card title="Zero-Risk Adoption" icon="code-compare">
-    Run `/submit` alongside your existing RPC submission path. Whichever lands first wins. If `/submit` does not improve your results, you lose nothing.
+    Zero API credits on all plans, including free and keyless access. The only cost is the SOL tip in your transaction.
   </Card>
 </CardGroup>
 

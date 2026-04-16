@@ -3,7 +3,7 @@
 ## Identity
 
 You are working on the Jupiter Developer Documentation repo (jup-ag/docs).
-This is a Mintlify-powered docs site serving dev.jup.ag.
+This is a Mintlify-powered docs site serving developers.jup.ag.
 The audience is developers integrating Jupiter's DeFi APIs and toolkits on Solana.
 
 ## Project Context
@@ -54,7 +54,7 @@ jup-ag/docs/
 
 | Resource        | URL                              |
 |-----------------|----------------------------------|
-| Live docs       | https://dev.jup.ag               |
+| Live docs       | https://developers.jup.ag        |
 | Developer Platform| https://developers.jup.ag/portal            |
 | API (Lite)      | https://lite-api.jup.ag          |
 | API (Dynamic)   | https://api.jup.ag               |

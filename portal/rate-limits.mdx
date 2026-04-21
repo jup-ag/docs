@@ -1,7 +1,7 @@
 ---
 title: "Rate Limits"
 description: "Rate limits for Jupiter APIs by plan tier."
-llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per account, not per API key. All API requests share the same rate limit bucket. Returns HTTP 429 when exceeded."
+llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per account, not per API key. Most API requests share the same general rate limit bucket, but /swap/v2/execute and /tx/v1/submit each have their own dedicated buckets separate from the general limit and from each other: Keyless 20 RPS, Free 50 RPS, Paid (Developer/Launch/Pro) 100 RPS. Returns HTTP 429 when exceeded."
 ---
 
 ## Overview
@@ -21,8 +21,20 @@ Rate limits apply **per account**, not per API key. Creating multiple API keys d
 </Note>
 
 <Note>
-Rate limits are **bucketed** - all API requests across all endpoints share the same rate limit bucket. For example, if you are on the Developer plan (10 RPS), a mix of Swap, Price, and Token requests all count towards the same 10 RPS limit.
+Rate limits are **bucketed**. Most API requests share the same rate limit bucket. For example, if you are on the Developer plan (10 RPS), a mix of Swap, Price, and Token requests all count towards the same 10 RPS limit. The exceptions are `/swap/v2/execute` and `/tx/v1/submit`, which have their own dedicated buckets (see below).
 </Note>
+
+## Dedicated rate limit buckets
+
+[`/execute`](/swap/order-and-execute#execute-the-transaction) and [`/submit`](/transaction/submit) each have their own rate limit bucket, separate from the general API limit and from each other. Calls to these endpoints do not count towards your plan's general RPS quota.
+
+| Tier | RPS per endpoint |
+| :--- | :--- |
+| Keyless | 20 |
+| Free | 50 |
+| Paid (Developer, Launch, Pro) | 100 |
+
+For example, a Developer plan account (10 RPS general) can simultaneously make 10 general API requests, 100 `/execute` requests, and 100 `/submit` requests per second.
 
 ## Handling rate limits
 

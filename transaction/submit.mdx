@@ -32,7 +32,11 @@ For `/build` transactions, use the `tipAmount` parameter to have the tip instruc
 | **Valid signed transaction** | Must be a valid Solana transaction with all required signatures |
 | **SOL tip** | Minimum 1,000,000 lamports (0.001 SOL) transferred to one of the 16 tip receiver accounts |
 | **Transaction size** | Must not exceed the Solana transaction size limit (1232 bytes) |
-| **API access** | Works with any API key (free, Developer, Launch, Pro) or keyless at 0.5 RPS |
+| **API access** | Works with any API key or keyless access |
+
+<Tip>
+`/submit` has its own dedicated rate limit bucket (Keyless 20, Free 50, Paid 100 RPS), separate from your general API limit. See [Rate Limits](/portal/rate-limits#dedicated-rate-limit-buckets).
+</Tip>
 
 ## Code example
 

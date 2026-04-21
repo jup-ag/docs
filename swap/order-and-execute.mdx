@@ -306,7 +306,13 @@ For the full parameter reference, see the [API reference](/api-reference/swap/or
 
 ### 3. Execute the transaction
 
-`POST /execute` takes the signed transaction and the `requestId` from the order response. Jupiter handles:
+`POST /execute` takes the signed transaction and the `requestId` from the order response.
+
+<Tip>
+`/execute` has its own dedicated rate limit bucket (Keyless 20, Free 50, Paid 100 RPS), separate from your general API limit. See [Rate Limits](/portal/rate-limits#dedicated-rate-limit-buckets).
+</Tip>
+
+Jupiter handles:
 
 - Optimised slippage via [RTSE](/swap/advanced/slippage) (Real-Time Slippage Estimator), applied at order time to balance trade success and price protection
 - Optimised priority fee strategy for current network conditions

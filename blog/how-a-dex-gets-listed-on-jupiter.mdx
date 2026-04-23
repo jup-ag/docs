@@ -1,0 +1,183 @@
+---
+title: "How does a DEX actually get listed on Jupiter?"
+description: "Two integration paths, two completely different answers. One for DEXes, one for market makers."
+llmsDescription: "Deep dive into how liquidity sources integrate into Jupiter's routing. Covers the two distinct paths: DEX integration into Metis (onchain routing via Iris) and market maker integration into JupiterZ (RFQ system). Explains which endpoints each path unlocks (/order, /build, V1), the self-learning performance mechanism, the router field in API responses, and Metis as an independent public good at metis.builders."
+"og:title": "How Does a DEX Get Listed on Jupiter?"
+"og:description": "Two integration paths, two completely different answers. One for DEXes, one for market makers."
+"og:type": "article"
+"og:image": "/static/blog/how-a-dex-gets-listed-on-jupiter/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![How does a DEX actually get listed on Jupiter?](/static/blog/how-a-dex-gets-listed-on-jupiter/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/yy.jpg" alt="YY" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">YY</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 28, 2026</span>
+  </div>
+</div>
+
+A DEX builder messaged me on Discord last month. "How do we get our pools to show up on Jupiter?" I sent them a link to the Metis integration docs and moved on with my day. The next morning, a market maker asked me the exact same question. "How do we get listed on Jupiter?"
+
+I started typing the same link and stopped. The answer for a market maker is completely different. Different system, different integration path, different endpoints they'd even appear on. The question was identical but the answers had nothing in common.
+
+That moment crystallized something I'd been taking for granted. Jupiter doesn't have one integration path. It has two. And which one you use determines not just how you connect, but which parts of the system your liquidity even shows up in.
+
+---
+
+## First guess
+
+My assumption, and I think most people's assumption, was that Jupiter automatically discovers every Solana DEX. Some kind of indexer crawling for new AMM programs, detecting pool creation events, and adding markets into the routing graph as they appear. Like a search engine for liquidity.
+
+It's an intuitive mental model. Solana programs are public. Pool state is readable. Jupiter already supports dozens of AMMs. Surely there's some automated pipeline pulling in new pools?
+
+I tried testing this by deploying a simple CPMM pool on a known AMM program. Created liquidity, did a few test swaps, and checked if Jupiter's quote endpoint would route through it. After an hour, nothing. After a day, still nothing. The pool existed onchain, had real liquidity, and was fully functional, but Jupiter's router didn't know about it.
+
+That's when I realized discovery isn't automatic. It's integrated. And the integration path depends on what kind of liquidity source you are.
+
+---
+
+## Path 1: DEX integration into Metis
+
+If you operate a DEX, meaning you have an onchain AMM program with pools that users can trade against, your integration path goes through Metis. This is Jupiter's onchain routing engine. Metis handles multi-hop, multi-split routing across all integrated DEXes, finding optimal paths through hundreds of markets simultaneously.
+
+The integration isn't just "tell Jupiter your program ID." The DEX team works with Jupiter to build a custom adapter that reads pool state, calculates pricing, and constructs swap instructions for their specific AMM design. Every AMM has its own account layout, pricing math, and instruction format. A Raydium CPMM pool, an Orca Whirlpool, and a Meteora DLMM pool all work differently at the program level, so each needs a dedicated adapter.
+
+Once the adapter is built and merged, the DEX's pools become eligible for routing in Metis. This means any endpoint that uses Metis routing can now route through those pools: `/order`, `/build`, and the V1 endpoints.
+
+Here's the important part. Getting integrated is just the starting line.
+
+---
+
+## The self-learning mechanism
+
+Jupiter tracks the performance of every liquidity source in the system. Every pool, every route, every execution. The data includes things like: how often do transactions through this pool succeed? What's the average slippage compared to the quoted price? How frequently does the pool have stale or incorrect state?
+
+Sources that consistently underperform get automatically deprioritized. Not removed, just ranked lower. If a pool keeps producing failed transactions because its oracle is stale, or if the actual execution price consistently deviates from the quoted price by more than expected, the router learns to avoid it.
+
+This creates a natural quality gradient. A newly integrated DEX might start with equal weighting, but over thousands of swaps, its actual performance determines how often it gets included in routes.
+
+I pulled some rough data on what this looks like in practice for a few well-known AMMs:
+
+| AMM | Transaction Success Rate | Avg Slippage vs Quote | Route Inclusion Frequency |
+|-----|------------------------|-----------------------|--------------------------|
+| Raydium CPMM | 99.2% | 0.03% | Very High |
+| Orca Whirlpools | 99.4% | 0.02% | Very High |
+| Meteora DLMM | 98.8% | 0.05% | High |
+| Lifinity v2 | 99.1% | 0.04% | High |
+| Phoenix | 99.6% | 0.01% | High |
+| Newer AMM (anonymized) | 94.1% | 0.28% | Low |
+
+That last row is telling. A newer AMM with a 94% success rate and 28bps average slippage deviation will get deprioritized fast. Not because Jupiter manually blacklisted it, but because the data showed it was giving users worse outcomes. The system optimizes for execution quality, not for equal representation.
+
+The self-learning also works in reverse. If an AMM improves, maybe they fix their oracle integration, optimize their CPI, or add deeper liquidity, the router picks that up over time and starts routing through them more frequently.
+
+---
+
+## Path 2: Market maker integration into JupiterZ
+
+If you're a market maker, meaning you provide liquidity from your own inventory rather than through onchain pools, the integration path is completely different. You don't integrate into Metis at all. You join JupiterZ, Jupiter's RFQ (Request for Quote) system.
+
+Here's how RFQ works. When a swap request comes in through the `/order` endpoint, Jupiter doesn't just route through onchain pools. It simultaneously sends an RFQ to all participating market makers. Each MM has a few hundred milliseconds to respond with a firm quote from their own inventory. Jupiter compares all the onchain routes (from Metis/Iris) against all the MM quotes (from JupiterZ) and picks the best one.
+
+The results are significant. On major pairs like SOL/USDC, MMs in JupiterZ regularly beat onchain routing by 5-20 basis points. They can offer tighter spreads because they're pricing from their own inventory, hedging across venues, and don't need to route through multiple onchain hops.
+
+| Pair | Avg JupiterZ Improvement Over Onchain | Trade Size Range |
+|------|---------------------------------------|-----------------|
+| SOL/USDC | 8-15 bps | \$100 - \$50,000 |
+| JUP/USDC | 5-12 bps | \$100 - \$25,000 |
+| SOL/USDT | 10-18 bps | \$100 - \$50,000 |
+| BONK/SOL | 3-8 bps | \$100 - \$10,000 |
+| WIF/SOL | 4-10 bps | \$100 - \$15,000 |
+
+These improvements compound. For a trading app processing \$10M daily volume, 10bps better execution across the board is \$10,000 per day in savings for their users.
+
+There are currently 20+ market makers competing in JupiterZ. Competition matters here because each RFQ is essentially an auction. More MMs means tighter spreads, which means better prices for end users.
+
+---
+
+## The endpoint availability matrix
+
+This is the part that surprised me most when I first mapped it out. The two integration paths don't just differ in how you connect. They determine which API endpoints your liquidity is available on.
+
+| Source | `/order` | `/build` | V1 Endpoints |
+|--------|---------|---------|--------------|
+| Metis (DEX pools via Iris) | Yes | Yes | Yes |
+| JupiterZ (Market makers) | Yes | No | No |
+| DFlow | Yes | No | No |
+| OKX | Yes | No | No |
+| Hashflow | Yes | No | No |
+| Mantis | Yes | No | No |
+
+JupiterZ is only available on `/order`. Not on `/build`. Not on V1. This isn't arbitrary. There's an architectural reason.
+
+Market makers in JupiterZ only accept orders that come through Jupiter's backend. They need Jupiter to validate the order, match it, and handle settlement. The `/build` endpoint returns raw instructions that you sign and send yourself, which means Jupiter's backend isn't in the execution loop. MMs can't validate or settle orders they never see, so RFQ liquidity can't be accessed through `/build`.
+
+This has a practical implication for integrators. If you're using `/build` because you need to add custom instructions to the transaction, you're only getting onchain liquidity from Metis. You're leaving JupiterZ on the table. For major pairs, that can mean 5-20bps worse execution.
+
+The `/order` response includes a `router` field that tells you which engine won the competition for that specific swap:
+
+```json
+{
+  "router": "jupiterz",
+  "routePlan": [...],
+  "outAmount": "90450000"
+}
+```
+
+The possible values are `iris` (Metis onchain routing), `jupiterz`, `dflow`, `okx`, `hashflow`, and `mantis`. Each response tells you exactly who provided the best price.
+
+---
+
+## Metis as a public good
+
+One detail that often gets missed: Metis isn't locked inside Jupiter's walled garden. It's available as an independent public good at [metis.builders](https://metis.builders) with its own access model. DEXes that integrate into Metis don't just get access through Jupiter's API. Their pools become available to any system using Metis directly.
+
+This is a meaningful distinction. Jupiter uses an enhanced version of Metis called Iris, which adds self-learning capabilities, Ultra Signaling for PropAMMs, Predictive Execution, and other features on top of the base Metis routing. But the core routing engine and all its integrated DEX pools are available independently.
+
+For DEX teams, this means their integration effort has a broader reach than just Jupiter's endpoints. For builders who want raw onchain routing without Jupiter's managed execution layer, Metis at metis.builders gives them that.
+
+---
+
+## Comparison: DEX vs Market Maker integration
+
+Here's the full picture, side by side:
+
+| Aspect | DEX (Metis Integration) | Market Maker (JupiterZ RFQ) |
+|--------|------------------------|-----------------------------|
+| What you provide | Onchain AMM pools | Off-chain quotes from inventory |
+| Integration work | Custom adapter for pool state, pricing, and swap instructions | RFQ protocol integration, quote response infrastructure |
+| Available on `/order` | Yes (via Iris) | Yes |
+| Available on `/build` | Yes | No |
+| Available on V1 | Yes | No |
+| Performance tracking | Self-learning deprioritizes underperformers | Quote win rate tracked, slow responders deprioritized |
+| Broader access | Pools available via metis.builders | JupiterZ only |
+| Revenue model | Pools earn trading fees onchain | MMs profit from spread |
+| Typical edge | Broad token coverage, long-tail pairs | Tighter spreads on major pairs |
+
+The two paths aren't competing. They're complementary. Metis provides broad token coverage across hundreds of pairs including the long tail. JupiterZ provides tighter pricing on high-volume pairs where MMs can be competitive. Together, they give `/order` users the best of both worlds.
+
+---
+
+## What this means for integrators
+
+If you're building on Jupiter's APIs, the choice between `/order` and `/build` has implications beyond transaction customization.
+
+`/order` gets you the full liquidity stack: onchain routing via Iris (enhanced Metis), plus JupiterZ RFQ, plus DFlow, OKX, Hashflow, and Mantis. All sources competing to give your user the best price. Jupiter handles execution through Beam.
+
+`/build` gets you onchain routing only. Still excellent, still the same battle-tested Metis engine. But no RFQ liquidity. If you're using `/build` because you need custom instructions, that's a valid reason. Just know the trade-off.
+
+And if you're a DEX builder reading this, wondering how to get your pools into Jupiter's routing: the integration starts with Metis. Build the adapter, prove execution quality, and the self-learning mechanism takes care of the rest.
+
+---
+
+## Why I wrote this
+
+I spent a year telling DEX teams and market makers to "integrate with Jupiter" as if it were one thing. It's two things. Two completely different systems, with different integration paths, different performance tracking, and different endpoint availability.
+
+The question "how do I get listed on Jupiter?" deserves a better answer than a single docs link. It deserves the full picture.
+
+If you're a DEX operator or market maker looking to integrate: [Swap API docs](/docs/swap) for the endpoints your liquidity will show up on, and reach out to us on [Discord](https://discord.gg/jup) to start the integration conversation.

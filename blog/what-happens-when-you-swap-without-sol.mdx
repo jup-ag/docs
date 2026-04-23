@@ -1,0 +1,176 @@
+---
+title: "What happens when you swap with zero SOL in your wallet?"
+description: "A user asked how to swap 500 USDC with no SOL. I told them they needed SOL first. I was wrong."
+llmsDescription: "Deep dive into Jupiter's three gasless swap mechanisms on Solana: automatic gasless via /order (Jupiter covers all gas when taker has < 0.01 SOL on trades over ~$10), JupiterZ gasless (RFQ market makers pay network and priority fees), and integrator payer (pass a payer parameter on /order or /build). Covers the four types of gas costs on Solana (base fee, ATA rent, priority fee, other account rent), when each mechanism applies, routing tradeoffs, and what integrators should know."
+"og:title": "Swapping With Zero SOL"
+"og:description": "A user asked how to swap 500 USDC with no SOL. I told them they needed SOL first. I was wrong."
+"og:type": "article"
+"og:image": "/static/blog/what-happens-when-you-swap-without-sol/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![What happens when you swap with zero SOL in your wallet?](/static/blog/what-happens-when-you-swap-without-sol/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/anmol.png" alt="Anmol" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">Anmol</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 28, 2026</span>
+  </div>
+</div>
+
+A partner messaged our Discord a couple months ago: "My user has 500 USDC and zero SOL in their wallet. How do they swap?" I told them the user needed to get SOL first. Bridge it, buy it on a centralized exchange, ask a friend. The standard Solana onboarding friction that everyone complains about.
+
+A few days later, another team member pointed out that the user could have just swapped directly on Jupiter. No SOL needed. I felt dumb because I should have known this already. I help people integrate the Swap API every day. I know the params. I've read the docs (I literally wrote some of them). But I'd never thought carefully about what happens when the wallet is empty.
+
+So I went and traced the actual flow. It turns out there are three completely different mechanisms for handling zero-SOL wallets, and they work in ways I didn't expect.
+
+---
+
+## First guess
+
+My mental model was simple: every Solana transaction requires SOL. The base fee is ~5,000 lamports per signature. Priority fees can be significant during congestion. If you're creating a new token account, that's another ~0.002 SOL in rent. Without SOL, you can't pay any of these, so you can't transact.
+
+This is technically correct. Solana does require SOL for fees. But "requires SOL" and "requires SOL from the swapper" are different statements. I was conflating the two.
+
+Before getting into the mechanisms, it helps to understand exactly what you're paying for in a swap transaction. It's not just one fee.
+
+---
+
+## The four gas costs in a swap
+
+| Cost | Typical amount | What triggers it |
+|------|---------------|-----------------|
+| Base network fee | ~5,000 lamports (~\$0.0001) | Every transaction, per signature |
+| ATA rent | ~0.002 SOL (~\$0.18) | Creating a new Associated Token Account for a mint you've never held |
+| Priority fee | 1,000 - 5,000,000 lamports | Variable. Higher during congestion. Can dominate total cost. |
+| Other account rent | Varies | Some DEXes (Pump.fun, certain CLMMs) require taker-owned accounts |
+
+The base fee is almost nothing. Nobody notices it. But ATA rent adds up fast if you're swapping into a token you've never held before, and priority fees during busy periods can easily hit 0.01 SOL or more. "Other account rent" is the sneaky one, some protocols require accounts owned by the swapper that cost rent to create.
+
+A typical swap on a calm day might cost 0.003 SOL total. During congestion with a new token account, you could be looking at 0.02 SOL or more.
+
+The question is: who pays these four costs?
+
+---
+
+## Mechanism 1: Automatic gasless
+
+This is the one I should have known about. When you call `GET https://api.jup.ag/swap/v2/order` with default parameters (no optional params), Jupiter checks the taker's SOL balance. If the taker has less than 0.01 SOL and the trade is at least ~\$10, Jupiter covers everything. All four gas costs. Automatically.
+
+No extra parameters. No configuration on the integrator side. The API detects the situation and handles it.
+
+How? Jupiter calculates the total SOL needed for gas (base fee + priority fee + ATA rent + other rent), increases the swap fee slightly, and deducts the gas cost from the swap output. The user receives fewer output tokens, but the difference is small relative to the trade size. The `feeBps` field in the response reflects this increased fee.
+
+Behind the scenes, a secondary signer (Jupiter's gas payer) is added to the transaction. When you send the signed transaction to `POST https://api.jup.ag/swap/v2/execute`, Jupiter's payer co-signs and covers the SOL fees. The user never needs to hold SOL at all.
+
+The minimum trade size (~\$10) exists because the math has to work out. If someone is swapping \$0.50 worth of tokens, the gas costs might exceed the swap output entirely. The threshold is dynamic and adjusts with the current priority fee market.
+
+There's one important constraint: this only works with default `/order` parameters. The moment you add `referralAccount`, `referralFee`, `payer`, `slippageBps`, `priorityFeeLamports`, or `excludeRouters`, automatic gasless is disabled. The API assumes that if you're customizing the request, you're handling gas yourself.
+
+---
+
+## Mechanism 2: JupiterZ gasless
+
+This one I genuinely didn't know about until I traced the flow.
+
+When you call `/order` with default params, all routers compete for the best quote: Metis, JupiterZ, Hashflow, Dflow, OKX, Mantis. JupiterZ is the RFQ (Request for Quote) engine where market makers provide direct quotes.
+
+When a JupiterZ market maker wins the routing auction, something interesting happens: the market maker pays the network and priority fees. Not Jupiter. Not the user. The market maker.
+
+The order transaction includes a secondary signer for the market maker. Jupiter sets the gas payer to the MM's signer. When you send the partially signed transaction to `/execute`, Jupiter forwards it to the market maker, who signs and submits it.
+
+The catch: JupiterZ does not cover ATA rent. If the taker needs a new token account created, they need enough SOL for that rent (~0.002 SOL). If they don't have it, the route won't go through JupiterZ.
+
+This means JupiterZ gasless is "mostly gasless." The market maker picks up the bigger costs (priority fee, base fee), but the taker still needs a small SOL balance for token account creation if they're receiving a token for the first time.
+
+The same constraint applies here: only works with default params. Add any optional parameters and JupiterZ routing may be excluded entirely.
+
+---
+
+## Mechanism 3: Integrator payer
+
+This is the explicit one. If you're building an app and want to guarantee your users never pay gas, pass the `payer` parameter on either `/order` or `/build`.
+
+```typescript
+const params = new URLSearchParams({
+  inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+  outputMint: "So11111111111111111111111111111111111111112",     // SOL
+  amount: "1000000",
+  taker: userWalletAddress,
+  payer: integratorPayerAddress,
+});
+
+const response = await fetch(
+  `https://api.jup.ag/swap/v2/order?${params}`,
+  { headers: { "x-api-key": API_KEY } }
+);
+```
+
+The `payer` wallet covers all four gas costs. The transaction needs two signatures: the taker signs to authorize the swap, and the payer signs to authorize the gas payment.
+
+On `/order`, temporary wSOL ATA rent is covered by the payer and returned in the same transaction (it's a temporary account that gets closed). Other ATAs (for the output token) are covered by the payer but not returned, since they need to exist to hold the swapped tokens.
+
+On `/build`, the payer address replaces the taker as the fee payer on all returned instructions. You're responsible for building the transaction, collecting both signatures, and sending via your own RPC.
+
+There's a routing tradeoff I wish I'd known earlier. Adding `payer` to `/order` disables JupiterZ, Dflow, and OKX routing. You only get Metis quotes. The reason makes sense once you think about it: those routers have their own gas payment mechanisms, and adding a third-party payer creates conflicts in who signs what.
+
+On `/order`, the `payer` parameter also needs to be used together with referral parameters (`referralAccount` and `referralFee`). The assumption is that if you're paying gas for your users, you're taking a referral fee to recoup those costs.
+
+---
+
+## Comparing the three mechanisms
+
+| | Automatic gasless | JupiterZ gasless | Integrator payer |
+|---|---|---|---|
+| **Endpoint** | `/order` | `/order` | `/order` and `/build` |
+| **Who pays base fee** | Jupiter | Market maker | Integrator |
+| **Who pays priority fee** | Jupiter | Market maker | Integrator |
+| **Who pays ATA rent** | Jupiter | Taker | Integrator |
+| **Who pays other account rent** | Jupiter | Taker | Integrator |
+| **Min trade size** | ~\$10 | No minimum | No minimum |
+| **SOL required from taker** | None (< 0.01 SOL) | ~0.002 SOL for new ATAs | None |
+| **Routing** | All routers | JupiterZ only | Metis only |
+| **Config needed** | None | None | `payer` param + referral params |
+| **Custom params allowed** | No | No | Yes |
+
+The tradeoff spectrum is clear. Automatic gasless gives you the best routing (all routers) but only works with default params and a minimum trade size. JupiterZ is automatic but doesn't cover rent. Integrator payer gives you full control but restricts routing to Metis.
+
+---
+
+## The scenarios in practice
+
+Let me walk through what actually happens for a few common situations.
+
+**User has 500 USDC, 0 SOL, swapping USDC to SOL with default params:**
+Automatic gasless kicks in. Jupiter covers all gas. User receives slightly less SOL due to increased fee. All routers compete. This is the case my partner asked about, and the one I got wrong.
+
+**User has 500 USDC, 0.005 SOL, swapping USDC to JUP with default params:**
+Taker has < 0.01 SOL, so automatic gasless applies. All gas covered. If JupiterZ happens to win the routing, the MM would have paid gas anyway. Either way, the user doesn't need to think about it.
+
+**User has 500 USDC, 0.05 SOL, swapping USDC to SOL with default params:**
+Taker has > 0.01 SOL, so automatic gasless does not apply. The user pays gas normally. But if JupiterZ wins the routing, the MM covers the base and priority fees anyway. The user would still pay ATA rent if needed.
+
+**Integrator app swapping on behalf of user, using `payer` param:**
+The integrator's wallet covers all gas. Only Metis routing. The integrator takes a referral fee to cover costs. The user signs the swap authorization only.
+
+---
+
+## Things worth knowing
+
+**On the \$10 threshold.** The minimum for automatic gasless is approximately \$10 but it's dynamic. It adjusts based on current priority fee market conditions. During high congestion when priority fees spike, the minimum might be higher. During calm periods, it might be lower. Don't hardcode this assumption.
+
+**On testing gasless in development.** If you're testing on mainnet with a funded wallet, you won't trigger automatic gasless because your wallet has SOL. To test the gasless flow, you need a wallet with less than 0.01 SOL and at least ~\$10 of a non-SOL token. Devnet doesn't reflect mainnet priority fee conditions, so gasless testing really needs mainnet.
+
+**On the `payer` and routing restriction.** If your app depends on JupiterZ for better prices on large stablecoin pairs, using `payer` will exclude those quotes. Measure the price difference before committing to the integrator-payer model. For some token pairs, the JupiterZ quote significantly beats Metis. For others, the difference is negligible.
+
+**On ATA rent being permanent.** When the `payer` covers ATA rent for a new token account, that SOL is not returned. The ATA continues to exist and hold the user's tokens. If you're paying for thousands of users' ATAs, the costs add up. Temporary wSOL ATAs are the exception, those get closed in the same transaction and the rent is returned to the payer.
+
+---
+
+## Why I wrote this
+
+That Discord conversation bothered me for days. Not because I gave bad advice (though I did), but because I realized my mental model of "Solana requires SOL for everything" was too simplistic. It's true at the protocol level. It's not true at the application level, and the application level is where our partners and their users actually live.
+
+Three mechanisms. Three different answers to "who pays?" Three different routing implications. The next time someone asks me if their zero-SOL user can swap on Jupiter, I'm not going to say "get SOL first." I'm going to ask them what their integration looks like, because the right gasless mechanism depends on the answer.

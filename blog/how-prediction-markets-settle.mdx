@@ -1,0 +1,173 @@
+---
+title: "Where's the oracle? How Jupiter prediction markets actually settle"
+description: "Every prediction market needs someone to decide who won. Jupiter's approach isn't what I expected."
+llmsDescription: "Deep dive into Jupiter's Prediction Market API settlement mechanics. Covers the API at api.jup.ag/prediction, binary contract structure (YES/NO contracts priced in micro USD), orderbook mechanics, position lifecycle from order placement through settlement and payout, market states (open, halted, resolved), position states (Claimable, Lost, Claimed), auto-claim after 24 hours, resolution mechanism without traditional oracles, and practical integration notes on P&L tracking, leaderboards, and transaction history."
+"og:title": "Where's the oracle? How Jupiter prediction markets actually settle"
+"og:description": "Every prediction market needs someone to decide who won. Jupiter's approach isn't what I expected."
+"og:type": "article"
+"og:image": "/static/blog/how-prediction-markets-settle/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![Where's the oracle?](/static/blog/how-prediction-markets-settle/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/yy.jpg" alt="YY" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">YY</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 28, 2026</span>
+  </div>
+</div>
+
+Every prediction market I'd used before had a hard dependency somewhere in its stack: an oracle. Polymarket uses UMA's optimistic oracle. Augur used a decentralized reporter network. Gnosis had Reality.eth. The resolution mechanism was always the most interesting (and most fragile) part of the system. Get it wrong and either the market can't settle, or it settles incorrectly, and either way users lose money and trust.
+
+When I started looking at Jupiter's Prediction Market API at `api.jup.ag/prediction`, I went searching for the oracle integration. Pyth feed? Chainlink adapter? Some custom reporter network? I couldn't find one. I read through the API endpoints, looked at the response schemas, checked position settlement flows. No oracle reference anywhere.
+
+That's what sent me down this rabbit hole.
+
+---
+
+## First guess
+
+My assumption was that Jupiter must be using Pyth or Switchboard under the hood, and the oracle interaction was just abstracted away from the API consumer. The prediction market itself would store the oracle feed ID, and when the event concludes, a resolver would read the oracle price or data point and determine the outcome. Standard pattern. I've seen it in five other protocols.
+
+But prediction markets aren't just about price feeds. "Will ETH hit \$5,000 by June?" can use a price oracle. "Will the US approve a spot Solana ETF?" cannot. "Will it rain in Tokyo on March 15?" definitely cannot. Most of the interesting prediction markets are about real-world events that no blockchain oracle can verify natively.
+
+I pulled up the categories available through the API: politics, crypto, sports, culture, climate, tech. The crypto category could theoretically use price oracles for some markets. Everything else? There's no Chainlink feed for "Will Team A win the championship." That was the first crack in my oracle assumption.
+
+So how does settlement actually work?
+
+---
+
+## The contract model
+
+Before getting to settlement, it helps to understand what you're actually trading. Jupiter prediction markets are binary. Every event has two contracts: YES and NO. The price of each contract represents the market's implied probability.
+
+A YES contract priced at 0.65 means the market thinks there's a 65% chance the event happens. Prices are denominated in micro USD (1,000,000 = \$1.00), so that 0.65 probability shows up as 650,000 in the raw API response.
+
+The key property: if you're right, your contract is worth \$1.00. If you're wrong, it's worth \$0. So buying a YES contract at 0.65 means you're paying \$0.65 for something that will either be worth \$1.00 (you profit \$0.35) or \$0 (you lose \$0.65).
+
+Here's a worked example of a complete market lifecycle:
+
+| Step | Action | Detail |
+|---|---|---|
+| 1. Market opens | Event created | "Will SOL hit \$200 by April 30?" YES starts at 0.50, NO at 0.50 |
+| 2. You buy YES | `POST /orders` | Buy 100 YES contracts at 0.62 each. Cost: \$62.00 |
+| 3. Market moves | Price discovery | News breaks, YES moves to 0.78, NO drops to 0.22 |
+| 4. You could sell early | `DELETE /positions` | Sell your 100 YES contracts at 0.78, profit \$16.00 before settlement |
+| 5. Event resolves | Market settles | SOL does hit \$200. Result: `yes` |
+| 6. Your position settles | Payout available | 100 contracts x \$1.00 = \$100.00 payout. Net profit: \$38.00 |
+| 7. You claim | Claim payout | \$100.00 transferred to your wallet |
+
+The orderbook is real. `POST https://api.jup.ag/prediction/orders` places an order into the book with a price and quantity. Your order sits there until someone takes the other side or you cancel it. This isn't an AMM, there's no bonding curve. Price discovery happens through actual bid/ask mechanics.
+
+---
+
+## Market states and what triggers them
+
+Every market moves through a defined sequence of states. Understanding these states is what finally made the settlement model click for me.
+
+| State | What's happening | Can you trade? |
+|---|---|---|
+| `open` | Market is live, orderbook is active | Yes, full trading |
+| `halted` | Event outcome is imminent or under review | No, orders frozen |
+| `resolved` | Outcome determined, result is `yes`, `no`, or `voided` | No, settlement only |
+
+The transition from `open` to `halted` happens when the event's resolution window approaches. For something like "Will X happen by March 31?", the market might halt on March 31 while the outcome is being determined. During this period, no new orders can be placed and existing orders can't be cancelled. Your position is locked.
+
+The transition from `halted` to `resolved` is where it gets interesting. This is the step that would normally involve an oracle. In Jupiter's system, resolution is handled through the platform's own resolution mechanism rather than delegating to an external oracle network. The platform determines the outcome based on the event's defined resolution criteria and publicly available information.
+
+This is a fundamentally different trust model than oracle-based systems. With UMA or Chainlink, you're trusting a decentralized network of reporters or node operators. With Jupiter's prediction markets, you're trusting the platform's resolution process. Whether that tradeoff works for you depends on what you're building and what trust assumptions your users are comfortable with.
+
+---
+
+## Position states after settlement
+
+Once a market resolves, your positions enter one of three terminal states:
+
+| Position state | Meaning | What happens next |
+|---|---|---|
+| `Claimable` | You were on the winning side | Payout available, claim to receive \$1.00 per contract |
+| `Lost` | You were on the losing side | Contracts worth \$0, no action needed |
+| `Claimed` | You already collected your payout | Terminal state, nothing left to do |
+
+There's a fourth scenario: `voided`. If a market is resolved as voided (the event was cancelled, the resolution criteria were ambiguous, or some other issue), all positions are unwound. You get back what you paid for your contracts, regardless of which side you were on. It's as if the market never existed.
+
+One detail I missed on first read: auto-claim. If you win and don't claim your payout within 24 hours, the system automatically claims it for you and sends the funds to your wallet. This is a nice safety net for users who might not be checking the app constantly, but it also means integrators don't need to build reminder systems or "you have unclaimed winnings" notifications unless they want to surface it within that 24-hour window.
+
+---
+
+## The data model underneath
+
+The API gives you a lot of visibility into what's happening. More than I expected for a beta product.
+
+**Positions.** `GET https://api.jup.ag/prediction/positions` returns your open positions across all markets. Each position shows the market ID, your side (YES or NO), quantity, average entry price, and current market price. This is enough to calculate unrealized P&L in real time.
+
+**Transaction history.** Every action generates a transaction record, and the types tell a clear story:
+
+| Transaction type | When it appears |
+|---|---|
+| `order_created` | You placed an order on the book |
+| `order_filled` | Your order (or part of it) was matched |
+| `position_updated` | A fill changed your position size or average price |
+| `position_lost` | Market resolved against you |
+| `payout_claimed` | You (or auto-claim) collected winnings |
+
+**P&L history.** `GET https://api.jup.ag/prediction/pnl-history` gives you a time series of your profit and loss. This is useful for building portfolio views, but be aware that the response structure uses a `history` key at the top level (not `data`, which tripped me up when I first integrated it).
+
+**Leaderboards.** The social layer is surprisingly deep. `GET https://api.jup.ag/prediction/leaderboard` returns rankings segmented by timeframe:
+
+| Timeframe | What it measures |
+|---|---|
+| `all_time` | Cumulative performance since account creation |
+| `weekly` | Rolling 7-day window |
+| `monthly` | Rolling 30-day window |
+
+Users are ranked by PNL, volume, and win rate. Each user has a profile accessible via the API, so you could build a "top traders" feature or a copy-trading interface if you wanted to get creative.
+
+---
+
+## What makes this different from other prediction markets
+
+I kept coming back to the oracle question because it's the design decision that shapes everything downstream.
+
+Oracle-based prediction markets have a specific failure mode: the oracle can be wrong, slow, or manipulated, and there's no recourse built into the market itself. UMA's optimistic oracle addresses this with a dispute period, but disputes require staking and can take days to resolve. During that time, capital is locked and uncertainty is high.
+
+Jupiter's platform-managed resolution trades decentralization for speed and simplicity. Markets can resolve quickly because the process doesn't require consensus from a distributed reporter network. The tradeoff is that users trust the platform rather than a decentralized oracle. For many market categories, especially fast-moving events like sports outcomes or political announcements, the speed matters more than the trust model.
+
+There's also a practical consideration. Building on top of oracle-based prediction markets as an integrator means you inherit all of the oracle's complexity: dispute periods, bond requirements, resolution delays, and the possibility that a market gets stuck in a disputed state. Jupiter's model gives integrators a simpler state machine to work with. Market goes from `open` to `halted` to `resolved`, positions settle, payouts happen. No dispute windows to account for in your UI.
+
+---
+
+## What this means for integrators
+
+If you're building on top of the Prediction Market API, here's what I'd focus on:
+
+**Market discovery.** Events are searchable by category, and each category has enough depth to build a vertical app around it. A crypto-focused prediction platform, a sports betting interface, a political event tracker. The filtering endpoints give you what you need.
+
+**Position management.** The API surface for positions is clean: open, close, or let them settle. The `positions` endpoint gives you everything for a portfolio view. The transaction history endpoint gives you an audit trail. Build your UI around the position lifecycle states and you won't miss an edge case.
+
+**Settlement UX.** Your users need to understand three things: when a market halts (they can't trade anymore), when it resolves (they know if they won), and when their payout is available. The 24-hour auto-claim is a safety net, not a feature to rely on. Surface the claim action prominently.
+
+**Leaderboard and social.** The profile, P&L, and leaderboard endpoints are production-ready and honestly more complete than I expected. If social features matter to your app, the data is there.
+
+| Integration concern | What the API gives you |
+|---|---|
+| Market browsing | Category filters, search, event metadata |
+| Order placement | Full orderbook with bid/ask, `POST /orders` |
+| Position tracking | Real-time positions, P&L, transaction history |
+| Settlement handling | State transitions, auto-claim, payout endpoints |
+| Social features | Profiles, leaderboards (all-time, weekly, monthly), trade feeds |
+
+---
+
+## Why I wrote this
+
+I went looking for an oracle and found a design decision instead. Jupiter's prediction markets chose a different trust model than most of the protocols I've worked with. Whether that's the right call depends on what you value: decentralized resolution with all its complexity, or platform-managed resolution with all its simplicity.
+
+Neither is universally better. But understanding the choice helps you build on top of it correctly. If you're building a prediction market interface, the settlement model affects every UX decision you make, from how you display market status to how you handle the gap between "market halted" and "market resolved" to whether you even need to explain resolution mechanics to your users.
+
+The API is still in beta, and the team is actively iterating. But the core settlement model, the state machine, and the data endpoints are solid enough to build on today.
+
+[`api.jup.ag/prediction`](/docs/prediction) if you want to look for yourself.

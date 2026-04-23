@@ -1,0 +1,174 @@
+---
+title: "DCA is just a cron job, right? (no)"
+description: "What actually happens when Jupiter executes thousands of automated recurring orders every day."
+llmsDescription: "Deep dive into Jupiter's Recurring/DCA system architecture. Covers the Recurring API at api.jup.ag/recurring/v1, time-based vs price-based order types, the keeper network that triggers executions, minimum order thresholds ($100 total / $50 per order), Metis routing for sub-order execution, 0.1% per-execution fee structure, order lifecycle states, Token-2022 limitations, and why building DIY DCA on top of swap endpoints fails at scale."
+"og:title": "DCA is just a cron job, right? (no)"
+"og:description": "What actually happens when Jupiter executes thousands of automated recurring orders every day."
+"og:type": "article"
+"og:image": "/static/blog/how-jupiter-runs-dca-orders/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![DCA is just a cron job, right?](/static/blog/how-jupiter-runs-dca-orders/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/yy.jpg" alt="YY" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">YY</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 28, 2026</span>
+  </div>
+</div>
+
+A few months ago an integrator messaged me on Discord asking how to add DCA to their app. I told them what I thought was obvious: call the swap endpoint on a timer. Set up a cron job, fire a swap every hour or every day, done. DCA solved.
+
+They came back a week later with a list of 14 edge cases they'd hit. What happens if the swap fails at the scheduled time? What if SOL price spikes and slippage eats the order? What if the user's wallet doesn't have enough SOL for gas on execution number 7 of 30? What if two orders fire at the same time and one invalidates the other's blockhash? What about rate limits on the swap API if you're running DCA for 500 users simultaneously?
+
+I didn't have good answers for most of them. That's when I realized I had no idea how Jupiter's own DCA system actually worked. I'd been pointing people to the Recurring API docs without understanding what was behind them.
+
+---
+
+## First guess
+
+My mental model was embarrassingly simple. I assumed Jupiter's DCA was essentially what I'd told that integrator to build: a server-side cron job that calls the swap endpoint on a schedule. User creates an order, Jupiter stores the parameters, and a scheduler fires swap requests at the right intervals. Fancy cron.
+
+To test this, I tried building a minimal version. A script that takes an amount, splits it into N equal parts, and calls `POST https://api.jup.ag/swap/v2/order` every 60 seconds.
+
+It worked for 3 executions. Then:
+
+- Execution 4 failed because the transaction expired before landing.
+- Execution 5 succeeded but got a worse price because I wasn't adjusting slippage per market conditions.
+- Execution 7 failed because my wallet ran out of SOL for priority fees (I'd budgeted for the swap amount but forgot about gas for 30 separate transactions).
+- I had no way to resume a partially-completed DCA if my script crashed.
+
+The "just call swap on a timer" approach handles the happy path. Everything else, which is most of what matters in production, is unaccounted for. Transaction failures, gas management, partial completion recovery, execution quality across varying market conditions. None of that comes for free.
+
+So what does Jupiter actually do?
+
+---
+
+## It's an on-chain program with a keeper network
+
+The Recurring API at `api.jup.ag/recurring/v1` isn't a wrapper around the swap endpoint. It's a distinct system with its own on-chain program.
+
+When you create a DCA order, the flow looks like this:
+
+1. `POST` to the create order endpoint with your parameters: `inputMint`, `outputMint`, `inAmount` (total), `frequency`, and `numberOfOrders`.
+2. The API returns a transaction. You sign it and submit it.
+3. The transaction creates an on-chain account that holds your input tokens and stores the order parameters. Your funds leave your wallet at this point.
+4. A network of keepers monitors all active orders and triggers execution when the scheduled time arrives.
+5. Each sub-order executes as a swap routed through the Metis routing engine.
+6. Output tokens accumulate in the order account and can be claimed or are returned when the order completes.
+
+The part that surprised me: your tokens are custodied by the on-chain program from the moment you create the order. This isn't a "we'll debit your wallet 30 times" model. It's a "deposit everything upfront and the program disburses it according to schedule" model.
+
+This solves half the problems on my integrator's list immediately. No worrying about the user's wallet having enough SOL for gas on execution 17. No worrying about the wallet being disconnected. No blockhash conflicts between concurrent orders. The funds and the schedule live on-chain, independent of any client.
+
+---
+
+## The keeper network
+
+Orders don't execute themselves. There's no magic scheduler built into Solana.
+
+Instead, a network of keepers continuously monitors all active recurring orders. When a sub-order's scheduled time arrives, a keeper constructs the swap transaction, routes it through Metis for best execution, and submits it to the network. The keeper pays the transaction fees.
+
+This is why there can be a slight delay between the scheduled execution time and the actual execution. A sub-order scheduled for 14:00:00 UTC might execute at 14:00:03 or 14:00:08, depending on keeper availability and network conditions. In practice, the delays I've observed are usually under 10 seconds.
+
+The keeper model also explains why there are minimum order requirements:
+
+| Requirement | Threshold | Why |
+|---|---|---|
+| Total order size | \$100 USD minimum | Prevents dust orders from consuming keeper resources |
+| Per sub-order size | \$50 USD minimum | Each execution has real costs (transaction fees, compute). Sub-\$50 orders would lose a meaningful percentage to overhead |
+
+If you try to create an order where `inAmount / numberOfOrders` works out to less than \$50 per execution, the API will reject it. Same if the total is under \$100. These aren't arbitrary limits. They exist because every sub-order execution costs real compute and gas, and the 0.1% fee on a \$5 order doesn't cover it.
+
+---
+
+## Order lifecycle
+
+This is the part the docs cover, but seeing it laid out with what actually triggers each transition made things click for me.
+
+| State | What it means | Triggered by |
+|---|---|---|
+| `created` | Order exists on-chain, funds deposited | User signs and submits create transaction |
+| `active` | At least one sub-order has executed | First keeper execution |
+| `partially_filled` | Some sub-orders complete, order still running | Each subsequent keeper execution |
+| `completed` | All sub-orders executed successfully | Final keeper execution |
+| `cancelled` | User cancelled before all sub-orders ran | User signs and submits cancel transaction |
+
+Cancellation is interesting. When you cancel a DCA order, the remaining input tokens (the ones not yet used in sub-orders) are returned to your wallet. Any output tokens already accumulated from completed sub-orders are also returned. You get back everything the program is holding.
+
+This means if you created a 10-order DCA buying SOL with USDC, and 6 orders have executed, cancelling gives you back the remaining USDC (for the 4 unexecuted orders) plus the SOL from the 6 that did execute.
+
+---
+
+## Execution quality
+
+Each sub-order is routed through the Metis routing engine. This is the same engine that powers the `/build` endpoint on the Swap API. So each execution gets multi-route aggregation, split routes across liquidity sources, and the same routing intelligence that handles billions in daily volume.
+
+The fee is 0.1% per execution. Applied to each sub-order individually, not the total order amount. So a \$1,000 DCA split into 10 orders of \$100 each pays \$0.10 per execution, or \$1.00 total. Not \$1.00 upfront.
+
+I put together a comparison of what you'd actually deal with building this yourself versus using the Recurring API:
+
+| Concern | DIY (swap on a timer) | Jupiter Recurring API |
+|---|---|---|
+| Gas management | You fund gas for every execution. Miss one and the chain breaks | Keepers handle gas. Your tokens are already deposited |
+| Transaction failures | You retry, manage blockhash expiry, handle RPC errors | Keepers retry automatically |
+| Execution routing | Whatever you hardcode or whatever the swap API returns | Metis routing engine, same as the Swap API |
+| Partial completion | You track state in your database and pray it stays in sync | On-chain program tracks state natively |
+| Cancellation | You stop your cron and hope no race condition fires one more | On-chain cancellation returns remaining funds atomically |
+| Multi-user scaling | You run N cron jobs, manage N wallets' gas, handle N failure modes | Each order is independent on-chain. Scales without your infra |
+| Slippage per execution | Static, or you build dynamic adjustment | Managed per execution based on market conditions |
+| Cost | RPC costs, server costs, swap fees, your engineering time | 0.1% per execution |
+| Token-2022 support | If you build it | Not supported (SPL tokens only) |
+
+That last row caught me off guard. The Recurring API supports standard SPL tokens but not Token-2022 tokens. If the token you're DCA-ing into uses Token-2022 extensions (transfer fees, interest-bearing, etc.), you can't use the Recurring API for it today. Worth knowing before you build an integration around a Token-2022 asset.
+
+---
+
+## Two order types (but really one)
+
+The API technically supports two order types: time-based recurring and price-based recurring.
+
+Time-based is the one you want. You set a frequency (every minute, every hour, every day, every week, every month) and a number of orders. The system executes each sub-order at the scheduled interval regardless of price. This is classic DCA: consistent buying over time to average out volatility.
+
+Price-based recurring is deprecated. It let you set price conditions that had to be met before execution, but the complexity of on-chain price monitoring and the edge cases around stale prices made it unreliable. The API still accepts the parameters for backwards compatibility, but new integrations should use time-based orders exclusively.
+
+---
+
+## What the query endpoints tell you
+
+Two `GET` endpoints give you visibility into orders:
+
+`GET https://api.jup.ag/recurring/v1/orders` returns active orders for a wallet. Each order includes the original parameters, how many sub-orders have executed, the accumulated output amount, and the next scheduled execution time.
+
+`GET https://api.jup.ag/recurring/v1/order-history` returns completed and cancelled orders. This is where you see the full execution history: every sub-order with its timestamp, input amount, output amount, and the price at execution.
+
+The history endpoint is underused. If you're building a DCA dashboard, the per-execution breakdown lets you show users exactly what price they got on each buy, how much their average cost changed over time, and what the total DCA saved (or cost) versus a single lump-sum buy at the start.
+
+---
+
+## What this means for integrators
+
+If you're adding DCA to your app, don't build it yourself. I say this as someone who tried. The Recurring API handles the hard parts: fund custody, scheduled execution, keeper infrastructure, routing, gas management, partial completion, and cancellation.
+
+Your integration is:
+1. Call the create endpoint with the user's parameters.
+2. Have the user sign the transaction.
+3. Show order status via the query endpoints.
+4. Offer a cancel button that calls the cancel endpoint.
+
+That's the entire integration surface. Four interactions. The rest, the keeper network monitoring thousands of orders, the Metis engine routing each execution, the on-chain program managing fund custody, runs without your involvement.
+
+The constraints to design around: \$100 minimum total, \$50 minimum per execution, SPL tokens only (no Token-2022), and expect sub-second to sub-10-second delays on execution timing. If your users need to DCA into Token-2022 assets or need exact-second execution precision, you're building custom. For everything else, the infrastructure is already running.
+
+---
+
+## Why I wrote this
+
+I spent six months telling integrators to "just use the Recurring API" without understanding what made it different from a cron job calling the swap endpoint. Now I know. There's an on-chain program holding funds, a keeper network triggering executions, a routing engine optimizing each swap, and a set of minimum thresholds that keep the system economically viable.
+
+The integrator who came back with 14 edge cases was right. DCA is not simple. Jupiter just made it look that way by solving those edge cases in infrastructure rather than documentation.
+
+[`api.jup.ag/recurring/v1`](/docs/recurring) if you want to look for yourself.

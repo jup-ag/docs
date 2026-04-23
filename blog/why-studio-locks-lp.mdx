@@ -1,0 +1,190 @@
+---
+title: "Why can't I pull my liquidity? The design behind Jupiter Studio"
+description: "The first question every token creator asks reveals the core design decision that makes Studio work."
+llmsDescription: "Deep dive into Jupiter Studio's LP locking mechanism and token creation system. Covers the Studio API at api.jup.ag/studio/v1, Dynamic Bonding Curve (DBC) pools, the three presets (Meme at 16K market cap, Indie at 32K, Custom configurable), why LP tokens are locked to prevent rug pulls, the token creation flow via API (create-tx, presigned URL uploads, transaction submission), LP fee claiming as ongoing creator revenue, token vesting schedules, and how locking makes the bonding curve migration to AMM pools trustworthy."
+"og:title": "Why can't I pull my liquidity? The design behind Jupiter Studio"
+"og:description": "The first question every token creator asks reveals the core design decision that makes Studio work."
+"og:type": "article"
+"og:image": "/static/blog/why-studio-locks-lp/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![Why can't I pull my liquidity?](/static/blog/why-studio-locks-lp/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/anmol.png" alt="Anmol" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">Anmol</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 28, 2026</span>
+  </div>
+</div>
+
+The first question every token creator asks when they use Jupiter Studio is "why can't I pull my liquidity?" I've seen it in Discord at least thirty times. Usually phrased more urgently: "I created my token, the pool is live, buyers are coming in, but I can't withdraw the LP tokens. Is this a bug?"
+
+It's not a bug. It's the entire point.
+
+I used to answer this with a one-liner: "LP is locked to prevent rug pulls." Which is true. But it's also the kind of non-answer that leaves the creator feeling like they've been restricted without understanding why. Last week I decided to actually trace through the system to understand not just that LP is locked, but why locking is the load-bearing design decision that makes everything else in Studio work.
+
+---
+
+## First guess
+
+My initial assumption was that LP locking is a trust signal. A marketing feature, essentially. "Look, the LP is locked, this token is safe." Lots of token launchpads advertise locked liquidity as a badge of honor, and I figured Studio was doing the same thing. Lock the LP, show a padlock icon, give buyers confidence.
+
+If that were the whole story, locking would be optional. Serious creators would opt in for credibility, less serious ones would skip it. The fact that Studio forces it, with no opt-out, suggested something deeper.
+
+I started by looking at what happens when LP isn't locked. Not theoretically. Actually looking.
+
+In 2024 and early 2025, before platforms started enforcing LP locks, the most common attack on new token launches was the rug pull. The pattern was textbook:
+
+1. Creator launches token with initial liquidity.
+2. Buyers enter, price rises along the bonding curve.
+3. Creator withdraws all liquidity from the pool.
+4. Token price goes to zero instantly. Buyers can't sell because there's no liquidity to sell into.
+5. Creator walks away with the deposited funds.
+
+This wasn't edge-case behavior. It was the dominant failure mode for new token launches on Solana. Thousands of tokens followed this exact script. The problem wasn't that people didn't know rug pulls existed. Everyone knew. The problem was that there was no way to verify whether a specific token's liquidity was safe until it wasn't.
+
+LP locking doesn't just signal trust. It makes the rug pull mechanically impossible. The creator physically cannot withdraw liquidity because the LP tokens are held by the program, not by the creator's wallet. That's not a marketing decision. That's an architectural one.
+
+---
+
+## How the bonding curve works
+
+To understand why LP locking matters structurally, you need to understand what happens to a token between creation and "graduation" to a standard AMM pool.
+
+Studio uses Dynamic Bonding Curve (DBC) pools. When a token launches, it doesn't start with a traditional liquidity pool. Instead, it starts on a bonding curve: a mathematical function where the price increases as more tokens are purchased. Early buyers get lower prices. Later buyers pay more. The curve defines the relationship between supply sold and current price.
+
+Each token launches with a preset that determines when the bonding curve "completes" and liquidity migrates to a standard AMM pool:
+
+| Preset | Market cap target | What it's for |
+|---|---|---|
+| Meme | \$16,000 | Quick launches, memecoins, experimental tokens |
+| Indie | \$32,000 | Projects with moderate early traction goals |
+| Custom | Configurable | Teams with specific market cap or liquidity targets |
+
+Here's the lifecycle:
+
+1. **Launch on bonding curve.** Token is created, initial supply is available for purchase along the DBC. Price starts low and increases with each buy.
+2. **Curve fills.** As buyers come in, the bonding curve absorbs their funds and issues tokens. The price climbs according to the curve function.
+3. **Target hit.** When the total market cap reaches the preset target (\$16K for Meme, \$32K for Indie), the bonding curve phase ends.
+4. **Migration to AMM.** The accumulated liquidity from the bonding curve phase migrates to a standard AMM pool. This is where the LP tokens are created.
+5. **LP tokens locked.** The LP tokens from the AMM pool are locked by the program. The creator cannot withdraw them.
+6. **Normal trading.** Token now trades on a standard AMM pool with the liquidity that accumulated during the bonding curve phase.
+
+The LP lock happens at step 5. By this point, the pool contains real liquidity from real buyers who purchased during the bonding curve phase. If the creator could withdraw those LP tokens, they could drain the pool of all that liquidity. Every buyer who entered during the curve phase would be stuck holding tokens they can't sell.
+
+This is why the lock isn't optional. The entire bonding curve model relies on the promise that the liquidity accumulated during the curve phase will remain in the pool after migration. Remove that promise and the bonding curve becomes a rug pull with extra steps.
+
+---
+
+## The creator's revenue model
+
+"OK, so I can't pull liquidity. How do I make money from my token?"
+
+This is the follow-up question I always get, and it's a fair one. If you create a token and attract buyers and the pool grows, you should benefit from that success. LP locking doesn't mean the creator gets nothing. It means the creator gets revenue through fees rather than through liquidity withdrawal.
+
+Studio provides a fee claiming mechanism. As trades happen in the DBC pool, fees accumulate. The creator can claim these fees via the `claim-fee` endpoint. This is ongoing, passive revenue proportional to trading activity.
+
+The math works differently than pulling LP, but for a successful token it can be more valuable:
+
+| Revenue model | How it works | Risk to buyers |
+|---|---|---|
+| Pull LP (traditional) | One-time withdrawal of all pooled funds | Catastrophic: pool drained, price collapses |
+| Claim fees (Studio) | Ongoing fee income as long as trading continues | None: liquidity stays in pool, trading continues normally |
+
+A creator who pulls LP makes money once and destroys the token. A creator who claims fees makes money continuously as long as people trade. For tokens that sustain trading activity, the cumulative fee income can exceed what a one-time LP withdrawal would have yielded, and the token is still alive.
+
+There's also token vesting. Studio lets creators set up vesting schedules for team token allocations. Instead of dumping a large allocation on the market immediately (another common rug pattern), vested tokens release over a defined schedule. This gives the creator skin in the game: their tokens become more valuable if the project succeeds over time, not just in the first 24 hours.
+
+---
+
+## Creating a token via the API
+
+The Studio API at `api.jup.ag/studio/v1` exposes the token creation flow programmatically. Here's the actual sequence:
+
+**Step 1: Create the pool transaction.**
+
+`POST https://api.jup.ag/studio/v1/dbc-pool/create-tx`
+
+You send the token metadata: name, symbol, decimals, description, and the preset you want (Meme, Indie, or Custom). The API returns a transaction to sign plus presigned URLs for uploading the token image and metadata JSON.
+
+**Step 2: Upload assets.**
+
+Use the presigned URLs to upload the token image (displayed on Jupiter's UI and aggregator frontends) and the metadata JSON (stored off-chain, referenced by the token's on-chain metadata account). Both uploads must complete before you submit the transaction.
+
+**Step 3: Sign and submit.**
+
+Sign the creation transaction with the creator's wallet and submit it to the network. On confirmation, the token exists on-chain, the DBC pool is initialized, and the bonding curve is live.
+
+**Step 4: Monitor and claim.**
+
+Once the token is trading, use the claim-fee endpoint to collect accumulated trading fees. Use the order and position endpoints to monitor the pool's state.
+
+The whole flow from API call to live, tradeable token takes about 30 seconds assuming normal network conditions. There's no approval process or review queue. Rate limits apply to the Studio API, so high-frequency token creation will get throttled, but for standard usage the limits are generous.
+
+---
+
+## What the dedicated token page shows
+
+Every token created through Studio gets its own page on Jupiter. This is something I didn't appreciate until a creator pointed it out to me. The page shows:
+
+- Token metadata (name, symbol, description, image)
+- Creator wallet address
+- LP lock status (always locked for Studio tokens)
+- Current bonding curve progress (if still in curve phase)
+- Pool liquidity and trading volume
+- Creator's fee earnings
+
+The LP lock status is visible to anyone looking at the token. This is where the trust signal actually matters, not as marketing copy on the launchpad, but as a verifiable on-chain state that any buyer can check. The token page doesn't say "LP is locked." It shows the on-chain proof that LP is locked. The creator can't fake it, remove it, or work around it.
+
+For integrators building token analytics or portfolio trackers, the creator details and LP lock status are queryable through the API. You could build a filter that only shows tokens with locked LP, though for Studio tokens that's all of them by definition.
+
+---
+
+## The preset comparison in practice
+
+I spent some time looking at how the three presets play out in practice, and the differences are more significant than the market cap numbers suggest.
+
+| Aspect | Meme (\$16K) | Indie (\$32K) | Custom |
+|---|---|---|---|
+| Market cap target | \$16,000 | \$32,000 | Creator-defined |
+| Time to graduate (typical) | Hours to days | Days to weeks | Varies |
+| Curve steepness | Steeper: price rises faster per buy | Gentler: more room for accumulation | Configurable |
+| Risk profile | Higher volatility, faster cycles | More stable early trading | Depends on config |
+| Best for | Memecoins, social experiments, viral tokens | Community tokens, small project launches | Teams with specific tokenomics goals |
+
+The Meme preset at \$16K means the bonding curve completes quickly. A few hundred dollars in buys can push the token to graduation. This is by design: memecoins move on social momentum, and a long bonding curve phase kills that momentum. The tradeoff is that the AMM pool after migration has less liquidity depth, so post-graduation trading can be volatile.
+
+The Indie preset at \$32K gives the curve more room to breathe. It takes more capital to graduate, which means the AMM pool starts with more liquidity. The curve phase lasts longer, but the token enters normal trading on more solid footing.
+
+Custom is for teams that know exactly what they want. You can set your own market cap target, adjust the curve parameters, and configure vesting schedules. This is the preset that projects with existing communities or pre-launch fundraising tend to use.
+
+---
+
+## What this means for integrators
+
+If you're building on top of Studio, the LP lock mechanism is something you benefit from without needing to implement. Every token created through Studio has locked LP, which means your users are protected from the most common attack vector in token launches. You can surface this in your UI as a trust indicator.
+
+For building a token launchpad or creation interface on top of the API:
+
+1. Let users pick a preset (Meme, Indie, Custom) and explain the tradeoffs in your UI. The market cap target and curve behavior are the key differentiators.
+2. Handle the image and metadata upload flow. The presigned URLs have expiry times, so don't delay between getting the creation transaction and completing the uploads.
+3. Show bonding curve progress. During the curve phase, users want to know how close the token is to graduating. The pool state endpoints give you this data.
+4. Surface fee claiming for creators. This is their revenue mechanism. Make it easy and visible.
+5. Rate limits apply to the Studio API. If you're building a platform where multiple users create tokens, account for this in your architecture.
+
+The API handles the hard parts: bonding curve math, LP locking, migration to AMM, fee accrual. Your integration is about the user experience around those primitives.
+
+---
+
+## Why I wrote this
+
+"Why can't I pull my liquidity?" is a frustrated question. It comes from creators who feel restricted. But the restriction is the feature. Every token on Studio carries an on-chain guarantee that the liquidity pool will not be drained by the creator. That guarantee is what makes it possible for buyers to enter bonding curves with any confidence at all.
+
+The old model was simple: create a token, add liquidity, and later choose whether to rug or not. Studio replaced that choice with a constraint. LP is locked. Fees are claimable. Vesting is available. The creator profits when the token succeeds over time, not when they decide to exit with everyone else's money.
+
+It's a small architectural decision with enormous downstream effects. The next time someone asks why they can't pull their LP, the answer isn't "to prevent rug pulls." The answer is "because everything else in the system depends on it."
+
+[`api.jup.ag/studio/v1`](/docs/studio) if you want to look for yourself.

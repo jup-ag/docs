@@ -1,0 +1,174 @@
+---
+title: "How does Jupiter decide if a token is safe?"
+description: "With 50,000+ tokens created on Solana daily, who decides which ones show up? The answer has changed three times."
+llmsDescription: "Deep dive into Jupiter's token verification system: the evolution from manual GitHub PR review to community lists to data-assisted verification powered by organic score. Covers the three verification levels (verified, unverified, banned), how organic score feeds into verification decisions, the token tags system, the connection between token verification and Price API inclusion, the /tokens/v2/recent endpoint behavior, and the Content API (BETA) powered by Jupiter VRFD."
+"og:title": "From 4,800 GitHub PRs to Automated Verification"
+"og:description": "With 50,000+ tokens created on Solana daily, who decides which ones show up? The answer has changed three times."
+"og:type": "article"
+"og:image": "/static/blog/how-jupiter-decides-if-a-token-is-safe/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![How does Jupiter decide if a token is safe?](/static/blog/how-jupiter-decides-if-a-token-is-safe/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/yy.jpg" alt="YY" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">YY</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 28, 2026</span>
+  </div>
+</div>
+
+With over 50,000 tokens created on Solana every day, I used to wonder: who decides which ones show up when you search on Jupiter? Someone has to be making a call. Verified or not. Safe or not. Show to users or don't.
+
+I've been on the DevRel team long enough to know the answer involves organic score and verification levels. I reference these fields in partner calls constantly. "Filter by `verification: verified` for your token list." "Check `organicScore` to surface quality tokens." Standard stuff.
+
+But last week a project asked me a question I couldn't answer properly: "How did we go from a GitHub repo where people submitted pull requests to what we have now? And how does all of it fit together?" I gave them the two-sentence version and it felt hollow. I realized that while I know the current system, I'd never traced the full journey from the beginning. The evolution itself explains a lot about why the system works the way it does.
+
+---
+
+## First guess
+
+My assumption was straightforward. Jupiter has a team that reviews tokens. They check social media, look at the contract, verify the project is real, and flip a switch. Verified or not. Like an app store review process.
+
+The reason I assumed this is because that's basically how it started. The original Solana Token Registry (deprecated in 2022) was literally a GitHub repo. You wanted your token to show up in wallets and aggregators? You opened a pull request. Someone reviewed it. Merged or closed.
+
+After the Token Registry was deprecated, Jupiter launched its own token list. Same model. Community members submitted PRs. The team reviewed them. Over 4,800 pull requests were reviewed by hand. I want to emphasize that number: 4,800 PRs. Each one representing a team or project saying "please look at our token and decide if it's legitimate."
+
+That worked when Solana had a few thousand tokens. It does not work when Solana has millions of tokens and tens of thousands are created daily.
+
+---
+
+## The three eras
+
+The verification system has evolved through three distinct phases. Each one was a response to scale breaking the previous approach.
+
+| Era | Period | Method | Scale |
+|-----|--------|--------|-------|
+| Token Registry | Pre-2022 | GitHub PRs to Solana Labs repo | Hundreds of tokens |
+| Jupiter Token List V1/V2 | 2022-2024 | GitHub PRs to Jupiter repo, then Catdet community lists | Thousands of tokens |
+| Data-Assisted (Current) | 2024-present | Organic score, trading metrics, social signals, VRFD | Millions of tokens |
+
+The transition from era 2 to era 3 is the interesting one. Community-maintained lists were better than a single team reviewing PRs, but they still relied on humans doing research. Even with the Catdet community (Jupiter's community reviewers), the volume of new tokens outpaced human review capacity by orders of magnitude.
+
+The question became: what can you measure automatically that correlates with "this is a real, active project" versus "this was created 10 minutes ago to rug"?
+
+That's where organic score entered the picture.
+
+---
+
+## Verification levels today
+
+The current system classifies every token into one of three levels:
+
+| Level | Meaning | API field value | What integrators should do |
+|-------|---------|----------------|---------------------------|
+| **Verified** | Passed Jupiter's verification. Real project, real activity. | `"verified"` | Display prominently. Safe for default token lists. |
+| **Unverified** | Not yet reviewed or doesn't meet criteria. Could be new, could be inactive. | `"unverified"` | Display with caution indicators. Don't hide entirely. |
+| **Banned** | Flagged as malicious, scam, or misleading. | `"banned"` | Do not display, or show with strong warnings. |
+
+The first thing I want to point out is that "unverified" is not "bad." It's "no opinion yet." A token minted five minutes ago with real volume and legitimate developers will show as unverified until the system has enough data to make a call. A dead token from 2023 with no activity will also show as unverified. The label says "we haven't verified this," not "we verified it and found it suspicious."
+
+For suspicious tokens, there's a separate signal: `audit.isSus`. This is a boolean flag in the Tokens V2 API response that flags tokens where something looks off. A token can be unverified but not suspicious, or unverified and suspicious. The two fields serve different purposes.
+
+---
+
+## Organic score as the verification engine
+
+In [Anmol's blog about organic score](/blog/what-is-organic-score), he dug into how the score is calculated: wallet classification, organic volume decomposition, comparative scoring. All of that feeds into the number you see in the API response.
+
+What I want to focus on is how that number connects to verification decisions.
+
+When tens of thousands of tokens are created daily, the verification system needs inputs it can compute automatically. Organic score is the primary one. It answers the question "is there real human activity around this token?" using data that's hard to fake at scale.
+
+Here's what I mean by "hard to fake." Organic score doesn't just count volume. It classifies every wallet that trades as organic or non-organic, based on whether the trade went through known automated pipelines (sniping tools, copy-trading bots, automated execution platforms). Volume from non-organic wallets doesn't count toward the score.
+
+A project can create 500 bot wallets and generate \$10 million in wash trading volume. The total volume numbers will look impressive. But if those wallets are flagged as non-organic, none of that volume moves the organic score. The score only reflects activity from wallets the system can confirm are not automated.
+
+This is why organic score became a core input to verification. It's not the only input, there are social signals, liquidity metrics, holder distribution, and other factors. But it's the one that's hardest to game because gaming it requires real humans making real trades from wallets that don't pattern-match to known bot infrastructure.
+
+| Organic Score Range | Typical verification outcome |
+|--------------------|-----------------------------|
+| 80-100 | Strong candidate for verified status |
+| 50-79 | May be verified based on additional signals |
+| 20-49 | Unlikely to be verified without strong social/community presence |
+| 0-19 | Almost certainly remains unverified |
+
+These ranges are approximate. Verification isn't a simple threshold on organic score. But the correlation is strong enough that a score above 80 with decent holder count is a reliable indicator.
+
+---
+
+## Where verification shows up when you're not looking
+
+This is the part that surprised me. Verification level doesn't just control whether a token gets a green checkmark in the Jupiter UI. It flows through multiple systems.
+
+**Price API filtering.** Tokens with poor organic metrics can be excluded from the Price API response entirely. In [Anmol's blog about Price API V3](/blog/how-jupiter-prices-a-token), he described the heuristic filters that decide whether a price is trustworthy enough to serve. Verification status and organic score are inputs to those filters. A "missing" token in the Price API isn't always "we don't have data." Sometimes it's "the token doesn't pass our trust threshold."
+
+**Search ranking.** When you call `GET https://api.jup.ag/tokens/v2/search?query=SOL`, the results aren't returned in random order. Verified tokens rank higher. Tokens with higher organic scores rank higher. If you search for a generic term that matches dozens of tokens, the verified, high-organic-score tokens appear first.
+
+**Default token lists.** The Jupiter frontend uses verification to build its default "strict" list. Only verified tokens appear by default. Users can toggle to see all tokens, but the default experience filters by verification.
+
+**Content and discovery.** Jupiter VRFD (Verified) now powers a Content API (still in beta) that provides curated content, community summaries, and context for tokens. Verified tokens are eligible for richer content. The verification layer determines not just whether you see a token, but how much context you get when you do.
+
+---
+
+## Token tags: the other discovery layer
+
+Separate from verification, there's a tags system that categorizes tokens by type: `lst` (liquid staking tokens), `verified`, `community`, and others. Tags are queryable via `GET https://api.jup.ag/tokens/v2/search` and the `GET /tag` endpoint.
+
+Tags solve a different problem than verification. Verification says "is this token legitimate?" Tags say "what kind of token is this?" An LST is categorically different from a memecoin, and integrators want to filter by category, not just by trust level.
+
+The tags system is community-driven but structured. Projects host a CSV endpoint with their token mint addresses, provide a tag name, and set a polling interval. Jupiter ingests the list and applies the tags. This means the ecosystem can define its own categories without Jupiter being the bottleneck.
+
+For integrators building token selectors or search interfaces, the combination of verification level + organic score + tags gives you three axes to filter on. Most teams filter by `verification: verified` for the default view, use organic score for ranking within that set, and use tags for category-specific features (like a "show me all LSTs" filter).
+
+---
+
+## The "recent" endpoint and what it actually means
+
+One endpoint that trips people up: `GET https://api.jup.ag/tokens/v2/recent`. It returns recently created tokens, but "recent" doesn't mean "recently minted." It means "recently got their first liquidity pool."
+
+A token can be minted weeks before anyone creates a pool for it. The mint timestamp and the first-tradeable timestamp can be very different. Jupiter tracks the pool creation time because that's when the token becomes relevant to traders and integrators. A token that exists but can't be traded isn't useful to surface.
+
+This means if you're building a "new tokens" feed, the `/recent` endpoint gives you what you actually want: tokens that just became tradeable. Not tokens that just got minted but might sit dormant for weeks.
+
+Fresh tokens from this endpoint will have volatile organic scores. There isn't enough history for the score to stabilize. I'd recommend treating organic scores on tokens less than 24 hours old as directional rather than definitive. Wait for the 24-hour window before making verification decisions based on the score.
+
+---
+
+## The timeline, condensed
+
+| Year | Event | Impact |
+|------|-------|--------|
+| Pre-2022 | Solana Token Registry (GitHub PRs) | First verification layer. Hundreds of tokens. Manual review. |
+| 2022 | Token Registry deprecated | Ecosystem lost its central token list |
+| 2022-2023 | Jupiter Token List V1 (GitHub PRs) | Jupiter became the de facto token list. 4,800+ PRs reviewed by hand. |
+| 2023-2024 | Jupiter Token List V2 (Catdet community lists) | Community-maintained. Better scale but still human-dependent. |
+| 2025 Jan | Organic Score announced at Catstanbul | Data-assisted verification begins. Automated pipeline. |
+| 2025-2026 | VRFD and Content API | Verification expands beyond yes/no into rich token context |
+| Present | 50,000+ tokens/day, data-assisted system | Organic score, trading metrics, social signals drive verification |
+
+Each transition happened because the previous approach couldn't keep up with the number of tokens being created. The current system is designed for the scale Solana actually operates at: not hundreds or thousands of tokens, but millions.
+
+---
+
+## What this means for integrators
+
+**Use verification as your first filter, not your only filter.** `verification: verified` gives you a clean default list. But for discovery features (trending, new, category browsing), you'll want to show unverified tokens too, with appropriate UI indicators. Some of the most actively traded tokens on Solana are unverified simply because they're too new for the system to have enough data.
+
+**Surface organic score, don't just filter by it.** The raw score (`organicScore`, a float 0-100) is more useful than the label (`organicScoreLabel`: high, medium, low). Two tokens can both be "medium" with very different scores. If you're building ranking or sorting, use the number.
+
+**Check `audit.isSus` separately.** It's not redundant with verification. A token can be unverified (no opinion) without being suspicious. A suspicious flag means something specifically looks wrong. Treat these differently in your UI.
+
+**The `/tokens/v2/toporganicscore/5m` feed is underused.** It returns tokens ranked by organic score in the last 5 minutes, filtering out the evergreen tokens (SOL, USDC, JUP) that would always dominate. It's a "what has real activity right now" signal. If you're building a discovery or trending feature, this is a better starting point than sorting by total volume.
+
+---
+
+## Why I wrote this
+
+The question that started this was "how did we get from GitHub PRs to what we have now?" The answer is that each system was a response to the previous one failing at scale. Manual review worked for hundreds of tokens. Community lists worked for thousands. Data-assisted verification is what works for millions.
+
+The interesting thing is that the data-assisted system didn't replace human judgment. It replaced human judgment at the initial screening layer. Organic score automates the question "is there real activity here?" but the signals that make up the score, wallet classification, volume decomposition, holder distribution, are all encoding the same intuitions a human reviewer would apply. They're just doing it at 50,000 tokens per day instead of 10.
+
+If you're building something that shows Solana tokens to users, understanding this pipeline matters. The `verification` field isn't a magic label. It's the output of a system that evolved over four years to answer one question at scale: is this token real?

@@ -1,0 +1,160 @@
+---
+title: "How does Jupiter Lend let you borrow at 95% LTV?"
+description: "When I first saw 95% LTV, I thought it was a typo. Here's the infrastructure that makes it possible."
+llmsDescription: "Deep dive into how Jupiter Lend (Fluid Protocol) achieves up to 95% loan-to-value ratios safely. Covers the three-program architecture (Liquidity Layer, Lending/Earn with jlTokens, Vaults/Borrow with position NFTs), the hop-based oracle system supporting Pyth, Chainlink, Redstone, SwitchboardV2, and other sources, liquidation mechanics, and advanced atomic operations (multiply, unwind, vault swap) using flashloans and CPI to Jupiter Swap."
+"og:title": "95% LTV On-Chain: Not a Typo"
+"og:description": "When I first saw 95% LTV, I thought it was a typo. Here's the infrastructure that makes it possible."
+"og:type": "article"
+"og:image": "/static/blog/how-jupiter-lend-95-ltv/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![How does Jupiter Lend let you borrow at 95% LTV?](/static/blog/how-jupiter-lend-95-ltv/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/yy.jpg" alt="YY" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">YY</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 28, 2026</span>
+  </div>
+</div>
+
+When I first saw 95% LTV on Jupiter Lend, I thought it was a typo. In DeFi, 80% is already aggressive. Most protocols sit around 75% for majors and drop to 50-60% for anything volatile. The logic is simple: higher LTV means less margin for error, and less margin for error means more liquidations, more bad debt, more pain for everyone.
+
+So when I saw a vault offering 95%, I expected there to be a catch. A restricted token pair, maybe. Or an asterisk leading to a wall of conditions. I went looking for the asterisk and found something more interesting instead.
+
+---
+
+## First guess
+
+My assumption was the simplest one: they just set the number higher and accept more risk. Maybe Jupiter's lending team decided that for certain stable pairs (USDC/USDT, for instance), the correlation is tight enough that you can push LTV up without worrying too much. Just crank the parameter and hope the peg holds.
+
+To test this I looked at LTV ratios across a few protocols on Solana and Ethereum:
+
+| Protocol | SOL/USDC LTV | Stablecoin LTV | Max LTV |
+|----------|-------------|----------------|---------|
+| Aave V3 (Ethereum) | 80% | 77% | 80% |
+| Compound V3 (Ethereum) | 83% | 83% | 83% |
+| MarginFi (Solana) | 65% | 80% | 80% |
+| Kamino (Solana) | 75% | 92% | 92% |
+| Jupiter Lend | 80% | 95% | 95% |
+
+Jupiter Lend is at the top. And it's not just stablecoin pairs. SOL-backed vaults go up to 80%, which is competitive with Aave. The stablecoin vaults push to 95%.
+
+If this were just "set the number higher," protocols would have done it already. There's a reason most of them don't. The gap between 80% and 95% LTV isn't 15 percentage points of additional risk. It's exponentially more sensitive to price movements. At 95% LTV, a 5.3% price drop puts you underwater. At 80%, you have a 20% buffer.
+
+Something else has to be doing the work.
+
+---
+
+## Three programs, one protocol
+
+To understand how Jupiter Lend manages the risk, you need to understand how the protocol is built. It's not one program. It's three, and they interact through CPI (Cross Program Invocation).
+
+| Program | What it does | Program ID |
+|---------|-------------|------------|
+| Liquidity | Core layer: holds all tokens, tracks reserves, manages interest rates | `jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC` |
+| Lending (Earn) | Deposit side: accepts assets, mints jlTokens, supplies into Liquidity | `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9` |
+| Vaults (Borrow) | Borrow side: collateral, debt, position NFTs, liquidations | `jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi` |
+
+Lending and Vaults never touch tokens directly. They CPI into Liquidity for every operation. All interactions go through `operate` instructions with operation-specific payloads. This means the Liquidity layer is the single source of truth for every deposit, borrow, and withdrawal in the protocol.
+
+On the Earn side, when you deposit an asset, you get back jlTokens. These are yield-bearing receipt tokens, similar to Compound's cTokens. The exchange rate between jlTokens and the underlying asset increases over time as interest accrues. You're not earning rewards in a separate step. The value of your jlTokens just goes up.
+
+On the Borrow side, every position is represented by an NFT mint. That's not a metaphor. Each borrow position is literally a unique NFT. The vault tracks your collateral, your debt, and your health factor through that NFT. Deposit collateral, borrow against it, and the position NFT holds the state.
+
+This separation matters because it means the Earn and Borrow sides can be upgraded, extended, and audited independently while sharing the same liquidity pool underneath.
+
+---
+
+## The oracle infrastructure
+
+Here's where it starts to click. High LTV is only as safe as your price data. If the oracle reports a price that's stale by 30 seconds during a volatile move, a position that should have been liquidated at 96% LTV is now at 102% and creating bad debt.
+
+Jupiter Lend doesn't rely on a single oracle provider. The Oracle Program (`jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc`) supports multiple source types:
+
+| Source | Description |
+|--------|------------|
+| Pyth | Push oracle feeds with confidence intervals |
+| Chainlink | Solana-native price feeds |
+| Redstone | Additional price data |
+| StakePool | SPL Stake Pool rates (Jito, Marinade) |
+| MsolPool | Marinade mSOL/SOL pool state |
+| SinglePool | SPL Single Pool (Helius, Jupiter, Nansen, Emerald, Shift, Kiln) |
+| JupLend | fToken exchange rates within the protocol |
+
+But the real design insight is the hop-based pricing system. The oracle doesn't need a direct USD price for every asset. It chains exchange rates through intermediate assets, up to four hops deep.
+
+Say you want the price of jupSOL in USD. There's no direct jupSOL/USD oracle feed. Instead, the system does:
+
+1. jupSOL/SOL (from SinglePool, on-chain stake pool rate)
+2. SOL/USD (from Pyth oracle)
+
+Multiply the ratios and you get jupSOL/USD. Each hop can invert the rate if needed, so the sequence is flexible.
+
+This extends to any asset in the protocol. An LST that only has on-chain pricing against SOL? One hop to SOL, one hop from SOL to USD. A protocol token with a JupLend exchange rate? Chain through fToken rate, then to the underlying, then to USD.
+
+The oracle type is per-reserve, not per-market. Each reserve gets the oracle configuration that makes sense for its asset type. Stablecoins might use Chainlink. LSTs use the on-chain pool state. Volatile tokens use Pyth with confidence interval validation.
+
+And there's a freshness guarantee. User operations (deposits, borrows, withdrawals) require price data no older than 600 seconds. Liquidations get a wider window of 7,200 seconds (2 hours) because you want liquidators to be able to act even if an oracle is temporarily slow. Pyth feeds also have confidence interval checks: if the confidence exceeds 2% of the price for user operations (or 4% for liquidations), the feed is rejected.
+
+---
+
+## Liquidation makes high LTV safe
+
+This is the part that actually answers the question. High LTV is not possible because of any single feature. It's possible because the liquidation mechanism is fast, reliable, and profitable enough that liquidators show up when they need to.
+
+When a position's health factor drops below the liquidation threshold, anyone can liquidate it. The liquidator pays the borrow token and receives the collateral at a discount. That discount is the incentive. The more reliable the oracle and the faster positions can be liquidated, the smaller the buffer you need between LTV and the liquidation threshold.
+
+At 95% LTV, the gap between "healthy" and "underwater" is small. But the protocol doesn't need the gap to be large if:
+
+1. Oracle prices update frequently (Pyth pushes on every slot, ~400ms)
+2. Confidence intervals reject bad data before it reaches the protocol
+3. Liquidators have reliable price data to act on
+4. Liquidation transactions can include everything needed in a single atomic operation
+
+That last point connects to something I didn't expect.
+
+---
+
+## Atomic operations: the safety net
+
+Jupiter Lend has a set of "advanced recipes" that combine flashloans, Jupiter Swap, and vault operations into single atomic transactions:
+
+| Recipe | What it does |
+|--------|-------------|
+| Multiply | Flashloan debt, swap to collateral, deposit + borrow, repay flashloan. Leveraged position in one tx. |
+| Unwind | Flashloan collateral, repay debt, withdraw collateral, swap + repay flashloan. Deleverage in one tx. |
+| Repay with collateral | Flashloan debt, repay, withdraw collateral, swap to debt, repay flashloan. No external capital needed. |
+| Vault swap | Flashloan both sides, close one position, open another. Migrate between vaults atomically. |
+
+These all use CPI to Jupiter Swap within a single Solana transaction. The flashloans are zero-fee. You borrow, do your thing, and repay in the same transaction. If anything fails, the whole thing reverts.
+
+This matters for high LTV because it means liquidators can perform complex liquidations atomically. A liquidator doesn't need to hold the borrow token beforehand. They can flashloan it, liquidate the position, receive the collateral, swap it, and repay the flashloan. All in one transaction. No capital requirements. No multi-step risk.
+
+When liquidation is cheap, fast, and capital-efficient, liquidators compete aggressively. When liquidators compete aggressively, positions get cleaned up quickly. When positions get cleaned up quickly, you can offer higher LTV safely.
+
+The multiply recipe also explains why users want high LTV in the first place. At 95% LTV on a stablecoin pair, you can loop 20x in a single transaction. Deposit \$1,000 USDC as collateral, borrow \$950, deposit that, borrow \$902.50, and so on. Each loop happens atomically in one flashloan-powered transaction. The effective yield on your original capital scales with the LTV ceiling.
+
+---
+
+## What this means for integrators
+
+If you're building on Jupiter Lend, the three-program architecture means you interact with different programs depending on what you're doing. Deposits go through Lending (Earn), borrows go through Vaults (Borrow), and both CPI into Liquidity under the hood.
+
+The SDK (`@jup-ag/lend`) abstracts most of this. `getDepositIxs`, `getWithdrawIxs`, `getBorrowIxs`, `getLiquidateIx` all return instructions ready to put into a transaction. For advanced recipes, `getFlashBorrowIx` and `getFlashPaybackIx` from `@jup-ag/lend/flashloan` handle the flashloan wrapping.
+
+One thing to watch: these advanced flows use a lot of instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` as the first instruction. The multiply recipe in particular can push close to the default limit.
+
+The oracle hop system also means that oracle prices for exotic assets might route through several intermediate prices. If you're building a liquidation bot, the `getExchangeRateOperate` method on the Oracle program gives you the same price the protocol uses internally. Don't try to replicate the hop logic yourself.
+
+---
+
+## Why I wrote this
+
+I've been helping teams integrate Jupiter Lend for a while, and the 95% LTV question comes up constantly. Partners see it on the UI, do a double take, and ask if it's real. It is. But "we set the number to 95" is not a satisfying answer, and it shouldn't be.
+
+The real answer involves oracle infrastructure with hop-based pricing and confidence validation, a liquidation mechanism that's capital-efficient thanks to zero-fee flashloans, and atomic operations that let liquidators act without pre-existing positions. None of those things are visible from the UI. They're all underneath, doing the work that makes a 5% buffer survivable.
+
+High LTV isn't a feature you turn on. It's a property that emerges when every other piece of the system is fast enough, reliable enough, and composable enough to handle the reduced margin. That's the part worth understanding.

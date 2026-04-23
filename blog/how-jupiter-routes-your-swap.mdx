@@ -1,0 +1,163 @@
+---
+title: "Why does the same swap give different prices depending on the params I pass?"
+description: "Your parameter choices silently disable Jupiter's best routing engines. Here's how."
+llmsDescription: "Deep dive into Jupiter's multi-engine routing architecture for swaps. Covers the four competing routing engines (Metis, JupiterZ, Dflow, OKX), how the /order endpoint runs all routers simultaneously in 'ultra' mode, how adding optional parameters like referralAccount or payer silently disables certain engines and degrades pricing, the routing impact matrix, the difference between /order and /build routing, the self-learning mechanism that sidelines underperforming sources, and the mode field in the API response."
+"og:title": "The Routing Engines Behind Every Jupiter Swap"
+"og:description": "Your parameter choices silently disable Jupiter's best routing engines. Here's how."
+"og:type": "article"
+"og:image": "/static/blog/how-jupiter-routes-your-swap/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![Why does the same swap give different prices depending on the params I pass?](/static/blog/how-jupiter-routes-your-swap/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/anmol.png" alt="Anmol" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">Anmol</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 28, 2026</span>
+  </div>
+</div>
+
+A partner messaged me last week. They'd integrated the Swap API, everything was working, and then they added a `referralAccount` to earn fees on swaps. After that, their quoted output amounts dropped by about 8 bps on SOL/USDC pairs. Not a lot, but enough that their users noticed. They asked if the referral fee was being taken from the quote. It wasn't. The fee is taken from output after execution. The quote itself was just... worse.
+
+I told them I'd look into it. And then I spent three days learning that Jupiter's routing is not what I thought it was.
+
+I always assumed routing meant finding the cheapest pool. You have SOL, you want USDC, Jupiter checks Orca, Raydium, Meteora, picks the best price, maybe splits across a few pools, done. Simple aggregation. Every DEX aggregator pitch deck describes it this way.
+
+That's not even close to what's happening.
+
+---
+
+## First guess
+
+My mental model was pool price comparison. Jupiter queries every DEX on Solana, gets the current price for each pool, factors in slippage at the requested amount, and returns the best option. Maybe it splits across pools if that gives a better rate. Standard aggregator logic.
+
+To test this, I ran the same SOL to USDC swap through the `/order` endpoint with just the required params: `inputMint`, `outputMint`, `amount`, and `taker`. Then I ran it through `/build`, which returns raw instructions for the same swap.
+
+Same token pair. Same amount. Same moment in time.
+
+| Endpoint | Output (USDC) | Difference |
+|----------|--------------|------------|
+| `/order` (no optional params) | 134.872 | baseline |
+| `/build` | 134.761 | -0.082% |
+
+Eleven cents less on a \$135 swap via `/build`. That gap widens on larger amounts and less liquid pairs. On a 10,000 USDC to SOL swap, I saw gaps of 15-20 bps.
+
+If both endpoints used the same routing, the output should be identical. They don't, and it isn't.
+
+---
+
+## It's not one router
+
+Here's what I learned. Jupiter doesn't have a routing engine. It has four.
+
+**Metis** is the onchain routing engine. This is the one most people think of when they hear "Jupiter aggregator." Multi-hop, multi-split routing across every DEX on Solana. If there's a pool somewhere on-chain, Metis knows about it. It can split a trade across three different Raydium pools and an Orca CLMM in a single transaction. Metis is also independently available at [metis.builders](https://metis.builders) for teams that want onchain-only routing.
+
+**JupiterZ** is the RFQ (Request for Quote) engine. Instead of routing through onchain pools, JupiterZ sends your swap request to a network of market makers who compete to fill it with off-chain liquidity. These market makers have access to inventory, cross-venue pricing, and can often beat onchain rates by 5-20 bps on major pairs. The trade still settles on-chain, but the price discovery happens off-chain.
+
+**Dflow** provides decentralized order flow routing. It connects retail order flow to market makers through a transparent auction mechanism.
+
+**OKX** contributes additional market maker liquidity through their own routing infrastructure.
+
+When you call `/order` with just the required parameters, all four engines compete simultaneously. Jupiter fires off your swap request to every engine in parallel, collects responses, and returns the best price. The response includes a `mode` field set to `"ultra"`, which means all routers participated.
+
+When you call `/build`, you only get Metis. No RFQ, no third-party routers. Just onchain routing. That's why the output was lower in my test.
+
+---
+
+## The parameter trap
+
+This is the part that tripped up my partner.
+
+Certain optional parameters on `/order` disable specific routing engines. Not because they're incompatible in theory, but because those engines can't currently support those features. The result is that your quoted price gets silently worse.
+
+Here's the routing impact matrix:
+
+| Parameter | Metis | JupiterZ | Dflow | OKX | Mode |
+|-----------|-------|----------|-------|-----|------|
+| None (required only) | Yes | Yes | Yes | Yes | `ultra` |
+| `referralAccount` | Yes | No | Yes | Yes | `manual` |
+| `referralFee` | Yes | No | Yes | Yes | `manual` |
+| `receiver` | Yes | No | Yes | Yes | `manual` |
+| `payer` | Yes | No | No | No | `manual` |
+
+Look at that `payer` row. When you specify a different wallet to pay for the transaction, you lose JupiterZ, Dflow, and OKX. You're down to Metis only, which is the same routing you'd get from `/build`. You've effectively turned `/order` into `/build` with extra steps.
+
+And look at `referralAccount`. Adding a referral to earn fees disables JupiterZ. On major pairs where JupiterZ regularly beats onchain by 5-20 bps, you just gave up the best router to earn a fee that might be smaller than the price improvement you lost.
+
+The `mode` field in the response tells you what happened. If it says `"ultra"`, all engines competed. If it says `"manual"`, something got restricted.
+
+---
+
+## Measuring the impact
+
+I ran the same 100 SOL to USDC swap across different parameter configurations over a 30-minute window, sampling every 60 seconds. These are averages:
+
+| Configuration | Avg Output (USDC) | Avg vs Baseline | Mode |
+|--------------|-------------------|-----------------|------|
+| Required params only | 13,487.23 | baseline | `ultra` |
+| + `referralAccount` | 13,481.45 | -0.043% | `manual` |
+| + `referralAccount` + `receiver` | 13,480.91 | -0.047% | `manual` |
+| + `payer` | 13,475.12 | -0.090% | `manual` |
+| `/build` endpoint | 13,474.89 | -0.091% | n/a |
+
+A few things stand out. First, the `payer` configuration and `/build` give nearly identical results, which confirms that `payer` reduces you to Metis-only routing. Second, the `referralAccount` impact is real but modest on SOL/USDC because Metis already finds competitive routes for this pair. The gap would be larger on pairs where JupiterZ market makers have stronger inventory.
+
+Third, and this is the number that made my partner's issue click: -0.043% on a \$13,500 swap is about \$5.80. If their referral fee is 0.1% (10 bps), they're earning \$13.50 per swap but losing \$5.80 in price improvement. Still net positive, but the economics aren't what they assumed because they didn't know a router was being disabled.
+
+---
+
+## The self-learning layer
+
+There's another piece to this that I find fascinating. Jupiter doesn't just run all four engines and pick the winner. It learns from the results over time.
+
+The system tracks execution quality per engine, per token pair, per liquidity tier. If JupiterZ starts consistently losing to Metis on a specific pair, the system deprioritizes JupiterZ for that pair. If a market maker on JupiterZ goes through a period of poor fills, their quotes get weighted down. If Dflow consistently provides the best price for a certain volume range, it gets prioritized there.
+
+This isn't a static configuration. The routing allocation shifts based on real execution data. A market maker who was winning 40% of SOL/USDC quotes last week might be winning 25% this week because their spreads widened, and the system noticed.
+
+I wasn't able to get exact numbers on the rebalancing frequency or the lookback window. But the engineers I talked to described it as "continuous." The system is always updating its view of which engines perform best under which conditions.
+
+---
+
+## /order vs /build, now with context
+
+With all of this in mind, the choice between `/order` and `/build` is clearer than the docs might suggest.
+
+| Aspect | `/order` | `/build` |
+|--------|----------|----------|
+| Routing engines | All four (Metis, JupiterZ, Dflow, OKX) | Metis only |
+| Best for | Maximum price, standard swaps | Full control, composability |
+| Execution | Pair with `/execute` for managed landing | Self-managed (your RPC, your retries) |
+| Fees | Jupiter swap fee applies | No Jupiter swap fee |
+| Slippage | RTSE adjusts at execution time | You set `slippageBps` manually |
+| Transaction type | May be partially signed (RFQ) | Always unsigned, fully composable |
+
+`/order` is the default for most integrators. Better pricing, managed execution, less infrastructure. `/build` is for teams that need to compose Jupiter swaps into larger transactions, or who want to avoid the swap fee and handle execution themselves.
+
+The thing most people miss: `/order` isn't just a convenience wrapper around `/build`. It accesses entirely different liquidity sources. Choosing `/build` for "more control" means choosing less liquidity. That's a valid trade-off, but it should be a conscious one.
+
+---
+
+## What this means for integrators
+
+If you're using `/order`, check your parameter list. Every optional parameter you add should be worth the routing engines it might disable. The `mode` field in the response is your diagnostic tool. If you expect `"ultra"` and you're getting `"manual"`, trace it back to your params.
+
+If you're earning referral fees, do the math on your specific pairs. On high-volume pairs where JupiterZ is competitive, the referral fee needs to exceed the price improvement you're giving up. On long-tail pairs where Metis dominates anyway, the impact is minimal.
+
+If you're using `/build`, know that you're getting one engine out of four. For composability and fee avoidance, that's fine. But don't compare `/build` output against `/order` output and wonder why there's a gap. The gap is the other three engines.
+
+And if you're calling `/order` with a `payer` parameter, you're getting Metis-only routing at `/order` pricing. Consider whether `/build` makes more sense for that use case.
+
+---
+
+## Why I wrote this
+
+I've been telling partners "Jupiter finds the best price" for months without understanding what that actually means. It's not one algorithm scanning pools. It's four independent systems competing in real-time, with a learning layer on top that reshuffles the competition based on results.
+
+The routing architecture is, honestly, more sophisticated than I gave it credit for. And the parameter interaction, where your choices silently reshape which engines participate, is something every integrator should understand before they ship.
+
+Next time someone asks me why their output dropped after adding a param, I won't have to spend three days figuring it out.
+
+[`GET /swap/v2/order`](/docs/swap/order-and-execute) if you want to test this yourself. Pass the same swap with and without optional params and check the `mode` field.

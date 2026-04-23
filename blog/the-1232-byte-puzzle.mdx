@@ -1,0 +1,193 @@
+---
+title: "Why does my Solana transaction keep failing at 1232 bytes?"
+description: "Solana transactions have a hard size limit. Swap routes are the biggest space consumers. Here's the byte budget and how to stay under it."
+llmsDescription: "Deep dive into Solana's 1232-byte transaction size limit and how Jupiter helps developers stay under it. Covers what consumes space in a transaction (signatures, accounts, instructions, compact-u16 prefixes), why swap routes are the biggest offenders (30-50 accounts at 32 bytes each), Address Lookup Tables (ALTs) and how Jupiter's /build endpoint returns addressesByLookupTableAddress for zero-RPC ALT resolution, the maxAccounts parameter (1-64) and its trade-off between route complexity and price quality, and removing unnecessary setup instructions."
+"og:title": "The 1232-Byte Puzzle: Solana Transaction Size Limits"
+"og:description": "Solana transactions have a hard size limit. Swap routes are the biggest space consumers. Here's the byte budget and how to stay under it."
+"og:type": "article"
+"og:image": "/static/blog/the-1232-byte-puzzle/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![Why does my Solana transaction keep failing at 1232 bytes?](/static/blog/the-1232-byte-puzzle/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/anmol.png" alt="Anmol" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">Anmol</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 28, 2026</span>
+  </div>
+</div>
+
+I was helping an integrator debug their swap flow last month. The swap worked perfectly in isolation. They'd call `/build`, get the instructions, sign, send, and it would land every time. Then they added two custom instructions to the same transaction, a memo and a token transfer, and everything broke. Not sometimes. Every single time.
+
+The error wasn't helpful. Something about transaction size. My first instinct was compute units. Maybe the extra instructions pushed the CU budget over the limit? I had them add a `setComputeUnitLimit` instruction with a higher value. Still broke.
+
+Then I looked at the actual error more carefully: `Transaction too large`. Not "exceeded compute budget." Too large. As in, too many bytes.
+
+I'm embarrassed to say I didn't immediately know the exact limit. I knew Solana transactions couldn't be infinitely large, obviously. But I'd never had to think about the actual number before because Jupiter's endpoints handle most of the optimization internally. This was the first time I ran face-first into the wall.
+
+---
+
+## First guess
+
+My assumption was that the size limit was generous. Something like 10KB or maybe 64KB. Enough that you'd have to be doing something absurd to hit it. The error had to be about something else, some edge case in how the transaction was serialized, maybe a duplicate account or a malformed instruction inflating the size.
+
+I asked the integrator to log the serialized transaction size before sending. The number came back: 1,247 bytes.
+
+That's when I looked up the actual limit. Solana transactions must fit in 1,232 bytes. The integrator was 15 bytes over. Fifteen. Bytes.
+
+The limit comes from the network layer. Solana uses UDP for transaction propagation, and the protocol targets IPv6 compatibility. The minimum MTU (Maximum Transmission Unit) for IPv6 is 1,280 bytes. Subtract the IPv6 header (40 bytes) and the UDP header (8 bytes), and you get 1,232 bytes for the payload. That's it. One UDP packet. Every Solana transaction, no matter how complex, must fit in that space.
+
+This isn't a configurable parameter. It's not a soft limit that validators can override. It's baked into the protocol. A transaction that's 1,233 bytes simply cannot be sent.
+
+---
+
+## What eats the bytes
+
+Once I knew the limit, I needed to understand what was consuming space. I deconstructed a few real transactions from our integrator's logs and counted bytes.
+
+Here's the anatomy of a Solana transaction, byte by byte:
+
+| Component | Size | Notes |
+|-----------|------|-------|
+| Signature (each) | 64 bytes | One per signer. Most swaps need 1 signer = 64 bytes |
+| Signature count | 1 byte | compact-u16 encoding |
+| Message header | 3 bytes | Number of signers, read-only signers, read-only non-signers |
+| Account address (each) | 32 bytes | Full Ed25519 public key |
+| Account count | 1-3 bytes | compact-u16 encoding |
+| Recent blockhash | 32 bytes | Required for every transaction |
+| Instruction count | 1 byte | compact-u16 encoding |
+| Per instruction: program ID index | 1 byte | Index into the accounts array |
+| Per instruction: account indices | 1 byte each | Index per referenced account |
+| Per instruction: data | variable | The actual instruction payload |
+| Per instruction: length prefixes | 2-4 bytes | compact-u16 for accounts and data lengths |
+
+The fixed overhead is relatively small: 64 (signature) + 1 + 3 + 32 (blockhash) + 1 = 101 bytes. That leaves 1,131 bytes for accounts and instructions.
+
+Now here's where swaps get expensive. A complex swap route, multi-hop with splits, can easily reference 30 to 50 unique accounts. Each account address is 32 bytes. Let me show you what that looks like:
+
+| Accounts in Route | Bytes for Accounts | Remaining for Instructions | Realistic? |
+|-------------------|--------------------|---------------------------|------------|
+| 15 | 480 | 651 | Comfortable |
+| 25 | 800 | 331 | Tight |
+| 35 | 1,120 | 11 | Impossible |
+| 45 | 1,440 | -309 | Over limit |
+
+At 35 accounts you have 11 bytes left for all instruction data. That's not enough for a single swap instruction, let alone compute budget instructions, token account creation, and any custom logic you want to add.
+
+Our integrator's transaction had 33 accounts from the swap route, plus 4 more from their custom instructions. Thirty-seven accounts at 32 bytes each: 1,184 bytes. Add the fixed overhead and instruction data and they were well past 1,232.
+
+---
+
+## Address Lookup Tables: the compression layer
+
+Solana's answer to the account bloat problem is Address Lookup Tables (ALTs). Instead of including every 32-byte address inline in the transaction, you reference a lookup table stored onchain and use 1-byte indices to point at addresses within it.
+
+The math is dramatic. An account that costs 32 bytes inline costs roughly 1 byte when referenced through an ALT. For a transaction with 35 accounts where 25 of them can be resolved through lookup tables:
+
+| Without ALTs | With ALTs |
+|-------------|-----------|
+| 10 inline accounts: 320 bytes | 10 inline accounts: 320 bytes |
+| 25 inline accounts: 800 bytes | 25 ALT references: ~25 bytes + ~70 bytes ALT overhead |
+| **Total: 1,120 bytes** | **Total: ~415 bytes** |
+
+That's a savings of over 700 bytes, turning an impossible transaction into one with plenty of room.
+
+Jupiter's `/build` endpoint returns the ALT data you need in the `addressesByLookupTableAddress` field. It's a mapping of lookup table addresses to the account addresses they contain:
+
+```json
+{
+  "addressesByLookupTableAddress": {
+    "9RnK5BFHZ8GVN2pEtCBKfpqCHnDax6o7GKmFmfv3MKi2": [
+      "So11111111111111111111111111111111111111112",
+      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN"
+    ],
+    "2immgwYNHBbyGQKGh8M2E1nQZ3bMxHfCE3FBc1aBYhVi": [
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+    ]
+  }
+}
+```
+
+This is the full mapping. You don't need to make any RPC calls to resolve the lookup tables. Jupiter gives you everything you need to construct the v0 transaction locally. I've seen codebases that fetch ALT data from the RPC after getting the `/build` response, which adds latency and an unnecessary network call. The data is already there in the response.
+
+---
+
+## maxAccounts: the route complexity dial
+
+Even with ALTs, sometimes you need more room. Maybe you're adding 5 custom instructions alongside the swap. Maybe you're building a complex composed transaction. This is where the `maxAccounts` parameter comes in.
+
+`maxAccounts` accepts a value from 1 to 64 (default 64). It tells Jupiter's router to limit the number of accounts in the swap route. Lower values force simpler routes: fewer hops, fewer splits, fewer pools involved. The router finds the best price it can within the account constraint.
+
+The trade-off is direct. Simpler routes may get worse prices because the router can't split across multiple pools or take multi-hop paths that would have been more efficient.
+
+I tested this with a 100 SOL swap to USDC to see the impact:
+
+| maxAccounts | Route Hops | Route Splits | Accounts Used | Output (USDC) | Price Impact |
+|-------------|-----------|--------------|---------------|---------------|-------------|
+| 64 (default) | 3 | 2 | 38 | 9,035.42 | baseline |
+| 40 | 2 | 2 | 29 | 9,031.18 | -0.047% |
+| 30 | 2 | 1 | 22 | 9,024.55 | -0.120% |
+| 20 | 1 | 1 | 14 | 9,011.87 | -0.261% |
+
+At `maxAccounts=40`, the price difference is less than 5 basis points. Barely noticeable. At `maxAccounts=20`, you're giving up about 26bps, which on a \$9,000 swap is roughly \$2.35. Not catastrophic, but it adds up at volume.
+
+The sweet spot depends on how many accounts your custom instructions need. Count the accounts your non-swap instructions require, add a buffer of 5-10, subtract that from 64, and use the result as your `maxAccounts` value.
+
+For our integrator with two custom instructions (memo + token transfer), the extra instructions needed about 6 accounts. Setting `maxAccounts=50` gave the router plenty of room while leaving enough space for the custom logic. Transaction dropped to ~900 bytes. Problem solved.
+
+---
+
+## Removing unnecessary setup instructions
+
+There's one more optimization that's easy to miss. Jupiter's `/build` response includes `createAssociatedTokenAccountIdempotent` instructions for token accounts that the swap might need. These create the associated token account if it doesn't exist, or do nothing if it already does.
+
+The "do nothing" case still costs bytes. Each idempotent create instruction takes up space in the transaction even when the account already exists. If you know the user's token accounts are already initialized (because you checked with `getAccountInfo` or because your app created them earlier), you can strip these instructions out.
+
+In practice, this saves 50-100 bytes per unnecessary setup instruction. On a tight transaction, that can be the difference between fitting and not fitting.
+
+```typescript
+// Check if the output token account already exists
+const outputATA = getAssociatedTokenAddressSync(outputMint, walletPublicKey);
+const accountInfo = await connection.getAccountInfo(outputATA);
+
+// If it exists, filter out the create instruction
+if (accountInfo !== null) {
+  const filteredInstructions = instructions.filter(
+    (ix) => !isCreateATAInstruction(ix, outputATA)
+  );
+}
+```
+
+The trade-off: you're adding an RPC call (`getAccountInfo`) to save bytes. For most integrations this is worth it, because the RPC call is fast and the byte savings can make or break a complex transaction.
+
+---
+
+## The full toolkit
+
+Here's the complete set of tools for staying under 1,232 bytes, ordered by impact:
+
+| Technique | Byte Savings | Trade-off | When to Use |
+|-----------|-------------|-----------|-------------|
+| Address Lookup Tables (ALTs) | 500-800 bytes | None if using `/build` response data | Always. No reason not to. |
+| `maxAccounts` parameter | 200-500 bytes (fewer accounts) | Potentially worse routing and pricing | When adding custom instructions to swap transactions |
+| Remove setup instructions | 50-100 bytes per instruction | Extra RPC call to check account existence | When you know token accounts already exist |
+| Combine the above | Up to 1,000+ bytes | Cumulative trade-offs | Complex composed transactions |
+
+For most integrators using `/order`, none of this matters. Jupiter handles the transaction construction and optimization internally. These techniques are specifically for `/build` users who are composing swap instructions with their own logic.
+
+---
+
+## What I wish I'd known earlier
+
+The 1,232-byte limit isn't something you think about until you hit it. And when you hit it, the error message doesn't tell you what's consuming the space or how to fix it. You just get "transaction too large" and have to work backwards.
+
+If you're using Jupiter's `/build` endpoint and planning to add custom instructions to the transaction, check your byte budget before you write the code. Count the accounts in your custom instructions. Estimate the total. If it's anywhere near 30+ accounts combined, plan for ALTs and `maxAccounts` from the start. It's much easier to architect for the constraint upfront than to retrofit compression after you've already built the flow.
+
+The tools are all there. Jupiter gives you ALT data in the `/build` response, `maxAccounts` to control route complexity, and idempotent setup instructions you can filter. The 1,232 bytes are tight, but they're workable once you know where every byte is going.
+
+[Swap API `/build` documentation](/docs/swap/build) for the full parameter reference.

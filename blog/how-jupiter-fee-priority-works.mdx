@@ -1,0 +1,214 @@
+---
+title: "Why was half my referral revenue missing?"
+description: "Jupiter's fee system is a multi-dimensional decision tree. Token priority, pair-specific rates, referral token accounts, and routing trade-offs all affect what you earn."
+llmsDescription: "Deep dive into Jupiter's fee system for swap integrators. Covers the fee mint priority hierarchy (SOL, stablecoins, LSTs, bluechips, others), pair-specific fee rates (0-50 bps depending on token category), the difference between /order fees (Jupiter platform fee + optional referral) and /build fees (no platform fee, only integrator platformFeeBps), the referralTokenAccount initialization gotcha where uninitialized accounts silently skip fees, and how adding referralAccount to /order disables JupiterZ RFQ routing."
+"og:title": "Why Was Half My Referral Revenue Missing?"
+"og:description": "Jupiter's fee system is a multi-dimensional decision tree. Token priority, pair-specific rates, referral token accounts, and routing trade-offs all affect what you earn."
+"og:type": "article"
+"og:image": "/static/blog/how-jupiter-fee-priority-works/banner.png"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+![Why was half my referral revenue missing?](/static/blog/how-jupiter-fee-priority-works/banner.png)
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/anmol.png" alt="Anmol" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">Anmol</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Mar 28, 2026</span>
+  </div>
+</div>
+
+An integrator came to me with a problem that took me an embarrassing amount of time to diagnose. They'd set up referral fees on their swap integration. 100 basis points. Straightforward. They watched their referral dashboard for a week and the revenue was about half of what they expected based on their volume.
+
+Not zero. That would have been easy to debug. Half. Some swaps generated fees, others didn't. No obvious pattern at first glance. Same users, same token pairs, same code path. Sometimes a fee appeared. Sometimes it didn't.
+
+I assumed it was a tracking issue. Maybe their analytics were double-counting volume. Maybe some swaps were failing and they weren't filtering those out. I asked them to log every successful swap alongside the fee collected. That's when the pattern emerged: the zero-fee swaps all had one thing in common. The `feeMint` in the response was a token they hadn't set up a referral token account for.
+
+---
+
+## First guess
+
+My mental model of swap fees was simple. You set a fee percentage, Jupiter takes it from the output token, done. If someone swaps SOL to USDC and you've set 100bps, you get 1% of the USDC output. If they swap USDC to SOL, you get 1% of the SOL output.
+
+Clean, predictable, always from the output.
+
+I was wrong about all of it. The fee isn't always taken from the output token. It's not always in the token you'd expect. And the system that decides which token the fee is denominated in is its own separate mechanism with its own priority logic.
+
+---
+
+## The fee mint priority system
+
+Jupiter doesn't just pick a random token for fees. It uses a priority hierarchy to determine the `feeMint`, the token that fees are collected in for a given swap. The system evaluates the tokens involved in the swap and picks the fee token based on this order:
+
+| Priority | Token Category | Examples |
+|----------|---------------|----------|
+| 1 (highest) | SOL | Native SOL (`So11111111111111111111111111111111111111112`) |
+| 2 | Stablecoins | USDC, USDT, PYUSD |
+| 3 | Liquid staked tokens | jupSOL, mSOL, bSOL, jitoSOL |
+| 4 | Bluechip tokens | Large market cap tokens with deep liquidity |
+| 5 (lowest) | Everything else | Memecoins, new tokens, long-tail assets |
+
+When you swap SOL to USDC, the fee mint is SOL (priority 1). When you swap USDC to JUP, the fee mint is USDC (priority 2). When you swap BONK to WIF, the fee mint is whichever one ranks higher in the priority list.
+
+This priority system exists for a practical reason. Jupiter (and integrators collecting referral fees) need to actually use the fee tokens they collect. SOL and stablecoins are universally liquid. Collecting fees in a random memecoin with thin liquidity creates a conversion problem. The priority system ensures fees accumulate in tokens that are easy to manage.
+
+The `/order` and `/build` responses both include a `feeMint` field telling you exactly which token the fee was denominated in. You don't have to guess.
+
+---
+
+## Pair-specific fee rates
+
+The fee percentage itself isn't uniform either. Jupiter applies different platform fee rates depending on the token pair being swapped:
+
+| Pair Category | Platform Fee | Examples |
+|---------------|-------------|----------|
+| Buying Jupiter tokens | 0 bps | SOL → JUP, USDC → JLP, SOL → jupSOL |
+| Pegged asset swaps | 0 bps | USDC → USDT, jupSOL → mSOL, SOL → jupSOL |
+| SOL-Stable | 2 bps | SOL → USDC, SOL → USDT |
+| LST-Stable | 5 bps | jupSOL → USDC, mSOL → USDT |
+| Standard pairs | 10 bps | JUP → USDC, BONK → SOL |
+| New tokens (< 24h old) | 50 bps | Any token created within the last 24 hours |
+
+The 0 bps rate for Jupiter ecosystem tokens (JUP, JLP, jupSOL) is intentional. No fee on buying Jupiter tokens. No fee on pegged asset swaps like SOL to jupSOL or USDC to USDT, where the price difference is minimal and fees would eat into an already thin margin.
+
+The 50 bps rate on new tokens is a protective measure. Tokens in their first 24 hours of existence tend to have volatile, unpredictable markets. The higher fee provides a buffer.
+
+These are Jupiter platform fees. They're separate from any integrator fees you configure.
+
+---
+
+## Two completely different fee models
+
+This is where things diverge. The `/order` and `/build` endpoints have entirely different fee structures. They're not variations of the same system. They're separate fee models.
+
+### `/order` fee model
+
+`/order` charges a Jupiter platform fee automatically. You don't configure it. It's the pair-specific rate from the table above, applied to every swap.
+
+On top of that, integrators can earn referral fees by passing `referralAccount` and `referralFee` (50-255 bps) in the request. When referral fees are active, Jupiter takes 20% of the integrator's referral fee as its platform cut. There's no separate platform fee stacked on top. The 20% share is the platform fee.
+
+Example: you set `referralFee=100` (100 bps). On a swap outputting 1,000 USDC:
+- Total fee: 10 USDC (100 bps)
+- Your share: 8 USDC (80%)
+- Jupiter's share: 2 USDC (20%)
+
+### `/build` fee model
+
+`/build` charges zero Jupiter swap fees. None. The entire fee structure is in the integrator's hands via `platformFeeBps` and `feeAccount`.
+
+You set the fee rate. You provide the account. You collect 100% of what you charge. Jupiter takes nothing from the swap itself.
+
+Here's the comparison:
+
+| Aspect | `/order` | `/build` |
+|--------|---------|---------|
+| Jupiter platform fee | Automatic (pair-specific, 0-50 bps) | None |
+| Integrator fee mechanism | `referralAccount` + `referralFee` | `platformFeeBps` + `feeAccount` |
+| Integrator fee range | 50-255 bps | Any amount |
+| Jupiter's cut of integrator fee | 20% | 0% |
+| Fee token determined by | Fee mint priority system | Fee mint priority system |
+| Integrator keeps | 80% of referral fee | 100% of platform fee |
+
+The fee mint priority system applies to both endpoints. Regardless of whether you're using `/order` or `/build`, the token the fee is collected in follows the same SOL > stablecoins > LSTs > bluechips > others hierarchy.
+
+---
+
+## The silent failure: uninitialized referral token accounts
+
+This is what was causing the integrator's missing revenue. It's the most expensive gotcha in Jupiter's fee system.
+
+When you set up referral fees on `/order`, you provide a `referralAccount`. But that account alone isn't enough. You also need a `referralTokenAccount` for each token that might be the `feeMint`. Remember, the fee mint depends on the priority system, not the output token. If someone swaps BONK to WIF, the fee mint might be SOL or USDC, not BONK or WIF.
+
+Here's the critical part: if the `referralTokenAccount` for the selected `feeMint` doesn't exist, the swap still executes successfully. The user gets their tokens. But your fee is silently skipped. You earn nothing on that swap. No error, no warning, no failed transaction. Just a zero where revenue should have been.
+
+Our integrator had created referral token accounts for USDC and SOL. Covered most swaps. But when the fee mint priority system selected jupSOL (priority 3) or another LST for certain pairs, there was no account to receive the fee. Those swaps went through fee-free.
+
+The fix is straightforward but requires planning:
+
+```typescript
+// Token mints you need referralTokenAccounts for,
+// based on the fee mint priority system
+const feeTokenMints = [
+  "So11111111111111111111111111111111111111112",   // SOL (priority 1)
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC (priority 2)
+  "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",  // USDT (priority 2)
+  "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4",  // jupSOL (priority 3)
+  // ... other LSTs and bluechips you expect to see
+];
+
+// Create referral token accounts for each expected fee mint
+for (const mint of feeTokenMints) {
+  await createReferralTokenAccount(referralAccount, mint);
+}
+```
+
+You don't need accounts for every token on Solana. Just the ones that rank high enough in the priority system to realistically be selected as `feeMint`. SOL, major stablecoins, and the top LSTs cover the vast majority of swaps.
+
+---
+
+## The routing trade-off nobody mentions
+
+There's one more dimension to the fee equation that I only discovered while debugging a separate issue.
+
+Adding `referralAccount` to an `/order` request disables JupiterZ (RFQ) routing for that swap. This isn't a bug. It's an architectural constraint. Market makers in the RFQ system settle trades through their own infrastructure, and the referral fee mechanism isn't compatible with that settlement flow.
+
+What this means in practice: swaps with referral fees only get routed through Iris (onchain routing). They miss out on JupiterZ, which on major pairs like SOL/USDC can offer 5-20bps better pricing.
+
+| Scenario | Routing Available | Typical Price on SOL/USDC |
+|----------|------------------|--------------------------|
+| `/order` without referral | Iris + JupiterZ + DFlow + OKX | Best available |
+| `/order` with referral | Iris only | 5-20 bps worse on major pairs |
+| `/build` with platformFee | Iris only (always) | Same as above |
+
+This creates a genuine trade-off. Your referral fee revenue comes at the cost of slightly worse execution for your users. On a 100bps referral fee, losing 10bps of price quality means the user is effectively paying 110bps, not 100bps.
+
+For many integrators this trade-off is acceptable. The fee revenue justifies the marginally worse routing. But it's worth knowing the trade-off exists, especially for high-volume integrations where the bps add up.
+
+---
+
+## Reading the fee fields in the response
+
+Both `/order` and `/build` responses include explicit fee information. You don't need to compute anything:
+
+```json
+{
+  "feeBps": 100,
+  "feeMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "platformFee": {
+    "amount": "10000000",
+    "feeBps": 100
+  }
+}
+```
+
+`feeBps` is the total fee in basis points. `feeMint` tells you which token the fee is denominated in. `platformFee.amount` is the raw token amount (in the fee token's smallest unit) being charged.
+
+Log these fields for every swap. They're your source of truth for fee reconciliation. If `feeMint` shows a token you don't have a referral token account for, that swap generated zero revenue for you.
+
+---
+
+## The complete fee decision tree
+
+Here's how Jupiter decides what happens with fees on any given swap, start to finish:
+
+1. **Determine fee token.** Evaluate the tokens in the swap against the priority hierarchy. Pick the highest-priority token as `feeMint`.
+2. **Determine platform fee rate.** Check the pair category (Jupiter tokens, pegged, SOL-stable, LST-stable, standard, new token) and apply the corresponding bps rate.
+3. **Check for integrator fees.** If `referralAccount` is set (on `/order`) or `platformFeeBps` is set (on `/build`), add integrator fees.
+4. **Route the swap.** If referral fees are active on `/order`, exclude JupiterZ from routing. Otherwise, all engines compete.
+5. **Execute and distribute.** Platform fees go to Jupiter. Integrator fees go to the `referralTokenAccount` or `feeAccount`. If the account doesn't exist for the selected `feeMint`, the integrator fee is silently skipped.
+
+Every step in this chain can affect your revenue. The fee rate depends on the pair. The fee token depends on the priority system. The routing depends on whether you're collecting fees. And whether you actually receive those fees depends on whether you initialized the right token accounts.
+
+---
+
+## Why I wrote this
+
+The integrator who came to me with the "half revenue" problem had done everything right, almost. They read the docs, set up their referral account, configured a reasonable fee rate, and built a working integration. The one thing they missed was initializing referral token accounts for every possible fee mint. That one gap cost them roughly half their expected revenue over a week.
+
+Jupiter's fee system isn't complicated once you see the full picture. But the full picture spans token priority, pair-specific rates, two different endpoint models, token account initialization, and routing trade-offs. No single docs page covers all of it because each piece lives in the context of its own feature.
+
+This post is the full picture. If you're setting up fees on a Jupiter integration, read it before you ship, not after your dashboard looks wrong for a week.
+
+[Swap API fee documentation](/docs/swap/fees) for the parameter reference. [Referral Program](/tool-kits/referral-program) for setup instructions.

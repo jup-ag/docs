@@ -1,0 +1,151 @@
+---
+title: "Swap V2: What Changed and Why It Matters"
+description: "Jupiter's swap infrastructure rebuilt from the ground up. Two paths, one API, better routing for everything built on Solana."
+"og:title": "Swap V2: What Changed and Why It Matters"
+"og:description": "Jupiter's swap infrastructure rebuilt from the ground up. Two paths, one API, better routing for everything built on Solana."
+"og:type": "article"
+"og:site_name": "Jupiter Developers Blog"
+---
+
+{/* TODO: Add banner image */}
+{/* ![Swap V2: What Changed and Why It Matters](/static/blog/swap-v2-what-changed/banner.png) */}
+
+<div className="flex items-center gap-3 mt-4 mb-6">
+  <img src="/static/blog/authors/yy.jpg" alt="YY" className="w-8 h-8 rounded-full object-cover" />
+  <div className="flex items-center gap-2">
+    <span className="text-sm font-medium">YY</span>
+    <span className="text-sm text-gray-400">·</span>
+    <span className="text-sm text-gray-400">Apr 9, 2026</span>
+  </div>
+</div>
+
+Every DeFi product starts with a swap. Wallets, bots, protocols, lending, perps, payments, yield: eventually, they all need to turn one token into another. Last year, that was 70 billion API requests. That makes the swap API the most foundational piece of infrastructure we ship. When the foundation gets better, everything built on it gets better. Swap V2 is a ground-up rethink of that foundation.
+
+V2 is live at `api.jup.ag/swap/v2`. Two paths, one API. This is the same execution stack that powers [jup.ag](https://jup.ag). Here's what changed.
+
+{/* TODO: Visual callout - "70 billion" as a large stat with subtext "API requests in 2025" - shareable on X */}
+
+---
+
+## If you're on /order
+
+`/order` is the default path. Call it, get a fully assembled transaction back. Sign it, pass it to `/execute`, done. Jupiter handles routing, slippage, priority fees, and landing. No RPC infrastructure required.
+
+What's different in V2: all routers now compete for your order.
+
+On V1, you got Metis routing, Jupiter's onchain DEX router. Solid, but limited to onchain liquidity. V2 opens the competition to JupiterZ (RFQ with 20+ market makers), Dflow, and OKX. Market makers quote off-chain and often beat onchain routing by 5-20bps on major pairs. That's real money at volume.
+
+The competition happens automatically. Call `/order` with the default parameters and every router races. The best price wins. The response tells you who won via the `router` field, whether it's `iris` (Metis), `jupiterz`, `dflow`, or `okx`.
+
+```
+GET https://api.jup.ag/swap/v2/order?inputMint=So11...&outputMint=EPjF...&amount=100000000&taker=<wallet>
+```
+
+Routing is only part of the story. Here's what your users get out of the box:
+
+- **Faster landing.** Transactions land in 0-1 blocks (50-400ms) via [Jupiter Beam](/blog/how-jupiter-lands-your-transaction), Jupiter's proprietary execution infrastructure running on its own validator stake. That's roughly 50-66% faster than V1's 1-3 block landing via standard RPCs.
+- **Positive slippage.** RTSE (Real-Time Slippage Estimator) auto-optimises slippage per trade using token category, historical data, and real-time volatility. The result: +0.63 bps average positive slippage, meaning your users receive more than quoted. ([Source: Jupiter Internal Monitoring, Oct 2025](/blog/ultra-v3#predictive-execution))
+- **MEV protection.** Trades are private until execution and never touch the public mempool. Jupiter has 34x better MEV protection than top trading terminals despite processing the highest swap volume on Solana. ([Source: sandwiched.me, Oct 2025](https://sandwiched.me))
+
+These aren't features you configure. They're built into every `/order` call by default.
+
+**But here's the part that matters most.** If you need more control, composability, CPI, custom instructions, you don't switch to a different API. You drop to `/build`. Same base URL, same auth, same API key. `/build` gives you raw swap instructions instead of an assembled transaction. Add your own instructions, build your own transaction, manage your own execution.
+
+Previously, getting transaction-level control meant switching to a completely different product: different API, different base URL, different response format, different mental model. In V2, `/build` is one parameter away. And you don't lose anything. `/build` gets the same Metis routing engine, the same token coverage, the same improvements. It's a drop-down, not a switch-out.
+
+---
+
+## If you're on /build
+
+`/build` replaces the old two-step `/quote` + `/swap-instructions` flow. One call, better routing.
+
+```
+GET https://api.jup.ag/swap/v2/build?inputMint=So11...&outputMint=EPjF...&amount=100000000&taker=<wallet>
+```
+
+You get back separated instructions (compute budget, setup, swap, cleanup) plus address lookup tables and a blockhash. Assemble them however you want, add your CPI, sign, send through your own RPC.
+
+What V2 gives you that V1 didn't:
+
+**Routing quality.** The Metis improvements that shipped to [jup.ag](https://jup.ag) over the past year (dynamic intermediate tokens, token revival, expanded hop types) now ship to `/build`. Tokens that only have an A-B market (no SOL or USDC pair) are now routable via intermediate hops. The long tail of tokens is now tradeable for your users.
+
+{/* TODO: Visual diagram - Before/after routing. Before: SOL -> USDC -> TokenB only. After: SOL -> TokenA -> TokenB via dynamic intermediate */}
+
+**RTSE.** The same Real-Time Slippage Estimator that powers `/order` is available on `/build`. Pass `slippageBps=rtse` to opt in instead of guessing a fixed value.
+
+**Fast mode.** Pass `mode=fast` for reduced-latency routing. Bellman-Ford with no splitting: entire amount through one pool path, priority fee lookup in parallel. For latency-sensitive bots on well-known pairs, the pricing difference is negligible and the speed gain is real.
+
+**Zero Jupiter swap fees.** Jupiter charges no platform fees on `/build`. None. The only fees are your own `platformFeeBps` if you choose to set them. For teams with existing RPC and execution infrastructure, this means Jupiter's full routing intelligence at zero cost.
+
+**Near 1:1 migration.** `userPublicKey` becomes `taker`. Route plan uses `bps` instead of `percent`. V2 instructions don't emit fee events: parse balance changes instead. That's about it.
+
+---
+
+## When to use which
+
+|  | `/order` + `/execute` | `/build` |
+| --- | --- | --- |
+| **Returns** | Assembled transaction | Raw instructions |
+| **Routers** | All (Metis, JupiterZ, Dflow, OKX) | Metis |
+| **Execution** | Managed (Jupiter Beam) | Self-managed |
+| **Jupiter swap fees** | Yes (0-50bps depending on pair) | None |
+| **RPC infrastructure** | None required | You provide |
+| **Transaction control** | Sign and submit | Full: CPI, compose, customise |
+| **Best for** | Wallets, simple swaps, best price | Bots, protocols, custom transactions |
+
+Start with `/order`. If you need to modify the transaction, drop to `/build`.
+
+One thing to watch: some `/order` parameters restrict routing. Adding `referralAccount`, `payer`, or `receiver` disables JupiterZ (RFQ), limiting you to Metis. The response's `mode` field tells you: `"ultra"` means all routers competed, `"manual"` means restrictions applied. If pricing matters and you're using these parameters, weigh the trade-off.
+
+{/* TODO: Visual diagram - Decision flow: Start -> Need tx control? -> Yes: /build -> No: /order -> Using optional params? -> Shows which params restrict which routers */}
+
+---
+
+## /submit: Jupiter Beam for any transaction
+
+`/submit` opens Jupiter Beam to any signed Solana transaction, not just swaps. Send a signed transaction with a SOL tip (minimum 0.001 SOL), and Beam handles multi-RPC sending and optimised landing through the same infrastructure that lands `/order` transactions in 50-400ms.
+
+```
+POST https://api.jup.ag/swap/v2/submit
+```
+
+If you're building on `/build` and want Jupiter Beam's landing performance without managing your own RPC infrastructure, `/submit` bridges that gap. You keep full transaction control from `/build` and get managed landing from Beam. The tip replaces the swap fee as the cost model: you pay for landing, not routing.
+
+This also works for non-Jupiter transactions. Any valid signed Solana transaction with a tip to one of the [permitted authorities](/swap/submit) can be submitted. If your product sends transactions beyond swaps (transfers, program interactions, multisig operations), your entire product benefits from better landing.
+
+---
+
+## What else ships with V2
+
+**Gasless swaps.** On `/order` with default parameters, Jupiter automatically covers gas when the taker has less than 0.01 SOL and the trade exceeds ~\$10. No wallet top-ups, no onboarding friction. Users swap with whatever they have. For wallets and consumer apps, this removes one of the most common drop-off points in the swap flow. Integrators can also cover gas on behalf of their users by setting `payer` on either path.
+
+**Compute unit simulation.** `/build` returns CU price but not CU limit. Simulate with 1,400,000 CUs, rebuild with 1.2x the simulated value. Getting this right means you're not overpaying 7x on priority fees, which adds up fast at volume.
+
+**`maxAccounts` control.** Lower the account limit (default 64) to fit more custom instructions within transaction size limits. Essential for teams composing swaps with other program calls in a single transaction.
+
+---
+
+## V1 is frozen. V2 gets everything.
+
+Every routing improvement, every new liquidity source, every performance optimisation from here ships to V2 only. V1 endpoints remain available, but they won't get better.
+
+The [migration](/swap/migration) is near 1:1. Most integrations move in a single PR. And on the other side: better routing, more tokens, faster landing, and zero fees on `/build`.
+
+---
+
+## Get started
+
+Swap V2 is live now. The [docs](/swap) cover everything: endpoint references, code examples in both `@solana/kit` and `@solana/web3.js`, migration guides, and advanced patterns.
+
+- [Swap V2 docs](/swap)
+- [API reference](/api-reference/swap/v2/order)
+- [Get an API key](https://portal.jup.ag)
+
+---
+
+Talk to us:
+- Discord: [discord.gg/jup](https://discord.gg/jup)
+- Twitter: [@JupiterExchange](https://twitter.com/JupiterExchange)
+- Telegram: [Jupiter Dev Notifications](https://t.me/jup_dev)
+
+Built something with Swap V2? Tag [@JupDevRel](https://x.com/JupDevRel) or [@0xYankee](https://x.com/0xYankee) / [@0xanmol](https://x.com/0xanmol).

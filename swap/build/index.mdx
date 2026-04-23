@@ -625,7 +625,7 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 | `slippageBps` | 50 | Slippage tolerance in basis points, or `"rtse"` for [RTSE](/swap/advanced/slippage) |
 | `tipAmount` | - | SOL tip amount in lamports. Adds a tip instruction for use with [`/submit`](/transaction/submit) |
 | `computeUnitPricePercentile` | - | Priority fee percentile for the CU price instruction. Named levels: `"medium"` (25th), `"high"` (50th), `"veryHigh"` (75th), or an integer 0-10000 in bps. See [Compute Units](/swap/advanced/compute-units) |
-| `mode` | (default) | "fast" for reduced latency routing |
+| `mode` | (default) | "fast" for reduced latency routing (BETA) |
 | `maxAccounts` | 64 | Maximum accounts for the swap route (1-64) |
 | `platformFeeBps` | 0 | Integrator platform fee in bps (requires `feeAccount`) |
 | `feeAccount` | - | Token account to collect platform fees |

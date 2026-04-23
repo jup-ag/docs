@@ -111,6 +111,14 @@ const response = await fetch(
 
 The returned instructions will have fee payer accounts set to the `payer` address. You are responsible for building the transaction, collecting both signatures (taker + payer), and sending via your own RPC.
 
+<Tip>
+    1. When using `payer` on `/build`, do note that your gas payer is not only paying for gas, it is paying for transaction fee, priority fee/tip, token accounts, or any other AMM related accounts that might be required.
+
+    2. The token accounts or AMM related accounts can be closed by the user. If you do not find ways to recoup the fees you spent for the user, it may be gameable where they always close their accounts and you have to fund them again.
+    
+    Hence, when you are the gas payer, ensure that you account for these and find ways to recoup the cost spent to ensure your gas payer is not drained.
+</Tip>
+
 ## Related
 
 - [Order & Execute](/swap/order-and-execute) for the default swap flow

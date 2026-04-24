@@ -46,12 +46,13 @@ const searchResponse = await (
 
 ## Query by Tag
 
-The Tokens API V2 provides an endpoint to query by tags. This is useful to help users distinguish between verified vs non-verified or specific groups of tokens like liquid-staked tokens (LSTs).
+The Tokens API V2 provides an endpoint to query by tags. This is useful to help users distinguish between verified vs non-verified or specific groups of tokens like liquid-staked tokens (LSTs) or tokenized stocks.
 
 <Tip>
   **TAGS**
 
-  * Only `lst` or `verified` tag.
+  * Supported tags: `lst`, `verified`, `stocks`.
+  * `stocks` returns tokenized equities (e.g. Ondo, Remora).
   * Note that this will return the entire array of existing mints that belongs to the tag.
 </Tip>
 

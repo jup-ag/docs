@@ -182,6 +182,7 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 - [2026-03-10] Three order types: `single` (price limit), `oco` (one-cancels-other TP/SL pair sharing one deposit), `otoco` (parent trigger activates OCO on fill).
 - [2026-03-10] Default slippage: TP/buy-below uses RTSE auto slippage, SL/buy-above defaults to 20% (2000 bps) for execution certainty.
 - [2026-03-10] V2 triggers on USD price (not pool rate like V1). Output amount is not guaranteed.
+- [2026-04-28] No integrator fees on Trigger V2, no timeline. No atomic workaround: the keeper executes the tx and the order is opaque to integrators. Only option is a separate transfer transaction outside the order flow. (Confirmed by YY.)
 
 ## Source Code
 

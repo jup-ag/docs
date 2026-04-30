@@ -106,4 +106,8 @@ The API accepts USD price triggers only (`triggerPriceUsd`). Market cap targetin
 No. V2 orders are stored off-chain and private by default. Order details (price, size, direction) are not revealed until the trigger condition is met and execution begins. In V1, pending orders were stored in on-chain PDA accounts, giving bots a roadmap to front-run profitable trades.
 </Accordion>
 
+<Accordion title="Does Trigger V2 support integrator fees?">
+Not currently, and there is no timeline for adding them. There is no atomic workaround because the keeper executes the transaction and the order is opaque to integrators. The only option is to run a separate transfer transaction outside the order flow.
+</Accordion>
+
 </AccordionGroup>

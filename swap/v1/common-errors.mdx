@@ -61,8 +61,8 @@ The common routing errors you may encounter are usually related to attempting to
 
 | Error | Description | Debug |
 | :--- | :--- | :--- |
-| NO\_ROUTES\_FOUND | No routes were found for the requested swap | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets |
-| COULD\_NOT\_FIND\_ANY\_ROUTE | Unable to find any valid route for the swap | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets |
+| NO\_ROUTES\_FOUND | No routes were found for the requested swap | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets <br/> * See [Market Listing](/swap/routing/market-listing) for grace period and liquidity criteria |
+| COULD\_NOT\_FIND\_ANY\_ROUTE | Unable to find any valid route for the swap | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets <br/> * See [Market Listing](/swap/routing/market-listing) for grace period and liquidity criteria |
 | ROUTE\_PLAN\_DOES\_NOT\_   CONSUME\_ALL\_THE\_AMOUNT | The calculated route cannot process the entire input amount, you can get more output amount by reducing your input amount | * Try reducing your input amount |
 | MARKET\_NOT\_FOUND | The specified market address was not found | * Verify the market address exists and is active |
 | TOKEN\_NOT\_TRADABLE | The specified token mint is not available for trading | * Check jup.ag if it's routable <br/> * Check the liquidity of the token's markets |

@@ -252,7 +252,7 @@ Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.
 
 - [Trigger Order API Overview](https://developers.jup.ag/docs/trigger/index.md): Jupiter Trigger Order API V2 enables vault-based limit orders on Solana. Supports single price orders, OCO (one-cancels-other for TP/SL), and OTOCO (one-triggers-OCO) order types. Requires JWT authentication via challenge-response flow. Deposits go into vault accounts managed by Privy.
 - [Authentication](https://developers.jup.ag/docs/trigger/authentication.md): POST /trigger/v2/auth/challenge requests a challenge (message or transaction). POST /trigger/v2/auth/verify submits the signed challenge and returns a JWT token (24h TTL). Use the JWT in Authorization: Bearer header for all authenticated endpoints.
-- [Create Order](https://developers.jup.ag/docs/trigger/create-order.md): POST /trigger/v2/deposit/craft builds a deposit transaction. POST /trigger/v2/orders/price creates single, OCO, or OTOCO orders with the signed deposit. Requires JWT authentication. Minimum order: 10 USD.
+- [Create Order](https://developers.jup.ag/docs/trigger/create-order.md): How to create Trigger V2 price orders using POST /trigger/v2/deposit/craft and POST /trigger/v2/orders/price. Covers the vault-based deposit flow, required craft-deposit fields including orderType: price and orderSubType (single, oco, otoco), client-side signing, create-order request bodies for single, OCO, and OTOCO orders, validation rules, and response handling.
 - [Manage Orders](https://developers.jup.ag/docs/trigger/manage-orders.md): PATCH /trigger/v2/orders/price/{orderId} updates order parameters. POST /trigger/v2/orders/price/cancel/{orderId} initiates cancellation and returns a withdrawal transaction. POST /trigger/v2/orders/price/confirm-cancel/{orderId} confirms with the signed withdrawal transaction.
 - [Order History](https://developers.jup.ag/docs/trigger/order-history.md): GET /trigger/v2/orders/history returns paginated order history with state, events, and fill details. Filter by state (active/past), mint, and sort by updated_at/created_at/expires_at.
 - [Best Practices](https://developers.jup.ag/docs/trigger/best-practices.md): Best practices for Trigger Order V2 integrations: order expiry is required (TTL improves execution quality), slippage recommendations by order type, error handling patterns, reference jup.ag frontend for implementation guidance.
@@ -268,7 +268,7 @@ Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.
 
 #### Order Management
 
-- [Craft Deposit](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Craft a deposit transaction for the trigger vault
+- [Craft Deposit](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): API reference for POST /trigger/v2/deposit/craft, which builds an unsigned deposit transaction for Trigger V2 vault-based orders. Covers required request fields including inputMint, outputMint, userAddress, amount, orderType, and orderSubType for price orders, plus response fields such as transaction, requestId, receiverAddress, inputTokenAccount, and outputTokenAccount.
 - [Create Order](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Create a new trigger order
 - [Update Order](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Update parameters of an existing trigger order
 - [Cancel Order](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Cancel a pending trigger order
@@ -467,7 +467,7 @@ Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.
 
 Changelog, release notes, and developer blog.
 
-- [Changelog](https://developers.jup.ag/docs/changelog/index.md): Latest announcements and breaking changes across Jupiter APIs.
+- [Changelog](https://developers.jup.ag/docs/changelog/index.md): Changelog for Jupiter developer APIs, SDKs, and docs. Tracks breaking changes, migration deadlines, new endpoint behaviour, product updates, and links to the relevant developer documentation.
 
 ## Resources
 

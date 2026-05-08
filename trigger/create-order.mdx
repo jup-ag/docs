@@ -1,10 +1,14 @@
 ---
 title: "Create Order"
-description: "Create trigger orders with vault-based deposits. Supports single limit orders, OCO (take-profit/stop-loss), and OTOCO (conditional chains)."
-llmsDescription: "POST /trigger/v2/deposit/craft builds a deposit transaction. POST /trigger/v2/orders/price creates single, OCO, or OTOCO orders with the signed deposit. Requires JWT authentication. Minimum order: 10 USD."
+description: "Create trigger orders with vault-based deposits. Supports single, OCO, and OTOCO orders."
+llmsDescription: "How to create Trigger V2 price orders using POST /trigger/v2/deposit/craft and POST /trigger/v2/orders/price. Covers the vault-based deposit flow, required craft-deposit fields including orderType: price and orderSubType (single, oco, otoco), client-side signing, create-order request bodies for single, OCO, and OTOCO orders, validation rules, and response handling."
 ---
 
 Creating an order in V2 is a two-step process: craft and sign a deposit transaction, then submit it alongside your order parameters.
+
+<Warning>
+An upcoming breaking change is planned for the end of the week of May 11, 2026. When crafting a price-order deposit, `POST /trigger/v2/deposit/craft` will require `orderType: "price"` and `orderSubType`. Requests that omit either field will return a `4xx` after enforcement.
+</Warning>
 
 <Tip>
 For a working reference of the full order creation flow, see how [jup.ag](https://jup.ag) handles it. The frontend implements the same API with validation, error handling, and UX patterns you can use as a guide.
@@ -70,11 +74,21 @@ const depositResponse = await fetch('https://api.jup.ag/trigger/v2/deposit/craft
     outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',  // USDC
     userAddress: walletAddress,
     amount: '1000000000',  // 1 SOL in lamports
+    orderType: 'price',
+    orderSubType: 'single',
   }),
 });
 
 const deposit = await depositResponse.json();
 ```
+
+Set `orderSubType` to match the price order you will create:
+
+| Order create type | Deposit `orderSubType` | Use it for |
+| :--- | :--- | :--- |
+| `single` | `single` | A standalone price order |
+| `oco` | `oco` | A one-cancels-other pair sharing one deposit |
+| `otoco` | `otoco` | A parent trigger that activates an OCO pair. This also provisions an output token account. |
 
 **Response:**
 ```json
@@ -84,13 +98,16 @@ const deposit = await depositResponse.json();
   "receiverAddress": "VaultPublicKey...",
   "mint": "So11111111111111111111111111111111111111112",
   "amount": "1000000000",
-  "tokenDecimals": 9
+  "tokenDecimals": 9,
+  "inputTokenAccount": "InputTokenAccountPubkey..."
 }
 ```
 
 <Note>
-The vault address is automatically resolved from your JWT. You do not specify it in the request.
+The vault address is automatically resolved from your JWT. You do not specify it in the request. You also do not pass `inputTokenAccount` or `outputTokenAccount` into `POST /trigger/v2/orders/price`; the API stores those accounts against the deposit `requestId`.
 </Note>
+
+For `orderSubType: "otoco"`, the response also includes `outputTokenAccount` for the output token account used by the conditional OCO pair.
 
 ## Step 3: Sign the Deposit Transaction
 

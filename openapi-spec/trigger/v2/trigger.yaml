@@ -367,16 +367,32 @@ paths:
                 amount:
                   type: string
                   description: Amount in smallest unit (e.g. lamports for SOL)
+                orderType:
+                  type: string
+                  enum:
+                    - price
+                  description: Order type for the deposit. Use price when crafting a deposit for price trigger orders.
+                orderSubType:
+                  type: string
+                  enum:
+                    - single
+                    - oco
+                    - otoco
+                  description: Required when orderType is price. Use single for standalone orders, oco for OCO orders, and otoco for OTOCO orders.
               required:
                 - inputMint
                 - outputMint
                 - userAddress
                 - amount
+                - orderType
+                - orderSubType
             example:
               inputMint: "So11111111111111111111111111111111111111112"
               outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
               userAddress: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
               amount: "1000000000"
+              orderType: "price"
+              orderSubType: "single"
       responses:
         '200':
           description: Unsigned deposit transaction
@@ -403,6 +419,12 @@ paths:
                   tokenDecimals:
                     type: number
                     description: Token decimals
+                  inputTokenAccount:
+                    type: string
+                    description: Deterministic per-order input token account. Returned for deposits crafted with an orderSubType.
+                  outputTokenAccount:
+                    type: string
+                    description: Deterministic per-order output token account. Returned only when orderSubType is otoco.
                 required:
                   - transaction
                   - requestId
@@ -417,6 +439,7 @@ paths:
                 mint: "So11111111111111111111111111111111111111112"
                 amount: "1000000000"
                 tokenDecimals: 9
+                inputTokenAccount: "InputTokenAccountPubkey..."
         '400':
           description: Invalid request
           content:

@@ -1,0 +1,80 @@
+---
+title: "Market Listing"
+description: "How Metis lists markets and the liquidity criteria they must meet to remain routable."
+llmsDescription: "How Jupiter's Metis routing engine lists markets and decides which remain routable. Two routing types apply: Instant routing automatically lists new markets created on supported DEXes during a grace period determined by token age; Normal routing is the default and re-checks market liquidity every 30 minutes. A market must pass one of two liquidity criteria to remain routable: less than 30% price difference on a $500 round-trip, or less than 20% price impact when comparing a $1000 buy against a $500 buy. Bonding curve markets that don't graduate before the grace period ends are removed from routing; the graduated market is added once it migrates. Also lists DEXes eligible for instant routing and explains what integrators see (NO_ROUTES_FOUND on /swap/v1/quote and /swap/v2/build) when a market is removed from Metis."
+---
+
+This page covers how Metis decides which markets to include in routing. Markets follow one of two routing types: **Instant routing** for new markets on supported DEXes, and **Normal routing**, the default, with a periodic liquidity check.
+
+## Routing types
+
+### Instant routing
+
+New markets created on supported DEXes are listed automatically. During a grace period, the liquidity criteria do not apply.
+
+The grace period is determined by **token age, not market age**. A new pool created for an existing token does not reset the grace period.
+
+| Token age | Scenario                        | Result                                |
+|-----------|---------------------------------|---------------------------------------|
+| —         | Token minted, no pool           | —                                     |
+| 1 day     | First pool created and trading  | Within grace period, instant routing  |
+| 20 days   | Second pool created and trading | Within grace period, instant routing  |
+| 30 days   | Third pool created and trading  | Outside grace period, normal routing  |
+
+After the grace period ends, the liquidity criteria apply (see [Liquidity criteria](#liquidity-criteria)).
+
+For bonding curves: if the token does not graduate before the grace period ends, the market is removed from routing. Once the bonding curve graduates to a new market, the graduated market is added to routing.
+
+<Accordion title="DEXes eligible for instant routing">
+- Meteora Dynamic Bonding Curve
+- Meteora Dynamic AMM
+- Meteora DAMM V2
+- Meteora DLMM
+- Raydium
+- Raydium CLMM
+- Raydium CPMM
+- Raydium Launchlab
+- Pump.fun AMM
+- Pump.fun
+- Fluxbeam
+- Whirlpool
+- Moonshot
+- Virtuals
+- Boop.fun
+</Accordion>
+
+### Normal routing
+
+The default for all markets. Every 30 minutes, the routing engine re-checks the liquidity of each market. Markets that fail the check are removed from routing.
+
+## Liquidity criteria
+
+A market must pass **one** of the following to remain routable.
+
+### 1. Less than 30% price difference on a \$500 round-trip
+
+Using a benchmark position size of \$500, the price difference between buying \$500 worth and selling it back on the same market must be less than 30%.
+
+```
+Price Difference = ($500 - Final USD value) / $500
+```
+
+If the price difference exceeds 30%, the market does not have enough liquidity for the benchmark position size.
+
+### 2. Less than 20% price impact comparing \$1000 vs \$500 buys
+
+If the round-trip test does not pass, the engine compares the price per token from a \$1000 buy against the price per token from a \$500 buy. If the price impact between the two buys exceeds 20%, the market is considered illiquid.
+
+<Tip>
+You can check your pool's liquidity directly via the UI of the DEX it was created on.
+</Tip>
+
+## What integrators see when a market is removed
+
+These criteria apply to Metis. When a market is removed from Metis routing:
+
+- `/swap/v1/quote` returns `NO_ROUTES_FOUND`
+- `/swap/v2/build` returns `No routes found`
+- `/swap/v2/order` may still return a quote via another router (JupiterZ, OKX, or Dflow)
+
+If a token quotes on jup.ag but `/swap/v1/quote` returns `NO_ROUTES_FOUND`, the route is most likely coming from a non-Metis router. Use `/swap/v2/order` for Meta-Aggregator coverage across all routers.

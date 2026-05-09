@@ -1,6 +1,7 @@
 ---
 title: "Changelog"
 description: "Latest announcements and breaking changes across Jupiter APIs."
+llmsDescription: "Changelog for Jupiter developer APIs, SDKs, and docs. Tracks breaking changes, migration deadlines, new endpoint behaviour, product updates, and links to the relevant developer documentation."
 ---
 
 <Card title="Stay Updated">
@@ -15,6 +16,29 @@ description: "Latest announcements and breaking changes across Jupiter APIs."
   </Card>
   </Columns>
 </Card>
+
+---
+
+<Update label="May 2026" description="">
+
+## Trigger API: Upcoming Craft Deposit Request Change
+
+<Danger>
+**Action Required** - A breaking change is currently planned for Wednesday, May 13, 2026. Update Trigger V2 integrations that craft price-order deposits before enforcement.
+</Danger>
+
+`POST https://api.jup.ag/trigger/v2/deposit/craft` will require explicit order metadata when crafting deposits for price orders:
+
+* Add `orderType: "price"` to the craft-deposit request body
+* Add `orderSubType: "single"`, `"oco"`, or `"otoco"` based on the order you will create
+* Requests that omit `orderType`, or omit `orderSubType` for price orders, will return a `4xx` after enforcement
+
+No change is required on `POST /trigger/v2/orders/price`. The deposit craft response may include `inputTokenAccount`, and includes `outputTokenAccount` for `orderSubType: "otoco"`. You do not need to pass those token account fields into the create-order request.
+
+- [Create Trigger Order](/trigger/create-order)
+- [Craft Deposit API Reference](/api-reference/trigger/deposit-craft)
+
+</Update>
 
 ---
 

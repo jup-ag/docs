@@ -27,7 +27,7 @@ Jupiter automatically covers all gas costs when the taker lacks SOL. No configur
 **What it covers:** all four gas types (signature fee, priority fee, ATA rent, other account rent).
 
 **How it works:**
-- Jupiter calculates the required SOL to cover gas and increases the swap fee. The taker receives less output tokens. The `feeBps` field in the response reflects this increased fee.
+- Jupiter calculates the required SOL to cover gas and increases the swap fee. The taker receives less output tokens. The top-level `feeBps` field reflects this increased total fee, while `platformFee.feeBps` only reflects the Jupiter platform fee.
 - A secondary signer (Jupiter's gas payer) is added to the transaction.
 
 **Limitations:**

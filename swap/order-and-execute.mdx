@@ -404,6 +404,12 @@ Jupiter charges a platform fee on `/order` swaps. This fee is included in the qu
 }
 ```
 
+#### Total fee vs platform fee
+
+The top-level `feeBps` field is the total fee rate charged for the swap. The `platformFee.feeBps` field is the Jupiter platform fee rate, which is the fee Jupiter intends to make from the swap.
+
+These values can differ when the swap includes additional charges, such as gasless support cost recoup. For example, if the platform fee for a swap pair is 5 bps and gasless support adds 7 bps, the response can show `feeBps: 12` and `platformFee.feeBps: 5`.
+
 #### Fee breakdown
 
 The platform fee varies by token pair:
@@ -427,7 +433,7 @@ Jupiter determines which token to collect fees in based on a priority list:
 4. **Bluechips** (large market cap tokens)
 5. **Others**
 
-Check the `feeBps` and `feeMint` fields in the `/order` response to see which token and rate apply to your swap.
+Check the `feeBps`, `platformFee.feeBps`, and `feeMint` fields in the `/order` response to see the total fee rate, Jupiter platform fee rate, and fee token for your swap.
 
 ### Referral fees
 
@@ -516,7 +522,7 @@ const response = await fetch(
 );
 ```
 
-Verify your fees are applied by checking the `feeBps` field in the response matches your `referralFee` value. If it falls back to the default platform fee, the `referralTokenAccount` for that `feeMint` is likely not initialised.
+Verify your fees are applied by checking the response fee fields. Top-level `feeBps` is the total fee rate charged for the swap, while `platformFee.feeBps` is the Jupiter platform fee rate. If the response falls back to the default platform fee, the `referralTokenAccount` for that `feeMint` is likely not initialised.
 
 <Warning>
   Adding `referralAccount` disables RFQ routing. You will only get Metis quotes. See the [routing impact matrix](#routing-impact-matrix) above.
@@ -528,10 +534,10 @@ The `/order` response includes these fee-related fields:
 
 | Field | Description |
 | --- | --- |
-| `feeBps` | Total fees including platform and other fees (basis points) |
+| `feeBps` | Total fee rate charged for the swap, including platform fee and additional charges such as gasless support cost recoup |
 | `feeMint` | Token fees are collected in |
 | `platformFee.amount` | Jupiter platform fee amount |
-| `platformFee.feeBps` | Jupiter platform fee rate |
+| `platformFee.feeBps` | Jupiter platform fee rate, excluding gasless support cost recoup |
 | `referralAccount` | Referral account used (if set) |
 
 ## Related

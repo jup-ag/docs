@@ -81,7 +81,7 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 - **TypeScript is the default language** for code examples
 - If showing multiple languages, use Mintlify's `<CodeGroup>`:
 
-```mdx
+````mdx
     <CodeGroup>
     ```typescript TypeScript
     // example
@@ -90,7 +90,7 @@ Technical but approachable. Professional and precise, not cold or overly formal.
     # example
     ```
     </CodeGroup>
-```
+````
 
 ### API Endpoints
 

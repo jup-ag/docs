@@ -82,7 +82,7 @@ components:
           type: string
         feeBps:
           type: number
-          description: Platform fee in basis points
+          description: Jupiter platform fee component in basis points. This is the fee Jupiter intends to make from the swap and does not include gasless support cost recoup.
         feeMint:
           type: string
 
@@ -326,7 +326,7 @@ paths:
                     type: string
                   feeBps:
                     type: number
-                    description: Total fees including platform fee and other fees
+                    description: Total fee rate charged for the swap in basis points. This includes the Jupiter platform fee plus any additional charges, such as gasless support cost recoup.
                   platformFee:
                     $ref: "#/components/schemas/PlatformFee"
                   signatureFeeLamports:

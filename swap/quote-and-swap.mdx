@@ -1,0 +1,190 @@
+---
+title: "Quote and Swap"
+description: "Separated quote and swap flow for integrators that need to roundtrip a quote"
+llmsDescription: "How to use the separated quote and swap flow on Jupiter Swap API V2 via three endpoints: GET https://api.jup.ag/swap/v2/quote returns a QuoteResponse; POST https://api.jup.ag/swap/v2/swap takes that QuoteResponse and returns a base64-encoded unsigned VersionedTransaction; POST https://api.jup.ag/swap/v2/swap-instructions takes the same QuoteResponse and returns raw Solana instructions plus address lookup table data. Useful when an integrator needs to inspect, log, or transform the quote between routing and transaction assembly. Parameters: inputMint, outputMint, amount, slippageBps, dexes/excludeDexes, platformFeeBps, dynamicSwap on /quote; taker, payer, feeAccount, destinationTokenAccount, nativeDestinationAccount, wrapAndUnwrapSol, blockhashSlotsToExpiry, tipAmount, computeUnitPricePercentile on /swap and /swap-instructions. Includes a complete TypeScript example for the quote then swap flow."
+hidden: true
+---
+
+The Swap API exposes a separated quote and swap flow under `/swap/v2`. Get a quote in one call, then pass that quote into a second call to either receive a fully built transaction or raw instructions.
+
+Use this flow when you need to inspect, log, or transform the quote between routing and transaction assembly. If you do not need that separation, use [Order & Execute](/swap/order-and-execute) (managed) or [Build](/swap/build) (instructions in a single call) instead.
+
+## Endpoints
+
+| Endpoint                          | Purpose                                                              |
+|-----------------------------------|----------------------------------------------------------------------|
+| `GET /swap/v2/quote`              | Returns a `QuoteResponse` describing the best route                  |
+| `POST /swap/v2/swap`              | Builds a base64-encoded unsigned VersionedTransaction from a quote   |
+| `POST /swap/v2/swap-instructions` | Returns raw Solana instructions and ALT data from a quote            |
+
+The `QuoteResponse` returned by `/quote` must be passed back **unchanged** to `/swap` or `/swap-instructions`. The response contains fields that are not part of the documented schema but are required for transaction assembly. Preserve unknown fields using a passthrough type (`Record<string, unknown>`, `serde_json::Value`, or similar). Do not deserialise into a strict struct and re-serialise.
+
+## GET /swap/v2/quote
+
+```
+GET https://api.jup.ag/swap/v2/quote
+```
+
+### Query parameters
+
+| Parameter                       | Type      | Required | Description                                                                                                                |
+|---------------------------------|-----------|----------|----------------------------------------------------------------------------------------------------------------------------|
+| `inputMint`                     | `string`  | Yes      | Mint address of the input token                                                                                            |
+| `outputMint`                    | `string`  | Yes      | Mint address of the output token                                                                                           |
+| `amount`                        | `string`  | Yes      | Amount of `inputMint` to swap, in the smallest unit (e.g. lamports for SOL)                                                |
+| `slippageBps`                   | `number`  | No       | Slippage tolerance in basis points (0–10000). Baked into the response's `otherAmountThreshold`. Defaults to `50`           |
+| `dexes`                         | `string`  | No       | Comma-separated DEX identifiers to restrict routing to. Mutually exclusive with `excludeDexes`                              |
+| `excludeDexes`                  | `string`  | No       | Comma-separated DEX identifiers to exclude from routing. Mutually exclusive with `dexes`                                   |
+| `platformFeeBps`                | `number`  | No       | Platform fee in basis points (0–10000). The matching `feeAccount` must be supplied at swap time                            |
+| `useIncurredSlippageForQuoting` | `boolean` | No       | Whether to use incurred slippage for quoting. Defaults to `false`                                                          |
+| `dynamicSwap`                   | `boolean` | No       | Allow split routing across multiple candidate AMMs. Defaults to `true`. Pass `false` to opt out                            |
+
+### Response
+
+A `QuoteResponse` object. The documented fields are below; additional fields are present and **must be preserved** when forwarding the quote to `/swap` or `/swap-instructions`.
+
+| Field                  | Type      | Description                                                                  |
+|------------------------|-----------|------------------------------------------------------------------------------|
+| `inputMint`            | `string`  | Echo of the request                                                          |
+| `outputMint`           | `string`  | Echo of the request                                                          |
+| `inAmount`             | `string`  | Input amount in smallest units                                               |
+| `outAmount`            | `string`  | Expected output amount in smallest units                                     |
+| `otherAmountThreshold` | `string`  | Minimum output after applying `slippageBps`                                  |
+| `swapMode`             | `string`  | `ExactIn` or `ExactOut`                                                      |
+| `slippageBps`          | `number`  | Slippage applied to the quote                                                |
+| `priceImpactPct`       | `string`  | Price impact as a decimal string                                             |
+| `contextSlot`          | `number`  | Solana slot the route was computed against                                   |
+| `timeTaken`            | `number`  | Routing latency in seconds                                                   |
+| `routePlan`            | `array`   | Per-step route information                                                   |
+| `platformFee`          | `object`  | `{ amount, feeBps }`. Present only when `platformFeeBps` was set on `/quote` |
+
+### Errors
+
+`/quote` returns `400` for: invalid `inputMint` or `outputMint`, `inputMint === outputMint`, invalid or out-of-range `amount`, both `dexes` and `excludeDexes` set, insufficient liquidity, and token-not-tradable.
+
+## POST /swap/v2/swap and POST /swap/v2/swap-instructions
+
+Both endpoints accept the same body. They differ only in the response:
+
+- `/swap` returns a fully built, base64-encoded unsigned VersionedTransaction.
+- `/swap-instructions` returns raw instructions and address lookup table data so you can compose your own transaction.
+
+```
+POST https://api.jup.ag/swap/v2/swap
+POST https://api.jup.ag/swap/v2/swap-instructions
+```
+
+### Request body
+
+| Field                        | Type                                                              | Required | Description                                                                                                       |
+|------------------------------|-------------------------------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------------|
+| `quoteResponse`              | `object`                                                          | Yes      | The full `QuoteResponse` returned by `/quote`, passed through unchanged                                            |
+| `taker`                      | `string`                                                          | Yes      | Pubkey of the wallet initiating the swap                                                                          |
+| `payer`                      | `string`                                                          | No       | Account that pays transaction fees and rent. Defaults to `taker`                                                  |
+| `feeAccount`                 | `string`                                                          | No       | Token account that collects the platform fee. Required if `quoteResponse.platformFee` is set                      |
+| `destinationTokenAccount`    | `string`                                                          | No       | SPL token account that receives the output. Mutually exclusive with `nativeDestinationAccount`                    |
+| `nativeDestinationAccount`   | `string`                                                          | No       | Native SOL account that receives the output. Mutually exclusive with `destinationTokenAccount`                    |
+| `wrapAndUnwrapSol`           | `boolean`                                                         | No       | Wrap/unwrap SOL automatically. Defaults to `true`. Always closes the wSOL token account after the swap            |
+| `blockhashSlotsToExpiry`     | `number`                                                          | No       | Slots until the blockhash expires (1–300). Defaults to `150`                                                      |
+| `tipAmount`                  | `string`                                                          | No       | Lamports to transfer to a permitted tip receiver via an included tip instruction. Paid by `payer` (or `taker`)    |
+| `computeUnitPricePercentile` | `"medium"` &#124; `"high"` &#124; `"veryHigh"` &#124; `number`    | No       | Named level or integer (0–10000 bps) that controls the compute-unit price. Defaults to a server-side percentile   |
+
+### /swap response
+
+| Field                       | Type     | Description                                                            |
+|-----------------------------|----------|------------------------------------------------------------------------|
+| `swapTransaction`           | `string` | Base64-encoded serialised unsigned `VersionedTransaction` (v0)         |
+| `lastValidBlockHeight`      | `number` | Last block height at which the included blockhash is valid             |
+| `prioritizationFeeLamports` | `number` | Compute-unit price multiplied by the default compute-unit limit        |
+| `computeUnitPrice`          | `string` | Resolved compute-unit price, in micro-lamports                         |
+
+### /swap-instructions response
+
+| Field                              | Type                      | Description                                                                                                       |
+|------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------|
+| `computeBudgetInstructions`        | `Instruction[]`           | Compute budget instructions (sets the compute-unit price)                                                         |
+| `setupInstructions`                | `Instruction[]`           | Setup (e.g. create-ATA, wrap-SOL) that must precede the swap                                                      |
+| `swapInstruction`                  | `Instruction`             | The swap instruction itself                                                                                       |
+| `cleanupInstruction`               | `Instruction \| null`     | Cleanup (e.g. unwrap-SOL) that must follow the swap                                                                |
+| `otherInstructions`                | `Instruction[]`           | Additional instructions required by the route                                                                     |
+| `tipInstruction`                   | `Instruction \| null`     | Present when `tipAmount` was supplied                                                                             |
+| `addressesByLookupTableAddress`    | `Record<string, string[]>`| Address Lookup Tables required to compile the v0 transaction (table address → contained addresses)                 |
+| `blockhashWithMetadata.blockhash`  | `number[]`                | Recent blockhash as a byte array                                                                                  |
+| `blockhashWithMetadata.lastValidBlockHeight` | `number`        | Last block height at which the blockhash is valid                                                                 |
+
+`Instruction` has the shape `{ programId: string, accounts: { pubkey: string, isWritable: boolean, isSigner: boolean }[], data: string }`. `data` is base64-encoded.
+
+The `addressesByLookupTableAddress` mapping contains every ALT needed to compile the transaction. **Do not fetch ALTs from RPC.** Build `AddressLookupTableAccount` instances directly from this response.
+
+## Quote then swap
+
+```typescript
+import { Connection, VersionedTransaction } from "@solana/web3.js";
+
+const BASE_URL = "https://api.jup.ag/swap/v2";
+const taker = wallet.publicKey.toBase58();
+
+// 1. Quote
+const quoteUrl = `${BASE_URL}/quote?` + new URLSearchParams({
+  inputMint: "So11111111111111111111111111111111111111112",
+  outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  amount: "1000000000",
+  slippageBps: "50",
+});
+
+const quoteRes = await fetch(quoteUrl);
+if (!quoteRes.ok) {
+  throw new Error(`quote failed: ${await quoteRes.text()}`);
+}
+const quoteResponse = await quoteRes.json();
+
+// 2. Build the transaction (pass quoteResponse through unchanged)
+const swapRes = await fetch(`${BASE_URL}/swap`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    quoteResponse,
+    taker,
+  }),
+});
+if (!swapRes.ok) {
+  throw new Error(`swap failed: ${await swapRes.text()}`);
+}
+const { swapTransaction, lastValidBlockHeight } = await swapRes.json();
+
+// 3. Deserialise, sign, and send
+const tx = VersionedTransaction.deserialize(Buffer.from(swapTransaction, "base64"));
+const signed = await wallet.signTransaction(tx);
+
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+const signature = await connection.sendRawTransaction(signed.serialize(), {
+  skipPreflight: true,
+});
+
+await connection.confirmTransaction(
+  {
+    signature,
+    blockhash: tx.message.recentBlockhash,
+    lastValidBlockHeight,
+  },
+  "confirmed"
+);
+```
+
+## Quote then swap-instructions
+
+When you need to compose your own transaction (custom fee payer, CPI, batching, etc.), call `/swap-instructions` instead. Convert the returned objects into `TransactionInstruction` and build `AddressLookupTableAccount` instances from `addressesByLookupTableAddress`. The transaction is v0 and must include the compute budget, setup, swap, cleanup, and any `otherInstructions` in that order.
+
+## Notes
+
+- **Preserve the full `quoteResponse`.** The schema is `passthrough` on the server side. Strict-typed clients that drop unknown fields will get `500 Internal Server Error` from `/swap` and `/swap-instructions`. Forward the JSON as-is.
+- **`platformFeeBps` requires `feeAccount`.** If you request a platform fee on `/quote`, you must supply the matching `feeAccount` on the swap call.
+- **wSOL token account is always closed** when `wrapAndUnwrapSol=true`, regardless of whether SOL is the input or output mint. The rent is returned to `payer` (or `taker` if `payer` is not specified).
+- **`dexes` and `excludeDexes` are mutually exclusive.** Sending both returns `400`.
+- **No `/execute` for this flow.** `/execute` is exclusive to `/order`. To submit transactions built via `/swap`, use your own RPC or [`/submit`](/transaction/submit).
+
+## Related
+
+- [Order & Execute](/swap/order-and-execute): the managed swap flow (`/order` + `/execute`)
+- [Build](/swap/build): raw instructions in a single call, no separate quote step
+- [`/submit`](/transaction/submit): Jupiter transaction landing endpoint

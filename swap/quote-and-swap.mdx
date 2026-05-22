@@ -1,7 +1,7 @@
 ---
 title: "Quote and Swap"
 description: "Separated quote and swap flow for integrators that need to roundtrip a quote"
-llmsDescription: "Two-step Swap API flow at api.jup.ag/swap/v2: GET /swap/v2/quote returns a QuoteResponse, POST /swap/v2/swap returns a base64 unsigned VersionedTransaction built from that quote, POST /swap/v2/swap-instructions returns raw instructions plus address lookup tables built from that quote. All three require an x-api-key header and are served only on api.jup.ag (not on lite-api.jup.ag). The compute-unit limit is pinned at 1,400,000 with no per-route simulation. The wSOL token account is closed when wrapAndUnwrapSol=true with rent returned to the taker, not the payer (different from /order). tipAmount transfers SOL to a randomly chosen receiver from a fixed allowlist of 16 Jupiter V6 program authorities. Includes runnable TypeScript examples in both @solana/kit and @solana/web3.js for the quote-then-swap flow."
+llmsDescription: "Two-step Swap API flow at api.jup.ag/swap/v2: GET /swap/v2/quote returns a QuoteResponse, POST /swap/v2/swap returns a base64 unsigned VersionedTransaction built from that quote, POST /swap/v2/swap-instructions returns raw instructions plus address lookup tables built from that quote. All three require an x-api-key header and are served only on api.jup.ag (not on lite-api.jup.ag). The compute-unit limit is pinned at 1,400,000 with no per-route simulation. The wSOL token account is closed when wrapAndUnwrapSol=true with rent returned to the taker, not the payer (different from /order). tipAmount transfers SOL to a randomly chosen receiver from a fixed allowlist of Jupiter authorities. Includes runnable TypeScript examples in both @solana/kit and @solana/web3.js for the quote-then-swap flow."
 hidden: true
 ---
 
@@ -96,7 +96,7 @@ POST https://api.jup.ag/swap/v2/swap-instructions
 | `nativeDestinationAccount`   | `string`                                                          | No       | Native SOL account that receives the output. Mutually exclusive with `destinationTokenAccount`                    |
 | `wrapAndUnwrapSol`           | `boolean`                                                         | No       | Wrap/unwrap SOL automatically. Defaults to `true`. Always closes the wSOL token account after the swap            |
 | `blockhashSlotsToExpiry`     | `number`                                                          | No       | Slots until the blockhash expires (1–300). Defaults to `150`                                                      |
-| `tipAmount`                  | `string`                                                          | No       | Lamports to transfer to a permitted tip receiver via an included tip instruction. **Minimum is `1000000` lamports (0.001 SOL).** The receiver is randomly selected per request from a fixed set of 16 Jupiter V6 program authority addresses (see [Tip receivers](#tip-receivers)). Paid by `payer` (or `taker`) |
+| `tipAmount`                  | `string`                                                          | No       | Lamports to transfer to a permitted tip receiver via an included tip instruction. **Minimum is `1000000` lamports (0.001 SOL).** The receiver is randomly selected per request from a fixed set of Jupiter authority addresses (see [Tip receivers](#tip-receivers)). Paid by `payer` (or `taker`) |
 | `computeUnitPricePercentile` | `"medium"` &#124; `"high"` &#124; `"veryHigh"` &#124; `number`    | No       | Named level or integer (0–10000 bps) that controls the `setComputeUnitPrice` instruction. Named levels map to `"medium"`=2500, `"high"`=5000, `"veryHigh"`=7500. Defaults to **5000 bps (50th percentile)** when omitted |
 
 ### /swap response
@@ -152,7 +152,7 @@ Both endpoints return JSON of the form `{ "error": "<message>" }`. Status codes:
 
 ### Tip receivers
 
-The tip recipient is randomly selected per request from a fixed 16-address allowlist of Jupiter V6 program authorities. You cannot choose the receiver. Multiple recipients exist to spread writable-account contention during landing. Same allowlist as [`/submit`](/transaction/submit).
+The tip recipient is randomly selected per request from a fixed allowlist of Jupiter authorities. You cannot choose the receiver. Multiple recipients exist to spread writable-account contention during landing. Same allowlist as [`/submit`](/transaction/submit).
 
 ## Quote then swap
 

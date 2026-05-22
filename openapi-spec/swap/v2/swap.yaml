@@ -237,7 +237,8 @@ paths:
             type: string
           description: |
             - The public key of an account that will cover gas-related fees (signature fees, priority fees, and rent) on behalf of the taker
-            - Enabling this changes routing behaviour: Jupiter may route through a dedicated gasless flow if the taker lacks sufficient SOL for gas
+            - Has no effect when set equal to `taker` — must be a different wallet to activate integrator-sponsored gas
+            - Enabling this restricts routing to Metis (JupiterZ is disabled when an integrator payer is set)
           example: gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB
         - name: priorityFeeLamports
           in: query
@@ -365,6 +366,12 @@ paths:
                     type: string
                   gasless:
                     type: boolean
+                    description: |
+                      True when signature and priority fees are paid by a wallet other than the taker. Set by three independent paths:
+                      - Automatic Jupiter sponsorship: `signatureFeePayer = gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`
+                      - JupiterZ market maker: `signatureFeePayer` is the MM address (varies per quote); ATA rent (`rentFeePayer`) is still the taker
+                      - Integrator payer: `signatureFeePayer` is your `payer` parameter
+                      For a deterministic opt-out, check `signatureFeePayer == taker` on every response.
                   requestId:
                     type: string
                     description: Unique request ID. Pass this to /execute.

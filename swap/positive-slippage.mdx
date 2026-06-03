@@ -1,7 +1,7 @@
 ---
 title: "Positive Slippage"
 description: "Collect a share of positive slippage on /order and /build swaps"
-llmsDescription: "Enterprise-only positive slippage collection on the Jupiter Swap V2 API. Whitelisted integrators pass the positiveSlippageBps query parameter (0–10000) to GET /swap/v2/order or GET /swap/v2/build to claim a share of positive slippage on swaps where the realised output exceeds the quoted output. Value 0 (default) sends all positive slippage to the user; 10000 sends all positive slippage to the integrator; intermediate values split proportionally. Access is gated by a case-by-case whitelist coordinated through an existing Jupiter contact. The integrator's share is collected in a Jupiter-managed wallet: Jupiter holds ATAs for every mint, swaps incoming balances to USDC at regular intervals, and pays out a single monthly USDC amount to the integrator's designated payout address. The Jupiter/integrator split is agreed during whitelisting. A self-managed collector wallet is not yet supported. The collection mechanism is identical for /order and /build."
+llmsDescription: "Enterprise-only positive slippage collection on the Jupiter Swap V2 API. Whitelisted integrators pass the positiveSlippageBps query parameter (0–10000) to GET /swap/v2/order or GET /swap/v2/build to claim a share of positive slippage on swaps where the realised output exceeds the quoted output. Value 0 (default) sends all positive slippage to the user; 10000 sends all positive slippage to the integrator; intermediate values split proportionally. Access is gated by a case-by-case whitelist arranged directly with the Jupiter team. The integrator's share is collected in a Jupiter-managed wallet: Jupiter holds ATAs for every mint, swaps incoming balances to USDC at regular intervals, and pays out a single monthly USDC amount to the integrator's designated payout address. The Jupiter/integrator split is agreed during whitelisting. A self-managed collector wallet is not yet supported. The collection mechanism is identical for /order and /build."
 hidden: true
 ---
 
@@ -14,7 +14,7 @@ Access is evaluated case by case and applies to both `/order` and `/build` integ
 Before `positiveSlippageBps` has any effect, Jupiter must whitelist your organisation. To request whitelisting:
 
 1. Find your organisation ID under Settings in the [Developer Platform](https://developers.jup.ag/portal).
-2. Share that organisation ID with your Jupiter contact.
+2. Send that organisation ID to us.
 3. Jupiter manually enables positive slippage on the matching organisation ID.
 
 If `positiveSlippageBps` is not passed, the user receives 100% of any positive slippage as usual.
@@ -82,7 +82,7 @@ You are responsible for:
 The integrator portion (`positiveSlippageBps` bps of the realised positive slippage) is split between Jupiter and you. The exact split is agreed during whitelisting.
 
 <Note>
-A self-managed collector wallet (where Jupiter sends collected mints to a wallet you control instead of converting and paying out monthly) is not yet supported. If you need this option, raise it with your Jupiter contact.
+A self-managed collector wallet (where Jupiter sends collected mints to a wallet you control instead of converting and paying out monthly) is not yet supported. Let us know if you need it.
 </Note>
 
 ## Related

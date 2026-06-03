@@ -1,7 +1,7 @@
 ---
 title: "Positive Slippage"
 description: "Collect a share of positive slippage on /order and /build swaps"
-llmsDescription: "Enterprise-only positive slippage collection on the Jupiter Swap V2 API. Whitelisted integrators pass the positiveSlippageBps query parameter (0–10000) to GET /swap/v2/order or GET /swap/v2/build to claim a share of positive slippage on swaps where the realised output exceeds the quoted output. Value 0 (default) sends all positive slippage to the user; 10000 sends all positive slippage to the integrator; intermediate values split proportionally. Access is gated by a case-by-case whitelist coordinated through an existing Jupiter contact; the organisation ID registered with the API gateway must match. Fee settlement enrolment is not a prerequisite. Two collection paths are offered: a Jupiter-managed collector wallet (recommended, Jupiter holds ATAs for every mint and pays out a single monthly USDC amount) or a direct collector wallet supplied by the integrator (Jupiter sends every collected mint as-is, integrator opens and maintains ATAs). The Jupiter/integrator share of the integrator's portion is agreed during whitelisting and mirrors the fee settlement split when the integrator is enrolled. The collection mechanism is identical for /order and /build."
+llmsDescription: "Enterprise-only positive slippage collection on the Jupiter Swap V2 API. Whitelisted integrators pass the positiveSlippageBps query parameter (0–10000) to GET /swap/v2/order or GET /swap/v2/build to claim a share of positive slippage on swaps where the realised output exceeds the quoted output. Value 0 (default) sends all positive slippage to the user; 10000 sends all positive slippage to the integrator; intermediate values split proportionally. Access is gated by a case-by-case whitelist coordinated through an existing Jupiter contact. The integrator's share is collected in a Jupiter-managed wallet: Jupiter holds ATAs for every mint, swaps incoming balances to USDC at regular intervals, and pays out a single monthly USDC amount to the integrator's designated payout address. The Jupiter/integrator split is agreed during whitelisting. A self-managed collector wallet is not yet supported. The collection mechanism is identical for /order and /build."
 hidden: true
 ---
 
@@ -9,7 +9,7 @@ Positive slippage is the amount by which a swap's realised output exceeds the qu
 
 ## Eligibility
 
-Access is evaluated case by case and applies independently of whether you are enrolled in the fee settlement service or which endpoint you integrate (`/order` or `/build`).
+Access is evaluated case by case and applies to both `/order` and `/build` integrations.
 
 Before `positiveSlippageBps` has any effect, Jupiter must whitelist your organisation. To request whitelisting:
 
@@ -71,25 +71,19 @@ curl -G "https://api.jup.ag/swap/v2/build" \
 
 ## Revenue distribution
 
-The user's share of positive slippage (`10000 − positiveSlippageBps` bps) is settled to the `taker` on-chain at swap time. Your share lands in a collector wallet. You choose one of two collection paths during whitelisting.
+The user's share of positive slippage (`10000 − positiveSlippageBps` bps) is settled to the `taker` on-chain at swap time. The integrator's share is collected in a Jupiter-managed wallet: Jupiter opens and maintains ATAs for every mint that flows into it, swaps incoming balances to USDC at regular intervals, and sends a single monthly USDC payout to your designated payout address.
 
-### Jupiter-managed collector (recommended)
-
-Jupiter holds the collector wallet, opens and maintains ATAs for every mint that flows into it, swaps incoming balances to USDC at regular intervals, and sends a single monthly USDC payout to your designated payout address.
-
-Most integrators choose this path. Positive slippage can arrive in any mint, including long-tail assets where Solana liquidity moves quickly. Opening per-mint ATAs and converting balances yourself adds up in cost and operational overhead.
+Positive slippage can arrive in any mint, including long-tail assets where Solana liquidity moves quickly. Opening per-mint ATAs and converting balances yourself adds up in cost and operational overhead; Jupiter handles this for you.
 
 You are responsible for:
 - The payout wallet address that Jupiter sends to.
 - Initialising the USDC ATA on that wallet before the first payout.
 
-### Direct collector
+The integrator portion (`positiveSlippageBps` bps of the realised positive slippage) is split between Jupiter and you. The exact split is agreed during whitelisting.
 
-You provide a wallet address you control. Jupiter sends every collected mint to that address as-is, with no conversion. You open and maintain the ATAs for every mint you expect to receive and run any USDC conversion yourself.
-
-### Jupiter and integrator split
-
-Across both paths, the integrator portion of the positive slippage (`positiveSlippageBps` bps of the realised amount) is split between Jupiter and you. The exact split is agreed during whitelisting and mirrors your fee settlement split if you are enrolled.
+<Note>
+A self-managed collector wallet (where Jupiter sends collected mints to a wallet you control instead of converting and paying out monthly) is not yet supported. If you need this option, raise it with your Jupiter contact.
+</Note>
 
 ## Related
 

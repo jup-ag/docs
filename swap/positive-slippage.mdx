@@ -7,17 +7,13 @@ hidden: true
 
 Positive slippage is the amount by which a swap's realised output exceeds the quoted output. By default, the entire positive slippage goes back to the user. Whitelisted enterprise integrators can claim a configurable share by passing `positiveSlippageBps` on `/order` or `/build`.
 
-<Note>
-Positive slippage collection is opt-in and gated by a manual whitelist. Coordinate access through your existing Jupiter contact before passing `positiveSlippageBps` in production traffic.
-</Note>
-
 ## Eligibility
 
 Access is evaluated case by case and applies independently of whether you are enrolled in the fee settlement service or which endpoint you integrate (`/order` or `/build`).
 
 Before `positiveSlippageBps` has any effect, Jupiter must whitelist your organisation. To request whitelisting:
 
-1. Confirm your organisation ID is registered with the API gateway (the same ID used to authenticate your API key).
+1. Find your organisation ID under Settings in the [Developer Platform](https://developers.jup.ag/portal).
 2. Share that organisation ID with your Jupiter contact.
 3. Jupiter manually enables positive slippage on the matching organisation ID.
 
@@ -27,11 +23,11 @@ If `positiveSlippageBps` is not passed, the user receives 100% of any positive s
 
 | Parameter             | Type     | Range    | Default | Description                                                                 |
 |-----------------------|----------|----------|---------|-----------------------------------------------------------------------------|
-| `positiveSlippageBps` | `number` | `0–10000`| `0`     | Share of positive slippage routed to the integrator's collector pool, in bps |
+| `positiveSlippageBps` | `number` | `0–10000`| `0`     | Share of positive slippage routed to the integrator's collector wallet, in bps |
 
 - `0` (default): user receives 100% of the positive slippage.
-- `10000`: integrator's collector pool receives 100% of the positive slippage; user receives 0.
-- Any value in between: split proportionally. For example, `5000` sends 50% to the integrator's collector pool and 50% to the user.
+- `10000`: integrator's collector wallet receives 100% of the positive slippage; user receives 0.
+- Any value in between: split proportionally. For example, `5000` sends 50% to the integrator's collector wallet and 50% to the user.
 
 The split is applied per swap, at execution time.
 
@@ -53,7 +49,7 @@ curl -G "https://api.jup.ag/swap/v2/order" \
   --data-urlencode "positiveSlippageBps=5000"
 ```
 
-No other changes are required. The returned transaction routes the user's share back to the taker and the integrator's share to the collector wallet configured during whitelisting.
+No other changes are required. The returned transaction routes the user's share back to the `taker` and the integrator's share to the collector wallet configured during whitelisting.
 
 ## Using with `/build`
 
@@ -75,7 +71,7 @@ curl -G "https://api.jup.ag/swap/v2/build" \
 
 ## Revenue distribution
 
-The user's share of positive slippage (`10000 − positiveSlippageBps` bps) is settled to the taker on-chain at swap time. Your share lands in a collector wallet. You choose one of two collection paths during whitelisting.
+The user's share of positive slippage (`10000 − positiveSlippageBps` bps) is settled to the `taker` on-chain at swap time. Your share lands in a collector wallet. You choose one of two collection paths during whitelisting.
 
 ### Jupiter-managed collector (recommended)
 
@@ -93,7 +89,7 @@ You provide a wallet address you control. Jupiter sends every collected mint to 
 
 ### Jupiter and integrator split
 
-Across both paths, the integrator portion of the positive slippage (`positiveSlippageBps` bps of the realised amount) is split between Jupiter and you. The exact split is agreed during whitelisting and mirrors your fee settlement split if you are enrolled (for example `80/20` or `85/15`).
+Across both paths, the integrator portion of the positive slippage (`positiveSlippageBps` bps of the realised amount) is split between Jupiter and you. The exact split is agreed during whitelisting and mirrors your fee settlement split if you are enrolled.
 
 ## Related
 

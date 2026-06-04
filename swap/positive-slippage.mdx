@@ -1,0 +1,92 @@
+---
+title: "Positive Slippage"
+description: "Collect a share of positive slippage on /order and /build swaps"
+llmsDescription: "Enterprise-only positive slippage collection on the Jupiter Swap V2 API. Whitelisted integrators pass the positiveSlippageBps query parameter (0–10000) to GET /swap/v2/order or GET /swap/v2/build to claim a share of positive slippage on swaps where the realised output exceeds the quoted output. Value 0 (default) sends all positive slippage to the user; 10000 sends all positive slippage to the integrator; intermediate values split proportionally. Access is gated by a case-by-case whitelist arranged directly with the Jupiter team. The integrator's share is collected in a Jupiter-managed wallet: Jupiter holds ATAs for every mint, swaps incoming balances to USDC at regular intervals, and pays out a single monthly USDC amount to the integrator's designated payout address. The Jupiter/integrator split is agreed during whitelisting. A self-managed collector wallet is not yet supported. The collection mechanism is identical for /order and /build."
+hidden: true
+---
+
+Positive slippage is the amount by which a swap's realised output exceeds the quoted output. By default, the entire positive slippage goes back to the user. Whitelisted enterprise integrators can claim a configurable share by passing `positiveSlippageBps` on `/order` or `/build`.
+
+## Eligibility
+
+Access is evaluated case by case and applies to both `/order` and `/build` integrations.
+
+Before `positiveSlippageBps` has any effect, Jupiter must whitelist your organisation. To request whitelisting:
+
+1. Find your **organisation ID** under Settings in the [Developer Platform](https://developers.jup.ag/portal).
+2. Send it to us.
+3. We enable positive slippage for that organisation.
+
+If `positiveSlippageBps` is not passed, the user receives 100% of any positive slippage as usual.
+
+## The `positiveSlippageBps` parameter
+
+| Parameter             | Type     | Range    | Default | Description                                                                 |
+|-----------------------|----------|----------|---------|-----------------------------------------------------------------------------|
+| `positiveSlippageBps` | `number` | `0–10000`| `0`     | Share of positive slippage routed to the integrator's collector wallet, in bps |
+
+- `0` (default): user receives 100% of the positive slippage.
+- `10000`: integrator's collector wallet receives 100% of the positive slippage; user receives 0.
+- Any value in between: split proportionally. For example, `5000` sends 50% to the integrator's collector wallet and 50% to the user.
+
+The split is applied per swap, at execution time.
+
+## Using with `/order`
+
+Append `positiveSlippageBps` as a query parameter on the [`/order`](/swap/order-and-execute) request.
+
+```
+GET https://api.jup.ag/swap/v2/order
+```
+
+```bash
+curl -G "https://api.jup.ag/swap/v2/order" \
+  -H "x-api-key: $JUPITER_API_KEY" \
+  --data-urlencode "inputMint=So11111111111111111111111111111111111111112" \
+  --data-urlencode "outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" \
+  --data-urlencode "amount=1000000000" \
+  --data-urlencode "taker=$TAKER" \
+  --data-urlencode "positiveSlippageBps=5000"
+```
+
+No other changes are required. The returned transaction routes the user's share back to the `taker` and the integrator's share to the collector wallet configured during whitelisting.
+
+## Using with `/build`
+
+Append `positiveSlippageBps` as a query parameter on the [`/build`](/swap/build) request. The split is applied in the same way.
+
+```
+GET https://api.jup.ag/swap/v2/build
+```
+
+```bash
+curl -G "https://api.jup.ag/swap/v2/build" \
+  -H "x-api-key: $JUPITER_API_KEY" \
+  --data-urlencode "inputMint=So11111111111111111111111111111111111111112" \
+  --data-urlencode "outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" \
+  --data-urlencode "amount=1000000000" \
+  --data-urlencode "taker=$TAKER" \
+  --data-urlencode "positiveSlippageBps=5000"
+```
+
+## Revenue distribution
+
+The user's share of positive slippage (`10000 − positiveSlippageBps` bps) is settled to the `taker` on-chain at swap time. The integrator's share is collected in a Jupiter-managed wallet: Jupiter opens and maintains ATAs for every mint that flows into it, swaps incoming balances to USDC at regular intervals, and sends a single monthly USDC payout to your designated payout address.
+
+Positive slippage can arrive in any mint, including long-tail assets where Solana liquidity moves quickly. Opening per-mint ATAs and converting balances yourself adds up in cost and operational overhead; Jupiter handles this for you.
+
+You are responsible for:
+- The payout wallet address that Jupiter sends to.
+- Initialising the USDC ATA on that wallet before the first payout.
+
+The integrator's share (positive slippage minus the user's share) is split between Jupiter and you. The exact split is agreed during whitelisting.
+
+<Note>
+A self-managed collector wallet (where Jupiter sends collected mints to a wallet you control instead of converting and paying out monthly) is not yet supported. Let us know if you need it.
+</Note>
+
+## Related
+
+- [Order & Execute](/swap/order-and-execute): the Meta-Aggregator path that supports `positiveSlippageBps`.
+- [Build](/swap/build): the Router path that supports `positiveSlippageBps`.
+- [Referral Program](/tool-kits/referral-program): the non-enterprise path for earning a share of swap fees on `/order`.

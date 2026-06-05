@@ -194,7 +194,6 @@ paths:
             - For non-SOL output: tokens are sent to the receiver's associated token account (ATA). If the ATA is not initialised, a create ATA instruction is added to the transaction
             - For SOL output: native SOL is transferred directly to the receiver
             - Does not support destination wSOL token accounts
-            - Disables RFQ routing (JupiterZ)
         - name: swapMode
           in: query
           schema:

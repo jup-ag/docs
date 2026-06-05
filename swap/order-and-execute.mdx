@@ -364,12 +364,12 @@ Adding optional parameters to `/order` can restrict which routers are eligible:
 | Parameter | Metis | JupiterZ (RFQ) | Dflow | OKX |
 | --- | --- | --- | --- | --- |
 | **(no optional params)** | Yes | Yes | Yes | Yes |
-| `receiver` | Yes | **No** | Yes | Yes |
+| `receiver` | Yes | Yes | Yes | Yes |
 | `referralAccount` & `referralFee` | Yes | **No** | Yes | Yes |
 | `payer` (integrator gasless) | Yes | **No** | **No** | **No** |
 | `excludeRouters: jupiterz` | Yes | **No** | Yes | Yes |
 
-**Key takeaway:** adding `receiver`, `referralAccount`, `referralFee` or `payer` disables JupiterZ (RFQ), which may result in worse pricing on major pairs where market makers often beat onchain routing by 5-20bps.
+**Key takeaway:** adding `referralAccount`, `referralFee` or `payer` disables JupiterZ (RFQ), which may result in worse pricing on major pairs where market makers often beat onchain routing by 5-20bps.
 
 For the full parameter reference, see the [API reference](/api-reference/swap/order).
 

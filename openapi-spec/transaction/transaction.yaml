@@ -12,7 +12,7 @@ components:
       type: apiKey
       in: header
       name: x-api-key
-      description: Jupiter API key from portal.jup.ag
+      description: Get API key via https://developers.jup.ag/portal
 paths:
   /submit:
     post:

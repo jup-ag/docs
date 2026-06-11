@@ -392,16 +392,22 @@ paths:
                   errorCode:
                     type: number
                     description: |
-                      Present when `taker` is defined and `transaction` is the empty string. The router quoted a price but could not build a transaction. Unique per error scenario:
+                      Present when `taker` is defined and `transaction` is the empty string. The router quoted a price but could not build a transaction. Match on `router` + `errorCode` to identify the error.
+
+                      Aggregator routers (router is iris, dflow, okx, mantis):
+                      - 1: Insufficient funds
+                      - 2: Insufficient SOL for gas
+                      - 3: Swap below minimum for gasless
+
+                      JupiterZ router (router is jupiterz):
                       - 1: Insufficient balance to fund the swap
                       - 2: Missing associated token account
                       - 3: Quote could not be built into a transaction
-                      - 4: Token account is frozen
                   errorMessage:
                     type: string
                     description: |
                       Human-readable error description. Present when `taker` is defined and `transaction` is the empty string.
-                      For display purposes only — do not match on this string as it may be parameterised.
+                      Match on `router` + `errorCode` instead of this string, as the message text may be parameterised.
                   error:
                     type: string
                     description: Duplicate of errorMessage for backwards compatibility

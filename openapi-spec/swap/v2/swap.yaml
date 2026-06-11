@@ -368,7 +368,7 @@ paths:
                     description: |
                       True when signature and priority fees are paid by a wallet other than the taker. Set by three independent paths:
                       - Automatic Jupiter sponsorship: `signatureFeePayer = gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`
-                      - JupiterZ market maker: `signatureFeePayer` is the MM address (varies per quote); ATA rent (`rentFeePayer`) is still the taker
+                      - JupiterZ market maker: `signatureFeePayer` is the MM address (varies per quote); Jupiter's gas wallet funds the output token account if not yet initialised
                       - Integrator payer: `signatureFeePayer` is your `payer` parameter
                       For a deterministic opt-out, check `signatureFeePayer == taker` on every response.
                   requestId:
@@ -391,10 +391,17 @@ paths:
                     description: Quote expiration timestamp for RFQ swaps
                   errorCode:
                     type: number
-                    description: Present when taker is defined but transaction is empty string
+                    description: |
+                      Present when `taker` is defined and `transaction` is the empty string. The router quoted a price but could not build a transaction. Unique per error scenario:
+                      - 1: Insufficient balance to fund the swap
+                      - 2: Missing associated token account
+                      - 3: Quote could not be built into a transaction
+                      - 4: Token account is frozen
                   errorMessage:
                     type: string
-                    description: Human-readable error description
+                    description: |
+                      Human-readable error description. Present when `taker` is defined and `transaction` is the empty string.
+                      For display purposes only — do not match on this string as it may be parameterised.
                   error:
                     type: string
                     description: Duplicate of errorMessage for backwards compatibility

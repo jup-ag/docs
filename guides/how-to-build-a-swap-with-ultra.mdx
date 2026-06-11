@@ -426,7 +426,7 @@ Ultra handles gasless automatically. You don't configure anything.
 
 **Ultra Gasless Support (Iris).** When the taker has less than 0.01 SOL and the trade is at least ~$10, Jupiter covers everything: network fee, priority fee, token account rent, and other accounts rent (e.g. DEX-specific accounts). The cost gets deducted from the swap output (you'll see it in `feeBps`).
 
-**JupiterZ (RFQ).** When a market maker provides the route, the market maker pays network and priority fees. But they don't cover token account rent, so the user still needs enough SOL for that.
+**JupiterZ (RFQ).** When a market maker provides the route, the market maker pays network and priority fees. If the output token account does not exist, Jupiter's gas wallet funds its creation.
 
 Check `gasless: true` in the order response to know if it kicked in. For the full breakdown of scenarios, see [Gasless Support](/ultra/gasless).
 

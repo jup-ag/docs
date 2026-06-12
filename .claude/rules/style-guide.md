@@ -40,7 +40,7 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 | Term                        | Definition / Usage                                                |
 |-----------------------------|-------------------------------------------------------------------|
 | Juno                        | Jupiter's liquidity engine (multi-source aggregation, self-learning) |
-| Iris                        | Jupiter's routing engine for DEX integrations                     |
+| Metis                       | Jupiter's onchain routing engine for DEX integrations. API router value: `metis`. Do not use "Iris" (legacy name). |
 | JupiterZ                    | RFQ-based routing engine for market maker integrations            |
 | Jupiter Beam                | Transaction landing infrastructure (sub-second)                   |
 | RTSE                        | Real-Time Slippage Estimator — always define on first use per page |

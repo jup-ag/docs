@@ -267,7 +267,7 @@ paths:
             type: string
           description: |
             - Comma-separated list of routers to exclude
-            - Available routers: `iris` (Metis), `jupiterz` (JupiterZ), `dflow`, `okx`
+            - Available routers: `metis`, `jupiterz`, `dflow`, `okx`
           example: jupiterz,dflow
         - name: excludeDexes
           in: query
@@ -353,7 +353,7 @@ paths:
                     enum: [aggregator, rfq, aggregator+rfq, dflow, okx]
                   router:
                     type: string
-                    enum: [iris, jupiterz, dflow, okx]
+                    enum: [metis, jupiterz, dflow, okx]
                     description: Which router won the quote
                   transaction:
                     type: string

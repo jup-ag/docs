@@ -300,28 +300,10 @@ if (result.status === "Success") {
 | `outAmount` | Expected output amount before slippage. |
 | `router` | Which router won the quote (iris, jupiterz, dflow, okx). |
 | `mode` | "ultra" (no optional params) or "manual" (optional params used). |
-| `errorCode` | Present when `transaction` is `""`. Numeric code identifying the error. Match on `router` + `errorCode` (see tables below). |
+| `errorCode` | Present when `transaction` is `""`. Match on `router` + `errorCode`. See [/order error codes](#order-error-codes). |
 | `errorMessage` | Present when `transaction` is `""`. Human-readable description. Do not match on this string, it may be parameterised. |
 
-When `transaction` is an empty string, the response still contains valid pricing (`inAmount`, `outAmount`) but the swap cannot proceed. The same `errorCode` number has different meanings depending on the `router`. Match on both fields:
-
-**Aggregator routers** (`metis`, `dflow`, `okx`):
-
-| errorCode | Meaning |
-| --- | --- |
-| 1 | Insufficient funds (taker lacks input token balance) |
-| 2 | Insufficient SOL for gas |
-| 3 | Swap below minimum for gasless |
-
-**JupiterZ router** (`jupiterz`):
-
-| errorCode | Meaning |
-| --- | --- |
-| 1 | Insufficient balance to fund the swap |
-| 2 | Missing associated token account |
-| 3 | Quote could not be built into a transaction |
-
-Handle this in your integration:
+When `transaction` is an empty string, the response still contains valid pricing (`inAmount`, `outAmount`) but the swap cannot proceed. Handle this in your integration:
 
 ```typescript
 if (!order.transaction) {
@@ -368,11 +350,37 @@ Jupiter handles:
 | --- | --- |
 | `status` | "Success" or "Failed" |
 | `signature` | Transaction signature (present on both success and some failures) |
-| `code` | Error code. 0 = success. See [error codes](#error-codes) below. |
+| `code` | Error code. 0 = success. See [/execute error codes](#execute-error-codes). |
 | `inputAmountResult` | Amount of input token used for the swap |
 | `outputAmountResult` | Amount of output token received |
 
 ## Error codes
+
+### /order error codes
+
+When `/order` returns `transaction: ""` (empty string), the response still contains valid pricing but the swap cannot proceed. The `errorCode` and `errorMessage` fields explain why.
+
+The same `errorCode` number has different meanings depending on the `router`. Match on both fields:
+
+**Aggregator routers** (`metis`, `dflow`, `okx`):
+
+| errorCode | Meaning |
+| --- | --- |
+| 1 | Insufficient funds (taker lacks input token balance) |
+| 2 | Insufficient SOL for gas |
+| 3 | Swap below minimum for gasless |
+
+**JupiterZ router** (`jupiterz`):
+
+| errorCode | Meaning |
+| --- | --- |
+| 1 | Insufficient balance to fund the swap |
+| 2 | Missing associated token account |
+| 3 | Quote could not be built into a transaction |
+
+### /execute error codes
+
+The `code` field in the `/execute` response indicates the result. `0` is success, negative values are errors grouped by router type:
 
 | Code | Category | Meaning |
 | --- | --- | --- |

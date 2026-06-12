@@ -305,7 +305,7 @@ if (result.status === "Success") {
 
 When `transaction` is an empty string, the response still contains valid pricing (`inAmount`, `outAmount`) but the swap cannot proceed. The same `errorCode` number has different meanings depending on the `router`. Match on both fields:
 
-**Aggregator routers** (`iris`, `dflow`, `okx`, `mantis`):
+**Aggregator routers** (`metis`, `dflow`, `okx`):
 
 | errorCode | Meaning |
 | --- | --- |

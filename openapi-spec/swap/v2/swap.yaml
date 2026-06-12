@@ -394,7 +394,7 @@ paths:
                     description: |
                       Present when `taker` is defined and `transaction` is the empty string. The router quoted a price but could not build a transaction. Match on `router` + `errorCode` to identify the error.
 
-                      Aggregator routers (router is iris, dflow, okx, mantis):
+                      Aggregator routers (router is metis, dflow, okx):
                       - 1: Insufficient funds
                       - 2: Insufficient SOL for gas
                       - 3: Swap below minimum for gasless

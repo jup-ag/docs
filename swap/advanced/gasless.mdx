@@ -6,7 +6,7 @@ llmsDescription: "How gasless swaps work on Jupiter Swap API V2. The gasless: tr
 
 Gasless swaps let users trade without holding SOL for transaction fees. On `/order`, the `gasless: true` response field can be set by three independent paths:
 
-1. **Automatic Jupiter sponsorship** — Jupiter covers gas when the taker has low SOL.
+1. **Automatic Jupiter sponsorship** — Jupiter covers gas and token account rent when the taker has low SOL.
 2. **JupiterZ market maker** — an RFQ market maker pays signature and priority fees directly.
 3. **Integrator payer** — your wallet covers gas via the `payer` parameter.
 

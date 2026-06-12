@@ -72,7 +72,7 @@ Keep entries concise — one line if possible, a short paragraph if needed.
   - "JupiterZ gasless does not work with manual mode params (`slippageBps`, `priorityFeeLamports`, `excludeRouters`)" — false. JupiterZ routes through with `slippageBps=5200` (5/5), `priorityFeeLamports=500000` (4/5), and `excludeRouters=okx` (5/5) all set individually.
   - "Automatic gasless does not work with manual mode params" — same as above, false.
   - The TRUE limitations: JupiterZ is disabled by `payer != taker` (5/5 routed Metis-only) and by `referralAccount` + `referralFee` (5/5 routed to OKX/Dflow, none JupiterZ).
-- [2026-05-22] When a quote returns `gasless: true` from a JupiterZ MM, the MM pays signature and priority fees but the **taker still pays ATA rent** (`rentFeePayer == taker`). Automatic Jupiter sponsorship covers all four cost types (sig, priority, ATA rent, other rent) since `gasTzr94…` is set as `rentFeePayer` too.
+- [2026-05-22] When a quote returns `gasless: true` from a JupiterZ MM, the MM pays signature and priority fees. ~~Taker previously paid ATA rent~~ — as of 2026-06-11, Jupiter's gas wallet (`gasTzr94…`) funds the output token account if not yet initialised. Automatic Jupiter sponsorship covers all four cost types (sig, priority, ATA rent, other rent) since `gasTzr94…` is set as `rentFeePayer` too.
 - [2026-06-05] `receiver` does not disable JupiterZ/RFQ routing on `/order`. Verified live with `receiver` set and `excludeRouters=iris,dflow,okx`: SOL->USDC and USDC->SOL requests returned `router: jupiterz`, `swapType: rfq`, and a transaction.
 
 ## Rent / Close-Account Handling (vs Ultra V1)

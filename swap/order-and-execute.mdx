@@ -82,13 +82,15 @@ import {
 } from "@solana/kit";
 
 type OrderResponse = {
-  transaction: string;       // base64-encoded transaction
+  transaction: string | null; // base64-encoded transaction, null if no taker, "" if quote-only
   requestId: string;
   outAmount: string;
   router: string;            // "iris" | "jupiterz" | "dflow" | "okx"
   mode: string;              // "ultra" | "manual"
   feeBps: number;
   feeMint: string;
+  errorCode?: number;        // present when transaction is ""
+  errorMessage?: string;     // present when transaction is ""
 };
 
 type ExecuteResponse = {
@@ -115,13 +117,15 @@ import { Keypair, VersionedTransaction } from "@solana/web3.js";
 import bs58 from "bs58";
 
 type OrderResponse = {
-  transaction: string;       // base64-encoded transaction
+  transaction: string | null; // base64-encoded transaction, null if no taker, "" if quote-only
   requestId: string;
   outAmount: string;
   router: string;            // "iris" | "jupiterz" | "dflow" | "okx"
   mode: string;              // "ultra" | "manual"
   feeBps: number;
   feeMint: string;
+  errorCode?: number;        // present when transaction is ""
+  errorMessage?: string;     // present when transaction is ""
 };
 
 type ExecuteResponse = {
@@ -291,11 +295,23 @@ if (result.status === "Success") {
 
 | Field | Description |
 | --- | --- |
-| `transaction` | Base64-encoded transaction to sign. Null if `taker` is not set. |
+| `transaction` | Base64-encoded transaction to sign. Null if `taker` is not set. Empty string (`""`) if the router could quote a price but could not build a transaction (check `errorCode`). |
 | `requestId` | Pass this to `/execute`. |
 | `outAmount` | Expected output amount before slippage. |
 | `router` | Which router won the quote (iris, jupiterz, dflow, okx). |
 | `mode` | "ultra" (no optional params) or "manual" (optional params used). |
+| `errorCode` | Present when `transaction` is `""`. Match on `router` + `errorCode`. See [/order error codes](#order-error-codes). |
+| `errorMessage` | Present when `transaction` is `""`. Human-readable description. Do not match on this string, it may be parameterised. |
+
+When `transaction` is an empty string, the response still contains valid pricing (`inAmount`, `outAmount`) but the swap cannot proceed. Handle this in your integration:
+
+```typescript
+if (!order.transaction) {
+  // Match on router + errorCode to identify the specific error
+  console.error(`[${order.router}] Error ${order.errorCode}: ${order.errorMessage}`);
+  // Show the quoted price to the user, but do not attempt to sign or execute
+}
+```
 
 For the full parameter reference, see the [API reference](/api-reference/swap/order). For how each parameter affects routing, see the [routing impact matrix](#routing-impact-matrix) below.
 
@@ -334,11 +350,37 @@ Jupiter handles:
 | --- | --- |
 | `status` | "Success" or "Failed" |
 | `signature` | Transaction signature (present on both success and some failures) |
-| `code` | Error code. 0 = success. See [error codes](#error-codes) below. |
+| `code` | Error code. 0 = success. See [/execute error codes](#execute-error-codes). |
 | `inputAmountResult` | Amount of input token used for the swap |
 | `outputAmountResult` | Amount of output token received |
 
 ## Error codes
+
+### /order error codes
+
+When `/order` returns `transaction: ""` (empty string), the response still contains valid pricing but the swap cannot proceed. The `errorCode` and `errorMessage` fields explain why.
+
+The same `errorCode` number has different meanings depending on the `router`. Match on both fields:
+
+**Aggregator routers** (`metis`, `dflow`, `okx`):
+
+| errorCode | Meaning |
+| --- | --- |
+| 1 | Insufficient funds (taker lacks input token balance) |
+| 2 | Insufficient SOL for gas |
+| 3 | Swap below minimum for gasless |
+
+**JupiterZ router** (`jupiterz`):
+
+| errorCode | Meaning |
+| --- | --- |
+| 1 | Insufficient balance to fund the swap |
+| 2 | Missing associated token account |
+| 3 | Quote could not be built into a transaction |
+
+### /execute error codes
+
+The `code` field in the `/execute` response indicates the result. `0` is success, negative values are errors grouped by router type:
 
 | Code | Category | Meaning |
 | --- | --- | --- |

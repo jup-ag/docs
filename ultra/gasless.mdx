@@ -19,7 +19,7 @@ don't need to hold SOL just to trade tokens.
 | Gasless Mechanism | Coverage | Requirements & Notes |
 |-------------------|----------|----------------------|
 | **Ultra<br/>Gasless Support** | - Base network fee<br/>- Priority fee/tips<br/>- ATA rent<br/>- Other accounts rent | - Taker has less than 0.01 SOL<br/>- Minimum trade size of ~10 USD<br/>- Gas is taken from swap amount which increases swap fee<br/>- Does not work with referral/payer params<br/>- Does not work with manual mode params |
-| **JupiterZ<br/>(RFQ)**         | - Base network fee<br/>- Priority fee/tips                                          | - Always gasless for network/prio fees (paid by MM)<br/>- ATA rent NOT covered: user must have enough SOL<br/>- No minimum trade size<br/>- Only applies if a market maker provides a route |
+| **JupiterZ<br/>(RFQ)**         | - Base network fee<br/>- Priority fee/tips<br/>- Taker's output token account rent (if not initialised)                                          | - Always gasless for network/prio fees (paid by MM)<br/>- Jupiter's gas wallet pays the rent to create the taker's output token account if needed<br/>- No minimum trade size<br/>- Only applies if a market maker provides a route |
 | **Other Routers**              | - | - |
 
 ## Types of Gas
@@ -68,18 +68,17 @@ Refer to [Payer](/ultra/add-payer) section for more details and usage on the Int
         2. **What does it cover?**
             * Base network transaction fee
             * Priority fee (or tips, etc)
-            * **Does not cover for associated token account rent**.
-            * It also means the taker will have to pay for the rent themselves, and if they do not have sufficient SOL for rent, JupiterZ will not be routed.
+            * Taker's output token account rent (if not yet initialised, paid by Jupiter's gas wallet)
 
         3. **How does it work?**
             * As long as the JupiterZ (or the market makers) provide a quote for your request, the transaction will be gasless.
             * It adds a secondary signer to the transaction to pay to be the gas payer - which is the market maker.
+            * If the taker's output token account does not exist, Jupiter's gas wallet pays the rent to create it.
 
         4. **What are the limitations?**
             * It only works for default Ultra transactions
             * It does not work when passing in integrator parameters like `referralAccount`, `referralFee`, `payer`, etc.
             * It does not work when passing in manual mode parameters like `slippageBps`, `priorityFeeLamports`, `excludeRouters`, etc.
-            * If taker does not have sufficient SOL for rent, JupiterZ will not be routed.
 
         ![JupiterZ Gasless Mechanism](/static/images/jupiterz-gasless-mechanism.png)    
     </Tab>
@@ -117,8 +116,8 @@ Refer to [Payer](/ultra/add-payer) section for more details and usage on the Int
 | **Scenario** | **Ultra<br/>Gasless Support** | **JupiterZ<br/>(Assuming if quoted)** |
 | --- | --- | --- |
 | **Taker has SOL & ATA** | Taker pays gas | MM pays gas |
-| **Taker has SOL, no ATA** | Taker pays gas & ATA rent | MM pays gas, taker pays ATA rent |
+| **Taker has SOL, no ATA** | Taker pays gas & ATA rent | MM pays gas, Jupiter's gas wallet pays taker's ATA rent |
 | **No SOL, has ATA** | - Gas taken from swap amount<br/>- Min $10 swap | MM pays gas |
-| **No SOL, no ATA** | - Gas & rent from swap amount<br/>- Min $10 swap | Not supported (no ATA funding) |
+| **No SOL, no ATA** | - Gas & rent from swap amount<br/>- Min $10 swap | MM pays gas, Jupiter's gas wallet pays taker's ATA rent |
 | **No SOL, has ATA,<br/>Small swap** | Quote shown, but cannot swap<br/>[`errorCode=3`](/ultra/response#order-response-codes) | MM pays gas |
-| **No SOL, no ATA,<br/>Small swap** | Quote shown, but cannot swap<br/>[`errorCode=3`](/ultra/response#order-response-codes) | Not supported (no ATA funding) |
+| **No SOL, no ATA,<br/>Small swap** | Quote shown, but cannot swap<br/>[`errorCode=3`](/ultra/response#order-response-codes) | MM pays gas, Jupiter's gas wallet pays taker's ATA rent |

@@ -33,7 +33,7 @@ Key features at a glance: Juno liquidity engine (multi-source aggregation with s
 
 <AccordionGroup>
 <Accordion title="Juno Liquidity Engine">
-Ultra Swap utilizes the latest [Juno Liquidity Engine](/swap#routing-engines) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines: improved versions of Iris and JupiterZ, and third-party liquidity sources, for the best possible price.
+Ultra Swap utilizes the latest [Juno Liquidity Engine](/swap#routing-engines) which aggregates across multiple liquidity sources, including Jupiter's proprietary routing engines: improved versions of Metis and JupiterZ, and third-party liquidity sources, for the best possible price.
 
 It also includes self-learning capabilities (to detect and sideline low-quality liquidity sources) which creates a competitive environment for all liquidity sources to continously optimize their performance and price.
 </Accordion>
@@ -90,7 +90,7 @@ Ultra Swap provides different gasless mechanisms for different scenarios.
 | Endpoint    | Description                                                                                           | Latency (P50 Average)   |
 | :----------- | :----------------------------------------------------------------------------------------------------- | :----------------------- |
 | `/order`    | Aggregating across multiple liquidity sources and selecting the best price.                           | 300ms                   |
-| `/execute`  | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Roundtrip<br/>Iris: 700ms; JupiterZ: 2s |
+| `/execute`  | Broadcasting the transaction to the network and polling for the status and result of the transaction. | Roundtrip<br/>Metis: 700ms; JupiterZ: 2s |
 | `/holdings` | Retrieving the user's balances.                                                                       | 70ms                   |
 | `/shield`   | Enhanced token security feature to provide critical token information.                                | 150ms                   |
 | `/search`   | Searching for a token by its symbol, name or mint address.                                            | 15ms                   |
@@ -150,10 +150,10 @@ The following table provides a comprehensive comparison between Ultra Swap API a
 | | **Configuration Philosophy** | Optimized defaults refined by millions of swaps | Complete flexibility to build your own strategies |
 | | **Primary Use Case** | Teams wanting immediate, optimized swap execution | Teams needing CPI, custom instructions, or infrastructure control |
 | | **Complexity** | Opinionated, streamlined integration | Flexible, requires extensive custom development |
-| **Routing** | **Routing Engine** | Meta-aggregator combining:<br/>• Iris (enhanced Metis with self-learning)<br/>• DFlow<br/>• OKX<br/>• JupiterZ (RFQ with 20+ market makers) | Single, proven routing engine for on-chain liquidity |
+| **Routing** | **Routing Engine** | Meta-aggregator combining:<br/>• Metis (onchain routing with self-learning)<br/>• DFlow<br/>• OKX<br/>• JupiterZ (RFQ with 20+ market makers) | Single, proven routing engine for on-chain liquidity |
 | | **RFQ Access** | Built-in JupiterZ RFQ with 20+ market makers | Not supported |
 | | **Liquidity Sources** | Aggregates across multiple DEXes, PropAMMs, RFQ's MMs | Direct access to Solana's on-chain liquidity |
-| | **Iris Features** | • Ultra Signaling for tighter PropAMM quotes<br/>• Predictive Execution<br/>• Just-In-Time Market Revival<br/>• Self-learning route optimization<br/>• And more | Not applicable |
+| | **Metis Features** | • Ultra Signaling for tighter PropAMM quotes<br/>• Predictive Execution<br/>• Just-In-Time Market Revival<br/>• Self-learning route optimization<br/>• And more | Not applicable |
 | | **Continuous Improvement** | Automatic improvements deployed from millions of swaps | Stable routing engine, you build improvements |
 | **Execution** | **Transaction Flow** | Get order → Sign → Submit to execute endpoint | Get quote → Build transaction → Send via your infrastructure |
 | | **Transaction Sending** | Jupiter Beam proprietary engine with network of transaction senders | You build and maintain your own RPC pipeline |
@@ -166,9 +166,9 @@ The following table provides a comprehensive comparison between Ultra Swap API a
 | **Configuration** | **Slippage Optimization** | RTSE (Real-Time Slippage Estimator) applying heuristics and real-time adjustments using token categories, historical and real-time data | Manual configuration based on your strategy |
 | | **Priority Fee Management** | Automatic estimation and optimization using quality RPC and network data | You build custom fee estimation logic |
 | | **Manual Mode** | Available for user-facing trading experiences<br/>*Not recommended as default integration* | Full manual control always |
-| **Gasless** | **Ultra Gasless Support (Iris)** | Automatic when user has trade value but insufficient SOL<br/>Jupiter pays: tx fee, priority fee, token account rent | Not supported |
+| **Gasless** | **Ultra Gasless Support (Metis)** | Automatic when user has trade value but insufficient SOL<br/>Jupiter pays: tx fee, priority fee, token account rent | Not supported |
 | | **JupiterZ Gasless** | Market makers cover tx and priority fees<br/>Jupiter's gas wallet pays the rent to create the taker's output token account if needed | Not applicable |
-| | **Integrator as Payer** | Supported (Iris quotes only, all gas covered) | Supported with full control over implementation |
+| | **Integrator as Payer** | Supported (Metis quotes only, all gas covered) | Supported with full control over implementation |
 | **Customization** | **Transaction Customization** | Opinionated—no custom instructions, no CPI, no instruction modification | Full flexibility—add instructions, use for CPI, compose as needed |
 | **Operations** | **Customer Support** | Jupiter provides direct support to your users via official channels | Minimal technical support—you handle user-facing support |
 | | **Rate Limits** | Dynamic based on executed volume<br/>Base quota can be increased on request | Fixed tiers via [Portal](https://developers.jup.ag/portal), no overages |

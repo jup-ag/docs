@@ -17,7 +17,7 @@ llmsDescription: "UNMAINTAINED: Four-step setup to add custom fees (50–255 bps
 
 The Jupiter Ultra Swap API allows you to add integrator fees to the orders.
 
-**Key points summary:** Fees require Referral Program accounts, Jupiter takes 20% of your integrator fees, Ultra decides which mint to take fees in (based on a priority list), you must create referralTokenAccount for each expected feeMint, and fees enforce routing to Iris only.
+**Key points summary:** Fees require Referral Program accounts, Jupiter takes 20% of your integrator fees, Ultra decides which mint to take fees in (based on a priority list), you must create referralTokenAccount for each expected feeMint, and fees enforce routing to Metis only.
 
 <AccordionGroup>
     <Accordion title="Requires specific Referral Program Accounts">
@@ -83,8 +83,8 @@ The Jupiter Ultra Swap API allows you to add integrator fees to the orders.
         | XYZ                                  | USDC    | No                            |
     </Accordion>
     
-    <Accordion title="Enforces routing to Iris and other DEX aggregator routes">
-        When integrator fees are being added, it defaults routing to Iris and other DEX aggregator routes.
+    <Accordion title="Enforces routing to Metis and other DEX aggregator routes">
+        When integrator fees are being added, it defaults routing to Metis and other DEX aggregator routes.
         
         JupiterZ does not support integrator fees currently.
     </Accordion>

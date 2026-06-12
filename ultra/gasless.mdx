@@ -38,7 +38,7 @@ Refer to [Payer](/ultra/add-payer) section for more details and usage on the Int
 <Tabs>
     <Tab title="Jupiter Ultra Gasless Support">
         1. **When does it apply?**
-            * Gasless Support only kicks in for Iris router.
+            * Gasless Support only kicks in for Metis router.
             * Requires taker to have less than 0.01 SOL.
             * Minimum trade size of 10 USD is required, but this is dynamic as priority fees/tips can vary based on the current market conditions.
 
@@ -87,7 +87,7 @@ Refer to [Payer](/ultra/add-payer) section for more details and usage on the Int
         1. **When does it apply?**
             * Integrator Gas Payer works only when integrator passes in `referralAccount` and `referralFee`, together with `payer` and `closeAuthority`.
             * Regardless of how much SOL the taker has, the payer will be the fee payer.
-            * Applying these parameters will default routing to only Iris.
+            * Applying these parameters will default routing to only Metis.
 
         2. **What does it cover?**
             * The `payer` address will be the fee payer of the entire transaction:
@@ -105,7 +105,7 @@ Refer to [Payer](/ultra/add-payer) section for more details and usage on the Int
             * It adds a secondary signer to the transaction to pay to be the gas payer - which is the integrator.
 
         4. **What are the limitations?**
-            * Passing in `payer` parameters will default routing to only Iris.
+            * Passing in `payer` parameters will default routing to only Metis.
 
         ![Integrator Gas Payer Mechanism](/static/images/integrator-gas-payer-mechanism.png)
     </Tab>

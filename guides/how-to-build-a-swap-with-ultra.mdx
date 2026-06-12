@@ -142,8 +142,8 @@ print(f"Swap {order['inAmount']} → {order['outAmount']}")
 | `taker` | No | User's wallet address. Required to get a signable transaction. Omit to get a quote only (useful for showing price before wallet connect). |
 | `referralAccount` | No | Referral account for [integrator fees](/ultra/add-fees-to-ultra) |
 | `referralFee` | No | Referral fee in basis points (50-255) |
-| `excludeRouters` | No | [Manual mode](/ultra/gasless) only. Comma-separated routers to exclude: `iris`, `jupiterz`, `dflow`, `okx` |
-| `excludeDexes` | No | [Manual mode](/ultra/gasless) only. Comma-separated DEXs to exclude (applies to Iris router only). [Full list of DEXs](/api-reference/swap/v1/program-id-to-label). |
+| `excludeRouters` | No | [Manual mode](/ultra/gasless) only. Comma-separated routers to exclude: `metis`, `jupiterz`, `dflow`, `okx` |
+| `excludeDexes` | No | [Manual mode](/ultra/gasless) only. Comma-separated DEXs to exclude (applies to Metis router only). [Full list of DEXs](/api-reference/swap/v1/program-id-to-label). |
 
 **What you get back:**
 
@@ -152,7 +152,7 @@ print(f"Swap {order['inAmount']} → {order['outAmount']}")
 | `transaction` | Base64 unsigned transaction. Sign this. `null` if you didn't pass `taker`. |
 | `requestId` | Pass this to `/execute`. It's how Ultra tracks your order. |
 | `outAmount` | Expected output in native token units |
-| `router` | Which router won the auction: `iris`, `jupiterz`, `dflow`, `okx` |
+| `router` | Which router won the auction: `metis`, `jupiterz`, `dflow`, `okx` |
 | `gasless` | `true` if this swap is gasless |
 | `slippageBps` | Slippage tolerance set by RTSE (you don't need to configure this) |
 | `feeBps` | Total fee in basis points |
@@ -327,7 +327,7 @@ interface OrderResponse {
   swapMode: string;                // "ExactIn"
   slippageBps: number;             // Set automatically by RTSE
   routePlan: RoutePlan[];
-  router: 'iris' | 'jupiterz' | 'dflow' | 'okx';
+  router: 'metis' | 'jupiterz' | 'dflow' | 'okx';
   transaction: string | null;      // Base64 unsigned tx (null if no taker)
   requestId: string;               // Pass to /execute
   gasless: boolean;
@@ -424,7 +424,7 @@ For the full list of error codes including aggregator and RFQ-specific codes, se
 
 Ultra handles gasless automatically. You don't configure anything.
 
-**Ultra Gasless Support (Iris).** When the taker has less than 0.01 SOL and the trade is at least ~$10, Jupiter covers everything: network fee, priority fee, token account rent, and other accounts rent (e.g. DEX-specific accounts). The cost gets deducted from the swap output (you'll see it in `feeBps`).
+**Ultra Gasless Support (Metis).** When the taker has less than 0.01 SOL and the trade is at least ~$10, Jupiter covers everything: network fee, priority fee, token account rent, and other accounts rent (e.g. DEX-specific accounts). The cost gets deducted from the swap output (you'll see it in `feeBps`).
 
 **JupiterZ (RFQ).** When a market maker provides the route, the market maker pays network and priority fees. If the taker's output token account does not exist, Jupiter's gas wallet pays the rent to create it.
 

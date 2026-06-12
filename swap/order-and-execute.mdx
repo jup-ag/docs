@@ -85,7 +85,7 @@ type OrderResponse = {
   transaction: string | null; // base64-encoded transaction, null if no taker, "" if quote-only
   requestId: string;
   outAmount: string;
-  router: string;            // "iris" | "jupiterz" | "dflow" | "okx"
+  router: string;            // "metis" | "jupiterz" | "dflow" | "okx"
   mode: string;              // "ultra" | "manual"
   feeBps: number;
   feeMint: string;
@@ -120,7 +120,7 @@ type OrderResponse = {
   transaction: string | null; // base64-encoded transaction, null if no taker, "" if quote-only
   requestId: string;
   outAmount: string;
-  router: string;            // "iris" | "jupiterz" | "dflow" | "okx"
+  router: string;            // "metis" | "jupiterz" | "dflow" | "okx"
   mode: string;              // "ultra" | "manual"
   feeBps: number;
   feeMint: string;
@@ -298,7 +298,7 @@ if (result.status === "Success") {
 | `transaction` | Base64-encoded transaction to sign. Null if `taker` is not set. Empty string (`""`) if the router could quote a price but could not build a transaction (check `errorCode`). |
 | `requestId` | Pass this to `/execute`. |
 | `outAmount` | Expected output amount before slippage. |
-| `router` | Which router won the quote (iris, jupiterz, dflow, okx). |
+| `router` | Which router won the quote (`metis`, `jupiterz`, `dflow`, `okx`). |
 | `mode` | "ultra" (no optional params) or "manual" (optional params used). |
 | `errorCode` | Present when `transaction` is `""`. Match on `router` + `errorCode`. See [/order error codes](#order-error-codes). |
 | `errorMessage` | Present when `transaction` is `""`. Human-readable description. Do not match on this string, it may be parameterised. |

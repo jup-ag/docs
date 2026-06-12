@@ -54,18 +54,18 @@ Jupiter automatically covers gas costs when the taker lacks SOL.
 
 ## JupiterZ gasless (`/order`)
 
-When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker pays network and priority fees directly. If the taker's output token account does not exist, Jupiter's gas wallet funds its creation.
+When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker pays network and priority fees directly. If the taker's output token account does not exist, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) pays the rent to create it.
 
 **When it applies:**
 - Taker trades a pair the market makers are willing to quote
 - `payer` is not set, and `referralAccount`/`referralFee` are not set (either disables JupiterZ in favour of Metis)
 
-**What it covers:** signature fee, priority fee, and output token account rent (if the account does not exist yet).
+**What it covers:** signature fee, priority fee, and the taker's output token account rent (if the account does not exist yet).
 
 **How it works:**
 - The order transaction includes a secondary signer for the market maker
 - Jupiter sets the gas payer to the MM signer and on `/execute`, your partially signed transaction is sent to the MM for them to co-sign and execute
-- If the taker's output token account is not yet initialised, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) funds its creation
+- If the taker's output token account is not yet initialised, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) pays the rent to create it
 - The `signatureFeePayer` is the MM's address. MM addresses vary per quote, so do not hardcode against a single address — use the `signatureFeePayer != taker` check instead.
 
 **Limitations:**

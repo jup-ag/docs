@@ -135,12 +135,12 @@ paths:
                     description: |
                       - The number of lamports the `taker` or `payer` has to pay for account rent, if a valid transaction is returned
                       - Note that this value is just an estimate
-                      - For JupiterZ quotes, Jupiter's gas wallet funds the output token account if not yet initialised
+                      - For JupiterZ quotes, Jupiter's gas wallet pays the rent to create the taker's output token account if not yet initialised
                   rentFeePayer:
                     type: string
                     nullable: true
                     description: |
-                      - The public key of the account that will cover the rent fee, it can be either `taker`, `payer` if passed in, or Jupiter's gas wallet for JupiterZ quotes when the output token account is not yet initialised
+                      - The public key of the account that will cover the rent fee, it can be either `taker`, `payer` if passed in, or Jupiter's gas wallet for JupiterZ quotes when the taker's output token account is not yet initialised
                   swapType:
                     type: string
                     description: |

@@ -368,7 +368,7 @@ paths:
                     description: |
                       True when signature and priority fees are paid by a wallet other than the taker. Set by three independent paths:
                       - Automatic Jupiter sponsorship: `signatureFeePayer = gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`
-                      - JupiterZ market maker: `signatureFeePayer` is the MM address (varies per quote); Jupiter's gas wallet funds the output token account if not yet initialised
+                      - JupiterZ market maker: `signatureFeePayer` is the MM address (varies per quote); Jupiter's gas wallet pays the rent to create the taker's output token account if not yet initialised
                       - Integrator payer: `signatureFeePayer` is your `payer` parameter
                       For a deterministic opt-out, check `signatureFeePayer == taker` on every response.
                   requestId:

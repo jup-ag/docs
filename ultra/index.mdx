@@ -167,7 +167,7 @@ The following table provides a comprehensive comparison between Ultra Swap API a
 | | **Priority Fee Management** | Automatic estimation and optimization using quality RPC and network data | You build custom fee estimation logic |
 | | **Manual Mode** | Available for user-facing trading experiences<br/>*Not recommended as default integration* | Full manual control always |
 | **Gasless** | **Ultra Gasless Support (Iris)** | Automatic when user has trade value but insufficient SOL<br/>Jupiter pays: tx fee, priority fee, token account rent | Not supported |
-| | **JupiterZ Gasless** | Market makers cover tx and priority fees<br/>Jupiter gas wallet covers output token account rent if needed | Not applicable |
+| | **JupiterZ Gasless** | Market makers cover tx and priority fees<br/>Jupiter's gas wallet pays the rent to create the taker's output token account if needed | Not applicable |
 | | **Integrator as Payer** | Supported (Iris quotes only, all gas covered) | Supported with full control over implementation |
 | **Customization** | **Transaction Customization** | Opinionated—no custom instructions, no CPI, no instruction modification | Full flexibility—add instructions, use for CPI, compose as needed |
 | **Operations** | **Customer Support** | Jupiter provides direct support to your users via official channels | Minimal technical support—you handle user-facing support |

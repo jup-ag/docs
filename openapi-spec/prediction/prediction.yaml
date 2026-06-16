@@ -50,6 +50,21 @@ components:
           format: uri
         isLive:
           type: boolean
+        isActive:
+          type: boolean
+        category:
+          type: string
+        subcategory:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        beginAt:
+          type: string
+          nullable: true
+        closeCondition:
+          type: string
       required:
         - eventId
     MarketMetadata:
@@ -57,18 +72,36 @@ components:
       properties:
         marketId:
           type: string
+        eventId:
+          type: string
         title:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        provider:
           type: string
         status:
           type: string
         result:
           type: string
+          nullable: true
         closeTime:
           type: number
         openTime:
           type: number
         isTeamMarket:
           type: boolean
+        marketOptions:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              buyYes:
+                type: boolean
         rulesPrimary:
           type: string
         rulesSecondary:
@@ -95,10 +128,24 @@ components:
           description: Trading volume for this market
     Market:
       type: object
+      description: Market fields are returned flat (there is no nested `metadata` object).
       properties:
         marketId:
           type: string
           description: Market identifier
+        eventId:
+          type: string
+          description: Parent event identifier
+        provider:
+          type: string
+          enum:
+            - polymarket
+            - gx
+            - bisonfi
+          description: Market data provider
+        title:
+          type: string
+          description: Market title
         status:
           type: string
           enum:
@@ -108,11 +155,11 @@ components:
           description: Current market status
         result:
           type: string
+          nullable: true
           enum:
-            - null
-            - yes
-            - no
-          description: Current market result
+            - "yes"
+            - "no"
+          description: Market result. null until resolved, then "yes" or "no"
         openTime:
           type: number
           description: Unix timestamp (seconds) when the market opens
@@ -120,9 +167,11 @@ components:
           type: number
           description: Unix timestamp (seconds) when the market closes
         resolveAt:
-          type: number
           nullable: true
-          description: Unix timestamp (seconds) when the market resolved (null if pending)
+          oneOf:
+            - type: string
+            - type: number
+          description: When the market resolved. null while open; returned as an ISO 8601 string once resolved
         marketResultPubkey:
           type: string
           nullable: true
@@ -132,8 +181,47 @@ components:
           nullable: true
           format: uri
           description: Market image URL
-        metadata:
-          $ref: "#/components/schemas/MarketMetadata"
+        rulesPrimary:
+          type: string
+          description: Primary resolution rules
+        rulesSecondary:
+          type: string
+          description: Secondary resolution rules
+        outcomes:
+          type: array
+          items:
+            type: string
+          description: Outcome labels for the market
+        marketOptions:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              buyYes:
+                type: boolean
+          description: Selectable options for team or multi-outcome markets
+        clobTokenIds:
+          type: array
+          items:
+            type: string
+          description: Underlying CLOB token IDs (provider-specific)
+        isTeamMarket:
+          type: boolean
+          description: True for team or sports markets
+        team:
+          type: object
+          nullable: true
+          description: Team metadata, present for team markets
+        sportsLine:
+          type: number
+          nullable: true
+          description: Sports line or handicap, when applicable
+        sportsMarketType:
+          type: string
+          nullable: true
+          description: Sports market type, when applicable
         pricing:
           $ref: "#/components/schemas/MarketPricing"
       required:

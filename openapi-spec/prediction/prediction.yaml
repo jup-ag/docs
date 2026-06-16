@@ -487,6 +487,11 @@ components:
         externalOrderId:
           type: string
           nullable: true
+        requiredSigners:
+          type: array
+          items:
+            type: string
+          description: Public keys that must sign the returned transaction
         order:
           type: object
           properties:
@@ -518,10 +523,22 @@ components:
               description: True when the order is on the YES side
             contracts:
               type: string
-              description: Contracts included in this order
+              description: Legacy whole-contract quantity. Use contractsMicro or contractsDecimal for the exact fractional quantity.
+            contractsMicro:
+              type: string
+              description: Contracts in micro-contract units (u64 as string, 1000000 = 1 contract)
+            contractsDecimal:
+              type: string
+              description: Contracts as a decimal string
             newContracts:
               type: string
-              description: Position contracts after executing the order
+              description: Position contracts after executing the order (legacy whole-contract quantity)
+            newContractsMicro:
+              type: string
+              description: Position contracts after the order, in micro-contract units
+            newContractsDecimal:
+              type: string
+              description: Position contracts after the order, as a decimal string
             maxBuyPriceUsd:
               type: string
               nullable: true
@@ -555,6 +572,22 @@ components:
             estimatedTotalFeeUsd:
               type: string
               description: Estimated total fees applied (micro USD)
+            payoutUsd:
+              type: string
+              description: Position max payout for this order (micro USD)
+            slippageBps:
+              type: integer
+              minimum: 0
+              description: >-
+                Estimated slippage for this order, in basis points (0 = none, 250 = 2.5%).
+                For a Polymarket buy this is the estimated price impact from sweeping
+                orderbook levels; for a sell it is the max allowed slippage from best bid
+                to the protected sell floor. Treat it as a quote signal, not a guaranteed loss.
+            maxSlippageBps:
+              type: integer
+              minimum: 0
+              nullable: true
+              description: Maximum slippage allowed for this order, in basis points
           required:
             - orderPubkey
             - orderAtaPubkey

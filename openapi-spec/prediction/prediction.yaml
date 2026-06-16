@@ -877,7 +877,13 @@ components:
               type: boolean
             contracts:
               type: string
-              description: Contracts settled (u64 as string)
+              description: Legacy whole-contract quantity settled. Use contractsMicro or contractsDecimal for the exact fractional quantity.
+            contractsMicro:
+              type: string
+              description: Contracts settled in micro-contract units (u64 as string, 1000000 = 1 contract)
+            contractsDecimal:
+              type: string
+              description: Contracts settled as a decimal string
             payoutAmountUsd:
               type: string
               description: Payout amount in micro USD (u64 as string)
@@ -924,10 +930,11 @@ components:
             - order_created
             - order_filled
             - order_failed
+            - order_closed
             - payout_claimed
             - position_updated
             - position_lost
-          description: Type of history event
+          description: Type of history event. Position wins surface as payout_claimed (there is no position_won).
         signature:
           type: string
           description: Solana transaction signature
@@ -966,13 +973,31 @@ components:
           description: True when the event relates to the YES side
         contracts:
           type: string
-          description: Number of contracts in the order (u64 as string)
+          description: Number of contracts in the order. Legacy whole-contract value; see contractsMicro/contractsDecimal for the exact quantity.
+        contractsMicro:
+          type: string
+          description: Contracts in micro-contract units (u64 as string, 1000000 = 1 contract)
+        contractsDecimal:
+          type: string
+          description: Contracts as a decimal string
         filledContracts:
           type: string
-          description: Number of contracts filled (u64 as string)
+          description: Number of contracts filled (legacy whole-contract value)
+        filledContractsMicro:
+          type: string
+          description: Filled contracts in micro-contract units
+        filledContractsDecimal:
+          type: string
+          description: Filled contracts as a decimal string
         contractsSettled:
           type: string
-          description: Number of contracts settled in this event (u64 as string)
+          description: Number of contracts settled in this event (legacy whole-contract value)
+        contractsSettledMicro:
+          type: string
+          description: Settled contracts in micro-contract units
+        contractsSettledDecimal:
+          type: string
+          description: Settled contracts as a decimal string
         maxFillPriceUsd:
           type: string
           description: Maximum fill price in micro USD (u64 as string)

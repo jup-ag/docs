@@ -35,10 +35,12 @@ Use `GET /events` to retrieve a paginated list of prediction market events. You 
 |:----------|:-----|:------------|
 | `category` | string | Filter by category: `crypto`, `sports`, `politics`, `esports`, `culture`, `economics`, `tech` |
 | `subcategory` | string | Filter by subcategory within the category |
-| `filter` | string | Filter by status: `new`, `live`, `trending` |
+| `tags` | string | Filter by tag (e.g. `soccer`) |
+| `filter` | string | Filter by status: `new`, `live`, `trending`, `upcoming` |
 | `sortBy` | string | Sort field |
 | `sortDirection` | string | Sort direction: `asc` or `desc` |
 | `includeMarkets` | boolean | Include nested markets in response |
+| `includeAllMarkets` | boolean | Include all sports market types (moneyline, spread, totals) and Saba markets. Defaults to `false` (moneyline only); F1 events always include every type |
 | `start` | number | Pagination start index |
 | `end` | number | Pagination end index |
 

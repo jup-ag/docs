@@ -1248,6 +1248,12 @@ paths:
           name: includeMarkets
           in: query
         - schema:
+            type: boolean
+          required: false
+          description: Include all allowed sports market types (moneyline, spread, totals) and extra (e.g. Saba) markets mapped onto Polymarket events. Defaults to false (moneyline only). F1 events always include every sportsMarketType.
+          name: includeAllMarkets
+          in: query
+        - schema:
             type: integer
             nullable: true
             minimum: 0
@@ -1369,6 +1375,12 @@ paths:
             nullable: true
           required: false
           name: includeMarkets
+          in: query
+        - schema:
+            type: boolean
+          required: false
+          description: Include all allowed sports market types (moneyline, spread, totals) and extra (e.g. Saba) markets mapped onto Polymarket events. Defaults to false (moneyline only). F1 events always include every sportsMarketType.
+          name: includeAllMarkets
           in: query
       responses:
         "200":

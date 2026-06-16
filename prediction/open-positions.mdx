@@ -42,7 +42,9 @@ Use `POST /orders` to create a buy order for YES or NO contracts.
 | `depositAmount` | string | Yes | Amount to deposit (in native token units of JupUSD or USDC) |
 | `depositMint` | string | Yes | Token mint for deposit (JupUSD or USDC) |
 
-Example: Create a buy order for 2 USD worth of contracts
+The minimum order is 5 USD (`5000000` native token units). Smaller deposits return `400 Minimum order is $5`.
+
+Example: Create a buy order for 5 USD worth of contracts
 ```js
 const response = await fetch('https://api.jup.ag/prediction/v1/orders', {
   method: 'POST',
@@ -52,7 +54,7 @@ const response = await fetch('https://api.jup.ag/prediction/v1/orders', {
   },
   body: JSON.stringify({
     ownerPubkey: wallet.publicKey.toString(),
-    depositAmount: '2000000',
+    depositAmount: '5000000',
     depositMint: 'JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD',
     marketId: marketId,
     isYes: true,
@@ -72,7 +74,8 @@ console.log(orderResponse);
 | `txMeta` | Transaction metadata: `blockhash` and `lastValidBlockHeight` |
 | `order.orderPubkey` | The order's on-chain account address |
 | `order.positionPubkey` | The position's on-chain account address |
-| `order.contracts` | The number of contracts being purchased |
+| `order.contracts` | Legacy whole-contract quantity. Contracts are fractional: use `order.contractsMicro` (`1000000` = 1 contract) or `order.contractsDecimal` for the exact amount |
+| `order.requiredSigners` | Public keys that must sign the transaction |
 
 
 ## Sign and Submit the Transaction
@@ -93,7 +96,7 @@ const orderResponse = await fetch('https://api.jup.ag/prediction/v1/orders', {
   },
   body: JSON.stringify({
     ownerPubkey: wallet.publicKey.toString(),
-    depositAmount: '2000000',
+    depositAmount: '5000000',
     depositMint: 'JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD',
     marketId: marketId, // Get from events and markets guide
     isYes: true,
@@ -158,9 +161,12 @@ Polling immediately after submitting the transaction might return a `pending` st
 
 | Status | Description |
 |:-------|:------------|
-| `pending` | Order submitted, waiting to be filled |
+| `created` | Order account created on-chain, waiting to be filled |
+| `partiallyfilled` | Order partially filled |
 | `filled` | Order fully executed |
 | `failed` | Order could not be filled |
+
+`GET /orders/{orderPubkey}` returns `400` once an order has filled and its account is closed; use `GET /orders/status/{orderPubkey}` or `GET /history` to track a completed order.
 
 ```js
 const orderPubkey = orderResponse.order.orderPubkey;

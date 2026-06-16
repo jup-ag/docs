@@ -220,6 +220,8 @@ Each contract represents a claim to **$1 if correct**:
 - If you buy NO at 40¢ and NO wins, you profit 60¢ per contract
 - Losing contracts expire worthless
 
+Contracts are fractional. The `contracts` field is the legacy whole-contract value; the API also returns `contractsMicro` (`1000000` = 1 contract) and `contractsDecimal` for the exact amount.
+
 ### Price as Probability
 
 Market prices reflect implied probability:

@@ -159,22 +159,20 @@ Example response:
 ```json expandable
 {
   "marketId": "market-456",
+  "eventId": "event-123",
+  "provider": "polymarket",
+  "title": "SOL $500 by Q2 2026",
   "status": "open",
   "result": null,
   "openTime": 1704067200,
   "closeTime": 1719792000,
   "resolveAt": null,
   "marketResultPubkey": null,
-  "metadata": {
-    "marketId": "market-456",
-    "title": "SOL $500 by Q2 2026",
-    "status": "open",
-    "result": "",
-    "closeTime": 1719792000,
-    "openTime": 1704067200,
-    "isTeamMarket": false,
-    "rulesPrimary": "Resolves YES if SOL reaches $500..."
-  },
+  "imageUrl": null,
+  "rulesPrimary": "Resolves YES if SOL reaches $500...",
+  "rulesSecondary": "",
+  "outcomes": ["Yes", "No"],
+  "isTeamMarket": false,
   "pricing": {
     "buyYesPriceUsd": 650000,
     "buyNoPriceUsd": 380000,
@@ -184,6 +182,8 @@ Example response:
   }
 }
 ```
+
+Market fields are returned flat. There is no nested `metadata` object. `resolveAt` stays `null` while the market is open and becomes an ISO 8601 string once it resolves.
 
 ### Understanding Prices
 
@@ -226,8 +226,7 @@ Market prices reflect the implied probability of an outcome. A `buyYesPriceUsd` 
 
 | Result | Description |
 |:-------|:------------|
-| `""` (empty) | Market not yet resolved |
-| `pending` | Resolution in progress |
+| `null` | Market not yet resolved |
 | `yes` | YES outcome confirmed |
 | `no` | NO outcome confirmed |
 
@@ -241,12 +240,12 @@ The response has four arrays. Each entry is a `[price, quantity]` pair:
 
 | Field | Description |
 |:------|:------------|
-| `yes` | YES bids: `[price_cents, quantity]`. Price is in cents (e.g. `1` = $0.01). |
+| `yes` | YES bids: `[price_cents, quantity]`. Price is in cents (e.g. `1` = $0.01). `price_cents` is rounded, so sub-cent levels show `0`; use `yes_dollars` for the exact price. |
 | `no` | NO bids: `[price_cents, quantity]`. Same format as `yes`. |
 | `yes_dollars` | YES bids with price as decimal string: `["0.0100", quantity]`. |
 | `no_dollars` | NO bids with price as decimal string. Same format as `yes_dollars`. |
 
-Quantities are in base units (e.g. contract size). Arrays are ordered by price (typically best bid first).
+Arrays are sorted by price ascending. Quantities are in base units and may be fractional.
 
 Example: Get orderbook data for a specific market
 

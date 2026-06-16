@@ -1159,6 +1159,8 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Event"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
                 required:
                   - data
   /events:
@@ -1251,14 +1253,24 @@ paths:
               - new
               - live
               - trending
+              - upcoming
             description: Apply named filters. Use `new` for events created in the last 24
-              hours, `live` for events that have begun, and `trending` for
-              events with recent trade activity.
+              hours, `live` for events that have begun, `trending` for events
+              with recent trade activity, and `upcoming` for events that have not
+              begun yet.
           required: false
           description: Apply named filters. Use `new` for events created in the last 24
-            hours, `live` for events that have begun, and `trending` for events
-            with recent trade activity.
+            hours, `live` for events that have begun, `trending` for events
+            with recent trade activity, and `upcoming` for events that have not
+            begun yet.
           name: filter
+          in: query
+        - schema:
+            type: string
+            description: Filter events by tag (e.g. `soccer`).
+          required: false
+          description: Filter events by tag (e.g. `soccer`).
+          name: tags
           in: query
       responses:
         "200":
@@ -1942,16 +1954,47 @@ paths:
     get:
       tags:
         - Forecast
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+          required: true
+          description: Market identifier to fetch the forecast for. Required; omitting it returns 400.
+          name: marketId
+          in: query
       responses:
         "200":
-          description: Forecast data from price service
+          description: Forecast time-series for the market
           content:
             application/json:
               schema:
                 type: object
-                nullable: true
-                description: Forecast response payload. Shape varies by provider; common fields listed below.
-                additionalProperties: true
+                properties:
+                  forecast_history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        market_ticker:
+                          type: string
+                        event_ticker:
+                          type: string
+                        end_period_ts:
+                          type: number
+                        period_interval:
+                          type: number
+                        numerical_forecast:
+                          type: number
+                        raw_numerical_forecast:
+                          type: number
+                        formatted_forecast:
+                          type: string
+        "400":
+          description: Invalid or missing market ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "502":
           description: Failed to fetch forecast data
           content:
@@ -1964,7 +2007,7 @@ paths:
         - Trading
       responses:
         "200":
-          description: Current Kalshi and Polymarket exchange trading status
+          description: Whether trading is currently enabled
           content:
             application/json:
               schema:
@@ -1994,7 +2037,7 @@ paths:
                 properties:
                   yes:
                     type: array
-                    description: YES-side levels sorted by price descending. Each entry is a [price_cents, size] tuple.
+                    description: YES-side levels sorted by price ascending. Each entry is a [price_cents, size] tuple. price_cents is rounded, so sub-cent levels show 0; size may be fractional.
                     items:
                       type: array
                       items:
@@ -2003,7 +2046,7 @@ paths:
                       maxItems: 2
                   no:
                     type: array
-                    description: NO-side levels sorted by price descending. Each entry is a [price_cents, size] tuple.
+                    description: NO-side levels sorted by price ascending. Each entry is a [price_cents, size] tuple. price_cents is rounded, so sub-cent levels show 0; size may be fractional.
                     items:
                       type: array
                       items:
@@ -2067,6 +2110,13 @@ paths:
                     type: string
                   totalActiveContracts:
                     type: string
+                    description: Legacy whole-contract count. Use totalActiveContractsMicro or totalActiveContractsDecimal for the exact value.
+                  totalActiveContractsMicro:
+                    type: string
+                    description: Active contracts in micro-contract units (1000000 = 1 contract)
+                  totalActiveContractsDecimal:
+                    type: string
+                    description: Active contracts as a decimal string
                   totalPositionsValueUsd:
                     type: string
                 required:
@@ -2161,7 +2211,8 @@ paths:
                       type: object
                       properties:
                         id:
-                          type: number
+                          type: string
+                          description: Trade identifier (e.g. "order-1906029")
                         ownerPubkey:
                           type: string
                         marketId:
@@ -2178,8 +2229,8 @@ paths:
                         side:
                           type: string
                           enum:
-                            - yes
-                            - no
+                            - "yes"
+                            - "no"
                         eventTitle:
                           type: string
                         marketTitle:
@@ -2192,6 +2243,17 @@ paths:
                           type: string
                         eventId:
                           type: string
+                        isTeamMarket:
+                          type: boolean
+                        marketOptions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              label:
+                                type: string
+                              buyYes:
+                                type: boolean
                       required:
                         - id
                         - ownerPubkey

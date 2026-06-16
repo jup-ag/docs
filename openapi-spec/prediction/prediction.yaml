@@ -738,7 +738,20 @@ components:
           description: True if this is a YES position
         contracts:
           type: string
-          description: Contracts held (u64 as string)
+          description: Legacy whole-contract quantity held. Use contractsMicro or contractsDecimal for the exact fractional quantity.
+        contractsMicro:
+          type: string
+          description: Contracts held in micro-contract units (u64 as string, 1000000 = 1 contract)
+        contractsDecimal:
+          type: string
+          description: Contracts held as a decimal string
+        source:
+          type: string
+          description: Origin of the position (e.g. "program")
+        maxSlippageBps:
+          type: integer
+          minimum: 0
+          description: Maximum slippage recorded for the position, in basis points
         totalCostUsd:
           type: string
           description: Total cost basis in micro USD (u128 as string)

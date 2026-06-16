@@ -649,68 +649,6 @@ components:
           description: Mint address for the deposit token
       required:
         - isBuy
-    CloseOrderResponse:
-      type: object
-      properties:
-        blockhash:
-          type: string
-        transaction:
-          type: string
-          description: Base64 encoded transaction
-        latestBlockhash:
-          type: string
-        lastValidBlockHeight:
-          type: integer
-          minimum: 0
-        requiredSigners:
-          type: array
-          items:
-            type: string
-        computeUnits:
-          type: integer
-          minimum: 0
-        orderPubkey:
-          type: string
-        accounts:
-          type: object
-          properties:
-            owner:
-              type: string
-            authority:
-              type: string
-            vault:
-              type: string
-            marketId:
-              type: string
-            position:
-              type: string
-            order:
-              type: string
-            orderAta:
-              type: string
-            ownerTokenAccount:
-              type: string
-            settlementMint:
-              type: string
-          required:
-            - owner
-            - authority
-            - vault
-            - marketId
-            - position
-            - order
-            - orderAta
-            - ownerTokenAccount
-            - settlementMint
-      required:
-        - blockhash
-        - transaction
-        - latestBlockhash
-        - lastValidBlockHeight
-        - requiredSigners
-        - computeUnits
-        - orderPubkey
-        - accounts
     Position:
       type: object
       properties:
@@ -962,6 +900,11 @@ components:
           type: string
           minLength: 32
           description: Position owner public key
+        minSellPriceSlippageBps:
+          type: number
+          description: Slippage tolerance applied to each sell, in basis points. Required.
+      required:
+        - minSellPriceSlippageBps
     ClaimPositionRequest:
       type: object
       properties:

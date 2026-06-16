@@ -292,6 +292,62 @@ const orderbook = await response.json();
 
 ---
 
+## Get Live Scores
+
+For sports events, use `GET /events/scores` to fetch live scores for one or more events, or `GET /events/{eventId}/score` for a single event. Events without a score row are omitted from the list response.
+
+```js
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/events/scores?' + new URLSearchParams({
+    eventIds: 'POLY-351731,POLY-30615' // comma-separated, max 100
+  }),
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const { data } = await response.json();
+```
+
+Example response:
+
+```json expandable
+{
+  "data": [
+    {
+      "eventId": "POLY-351731",
+      "gameId": "90086923",
+      "leagueAbbreviation": "fifwc",
+      "homeTeam": "France",
+      "awayTeam": "Senegal",
+      "score": "2-0",
+      "period": "2H",
+      "elapsed": "90",
+      "status": "InProgress",
+      "live": true,
+      "ended": false,
+      "finishedTimestamp": null,
+      "updatedAt": "2026-06-16T20:53:39.834Z"
+    }
+  ]
+}
+```
+
+| Field | Description |
+|:------|:------------|
+| `score` | Raw score string from the provider (e.g. `"2-0"`) |
+| `period` | Current period (e.g. `"2H"`) |
+| `elapsed` | Elapsed time within the game (e.g. `"90"`) |
+| `status` | Provider status string (e.g. `"InProgress"`) |
+| `live` | `true` while the game is in progress |
+| `ended` | `true` once the game has finished |
+| `finishedTimestamp` | ISO 8601 timestamp when the game finished, if ended |
+| `updatedAt` | ISO 8601 timestamp of the last score update |
+
+---
+
 ## Check Trading Status
 
 Use `GET /trading-status` to verify if the exchange is actively trading. This is useful for conditional logic before placing orders.

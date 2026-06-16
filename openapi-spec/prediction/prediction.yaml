@@ -636,7 +636,17 @@ components:
           anyOf:
             - type: string
             - type: number
-          description: Number of contracts to sell (only applicable when `isBuy` is `false`)
+          description: Legacy whole-contract sell quantity (only when `isBuy` is `false`). Cannot express fractions; prefer contractsMicro or contractsDecimal. Provide only one of contracts, contractsMicro, or contractsDecimal.
+        contractsMicro:
+          anyOf:
+            - type: string
+            - type: number
+          description: Exact sell quantity in micro-contract units (1000000 = 1 contract). Provide only one of contracts, contractsMicro, or contractsDecimal.
+        contractsDecimal:
+          anyOf:
+            - type: string
+            - type: number
+          description: Exact sell quantity as a decimal (e.g. 5.777773). Provide only one of contracts, contractsMicro, or contractsDecimal.
         depositAmount:
           anyOf:
             - type: string

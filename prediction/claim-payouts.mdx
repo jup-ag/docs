@@ -36,16 +36,16 @@ When a market closes, it goes through a settlement process:
 | State | Description |
 |:------|:------------|
 | `open` | Market actively trading |
-| `closed` | Trading stopped, awaiting result determination |
-| `settled` | Result determined, payouts available |
+| `closed` | Trading stopped; awaiting or holding the result |
 | `cancelled` | Market voided, positions refunded |
+
+A resolved market stays `closed` with its `result` set; there is no separate `settled` status.
 
 ### Market Results
 
 | Result | Description |
 |:-------|:------------|
-| `""` (empty) | Not yet resolved |
-| `pending` | Resolution in progress |
+| `null` | Not yet resolved |
 | `yes` | YES outcome confirmed |
 | `no` | NO outcome confirmed |
 
@@ -141,7 +141,11 @@ A position is claimable when:
 
 ## Claiming a Payout
 
-Use `POST /positions/{positionPubkey}/claim` to create a claim transaction.
+Use `POST /positions/{positionPubkey}/claim` to create a claim transaction. Calling it before the market resolves returns `400 Market not settled yet`.
+
+<Note>
+Some markets settle automatically and do not need a claim. For those positions the endpoint returns a message saying no claim is required. Combined with the 24-hour auto-claim, you can always rely on winnings being credited without a manual claim.
+</Note>
 
 ```js
 const positionPubkey = 'position-pubkey-789';
@@ -169,13 +173,20 @@ Example response:
 ```json expandable
 {
   "transaction": "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAGDkS+3LuGTbs...",
-  "position": {
-    "pubkey": "position-pubkey-789",
-    "contracts": "10",
-    "payoutAmountUsd": "10000000"
+  "txMeta": {
+    "blockhash": "EkSnNWid2cvwEVnVx9aBqawnmiCNiDgp3gUdkDPTKN1N",
+    "lastValidBlockHeight": 279632475
   },
-  "blockhash": "EkSnNWid2cvwEVnVx9aBqawnmiCNiDgp3gUdkDPTKN1N",
-  "lastValidBlockHeight": 279632475
+  "position": {
+    "positionPubkey": "position-pubkey-789",
+    "marketPubkey": "market-pubkey-456",
+    "userPubkey": "your-wallet-pubkey",
+    "isYes": true,
+    "contracts": "10",
+    "contractsMicro": "10000000",
+    "contractsDecimal": "10",
+    "payoutAmountUsd": "10000000"
+  }
 }
 ```
 

@@ -1,0 +1,63 @@
+---
+title: "Account Security"
+description: "Protect your account with two-factor authentication and review activity in the audit log."
+llmsDescription: "How to secure a Jupiter Developer Platform account and review activity. Two-factor authentication (2FA) supports an authenticator app (TOTP), email one-time codes, and backup recovery codes; 2FA applies only to email and password sign-in, OAuth sign-in is not covered by it, and accounts that only use OAuth cannot enable 2FA. The audit log records 17 event types across API keys (created, deleted, renamed), plan (changed, subscribed), payments (succeeded, failed), members (invited, removed, role changed, left), invitation canceled, and firewall rules (created, updated, enabled, disabled, deleted). The audit log can be filtered by event type. Most events are retained for 1 year; payment events are retained for 7 years; sensitive metadata is redacted."
+---
+
+Protect your account and review who did what.
+
+## Two-factor authentication
+
+Add two-factor authentication (2FA) from your account settings. Supported methods:
+
+- an authenticator app (TOTP)
+- email one-time codes
+- backup recovery codes
+
+<Note>
+2FA applies to email and password sign-in only. If you sign in with OAuth, 2FA is not applied, and an account that only uses OAuth cannot enable 2FA.
+</Note>
+
+{/* TODO: add screenshot - 2FA setup flow */}
+<Frame>
+  <img src="/static/images/portal-2fa-setup.png" alt="Two-factor authentication setup flow showing authenticator app, email codes, and backup codes" />
+</Frame>
+
+## Audit log
+
+The audit log records who did what in your organization. It covers 17 event types:
+
+| Category | Events |
+| :--- | :--- |
+| API keys | `api_key.created`, `api_key.deleted`, `api_key.renamed` |
+| Plan | `plan.changed`, `plan.subscribed` |
+| Payments | `payment.succeeded`, `payment.failed` |
+| Members | `member.invited`, `member.removed`, `member.role_changed`, `member.left` |
+| Invitations | `invitation.canceled` |
+| Firewall rules | `firewall_rule.created`, `firewall_rule.updated`, `firewall_rule.enabled`, `firewall_rule.disabled`, `firewall_rule.deleted` |
+
+Filter the log by event type to find a specific change. Sensitive metadata in each entry is redacted.
+
+Most events are kept for **1 year**. Payment events are kept for **7 years**.
+
+{/* TODO: add screenshot - audit log view with an event-type filter applied */}
+<Frame>
+  <img src="/static/images/portal-audit-log.png" alt="Audit log view with an event-type filter applied" />
+</Frame>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Organizations & Teams" icon="users" href="/portal/organizations">
+    Roles and who can manage a team's resources.
+  </Card>
+  <Card title="API Keys" icon="key" href="/portal/api-keys">
+    Key changes are recorded in the audit log.
+  </Card>
+  <Card title="Firewall" icon="shield-halved" href="/portal/firewall">
+    Rule changes are recorded in the audit log.
+  </Card>
+  <Card title="Request Logs" icon="list" href="/portal/logs">
+    Per-request history, separate from the audit log.
+  </Card>
+</CardGroup>

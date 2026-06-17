@@ -1,0 +1,73 @@
+---
+title: "Request Logs"
+description: "Inspect individual requests to debug an integration and see what the gateway did."
+llmsDescription: "How to use the Jupiter Developer Platform request logs to inspect individual requests to api.jup.ag. Logs are scoped to a team, listed newest first, with cursor-based pagination, and can be filtered by status code, method, API group, and path. Selecting a request opens a detail panel with the full record, including the firewall decision. Each entry records: timestamp, request ID, client IP, ASN, country, host, referrer, user-agent, method, URI path and query, HTTP status, bytes sent and received, credits consumed, a latency breakdown (total, auth, time to first byte, time to last byte), and the firewall outcome with the rules that matched. Request logs are retained for 6 months."
+---
+
+Request logs show the individual requests made with a team's API keys, newest first. Use them to debug an integration: see the status the gateway returned, how long a request took, how many credits it cost, and which firewall rule, if any, applied.
+
+## View and filter
+
+Logs are scoped to a team and listed newest first, with cursor-based pagination. Filter the list by:
+
+- status code
+- method
+- API group
+- path
+
+{/* TODO: add screenshot - request logs list with filters applied */}
+<Frame>
+  <img src="/static/images/portal-logs-list.png" alt="Request logs list in Portal with status, method, API group, and path filters applied" />
+</Frame>
+
+## Request detail
+
+Select a request to open its detail panel. The panel shows the full record for that request, including the firewall decision and the rules that matched.
+
+{/* TODO: add screenshot - log detail panel showing a firewall decision */}
+<Frame>
+  <img src="/static/images/portal-log-detail.png" alt="Request log detail panel showing the full record including the firewall decision" />
+</Frame>
+
+## Field reference
+
+Each log entry records:
+
+| Field | Description |
+| :--- | :--- |
+| Timestamp | When the gateway received the request. |
+| Request ID | Unique ID for the request. |
+| Client IP | The caller's IP address. |
+| ASN | The caller's autonomous system number. |
+| Country | The country the request came from. |
+| Host | The host the request was sent to. |
+| Referrer | The referrer header, if sent. |
+| User agent | The user-agent header. |
+| Method | The HTTP method. |
+| Path | The URI path and query string. |
+| Status | The HTTP status code returned. |
+| Bytes sent / received | Response and request sizes. |
+| Credits consumed | Credits the request cost. |
+| Latency | Total time, broken into auth, time to first byte, and time to last byte. |
+| Firewall | The outcome and the rules that matched. |
+
+## Retention
+
+Request logs are kept for 6 months.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Analytics" icon="chart-line" href="/portal/analytics">
+    Aggregate traffic, performance, and cost across requests.
+  </Card>
+  <Card title="Firewall" icon="shield-halved" href="/portal/firewall">
+    See the rules behind the firewall decisions in your logs.
+  </Card>
+  <Card title="Response Codes" icon="list" href="/portal/responses">
+    What each HTTP status in the logs means.
+  </Card>
+  <Card title="Plans and Pricing" icon="credit-card" href="/portal/plans">
+    How credits are counted per endpoint.
+  </Card>
+</CardGroup>

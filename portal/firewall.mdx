@@ -1,0 +1,173 @@
+---
+title: "Firewall"
+description: "Set rules to limit, rate-limit, or block traffic to your API keys at the gateway."
+llmsDescription: "How to use the Jupiter Developer Platform firewall to control traffic to API keys used in browser, mobile, or other client-side apps. Firewall rules are evaluated per team at the api.jup.ag gateway before requests reach the API, with up to 50 rules per team (enabled or disabled, deleted rules excluded). When several rules match a request, one decision rule wins by action precedence Bypass > Deny > Rate limit > Log. Each rule combines conditions (Path starts-with prefix, API keys is-any-of, Method, Country, Header, IP/CIDR) with AND/OR groups and one of four actions: Log (record only), Deny (returns 403 'Request blocked by firewall'), Rate limit (N requests per second/minute scoped per IP, per API key, or per team; returns 429 when exceeded), or Bypass (skips firewall checks for matching trusted traffic, must have at least one condition). Each rule shows a human-readable IF...THEN Expression Overview. Firewall decisions and matched rules appear in request logs and Firewall analytics, and rule changes are recorded in the audit log."
+---
+
+An API key used in a browser, mobile app, or other client-side code is not secret. Anyone can read it from network traffic and reuse it. Firewall rules let you control which requests the gateway allows, blocks, or rate-limits.
+
+Common uses:
+
+- **Limit an exposed key** to the few endpoints and regions you actually use, so a leaked key cannot reach the rest.
+- **Block abuse** by rate-limiting or denying an IP, country, or key that sends too many requests.
+- **Exempt trusted traffic**, such as your own backend, from the rules that apply to everyone else.
+
+<Note>
+The firewall matches on request attributes for the whole team: path, IP, country, method, headers, and API key. To limit what one specific key can do, use [API Key Permissions](/portal/api-keys#permissions) instead. A permission is tied to a single key; a firewall rule applies to all of the team's traffic.
+</Note>
+
+## How firewall rules work
+
+A rule has three parts:
+
+1. **Name** so you can find it later in the rules list, logs, and analytics.
+2. **Conditions** a request must match. A rule can have several, combined with `AND`/`OR`.
+3. **Action** that runs when a request matches.
+
+Rules belong to a team and apply at the gateway. Each rule has an enabled toggle, on by default, so you can switch a rule off without deleting it. A team can have up to **50 rules**, counting every rule that is not deleted, enabled or disabled. Disabling a rule does not free a slot, so delete a rule to make room for another.
+
+A request can match more than one rule. Every match is recorded, but one rule decides the outcome, chosen by action precedence: `Bypass` > `Deny` > `Rate limit` > `Log`. Ties break toward the more specific rule, then the older one. A `Bypass` match therefore wins over any `Deny` or `Rate limit` the request also matches, and skips the firewall rate-limit checks.
+
+Every decision is recorded. The outcome and matching rules appear in [request logs](/portal/logs) and [Firewall analytics](/portal/analytics#firewall-analytics), and changes to a rule appear in the [audit log](/portal/security#audit-log).
+
+{/* TODO: add gif - building a rule in the condition builder with the Expression Overview updating live */}
+<Frame>
+  <img src="/static/images/portal-firewall-rule-builder.gif" alt="Building a firewall rule in the condition builder, with the Expression Overview preview updating as conditions and the action are set" />
+</Frame>
+
+## Create your first rule
+
+<Steps>
+  <Step title="Open Firewall for your team">
+    In [Portal](https://developers.jup.ag/portal), switch to the team you want to protect, then open **Firewall**. Rules apply only to the selected team.
+  </Step>
+  <Step title="Name the rule">
+    Give it a descriptive name, for example `Block non-swap paths on web key`.
+  </Step>
+  <Step title="Add conditions">
+    Pick a condition type and set its value. Add more if you need them, grouped with `AND` (all must match) or `OR` (any can match). See [Conditions](#conditions).
+  </Step>
+  <Step title="Choose an action">
+    Pick `Log`, `Deny`, `Rate limit`, or `Bypass`. For `Rate limit`, set the count, the window, and the scope. See [Actions](#actions).
+  </Step>
+  <Step title="Review and confirm">
+    Read the `IF … THEN …` [Expression Overview](#expression-overview), then confirm. New rules are enabled by default.
+  </Step>
+</Steps>
+
+<Tip>
+Set a new rule to `Log` first. It records matches without blocking anything, so you can see what the rule catches before you switch it to `Deny` or `Rate limit`.
+</Tip>
+
+## Conditions
+
+Each condition matches a request against one attribute. Combine them with `AND`/`OR`.
+
+| Condition | Operator | Matches |
+| :--- | :--- | :--- |
+| `Path` | starts with | The request path prefix, for example `/swap` or `/price`. |
+| `API keys` | is any of | The API key used on the request. |
+| `Method` | is any of | The HTTP method, for example `GET` or `POST`. |
+| `Country` | is any of | The country the request comes from, chosen by name (up to 50). |
+| `Header` | Equals | A request header name and its exact value. The value match is case-sensitive. |
+| `IP/CIDR` | is any of | A client IP address or CIDR range. |
+
+For example, `Path starts with /swap` `AND` `Country is any of United States, United Kingdom` matches only swap requests from those two countries. You pick countries by name; the Expression Overview shows them by name too.
+
+Reserved and internal headers cannot be used in a `Header` condition, and one condition group can match up to 5 header values, combined with `OR`.
+
+{/* TODO: add screenshot - conditions dropdown showing Path / API keys / Method / Country / Header / IP/CIDR */}
+<Frame>
+  <img src="/static/images/portal-firewall-conditions.png" alt="Firewall condition type dropdown listing Path, API keys, Method, Country, Header, and IP/CIDR" />
+</Frame>
+
+## Actions
+
+Each rule has one action.
+
+| Action | What it does |
+| :--- | :--- |
+| `Log` | Records the match. The request is allowed through. |
+| `Deny` | Blocks the request and returns `403 Forbidden` with the message `Request blocked by firewall`. |
+| `Rate limit` | Allows matching traffic up to a set count per window, then returns `429 Too Many Requests`. See [Rate-limit scopes](#rate-limit-scopes). |
+| `Bypass` | Lets matching requests through and skips the firewall's rate-limit checks. Use it for traffic you trust, such as your own backend IPs. |
+
+<Warning>
+A `Bypass` rule needs at least one condition, so it cannot match every request. Otherwise a single rule could switch off your whole firewall.
+</Warning>
+
+### Rate-limit scopes
+
+The `Rate limit` action allows **N requests per window** (in seconds or minutes) for traffic that matches the rule. The scope decides who that limit applies to:
+
+| Scope | Behaviour |
+| :--- | :--- |
+| Per **IP** | Each client IP gets its own limit. |
+| Per **API key** | Each API key gets its own limit. |
+| Per **Team** | The whole team shares one limit. |
+
+For example, a rule on `Path starts with /tokens/v2/search` set to 30 requests per 60 seconds per **IP** lets each visitor make 30 searches a minute. The same rule scoped per **Team** caps total search traffic across all your users.
+
+A firewall rate limit stacks on top of your plan's [rate limit](/portal/rate-limits): a request can be within your plan quota and still get a `429` from a firewall rule.
+
+{/* TODO: add screenshot - Rate limit action config with the per-IP / per-API key / per-Team scope cards */}
+<Frame>
+  <img src="/static/images/portal-firewall-rate-limit-scope.png" alt="Rate limit action configuration showing request count, duration, and per-IP, per-API key, and per-Team scope cards" />
+</Frame>
+
+## Expression Overview
+
+As you build a rule, Portal shows a plain-language `IF … THEN …` version of it. Condition groups are wrapped in parentheses and joined with `OR`; conditions inside a group are joined with `AND`.
+
+```
+IF (path starts with /swap AND method is POST)
+THEN Deny
+```
+
+```
+IF (path starts with /tokens/v2/search)
+THEN Rate limit to 30 requests per 60s (per ip)
+```
+
+Check it before you save to spot a misplaced `AND`/`OR` or the wrong action.
+
+## Outcomes
+
+The action decides the response:
+
+| Action | Response |
+| :--- | :--- |
+| `Deny` | `403 Forbidden`, body `{ "code": 403, "message": "Request blocked by firewall" }` |
+| `Rate limit` (over the limit) | `429 Too Many Requests`, body `{ "code": 429, "message": "Too many requests" }` |
+| `Log` | No change to the response. The match is recorded only. |
+| `Bypass` | No change to the response. The firewall rate-limit checks are skipped. |
+
+A firewall `429` includes the same `x-ratelimit-remaining`, `x-ratelimit-current`, and `x-ratelimit-reset` headers as a plan rate limit. The body message tells the two apart: a firewall rule returns `Too many requests`, while the plan limit returns `[API Gateway] Too many requests`.
+
+Each decision is visible after the request:
+
+- **[Request logs](/portal/logs)** show the firewall outcome and matching rules for each request.
+- **[Firewall analytics](/portal/analytics#firewall-analytics)** show outcomes over time and how often each rule matched.
+- **[Audit log](/portal/security#audit-log)** records when firewall rules are created, updated, enabled, disabled, or deleted.
+
+{/* TODO: add screenshot - Firewall analytics showing outcomes over time and rule-match counts */}
+<Frame>
+  <img src="/static/images/portal-firewall-analytics.png" alt="Firewall analytics showing request outcomes over time and how often each rule matched" />
+</Frame>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="API Keys & Permissions" icon="key" href="/portal/api-keys">
+    Restrict a key to specific APIs to limit what a leaked key can do.
+  </Card>
+  <Card title="Request Logs" icon="list" href="/portal/logs">
+    Inspect individual requests and the firewall decision for each.
+  </Card>
+  <Card title="Analytics" icon="chart-line" href="/portal/analytics">
+    Track firewall outcomes and rule matches over time.
+  </Card>
+  <Card title="Rate Limits" icon="gauge-high" href="/portal/rate-limits">
+    See how plan limits and firewall rate limits combine.
+  </Card>
+</CardGroup>

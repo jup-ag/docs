@@ -1,7 +1,7 @@
 ---
 title: "Rate Limits"
 description: "Rate limits for Jupiter APIs by plan tier."
-llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per account, not per API key. Most API requests share the same general rate limit bucket, but /swap/v2/execute and /tx/v1/submit each have their own dedicated buckets separate from the general limit and from each other: Keyless 20 RPS, Free 50 RPS, Paid (Developer/Launch/Pro) 100 RPS. Returns HTTP 429 when exceeded."
+llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per account, not per API key. Most API requests share the same general rate limit bucket, but /swap/v2/execute and /tx/v1/submit each have their own dedicated buckets separate from the general limit and from each other: Keyless 20 RPS, Free 50 RPS, Paid (Developer/Launch/Pro) 100 RPS. The /ultra endpoints have a separate bucket at 10 RPS (100 requests / 10 seconds) on Free and all paid tiers. Rate-limited responses include x-ratelimit-remaining, x-ratelimit-current, and x-ratelimit-reset headers (on successful and 429 responses, not on 401/403). Firewall rules can impose additional per-IP, per-API-key, or per-team limits on top of the plan limit. Returns HTTP 429 when exceeded."
 ---
 
 ## Overview
@@ -17,7 +17,7 @@ All Jupiter APIs use a fixed rate limit based on your plan tier. Rate limits are
 | Pro | 150 | 9,000 | Yes |
 
 <Note>
-Rate limits apply **per account**, not per API key. Creating multiple API keys does not increase your rate limit.
+Your plan's rate limit applies **per account**, not per API key. Creating multiple API keys does not increase it. [Firewall](/portal/firewall) rules can add further limits per IP, key, or team.
 </Note>
 
 <Note>
@@ -35,6 +35,24 @@ Rate limits are **bucketed**. Most API requests share the same rate limit bucket
 | Paid (Developer, Launch, Pro) | 100 |
 
 For example, a Developer plan account (10 RPS general) can simultaneously make 10 general API requests, 100 `/execute` requests, and 100 `/submit` requests per second.
+
+The `/ultra` endpoints have their own bucket at **10 RPS (100 requests / 10 seconds)** on the Free tier and all paid tiers, separate from the general limit and from the `/execute` and `/submit` buckets.
+
+## Rate limit headers
+
+When a rate-limit window is active, responses include:
+
+| Header | Meaning |
+| :--- | :--- |
+| `x-ratelimit-remaining` | Requests left in the current window. |
+| `x-ratelimit-current` | Requests used in the current window. |
+| `x-ratelimit-reset` | When the current window resets. |
+
+These appear on both successful and `429` responses, but not on `401` or `403`.
+
+## Firewall rate limits
+
+A team can add [firewall](/portal/firewall) rules that rate-limit traffic per IP, per API key, or per team. A firewall rate limit applies on top of your plan limit, so a request can stay within your plan quota and still receive a `429`.
 
 ## Handling rate limits
 

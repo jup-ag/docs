@@ -1,0 +1,86 @@
+---
+title: "API Keys"
+description: "Create API keys, restrict them to specific APIs, and manage their lifecycle."
+llmsDescription: "How to create and manage Jupiter Developer Platform API keys and restrict them with permissions. Keys are created inside a team, use the format jup_..., need a name unique within the team, and are shown in full only at creation (afterwards only the first and last few characters appear). Pass a key in the x-api-key header to api.jup.ag. New keys, permission changes, and deletions take effect within about 15 seconds. By default a key can call every Jupiter API. Permissions are an allow-list of products matched by case-sensitive path prefix, across Swap (which also covers the Ultra API /ultra/v1/* and transaction submission /tx/v1/submit), Tokens, Price, Trigger, Recurring, Portfolio, Lend, Send, Studio, and Prediction. Once a list is set, the key can only call those endpoints, and a request to a disallowed endpoint is rejected at the gateway with 403 Forbidden and the message 'API key does not have access to this endpoint'. Covers the lifecycle (create, view, delete), permissions, and best practices: one key per app or environment, least privilege, and rotation."
+---
+
+An API key authenticates your requests to `api.jup.ag`. You pass it in the `x-api-key` header. By default a key can call every Jupiter API, so keep it secret. Permissions let you restrict a key to specific APIs, so a key used in a client app, or one that leaks, can only reach the APIs you allowed.
+
+## Create a key
+
+API keys belong to a team. You can create and manage a team's keys if you are a member of that team, or an owner or admin of the organization. See [Organizations & Teams](/portal/organizations) for who can manage what.
+
+<Steps>
+  <Step title="Open API Keys for your team">
+    In [Portal](https://developers.jup.ag/portal), switch to the team the key is for, then open **API Keys**.
+  </Step>
+  <Step title="Create and name the key">
+    Create a key and give it a name. Names are unique within a team, so use something that identifies where the key runs, for example `web-app-prod` or `backend-staging`.
+  </Step>
+  <Step title="Copy the key">
+    The key has the format `jup_…`. Copy it now: afterwards only the first and last few characters are shown, so it cannot be retrieved in full.
+  </Step>
+  <Step title="Use it in the x-api-key header">
+    Send the key in the `x-api-key` header on requests to `api.jup.ag`. See [Getting Started](/portal/setup) for a request example.
+  </Step>
+</Steps>
+
+<Note>
+New keys, permission changes, and deletions take effect within about 15 seconds.
+</Note>
+
+{/* TODO: add gif - creating an API key end to end */}
+<Frame>
+  <img src="/static/images/portal-api-key-create.gif" alt="Creating an API key in Portal end to end: naming the key, copying it, and seeing it in the team's key list" />
+</Frame>
+
+Delete a key you no longer use or that may be exposed. Deletions are recorded in the [audit log](/portal/security#audit-log).
+
+## Permissions
+
+By default a key can call every Jupiter API. Permissions restrict a key to an allow-list of products. Once you set the list, the key can only call the endpoints those products cover, and a request to any other endpoint is rejected.
+
+In Portal you toggle which products a key can call: Swap, Tokens, Price, Trigger, Recurring, Portfolio, Lend, Send, Studio, and Prediction. Matching is by path prefix and is case-sensitive.
+
+The **Swap** product also covers the Ultra API (`/ultra/v1/*`) and transaction submission (`/tx/v1/submit`), so a key limited to Swap can reach those endpoints too.
+
+{/* TODO: add screenshot - API key permissions UI showing the allowed-API selection */}
+<Frame>
+  <img src="/static/images/portal-api-key-permissions.png" alt="API key permissions UI showing the list of APIs a key is allowed to call" />
+</Frame>
+
+### Example: a key scoped to Price and Tokens
+
+A key allowed only the Price and Tokens products can call those APIs. A request to a Swap endpoint like `/swap/v2/order` is rejected at the gateway with `403 Forbidden`:
+
+```json
+{
+  "code": 403,
+  "message": "API key does not have access to this endpoint"
+}
+```
+
+See [Response Codes](/portal/responses) for the other gateway responses.
+
+## Best practices
+
+- **One key per app or environment.** Use separate keys for your web app, mobile app, and backend, and separate keys for staging and production. If one is exposed, you delete only that key. Your [rate limit](/portal/rate-limits) is shared across the account, so extra keys do not raise it.
+- **Least privilege.** Give each key only the permissions its app needs. A key used in a client app should be limited to the APIs that app actually calls.
+- **Rotate keys.** Replace keys periodically, and whenever one might be exposed. Create the new key, move traffic to it, then delete the old one. For a key you use in a client app, add [firewall](/portal/firewall) rules to limit abuse.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Firewall" icon="shield-halved" href="/portal/firewall">
+    Block abuse and rate-limit traffic to keys you use in client apps.
+  </Card>
+  <Card title="Organizations & Teams" icon="users" href="/portal/organizations">
+    See who can create and manage a team's API keys.
+  </Card>
+  <Card title="Rate Limits" icon="gauge-high" href="/portal/rate-limits">
+    Rate limits apply per account, not per key.
+  </Card>
+  <Card title="Getting Started" icon="key" href="/portal/setup">
+    Sign up, get a key, and make your first request.
+  </Card>
+</CardGroup>

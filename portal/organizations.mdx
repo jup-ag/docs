@@ -1,10 +1,10 @@
 ---
-title: "Organizations & Teams"
-description: "Group your teams under one organization, each with its own keys, analytics, and logs."
-llmsDescription: "How organizations and teams work in the Jupiter Developer Platform. An organization groups teams; each team has its own API keys, analytics, request logs, and firewall rules, so you can separate products or environments. Each team has a slug (lowercase a-z, 0-9, hyphens, max 48 chars, unique per organization) used in its Portal URL /portal/{org}/{team}. An organization has three roles: owner, admin, and member; team membership is separate and binary. All organization members can view every team's analytics and logs read-only. Managing a team's API keys and firewall rules requires membership of that team or an owner/admin role in the organization. Managing billing and the plan requires an owner or admin role. An organization can have multiple owners; an existing owner promotes another member to owner, and the original owner keeps their role unless they voluntarily self-demote. The last remaining owner cannot be demoted or removed. Members are invited by email and invitations expire after 10 days."
+title: "Organisations & Teams"
+description: "Group your teams under one organisation, each with its own keys, analytics, and logs."
+llmsDescription: "How organisations and teams work in the Jupiter Developer Platform. An organisation groups teams; each team has its own API keys, analytics, request logs, and firewall rules, so you can separate products or environments. Each team has a slug (lowercase a-z, 0-9, hyphens, max 48 chars, unique per organisation) used in its Portal URL /portal/{org}/{team}. An organisation has three roles: owner, admin, and member; team membership is separate and binary. All organisation members can view every team's analytics and logs read-only. Managing a team's API keys and firewall rules requires membership of that team or an owner/admin role in the organisation. Managing billing and the plan requires an owner or admin role. An organisation can have multiple owners; an existing owner promotes another member to owner, and the original owner keeps their role unless they voluntarily self-demote. The last remaining owner cannot be demoted or removed. Members are invited by email and invitations expire after 10 days."
 ---
 
-An organization groups your teams. Each team has its own API keys, analytics, request logs, and firewall rules, so you can keep products or environments separate: production in one team, staging in another, or one team per app.
+An organisation groups your teams. Each team has its own API keys, analytics, request logs, and firewall rules, so you can keep products or environments separate: production in one team, staging in another, or one team per app.
 
 ## Teams
 
@@ -15,7 +15,7 @@ Create a team for each product or environment you want to track on its own. A te
 - Request Logs
 - Firewall Rules
 
-Each team has a slug used in its Portal URL, `/portal/{org}/{team}`. Slugs are lowercase letters, digits, and hyphens, up to 48 characters, and unique within the organization. If a name produces a slug that is already taken, Portal adds a short suffix to keep it unique. Switch between teams from the team selector in Portal.
+Each team has a slug used in its Portal URL, `/portal/{org}/{team}`. Slugs are lowercase letters, digits, and hyphens, up to 48 characters, and unique within the organisation. If a name produces a slug that is already taken, Portal adds a short suffix to keep it unique. Switch between teams from the team selector in Portal.
 
 Deleting a team permanently invalidates its API keys. Any request using those keys will be rejected.
 
@@ -26,9 +26,9 @@ Deleting a team permanently invalidates its API keys. Any request using those ke
 
 ## Members and roles
 
-Invite people to your organization by email. An invitation expires after 10 days.
+Invite people to your organisation by email. An invitation expires after 10 days.
 
-An organization has three roles: **owner**, **admin**, and **member**. Team membership is separate from the organization role: you are either in a team or not, with no per-team roles.
+An organisation has three roles: **owner**, **admin**, and **member**. Team membership is separate from the organisation role: you are either in a team or not, with no per-team roles.
 
 ### Who can do what
 
@@ -40,11 +40,11 @@ An organization has three roles: **owner**, **admin**, and **member**. Team memb
 | Upgrade, downgrade, or cancel the organisation's [plan](/portal/plans) | No | Yes |
 | Invite or remove members, change roles | No | Yes |
 
-An organization can have multiple owners. To grant ownership, an existing owner promotes another member to owner. The original owner keeps their role unless they voluntarily demote themselves. An organization must always have at least one owner: the last remaining owner cannot be demoted or removed.
+An organisation can have multiple owners. To grant ownership, an existing owner promotes another member to owner. The original owner keeps their role unless they voluntarily demote themselves. An organisation must always have at least one owner: the last remaining owner cannot be demoted or removed.
 
 {/* TODO: add screenshot - invite member dialog and the members table with roles */}
 <Frame>
-  <img src="/static/images/portal-members-invite.png" alt="Invite member dialog and the organization members table showing roles" />
+  <img src="/static/images/portal-members-invite.png" alt="Invite member dialog and the organisation members table showing roles" />
 </Frame>
 
 ## Related

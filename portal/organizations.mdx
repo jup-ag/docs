@@ -17,7 +17,7 @@ Create a team for each product or environment you want to track on its own. A te
 
 Each team has a slug used in its Portal URL, `/portal/{org}/{team}`. Slugs are lowercase letters, digits, and hyphens, up to 48 characters, and unique within the organization. If a name produces a slug that is already taken, Portal adds a short suffix to keep it unique. Switch between teams from the team selector in Portal.
 
-Deleting a team deactivates its API keys. The keys stop working immediately but remain in the database for audit purposes.
+Deleting a team permanently invalidates its API keys. Any request using those keys will be rejected.
 
 {/* TODO: add screenshot - Teams grid showing each team with its member and API key counts */}
 <Frame>

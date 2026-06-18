@@ -4,9 +4,27 @@ description: "HTTP response codes for Jupiter APIs."
 llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized (only when an invalid or unknown API key is sent; a request with no x-api-key header is treated as keyless), 403 forbidden (message 'API key does not have access to this endpoint' for permission denial, or 'Request blocked by firewall' for a firewall deny rule), 404 not found, 429 rate limited (message '[API Gateway] Too many requests' for plan limit, or 'Too many requests' for a firewall rate-limit rule), and 5xx server errors, with debugging guidance."
 ---
 
-<Tip>
-When reporting an issue, include the response headers (especially the request ID) and the full response body. These let support identify your request immediately. Product-specific error codes are documented on each product's page.
-</Tip>
+## Debugging
+
+Every response includes an `x-api-gateway-request-id` header. This is the same request ID that appears in your team's [Request Logs](/portal/logs), so you can match a failed client request to its full server-side record (status, latency breakdown, firewall decision, credits consumed).
+
+Log this header on every response. When reporting an issue to support, include it alongside the response body so we can look up the request immediately.
+
+```typescript
+const response = await fetch("https://api.jup.ag/swap/v2/order?...", {
+  headers: { "x-api-key": API_KEY },
+});
+
+if (!response.ok) {
+  const requestId = response.headers.get("x-api-gateway-request-id");
+  const body = await response.text();
+  console.error(`[${response.status}] request=${requestId} body=${body}`);
+}
+```
+
+<Note>
+Product-specific error codes are documented on each product's page.
+</Note>
 
 ## HTTP status codes
 

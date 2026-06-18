@@ -1,7 +1,7 @@
 ---
 title: "Response Codes"
 description: "HTTP response codes for Jupiter APIs."
-llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized (only when an invalid or unknown API key is sent; a request with no x-api-key header is treated as keyless), 403 forbidden (the API key lacks permission for the endpoint, or a firewall rule blocked the request), 404 not found, 429 rate limited (from your plan limit or a firewall rate-limit rule), and 5xx server errors, with debugging guidance."
+llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized (only when an invalid or unknown API key is sent; a request with no x-api-key header is treated as keyless), 403 forbidden (message 'API key does not have access to this endpoint' for permission denial, or 'Request blocked by firewall' for a firewall deny rule), 404 not found, 429 rate limited (message '[API Gateway] Too many requests' for plan limit, or 'Too many requests' for a firewall rate-limit rule), and 5xx server errors, with debugging guidance."
 ---
 
 <Tip>
@@ -23,7 +23,7 @@ llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400
 | 200  | Success               | Request completed successfully.                                                             |
 | 400  | Bad Request           | Check the request parameters and syntax.                                                    |
 | 401  | Unauthorised          | Sent when you provide an invalid or unknown API key. A request with no `x-api-key` header is treated as keyless, not rejected. Check that your key is correct and active. |
-| 403  | Forbidden             | Either your API key lacks [permission](/portal/api-keys#permissions) for the endpoint, or a [firewall](/portal/firewall) rule blocked the request. |
+| 403  | Forbidden             | Either your API key lacks [permission](/portal/api-keys#permissions) for the endpoint (message: `API key does not have access to this endpoint`) or a [firewall](/portal/firewall) rule blocked the request (message: `Request blocked by firewall`). |
 | 404  | Not Found             | Check the endpoint URL.                                                                     |
-| 429  | Rate Limited          | You exceeded a rate limit. This can be your plan limit or a [firewall](/portal/firewall) rate-limit rule. Slow down or implement backoff. See [Rate Limits](/portal/rate-limits) for details. |
+| 429  | Rate Limited          | You exceeded a rate limit. The message tells you which: `[API Gateway] Too many requests` is your plan limit, `Too many requests` is a [firewall](/portal/firewall) rate-limit rule. Slow down or implement backoff. See [Rate Limits](/portal/rate-limits) for details. |
 | 5xx  | Server Error          | Retry with backoff. If persistent, submit a [Portal Enquiry](https://support.jup.ag/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer) or reach out in [Discord Dev Support](https://discord.com/channels/897540204506775583/910250162402779146). |

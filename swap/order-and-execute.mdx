@@ -315,6 +315,15 @@ if (!order.transaction) {
 
 For the full parameter reference, see the [API reference](/api-reference/swap/order). For how each parameter affects routing, see the [routing impact matrix](#routing-impact-matrix) below.
 
+### Transaction validity
+
+Sign and submit the transaction as soon as you receive it. The longer you wait, the more the quote goes stale as onchain prices move.
+
+- **Aggregator routes** (Metis, Dflow, OKX): `lastValidBlockHeight` in the response is the hard expiry. The transaction becomes invalid after this block height.
+- **RFQ routes** (JupiterZ): `expireAt` is the quote expiry timestamp from the market maker. RFQ quotes are typically shorter-lived than aggregator quotes.
+
+These are guidelines, not guarantees of execution. Prices can move against you even within the validity window, causing the transaction to fail due to slippage. Sign and submit immediately after receiving the order.
+
 ### 2. Sign the transaction
 
 - The transaction returned by `/order` is unsigned. Sign it with your wallet's private key. The example above uses `@solana/kit`. The transaction is a versioned transaction (v0).

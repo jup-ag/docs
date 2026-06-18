@@ -600,7 +600,11 @@ The response includes address lookup tables in `addressesByLookupTableAddress`. 
 
 ### 5. Sign and send
 
-Sign the transaction with your wallet and send via your own RPC, or use [`/submit`](/transaction/submit) to land them through Jupiter's transaction infrastructure with SOL tips.
+Sign and submit as soon as the transaction is built. The longer you wait, the more the quote goes stale as onchain prices move. The `blockhashWithMetadata.lastValidBlockHeight` field is the hard expiry, but price movement can cause slippage failures well before then.
+
+The `blockhashSlotsToExpiry` parameter (default 150 slots, roughly 60-90 seconds) controls how far into the future the blockhash is valid. This is a ceiling, not a target. Sign and submit immediately.
+
+Send via your own RPC, or use [`/submit`](/transaction/submit) to land through Jupiter's transaction infrastructure with SOL tips.
 
 <Note>
 `/build` transactions cannot use `/execute`.
@@ -636,6 +640,7 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 | `destinationTokenAccount` | - | SPL token account for output |
 | `nativeDestinationAccount` | - | Native SOL account for output |
 | `blockhashSlotsToExpiry` | 150 | Slots until blockhash expires (1-300) |
+| `forJitoBundle` | false | Exclude DEXes incompatible with Jito bundles |
 
 For the full parameter reference, see the [API reference](/api-reference/swap).
 

@@ -18,23 +18,25 @@ API keys belong to a team. You can create and manage a team's keys if you are a 
     Create a key and give it a name. Names are unique within a team, so use something that identifies where the key runs, for example `web-app-prod` or `backend-staging`.
   </Step>
   <Step title="Copy the key">
-    The key has the format `jup_…`. Copy it now: afterwards only the first and last few characters are shown, so it cannot be retrieved in full.
+    The full key is shown **only once**, at creation. Copy it now and store it securely. After you close this dialog, Portal shows only the first and last few characters, and there is no way to reveal the full key again.
   </Step>
   <Step title="Use it in the x-api-key header">
     Send the key in the `x-api-key` header on requests to `api.jup.ag`. See [Getting Started](/portal/setup) for a request example.
   </Step>
 </Steps>
 
-<Note>
-New keys, permission changes, and deletions take effect within about 15 seconds.
-</Note>
-
 {/* TODO: add video portal-api-key-create.mp4 - creating an API key end to end */}
 <Frame>
   <video autoPlay loop muted playsInline src="/static/images/portal-api-key-create.mp4" style={{ width: '100%', borderRadius: '10px' }} aria-label="Creating an API key in Portal end to end: naming the key, copying it, and seeing it in the team's key list" />
 </Frame>
 
-You can rename a key from its detail view in Portal. Delete a key you no longer use or that may be exposed. Renames and deletions are recorded in the [audit log](/portal/security#audit-log).
+## Managing keys
+
+- **Rename** a key from its detail view in Portal.
+- **Delete** a key you no longer use or that may be exposed.
+- **Permissions** can be changed at any time from the key's detail view. See [Permissions](#permissions).
+
+New keys, permission changes, renames, and deletions propagate to the gateway within about 15 seconds. All key changes are recorded in the [audit log](/portal/security#audit-log).
 
 ## Permissions
 
@@ -64,7 +66,7 @@ See [Response Codes](/portal/responses) for the other gateway responses.
 
 ## Best practices
 
-- **One key per app or environment.** Use separate keys for your web app, mobile app, and backend, and separate keys for staging and production. If one is exposed, you delete only that key. Your [rate limit](/portal/rate-limits) is shared across the account, so extra keys do not raise it.
+- **One key per app or environment.** Use separate keys for your web app, mobile app, and backend, and separate keys for staging and production. If one is exposed, you delete only that key. Your [rate limit](/portal/rate-limits) is shared across the organisation, so extra keys do not raise it.
 - **Least privilege.** Give each key only the permissions its app needs. A key used in a client app should be limited to the APIs that app actually calls.
 - **Rotate keys.** Replace keys periodically, and whenever one might be exposed. Create the new key, move traffic to it, then delete the old one. For a key you use in a client app, add [firewall](/portal/firewall) rules to limit abuse.
 
@@ -78,7 +80,7 @@ See [Response Codes](/portal/responses) for the other gateway responses.
     See who can create and manage a team's API keys.
   </Card>
   <Card title="Rate Limits" icon="gauge-high" href="/portal/rate-limits">
-    Rate limits apply per account, not per key.
+    Rate limits apply per organisation, not per key.
   </Card>
   <Card title="Getting Started" icon="key" href="/portal/setup">
     Sign up, get a key, and make your first request.

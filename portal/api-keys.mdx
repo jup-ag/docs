@@ -29,9 +29,9 @@ API keys belong to a team. You can create and manage a team's keys if you are a 
 New keys, permission changes, and deletions take effect within about 15 seconds.
 </Note>
 
-{/* TODO: add gif - creating an API key end to end */}
+{/* TODO: add video portal-api-key-create.mp4 - creating an API key end to end */}
 <Frame>
-  <img src="/static/images/portal-api-key-create.gif" alt="Creating an API key in Portal end to end: naming the key, copying it, and seeing it in the team's key list" />
+  <video autoPlay loop muted playsInline src="/static/images/portal-api-key-create.mp4" style={{ width: '100%', borderRadius: '10px' }} aria-label="Creating an API key in Portal end to end: naming the key, copying it, and seeing it in the team's key list" />
 </Frame>
 
 Delete a key you no longer use or that may be exposed. Deletions are recorded in the [audit log](/portal/security#audit-log).
@@ -44,9 +44,9 @@ In Portal you toggle which products a key can call: Swap, Tokens, Price, Trigger
 
 The **Swap** product also covers the Ultra API (`/ultra/v1/*`) and transaction submission (`/tx/v1/submit`), so a key limited to Swap can reach those endpoints too.
 
-{/* TODO: add screenshot - API key permissions UI showing the allowed-API selection */}
+{/* TODO: add video portal-api-key-permissions.mp4 - toggling which products a key can call and the resulting allow-list */}
 <Frame>
-  <img src="/static/images/portal-api-key-permissions.png" alt="API key permissions UI showing the list of APIs a key is allowed to call" />
+  <video autoPlay loop muted playsInline src="/static/images/portal-api-key-permissions.mp4" style={{ width: '100%', borderRadius: '10px' }} aria-label="Selecting which APIs a key is allowed to call in the permissions UI, building up the allow-list" />
 </Frame>
 
 ### Example: a key scoped to Price and Tokens

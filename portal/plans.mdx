@@ -1,7 +1,7 @@
 ---
 title: "Plans and Pricing"
 description: "Choose a plan that fits your project - from free to enterprise."
-llmsDescription: "Jupiter Developer Platform pricing tiers: Free (1 RPS, no payment), Developer ($25/mo, 10 RPS, 25M credits), Launch ($100/mo, 50 RPS, 100M credits), Pro ($500/mo, 150 RPS, 500M credits). Credit-based billing at $1 per million credits for overages. Per-endpoint credit costs vary from 0 (execute endpoints) to 100 (portfolio positions). Keyless access available at 0.5 RPS."
+llmsDescription: "Jupiter Developer Platform pricing tiers: Free (1 RPS, no payment), Developer ($25/mo, 10 RPS, 25M credits), Launch ($100/mo, 50 RPS, 100M credits), Pro ($500/mo, 150 RPS, 500M credits). Overage billing applies to usage beyond included credits. Per-endpoint credit costs vary from 0 (execute endpoints) to 100 (portfolio positions). Keyless access available at 0.5 RPS."
 ---
 
 ## Plans
@@ -14,8 +14,10 @@ All plans use the same API (`api.jup.ag`) and have the same data freshness and l
 | **Price (annual)** | $0 | $250 | $1,000 | $5,000 |
 | **Requests per second** | 1 | 10 | 50 | 150 |
 | **Included credits** | Unlimited | 25M / month | 100M / month | 500M / month |
-| **Overage** | - | $1 per 1M credits | $1 per 1M credits | $1 per 1M credits |
 | **Support** | Community | Community | Community | Priority |
+
+{/* Overage row hidden per DEV-556, do not expose $ per credit:
+| **Overage** | - | $1 per 1M credits | $1 per 1M credits | $1 per 1M credits | */}
 
 ### Keyless access
 
@@ -30,9 +32,10 @@ Need higher rate limits, custom SLAs, or volume pricing? [Contact us](https://ai
 Credits measure your API usage. Each API request costs a certain number of credits depending on the endpoint.
 
 - **Free tier**: Unlimited credits, rate-limited only
-- **Paid tiers**: Included credits reset each billing period. Usage beyond your allowance is billed at **$1 per 1M credits**
+- **Paid tiers**: Included credits reset each billing period. Usage beyond your allowance is billed.{/* Overage rate hidden per DEV-556: $1 per 1M credits */}
 - **Execute endpoints are free**: All execute calls cost 0 credits
 
+{/* Credit-to-dollar conversion hidden per DEV-556, do not expose $ per credit:
 | Credits per request | Cost per request |
 | :--- | :--- |
 | 0 | Free |
@@ -42,6 +45,7 @@ Credits measure your API usage. Each API request costs a certain number of credi
 | 10 | $0.00001 |
 | 50 | $0.00005 |
 | 100 | $0.0001 |
+*/}
 
 ### Per-endpoint credit costs
 

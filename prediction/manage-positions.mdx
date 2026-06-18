@@ -1,7 +1,7 @@
 ---
 title: "Manage Positions"
-description: "View your prediction market positions, sell contracts to reduce exposure, and cancel pending orders."
-llmsDescription: "GET /positions lists holdings with P&L. DELETE /positions/{positionPubkey} closes entire position. POST /orders with isBuy=false sells partial. DELETE /orders cancels pending orders."
+description: "View your prediction market positions and sell contracts to close positions."
+llmsDescription: "GET /positions lists holdings with P&L. GET /orders lists your orders. DELETE /positions/{positionPubkey} closes a single position. DELETE /positions closes all open positions and requires minSellPriceSlippageBps."
 ---
 
 <Note>
@@ -111,6 +111,8 @@ const closeResponse = await response.json();
 
 Use `DELETE /positions` to close all your open positions at once. This is useful for quickly exiting all markets.
 
+`minSellPriceSlippageBps` is required (slippage tolerance per sell, in basis points). The request returns `{ data: [...] }`, one sell transaction per open position, each in the same shape as a single close.
+
 ```js
 const response = await fetch('https://api.jup.ag/prediction/v1/positions', {
   method: 'DELETE',
@@ -120,11 +122,12 @@ const response = await fetch('https://api.jup.ag/prediction/v1/positions', {
   },
   body: JSON.stringify({
     ownerPubkey: wallet.publicKey.toString(),
+    minSellPriceSlippageBps: 2500,
   })
 });
 
 const closeAllResponse = await response.json();
-// Sign and submit the transaction (see above)
+// Sign and submit each transaction in closeAllResponse.data (see above)
 ```
 
 ### Sign and Submit the Transaction

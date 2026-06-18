@@ -220,6 +220,22 @@ Each contract represents a claim to **$1 if correct**:
 - If you buy NO at 40¢ and NO wins, you profit 60¢ per contract
 - Losing contracts expire worthless
 
+### Fractional Contracts
+
+Contracts are fractional. Each response carries three forms of every contract quantity:
+
+- `*Micro` (e.g. `contractsMicro`) — exact amount in micro-contracts, where `1000000` = 1 contract. Use this for any math.
+- `*Decimal` (e.g. `contractsDecimal`) — exact amount as a decimal string (e.g. `"5.777773"`). Use this for display.
+- legacy whole-contract field (e.g. `contracts`) — the amount **floored to a whole number**. Kept for backwards compatibility only; fills can be fractional, so this value is truncated and must not be used for accounting.
+
+This applies across the API: `contracts`, `filledContracts`, `contractsSettled`, `newContracts`, and `totalActiveContracts` each have `*Micro` and `*Decimal` siblings.
+
+<Warning>
+`*Micro` values are returned as strings (`u64`/`u128`) and can exceed JavaScript's safe-integer range. Parse them with `BigInt` or a decimal library, never `parseFloat` or `Number`.
+</Warning>
+
+When creating an order you may send `contractsMicro` (or `contractsDecimal`, or the legacy `contracts`), but only one quantity field per request. Effective fill sizes are floored to 0.01-contract increments; you can submit finer sizes, but executed amounts round down to the nearest 0.01.
+
 ### Price as Probability
 
 Market prices reflect implied probability:

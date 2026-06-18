@@ -57,18 +57,36 @@ components:
       properties:
         marketId:
           type: string
+        eventId:
+          type: string
         title:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        provider:
           type: string
         status:
           type: string
         result:
           type: string
+          nullable: true
         closeTime:
           type: number
         openTime:
           type: number
         isTeamMarket:
           type: boolean
+        marketOptions:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              buyYes:
+                type: boolean
         rulesPrimary:
           type: string
         rulesSecondary:
@@ -95,10 +113,24 @@ components:
           description: Trading volume for this market
     Market:
       type: object
+      description: Market fields are returned flat (there is no nested `metadata` object).
       properties:
         marketId:
           type: string
           description: Market identifier
+        eventId:
+          type: string
+          description: Parent event identifier
+        provider:
+          type: string
+          enum:
+            - polymarket
+            - gx
+            - bisonfi
+          description: Market data provider
+        title:
+          type: string
+          description: Market title
         status:
           type: string
           enum:
@@ -108,11 +140,11 @@ components:
           description: Current market status
         result:
           type: string
+          nullable: true
           enum:
-            - null
-            - yes
-            - no
-          description: Current market result
+            - "yes"
+            - "no"
+          description: Market result. null until resolved, then "yes" or "no"
         openTime:
           type: number
           description: Unix timestamp (seconds) when the market opens
@@ -120,9 +152,11 @@ components:
           type: number
           description: Unix timestamp (seconds) when the market closes
         resolveAt:
-          type: number
           nullable: true
-          description: Unix timestamp (seconds) when the market resolved (null if pending)
+          oneOf:
+            - type: string
+            - type: number
+          description: When the market resolved. null while open; returned as an ISO 8601 string once resolved
         marketResultPubkey:
           type: string
           nullable: true
@@ -132,8 +166,47 @@ components:
           nullable: true
           format: uri
           description: Market image URL
-        metadata:
-          $ref: "#/components/schemas/MarketMetadata"
+        rulesPrimary:
+          type: string
+          description: Primary resolution rules
+        rulesSecondary:
+          type: string
+          description: Secondary resolution rules
+        outcomes:
+          type: array
+          items:
+            type: string
+          description: Outcome labels for the market
+        marketOptions:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              buyYes:
+                type: boolean
+          description: Selectable options for team or multi-outcome markets
+        clobTokenIds:
+          type: array
+          items:
+            type: string
+          description: Underlying CLOB token IDs (provider-specific)
+        isTeamMarket:
+          type: boolean
+          description: True for team or sports markets
+        team:
+          type: object
+          nullable: true
+          description: Team metadata, present for team markets
+        sportsLine:
+          type: number
+          nullable: true
+          description: Sports line or handicap, when applicable
+        sportsMarketType:
+          type: string
+          nullable: true
+          description: Sports market type, when applicable
         pricing:
           $ref: "#/components/schemas/MarketPricing"
       required:
@@ -175,7 +248,13 @@ components:
             $ref: "#/components/schemas/Market"
         volumeUsd:
           type: string
-          description: Total volume for the event
+          description: Total volume for the event in micro USD
+        volume24hr:
+          type: string
+          description: Rolling 24-hour volume in micro USD
+        liveScore:
+          nullable: true
+          description: Live score data for sports events; null when no score is available
         closeCondition:
           type: string
           description: Close condition for the event
@@ -399,6 +478,11 @@ components:
         externalOrderId:
           type: string
           nullable: true
+        requiredSigners:
+          type: array
+          items:
+            type: string
+          description: Public keys that must sign the returned transaction
         order:
           type: object
           properties:
@@ -430,10 +514,22 @@ components:
               description: True when the order is on the YES side
             contracts:
               type: string
-              description: Contracts included in this order
+              description: Legacy whole-contract quantity. Use contractsMicro or contractsDecimal for the exact fractional quantity.
+            contractsMicro:
+              type: string
+              description: Contracts in micro-contract units (u64 as string, 1000000 = 1 contract)
+            contractsDecimal:
+              type: string
+              description: Contracts as a decimal string
             newContracts:
               type: string
-              description: Position contracts after executing the order
+              description: Position contracts after executing the order (legacy whole-contract quantity)
+            newContractsMicro:
+              type: string
+              description: Position contracts after the order, in micro-contract units
+            newContractsDecimal:
+              type: string
+              description: Position contracts after the order, as a decimal string
             maxBuyPriceUsd:
               type: string
               nullable: true
@@ -467,6 +563,22 @@ components:
             estimatedTotalFeeUsd:
               type: string
               description: Estimated total fees applied (micro USD)
+            payoutUsd:
+              type: string
+              description: Position max payout for this order (micro USD)
+            slippageBps:
+              type: integer
+              minimum: 0
+              description: >-
+                Estimated slippage for this order, in basis points (0 = none, 250 = 2.5%).
+                For a Polymarket buy this is the estimated price impact from sweeping
+                orderbook levels; for a sell it is the max allowed slippage from best bid
+                to the protected sell floor. Treat it as a quote signal, not a guaranteed loss.
+            maxSlippageBps:
+              type: integer
+              minimum: 0
+              nullable: true
+              description: Maximum slippage allowed for this order, in basis points
           required:
             - orderPubkey
             - orderAtaPubkey
@@ -515,7 +627,17 @@ components:
           anyOf:
             - type: string
             - type: number
-          description: Number of contracts to sell (only applicable when `isBuy` is `false`)
+          description: Legacy whole-contract sell quantity (only when `isBuy` is `false`). Cannot express fractions; prefer contractsMicro or contractsDecimal. Provide only one of contracts, contractsMicro, or contractsDecimal.
+        contractsMicro:
+          anyOf:
+            - type: string
+            - type: number
+          description: Exact sell quantity in micro-contract units (1000000 = 1 contract). Provide only one of contracts, contractsMicro, or contractsDecimal.
+        contractsDecimal:
+          anyOf:
+            - type: string
+            - type: number
+          description: Exact sell quantity as a decimal (e.g. 5.777773). Provide only one of contracts, contractsMicro, or contractsDecimal.
         depositAmount:
           anyOf:
             - type: string
@@ -528,68 +650,6 @@ components:
           description: Mint address for the deposit token
       required:
         - isBuy
-    CloseOrderResponse:
-      type: object
-      properties:
-        blockhash:
-          type: string
-        transaction:
-          type: string
-          description: Base64 encoded transaction
-        latestBlockhash:
-          type: string
-        lastValidBlockHeight:
-          type: integer
-          minimum: 0
-        requiredSigners:
-          type: array
-          items:
-            type: string
-        computeUnits:
-          type: integer
-          minimum: 0
-        orderPubkey:
-          type: string
-        accounts:
-          type: object
-          properties:
-            owner:
-              type: string
-            authority:
-              type: string
-            vault:
-              type: string
-            marketId:
-              type: string
-            position:
-              type: string
-            order:
-              type: string
-            orderAta:
-              type: string
-            ownerTokenAccount:
-              type: string
-            settlementMint:
-              type: string
-          required:
-            - owner
-            - authority
-            - vault
-            - marketId
-            - position
-            - order
-            - orderAta
-            - ownerTokenAccount
-            - settlementMint
-      required:
-        - blockhash
-        - transaction
-        - latestBlockhash
-        - lastValidBlockHeight
-        - requiredSigners
-        - computeUnits
-        - orderPubkey
-        - accounts
     Position:
       type: object
       properties:
@@ -617,7 +677,20 @@ components:
           description: True if this is a YES position
         contracts:
           type: string
-          description: Contracts held (u64 as string)
+          description: Legacy whole-contract quantity held. Use contractsMicro or contractsDecimal for the exact fractional quantity.
+        contractsMicro:
+          type: string
+          description: Contracts held in micro-contract units (u64 as string, 1000000 = 1 contract)
+        contractsDecimal:
+          type: string
+          description: Contracts held as a decimal string
+        source:
+          type: string
+          description: Origin of the position (e.g. "program")
+        maxSlippageBps:
+          type: integer
+          minimum: 0
+          description: Maximum slippage recorded for the position, in basis points
         totalCostUsd:
           type: string
           description: Total cost basis in micro USD (u128 as string)
@@ -805,7 +878,13 @@ components:
               type: boolean
             contracts:
               type: string
-              description: Contracts settled (u64 as string)
+              description: Legacy whole-contract quantity settled. Use contractsMicro or contractsDecimal for the exact fractional quantity.
+            contractsMicro:
+              type: string
+              description: Contracts settled in micro-contract units (u64 as string, 1000000 = 1 contract)
+            contractsDecimal:
+              type: string
+              description: Contracts settled as a decimal string
             payoutAmountUsd:
               type: string
               description: Payout amount in micro USD (u64 as string)
@@ -828,6 +907,11 @@ components:
           type: string
           minLength: 32
           description: Position owner public key
+        minSellPriceSlippageBps:
+          type: number
+          description: Slippage tolerance applied to each sell, in basis points. Required.
+      required:
+        - minSellPriceSlippageBps
     ClaimPositionRequest:
       type: object
       properties:
@@ -847,10 +931,11 @@ components:
             - order_created
             - order_filled
             - order_failed
+            - order_closed
             - payout_claimed
             - position_updated
             - position_lost
-          description: Type of history event
+          description: Type of history event. Position wins surface as payout_claimed (there is no position_won).
         signature:
           type: string
           description: Solana transaction signature
@@ -889,13 +974,31 @@ components:
           description: True when the event relates to the YES side
         contracts:
           type: string
-          description: Number of contracts in the order (u64 as string)
+          description: Number of contracts in the order. Legacy whole-contract value; see contractsMicro/contractsDecimal for the exact quantity.
+        contractsMicro:
+          type: string
+          description: Contracts in micro-contract units (u64 as string, 1000000 = 1 contract)
+        contractsDecimal:
+          type: string
+          description: Contracts as a decimal string
         filledContracts:
           type: string
-          description: Number of contracts filled (u64 as string)
+          description: Number of contracts filled (legacy whole-contract value)
+        filledContractsMicro:
+          type: string
+          description: Filled contracts in micro-contract units
+        filledContractsDecimal:
+          type: string
+          description: Filled contracts as a decimal string
         contractsSettled:
           type: string
-          description: Number of contracts settled in this event (u64 as string)
+          description: Number of contracts settled in this event (legacy whole-contract value)
+        contractsSettledMicro:
+          type: string
+          description: Settled contracts in micro-contract units
+        contractsSettledDecimal:
+          type: string
+          description: Settled contracts as a decimal string
         maxFillPriceUsd:
           type: string
           description: Maximum fill price in micro USD (u64 as string)
@@ -1011,6 +1114,58 @@ components:
           type: boolean
       required:
         - trading_active
+    GameScore:
+      type: object
+      properties:
+        eventId:
+          type: string
+          description: Application-level event identifier
+        gameId:
+          type: string
+        leagueAbbreviation:
+          type: string
+          nullable: true
+        homeTeam:
+          type: string
+          nullable: true
+        awayTeam:
+          type: string
+          nullable: true
+        score:
+          type: string
+          nullable: true
+          description: Raw score string from the provider (e.g. "2-0")
+        period:
+          type: string
+          nullable: true
+          description: Current period (e.g. "2H")
+        elapsed:
+          type: string
+          nullable: true
+          description: Elapsed time within the game (e.g. "90")
+        status:
+          type: string
+          nullable: true
+          description: Provider status string (e.g. "InProgress")
+        live:
+          type: boolean
+          description: True while the game is in progress
+        ended:
+          type: boolean
+          description: True once the game has finished
+        finishedTimestamp:
+          type: string
+          nullable: true
+          description: ISO 8601 timestamp when the game finished, if ended
+        updatedAt:
+          type: string
+          description: ISO 8601 timestamp of the last score update
+      required:
+        - eventId
+        - gameId
+        - live
+        - ended
+        - updatedAt
   parameters: {}
 paths:
   /events/search:
@@ -1057,6 +1212,8 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Event"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
                 required:
                   - data
   /events:
@@ -1080,6 +1237,12 @@ paths:
             nullable: true
           required: false
           name: includeMarkets
+          in: query
+        - schema:
+            type: boolean
+          required: false
+          description: Include all allowed sports market types (moneyline, spread, totals) and extra (e.g. Saba) markets mapped onto Polymarket events. Defaults to false (moneyline only). F1 events always include every sportsMarketType.
+          name: includeAllMarkets
           in: query
         - schema:
             type: integer
@@ -1149,14 +1312,24 @@ paths:
               - new
               - live
               - trending
+              - upcoming
             description: Apply named filters. Use `new` for events created in the last 24
-              hours, `live` for events that have begun, and `trending` for
-              events with recent trade activity.
+              hours, `live` for events that have begun, `trending` for events
+              with recent trade activity, and `upcoming` for events that have not
+              begun yet.
           required: false
           description: Apply named filters. Use `new` for events created in the last 24
-            hours, `live` for events that have begun, and `trending` for events
-            with recent trade activity.
+            hours, `live` for events that have begun, `trending` for events
+            with recent trade activity, and `upcoming` for events that have not
+            begun yet.
           name: filter
+          in: query
+        - schema:
+            type: string
+            description: Filter events by tag (e.g. `soccer`).
+          required: false
+          description: Filter events by tag (e.g. `soccer`).
+          name: tags
           in: query
       responses:
         "200":
@@ -1193,6 +1366,12 @@ paths:
             nullable: true
           required: false
           name: includeMarkets
+          in: query
+        - schema:
+            type: boolean
+          required: false
+          description: Include all allowed sports market types (moneyline, spread, totals) and extra (e.g. Saba) markets mapped onto Polymarket events. Defaults to false (moneyline only). F1 events always include every sportsMarketType.
+          name: includeAllMarkets
           in: query
       responses:
         "200":
@@ -1245,6 +1424,52 @@ paths:
                       $ref: "#/components/schemas/Event"
                 required:
                   - data
+  /events/scores:
+    get:
+      tags:
+        - Events
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            example: POLY-351731,POLY-30615
+          required: true
+          description: Comma-separated event IDs to fetch live scores for (max 100)
+          name: eventIds
+          in: query
+      responses:
+        "200":
+          description: Latest live scores for the given event IDs. Events without a score row are omitted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GameScore"
+                required:
+                  - data
+  /events/{eventId}/score:
+    get:
+      tags:
+        - Events
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+          required: true
+          description: Event identifier
+          name: eventId
+          in: path
+      responses:
+        "200":
+          description: Latest live score for the event, or null if no score row exists.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameScore"
   /events/{eventId}/markets:
     get:
       tags:
@@ -1840,16 +2065,47 @@ paths:
     get:
       tags:
         - Forecast
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+          required: true
+          description: Market identifier to fetch the forecast for. Required; omitting it returns 400.
+          name: marketId
+          in: query
       responses:
         "200":
-          description: Forecast data from price service
+          description: Forecast time-series for the market
           content:
             application/json:
               schema:
                 type: object
-                nullable: true
-                description: Forecast response payload. Shape varies by provider; common fields listed below.
-                additionalProperties: true
+                properties:
+                  forecast_history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        market_ticker:
+                          type: string
+                        event_ticker:
+                          type: string
+                        end_period_ts:
+                          type: number
+                        period_interval:
+                          type: number
+                        numerical_forecast:
+                          type: number
+                        raw_numerical_forecast:
+                          type: number
+                        formatted_forecast:
+                          type: string
+        "400":
+          description: Invalid or missing market ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "502":
           description: Failed to fetch forecast data
           content:
@@ -1862,7 +2118,7 @@ paths:
         - Trading
       responses:
         "200":
-          description: Current Kalshi and Polymarket exchange trading status
+          description: Whether trading is currently enabled
           content:
             application/json:
               schema:
@@ -1892,7 +2148,7 @@ paths:
                 properties:
                   yes:
                     type: array
-                    description: YES-side levels sorted by price descending. Each entry is a [price_cents, size] tuple.
+                    description: YES-side levels sorted by price ascending. Each entry is a [price_cents, size] tuple. price_cents is rounded, so sub-cent levels show 0; size may be fractional.
                     items:
                       type: array
                       items:
@@ -1901,7 +2157,7 @@ paths:
                       maxItems: 2
                   no:
                     type: array
-                    description: NO-side levels sorted by price descending. Each entry is a [price_cents, size] tuple.
+                    description: NO-side levels sorted by price ascending. Each entry is a [price_cents, size] tuple. price_cents is rounded, so sub-cent levels show 0; size may be fractional.
                     items:
                       type: array
                       items:
@@ -1965,6 +2221,13 @@ paths:
                     type: string
                   totalActiveContracts:
                     type: string
+                    description: Legacy whole-contract count. Use totalActiveContractsMicro or totalActiveContractsDecimal for the exact value.
+                  totalActiveContractsMicro:
+                    type: string
+                    description: Active contracts in micro-contract units (1000000 = 1 contract)
+                  totalActiveContractsDecimal:
+                    type: string
+                    description: Active contracts as a decimal string
                   totalPositionsValueUsd:
                     type: string
                 required:
@@ -2059,7 +2322,8 @@ paths:
                       type: object
                       properties:
                         id:
-                          type: number
+                          type: string
+                          description: Trade identifier (e.g. "order-1906029")
                         ownerPubkey:
                           type: string
                         marketId:
@@ -2076,8 +2340,8 @@ paths:
                         side:
                           type: string
                           enum:
-                            - yes
-                            - no
+                            - "yes"
+                            - "no"
                         eventTitle:
                           type: string
                         marketTitle:
@@ -2090,6 +2354,17 @@ paths:
                           type: string
                         eventId:
                           type: string
+                        isTeamMarket:
+                          type: boolean
+                        marketOptions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              label:
+                                type: string
+                              buyYes:
+                                type: boolean
                       required:
                         - id
                         - ownerPubkey

@@ -59,7 +59,9 @@ Each position includes identity, state, and P&L fields. All USD values are in mi
 | `ownerPubkey` | string | Position owner wallet public key |
 | `marketId` | string | External market identifier |
 | `isYes` | boolean | `true` if this is a YES position, `false` for NO |
-| `contracts` | string | Number of contracts held (u64 as string) |
+| `contracts` | string | Legacy whole-contract quantity. Contracts are fractional: use `contractsMicro` (`1000000` = 1) or `contractsDecimal` for the exact amount |
+| `contractsMicro` | string | Contracts held in micro-contract units |
+| `contractsDecimal` | string | Contracts held as a decimal string |
 | `openOrders` | integer | Number of currently open orders for this position |
 | `claimable` | boolean | `true` when the position qualifies for payout claim |
 | `claimed` | boolean | Whether payout has already been claimed |
@@ -237,9 +239,10 @@ Use `GET /history` to retrieve a complete audit trail of all prediction market a
 | `order_created` | New order placed on-chain |
 | `order_filled` | Order matched and executed |
 | `order_failed` | Order could not be filled |
+| `order_closed` | Order account closed after completion |
 | `position_updated` | Position modified by order fill |
 | `position_lost` | Market resolved against position |
-| `payout_claimed` | Winnings withdrawn |
+| `payout_claimed` | Winnings withdrawn (also used when a position wins) |
 
 ### History Event Fields
 

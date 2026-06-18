@@ -1,7 +1,7 @@
 ---
 title: "Social Features"
-description: "Access user profiles, follow traders, view leaderboards, and track the global trade feed on Jupiter Prediction Market."
-llmsDescription: "GET /profiles/{pubkey} returns user stats. POST /follow and DELETE /unfollow manage relationships. GET /leaderboards returns rankings by pnl/volume/win_rate. GET /trades provides global trade feed."
+description: "Access user profiles, view leaderboards, and track the global trade feed on Jupiter Prediction Market."
+llmsDescription: "GET /profiles/{pubkey} returns user stats. GET /profiles/{pubkey}/pnl-history returns time-series P&L. GET /leaderboards returns rankings by pnl/volume/win_rate. GET /trades provides the global trade feed."
 ---
 
 <Note>
@@ -10,7 +10,7 @@ llmsDescription: "GET /profiles/{pubkey} returns user stats. POST /follow and DE
 The Prediction Market API is currently in beta and subject to breaking changes as we continue to improve the product. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
 </Note>
 
-This doc covers the social features of Jupiter Prediction Market, including user profiles, following system, leaderboards, and the global trade feed.
+This doc covers the social features of Jupiter Prediction Market: user profiles, leaderboards, and the global trade feed.
 
 ## Prerequisite
 
@@ -304,9 +304,5 @@ console.log('Top trader weekly P&L trend:', topTraderHistory.history);
 |:--------|:---------|:------------|
 | Profiles | `GET /profiles/{pubkey}` | User stats and performance |
 | P&L History | `GET /profiles/{pubkey}/pnl-history` | Time-series P&L data |
-| Follow | `POST /follow/{pubkey}` | Follow a trader |
-| Unfollow | `DELETE /unfollow/{pubkey}` | Unfollow a trader |
-| Followers | `GET /followers/{pubkey}` | List followers |
-| Following | `GET /following/{pubkey}` | List who user follows |
 | Trade Feed | `GET /trades` | Global recent trades |
 | Leaderboards | `GET /leaderboards` | Competitive rankings |

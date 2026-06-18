@@ -35,10 +35,12 @@ Use `GET /events` to retrieve a paginated list of prediction market events. You 
 |:----------|:-----|:------------|
 | `category` | string | Filter by category: `crypto`, `sports`, `politics`, `esports`, `culture`, `economics`, `tech` |
 | `subcategory` | string | Filter by subcategory within the category |
-| `filter` | string | Filter by status: `new`, `live`, `trending` |
+| `tags` | string | Filter by tag (e.g. `soccer`) |
+| `filter` | string | Filter by status: `new`, `live`, `trending`, `upcoming` |
 | `sortBy` | string | Sort field |
 | `sortDirection` | string | Sort direction: `asc` or `desc` |
 | `includeMarkets` | boolean | Include nested markets in response |
+| `includeAllMarkets` | boolean | Include all sports market types (moneyline, spread, totals) and Saba markets. Defaults to `false` (moneyline only); F1 events always include every type |
 | `start` | number | Pagination start index |
 | `end` | number | Pagination end index |
 
@@ -159,22 +161,20 @@ Example response:
 ```json expandable
 {
   "marketId": "market-456",
+  "eventId": "event-123",
+  "provider": "polymarket",
+  "title": "SOL $500 by Q2 2026",
   "status": "open",
   "result": null,
   "openTime": 1704067200,
   "closeTime": 1719792000,
   "resolveAt": null,
   "marketResultPubkey": null,
-  "metadata": {
-    "marketId": "market-456",
-    "title": "SOL $500 by Q2 2026",
-    "status": "open",
-    "result": "",
-    "closeTime": 1719792000,
-    "openTime": 1704067200,
-    "isTeamMarket": false,
-    "rulesPrimary": "Resolves YES if SOL reaches $500..."
-  },
+  "imageUrl": null,
+  "rulesPrimary": "Resolves YES if SOL reaches $500...",
+  "rulesSecondary": "",
+  "outcomes": ["Yes", "No"],
+  "isTeamMarket": false,
   "pricing": {
     "buyYesPriceUsd": 650000,
     "buyNoPriceUsd": 380000,
@@ -184,6 +184,8 @@ Example response:
   }
 }
 ```
+
+Market fields are returned flat. There is no nested `metadata` object. `resolveAt` stays `null` while the market is open and becomes an ISO 8601 string once it resolves.
 
 ### Understanding Prices
 
@@ -226,8 +228,7 @@ Market prices reflect the implied probability of an outcome. A `buyYesPriceUsd` 
 
 | Result | Description |
 |:-------|:------------|
-| `""` (empty) | Market not yet resolved |
-| `pending` | Resolution in progress |
+| `null` | Market not yet resolved |
 | `yes` | YES outcome confirmed |
 | `no` | NO outcome confirmed |
 
@@ -241,12 +242,12 @@ The response has four arrays. Each entry is a `[price, quantity]` pair:
 
 | Field | Description |
 |:------|:------------|
-| `yes` | YES bids: `[price_cents, quantity]`. Price is in cents (e.g. `1` = $0.01). |
+| `yes` | YES bids: `[price_cents, quantity]`. Price is in cents (e.g. `1` = $0.01). `price_cents` is rounded, so sub-cent levels show `0`; use `yes_dollars` for the exact price. |
 | `no` | NO bids: `[price_cents, quantity]`. Same format as `yes`. |
 | `yes_dollars` | YES bids with price as decimal string: `["0.0100", quantity]`. |
 | `no_dollars` | NO bids with price as decimal string. Same format as `yes_dollars`. |
 
-Quantities are in base units (e.g. contract size). Arrays are ordered by price (typically best bid first).
+Arrays are sorted by price ascending. Quantities are in base units and may be fractional.
 
 Example: Get orderbook data for a specific market
 
@@ -290,6 +291,62 @@ const orderbook = await response.json();
   ]
 }
 ```
+
+---
+
+## Get Live Scores
+
+For sports events, use `GET /events/scores` to fetch live scores for one or more events, or `GET /events/{eventId}/score` for a single event. Events without a score row are omitted from the list response.
+
+```js
+const response = await fetch(
+  'https://api.jup.ag/prediction/v1/events/scores?' + new URLSearchParams({
+    eventIds: 'POLY-351731,POLY-30615' // comma-separated, max 100
+  }),
+  {
+    headers: {
+      'x-api-key': 'your-api-key'
+    }
+  }
+);
+
+const { data } = await response.json();
+```
+
+Example response:
+
+```json expandable
+{
+  "data": [
+    {
+      "eventId": "POLY-351731",
+      "gameId": "90086923",
+      "leagueAbbreviation": "fifwc",
+      "homeTeam": "France",
+      "awayTeam": "Senegal",
+      "score": "2-0",
+      "period": "2H",
+      "elapsed": "90",
+      "status": "InProgress",
+      "live": true,
+      "ended": false,
+      "finishedTimestamp": null,
+      "updatedAt": "2026-06-16T20:53:39.834Z"
+    }
+  ]
+}
+```
+
+| Field | Description |
+|:------|:------------|
+| `score` | Raw score string from the provider (e.g. `"2-0"`) |
+| `period` | Current period (e.g. `"2H"`) |
+| `elapsed` | Elapsed time within the game (e.g. `"90"`) |
+| `status` | Provider status string (e.g. `"InProgress"`) |
+| `live` | `true` while the game is in progress |
+| `ended` | `true` once the game has finished |
+| `finishedTimestamp` | ISO 8601 timestamp when the game finished, if ended |
+| `updatedAt` | ISO 8601 timestamp of the last score update |
 
 ---
 

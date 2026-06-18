@@ -10,14 +10,14 @@ An organization groups your teams. Each team has its own API keys, analytics, re
 
 Create a team for each product or environment you want to track on its own. A team holds its own:
 
-- API keys
-- analytics
-- request logs
-- firewall rules
+- API Keys
+- Analytics
+- Request Logs
+- Firewall Rules
 
 Each team has a slug used in its Portal URL, `/portal/{org}/{team}`. Slugs are lowercase letters, digits, and hyphens, up to 48 characters, and unique within the organization. If a name produces a slug that is already taken, Portal adds a short suffix to keep it unique. Switch between teams from the team selector in Portal.
 
-Deleting a team revokes the API keys that belong to it.
+Deleting a team deactivates its API keys. The keys stop working immediately but remain in the database for audit purposes.
 
 {/* TODO: add screenshot - Teams grid showing each team with its member and API key counts */}
 <Frame>
@@ -34,11 +34,11 @@ An organization has three roles: **owner**, **admin**, and **member**. Team memb
 
 | Capability | Member | Admin / Owner |
 | :--- | :--- | :--- |
-| View any team's analytics and logs | Read-only | Read-only |
-| Manage a team's API keys and firewall rules | Teams they belong to | Any team |
-| Manage billing and the plan | No | Yes |
-
-Every member of the organization can see every team's [analytics](/portal/analytics) and [request logs](/portal/logs), but only in read-only mode. Changing a team's [API keys](/portal/api-keys) or [firewall rules](/portal/firewall) requires membership of that team, or an owner or admin role in the organization. Managing billing and the organization's [plan](/portal/plans), including upgrading, changing, or cancelling, requires an owner or admin role.
+| View any team's [Analytics](/portal/analytics) and [Request Logs](/portal/logs) | Read-only | Read-only |
+| Create, rename, delete, and set permissions on a team's [API Keys](/portal/api-keys) | Only teams they belong to | Any team |
+| Create, edit, enable, disable, and delete a team's [Firewall](/portal/firewall) rules | Only teams they belong to | Any team |
+| Upgrade, downgrade, or cancel the organisation's [plan](/portal/plans) | No | Yes |
+| Invite or remove members, change roles | No | Yes |
 
 An organization can have multiple owners. To grant ownership, an existing owner promotes another member to owner. The original owner keeps their role unless they voluntarily demote themselves. An organization must always have at least one owner: the last remaining owner cannot be demoted or removed.
 

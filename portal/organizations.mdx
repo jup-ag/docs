@@ -1,7 +1,7 @@
 ---
 title: "Organizations & Teams"
 description: "Group your teams under one organization, each with its own keys, analytics, and logs."
-llmsDescription: "How organizations and teams work in the Jupiter Developer Platform. An organization groups teams; each team has its own API keys, analytics, request logs, and firewall rules, so you can separate products or environments. Each team has a slug (lowercase a-z, 0-9, hyphens, max 48 chars, unique per organization) used in its Portal URL /portal/{org}/{team}. An organization has three roles: owner, admin, and member; team membership is separate and binary. All organization members can view every team's analytics and logs read-only. Managing a team's API keys and firewall rules requires membership of that team or an owner/admin role in the organization. Managing billing and the plan requires an owner or admin role. There is no separate transfer-ownership action; an owner transfers ownership by promoting another member to owner. Members are invited by email and invitations expire after 10 days."
+llmsDescription: "How organizations and teams work in the Jupiter Developer Platform. An organization groups teams; each team has its own API keys, analytics, request logs, and firewall rules, so you can separate products or environments. Each team has a slug (lowercase a-z, 0-9, hyphens, max 48 chars, unique per organization) used in its Portal URL /portal/{org}/{team}. An organization has three roles: owner, admin, and member; team membership is separate and binary. All organization members can view every team's analytics and logs read-only. Managing a team's API keys and firewall rules requires membership of that team or an owner/admin role in the organization. Managing billing and the plan requires an owner or admin role. An organization can have multiple owners; an existing owner promotes another member to owner, and the original owner keeps their role unless they voluntarily self-demote. The last remaining owner cannot be demoted or removed. Members are invited by email and invitations expire after 10 days."
 ---
 
 An organization groups your teams. Each team has its own API keys, analytics, request logs, and firewall rules, so you can keep products or environments separate: production in one team, staging in another, or one team per app.
@@ -40,7 +40,7 @@ An organization has three roles: **owner**, **admin**, and **member**. Team memb
 
 Every member of the organization can see every team's [analytics](/portal/analytics) and [request logs](/portal/logs), but only in read-only mode. Changing a team's [API keys](/portal/api-keys) or [firewall rules](/portal/firewall) requires membership of that team, or an owner or admin role in the organization. Managing billing and the organization's [plan](/portal/plans), including upgrading, changing, or cancelling, requires an owner or admin role.
 
-To transfer ownership, an owner promotes another member to owner.
+An organization can have multiple owners. To grant ownership, an existing owner promotes another member to owner. The original owner keeps their role unless they voluntarily demote themselves. An organization must always have at least one owner: the last remaining owner cannot be demoted or removed.
 
 {/* TODO: add screenshot - invite member dialog and the members table with roles */}
 <Frame>

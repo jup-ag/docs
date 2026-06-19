@@ -46,7 +46,7 @@ If you currently use Metis `/quote` + `/swap-instructions`, migrate to `/build` 
 
 ## V1 to V2 instruction differences
 
-**V1 `/swap` returned an assembled base64-encoded transaction.** V2 `/build` returns individual instruction objects (`computeBudgetInstructions`, `setupInstructions`, `swapInstruction`, etc.) that you assemble into a transaction yourself. This gives you full control to insert custom instructions, but means you are responsible for building the v0 transaction, simulating compute units, and signing. See the [Build](/swap/build) page for the complete workflow.
+**V1 `/swap` returned an assembled base64-encoded transaction.** V2 `/build` combines the quote and instructions into a single response, similar to V1's `/swap-instructions` but with the quote included. It returns individual instruction objects (`computeBudgetInstructions`, `setupInstructions`, `swapInstruction`, etc.) that you assemble into a transaction yourself. This gives you full control to insert custom instructions, but means you are responsible for building the v0 transaction, simulating compute units, and signing. See the [Build](/swap/build) page for the complete workflow.
 
 Swap V2 defaults to `instructionVersion=V2` or the V2 routing instructions in the Jupiter Aggregator Program. Key differences:
 

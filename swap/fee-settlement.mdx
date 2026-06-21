@@ -7,7 +7,7 @@ hidden: true
 
 This doc covers how fee collection and settlement works for enterprise integrators on Swap API v2 under a rev-share agreement. It applies to both the `/order` + `/execute` path (Meta-Aggregator) and the `/build` path (Router).
 
-In both cases the integrator passes the same parameter, `integratorFeeBps`, representing the total fee the end user pays. Jupiter collects the fee into a Jupiter-owned collector wallet, converts the collected mints to USDC on a rolling basis, and settles the integrator's share to a payout wallet once a month. Jupiter handles the collector wallet, fee collection, conversion to USDC, reconciliation, and payout.
+In both cases the integrator passes the same parameter, `integratorFeeBps`, representing the total fee the end user pays. Jupiter collects the fee into a Jupiter-owned collector wallet, converts the collected mints to USDC on a rolling basis, and settles the integrator's share to a payout wallet once a month.
 
 `integratorFeeBps` is an enterprise-only parameter. It will not work unless your organisation ID has been whitelisted by the Jupiter team for the fee settlement service. It is not part of the public API reference.
 
@@ -15,7 +15,7 @@ In both cases the integrator passes the same parameter, `integratorFeeBps`, repr
 
 Swap API v2 exposes different fee parameters for non-enterprise integrators on each path: `referralAccount` and `referralFee` on `/order`, and `platformFeeBps` on `/build`.
 
-Enterprise integrators on the fee settlement service use `integratorFeeBps` only, on both paths. Do not use `referralAccount`, `referralFee`, or `platformFeeBps`. Use only `integratorFeeBps`.
+Enterprise integrators on the fee settlement service use `integratorFeeBps` only, on both paths. Do not use `referralAccount`, `referralFee`, or `platformFeeBps`.
 
 ## What we need from the integrator
 
@@ -28,43 +28,19 @@ That's it. Jupiter handles the collector wallet, fee collection, conversion to U
 
 ## Fee model
 
-Under the rev-share model, the integrator passes a single `integratorFeeBps` per swap, representing the **total** fee the end user pays. Jupiter then splits that total into the integrator share and the Jupiter share based on the commercial agreement.
+The integrator passes one number, `integratorFeeBps`: the **total** fee the end user pays on the swap. Jupiter collects that whole amount into the Jupiter-owned collector wallet on chain, then splits it per the commercial rev-share agreement: the integrator keeps **y%** and Jupiter keeps **x%** (`y = 100 − x`). The split is reconciled at settlement, not on chain per swap.
 
-The split is defined by the rev-share percentages agreed commercially. If the total fee collected is 100%, the integrator keeps **y%** and Jupiter takes **x%** (where `y = 100 − x`).
+The API Gateway applies the agreed rev-share to each request based on the integrator's org, so the integrator only ever sets the total. For a total fee of **F bps**, the integrator receives `y/100 × F` bps and Jupiter receives `x/100 × F` bps.
 
-### How the split works
-
-- Integrator passes `integratorFeeBps` in the request, which is the total bps the end user pays
-- The API Gateway tags the request with the fee model (`rev-share`) and the agreed shares
-- Jupiter calculates the individual bps for the integrator and for Jupiter from the total fee bps
-- The router program transfers the entire collected fee to the Jupiter-owned collector wallet
-
-### Example
-
-Assume a total fee of **F bps** on a swap, with an integrator share of **y%** and a Jupiter share of **x%**:
-
-- `integratorFeeBps`: **F**, which is what's passed in the request
-- User pays a total of **F bps** in fees
-- Integrator share: **y%** of F = `y/100 × F` bps
-- Jupiter share: **x%** of F = `x/100 × F` bps
-
-To make this concrete, assume `integratorFeeBps: 100` (100 bps = 1%) with an 85/15 split:
-
-- User pays a total of **100 bps** in fees
-- Integrator share: 85% of 100 = **85 bps**
-- Jupiter share: **15 bps**
-
-The entire 100 bps is transferred to the collector wallet, and the 85/15 split is reconciled at settlement.
-
-Since the integrator constructs `integratorFeeBps` before passing it to us, the integrator has all the inputs needed to reconstruct the split per swap or in aggregate on their side.
+Because the integrator sets `integratorFeeBps`, they have everything needed to reconstruct the split per swap or in aggregate.
 
 ## Passing the fee
 
-The same `integratorFeeBps` parameter is used on both paths, and it only has effect once the org ID is whitelisted for fee settlement.
+The same `integratorFeeBps` parameter is used on both paths.
 
 ### Using with `/order` + `/execute`
 
-Pass `integratorFeeBps` on the `/order` request. `/order` returns an assembled transaction, which you sign and submit through `/execute` for managed landing.
+Pass `integratorFeeBps` on the `/order` request. `/order` returns an assembled transaction, which you sign and submit through `/execute` for managed landing. Because Jupiter assembles the transaction and `/execute` validates it against the original order before landing, fee inclusion is enforced on this path: the fee instruction cannot be stripped before submission.
 
 ```
 GET https://api.jup.ag/swap/v2/order
@@ -76,7 +52,7 @@ Reference: [Order & Execute](/swap/order-and-execute)
 
 Pass `integratorFeeBps` on the `/build` request. `/build` returns raw swap instructions, and the integrator assembles, signs, and submits the transaction either through their own RPC or through `/submit`. `/execute` is not used on this path.
 
-On `/build`, Jupiter is not constructing the transaction the user signs the way it does on `/order`, so it cannot enforce fee inclusion at the point the integrator submits the transaction on chain. For enterprise integrators on the fee settlement service, `integratorFeeBps` communicates the total fee the user is to be charged, and the rev share still applies because Jupiter has custody of the funds in the collector wallet before the integrator's share is sent to the payout wallet.
+On `/build`, Jupiter is not constructing the transaction the user signs the way it does on `/order`, so it cannot enforce fee inclusion at the point the integrator submits the transaction on chain. For enterprise integrators on the fee settlement service, `integratorFeeBps` communicates the total fee the user is to be charged, and including that fee in the submitted transaction is part of the commercial agreement. Jupiter reconciles the fees collected on chain against what is expected. Once a fee lands in the Jupiter-owned collector wallet, Jupiter has custody of the funds and handles the split before the integrator's share is sent to the payout wallet.
 
 ```
 GET https://api.jup.ag/swap/v2/build
@@ -86,7 +62,9 @@ Reference: [Build](/swap/build)
 
 ## Fee mint priority
 
-The fee mint is selected automatically based on the priority list, so it can be either the input or output mint. It cannot be forced to always be the input. The integration should read `feeMint` from the response rather than assume which mint the fee is taken on.
+On `/order`, the fee mint is selected automatically based on a priority list, so it can be either the input or output mint. It cannot be forced to always be the input. Read `feeMint` from the `/order` response rather than assume which mint the fee is taken on.
+
+This automatic fee mint priority applies to `/order` only. It does not apply to `/build`.
 
 Reference: [Fee mint priority](/swap/order-and-execute#fee-mint-priority)
 
@@ -97,7 +75,7 @@ Fees are collected by Jupiter and settled in USDC. There are two distinct rhythm
 - **Conversion (every 6 hours):** the collector wallet receives fees in whatever mint each swap settles in. Jupiter opens and maintains ATAs for every mint that flows in, and converts the collected balances to USDC every 6 hours.
 - **Payout (monthly):** the integrator's share of the accumulated USDC is transferred to the payout wallet once a month.
 
-**Fees are denominated in USDC at the point of the periodic conversion, not at the point of the user swap.** The USD value is fixed when the collected mints are converted, not at swap time.
+**Fees are denominated in USDC at the point of the periodic conversion, not at the point of the user swap.**
 
 At settlement the accumulated total is split per the agreement: the integrator's share (**y%**) goes to the payout wallet, and Jupiter retains its share (**x%**) in the treasury wallet.
 
@@ -137,8 +115,6 @@ Before `integratorFeeBps` has any effect, Jupiter must whitelist the organisatio
 1. Find your **organisation ID** under Settings in the [Developer Platform](https://developers.jup.ag/portal).
 2. Send it to us.
 3. We enable fee settlement for that organisation.
-
-Until the org ID is whitelisted, passing the fee parameter has no effect.
 
 ## Rate limits & credits
 

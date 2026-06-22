@@ -32,18 +32,26 @@ Jupiter categorises tokens into trust levels based on trading activity, social p
 | **Unverified** | Not yet reviewed or doesn't meet criteria. May still be legitimate. | Display with caution indicators. |
 | **Banned** | Flagged as malicious, scam, or misleading. | Do not display or warn users. |
 
-Check the `verification` field in the API response. Use `audit.isSus` as an additional signal for suspicious tokens.
+Check the `isVerified` field in the API response. Use `audit.isSus` as an additional signal for suspicious tokens. `audit.isSus` is only present when a token has been flagged, so check for the field's presence rather than its value.
 
 ## Organic Score
 
-Organic Score (0-100) measures genuine trading activity for a token, filtering out bot activity and wash trading. It derives from:
+Organic Score (0-100) measures how genuine a token's trading activity is, filtering out bots, snipers, and copy-trading tools so you can find the signal within the noise. The system identifies non-organic wallets (those trading through known bot and automation channels) and treats the remaining activity as organic.
 
-- Holder distribution statistics
-- Trading volume from real user wallets
-- Market liquidity metrics
-- Market behaviour patterns
+The score combines four organic signals:
 
-Higher scores indicate more legitimate, organic trading. Surface this in your UI to help users make informed decisions.
+- Organic volume
+- Organic holders
+- Organic traders
+- Organic buyers
+
+A few things to keep in mind when using it:
+
+- **It is relative, not absolute.** Scores are normalised against the rest of the ecosystem. The score says a token is more organic than another, not that it has a specific amount of organic activity. High-volume tokens like SOL and USDC sit near 100 because differences flatten out at that scale.
+- **Early growth counts most.** Going from 10 organic buyers to 100 moves the score far more than going from 10,000 to 10,100.
+- **Prefer the raw score over the label.** Each token also has an `organicScoreLabel` of `high`, `medium`, or `low`, but these buckets are wide: two tokens can both be `medium` and behave very differently. For filtering, use the raw `organicScore`.
+
+For more detail, see [How does Jupiter decide if a token is real?](https://developers.jup.ag/blog/what-is-organic-score).
 
 ## Token Tags
 

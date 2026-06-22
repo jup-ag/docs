@@ -447,11 +447,15 @@ components:
             topHoldersPercentage:
               type: number
               nullable: true
-              description: Percentage of supply held by top holders
+              description: |
+                Percentage of supply held by the top holders, on a 0-100 scale
+                (e.g. 25.07 means 25.07%, not the fraction 0.2507).
             devBalancePercentage:
               type: number
               nullable: true
-              description: Percentage of supply held by the developer
+              description: |
+                Percentage of supply held by the developer, on a 0-100 scale
+                (e.g. 2.5 means 2.5%, not the fraction 0.025).
             devMints:
               type: number
               nullable: true

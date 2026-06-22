@@ -44,6 +44,25 @@ const searchResponse = await (
 ).json();
 ```
 
+To resolve a batch of known mints, comma-separate up to 100 mint addresses in a single `query`. This returns all of their mint information in one request, so you do not need to issue a separate request per mint.
+
+```js
+const mints = [
+  'So11111111111111111111111111111111111111112',
+  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+];
+
+const searchResponse = await (
+  await fetch(`https://api.jup.ag/tokens/v2/search?query=${mints.join(',')}`,
+    {
+      headers: {
+        'x-api-key': 'your-api-key',
+      },
+    }
+  )
+).json();
+```
+
 ## Query by Tag
 
 The Tokens API V2 provides an endpoint to query by tags. This is useful to help users distinguish between verified vs non-verified or specific groups of tokens like liquid-staked tokens (LSTs) or tokenized stocks.
@@ -141,7 +160,7 @@ All endpoints will return an array of mints, along with their information.
     audit: {
       mintAuthorityDisabled: true,
       freezeAuthorityDisabled: true,
-      topHoldersPercentage: 1.2422471238911812
+      topHoldersPercentage: 1.2422471238911812 // 0-100 scale: 1.24%, not a 0-1 fraction
     },
     organicScore: 98.92390784896082,
     organicScoreLabel: 'high',

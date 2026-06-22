@@ -115,11 +115,6 @@ For example, a rule on `Path starts with /tokens/v2/search` set to 30 requests p
 
 A firewall rate limit stacks on top of your plan's [rate limit](/portal/rate-limits): a request can be within your plan quota and still get a `429` from a firewall rule.
 
-{/* TODO: add screenshot - Rate limit action config with the per-IP / per-API key / per-Team scope cards */}
-<Frame>
-  <img src="/static/images/portal-firewall-rate-limit-scope.png" alt="Rate limit action configuration showing request count, duration, and per-IP, per-API key, and per-Team scope cards" />
-</Frame>
-
 ## Expression Overview
 
 As you build a rule, Portal shows a plain-language `IF … THEN …` version of it. Condition groups are wrapped in parentheses and joined with `OR`; conditions inside a group are joined with `AND`.

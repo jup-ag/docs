@@ -40,15 +40,21 @@ When a rate-limit window is active, responses include:
 
 | Header | Meaning |
 | :--- | :--- |
-| `x-ratelimit-remaining` | Requests left in the current window. |
-| `x-ratelimit-current` | Requests used in the current window. |
-| `x-ratelimit-reset` | When the current window resets. |
+| `x-ratelimit-remaining` | Requests left in the current window. This value is signed: it can be `0` or negative when you are over the limit. |
+| `x-ratelimit-current` | Requests already used in the current window. |
+| `x-ratelimit-reset` | The absolute Unix timestamp, in seconds, at which the oldest request in the sliding window ages out and one slot frees up. |
 
-These appear on both successful and `429` responses, but not on `401` or `403`.
+These appear only on successful (`200`) and `429` responses. They are not sent on `401`, `403`, or `5xx`, and may also be absent on allowed responses for organisations on unlimited or custom rate-limit policies.
 
-Use them to back off before you hit the limit:
+Each response reflects a single bucket: whichever limit applied to that request's path, whether the main limit or a path-specific one such as `/swap/v2/execute` or `/ultra`. Every endpoint uses the same three header names, so one response never reports more than one bucket's counts.
+
+`x-ratelimit-reset` marks when the oldest in-window request expires and one slot opens, not when the counter fully empties. Waiting until that timestamp guarantees at least one request becomes available, which is the correct backoff target.
+
+Use the headers to back off before you hit the limit. Because `x-ratelimit-reset` is a Unix timestamp in seconds, multiply it by 1000 to get epoch milliseconds and subtract the current time to get how long to wait. When the header is absent, fall back to a fixed delay:
 
 ```typescript
+const DEFAULT_BACKOFF_MS = 1000;
+
 const response = await fetch("https://api.jup.ag/tokens/v1", {
   headers: { "x-api-key": API_KEY },
 });
@@ -56,8 +62,10 @@ const response = await fetch("https://api.jup.ag/tokens/v1", {
 const remaining = Number(response.headers.get("x-ratelimit-remaining"));
 
 if (response.status === 429) {
-  const resetAt = Number(response.headers.get("x-ratelimit-reset"));
-  const waitMs = Math.max(0, resetAt * 1000 - Date.now());
+  const resetHeader = response.headers.get("x-ratelimit-reset");
+  const waitMs = resetHeader
+    ? Math.max(0, Number(resetHeader) * 1000 - Date.now())
+    : DEFAULT_BACKOFF_MS;
   await new Promise((r) => setTimeout(r, waitMs));
 } else if (remaining <= 1) {
   // approaching the limit, slow down
@@ -77,9 +85,9 @@ If you exceed your rate limit, the API returns a `429 Too Many Requests` respons
 2. **Spread requests**: Distribute requests evenly rather than bursting
 3. **Upgrade your plan**: If you consistently hit limits, consider upgrading to a higher tier
 
-<Warning>
-Aggressive retry patterns without backoff may extend your rate limit window. Always wait before retrying after a 429 response.
-</Warning>
+<Note>
+The limiter is a pure sliding window. There is no extra cooldown or lockout after a `429`: a request succeeds as soon as enough earlier requests age out of the window. Retrying immediately is not penalised; it simply keeps failing until a slot frees. We recommend waiting until `x-ratelimit-reset` before you retry, as a client-side practice rather than a gateway rule.
+</Note>
 
 ## Need higher limits?
 

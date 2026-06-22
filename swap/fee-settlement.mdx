@@ -1,0 +1,89 @@
+---
+title: "Fee Settlement"
+description: "How fee collection and settlement works for enterprise integrators on Swap API V2"
+llmsDescription: "Enterprise-only fee settlement for the Jupiter Swap V2 API under a rev-share agreement, covering both the /order + /execute (Meta-Aggregator) and /build (Router) paths. Whitelisted integrators pass a single integratorFeeBps parameter representing the total fee the end user pays, and must not use referralAccount, referralFee, or platformFeeBps. Jupiter collects the full fee into a Jupiter-owned collector wallet, converts collected balances to USDC on a set cadence, and settles the integrator's USDC share to a payout wallet monthly. Covers how the flow works end to end, what the integrator must provide (payout wallet with an initialised USDC ATA, organisation ID for whitelisting), how to pass the fee on each path, fee mint priority, wallet roles, and rate limits and credits."
+hidden: true
+---
+
+Fee collection and settlement for enterprise integrators on Swap API V2. Pass `integratorFeeBps` on `/order` or `/build`, and Jupiter handles the rest: collecting the fee, converting it to USDC, and paying out your share monthly.
+
+## Why use this
+
+Without fee settlement, collecting swap fees means opening token accounts for every mint your users swap through, running your own conversion to consolidate those balances, and reconciling individual transactions. Token account rent alone scales linearly with the number of mints you encounter.
+
+Fee settlement handles all of this. You pass one parameter, Jupiter collects and converts fees across all mints, and your share arrives as USDC once a month. No token accounts to maintain, no conversion pipeline to run, no per-swap bookkeeping.
+
+## How it works
+
+1. **User swap.** Swap API generates a transaction that charges the fee you set with `integratorFeeBps`. The fee mint is selected automatically from a [priority list](/swap/order-and-execute#fee-mint-priority) and can be either the input or output mint.
+2. **Fee collected.** The fee lands in a Jupiter-owned collector wallet on chain, in whatever mint was selected.
+3. **Conversion to USDC (at specific cadence).** Jupiter converts collected balances to USDC. This is a separate swap, not at the time of the user swap.
+4. **Monthly payout.** Your share of the accumulated USDC is transferred to your payout wallet. Jupiter applies your agreed rev-share split at time of transfer to your payout wallet, not during conversion.
+
+<Frame>
+  <img src="/static/images/fee-settlement-flow.png" alt="Fee settlement flow" />
+</Frame>
+
+## Setup
+
+`integratorFeeBps` is an enterprise-only parameter. To enable it:
+
+1. Send your organisation ID (found under Settings in the [Developer Platform](https://developers.jup.ag/portal)) to your Jupiter contact for whitelisting.
+2. Provide a USDC payout wallet address. This is where your share is settled each month.
+3. Pass `integratorFeeBps` on every `/order` or `/build` request.
+
+<Warning>
+The USDC token account on your payout wallet must be initialised and kept open. If it is missing or closed, settlement fails.
+</Warning>
+
+## How to use via the API
+
+Pass `integratorFeeBps` as the only fee parameter. Do not use `referralAccount`, `referralFee`, or `platformFeeBps`. These are the standard fee parameters and do not apply to fee settlement.
+
+### Via `/order` + `/execute`
+
+```http
+GET https://api.jup.ag/swap/v2/order
+  ?inputMint=So11111111111111111111111111111111111111112
+  &outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+  &amount=1000000000
+  &taker=YOUR_WALLET
+  &integratorFeeBps=50
+```
+
+`/order` returns an assembled transaction. You sign it and submit it through `/execute` for managed landing. Fee inclusion is enforced on this path: `/execute` validates the transaction against the original order, so the fee instruction cannot be stripped.
+
+References: [Order & Execute](/swap/order-and-execute), [Fee mint priority](/swap/order-and-execute#fee-mint-priority)
+
+### Via `/build`
+
+```http
+GET https://api.jup.ag/swap/v2/build
+  ?inputMint=So11111111111111111111111111111111111111112
+  &outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+  &amount=1000000000
+  &taker=YOUR_WALLET
+  &integratorFeeBps=50
+```
+
+`/build` returns raw swap instructions. You assemble, sign, and submit the transaction yourself, through your own RPC or through `/submit`. `/execute` is not used on this path.
+
+<Warning>
+Because you build, sign, and submit the transaction yourself, Jupiter has no visibility into the final transaction and cannot prevent the fee from being modified. Jupiter reconciles collected fees against the commercial agreement, and may audit.
+</Warning>
+
+Reference: [Build](/swap/build)
+
+## Related
+
+<CardGroup cols={3}>
+  <Card title="Order & Execute" icon="arrow-right-arrow-left" href="/swap/order-and-execute">
+    The Meta-Aggregator swap path
+  </Card>
+  <Card title="Build" icon="code" href="/swap/build">
+    The Router swap path for custom transaction assembly
+  </Card>
+  <Card title="Fee Mint Priority" icon="coins" href="/swap/order-and-execute#fee-mint-priority">
+    How the fee mint is selected per swap
+  </Card>
+</CardGroup>

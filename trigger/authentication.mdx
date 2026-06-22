@@ -25,7 +25,14 @@ npm install @solana/web3.js bs58
 
 ## Step 1: Request a Challenge
 
-Request a challenge for your wallet. Choose `message` for standard wallets or `transaction` for hardware wallets that only support transaction signing.
+Request a challenge for your wallet. The `type` field selects how your wallet will sign, and accepts exactly two values:
+
+| `type` | Use it for | You sign with |
+| :--- | :--- | :--- |
+| `message` | Standard wallets (Phantom, Solflare, and most others) | `signMessage` on the returned `challenge` string |
+| `transaction` | Hardware wallets (Ledger, etc.) that only support transaction signing | `signTransaction` on the returned `transaction` (it is never submitted on-chain) |
+
+Both prove wallet ownership and return the same JWT. Any other value returns a `400`.
 
 ```typescript
 const challengeResponse = await fetch('https://api.jup.ag/trigger/v2/auth/challenge', {

@@ -40,12 +40,33 @@
             "group": "Portal",
             "pages": [
               "portal/setup",
-              "portal/plans",
-              "portal/rate-limits",
-              "portal/responses",
-              "portal/latency",
-              "portal/migration",
-              "portal/faq"
+              {
+                "group": "Plans & Limits",
+                "pages": [
+                  "portal/plans",
+                  "portal/rate-limits"
+                ]
+              },
+              {
+                "group": "Platform Features",
+                "pages": [
+                  "portal/organisations",
+                  "portal/api-keys",
+                  "portal/firewall",
+                  "portal/logs",
+                  "portal/analytics",
+                  "portal/security"
+                ]
+              },
+              {
+                "group": "Reference",
+                "pages": [
+                  "portal/responses",
+                  "portal/latency",
+                  "portal/migration",
+                  "portal/faq"
+                ]
+              }
             ]
           }
         ]
@@ -307,11 +328,13 @@
                 "group": "Trigger",
                 "pages": [
                   "trigger/index",
+                  "trigger/lifecycle",
                   "trigger/authentication",
                   "trigger/create-order",
                   "trigger/manage-orders",
                   "trigger/order-history",
-                  "trigger/best-practices"
+                  "trigger/best-practices",
+                  "trigger/errors"
                 ]
               },
               {
@@ -391,6 +414,7 @@
                 "tag": "BETA",
                 "pages": [
                   "prediction/index",
+                  "prediction/trading-lifecycle",
                   "prediction/events-and-markets",
                   "prediction/open-positions",
                   "prediction/manage-positions",

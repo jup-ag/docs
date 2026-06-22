@@ -1,7 +1,7 @@
 ---
 title: "Rate Limits"
 description: "Rate limits for Jupiter APIs by plan tier."
-llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per account, not per API key. Most API requests share the same general rate limit bucket, but /swap/v2/execute and /tx/v1/submit each have their own dedicated buckets separate from the general limit and from each other: Keyless 20 RPS, Free 50 RPS, Paid (Developer/Launch/Pro) 100 RPS. Returns HTTP 429 when exceeded."
+llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per organisation, not per API key. Most API requests share the main rate limit bucket, but /swap/v2/execute and /tx/v1/submit each have their own dedicated buckets separate from the main limit and from each other: Keyless 20 RPS, Free 50 RPS, Paid (Developer/Launch/Pro) 100 RPS. Rate-limited responses include x-ratelimit-remaining, x-ratelimit-current, and x-ratelimit-reset headers (on successful and 429 responses, not on 401/403). Firewall rules can impose additional per-IP, per-API-key, or per-team limits on top of the plan limit. Returns HTTP 429 when exceeded."
 ---
 
 ## Overview
@@ -17,24 +17,64 @@ All Jupiter APIs use a fixed rate limit based on your plan tier. Rate limits are
 | Pro | 150 | 9,000 | Yes |
 
 <Note>
-Rate limits apply **per account**, not per API key. Creating multiple API keys does not increase your rate limit.
+Your plan's rate limit applies **per organisation**, not per API key. Creating multiple keys or teams does not increase it. [Firewall](/portal/firewall) rules can add further limits per IP, key, or team.
 </Note>
 
-<Note>
-Rate limits are **bucketed**. Most API requests share the same rate limit bucket. For example, if you are on the Developer plan (10 RPS), a mix of Swap, Price, and Token requests all count towards the same 10 RPS limit. The exceptions are `/swap/v2/execute` and `/tx/v1/submit`, which have their own dedicated buckets (see below).
-</Note>
+## Buckets
 
-## Dedicated rate limit buckets
+Most requests share a single rate limit bucket. A mix of Swap, Price, and Token requests all count toward the same limit shown in the table above.
 
-[`/execute`](/swap/order-and-execute#execute-the-transaction) and [`/submit`](/transaction/submit) each have their own rate limit bucket, separate from the general API limit and from each other. Calls to these endpoints do not count towards your plan's general RPS quota.
+Some endpoints have their own bucket, separate from the main limit and from each other:
 
-| Tier | RPS per endpoint |
+| Bucket | Keyless | Free | Paid (Developer / Launch / Pro) |
+| :--- | :--- | :--- | :--- |
+| [`/swap/v2/execute`](/swap/order-and-execute#execute-the-transaction) | 20 RPS | 50 RPS | 100 RPS |
+| [`/tx/v1/submit`](/transaction/submit) | 20 RPS | 50 RPS | 100 RPS |
+
+Calls to these endpoints do not count toward your main bucket, and each bucket is independent. For example, a Developer plan organisation (10 RPS main) can simultaneously make 10 main API requests, 100 `/execute` requests, and 100 `/submit` requests per second.
+
+## Rate limit headers
+
+When a rate-limit window is active, responses include:
+
+| Header | Meaning |
 | :--- | :--- |
-| Keyless | 20 |
-| Free | 50 |
-| Paid (Developer, Launch, Pro) | 100 |
+| `x-ratelimit-remaining` | Requests left in the current window. This value is signed: it can be `0` or negative when you are over the limit. |
+| `x-ratelimit-current` | Requests already used in the current window. |
+| `x-ratelimit-reset` | The absolute Unix timestamp, in seconds, at which the oldest request in the sliding window ages out and one slot frees up. |
 
-For example, a Developer plan account (10 RPS general) can simultaneously make 10 general API requests, 100 `/execute` requests, and 100 `/submit` requests per second.
+These appear only on successful (`200`) and `429` responses. They are not sent on `401`, `403`, or `5xx`, and may also be absent on allowed responses for organisations on unlimited or custom rate-limit policies.
+
+Each response reflects a single bucket: whichever limit applied to that request's path, whether the main limit or a path-specific one such as `/swap/v2/execute`. Every endpoint uses the same three header names, so one response never reports more than one bucket's counts.
+
+`x-ratelimit-reset` marks when the oldest in-window request expires and one slot opens, not when the counter fully empties. Waiting until that timestamp guarantees at least one request becomes available, which is the correct backoff target.
+
+Use the headers to back off before you hit the limit. Because `x-ratelimit-reset` is a Unix timestamp in seconds, multiply it by 1000 to get epoch milliseconds and subtract the current time to get how long to wait. When the header is absent, fall back to a fixed delay:
+
+```typescript
+const DEFAULT_BACKOFF_MS = 1000;
+
+const response = await fetch("https://api.jup.ag/tokens/v1", {
+  headers: { "x-api-key": API_KEY },
+});
+
+const remaining = Number(response.headers.get("x-ratelimit-remaining"));
+
+if (response.status === 429) {
+  const resetHeader = response.headers.get("x-ratelimit-reset");
+  const waitMs = resetHeader
+    ? Math.max(0, Number(resetHeader) * 1000 - Date.now())
+    : DEFAULT_BACKOFF_MS;
+  await new Promise((r) => setTimeout(r, waitMs));
+} else if (remaining <= 1) {
+  // approaching the limit, slow down
+  await new Promise((r) => setTimeout(r, 1000));
+}
+```
+
+## Firewall rate limits
+
+A team can add [firewall](/portal/firewall) rules that rate-limit traffic per IP, per API key, or per team. A firewall rate limit applies on top of your plan limit, so a request can stay within your plan quota and still receive a `429`.
 
 ## Handling rate limits
 
@@ -44,9 +84,9 @@ If you exceed your rate limit, the API returns a `429 Too Many Requests` respons
 2. **Spread requests**: Distribute requests evenly rather than bursting
 3. **Upgrade your plan**: If you consistently hit limits, consider upgrading to a higher tier
 
-<Warning>
-Aggressive retry patterns without backoff may extend your rate limit window. Always wait before retrying after a 429 response.
-</Warning>
+<Note>
+The limiter is a pure sliding window. There is no extra cooldown or lockout after a `429`: a request succeeds as soon as enough earlier requests age out of the window. Retrying immediately is not penalised; it simply keeps failing until a slot frees. We recommend waiting until `x-ratelimit-reset` before you retry, as a client-side practice rather than a gateway rule.
+</Note>
 
 ## Need higher limits?
 

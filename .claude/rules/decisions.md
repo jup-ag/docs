@@ -24,6 +24,22 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-06-17] Portal nav ordered by developer journey, not feature-vs-reference
+**Status:** implemented
+**Scope:** navigation
+**Files affected:** `docs.json` (Get Started tab, Portal group)
+**Linear issue:** DEV-554
+
+**Context:** Documenting the new portal features (organizations, API keys, firewall, logs, analytics, security) needed a nav home. A first pass split Portal into "Platform Features" + "Reference", but "Reference" became a catch-all that buried high-intent pages, especially Plans and Pricing, under a dry "reference" label.
+**Decision:** Order the Portal group by the developer's journey and surface the highest-value pages first:
+1. `setup` (Getting Started, pinned at top, ungrouped)
+2. **Plans & Limits** group: `plans`, `rate-limits` (cost and constraints are an early evaluation decision)
+3. **Platform Features** group: `organizations`, `api-keys`, `firewall`, `logs`, `analytics`, `security` (in rough order of adoption: set up, secure, observe, account)
+4. **Reference** group: `responses`, `latency`, `migration`, `faq` (true lookup plus decreasing-value helpers)
+**Rationale:** A developer checks cost and limits right after "how do I start", before feature deep-dives, so Plans & Limits moves from last to second. Keeps Platform Features one coherent block. Reference now matches its contents (lookup + helpers) instead of hiding pricing.
+**Alternatives considered:** (1) Keep Plans/Rate Limits inside a single "Reference" group — rejected, buries pricing. (2) Split Migration + FAQ into a separate "Help" group — deferred to avoid an extra sidebar group; revisit if Reference feels mixed.
+**Migration notes:** No path changes, nav reorder only. No redirects needed.
+
 ### [2026-03-09] Extract sub-guides from comprehensive guides
 **Status:** accepted
 **Scope:** folder-structure

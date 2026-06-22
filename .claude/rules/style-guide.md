@@ -60,7 +60,12 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 | as mentioned above    | (link to the section)       | Pages are non-linear — readers jump in   |
 | click here            | (use descriptive link text) | Bad for accessibility and scanning       |
 | em dash (—)           | colon, comma, period, or restructure | **Never use em dashes.** They read as AI-generated. Use a colon for explanations, a comma for light pauses, a period for separate thoughts, or restructure the sentence. |
-| dApp, dapp, DApp      | app, application, website     | Avoid web3 jargon — use plain language   |
+| dApp, dapp, DApp      | app, application, website     | Avoid web3 jargon, use plain language   |
+| ship (as in "when you ship a key") | use, run, expose, put in | "Ship" reads as AI filler in most contexts. Describe the concrete action. |
+| blast radius, attack surface, public surface | what actually happens ("a leaked key can only call those APIs") | Vague jargon. Say the literal effect. |
+| before it ever counts against your plan, at a glance, observable after the fact, seamlessly | (delete or say it plainly) | Flourish phrases that add no information. Engineers want the plain fact. |
+| rhetorical triplets ("block X, restrict Y, and rate-limit Z before…") | a plain list or shorter sentence | Three-part "marketing rhythm" sentences read as AI slop. |
+| hammering, slop, supercharge, unlock (figurative) | sending too many requests, etc. | Informal or hype verbs. Use neutral engineer English. |
 
 ## Formatting Conventions
 
@@ -201,4 +206,5 @@ Format: `- [YYYY-MM-DD] Decision: rationale`
 - [2026-04-16] Swap API overview uses "Meta-Aggregator" and "Router" as the two integration paths. "Meta-Aggregator" = `/order` + `/execute` (Jupiter handles everything). "Router" = `/build` + `/submit` or own RPC (integrator builds the transaction). Use these terms consistently in swap docs.
 - [2026-04-16] When absorbing a standalone page into another page, delete the original and add a redirect. Done for `swap/fees.mdx` (absorbed into order-and-execute and build) and `swap/routing/index.mdx` (absorbed into overview). Keeps URL space clean.
 - [2026-04-16] British English spelling for docs prose (e.g. "randomise", "optimise", "colour"). Do not Americanise existing British spellings.
+- [2026-06-17] Write in plain engineer English. Before showing any page, scan the prose for (1) em dashes, (2) the AI-slop phrases in the Words to Avoid table ("ship", "blast radius", "before it ever counts against your plan", "at a glance", rhetorical triplets). Prefer the concrete action and the literal effect over flourish. "An API key used in a client the user controls is not private" beats "When you ship a key, that key is no longer a secret".
 - [2026-06-21] Fee settlement / rev-share docs use abstract placeholders for the integrator/Jupiter split (`y%` integrator, `x%` Jupiter, `y = 100 − x`; `F bps` for the total), never concrete bps or split ratios (no "85/15", no "100 bps" example). Splits are negotiated per-integrator and Jupiter aims to maximise its share, so a concrete example would anchor integrators to a number that may be lower than what is actually charged. Keep the split illustration general (e.g. `y/100 × F`).

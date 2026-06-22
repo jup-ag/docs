@@ -1,0 +1,158 @@
+---
+title: "Lifecycle"
+description: "The end-to-end sequence of Trigger Order API calls, the data that flows between them, and the states an order moves through."
+llmsDescription: "Maps the full Jupiter Trigger Order V2 integration flow across endpoints: POST /trigger/v2/auth/challenge and /auth/verify to get a JWT, GET /trigger/v2/vault (or /vault/register) to resolve the vault, POST /trigger/v2/deposit/craft to build a deposit and get a requestId, sign the deposit client-side, POST /trigger/v2/orders/price to create the order (id/ocoId), GET /trigger/v2/orders/history to monitor state, PATCH /trigger/v2/orders/price/{id} to update, and POST /trigger/v2/orders/price/cancel/{id} + /confirm-cancel/{id} to cancel and withdraw. Shows the call order, the data dependencies between calls (token, vaultPubkey, requestId, depositSignedTx, id, cancelRequestId), the order state machine (open, executing, filled, expired, cancelled, pending_withdraw), how OCO and OTOCO orders branch, and how to recover a cancellation that was interrupted. Use this page to understand which endpoints to call in what order before integrating."
+---
+
+This page maps a trigger order from start to finish: which endpoints to call, in what order, the data that flows from one call into the next, and the states an order moves through. Each endpoint has its own detail page, linked at every step.
+
+## Prerequisites
+
+- An API key from the [Portal](https://developers.jup.ag/portal). All requests require the `x-api-key` header.
+- A Solana wallet. Every step that moves funds (deposit, withdrawal) is signed client-side by the wallet owner.
+
+## Integration at a Glance
+
+A trigger order moves through authentication, a one-time vault setup, the deposit-and-create flow, then monitoring and an optional cancel-and-withdraw. The key to integrating is the data hand-off: each call produces the value the next call needs.
+
+```text
+POST /auth/challenge              ─▶ challenge (or transaction)
+POST /auth/verify                 ─▶ token (JWT, 24h)
+GET  /vault   (or /vault/register)─▶ vaultPubkey
+POST /deposit/craft               ─▶ transaction + requestId
+  └ sign deposit client-side      ─▶ depositSignedTx
+POST /orders/price                ─▶ id (ocoId) + txSignature
+GET  /orders/history              ─▶ orderState / rawState
+POST /orders/price/cancel/{id}    ─▶ withdrawal transaction + requestId (cancelRequestId)
+  └ sign withdrawal client-side
+POST /orders/price/confirm-cancel/{id} ─▶ txSignature
+```
+
+All endpoints are under `https://api.jup.ag/trigger/v2`.
+
+## Step by Step
+
+### 1. Authenticate
+
+Call `POST /auth/challenge` with your `walletPubkey` and a `type` of `message` (standard wallets) or `transaction` (hardware wallets). Sign the returned challenge, then submit it to `POST /auth/verify` to receive a JWT `token`. Include the token as `Authorization: Bearer <token>` on every subsequent call.
+
+The token is valid for 24 hours. There is no refresh endpoint: when it expires, repeat the challenge-response flow.
+
+See [Authentication](/trigger/authentication) for the message and transaction flows and the full token lifecycle.
+
+### 2. Get or register your vault
+
+Call `GET /vault` to resolve your vault, or `GET /vault/register` on first use. The vault is a Privy-managed custodial account that holds deposits for your orders. The vault address is resolved from your JWT, so you do not pass it into later calls.
+
+See [Create Order](/trigger/create-order#step-1-get-your-vault).
+
+### 3. Craft and sign a deposit
+
+Call `POST /deposit/craft` with the input/output mints, amount, `orderType: "price"`, and the `orderSubType` that matches the order you will create (`single`, `oco`, or `otoco`). It returns an unsigned `transaction` and a `requestId`. Sign the transaction client-side to produce `depositSignedTx`.
+
+The API stores the deposit's token accounts against the `requestId`, so you carry only the `requestId` and `depositSignedTx` into the next step.
+
+See [Create Order](/trigger/create-order#step-2-craft-a-deposit-transaction).
+
+### 4. Create the order
+
+Call `POST /orders/price` with `depositRequestId`, `depositSignedTx`, and your order parameters. The `orderType` determines which fields are required:
+
+| Order type | Behaviour |
+| :--- | :--- |
+| `single` | One price order that triggers when `triggerMint` crosses the target price |
+| `oco` | A take-profit and stop-loss pair sharing one deposit. When one side fills, the other cancels |
+| `otoco` | A parent trigger that, once filled, activates an OCO pair on the output tokens |
+
+The response returns the order `id` (the `ocoId`, your primary identifier for the order or group) and a `txSignature` confirming the deposit landed. The order is now active.
+
+See [Create Order](/trigger/create-order#step-4-create-the-order).
+
+### 5. Monitor order state
+
+Call `GET /orders/history` to track an order through its lifecycle. Each order carries an `orderState` (human-friendly) and `rawState` (exact internal state), plus an `events` array of deposits, fills, withdrawals, cancellations, and expirations.
+
+See [Order History](/trigger/order-history) and the [Order State Lifecycle](#order-state-lifecycle) below.
+
+### 6. Update or cancel
+
+While an order is `open` you can:
+
+- **Update** it in place with `PATCH /orders/price/{id}` to change the trigger price, slippage, or expiry. No new deposit is needed.
+- **Cancel** it with `POST /orders/price/cancel/{id}`, which returns a withdrawal transaction to sign.
+
+See [Manage Orders](/trigger/manage-orders).
+
+### 7. Confirm cancellation
+
+Sign the withdrawal transaction from step 6 and submit it to `POST /orders/price/confirm-cancel/{id}` with the `cancelRequestId`. This returns the funds to your wallet and moves the order to `cancelled`.
+
+See [Cancellation and Recovery](#cancellation-and-recovery) for what happens if this step is interrupted.
+
+## Order State Lifecycle
+
+An order moves through a state machine from creation to completion. `GET /orders/history` reports both an `orderState` (display) and a `rawState` (internal). The high-level flow:
+
+```text
+pending ──▶ open ──▶ executing ──▶ filled
+   │          │          │
+   │          │          └──▶ failed
+   └──▶ failed│
+   (deposit)  ├──▶ expired
+              │
+              └──▶ pending_withdraw ──▶ cancelled
+                   (cancel initiated)
+```
+
+- **`open`** orders can be updated or cancelled. Updates and cancellation are only valid from this state.
+- **`executing`** covers the swap from trigger detection to output withdrawal, including partial fills.
+- **`expired`** orders did not fill before `expiresAt`. The deposit is still in the vault and is retrieved with the same cancel flow (see below).
+
+**OCO orders:** the take-profit and stop-loss legs share one deposit. When one leg fills, the other transitions to `cancelled` automatically (shown as `oco_cancelled` in the raw state).
+
+**OTOCO orders:** the child OCO pair only activates after the parent order reaches `filled`. If the parent expires or fails, the children are never created.
+
+For the complete `orderState` ↔ `rawState` mapping and the `events` schema, see [Order History](/trigger/order-history#order-states).
+
+## Cancellation and Recovery
+
+Cancellation is a two-step process designed so funds are never at risk mid-flow:
+
+1. **Initiate** with `POST /orders/price/cancel/{id}`. The order moves from `open` to `ready_to_cancel` (display: `pending_withdraw`) immediately, so it can no longer be filled. The call returns an unsigned withdrawal transaction and a `cancelRequestId`.
+2. **Confirm** by signing that transaction and submitting it to `POST /orders/price/confirm-cancel/{id}`. The funds return to your wallet and the order becomes `cancelled`.
+
+Between the two steps the order sits safely in `ready_to_cancel`: fills are stopped and the deposit remains in the vault.
+
+<Note>
+If the second step is interrupted (the tab closes, or the transaction does not land):
+
+- **You still have the withdrawal transaction and `cancelRequestId`:** retry `POST /orders/price/confirm-cancel/{id}` with the same `cancelRequestId`.
+- **You lost the withdrawal transaction:** call `POST /orders/price/cancel/{id}` again. The order is already in `ready_to_cancel`, so the call simply crafts and returns a fresh withdrawal transaction to sign.
+
+The order remains in `ready_to_cancel` until a withdrawal confirms on-chain, so funds are never stranded.
+</Note>
+
+The same two-step flow retrieves funds from an `expired` order: initiate cancellation, sign, and confirm.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Authentication" href="/trigger/authentication" icon="key">
+    Challenge-response signing and the JWT token lifecycle.
+  </Card>
+  <Card title="Create Order" href="/trigger/create-order" icon="circle-plus">
+    The vault, deposit, and order-creation request shapes.
+  </Card>
+  <Card title="Manage Orders" href="/trigger/manage-orders" icon="sliders">
+    Update orders and the two-step cancel-and-withdraw flow.
+  </Card>
+  <Card title="Order History" href="/trigger/order-history" icon="clock-rotate-left">
+    Full order state mapping and the events schema.
+  </Card>
+  <Card title="Best Practices" href="/trigger/best-practices" icon="lightbulb">
+    Expiry, slippage, and integration guidance.
+  </Card>
+  <Card title="API Reference" href="/api-reference/trigger/challenge" icon="code">
+    Full endpoint specifications.
+  </Card>
+</CardGroup>

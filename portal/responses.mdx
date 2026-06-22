@@ -1,19 +1,29 @@
 ---
 title: "Response Codes"
 description: "HTTP response codes for Jupiter APIs."
-llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized, 429 rate limited, and 5xx server errors with debugging guidance."
+llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400 bad request, 401 unauthorized (only when an invalid or unknown API key is sent; a request with no x-api-key header is treated as keyless), 403 forbidden (message 'API key does not have access to this endpoint' for permission denial, or 'Request blocked by firewall' for a firewall deny rule), 404 not found, 429 rate limited (message '[API Gateway] Too many requests' for plan limit, or 'Too many requests' for a firewall rate-limit rule), and 5xx server errors, with debugging guidance."
 ---
 
-<Tip>
-  **Help Us Debug**
+## Debugging
 
-  If you face any issues, please provide a clear and concise description of the error.
+Every response includes an `x-api-gateway-request-id` header. This is the same request ID that appears in your team's [Request Logs](/portal/logs), so you can match a failed client request to its full server-side record (status, latency breakdown, firewall decision, credits consumed).
 
-  **Logging the response headers** will help us identify your requests.
-</Tip>
+Log this header on every response. When reporting an issue to support, include it alongside the response body so we can look up the request immediately.
+
+```typescript
+const response = await fetch("https://api.jup.ag/swap/v2/order?...", {
+  headers: { "x-api-key": API_KEY },
+});
+
+if (!response.ok) {
+  const requestId = response.headers.get("x-api-gateway-request-id");
+  const body = await response.text();
+  console.error(`[${response.status}] request=${requestId} body=${body}`);
+}
+```
 
 <Note>
-  For product-specific error codes, refer to each product's documentation.
+Product-specific error codes are documented on each product's page.
 </Note>
 
 ## HTTP status codes
@@ -22,7 +32,8 @@ llmsDescription: "Common HTTP response codes from Jupiter APIs: 200 success, 400
 | :--- | :--------------------- | :------------------------------------------------------------------------------------------- |
 | 200  | Success               | Request completed successfully.                                                             |
 | 400  | Bad Request           | Check the request parameters and syntax.                                                    |
-| 401  | Unauthorised          | Check that your API key is correct and active.                                              |
+| 401  | Unauthorised          | Sent when you provide an invalid or unknown API key. A request with no `x-api-key` header is treated as keyless, not rejected. Check that your key is correct and active. |
+| 403  | Forbidden             | Either your API key lacks [permission](/portal/api-keys#permissions) for the endpoint (message: `API key does not have access to this endpoint`) or a [firewall](/portal/firewall) rule blocked the request (message: `Request blocked by firewall`). |
 | 404  | Not Found             | Check the endpoint URL.                                                                     |
-| 429  | Rate Limited          | You have exceeded your rate limit. Slow down requests or implement backoff. See [Rate Limits](/portal/rate-limits) for details. |
+| 429  | Rate Limited          | You exceeded a rate limit. The message tells you which: `[API Gateway] Too many requests` is your plan limit, `Too many requests` is a [firewall](/portal/firewall) rate-limit rule. Slow down or implement backoff. See [Rate Limits](/portal/rate-limits) for details. |
 | 5xx  | Server Error          | Retry with backoff. If persistent, submit a [Portal Enquiry](https://support.jup.ag/requests/new?ticket_form_id=18069133114012&tf_18541841140892=api_or_developer) or reach out in [Discord Dev Support](https://discord.com/channels/897540204506775583/910250162402779146). |

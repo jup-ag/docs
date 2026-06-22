@@ -1,7 +1,7 @@
 ---
 title: "Getting Started"
 description: "Set up your Jupiter API key and start building."
-llmsDescription: "How to get started with the Jupiter Developer Platform: sign up, generate an API key, and make your first request. API key is passed via x-api-key header. Four tiers available: Free (1 RPS), Developer ($25/mo, 10 RPS), Launch ($100/mo, 50 RPS), Pro ($500/mo, 150 RPS). Keyless access available at 0.5 RPS without sign-up."
+llmsDescription: "How to get started with the Jupiter Developer Platform: sign up, create or join a team, generate an API key scoped to that team, and make your first request. API key is passed via x-api-key header; new keys take effect within about 15 seconds. Four tiers available: Free (1 RPS), Developer ($25/mo, 10 RPS), Launch ($100/mo, 50 RPS), Pro ($500/mo, 150 RPS). Keyless access available at 0.5 RPS without sign-up."
 ---
 
 ## Quick start
@@ -15,7 +15,10 @@ For production applications, [sign up](https://developers.jup.ag/portal) for an 
     Sign up at [Portal](https://developers.jup.ag/portal)
   </Step>
   <Step>
-    Generate an API key
+    Create or join a [team](/portal/organisations) in your organisation
+  </Step>
+  <Step>
+    Generate an API key in that team
   </Step>
   <Step>
     Pass the key via the `x-api-key` header in your requests to `api.jup.ag`
@@ -64,8 +67,28 @@ curl -H "x-api-key: YOUR_API_KEY" \
 </CodeGroup>
 
 <Note>
-New API keys may take 2-5 minutes to become active.
+New keys take effect within about 15 seconds.
 </Note>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Organisations & Teams" icon="users" href="/portal/organisations">
+    Group teams and control who can manage each one.
+  </Card>
+  <Card title="API Keys" icon="key" href="/portal/api-keys">
+    Scope a key to specific APIs.
+  </Card>
+  <Card title="Firewall" icon="shield-halved" href="/portal/firewall">
+    Block abuse and rate-limit traffic to your keys.
+  </Card>
+  <Card title="Request Logs" icon="list" href="/portal/logs">
+    Inspect individual requests.
+  </Card>
+  <Card title="Analytics" icon="chart-line" href="/portal/analytics">
+    Track traffic, performance, and cost.
+  </Card>
+</CardGroup>
 
 ## Migrating from the old Portal?
 

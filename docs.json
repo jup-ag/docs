@@ -40,12 +40,33 @@
             "group": "Portal",
             "pages": [
               "portal/setup",
-              "portal/plans",
-              "portal/rate-limits",
-              "portal/responses",
-              "portal/latency",
-              "portal/migration",
-              "portal/faq"
+              {
+                "group": "Plans & Limits",
+                "pages": [
+                  "portal/plans",
+                  "portal/rate-limits"
+                ]
+              },
+              {
+                "group": "Platform Features",
+                "pages": [
+                  "portal/organisations",
+                  "portal/api-keys",
+                  "portal/firewall",
+                  "portal/logs",
+                  "portal/analytics",
+                  "portal/security"
+                ]
+              },
+              {
+                "group": "Reference",
+                "pages": [
+                  "portal/responses",
+                  "portal/latency",
+                  "portal/migration",
+                  "portal/faq"
+                ]
+              }
             ]
           }
         ]

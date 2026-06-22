@@ -22,7 +22,7 @@ llmsDescription: "Frequently asked questions about the Jupiter Developer Platfor
   </Accordion>
 
   <Accordion title="Do all API requests share the same rate limit?">
-    Yes. Rate limits are bucketed - all requests across all endpoints count towards the same limit. For example, on the Developer plan (10 RPS), Swap, Price, and Token requests all share the same 10 RPS bucket.
+    Most do. Swap, Price, and Token requests share the same bucket. However, `/swap/v2/execute` and `/tx/v1/submit` each have their own dedicated bucket. See [Rate Limits](/portal/rate-limits#buckets) for the full breakdown.
   </Accordion>
 
   <Accordion title="What happens if I exceed my included credits?">
@@ -66,7 +66,7 @@ llmsDescription: "Frequently asked questions about the Jupiter Developer Platfor
   </Accordion>
 
   <Accordion title="Who can see my team's data and keys?">
-    Everyone in your organization can view every team's analytics and request logs, read-only. Only members of a team, and organization owners and admins, can create or manage that team's API keys and firewall rules. See [Organizations & Teams](/portal/organizations).
+    Everyone in your organisation can view every team's analytics and request logs, read-only. Only members of a team, and organisation owners and admins, can create or manage that team's API keys and firewall rules. See [Organisations & Teams](/portal/organisations).
   </Accordion>
 
   <Accordion title="How do I stop a leaked key from being abused?">

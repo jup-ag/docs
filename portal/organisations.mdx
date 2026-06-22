@@ -1,0 +1,65 @@
+---
+title: "Organisations & Teams"
+description: "Group your teams under one organisation, each with its own keys, analytics, and logs."
+llmsDescription: "How organisations and teams work in the Jupiter Developer Platform. An organisation groups teams; each team has its own API keys, analytics, request logs, and firewall rules, so you can separate products or environments. Each team has a slug (lowercase a-z, 0-9, hyphens, max 48 chars, unique per organisation) used in its Portal URL /portal/{org}/{team}. An organisation has three roles: owner, admin, and member; team membership is separate and binary. All organisation members can view every team's analytics and logs read-only. Managing a team's API keys and firewall rules requires membership of that team or an owner/admin role in the organisation. Managing billing and the plan requires an owner or admin role. An organisation can have multiple owners; an existing owner promotes another member to owner, and the original owner keeps their role unless they voluntarily self-demote. The last remaining owner cannot be demoted or removed. Members are invited by email and invitations expire after 10 days."
+---
+
+An organisation groups your teams. Each team has its own API keys, analytics, request logs, and firewall rules, so you can keep products or environments separate: production in one team, staging in another, or one team per app.
+
+## Teams
+
+Create a team for each product or environment you want to track on its own. A team holds its own:
+
+- API Keys
+- Analytics
+- Request Logs
+- Firewall Rules
+
+Each team has a slug used in its Portal URL, `/portal/{org}/{team}`. Slugs are lowercase letters, digits, and hyphens, up to 48 characters, and unique within the organisation. If a name produces a slug that is already taken, Portal adds a short suffix to keep it unique. Switch between teams from the team selector in Portal.
+
+Deleting a team permanently invalidates its API keys. Any request using those keys will be rejected.
+
+{/* TODO: add screenshot - Teams grid showing each team with its member and API key counts */}
+<Frame>
+  <img src="/static/images/portal-teams-grid.png" alt="Teams grid in Portal showing each team with its member count and API key count" />
+</Frame>
+
+## Members and roles
+
+Invite people to your organisation by email. An invitation expires after 10 days.
+
+An organisation has three roles: **owner**, **admin**, and **member**. Team membership is separate from the organisation role: you are either in a team or not, with no per-team roles.
+
+### Who can do what
+
+| Capability | Member | Admin / Owner |
+| :--- | :--- | :--- |
+| View any team's [Analytics](/portal/analytics) and [Request Logs](/portal/logs) | Read-only | Read-only |
+| Create, rename, delete, and set permissions on a team's [API Keys](/portal/api-keys) | Only teams they belong to | Any team |
+| Create, edit, enable, disable, and delete a team's [Firewall](/portal/firewall) rules | Only teams they belong to | Any team |
+| Upgrade, downgrade, or cancel the organisation's [plan](/portal/plans) | No | Yes |
+| Invite or remove members, change roles | No | Yes |
+
+An organisation can have multiple owners. To grant ownership, an existing owner promotes another member to owner. The original owner keeps their role unless they voluntarily demote themselves. An organisation must always have at least one owner: the last remaining owner cannot be demoted or removed.
+
+{/* TODO: add screenshot - invite member dialog and the members table with roles */}
+<Frame>
+  <img src="/static/images/portal-members-invite.png" alt="Invite member dialog and the organisation members table showing roles" />
+</Frame>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="API Keys" icon="key" href="/portal/api-keys">
+    Create and scope the keys that belong to each team.
+  </Card>
+  <Card title="Firewall" icon="shield-halved" href="/portal/firewall">
+    Add rules that apply to a team's traffic.
+  </Card>
+  <Card title="Analytics" icon="chart-line" href="/portal/analytics">
+    Every member can view any team's analytics.
+  </Card>
+  <Card title="Request Logs" icon="list" href="/portal/logs">
+    Every member can inspect any team's request logs.
+  </Card>
+</CardGroup>

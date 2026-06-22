@@ -1,14 +1,14 @@
 ---
 title: "API Keys"
 description: "Create API keys, restrict them to specific APIs, and manage their lifecycle."
-llmsDescription: "How to create and manage Jupiter Developer Platform API keys and restrict them with permissions. Keys are created inside a team, use the format jup_..., need a name unique within the team, and are shown in full only at creation (afterwards only the first and last few characters appear). Pass a key in the x-api-key header to api.jup.ag. New keys, permission changes, and deletions take effect within about 15 seconds. By default a key can call every Jupiter API. Permissions are an allow-list of products matched by case-sensitive path prefix, across Swap (which also covers the Ultra API /ultra/v1/* and transaction submission /tx/v1/submit), Tokens, Price, Trigger, Recurring, Portfolio, Lend, Send, Studio, and Prediction. Once a list is set, the key can only call those endpoints, and a request to a disallowed endpoint is rejected at the gateway with 403 Forbidden and the message 'API key does not have access to this endpoint'. Covers the lifecycle (create, view, delete), permissions, and best practices: one key per app or environment, least privilege, and rotation."
+llmsDescription: "How to create and manage Jupiter Developer Platform API keys and restrict them with permissions. Keys are created inside a team, use the format jup_..., need a name unique within the team, and are shown in full only at creation (afterwards only the first and last few characters appear). Pass a key in the x-api-key header to api.jup.ag. New keys, permission changes, and deletions take effect within about 15 seconds. By default a key can call every Jupiter API. Permissions are an allow-list of products matched by case-sensitive path prefix, across Swap (which also covers /tx/v1/submit), Tokens, Price, Trigger, Recurring, Portfolio, Lend, Send, Studio, and Prediction. Once a list is set, the key can only call those endpoints, and a request to a disallowed endpoint is rejected at the gateway with 403 Forbidden and the message 'API key does not have access to this endpoint'. Covers the lifecycle (create, view, delete), permissions, and best practices: one key per app or environment, least privilege, and rotation."
 ---
 
 An API key authenticates your requests to `api.jup.ag`. You pass it in the `x-api-key` header. By default a key can call every Jupiter API, so keep it secret. Permissions let you restrict a key to specific APIs, so a key used in a client app, or one that leaks, can only reach the APIs you allowed.
 
 ## Create a key
 
-API keys belong to a team. You can create and manage a team's keys if you are a member of that team, or an owner or admin of the organization. See [Organizations & Teams](/portal/organizations) for who can manage what.
+API keys belong to a team. You can create and manage a team's keys if you are a member of that team, or an owner or admin of the organisation. See [Organisations & Teams](/portal/organisations) for who can manage what.
 
 <Steps>
   <Step title="Open API Keys for your team">
@@ -44,7 +44,7 @@ By default a key can call every Jupiter API. Permissions restrict a key to an al
 
 In Portal you toggle which products a key can call: Swap, Tokens, Price, Trigger, Recurring, Portfolio, Lend, Send, Studio, and Prediction. Matching is by path prefix and is case-sensitive.
 
-The **Swap** product also covers the Ultra API (`/ultra/v1/*`) and transaction submission (`/tx/v1/submit`), so a key limited to Swap can reach those endpoints too.
+The **Swap** permission also covers `/tx/v1/submit`, so a key limited to Swap can submit transactions too.
 
 {/* TODO: add video portal-api-key-permissions.mp4 - toggling which products a key can call and the resulting allow-list */}
 <Frame>
@@ -76,7 +76,7 @@ See [Response Codes](/portal/responses) for the other gateway responses.
   <Card title="Firewall" icon="shield-halved" href="/portal/firewall">
     Block abuse and rate-limit traffic to keys you use in client apps.
   </Card>
-  <Card title="Organizations & Teams" icon="users" href="/portal/organizations">
+  <Card title="Organisations & Teams" icon="users" href="/portal/organisations">
     See who can create and manage a team's API keys.
   </Card>
   <Card title="Rate Limits" icon="gauge-high" href="/portal/rate-limits">

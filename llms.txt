@@ -185,7 +185,7 @@ Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and F
 ### Borrow
 
 - [Borrow Overview](https://developers.jup.ag/docs/lend/borrow/index.md): Introduction to Jupiter Borrow, the collateralised borrowing side of Jupiter Lend. Covers the vault and position model (NFT-based positions, tick-based pricing), key TypeScript data structures (VaultConfig, UserPosition, NftPosition), and links to borrow operations and vault data reading via the Read SDK.
-- [Borrow API (Soon)](https://developers.jup.ag/docs/lend/borrow/api.md): Jupiter Lend Borrow API for collateralized borrowing with up to 95% LTV. Work-in-progress, documentation coming soon.
+- [Borrow API (Beta)](https://developers.jup.ag/docs/lend/borrow/api.md): Jupiter Lend Borrow REST API. Read endpoints GET /lend/v1/borrow/vaults and GET /lend/v1/borrow/positions, and the universal POST /lend/v1/borrow/operate (and /operate-instructions) endpoint that creates a position, deposits collateral, borrows, repays, and withdraws using signed colAmount and debtAmount. Covers the OperatePayload, positionId 0 to create a new position NFT, the nftId returned in responses, address lookup tables in the instructions response, the MIN_I128 repay-all and withdraw-all sentinel, and that WSOL-collateral vaults require pre-wrapped SOL. Includes runnable TypeScript examples.
 
 #### Borrow SDK
 
@@ -251,6 +251,13 @@ Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and F
 - [Tokens](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for the tokens available to be deposited and their information
 - [Positions](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for the position data of one or multiple users
 - [Earnings](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request for the earnings of one or multiple positions of a user
+
+#### Borrow
+
+- [Vaults](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request all borrow vaults with their configuration, rates, and liquidity
+- [Positions](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request the borrow positions of one or multiple users
+- [Operate](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request a base64-encoded unsigned borrow operate transaction (deposit, borrow, repay, withdraw)
+- [Operate Instructions](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request the instructions and address lookup tables for a borrow operate transaction
 
 ## Trigger
 

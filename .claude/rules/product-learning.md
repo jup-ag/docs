@@ -248,6 +248,16 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 - [2026-03-12] Two integration paths: Lend SDK (`@jup-ag/lend-sdk`) for TypeScript with helper functions, and REST API for language-agnostic access. SDK wraps the same on-chain programs but provides typed helpers like `getDepositIxs`, `getWithdrawIxs`, `getBorrowIxs`.
 - [2026-03-12] SDK deposit/withdraw functions use named parameters (`{ connection, signer, asset, amount }`), not positional args. This was a common source of errors in early examples.
 
+## Borrow REST API (verified live 2026-06-23, DEV-461)
+
+- [2026-06-23] Four routes on `https://api.jup.ag/lend/v1/borrow/*` (no lite-api per decision): `GET /vaults`, `GET /positions?users=a,b` (comma-separated), `POST /operate`, `POST /operate-instructions`. All returned data keyless in testing, but the OpenAPI spec keeps `ApiKeyAuth` to match Earn; docs show the `x-api-key` header.
+- [2026-06-23] `OperatePayload` = `{ vaultId:number, positionId:number, positionOwner?:string, signer:string, colAmount:string, debtAmount:string }`. Single universal endpoint. Signed amounts: `colAmount` >0 deposit / <0 withdraw; `debtAmount` >0 borrow / <0 repay; `0` = no change. `positionId:0` creates a new position NFT.
+- [2026-06-23] Response shapes differ from Earn: `/operate` → `{ nftId, transaction }` (Earn returns only `transaction`). `/operate-instructions` → `{ nftId, instructions[], addressLookupTableAddresses[] }` — an ARRAY of instructions PLUS ALT addresses (Earn `*-instructions` returns a single instruction object, no ALTs). So borrow code must resolve ALTs and build a `VersionedTransaction`.
+- [2026-06-23] **Repay-all / withdraw-all sentinel = `MIN_I128` = `-170141183460469231731687303715884105728`** (string). This is `MAX_REPAY_AMOUNT` / `MAX_WITHDRAW_AMOUNT` in `@jup-ag/lend/borrow` (`= MIN_I128`). Verified: repaying the exact displayed `borrow` leaves interest dust (`dustBorrow`) below `minimumBorrowing` and fails with `VaultUserDebtTooLow` (error 6025 / 0x1789). Use the sentinel to fully clear debt before closing.
+- [2026-06-23] **WSOL-collateral vaults (vault 1, `supplyToken=So111…112`) do NOT auto-wrap native SOL.** The operate tx assumes the user already holds wrapped SOL; depositing without it fails with token-program `insufficient funds` (0x1). Integrators must wrap SOL into the WSOL ATA first.
+- [2026-06-23] Vault risk fields scale: `collateralFactor`/`liquidationThreshold`/`liquidationMaxLimit` map to LTV % (e.g. 800/850/900 = 80/85/90%; JLP vault 850/900/950 = 85/90/95%, matching the "up to 95% LTV" claim). `supplyRate`/`borrowRate` in basis points (487 = 4.87%). `minimumBorrowing`, `borrowable`, `withdrawable` in token base units. Exact oracle/exchange-price scaling documented in `lend/borrow/read-vault-data`.
+- [2026-06-23] Full e2e trace (mainnet, gpl wallet): wrap → `/operate` create+deposit (position 9062) → `/operate-instructions` borrow → `/operate` repay-all (MIN_I128) → `/operate` withdraw-all (MIN_I128), position closed. New-position `/operate` deposit tx = 3 ixs (ComputeBudget + 2× vaults program: PreOperate/init + operate) with 1 ALT.
+
 ## Terminology
 
 - [2026-03-12] "Earn" = supply/deposit side (get jlTokens). "Borrow" = vault/debt side (position NFTs). Never use "Supply" or "Lending" as section names, use "Earn" and "Borrow" to match the product UI.

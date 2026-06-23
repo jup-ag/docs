@@ -24,9 +24,9 @@ Jupiter Lend provides multiple integration options:
 | Earn user positions | `positions` endpoint | `getUserPosition`, `getUserPositions` | - |
 | Earnings data | `earnings` endpoint | - | - |
 | Vault config and state | - | `getAllVaults`, `getVaultByVaultId` | - |
-| Borrow user positions | Coming soon | `getAllUserPositions`, `getPositionByVaultId` | - |
+| Borrow vaults and user positions | `vaults`, `positions` endpoints | `getAllUserPositions`, `getPositionByVaultId` | - |
 | Earn transactions (deposit, withdraw, mint, redeem) | `deposit`, `withdraw`, `mint`, `redeem` or `*-instructions` | - | `getDepositIxs`, `getWithdrawIxs`, `getMintIxs`, `getRedeemIxs` |
-| Borrow transactions | Coming soon | - | `getInitPositionIx`, `getOperateIx`, etc. |
+| Borrow transactions | `operate`, `operate-instructions` | - | `getInitPositionIx`, `getOperateIx`, etc. |
 | Language | Any (HTTP) | TypeScript/JavaScript | TypeScript/JavaScript |
 
 ## Data and analytics
@@ -67,7 +67,7 @@ const { userPosition, vaultData } = await client.vault.getPositionByVaultId(vaul
 ```
 
 <Info>
-  Borrow API endpoints (vaults, positions, transactions) are coming soon. Use the Read SDK for vault and position data today.
+  The Borrow API exposes vault and position reads (`vaults`, `positions`) and operate transactions (`operate`, `operate-instructions`). See the [Borrow API](/lend/borrow/api). The Read SDK remains available for richer on-chain vault and position data.
 </Info>
 
 ## On-chain transactions
@@ -99,7 +99,7 @@ const { ixs: withdrawIxs } = await getWithdrawIxs({
 
 ### Borrow operations
 
-Borrow API and SDK flows for create-position, deposit, borrow, repay, withdraw, and liquidate are documented in the [Borrow operations](/lend/borrow) pages. Borrow API endpoints are coming soon.
+Borrow API and SDK flows for create-position, deposit, borrow, repay, withdraw, and liquidate are documented in the [Borrow operations](/lend/borrow) pages. For the REST flow, see the [Borrow API](/lend/borrow/api).
 
 ## Recommended usage
 

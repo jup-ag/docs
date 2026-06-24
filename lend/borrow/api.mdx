@@ -137,9 +137,14 @@ const operateResponse = await (
 
 The response includes `nftId` (the position NFT ID, newly assigned when `positionId` was `0`) and a base64-encoded unsigned `VersionedTransaction`.
 
-<Warning>
-  **WSOL collateral vaults require wrapped SOL.** For vaults whose `supplyToken` is `So11111111111111111111111111111111111111112` (WSOL), the operate transaction does not wrap native SOL for you. Wrap SOL into your WSOL token account before depositing, otherwise the transaction fails with a token-program `insufficient funds` error.
-</Warning>
+The API creates the borrow-token associated token account for the `signer` when it does not already exist, so borrowing to a fresh wallet works without adding a create-account instruction. You do not need to pre-create the output token account.
+
+### Native SOL (WSOL) handling
+
+The API does not wrap or unwrap native SOL. This matters whenever a vault's `supplyToken` or `borrowToken` is `So11111111111111111111111111111111111111112` (WSOL):
+
+- **Depositing WSOL collateral:** wrap SOL into your WSOL token account first. Without a funded WSOL account, the deposit fails with a token-program `insufficient funds` error.
+- **Borrowing or withdrawing WSOL:** you receive wrapped SOL in your WSOL token account. Close the account yourself if you want native SOL back.
 
 <Note>
   Repaying the exact `borrow` amount can leave interest dust below `minimumBorrowing`, which fails with `VaultUserDebtTooLow`. Repay with `debtAmount: MIN_I128` to clear all debt before closing a position.

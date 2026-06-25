@@ -254,10 +254,10 @@ Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and F
 
 #### Borrow
 
-- [Vaults](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request all borrow vaults with their configuration, rates, and liquidity
-- [Positions](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request the borrow positions of one or multiple users
-- [Operate](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request a base64-encoded unsigned borrow operate transaction (deposit, borrow, repay, withdraw)
-- [Operate Instructions](https://developers.jup.ag/docs/openapi-spec/lend/lend.yaml): Request the instructions and address lookup tables for a borrow operate transaction
+- [Vaults](https://developers.jup.ag/docs/openapi-spec/lend/borrow.yaml): Request all borrow vaults with their configuration, rates, and liquidity
+- [Positions](https://developers.jup.ag/docs/openapi-spec/lend/borrow.yaml): Request the borrow positions of one or multiple users
+- [Operate](https://developers.jup.ag/docs/openapi-spec/lend/borrow.yaml): Request a base64-encoded unsigned borrow operate transaction (deposit, borrow, repay, withdraw)
+- [Operate Instructions](https://developers.jup.ag/docs/openapi-spec/lend/borrow.yaml): Request the instructions and address lookup tables for a borrow operate transaction
 
 ## Trigger
 

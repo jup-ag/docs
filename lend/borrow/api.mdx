@@ -55,6 +55,10 @@ const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
 
 </AccordionGroup>
 
+## Markets
+
+All borrow endpoints accept an optional `market` parameter: `main` (default) or `ethena`. Pass it as a query parameter on the read endpoints (`?market=ethena`) or in the body on operate calls. Omitting it uses the `main` market.
+
 ## Read vault and position data
 
 Use the read endpoints to discover vaults and inspect user positions. Both accept GET requests.

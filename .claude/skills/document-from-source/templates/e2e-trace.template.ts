@@ -10,6 +10,10 @@
  * whatever your workbench uses — `bun run <file>` or `npx tsx <file>`. The skill infers this
  * from your workbench; keep the script faithful to whichever SDK you actually have.
  *
+ * Config: this lives in YOUR workbench, so wire it to however your workbench loads secrets
+ * (env, a config file, a keystore — your call). The reads below are just a sensible default;
+ * the docs repo does not define or maintain these names.
+ *
  * Safety model: use a DEDICATED LOW-FUND TEST WALLET, small amounts, and ALWAYS define the
  * unwind before sending. Read probes and build-only POSTs move no funds and are safe.
  */
@@ -75,7 +79,7 @@ async function signAndSend(label: string, txBase64: string, signer: Keypair) {
 }
 
 // ── The trace ─────────────────────────────────────────────────────────────────────────────
-const BASE = "https://api.jup.ag"; // or lite-api.jup.ag for keyless
+const BASE = "https://api.jup.ag";
 
 async function main() {
   const wallet = loadTestWallet();

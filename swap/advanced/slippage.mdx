@@ -30,7 +30,7 @@ RTSE uses a variety of heuristics, algorithms, and monitoring to estimate the be
 
 On the Meta-Aggregator path (`/order`), RTSE is applied automatically when the order is created. You do not need to set any slippage parameter. The estimated slippage is embedded in the transaction returned by `/order`.
 
-If you pass `slippageBps` to `/order`, it overrides RTSE with a fixed value.
+If you pass `slippageBps` to `/order`, it overrides RTSE with a fixed value. Fixed `slippageBps` does not restrict `/order` to Metis-only routing by itself.
 
 ### Router (opt-in)
 

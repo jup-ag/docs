@@ -55,7 +55,7 @@ Jupiter automatically covers gas costs when the taker lacks SOL.
 
 ## JupiterZ gasless (`/order`)
 
-When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker pays network and priority fees directly. Output token account rent is separate: when referral fees are not set, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) can pay the rent to create the taker's output token account. With referral fees, rent may be paid by the taker.
+When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker pays network and priority fees directly. Output token account rent is separate: when referral fees are not set, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) can pay the rent to create the taker's output token account. With referral fees, the taker pays output token account rent.
 
 **When it applies:**
 - Taker trades a pair the market makers are willing to quote
@@ -71,7 +71,7 @@ When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker 
 
 **Limitations:**
 - Does not fire when `payer` is set
-- With `referralAccount` and `referralFee`, JupiterZ can still quote and execute, but low-SOL takers may fail if rent or account costs must be paid by the taker
+- With `referralAccount` and `referralFee`, JupiterZ can still quote and execute, but the taker must have enough SOL for any required output token account rent
 
 ## Integrator payer
 

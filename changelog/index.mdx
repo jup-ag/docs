@@ -21,11 +21,11 @@ llmsDescription: "Changelog for Jupiter developer APIs, SDKs, and docs. Tracks b
 
 <Update label="June 2026" description="">
 
-## Swap API: Referral Fees and JupiterZ Routing
+## Swap API: JupiterZ Integrator Fees
 
-Referral fees on `/swap/v2/order` no longer disable JupiterZ routing. Integrations using `referralAccount` and `referralFee` can still receive RFQ quotes when JupiterZ is the best eligible route.
+Swap API `/order` supports integrator fees on JupiterZ routes. Requests using `referralAccount` and `referralFee` can receive RFQ quotes when JupiterZ is the best eligible route.
 
-Integrator-sponsored gas still changes router eligibility: setting `payer` to a wallet different from `taker` restricts routing to Metis.
+Integrator-sponsored gas is separate. Setting `payer` to a wallet different from `taker` still restricts routing to Metis.
 
 - [Order & Execute](/swap/order-and-execute)
 - [Gasless Swaps](/swap/advanced/gasless)

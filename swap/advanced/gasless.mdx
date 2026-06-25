@@ -1,14 +1,14 @@
 ---
 title: "Gasless Swaps"
 description: "Let users swap without holding SOL for transaction fees"
-llmsDescription: "How gasless swaps work on Jupiter Swap API V2. The gasless: true response field on /order can be set by three independent paths: automatic Jupiter sponsorship (signatureFeePayer = gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB), a JupiterZ RFQ market maker (signatureFeePayer = MM address, Jupiter's gas wallet pays the rent to create the taker's output token account if not yet initialised), or integrator-sponsored gas via the payer parameter. Covers the three sources, how to detect which one fired via signatureFeePayer, how to opt out using excludeRouters=jupiterz or a signatureFeePayer == taker check, integrator payer setup for /order and /build, and the related fee semantics."
+llmsDescription: "How gasless swaps work on Jupiter Swap API V2. The gasless: true response field on /order can be set by three independent paths: automatic Jupiter sponsorship (signatureFeePayer = gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB), a JupiterZ RFQ market maker (signatureFeePayer = MM address), or integrator-sponsored gas via the payer parameter. Covers the three sources, how to detect which one fired via signatureFeePayer, how to opt out using excludeRouters=jupiterz or a signatureFeePayer == taker check, JupiterZ output token account rent behaviour with referral fees, integrator payer setup for /order and /build, and the related fee semantics."
 ---
 
 Gasless swaps let users trade without holding SOL for transaction fees. On `/order`, the `gasless: true` response field can be set by three independent paths:
 
-1. **Automatic Jupiter sponsorship** — Jupiter covers gas and token account rent when the taker has low SOL.
-2. **JupiterZ market maker** — an RFQ market maker pays signature and priority fees directly.
-3. **Integrator payer** — your wallet covers gas via the `payer` parameter.
+1. **Automatic Jupiter sponsorship:** Jupiter covers gas and token account rent when the taker has low SOL.
+2. **JupiterZ market maker:** an RFQ market maker pays signature and priority fees directly.
+3. **Integrator payer:** your wallet covers gas via the `payer` parameter.
 
 To identify which path fired on any quote, compare `signatureFeePayer` to the `taker`:
 
@@ -51,33 +51,34 @@ Jupiter automatically covers gas costs when the taker lacks SOL.
 
 **Limitations:**
 - Does not fire when `payer` is set to a wallet other than the taker (integrator payer takes over instead)
+- Does not fire when `referralAccount` and `referralFee` are set
 
 ## JupiterZ gasless (`/order`)
 
-When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker pays network and priority fees directly. If the taker's output token account does not exist, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) pays the rent to create it.
+When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker pays network and priority fees directly. Output token account rent is separate: when referral fees are not set, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) can pay the rent to create the taker's output token account. With referral fees, the taker pays output token account rent.
 
 **When it applies:**
 - Taker trades a pair the market makers are willing to quote
-- `payer` is not set, and `referralAccount`/`referralFee` are not set (either disables JupiterZ in favour of Metis)
+- `payer` is not set
 
-**What it covers:** signature fee, priority fee, and the taker's output token account rent (if the account does not exist yet).
+**What it covers:** signature fee and priority fee. Output token account rent can be covered by Jupiter's gas wallet when referral fees are not set.
 
 **How it works:**
 - The order transaction includes a secondary signer for the market maker
 - Jupiter sets the gas payer to the MM signer and on `/execute`, your partially signed transaction is sent to the MM for them to co-sign and execute
-- If the taker's output token account is not yet initialised, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) pays the rent to create it
-- The `signatureFeePayer` is the MM's address. MM addresses vary per quote, so do not hardcode against a single address — use the `signatureFeePayer != taker` check instead.
+- If the taker's output token account is not yet initialised and referral fees are not set, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) can pay the rent to create it
+- The `signatureFeePayer` is the MM's address. MM addresses vary per quote, so do not hardcode against a single address. Use the `signatureFeePayer != taker` check instead.
 
 **Limitations:**
 - Does not fire when `payer` is set
-- Does not fire when `referralAccount` and `referralFee` are set
+- With `referralAccount` and `referralFee`, JupiterZ can still quote and execute, but the taker must have enough SOL for any required output token account rent
 
 ## Integrator payer
 
 Integrators can cover all gas costs on behalf of their users by passing the `payer` parameter. This works on both `/order` and `/build`.
 
 <Note>
-`payer` only activates when set to a wallet different from `taker`. Setting `payer=taker` has no effect — the request behaves as if no `payer` was provided.
+`payer` only activates when set to a wallet different from `taker`. Setting `payer=taker` has no effect. The request behaves as if no `payer` was provided.
 </Note>
 
 ### On `/order`

@@ -19,6 +19,21 @@ llmsDescription: "Changelog for Jupiter developer APIs, SDKs, and docs. Tracks b
 
 ---
 
+<Update label="June 2026" description="">
+
+## Swap API: JupiterZ Integrator Fees
+
+Swap API `/order` supports integrator fees on JupiterZ routes. Requests using `referralAccount` and `referralFee` can receive RFQ quotes when JupiterZ is the best eligible route.
+
+Integrator-sponsored gas is separate. Setting `payer` to a wallet different from `taker` still restricts routing to Metis.
+
+- [Order & Execute](/swap/order-and-execute)
+- [Gasless Swaps](/swap/advanced/gasless)
+
+</Update>
+
+---
+
 <Update label="May 2026" description="">
 
 ## Trigger API: Upcoming Craft Deposit Request Change

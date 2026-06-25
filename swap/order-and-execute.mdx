@@ -416,11 +416,11 @@ Adding optional parameters to `/order` can restrict which routers are eligible:
 | --- | --- | --- | --- | --- |
 | **(no optional params)** | Yes | Yes | Yes | Yes |
 | `receiver` | Yes | Yes | Yes | Yes |
-| `referralAccount` & `referralFee` | Yes | **No** | Yes | Yes |
+| `referralAccount` & `referralFee` | Yes | Yes | Yes | Yes |
 | `payer` (integrator gasless) | Yes | **No** | **No** | **No** |
 | `excludeRouters: jupiterz` | Yes | **No** | Yes | Yes |
 
-**Key takeaway:** adding `referralAccount`, `referralFee` or `payer` disables JupiterZ (RFQ), which may result in worse pricing on major pairs where market makers often beat onchain routing by 5-20bps.
+**Key takeaway:** setting `payer` to a wallet different from `taker` disables JupiterZ (RFQ) and restricts routing to Metis, which may result in worse pricing on major pairs where market makers often beat onchain routing by 5-20bps.
 
 For the full parameter reference, see the [API reference](/api-reference/swap/order).
 
@@ -574,10 +574,6 @@ const response = await fetch(
 ```
 
 Verify your fees are applied by checking the response fee fields. Top-level `feeBps` is the total fee rate charged for the swap, while `platformFee.feeBps` is the Jupiter platform fee rate. If the response falls back to the default platform fee, the `referralTokenAccount` for that `feeMint` is likely not initialised.
-
-<Warning>
-  Adding `referralAccount` disables RFQ routing. You will only get Metis quotes. See the [routing impact matrix](#routing-impact-matrix) above.
-</Warning>
 
 ### Fee response fields
 

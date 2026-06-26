@@ -134,7 +134,7 @@ Before creating a new issue, search existing issues to avoid duplicates.
 
 Create a Linear issue for the work using the Linear MCP tools:
 - **Project:** `Docs` (ID: `docs-18ccf0a02c86`)
-- **Team:** `DevRel`
+- **Team:** `Developer Platform` (issues are prefixed `DEV-`)
 - **Title:** Action-oriented, specific — `[Area] Verb + what`
   - ✅ `[Ultra] Rewrite get-order page with complete code example`
   - ❌ `Update Ultra docs`

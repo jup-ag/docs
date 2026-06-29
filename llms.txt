@@ -420,7 +420,7 @@ Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock
 - [Position Account](https://developers.jup.ag/docs/perps/position-account.md): The Position account stores trade position data including owner, side (long/short), entry price, size, collateral, PNL, and borrow fee snapshot. Derived from the trader's wallet, custody, and collateral custody.
 - [PositionRequest Account](https://developers.jup.ag/docs/perps/position-request-account.md): The PositionRequest account represents a pending request to open, close, or modify a position, including TP/SL triggers. It is a PDA derived from the Position account with a unique random seed.
 - [Pool Account](https://developers.jup.ag/docs/perps/pool-account.md): The Pool account stores JLP pool configuration including AUM (aumUsd), custody public keys, position limits, fee schedules (open/close/swap), and APR calculation data. Only one Pool account exists.
-- [Custody Account](https://developers.jup.ag/docs/perps/custody-account.md): The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state.
+- [Custody Account](https://developers.jup.ag/docs/perps/custody-account.md): The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT, JupUSD) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state.
 
 ### API Reference
 

@@ -113,6 +113,7 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 ## Patterns & Conventions
 
+- [2026-06-29] `/execute` amount fields have two perspectives. `totalInputAmount` and `totalOutputAmount` are wallet-level amounts, while `inputAmountResult` and `outputAmountResult` are swap-route amounts. `feeMint` determines where the fee is reflected: if `feeMint == inputMint`, fee collected in the input mint = `totalInputAmount - inputAmountResult`; if `feeMint == outputMint`, fee collected in the output mint = `outputAmountResult - totalOutputAmount`. Verified live with SOL->USDC and USDC->SOL Swap API V2 executions.
 - [2026-03-17] Code examples provide both @solana/kit and @solana/web3.js variants in `<CodeGroup>` tabs. Kit is listed first as the recommended modern SDK.
 - [2026-03-17] Prerequisites (imports, types, helpers) go in a collapsible `<Accordion>` above the main code example to keep the page scannable.
 - [2026-04-09] `/build` code examples now default to `/submit` as the submission path instead of `sendRawTransaction`. Comments note "or use your own RPC / transaction pipeline" for integrators not using `/submit`.

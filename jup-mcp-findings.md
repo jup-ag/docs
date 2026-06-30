@@ -134,6 +134,15 @@ Ran the MCP protocol directly against `https://mcp.jup.ag` over Streamable HTTP 
 | `tools/call price_get` with `ids=<SOL mint>` + dummy key | `API error (401): {"code":401,"message":"Unauthorized"}` — the key is forwarded to `api.jup.ag` as `x-api-key` and Jupiter rejects the dummy. **Confirms the full MCP → Jupiter wiring.** |
 | Happy-path execution with a **valid** key | `200`, `isError` unset. `price_get` for SOL + USDC returned live data: SOL `usdPrice ≈ 73.14`, USDC `≈ 0.9996`, each with `liquidity`, `decimals`, and `priceChange24h`. **Full path verified end to end.** |
 
+### Client-level test (the documented user path)
+Beyond raw JSON-RPC, the documented **Claude Code** setup was exercised exactly as a user would:
+
+| Check | Result |
+|-------|--------|
+| `claude mcp add --transport http jupiter-trading https://mcp.jup.ag --header "Authorization: Bearer <key>"` | Server added to local config. |
+| `claude mcp list` connection check | `jupiter-trading … ✔ Connected` (client ran the real `initialize` handshake with the key). |
+| Headless agent, natural-language prompt ("look up the current USD price of SOL and JUP") | Agent auto-discovered the tools and called `price_get`, returning live prices (SOL ≈ \$73.2, JUP ≈ \$0.21). **The documented config + tool discovery + a real tool call all work from an actual MCP client.** |
+
 **Behaviour note (relates to F4):** the MCP auth boundary checks only that a Bearer token is
 *present*, not that it is *valid* — `initialize` and `tools/list` succeed with any non-empty
 Bearer. Key validity is enforced downstream by Jupiter's API on the first tool call that hits

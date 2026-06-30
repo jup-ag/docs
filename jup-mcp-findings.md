@@ -75,6 +75,17 @@ step 1, the Authentication section, and Support). That host **redirects to the d
 README lands on the docs homepage instead of the API-key page. Fix in the MCP repo's README.
 (Our docs page already uses `https://developers.jup.ag/portal`.)
 
+### F4 — nit: inbound auth only accepts `Authorization: Bearer`, not `x-api-key`
+The server's inbound auth (`src/infrastructure/security/auth.ts`) accepts **only**
+`Authorization: Bearer <key>` and returns `401` otherwise. But the value is a Jupiter API key,
+and the server forwards it **outbound as `x-api-key`** (`jupiter-client.ts`,
+`API_KEY_HEADER = "x-api-key"`) — the convention every other Jupiter REST API uses.
+
+Suggestion: keep `Authorization: Bearer` as the documented/primary method (aligns with the MCP
+Authorization spec and is forward-compatible with OAuth), but **also accept `x-api-key` inbound**
+as a fallback — one extra check in `extractApiKey`. This matches the rest of the platform so
+integrators can reuse the header they already send, with no downside. Additive, low-risk.
+
 ### F2 — low (cosmetic): em dashes in tool descriptions
 `prediction_get_trade_history`, `prediction_list_trades`, `swap_get_instructions`, and
 `tokens_search` contain em dashes in their `description` strings. Conflicts with our style guide

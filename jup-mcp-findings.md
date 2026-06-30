@@ -16,11 +16,19 @@ Date: 2026-06-30. MCP commit: `main` HEAD at time of check.
 ## Summary
 
 - The server is **live** at `https://mcp.jup.ag` (`GET /health` → `200`).
-- **47 tools across 8 domains**, confirmed from source.
-- Most domains call the **current** API version (price v3, swap v2, tokens v2). The one real
-  staleness flag is **Trigger**, which calls the unmaintained `/trigger/v1/*` API.
+- **47 tools across 8 domains**, confirmed from source (re-verified).
+- Most domains call the **current** API version (price v3, swap v2, tokens v2). Two flags for the
+  MCP repo: **Trigger** calls the unmaintained `/trigger/v1/*` API (F1), and the README links the
+  wrong **portal URL** (F3).
 - The DEV-480 description has several inaccuracies (endpoint, Prediction count, tokens/trigger/lend
   domain descriptions) — corrected in section A.
+
+Re-verification (2026-06-30): live checks — `mcp.jup.ag/health` `200`, `mcp.jup.ag/` `401`
+(auth required), `api.jup.ag/mcp` `404`. Source tool counts confirmed exactly: lend 7,
+portfolio 3, prediction 20, price 1, recurring 4, swap 3, tokens 4, trigger 5 = **47**. API
+version prefixes confirmed: price `/v3`, swap `/v2`, tokens `/v2`, recurring/lend/portfolio/
+prediction/trigger `/v1`. Portal redirect confirmed: `portal.jup.ag` → `developers.jup.ag/`
+(docs root), while `developers.jup.ag/portal` → portal sign-in.
 
 ---
 
@@ -58,6 +66,14 @@ Our docs mark **Trigger V1 as unmaintained** (superseded by Trigger V2: `api.jup
 vault-based, JWT challenge-response, `/orders/price`). Trigger V1 still works, so the MCP is
 functional, but it is a generation behind the current product. The docs page describes this as
 generic "limit orders" and does not claim V2.
+
+### F3 — medium: README links the wrong portal URL
+The README sends users to `https://portal.jup.ag/` to create an API key (3 places: quickstart
+step 1, the Authentication section, and Support). That host **redirects to the docs root
+`https://developers.jup.ag/`**, not to the Developer Platform. The canonical URL is
+**`https://developers.jup.ag/portal`** (redirects to sign-in → portal). A new user following the
+README lands on the docs homepage instead of the API-key page. Fix in the MCP repo's README.
+(Our docs page already uses `https://developers.jup.ag/portal`.)
 
 ### F2 — low (cosmetic): em dashes in tool descriptions
 `prediction_get_trade_history`, `prediction_list_trades`, `swap_get_instructions`, and

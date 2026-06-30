@@ -120,6 +120,28 @@ and 2-cycle minimums against the live API / `recurring` source, then add them to
 
 ---
 
+## E. End-to-end verification against the live server (2026-06-30)
+
+Ran the MCP protocol directly against `https://mcp.jup.ag` over Streamable HTTP (JSON-RPC POST).
+
+| Check | Result |
+|-------|--------|
+| `GET /health` | `200 {"status":"ok"}` |
+| `initialize` (no `Authorization` header) | `401 {"error":"Unauthorized: API key required"}` |
+| `initialize` (any Bearer token) | `200` — `serverInfo: jup-mcp v1.0.0`, `protocolVersion 2025-06-18`, `capabilities.tools.listChanged: true`. No `Mcp-Session-Id` returned → **stateless** server. |
+| `tools/list` | `200` — **47 tools**, domain split exactly matches source (lend 7, portfolio 3, prediction 20, price 1, recurring 4, swap 3, tokens 4, trigger 5). **Live deployment matches source 1:1.** |
+| `tools/call price_get` with wrong arg (`mints`) | MCP input-validation error `-32602` (schema requires `ids`). Tool schemas are enforced. |
+| `tools/call price_get` with `ids=<SOL mint>` + dummy key | `API error (401): {"code":401,"message":"Unauthorized"}` — the key is forwarded to `api.jup.ag` as `x-api-key` and Jupiter rejects the dummy. **Confirms the full MCP → Jupiter wiring.** |
+| Happy-path execution (real price) | Not run — requires a valid Jupiter API key. |
+
+**Behaviour note (relates to F4):** the MCP auth boundary checks only that a Bearer token is
+*present*, not that it is *valid* — `initialize` and `tools/list` succeed with any non-empty
+Bearer. Key validity is enforced downstream by Jupiter's API on the first tool call that hits
+`api.jup.ag`. This is expected for a stateless passthrough, but worth noting: a misconfigured key
+surfaces as an `API error (401)` inside a tool result, not as a connection-time failure.
+
+---
+
 ## Tool inventory (47 total)
 
 - **Swap (3):** `swap_get_order`, `swap_get_instructions`, `swap_execute_order`

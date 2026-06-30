@@ -25,7 +25,7 @@ components:
         - JUPUSD
       description: |
         Accepted payment currency, given as a token symbol (not a mint address): JUP, SOL, USDC, or JUPUSD.
-        All paths settle 1000 JUP to the treasury. JUP transfers directly; SOL, USDC, and JUPUSD are
+        All input currencies are converted to 1000 JUP. JUP transfers directly; SOL, USDC, and JUPUSD are
         swapped to 1000 JUP via Ultra.
       example: JUP
     CheckEligibilityResponse:

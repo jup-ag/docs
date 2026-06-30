@@ -7,15 +7,15 @@ llmsDescription: "Jupiter VRFD Express Verification API for programmatic token v
 
 The Express Verification API lets you submit tokens for [Jupiter VRFD](https://verified.jup.ag) verification and update token metadata programmatically. This is the same Express flow available on the VRFD UI, exposed as an API for launchpads, agents, and projects that need to integrate verification into their token creation pipelines.
 
-Each submission costs 1000 JUP. You can pay in JUP directly, or in SOL, USDC, or JUPUSD, which are swapped to 1000 JUP via Ultra. All paths settle 1000 JUP to a Jupiter treasury wallet, and the JUP is burned periodically. There is also a free standard submission flow on the [VRFD site](https://verified.jup.ag).
+Each Express submission costs 1000 JUP, which prevents spam and prioritizes requests. You can pay in JUP directly, or in SOL, USDC, or JUPUSD, which are converted to 1000 JUP via Ultra. Standard submissions on the [VRFD site](https://verified.jup.ag) are free.
 
 You can request verification and metadata updates together. Each is reviewed independently, so a metadata update can proceed even if verification is declined.
 
 ## Payment Currencies
 
-`paymentCurrency` takes one of the token symbols below, passed verbatim as a string. Use the symbol (for example `SOL`), not the mint address or token name. The mint column shows what each symbol resolves to on-chain. JUP is the default and transfers directly. SOL, USDC, and JUPUSD are routed through an Ultra swap so that 1000 JUP still settles to the treasury.
+`paymentCurrency` takes one of the token symbols below, passed verbatim as a string. Use the symbol (for example `SOL`), not the mint address or token name. The mint column shows what each symbol resolves to on-chain. JUP is the default and transfers directly. SOL, USDC, and JUPUSD are converted to 1000 JUP through an Ultra swap.
 
-| `paymentCurrency` value | Resolves to mint | Decimals | How it settles |
+| `paymentCurrency` value | Resolves to mint | Decimals | Conversion |
 | --- | --- | --- | --- |
 | `JUP` | `JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN` | 6 | Direct transfer of 1000 JUP |
 | `SOL` | `So11111111111111111111111111111111111111112` | 9 | Swapped to 1000 JUP via Ultra |
@@ -25,7 +25,7 @@ You can request verification and metadata updates together. Each is reviewed ind
 ## Prerequisites
 
 1. Get an API key at [Portal](https://developers.jup.ag/portal). All requests require the `x-api-key` header.
-2. The submitting wallet needs enough of your chosen payment currency to cover 1000 JUP. For JUP that is 1000 JUP. For SOL, USDC, or JUPUSD it is the swap input amount returned by craft-txn. Transactions are gasless, so the wallet does not need extra SOL for network fees.
+2. The submitting wallet needs enough of your chosen payment currency for 1000 JUP. Transactions are gasless, so the wallet does not need extra SOL for network fees.
 
 ## Flow
 
@@ -91,7 +91,7 @@ The response includes the base64-encoded unsigned transaction and a `requestId` 
 
 ```json
 {
-  "receiverAddress": "5x...treasury",
+  "receiverAddress": "5x...recipient",
   "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
   "amount": "1000000000",
   "tokenDecimals": 6,
@@ -115,10 +115,10 @@ The response includes the base64-encoded unsigned transaction and a `requestId` 
 | `transaction` | `string` | Base64-encoded unsigned transaction |
 | `requestId` | `string` | Unique ID for this payment. Pass to `/execute`. |
 | `receiverAddress` | `string` | Wallet address receiving the JUP payment |
-| `mint` | `string` | Mint of the settled payment token (JUP) |
+| `mint` | `string` | Mint of the JUP collected (always JUP) |
 | `amount` | `string` | JUP amount in smallest unit (1000 JUP = `1000000000`) |
-| `tokenDecimals` | `number` | Decimals of the settled token (JUP is 6) |
-| `tokenUsdRate` | `number` | USD rate of the settled token at craft time |
+| `tokenDecimals` | `number` | Decimals of the JUP collected (6) |
+| `tokenUsdRate` | `number` | USD rate of JUP at craft time |
 | `feeLamports` | `number` | Network fee for the transaction, in lamports |
 | `feeUsdAmount` | `number` | Network fee in USD |
 | `feeMint` | `string` | Mint address of the fee token |

@@ -132,7 +132,7 @@ Ran the MCP protocol directly against `https://mcp.jup.ag` over Streamable HTTP 
 | `tools/list` | `200` — **47 tools**, domain split exactly matches source (lend 7, portfolio 3, prediction 20, price 1, recurring 4, swap 3, tokens 4, trigger 5). **Live deployment matches source 1:1.** |
 | `tools/call price_get` with wrong arg (`mints`) | MCP input-validation error `-32602` (schema requires `ids`). Tool schemas are enforced. |
 | `tools/call price_get` with `ids=<SOL mint>` + dummy key | `API error (401): {"code":401,"message":"Unauthorized"}` — the key is forwarded to `api.jup.ag` as `x-api-key` and Jupiter rejects the dummy. **Confirms the full MCP → Jupiter wiring.** |
-| Happy-path execution (real price) | Not run — requires a valid Jupiter API key. |
+| Happy-path execution with a **valid** key | `200`, `isError` unset. `price_get` for SOL + USDC returned live data: SOL `usdPrice ≈ 73.14`, USDC `≈ 0.9996`, each with `liquidity`, `decimals`, and `priceChange24h`. **Full path verified end to end.** |
 
 **Behaviour note (relates to F4):** the MCP auth boundary checks only that a Bearer token is
 *present*, not that it is *valid* — `initialize` and `tools/list` succeed with any non-empty

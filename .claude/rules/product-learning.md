@@ -312,3 +312,27 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 - [2026-04-07] On `/order`, RTSE is automatic (no param needed). Passing `slippageBps` overrides RTSE with a fixed value. Live forced-JupiterZ tests on 2026-06-23 showed `slippageBps` does not disable JupiterZ by itself.
 - [2026-04-07] On `/build`, RTSE is opt-in via `slippageBps=rtse` (literal string). Default is 50 bps fixed.
 - [2026-04-07] Do not use "dynamic slippage" or "auto slippage" as naming conventions. The canonical name is RTSE (Real-Time Slippage Estimator).
+
+---
+
+# Token Verification (VRFD) — Express API
+
+## Architecture
+
+- [2026-06-30] Published OpenAPI spec lives at `https://token-verify-api.jup.ag/openapi.json` (service URL). The public docs/gateway path is `https://api.jup.ag/tokens/v2/verify/express/*`. Local repo spec `openapi-spec/tokens/v2/verification.yaml` uses server `https://api.jup.ag/tokens/v2/verify` and backs the three `api-reference/tokens/verify-*` MDX pages (thin `openapi:` wrappers, no hand-written field tables).
+- [2026-06-30] Three documented routes: `GET /express/check-eligibility`, `GET /express/craft-txn`, `POST /express/execute`. Every submission costs 1000 JUP; the JUP settles to a treasury wallet and is burned periodically.
+
+## Multi-Currency Payment
+
+- [2026-06-30] `paymentCurrency` enum is `JUP` (default, direct transfer), `SOL`, `USDC`, `JUPUSD`. Non-JUP: backend sizes input via an Ultra ExactOut quote for 1000 JUP + a 50 bps buffer (`SIZING_BUFFER_BPS`), then crafts an **ExactIn** swap (Ultra rejects ExactOut + external payer), so the swap yields **>= 1000 JUP**. JUP path uses Ultra `/transfer/craft-token`; swap paths use Ultra `/order`. Mints: JUP `JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN` (6 dec), SOL `So111...112` (9), USDC `EPjF...Dt1v` (6), JUPUSD `JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD` (6). Source: `vrfd/hub-api/apps/token-verification/src/routes/combined/{craftExpressTxn,executeExpressTxn,helpers}.ts`.
+- [2026-06-30] On non-JUP paths, `craft-txn` response adds `inputMint`, `inputDecimals`, `quotedInputAmount`, `maxInputAmount`. Because the swap is ExactIn, `quotedInputAmount == maxInputAmount == order.inAmount` (the buffered input) — they are NOT distinct values. Settlement fields stay JUP-denominated: `mint` = JUP mint, `amount` = `order.outAmount` (>= 1000 JUP; JUP path is exactly `1000000000`). `feeLamports`/`feeAmount` are 0 on swap paths (fee is the swapped-in token, surfaced via `inputMint`/input amounts).
+- [2026-06-30] `execute` body adds `paymentCurrency`, `paymentAmount`, `jupOutputAmount`. `paymentAmount` is REQUIRED for non-JUP (handler returns 400 if missing) and is recorded as-is for the payment row + revenue event. `jupOutputAmount` is OPTIONAL: only used for the revenue event, floored at 1000 JUP. Docs map `paymentAmount` → craft `quotedInputAmount`, `jupOutputAmount` → craft `amount`. `paymentCurrency` must match craft: handler signs a legacy `Transaction` for JUP vs `VersionedTransaction` for swaps and routes to Ultra `/transfer/execute` vs `/execute`.
+
+## Open Questions
+
+- [2026-06-30] RESOLVED (verified against `hub-api` source): `paymentAmount` quoted-vs-max is moot — the ExactIn swap returns `quotedInputAmount == maxInputAmount == order.inAmount`, and the handler records `paymentAmount` without validating it against the craft response. Docs use `quotedInputAmount`.
+
+## Content Gaps
+
+- [2026-06-30] Published spec has a fourth route, `GET /express/quote` (cost preview without crafting a tx; returns `ExpressQuoteResponse`). Intentionally NOT documented (DEV-672 scoped to existing routes only). It is the cleanest way to preview non-JUP cost; revisit if integrators need it. The local repo spec also omits it.
+- [2026-06-30] Local spec `verification.yaml` lagged the published spec: before DEV-672 it had `senderTwitterHandle` + the metadata `use*` toggles + full craft/execute responses, but not the payment-currency additions. DEV-672 added the payment-currency fields (still no `/express/quote`).

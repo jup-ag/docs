@@ -2,19 +2,30 @@
 title: "Express Verification API"
 sidebarTitle: "Express Verification"
 description: "Programmatically submit tokens for verification and update metadata via API"
-llmsDescription: "Jupiter VRFD Express Verification API for programmatic token verification and metadata updates. Three-step flow: check eligibility (GET /tokens/v2/verify/express/check-eligibility), craft a 1000 JUP payment transaction (GET /tokens/v2/verify/express/craft-txn), then execute with signed transaction and token details (POST /tokens/v2/verify/express/execute). Used by launchpads, agents, and projects to submit tokens for Jupiter verification without the UI. Requires an API key from developers.jup.ag/portal. Verification and metadata updates are reviewed independently by the VRFD team."
+llmsDescription: "Jupiter VRFD Express Verification API for programmatic token verification and metadata updates. Three-step flow: check eligibility (GET /tokens/v2/verify/express/check-eligibility), craft a payment transaction worth 1000 JUP (GET /tokens/v2/verify/express/craft-txn), then execute with the signed transaction and token details (POST /tokens/v2/verify/express/execute). Payment can be made in JUP, SOL, USDC, or JUPUSD; non-JUP currencies are swapped to 1000 JUP via Ultra. Returns swap sizing fields (quotedInputAmount, maxInputAmount, inputMint) on non-JUP paths and reports verificationCreated and metadataCreated on execute. Used by launchpads, agents, and projects to submit tokens for Jupiter verification without the UI. Requires an API key from developers.jup.ag/portal. Verification and metadata updates are reviewed independently by the VRFD team."
 ---
 
 The Express Verification API lets you submit tokens for [Jupiter VRFD](https://verified.jup.ag) verification and update token metadata programmatically. This is the same Express flow available on the VRFD UI, exposed as an API for launchpads, agents, and projects that need to integrate verification into their token creation pipelines.
 
-Each submission costs 1000 JUP, sent via a Solana transaction. The JUP is sent to a multisig wallet and burned periodically. There is also a free standard submission flow on the [VRFD site](https://verified.jup.ag).
+Each submission costs 1000 JUP. You can pay in JUP directly, or in SOL, USDC, or JUPUSD, which are swapped to 1000 JUP via Ultra. All paths settle 1000 JUP to a Jupiter treasury wallet, and the JUP is burned periodically. There is also a free standard submission flow on the [VRFD site](https://verified.jup.ag).
 
 You can request verification and metadata updates together. Each is reviewed independently, so a metadata update can proceed even if verification is declined.
+
+## Payment Currencies
+
+`paymentCurrency` takes one of the token symbols below, passed verbatim as a string. Use the symbol (for example `SOL`), not the mint address or token name. The mint column shows what each symbol resolves to on-chain. JUP is the default and transfers directly. SOL, USDC, and JUPUSD are routed through an Ultra swap so that 1000 JUP still settles to the treasury.
+
+| `paymentCurrency` value | Resolves to mint | Decimals | How it settles |
+| --- | --- | --- | --- |
+| `JUP` | `JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN` | 6 | Direct transfer of 1000 JUP |
+| `SOL` | `So11111111111111111111111111111111111111112` | 9 | Swapped to 1000 JUP via Ultra |
+| `USDC` | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` | 6 | Swapped to 1000 JUP via Ultra |
+| `JUPUSD` | `JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD` | 6 | Swapped to 1000 JUP via Ultra |
 
 ## Prerequisites
 
 1. Get an API key at [Portal](https://developers.jup.ag/portal). All requests require the `x-api-key` header.
-2. The submitting wallet needs at least 1000 JUP. Transactions are gasless, so no SOL is required for fees.
+2. The submitting wallet needs enough of your chosen payment currency to cover 1000 JUP. For JUP that is 1000 JUP. For SOL, USDC, or JUPUSD it is the swap input amount returned by craft-txn. Transactions are gasless, so the wallet does not need extra SOL for network fees.
 
 ## Flow
 
@@ -48,7 +59,7 @@ const eligibility = await response.json();
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `tokenExists` | `boolean` | Whether Jupiter recognizes the token |
+| `tokenExists` | `boolean` | Whether the token exists on-chain |
 | `isVerified` | `boolean` | Whether the token is already verified |
 | `canVerify` | `boolean` | Whether a verification request can be submitted |
 | `canMetadata` | `boolean` | Whether a metadata update can be submitted |
@@ -59,7 +70,7 @@ If both `canVerify` and `canMetadata` are `false`, the submission will be reject
 
 ### Step 2: Craft the Payment Transaction
 
-This returns an unsigned Solana transaction that transfers 1000 JUP. Save the `requestId` from the response, you need it in the next step.
+This returns an unsigned Solana transaction worth 1000 JUP. By default it crafts a direct JUP transfer. Pass `paymentCurrency` to pay in SOL, USDC, or JUPUSD instead, which crafts an Ultra swap to JUP (see [Pay with SOL, USDC, or JUPUSD](#pay-with-sol-usdc-or-jupusd)). Save the `requestId` from the response, you need it in the next step.
 
 ```typescript
 const craftResponse = await fetch(
@@ -71,16 +82,54 @@ const craftResponse = await fetch(
 const { transaction, requestId } = await craftResponse.json();
 ```
 
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `senderAddress` | `string` | Yes | Solana wallet address that will sign and pay for the transaction |
+| `paymentCurrency` | `string` | No | Token symbol, not a mint address: `JUP` (default), `SOL`, `USDC`, or `JUPUSD`. Non-JUP currencies route through an Ultra swap to JUP. |
+
 The response includes the base64-encoded unsigned transaction and a `requestId` that links this payment to your execute request.
+
+```json
+{
+  "receiverAddress": "5x...treasury",
+  "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+  "amount": "1000000000",
+  "tokenDecimals": 6,
+  "tokenUsdRate": 0.42,
+  "feeLamports": 5000,
+  "feeUsdAmount": 0.0009,
+  "feeMint": "So11111111111111111111111111111111111111112",
+  "feeTokenDecimals": 9,
+  "feeAmount": 5000,
+  "transaction": "AQAB...",
+  "requestId": "req_abc123",
+  "totalTime": 412,
+  "expireAt": "2026-06-30T12:00:00.000Z",
+  "code": 0,
+  "gasless": true
+}
+```
 
 | Field | Type | Description |
 | --- | --- | --- |
 | `transaction` | `string` | Base64-encoded unsigned transaction |
 | `requestId` | `string` | Unique ID for this payment. Pass to `/execute`. |
-| `mint` | `string` | Payment token mint (JUP) |
-| `amount` | `string` | Payment amount in smallest unit (1000000000 = 1000 JUP) |
-| `expireAt` | `string` | Transaction expiry timestamp |
+| `receiverAddress` | `string` | Wallet address receiving the JUP payment |
+| `mint` | `string` | Mint of the settled payment token (JUP) |
+| `amount` | `string` | JUP amount in smallest unit (1000 JUP = `1000000000`) |
+| `tokenDecimals` | `number` | Decimals of the settled token (JUP is 6) |
+| `tokenUsdRate` | `number` | USD rate of the settled token at craft time |
+| `feeLamports` | `number` | Network fee for the transaction, in lamports |
+| `feeUsdAmount` | `number` | Network fee in USD |
+| `feeMint` | `string` | Mint address of the fee token |
+| `feeTokenDecimals` | `number` | Decimals of the fee token |
+| `feeAmount` | `number` | Fee amount in the fee token's smallest unit |
+| `totalTime` | `number` | Time taken to craft the transaction, in milliseconds |
+| `expireAt` | `string` | Expiry timestamp for the crafted transaction |
+| `code` | `number` | Status code (`0` for success) |
 | `gasless` | `boolean` | Whether the transaction is gasless |
+
+Non-JUP payments return additional swap sizing fields. See [Pay with SOL, USDC, or JUPUSD](#pay-with-sol-usdc-or-jupusd).
 
 ### Step 3: Sign and Execute
 
@@ -125,6 +174,20 @@ const executeResponse = await fetch(
 const result = await executeResponse.json();
 ```
 
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `transaction` | `string` | Yes | Base64-encoded signed transaction from craft-txn |
+| `requestId` | `string` | Yes | `requestId` from the craft-txn response |
+| `senderAddress` | `string` | Yes | Solana wallet address of the sender |
+| `tokenId` | `string` | Yes | Token mint address to verify |
+| `twitterHandle` | `string` | Yes | Twitter/X handle of the token project |
+| `description` | `string` | Yes | Reason for the verification request |
+| `senderTwitterHandle` | `string` | No | Twitter/X handle of the submitter |
+| `tokenMetadata` | `object` | No | Token metadata to submit alongside verification. See [Token Metadata Fields](#token-metadata-fields). |
+| `paymentCurrency` | `string` | No | Token symbol, not a mint address: `JUP` (default), `SOL`, `USDC`, or `JUPUSD`. Must match the currency used in craft-txn. |
+| `paymentAmount` | `string` | Conditional | Atomic input amount paid, from the craft response's `quotedInputAmount`. Required when `paymentCurrency` is not `JUP`. |
+| `jupOutputAmount` | `string` | No | Atomic JUP output from the craft response (its `amount` field). Optional, but recommended on non-JUP paths so revenue tracks the JUP actually collected. |
+
 ```json
 {
   "status": "Success",
@@ -138,11 +201,55 @@ const result = await executeResponse.json();
 | Field | Type | Description |
 | --- | --- | --- |
 | `status` | `"Success" \| "Failed"` | Whether the transaction executed |
-| `signature` | `string` | On-chain transaction signature (on success) |
+| `signature` | `string` | On-chain transaction signature (present on success) |
+| `error` | `string` | Error message (present on failure) |
+| `code` | `number` | Error code (present on failure) |
+| `totalTime` | `number` | Time taken to execute, in milliseconds |
 | `verificationCreated` | `boolean` | Whether a verification request was created |
 | `metadataCreated` | `boolean` | Whether a metadata update request was created |
 
 After submission, track your request status at [verified.jup.ag/tokens/browse](https://verified.jup.ag/tokens/browse).
+
+## Pay with SOL, USDC, or JUPUSD
+
+To pay with a non-JUP currency, set `paymentCurrency` on both the craft and execute steps. The craft step returns an Ultra swap that converts your input token into JUP, sized with a small buffer so the swap yields at least 1000 JUP.
+
+Request the transaction with your chosen currency:
+
+```typescript
+const craftResponse = await fetch(
+  `https://api.jup.ag/tokens/v2/verify/express/craft-txn?senderAddress=${walletAddress}&paymentCurrency=SOL`,
+  {
+    headers: { 'x-api-key': 'YOUR_API_KEY' },
+  }
+);
+const craft = await craftResponse.json();
+```
+
+On non-JUP paths the response includes these swap sizing fields in addition to the common fields above:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `inputMint` | `string` | Input token mint address |
+| `inputDecimals` | `number` | Input token decimals |
+| `quotedInputAmount` | `string` | Atomic input amount for the swap, sized to yield at least 1000 JUP |
+| `maxInputAmount` | `string` | Maximum atomic input amount for the swap. Equal to `quotedInputAmount` on the current swap flow. |
+
+When you execute, pass `paymentAmount` (required on non-JUP paths) and `jupOutputAmount` (optional, for revenue tracking). `paymentAmount` is the input amount from the craft response's `quotedInputAmount`, and `jupOutputAmount` is the craft response's `amount`:
+
+```typescript
+body: JSON.stringify({
+  transaction: signedTransaction,
+  requestId,
+  senderAddress: wallet.publicKey.toBase58(),
+  tokenId: 'YOUR_TOKEN_MINT_ADDRESS',
+  twitterHandle: 'https://x.com/yourproject',
+  description: 'Submitting for verification because...',
+  paymentCurrency: 'SOL',
+  paymentAmount: craft.quotedInputAmount,
+  jupOutputAmount: craft.amount,
+}),
+```
 
 ## Token Metadata Fields
 
@@ -163,8 +270,11 @@ The `tokenMetadata` object in the execute request is optional. Include it to upd
 | `tiktok` | `string` | TikTok profile URL |
 | `tokenDescription` | `string` | Short description of the token |
 | `circulatingSupply` | `string` | Circulating supply value |
+| `useCirculatingSupply` | `boolean` | Whether to use the provided `circulatingSupply` value |
 | `circulatingSupplyUrl` | `string` | URL to a live circulating supply endpoint |
+| `useCirculatingSupplyUrl` | `boolean` | Whether to use the provided `circulatingSupplyUrl` |
 | `coingeckoCoinId` | `string` | CoinGecko coin ID for price data |
+| `useCoingeckoCoinId` | `boolean` | Whether to use the provided `coingeckoCoinId` |
 | `otherUrl` | `string` | Any other relevant URL |
 
 ## Known Projects and Launchpads

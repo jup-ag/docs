@@ -30,6 +30,14 @@ Integrator-sponsored gas is separate. Setting `payer` to a wallet different from
 - [Order & Execute](/swap/order-and-execute)
 - [Gasless Swaps](/swap/advanced/gasless)
 
+## Express Verification: Pay in SOL, USDC, or JUPUSD
+
+The Express Verification API now accepts SOL, USDC, and JUPUSD in addition to JUP. Non-JUP currencies are swapped to 1000 JUP via Ultra, so every submission still settles 1000 JUP to the treasury.
+
+Pass `paymentCurrency` to `craft-txn` and `execute`. Non-JUP paths return swap sizing fields (`quotedInputAmount`, `maxInputAmount`, `inputMint`) and require `paymentAmount` and `jupOutputAmount` on execute.
+
+- [Express Verification API](/tokens/verification)
+
 </Update>
 
 ---

@@ -16,6 +16,18 @@ components:
       name: x-api-key
       description: Get API key via https://developers.jup.ag/portal
   schemas:
+    PaymentCurrency:
+      type: string
+      enum:
+        - JUP
+        - SOL
+        - USDC
+        - JUPUSD
+      description: |
+        Accepted payment currency, given as a token symbol (not a mint address): JUP, SOL, USDC, or JUPUSD.
+        All paths settle 1000 JUP to the treasury. JUP transfers directly; SOL, USDC, and JUPUSD are
+        swapped to 1000 JUP via Ultra.
+      example: JUP
     CheckEligibilityResponse:
       type: object
       required:
@@ -75,7 +87,7 @@ components:
           example: JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN
         amount:
           type: string
-          description: Payment amount in smallest unit (1000 JUP = 1000000000)
+          description: JUP amount collected in smallest unit. JUP path transfers exactly 1000 JUP (1000000000); swap paths yield at least that.
         tokenDecimals:
           type: number
           description: Decimals of the payment token
@@ -112,6 +124,18 @@ components:
         gasless:
           type: boolean
           description: Whether the transaction is gasless
+        inputMint:
+          type: string
+          description: Input token mint address (non-JUP paths)
+        inputDecimals:
+          type: number
+          description: Input token decimals (non-JUP paths)
+        quotedInputAmount:
+          type: string
+          description: Atomic input amount for the swap, sized to yield at least 1000 JUP (non-JUP paths)
+        maxInputAmount:
+          type: string
+          description: Maximum atomic input amount for the swap; equal to quotedInputAmount on the current swap flow (non-JUP paths)
 
     TokenMetadataInput:
       type: object
@@ -228,6 +252,16 @@ components:
           description: Reason for verification request
         tokenMetadata:
           $ref: "#/components/schemas/TokenMetadataInput"
+        paymentCurrency:
+          allOf:
+            - $ref: "#/components/schemas/PaymentCurrency"
+            - description: Payment currency. Defaults to JUP (direct transfer). SOL/USDC/JUPUSD execute the Ultra swap crafted in the previous step.
+        paymentAmount:
+          type: string
+          description: Atomic input amount paid. Required when paymentCurrency is not JUP.
+        jupOutputAmount:
+          type: string
+          description: Atomic JUP output from the craft quote (CraftTxnResponse.amount), echoed back so revenue tracks the actual JUP collected on swap paths.
 
     ExpressExecuteResponse:
       type: object
@@ -322,8 +356,9 @@ paths:
     get:
       summary: Craft express verification payment transaction
       description: |
-        Returns an unsigned Solana transaction that transfers 1000 JUP as payment for
-        express verification. The `requestId` in the response is required for the execute step.
+        Returns an unsigned Solana transaction worth 1000 JUP as payment for express
+        verification. JUP transfers directly; SOL, USDC, and JUPUSD craft an Ultra swap to
+        1000 JUP. The `requestId` in the response is required for the execute step.
       tags:
         - Express Verification
       security:
@@ -335,6 +370,12 @@ paths:
             type: string
           required: true
           description: Solana wallet address that will sign and pay for the transaction
+        - in: query
+          name: paymentCurrency
+          schema:
+            $ref: "#/components/schemas/PaymentCurrency"
+          required: false
+          description: Payment currency. Defaults to JUP (direct transfer). SOL/USDC/JUPUSD route through an Ultra swap to JUP.
       responses:
         "200":
           description: Unsigned payment transaction

@@ -680,16 +680,16 @@ paths:
                       - RFQ: -2000 (failed to land), -2001 (unknown), -2002 (invalid payload), -2003 (quote expired), -2004 (swap rejected).
                   totalInputAmount:
                     type: string
-                    description: Total input token amount before fees
+                    description: Total input token amount deducted from the user's wallet, including the fee if feeMint is the input mint
                   totalOutputAmount:
                     type: string
-                    description: Total output token amount after fees
+                    description: Final output token amount reflected in the user's wallet, after any fee collected in the output mint
                   inputAmountResult:
                     type: string
-                    description: Amount of input token used for the swap
+                    description: Input amount that went into the swap route, after any fee collected in the input mint
                   outputAmountResult:
                     type: string
-                    description: Amount of output token received from the swap
+                    description: Output amount produced by the swap route, before any fee collected in the output mint
                   swapEvents:
                     type: array
                     items:

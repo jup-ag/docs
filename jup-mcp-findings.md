@@ -143,6 +143,31 @@ Beyond raw JSON-RPC, the documented **Claude Code** setup was exercised exactly 
 | `claude mcp list` connection check | `jupiter-trading … ✔ Connected` (client ran the real `initialize` handshake with the key). |
 | Headless agent, natural-language prompt ("look up the current USD price of SOL and JUP") | Agent auto-discovered the tools and called `price_get`, returning live prices (SOL ≈ \$73.2, JUP ≈ \$0.21). **The documented config + tool discovery + a real tool call all work from an actual MCP client.** |
 
+### Read-tool sweep (8 domains)
+Exercised one read tool per domain with live calls; all returned valid data: `price_get`,
+`tokens_search`, `tokens_list_by_category`, `swap_get_order` (quote, no taker), `lend_list_tokens`,
+`prediction_list_events`, `portfolio_list_platforms`. **F5 (usability) — `prediction_list_events`
+returns oversized payloads:** even `limit=5` returned ~108 KB because each event embeds its full
+`markets` array, which exceeds the MCP-client tool-result token cap. An agent will choke on the
+default response. Suggest trimming embedded markets from the list response or adding a lightweight
+list mode.
+
+### Write path — real on-chain execution
+Completed the full `swap_get_order(taker)` → sign → `swap_execute_order` loop against the live
+server with a real funded wallet:
+
+| Check | Result |
+|-------|--------|
+| `swap_get_order` with a real `taker` | Returned a signable base64 `transaction` + `requestId`, RTSE auto-slippage, fees attributed to the taker. No spend. |
+| Sign locally + `swap_execute_order` | **`status: Success`**, real on-chain swap landed: 0.01 SOL → 0.732081 USDC, signature `49EtE9d…X438R`, slot 429909875. **Full write path verified end to end.** |
+
+**F6 (integration note, for docs) — short blockhash validity.** A first attempt failed with
+`code -1005 "Transaction expired"` because model-in-the-loop latency between order, signing, and
+execute exceeded the order's blockhash validity (~60s). Re-running build → sign → execute back to
+back succeeded. Integrators (and the docs page) should treat the order as short-lived: sign and
+submit immediately, and re-fetch the order rather than reusing a stale `requestId`. No funds are
+spent on an expired submission.
+
 **Behaviour note (relates to F4):** the MCP auth boundary checks only that a Bearer token is
 *present*, not that it is *valid* — `initialize` and `tools/list` succeed with any non-empty
 Bearer. Key validity is enforced downstream by Jupiter's API on the first tool call that hits

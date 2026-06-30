@@ -1,7 +1,7 @@
 ---
 title: "Integrate DEX into Metis"
 description: "Requirements and steps to integrate your DEX into the Metis routing engine, including the Jupiter AMM Interface SDK and security audit prerequisites."
-llmsDescription: "How to integrate a decentralized exchange (DEX) into Jupiter's Metis routing engine. Requires implementing the Jupiter AMM Interface SDK, passing security audits and code health checks, and demonstrating traction. Metis routing powers both /order and /build endpoints. Covers the AMM Interface specification, integration requirements, audit prerequisites, and how to submit your DEX for review."
+llmsDescription: "How to integrate a decentralized exchange (DEX) into Jupiter's Metis routing engine. Requires implementing the Jupiter AMM Interface SDK, passing security audits and code health checks, and demonstrating traction. Metis routing powers both /order and /build endpoints. Covers the AMM Interface specification, integration requirements, audit prerequisites, and how to submit your DEX for review. Also explains how proprietary AMMs (propAMMs) detect Jupiter frontend flow: the Jupiter frontend signs swap transactions with the dedicated signer sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF, and verifying that signature lets a propAMM classify the trade as non-toxic order flow and quote tighter spreads. This is the mechanism behind Ultra Signaling."
 ---
 
 This guide covers how to integrate your decentralized exchange (DEX) into Jupiter's Metis routing engine. You will need to provide a DEX SDK implementing the Jupiter AMM Interface, pass security and code health checks, and demonstrate traction.
@@ -115,3 +115,21 @@ To facilitate integration of your DEX into the Jupiter Core Engine:
 }
   ```
 </Accordion>
+
+## Detect Jupiter Frontend Flow
+
+Trades that originate from the Jupiter frontend (jup.ag) are retail flow. They are non-toxic order flow: not the latency-sensitive, adversarial flow a market maker loses money to. If your propAMM can identify this flow, you can quote it tighter spreads with confidence. This is the mechanism behind [Ultra Signaling](/ultra).
+
+To make that flow verifiable, the Jupiter frontend adds a dedicated signer to every swap transaction and signs the transaction with it:
+
+| Signer | Address |
+|--------|---------|
+| Jupiter frontend | `sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF` |
+
+To detect Jupiter frontend flow, check the transaction's account keys for this address as a signer and confirm its signature is present and valid. Jupiter holds the private key, so a valid signature from this address can only have been produced by the Jupiter frontend.
+
+<Note>
+Verify the signature, not just the presence of the address. Any sender can add `sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF` to a transaction's account keys, but only the Jupiter frontend can produce a valid signature for it. A transaction that lists the address without a valid signature from it is not Jupiter frontend flow.
+</Note>
+
+For a live example, inspect [this transaction](https://solscan.io/tx/4PUVAsfdagLZcHbxso5w7eH13fnmAmobrRLih5uyqAFjQqRL5TgmVD5Fyrnbfm2mvpEn7dutk9wvGYNZrzQc6tbH), which is signed by `sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF`.

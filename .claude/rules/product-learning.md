@@ -313,3 +313,11 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 - [2026-04-07] On `/order`, RTSE is automatic (no param needed). Passing `slippageBps` overrides RTSE with a fixed value. Live forced-JupiterZ tests on 2026-06-23 showed `slippageBps` does not disable JupiterZ by itself.
 - [2026-04-07] On `/build`, RTSE is opt-in via `slippageBps=rtse` (literal string). Default is 50 bps fixed.
 - [2026-04-07] Do not use "dynamic slippage" or "auto slippage" as naming conventions. The canonical name is RTSE (Real-Time Slippage Estimator).
+
+---
+
+# Routing — Frontend Flow Signaling (propAMM)
+
+## Architecture
+
+- [2026-06-30] The Jupiter frontend (jup.ag) appends the dedicated signer `sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF` to swap transactions and signs the transaction with it. PropAMMs detect Jupiter frontend (retail / non-toxic) flow by verifying this signature is present and valid, then quote tighter spreads. This is the technical mechanism behind "Ultra Signaling" (named but not previously explained in `ultra/index.mdx`). Trust model is a real signature, not just the address: only Jupiter holds the private key so it cannot be forged, which is why the address is safe to publish. Documented as a section on `swap/routing/dex-integration.mdx` (DEV-649). Example tx: `4PUVAsfdagLZcHbxso5w7eH13fnmAmobrRLih5uyqAFjQqRL5TgmVD5Fyrnbfm2mvpEn7dutk9wvGYNZrzQc6tbH`.

@@ -167,7 +167,7 @@ paths:
         (predictive execution, RTSE, Jupiter Beam, gasless, multi-router competition).
 
         Without optional parameters, all routers compete for the best price (Metis, JupiterZ RFQ, Dflow, OKX).
-        Adding fee or swap modification parameters may restrict routing to Metis only.
+        Setting `payer` to a wallet different from `taker` restricts routing to Metis.
       security:
         - ApiKeyAuth: []
       parameters:
@@ -218,7 +218,6 @@ paths:
           description: |
             - Address of your referral account for the Jupiter referral project
             - Must be used together with `referralFee`
-            - Disables RFQ routing (JupiterZ)
             - See the [Referral Program](/tool-kits/referral-program) for setup
         - name: referralFee
           in: query
@@ -236,7 +235,7 @@ paths:
             type: string
           description: |
             - The public key of an account that will cover gas-related fees (signature fees, priority fees, and rent) on behalf of the taker
-            - Has no effect when set equal to `taker` — must be a different wallet to activate integrator-sponsored gas
+            - Has no effect when set equal to `taker`. Must be a different wallet to activate integrator-sponsored gas
             - Enabling this restricts routing to Metis (JupiterZ is disabled when an integrator payer is set)
           example: gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB
         - name: priorityFeeLamports
@@ -368,7 +367,7 @@ paths:
                     description: |
                       True when signature and priority fees are paid by a wallet other than the taker. Set by three independent paths:
                       - Automatic Jupiter sponsorship: `signatureFeePayer = gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`
-                      - JupiterZ market maker: `signatureFeePayer` is the MM address (varies per quote); Jupiter's gas wallet pays the rent to create the taker's output token account if not yet initialised
+                      - JupiterZ market maker: `signatureFeePayer` is the MM address (varies per quote); Jupiter's gas wallet can pay the rent to create the taker's output token account when referral fees are not set
                       - Integrator payer: `signatureFeePayer` is your `payer` parameter
                       For a deterministic opt-out, check `signatureFeePayer == taker` on every response.
                   requestId:
@@ -681,16 +680,16 @@ paths:
                       - RFQ: -2000 (failed to land), -2001 (unknown), -2002 (invalid payload), -2003 (quote expired), -2004 (swap rejected).
                   totalInputAmount:
                     type: string
-                    description: Total input token amount before fees
+                    description: Total input token amount deducted from the user's wallet, including the fee if feeMint is the input mint
                   totalOutputAmount:
                     type: string
-                    description: Total output token amount after fees
+                    description: Final output token amount reflected in the user's wallet, after any fee collected in the output mint
                   inputAmountResult:
                     type: string
-                    description: Amount of input token used for the swap
+                    description: Input amount that went into the swap route, after any fee collected in the input mint
                   outputAmountResult:
                     type: string
-                    description: Amount of output token received from the swap
+                    description: Output amount produced by the swap route, before any fee collected in the output mint
                   swapEvents:
                     type: array
                     items:

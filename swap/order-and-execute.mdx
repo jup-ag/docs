@@ -97,6 +97,8 @@ type ExecuteResponse = {
   status: "Success" | "Failed";
   signature: string;
   code: number;
+  totalInputAmount: string;
+  totalOutputAmount: string;
   inputAmountResult: string;
   outputAmountResult: string;
   error?: string;
@@ -132,6 +134,8 @@ type ExecuteResponse = {
   status: "Success" | "Failed";
   signature: string;
   code: number;
+  totalInputAmount: string;
+  totalOutputAmount: string;
   inputAmountResult: string;
   outputAmountResult: string;
   error?: string;
@@ -360,8 +364,35 @@ Jupiter handles:
 | `status` | "Success" or "Failed" |
 | `signature` | Transaction signature (present on both success and some failures) |
 | `code` | Error code. 0 = success. See [/execute error codes](#execute-error-codes). |
-| `inputAmountResult` | Amount of input token used for the swap |
-| `outputAmountResult` | Amount of output token received |
+| `totalInputAmount` | Total input token amount deducted from the user's wallet, including the fee if `feeMint` is the input mint |
+| `inputAmountResult` | Input amount that went into the swap route, after any fee collected in the input mint |
+| `outputAmountResult` | Output amount produced by the swap route, before any fee collected in the output mint |
+| `totalOutputAmount` | Final output token amount reflected in the user's wallet, after any fee collected in the output mint |
+
+Use `totalInputAmount` and `totalOutputAmount` for the swap token amounts reflected in the user's wallet. Use `inputAmountResult` and `outputAmountResult` for swap-route accounting.
+
+The swap fee is collected in one token, shown by `feeMint` in the `/order` response. If `feeMint` matches `inputMint`, compare `totalInputAmount` and `inputAmountResult`:
+
+```txt
+fee collected in the input mint = totalInputAmount - inputAmountResult
+```
+
+If `feeMint` matches `outputMint`, compare `outputAmountResult` and `totalOutputAmount`:
+
+```txt
+fee collected in the output mint = outputAmountResult - totalOutputAmount
+```
+
+For example, if `/execute` returns:
+
+```json
+{
+  "outputAmountResult": "2103",
+  "totalOutputAmount": "2101"
+}
+```
+
+The swap route produced `2103` output units, and `2101` output units were reflected in the user's wallet. The difference is the fee collected in the output mint.
 
 ## Error codes
 
@@ -416,11 +447,11 @@ Adding optional parameters to `/order` can restrict which routers are eligible:
 | --- | --- | --- | --- | --- |
 | **(no optional params)** | Yes | Yes | Yes | Yes |
 | `receiver` | Yes | Yes | Yes | Yes |
-| `referralAccount` & `referralFee` | Yes | **No** | Yes | Yes |
+| `referralAccount` & `referralFee` | Yes | Yes | Yes | Yes |
 | `payer` (integrator gasless) | Yes | **No** | **No** | **No** |
 | `excludeRouters: jupiterz` | Yes | **No** | Yes | Yes |
 
-**Key takeaway:** adding `referralAccount`, `referralFee` or `payer` disables JupiterZ (RFQ), which may result in worse pricing on major pairs where market makers often beat onchain routing by 5-20bps.
+**Key takeaway:** setting `payer` to a wallet different from `taker` disables JupiterZ (RFQ) and restricts routing to Metis, which may result in worse pricing on major pairs where market makers often beat onchain routing by 5-20bps.
 
 For the full parameter reference, see the [API reference](/api-reference/swap/order).
 
@@ -574,10 +605,6 @@ const response = await fetch(
 ```
 
 Verify your fees are applied by checking the response fee fields. Top-level `feeBps` is the total fee rate charged for the swap, while `platformFee.feeBps` is the Jupiter platform fee rate. If the response falls back to the default platform fee, the `referralTokenAccount` for that `feeMint` is likely not initialised.
-
-<Warning>
-  Adding `referralAccount` disables RFQ routing. You will only get Metis quotes. See the [routing impact matrix](#routing-impact-matrix) above.
-</Warning>
 
 ### Fee response fields
 

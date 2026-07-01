@@ -1,16 +1,16 @@
 ---
 title: "Custody Account"
 description: "Overview of the Custody account used in the Jupiter Perpetuals Program, representing tokens managed by the JLP pool"
-llmsDescription: "The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state."
+llmsDescription: "The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT, JupUSD) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state."
 ---
 
 This page contains an overview of the  used in the Jupiter Perpetuals Program, and specifically the  account.
 
 The `Custody` account is a struct which represents a set of parameters and states associated to custodies (tokens) managed by the JLP pool which consists of the following custodies.
 
-| Custodies                                                                      |                                                                                |                                                                                |                                                                                 |                                                                                 |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| [SOL](https://solscan.io/account/7xS2gz2bTp3fwCC7knJvUWTEU9Tycczu6VhJYKgi1wdz) | [ETH](https://solscan.io/account/AQCGyheWPLeo6Qp9WpYS9m3Qj479t7R636N9ey1rEjEn) | [BTC](https://solscan.io/account/5Pv3gM9JrFFH883SWAhvJC9RPYmo8UNxuFtv5bMMALkm) | [USDC](https://solscan.io/account/G18jKKXQwBbrHeiK3C9MRXhkHsLHf7XgCSisykV46EZa) | [USDT](https://solscan.io/account/4vkNeXiYEUizLdrpdPS1eC2mccyM4NUPRtERrk6ZETkk) |
+| Custodies                                                                      |                                                                                |                                                                                |                                                                                 |                                                                                 |                                                                                    |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [SOL](https://solscan.io/account/7xS2gz2bTp3fwCC7knJvUWTEU9Tycczu6VhJYKgi1wdz) | [ETH](https://solscan.io/account/AQCGyheWPLeo6Qp9WpYS9m3Qj479t7R636N9ey1rEjEn) | [BTC](https://solscan.io/account/5Pv3gM9JrFFH883SWAhvJC9RPYmo8UNxuFtv5bMMALkm) | [USDC](https://solscan.io/account/G18jKKXQwBbrHeiK3C9MRXhkHsLHf7XgCSisykV46EZa) | [USDT](https://solscan.io/account/4vkNeXiYEUizLdrpdPS1eC2mccyM4NUPRtERrk6ZETkk) | [JupUSD](https://solscan.io/account/DdwY1ELc9rRK7xNL3hTXabSFBmVrTPpfsUZSv2Y3LL1U) |
 
 <Tip>
   This [repository](https://github.com/julianfssen/jupiter-perps-anchor-idl-parsing) contains Typescript code samples on interacting with the Jupiter Perpetuals program IDL with `anchor` and `@solana/web3.js`

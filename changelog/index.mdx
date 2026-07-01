@@ -41,6 +41,16 @@ The Jupiter Lend Borrow REST API is now documented. Read borrow vaults and user 
 - [Borrow API guide](/lend/borrow/api)
 - [Borrow API reference](/api-reference/lend/borrow/vaults)
 
+---
+
+## Express Verification: Pay in SOL, USDC, or JUPUSD
+
+The Express Verification API now accepts SOL, USDC, and JUPUSD in addition to JUP. Non-JUP currencies are converted to 1000 JUP via Ultra.
+
+Pass `paymentCurrency` to `craft-txn` and `execute`. On non-JUP paths, `craft-txn` returns the swap input amounts and `execute` takes a `paymentAmount`.
+
+- [Express Verification API](/tokens/verification)
+
 </Update>
 
 ---

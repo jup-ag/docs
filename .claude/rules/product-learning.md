@@ -347,6 +347,30 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 
 ---
 
+# Token Verification (VRFD) — Express API
+
+## Architecture
+
+- [2026-06-30] Published OpenAPI spec lives at `https://token-verify-api.jup.ag/openapi.json` (service URL). The public docs/gateway path is `https://api.jup.ag/tokens/v2/verify/express/*`. Local repo spec `openapi-spec/tokens/v2/verification.yaml` uses server `https://api.jup.ag/tokens/v2/verify` and backs the three `api-reference/tokens/verify-*` MDX pages (thin `openapi:` wrappers, no hand-written field tables).
+- [2026-06-30] Three documented routes: `GET /express/check-eligibility`, `GET /express/craft-txn`, `POST /express/execute`. 1000 JUP is required for Express submissions to prevent spam and prioritize requests. Standard submissions (on the VRFD site) are free.
+
+## Multi-Currency Payment
+
+- [2026-06-30] `paymentCurrency` is a token symbol: `JUP` (default), `SOL`, `USDC`, or `JUPUSD` (not a mint). JUP transfers directly (Ultra `/transfer/craft-token`). Non-JUP swaps to JUP (Ultra `/order`): the backend works out how much input buys 1000 JUP, adds a 50 bps buffer (`SIZING_BUFFER_BPS`), and swaps that fixed amount, so the output is a little above 1000 JUP. Mints: JUP `JUPyiwr…`, SOL `So111…112`, USDC `EPjF…Dt1v`, JUPUSD `Juprjzn…55USD`. Source: `vrfd/hub-api/apps/token-verification/src/routes/combined/{craftExpressTxn,executeExpressTxn,helpers}.ts`.
+- [2026-06-30] On non-JUP paths, `craft-txn` also returns `inputMint`, `inputDecimals`, `quotedInputAmount`, `maxInputAmount`. `quotedInputAmount` and `maxInputAmount` are the same value (the swap input is fixed). `mint`/`amount` stay JUP: `amount` is a little above 1000 JUP on swaps, exactly `1000000000` on the JUP path. `feeLamports`/`feeAmount` are 0 on swap paths.
+- [2026-06-30] `execute` body adds `paymentCurrency`, `paymentAmount`, `jupOutputAmount`. `paymentAmount` (atomic input paid) is required for non-JUP — the API returns 400 without it. `jupOutputAmount` (the craft `amount`) is optional and only used for revenue reporting. Use craft `quotedInputAmount` for `paymentAmount`. `paymentCurrency` must match what craft-txn used.
+
+## Open Questions
+
+- [2026-06-30] RESOLVED (verified in `hub-api` source): `paymentAmount` can use `quotedInputAmount` — it equals `maxInputAmount` (the swap input is fixed), and the API records it without re-checking.
+
+## Content Gaps
+
+- [2026-06-30] Published spec has a fourth route, `GET /express/quote` (cost preview without crafting a tx; returns `ExpressQuoteResponse`). Intentionally NOT documented (DEV-672 scoped to existing routes only). It is the cleanest way to preview non-JUP cost; revisit if integrators need it. The local repo spec also omits it.
+- [2026-06-30] Local spec `verification.yaml` lagged the published spec: before DEV-672 it had `senderTwitterHandle` + the metadata `use*` toggles + full craft/execute responses, but not the payment-currency additions. DEV-672 added the payment-currency fields (still no `/express/quote`).
+
+---
+
 # Routing — Frontend Flow Signaling (propAMM)
 
 ## Architecture

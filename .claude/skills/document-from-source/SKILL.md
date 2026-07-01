@@ -101,7 +101,22 @@ differently from the REST API (extra ATA instructions, manual SOL wrap, named co
 magic numbers, different response envelopes), that is a discrepancy — log it with the
 authority order deciding which surface is "right" for behaviour.
 
-### 6. Write the outputs
+### 6. Release gate — confirm the feature is shipped (always ask)
+The authority order proves what the API *does*, never whether it is *meant to be public yet*.
+A feature can pass every live and on-chain check and still be unreleased. Before writing
+anything, check release signals and **always pause for explicit operator confirmation** — do
+not write until the operator confirms the feature is public:
+
+- **Source recency** — how recently did the endpoint/feature merge (`git log` in the source repo)? A merge from the last few days is a red flag.
+- **Tracking ticket** — is an in-progress ticket gating it? Ask the operator; a feature behind an open ticket is not shipped.
+- **First-party FE usage** — does the FE actually call it? A live endpoint with no FE usage is often unreleased.
+- **Flags/config** — is it behind a feature flag or config gate?
+
+If any signal says "unshipped" (recent merge, open ticket, no FE usage, behind a flag), say so
+plainly and hold. Publishing an unreleased feature is the worst failure mode for a docs skill,
+and clean live evidence alone will not catch it.
+
+### 7. Write the outputs
 Produce all of these by default:
 
 1. **Docs pages** (`.mdx`) — the primary deliverable. Follow the repo's writing rules in
@@ -113,7 +128,10 @@ Produce all of these by default:
    map current, as a side effect of documenting.
 3. **`dx-findings/<feature>-dx-findings.md`** — when the API/SDK/FE has rough edges, write DX
    feedback for the product engineers using `templates/findings-template.md`. This dir is
-   gitignored; findings stay local.
+   gitignored; findings stay local. Note: `mint broken-links` (a Handoff step) parses every
+   `.md`/`.mdx` in the working tree **regardless of gitignore**, so keep the findings file
+   MDX-safe — use `{/* */}` not HTML comments, and backtick any bare `<...>` (e.g.
+   `` `<placeholder>` ``, `` `Record<string, T>` ``) or the check fails to parse it.
 4. **`updates/index.mdx` changelog** — add an `<Update>` entry only when the work surfaces a
    public API or product change (per `CLAUDE.md`). Skip for docs-only fixes.
 
@@ -135,5 +153,7 @@ artifacts so it never drifts from the canonical ship process.
 
 - `SKILL.md` — this file.
 - `templates/findings-template.md` — DX findings format (copy into `dx-findings/`).
-- `templates/e2e-trace.template.ts` — generic trace script to copy into your workbench and
-  wire to its own secret loading.
+- `templates/e2e-trace.template.ts` — a **simple build → sign → send** trace skeleton to copy
+  into your workbench and wire to its own secret loading. Real flows can be anything: an auth'd
+  or custodial API (challenge-response signing, server-submitted steps, a multi-step lifecycle,
+  keeper/status polling) needs a near-total rewrite, not just filled-in endpoints.

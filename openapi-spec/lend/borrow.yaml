@@ -556,9 +556,7 @@ components:
         ownerAddress:
           type: string
         vault:
-          oneOf:
-          - $ref: '#/components/schemas/BorrowVault'
-          - type: 'null'
+          $ref: '#/components/schemas/BorrowVault'
         config:
           type: object
           additionalProperties:

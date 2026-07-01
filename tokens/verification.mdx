@@ -13,7 +13,7 @@ You can request verification and metadata updates together. Each is reviewed ind
 
 ## Payment Currencies
 
-`paymentCurrency` takes one of the token symbols below, passed verbatim as a string. Use the symbol (for example `SOL`), not the mint address or token name. The mint column shows what each symbol resolves to on-chain. JUP is the default and transfers directly. SOL, USDC, and JUPUSD are converted to 1000 JUP through an Ultra swap.
+Pass `paymentCurrency` as a token symbol (for example `SOL`), not a mint address. JUP is the default and transfers directly. SOL, USDC, and JUPUSD are converted to 1000 JUP via an Ultra swap.
 
 | `paymentCurrency` value | Resolves to mint | Decimals | Conversion |
 | --- | --- | --- | --- |
@@ -279,7 +279,7 @@ The `tokenMetadata` object in the execute request is optional. Include it to upd
 
 ## Known Projects and Launchpads
 
-If you are a known project or launchpad on Solana, DM [@jup_vrfd](https://x.com/jup_vrfd) from your organization account on X. This lets the VRFD team connect your Developer Platform OrgId, which adds credibility and supports your submissions.
+If you are a known project or launchpad on Solana, DM [@jup_vrfd](https://x.com/jup_vrfd) from your organization account on X. This links your Developer Platform OrgId to your submissions, which helps the VRFD team review them.
 
 ## API Reference
 

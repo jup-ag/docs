@@ -10,6 +10,14 @@ and a future session would benefit from knowing it.
 
 **Format:** Every entry is a dated bullet under the appropriate heading.
 Keep entries concise — one line if possible, a short paragraph if needed.
+Cite the source on a learning where known (e.g. `Source: <repo>/<path>` or the live endpoint),
+so a future session can re-verify it.
+
+**Sources convention:** A product section may open with a `## Sources` subsection naming where
+ground truth lives for that product: the live API host, the OpenAPI spec path in this repo, the
+source-code repo(s), the SDK package, and the first-party FE/backend. The `document-from-source`
+skill reads this to know what to verify against (authority order: live API + on-chain result >
+source code > SDK/FE > docs). Keep it current as a side effect of documenting the product.
 
 ---
 
@@ -240,6 +248,14 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 ---
 
 # Jupiter Lend (Fluid Protocol)
+
+## Sources
+
+- **Live API:** `api.jup.ag/lend/v1` (earn + borrow). Borrow read endpoints returned data without `x-api-key` during DEV-461 testing; confirm before relying on keyless.
+- **OpenAPI spec:** `openapi-spec/lend/lend.yaml` — drifts from live in places (e.g. `InstructionResponse` shape); live wins.
+- **SDK:** `@jup-ag/lend` (build) and `@jup-ag/lend-read` (read). Mainnet-only; amounts are `BN`; subpath exports (`/api`, `/earn`, `/borrow`, `/flashloan`). SDK does not create ATAs (REST does).
+- **First-party FE:** `TeamRaccoons/monorepo` → `apps/jupiter-ui/src/components/Borrowing`. Builds instructions with the SDK and reads vault/position data from Fluid's backend, not the public REST API.
+- **Backend:** `api.solana.fluid.io/v1` (`borrowing/vaults`, `borrowing/users/{addr}/nfts`) — what the FE actually reads from. The public REST surface is not dogfooded by the FE.
 
 ## Architecture
 

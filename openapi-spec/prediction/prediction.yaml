@@ -207,6 +207,27 @@ components:
           type: string
           nullable: true
           description: Sports market type, when applicable
+        outcomeMint:
+          type: string
+          nullable: true
+          description: >-
+            Outcome token mint for this market side (Jupiter Forecast / bisonfi).
+            Buying the market gives you this token; it can also be traded directly
+            through the Swap API.
+        outcomeTokenProgram:
+          type: string
+          nullable: true
+          description: >-
+            Token program that owns `outcomeMint`. Jupiter Forecast uses
+            Token-2022 (`TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb`).
+        marketPda:
+          type: string
+          nullable: true
+          description: On-chain market account (Jupiter Forecast / bisonfi).
+        outcomeSide:
+          type: string
+          nullable: true
+          description: Outcome side for Jupiter Forecast markets (`up` or `down`).
         pricing:
           $ref: "#/components/schemas/MarketPricing"
       required:
@@ -483,6 +504,27 @@ components:
           items:
             type: string
           description: Public keys that must sign the returned transaction
+        execution:
+          $ref: "#/components/schemas/Execution"
+        executionModel:
+          type: string
+          nullable: true
+          description: >-
+            Execution model for the order. `atomic_swap` for Jupiter Forecast
+            (bisonfi) orders, which execute as a single atomic swap through
+            `POST /execute`. `null` for keeper-filled prediction orders.
+        settlement:
+          type: string
+          nullable: true
+          description: >-
+            Settlement mode. `auto` for Jupiter Forecast orders, which settle
+            automatically. `null` for keeper-filled prediction orders.
+        jupiterSwapRequestId:
+          type: string
+          nullable: true
+          description: >-
+            Jupiter swap request id when the order executes as a swap (Jupiter
+            Forecast). `null` otherwise.
         order:
           type: object
           properties:
@@ -650,6 +692,56 @@ components:
           description: Mint address for the deposit token
       required:
         - isBuy
+    Execution:
+      type: object
+      description: >-
+        Execution details returned with an order build. Sign the build's
+        `transaction`, then pass `context` unchanged to `POST /execute`.
+      properties:
+        endpoint:
+          type: string
+          description: Relative execute path. Resolves to `https://api.jup.ag/prediction/v1/execute`.
+          example: /api/v1/execute
+        context:
+          type: object
+          additionalProperties: true
+          description: >-
+            Opaque execution context. Pass this object unchanged to `POST /execute`.
+            Includes a `type` field (`create_order` for keeper-filled orders,
+            `bisonfi_swap` for Jupiter Forecast orders).
+      required:
+        - endpoint
+        - context
+    ExecuteRequest:
+      type: object
+      properties:
+        signedTransaction:
+          type: string
+          description: Base64-encoded signed transaction from the order build.
+        context:
+          type: object
+          additionalProperties: true
+          description: The `execution.context` object from the order build, passed unchanged.
+      required:
+        - signedTransaction
+        - context
+    ExecuteResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Execution status.
+          example: Success
+        signature:
+          type: string
+          nullable: true
+          description: Transaction signature when execution succeeds.
+        error:
+          type: string
+          nullable: true
+          description: Error detail, or `null` on success.
+      required:
+        - status
     Position:
       type: object
       properties:
@@ -1178,10 +1270,11 @@ paths:
             enum:
               - kalshi
               - polymarket
+              - bisonfi
             default: polymarket
-            description: Data provider for events (defaults to polymarket)
+            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
           required: false
-          description: Data provider for events (defaults to polymarket)
+          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
           name: provider
           in: query
         - schema:
@@ -1226,10 +1319,11 @@ paths:
             enum:
               - kalshi
               - polymarket
+              - bisonfi
             default: polymarket
-            description: Data provider for events (defaults to polymarket)
+            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
           required: false
-          description: Data provider for events (defaults to polymarket)
+          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
           name: provider
           in: query
         - schema:
@@ -1404,10 +1498,11 @@ paths:
             enum:
               - kalshi
               - polymarket
+              - bisonfi
             default: polymarket
-            description: Data provider for events (defaults to polymarket)
+            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
           required: false
-          description: Data provider for events (defaults to polymarket)
+          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
           name: provider
           in: query
       responses:
@@ -1657,6 +1752,37 @@ paths:
                 $ref: "#/components/schemas/CreateOrderResponse"
         "400":
           description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /execute:
+    post:
+      tags:
+        - Orders
+      summary: Execute a signed order transaction
+      description: >-
+        Submit a signed order transaction for execution. Pass the base64
+        `signedTransaction` together with the `execution.context` object returned
+        by the order build (`POST /orders`, or `DELETE /positions/{positionPubkey}`
+        for a sell), unchanged. Jupiter Forecast (bisonfi) orders execute as an
+        atomic swap through this endpoint and the transaction signature is
+        returned on success.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExecuteRequest"
+      responses:
+        "200":
+          description: Execution result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExecuteResponse"
+        "400":
+          description: Execution failed or invalid request
           content:
             application/json:
               schema:

@@ -323,6 +323,7 @@ Binary prediction markets for real-world events.
 ### Prediction
 
 - [About Prediction](https://developers.jup.ag/docs/prediction/index.md): Overview of Jupiter Prediction Market
+- [Jupiter Forecast](https://developers.jup.ag/docs/prediction/forecast.md): Jupiter Forecast is a native Solana binary prediction market, currently 15-minute BTC up/down rounds settled from the Chainlink BTC/USD data stream. Forecast markets are exposed under the Prediction API with provider=bisonfi. Two integration paths: (1) Prediction API, GET /prediction/v1/events?provider=bisonfi&category=crypto&tag=15m to discover markets (IDs BISON-<marketPda>-UP / -DOWN, each with an outcomeMint), POST /prediction/v1/orders to build a USDC buy, then sign and POST /prediction/v1/execute with {signedTransaction, context} (executionModel atomic_swap, settlement auto, position appears immediately, no order-status polling), and DELETE /prediction/v1/positions/{positionPubkey} to sell; (2) Swap API, GET /swap/v2/order from USDC to the market outcomeMint then POST /swap/v2/execute, for integrators managing their own position tracking. Deposits are USDC only, minimum 5 USDC. Includes complete TypeScript examples.
 - [Trading Lifecycle](https://developers.jup.ag/docs/prediction/trading-lifecycle.md): Maps the full Jupiter Prediction Market trading flow across endpoints: GET /events or /events/search to discover events, read marketId from event.markets[], GET /markets/{marketId} for pricing, GET /orderbook/{marketId} for depth, GET /trading-status to confirm the exchange is open, POST /orders to place and sign the order, GET /orders/status/{orderPubkey} and GET /positions to track the fill, and POST /positions/{positionPubkey}/claim to settle. Shows call order and the data dependencies between calls. Use this page to understand which endpoints to call in what order before integrating.
 - [Events & Markets](https://developers.jup.ag/docs/prediction/events-and-markets.md): GET /events lists events with filters. GET /events/search searches by keyword. GET /markets/{marketId} returns market details with pricing in micro USD. GET /orderbook/{marketId} provides bid/ask depth.
 - [Open Positions](https://developers.jup.ag/docs/prediction/open-positions.md): POST /orders creates buy orders for YES/NO contracts. Required parameters: ownerPubkey, marketId, isYes, isBuy. Returns base64 transaction to sign and submit to Solana.
@@ -361,6 +362,7 @@ Binary prediction markets for real-world events.
 - [Get Order](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific order
 - [Get Order Status](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get the latest status and history for an order
 - [Create Order](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to create a new order
+- [Execute Order](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Submit a signed order transaction, including Jupiter Forecast orders
 
 #### Positions
 

@@ -116,9 +116,10 @@ To facilitate integration of your DEX into the Jupiter Core Engine:
   ```
 </Accordion>
 
-## Detect Jupiter Frontend Flow
+## More
 
-Trades that originate from the Jupiter frontend (jup.ag) are retail flow. They are non-toxic order flow: not the latency-sensitive, adversarial flow a market maker loses money to. If your propAMM can identify this flow, you can quote it tighter spreads with confidence. This is the mechanism behind [Ultra Signaling](/ultra).
+<Accordion title="Detect Jupiter Frontend Flow">
+Trades that originate from the Jupiter frontend (jup.ag) are retail flow. They are non-toxic order flow and if your propAMM can identify this flow, you can quote it tighter spreads with confidence.
 
 To make that flow verifiable, the Jupiter frontend adds a dedicated signer to every swap transaction and signs the transaction with it:
 
@@ -131,5 +132,4 @@ To detect Jupiter frontend flow, check the transaction's account keys for this a
 <Note>
 Verify the signature, not just the presence of the address. Any sender can add `sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF` to a transaction's account keys, but only the Jupiter frontend can produce a valid signature for it. A transaction that lists the address without a valid signature from it is not Jupiter frontend flow.
 </Note>
-
-For a live example, inspect [this transaction](https://solscan.io/tx/4PUVAsfdagLZcHbxso5w7eH13fnmAmobrRLih5uyqAFjQqRL5TgmVD5Fyrnbfm2mvpEn7dutk9wvGYNZrzQc6tbH), which is signed by `sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF`.
+</Accordion>

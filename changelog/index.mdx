@@ -30,6 +30,19 @@ Integrator-sponsored gas is separate. Setting `payer` to a wallet different from
 - [Order & Execute](/swap/order-and-execute)
 - [Gasless Swaps](/swap/advanced/gasless)
 
+---
+
+## Jupiter Lend: Borrow API
+
+The Jupiter Lend Borrow REST API is now documented. Read borrow vaults and user positions, and build collateralised borrow transactions over HTTP.
+
+- `GET https://api.jup.ag/lend/v1/borrow/vaults` and `GET /borrow/positions` for vault config and user positions
+- `POST /borrow/operate` and `POST /borrow/operate-instructions` build a transaction that creates a position, deposits collateral, borrows, repays, and withdraws using signed `colAmount` and `debtAmount`
+- [Borrow API guide](/lend/borrow/api)
+- [Borrow API reference](/api-reference/lend/borrow/vaults)
+
+---
+
 ## Express Verification: Pay in SOL, USDC, or JUPUSD
 
 The Express Verification API now accepts SOL, USDC, and JUPUSD in addition to JUP. Non-JUP currencies are converted to 1000 JUP via Ultra.

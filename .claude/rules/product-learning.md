@@ -10,6 +10,14 @@ and a future session would benefit from knowing it.
 
 **Format:** Every entry is a dated bullet under the appropriate heading.
 Keep entries concise — one line if possible, a short paragraph if needed.
+Cite the source on a learning where known (e.g. `Source: <repo>/<path>` or the live endpoint),
+so a future session can re-verify it.
+
+**Sources convention:** A product section may open with a `## Sources` subsection naming where
+ground truth lives for that product: the live API host, the OpenAPI spec path in this repo, the
+source-code repo(s), the SDK package, and the first-party FE/backend. The `document-from-source`
+skill reads this to know what to verify against (authority order: live API + on-chain result >
+source code > SDK/FE > docs). Keep it current as a side effect of documenting the product.
 
 ---
 
@@ -113,6 +121,7 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 ## Patterns & Conventions
 
+- [2026-06-29] `/execute` amount fields have two perspectives. `totalInputAmount` and `totalOutputAmount` are wallet-level amounts, while `inputAmountResult` and `outputAmountResult` are swap-route amounts. `feeMint` determines where the fee is reflected: if `feeMint == inputMint`, fee collected in the input mint = `totalInputAmount - inputAmountResult`; if `feeMint == outputMint`, fee collected in the output mint = `outputAmountResult - totalOutputAmount`. Verified live with SOL->USDC and USDC->SOL Swap API V2 executions.
 - [2026-03-17] Code examples provide both @solana/kit and @solana/web3.js variants in `<CodeGroup>` tabs. Kit is listed first as the recommended modern SDK.
 - [2026-03-17] Prerequisites (imports, types, helpers) go in a collapsible `<Accordion>` above the main code example to keep the page scannable.
 - [2026-04-09] `/build` code examples now default to `/submit` as the submission path instead of `sendRawTransaction`. Comments note "or use your own RPC / transaction pipeline" for integrators not using `/submit`.
@@ -240,6 +249,14 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 # Jupiter Lend (Fluid Protocol)
 
+## Sources
+
+- **Live API:** `api.jup.ag/lend/v1` (earn + borrow). Borrow read endpoints returned data without `x-api-key` during DEV-461 testing; confirm before relying on keyless.
+- **OpenAPI spec:** `openapi-spec/lend/lend.yaml` — drifts from live in places (e.g. `InstructionResponse` shape); live wins.
+- **SDK:** `@jup-ag/lend` (build) and `@jup-ag/lend-read` (read). Mainnet-only; amounts are `BN`; subpath exports (`/api`, `/earn`, `/borrow`, `/flashloan`). SDK does not create ATAs (REST does).
+- **First-party FE:** `TeamRaccoons/monorepo` → `apps/jupiter-ui/src/components/Borrowing`. Builds instructions with the SDK and reads vault/position data from Fluid's backend, not the public REST API.
+- **Backend:** `api.solana.fluid.io/v1` (`borrowing/vaults`, `borrowing/users/{addr}/nfts`) — what the FE actually reads from. The public REST surface is not dogfooded by the FE.
+
 ## Architecture
 
 - [2026-03-12] Three on-chain programs: Liquidity Layer (reserves, interest-rate curves), Lending/Earn (jlToken deposits/withdrawals), Vaults/Borrow (position NFTs, collateral, debt). All interactions go through `operate` instructions with operation-specific payloads.
@@ -250,6 +267,21 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 - [2026-03-12] Two integration paths: Lend SDK (`@jup-ag/lend-sdk`) for TypeScript with helper functions, and REST API for language-agnostic access. SDK wraps the same on-chain programs but provides typed helpers like `getDepositIxs`, `getWithdrawIxs`, `getBorrowIxs`.
 - [2026-03-12] SDK deposit/withdraw functions use named parameters (`{ connection, signer, asset, amount }`), not positional args. This was a common source of errors in early examples.
+
+## Borrow REST API (verified live 2026-06-23, DEV-461)
+
+- [2026-06-23] Four routes on `https://api.jup.ag/lend/v1/borrow/*` (no lite-api per decision): `GET /vaults`, `GET /positions?users=a,b` (comma-separated), `POST /operate`, `POST /operate-instructions`. All returned data keyless in testing, but the OpenAPI spec keeps `ApiKeyAuth` to match Earn; docs show the `x-api-key` header.
+- [2026-06-23] `OperatePayload` = `{ vaultId:number, positionId:number, positionOwner?:string, signer:string, colAmount:string, debtAmount:string }`. Single universal endpoint. Signed amounts: `colAmount` >0 deposit / <0 withdraw; `debtAmount` >0 borrow / <0 repay; `0` = no change. `positionId:0` creates a new position NFT.
+- [2026-06-23] Response shapes differ from Earn: `/operate` → `{ nftId, transaction }` (Earn returns only `transaction`). `/operate-instructions` → `{ nftId, instructions[], addressLookupTableAddresses[] }` — an ARRAY of instructions PLUS ALT addresses (Earn `*-instructions` returns a single instruction object, no ALTs). So borrow code must resolve ALTs and build a `VersionedTransaction`.
+- [2026-06-23] **Repay-all / withdraw-all sentinel = `MIN_I128` = `-170141183460469231731687303715884105728`** (string). This is `MAX_REPAY_AMOUNT` / `MAX_WITHDRAW_AMOUNT` in `@jup-ag/lend/borrow` (`= MIN_I128`). Verified: repaying the exact displayed `borrow` leaves interest dust (`dustBorrow`) below `minimumBorrowing` and fails with `VaultUserDebtTooLow` (error 6025 / 0x1789). Use the sentinel to fully clear debt before closing.
+- [2026-06-23] **WSOL-collateral vaults (vault 1, `supplyToken=So111…112`) do NOT auto-wrap native SOL.** The operate tx assumes the user already holds wrapped SOL; depositing without it fails with token-program `insufficient funds` (0x1). Integrators must wrap SOL into the WSOL ATA first.
+- [2026-06-23] Vault risk fields scale: `collateralFactor`/`liquidationThreshold`/`liquidationMaxLimit` map to LTV % (e.g. 800/850/900 = 80/85/90%; JLP vault 850/900/950 = 85/90/95%, matching the "up to 95% LTV" claim). `supplyRate`/`borrowRate` in basis points (487 = 4.87%). `minimumBorrowing`, `borrowable`, `withdrawable` in token base units. Exact oracle/exchange-price scaling documented in `lend/borrow/read-vault-data`.
+- [2026-06-23] Full e2e trace (mainnet, gpl wallet): wrap → `/operate` create+deposit (position 9062) → `/operate-instructions` borrow → `/operate` repay-all (MIN_I128) → `/operate` withdraw-all (MIN_I128), position closed. New-position `/operate` deposit tx = 3 ixs (ComputeBudget + 2× vaults program: PreOperate/init + operate) with 1 ALT.
+- [2026-06-24] **REST `/operate` auto-creates the borrow-token (output) ATA** (verified by closing gpl's USDC ATA, then borrowing 1.05 USDC — it succeeded and the USDC ATA was recreated with the borrowed funds). The ATA is created via CPI *inside* the vaults program (the operate ix itself), NOT as a separate Associated-Token-Account-program instruction (`/operate-instructions` returned a single operate ix, no ATA ix). So REST integrators do NOT add a create-ATA instruction. This is the OPPOSITE of the SDK path: the FE monorepo (`useDepositAndBorrowMutation`/`useRepayAndWithdrawMutation`) adds `getOrCreateATAInstruction` for both supply and borrow mints itself, because `getOperateIx` does not.
+- [2026-06-24] **REST API does not wrap/unwrap native SOL** (both directions verified): WSOL-collateral deposit fails without pre-wrapped SOL (token-program 0x1), and withdrawing WSOL collateral returns *wrapped* SOL to the WSOL ATA (it stays wrapped, caller must close to get native). The FE handles wrap/unwrap only because it uses the SDK path; for deposit it wraps, for native borrow/withdraw it appends a close-WSOL ix, for native repay it wraps the repay amount (+100 lamports buffer on full repay).
+- [2026-06-25] Official borrow OpenAPI received from YY (`jup-lend-borrow.json`) and plugged in as `openapi-spec/lend/borrow.yaml` (its own spec file, NOT merged into `lend.yaml` — the official `LiquiditySupplyData`/`Token` schemas would collide with Earn's). Normalized on import: server changed from `lite-api.jup.ag/lend` to `api.jup.ag/lend/v1` (no lite-api per decision), `/v1/borrow/*` path prefix stripped, `ApiKeyAuth` added to match Earn, and the broken `operate-instructions` example (`addressLookupTableAddresses` was a float, programId was the lending program) fixed to real values. The 4 `api-reference/lend/borrow/*` pages point at `borrow.yaml`.
+- [2026-06-25] **Borrow endpoints accept an optional `market` param: `main` (default) or `ethena`** (query on reads, body on operate). Verified live on api.jup.ag: `market=main` → 78 vaults, `market=ethena` → 3 vaults, no param → 78, `market=bogus` → 400. `GET /borrow/vaults` also accepts an optional `rpcUrl` query param to resolve on-chain vault state via a custom RPC.
+- [2026-06-24] **FE monorepo (`TeamRaccoons/monorepo`, `apps/jupiter-ui/src/components/Borrowing`) does NOT use the public REST borrow endpoints.** It builds instructions with the SDK `getOperateIx` and reads vault/position data from Fluid's backend (`https://api.solana.fluid.io/v1`, paths `borrowing/vaults`, `borrowing/users/{addr}/nfts`), not `api.jup.ag/lend/v1/borrow/*`. It also gates sends behind an address-registration check (`datapi.jup.ag/v1/lend/register`) — a FE/ToS gate, NOT an on-chain requirement (the mainnet e2e succeeded with an unregistered wallet). The FE corroborates operate semantics (signed amounts, `positionId:0`=new, `positionOwner`, MIN_I128 = `MAX_REPAY_AMOUNT`/`MAX_WITHDRAW_AMOUNT` for repay/withdraw-all) but is not a reference for the public REST surface.
 
 ## Terminology
 
@@ -336,3 +368,11 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 
 - [2026-06-30] Published spec has a fourth route, `GET /express/quote` (cost preview without crafting a tx; returns `ExpressQuoteResponse`). Intentionally NOT documented (DEV-672 scoped to existing routes only). It is the cleanest way to preview non-JUP cost; revisit if integrators need it. The local repo spec also omits it.
 - [2026-06-30] Local spec `verification.yaml` lagged the published spec: before DEV-672 it had `senderTwitterHandle` + the metadata `use*` toggles + full craft/execute responses, but not the payment-currency additions. DEV-672 added the payment-currency fields (still no `/express/quote`).
+
+---
+
+# Routing — Frontend Flow Signaling (propAMM)
+
+## Architecture
+
+- [2026-06-30] The Jupiter frontend (jup.ag) appends the dedicated signer `sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF` to swap transactions and signs the transaction with it. PropAMMs detect Jupiter frontend (retail / non-toxic) flow by verifying this signature is present and valid, then quote tighter spreads. This is the technical mechanism behind "Ultra Signaling" (named but not previously explained in `ultra/index.mdx`). Trust model is a real signature, not just the address: only Jupiter holds the private key so it cannot be forged, which is why the address is safe to publish. Documented as a section on `swap/routing/dex-integration.mdx` (DEV-649). Example tx: `4PUVAsfdagLZcHbxso5w7eH13fnmAmobrRLih5uyqAFjQqRL5TgmVD5Fyrnbfm2mvpEn7dutk9wvGYNZrzQc6tbH`.

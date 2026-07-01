@@ -26,7 +26,7 @@ llmsDescription: "Changelog for Jupiter developer APIs, SDKs, and docs. Tracks b
 The Trigger API now documents DCA orders. A DCA order splits one deposit into multiple swaps that run on a fixed schedule, using the same vault, authentication, and deposit flow as price orders.
 
 - Create with `POST /trigger/v2/orders/dca` (`time_based` or `price_conditional`)
-- `orderCount` 2–100, `intervalSeconds` 60s–1 year, minimum 10 USD per round
+- `orderCount` 2 or more, `intervalSeconds` 60s–1 year, currently 10 USD minimum per round
 - Cancel via the two-step withdrawal flow to refund the unfilled remainder
 - [DCA guide](/trigger/dca)
 

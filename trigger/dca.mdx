@@ -157,7 +157,7 @@ The body of `POST /trigger/v2/orders/dca`:
 | `inputMint` | `string` | Yes | Mint of the token to sell. Native SOL is supported (wrapped automatically). Tokens with transfer-fee or transfer-hook extensions are rejected at the deposit step unless whitelisted. |
 | `outputMint` | `string` | Yes | Mint of the token to buy. |
 | `inputAmount` | `string` | Yes | Total amount to DCA, in the input token's smallest unit. Any remainder from uneven division is added to the last round. |
-| `orderCount` | `number` | Yes | Number of rounds. Minimum 2, no fixed maximum (the per-round \$10 minimum effectively caps it at your deposit in USD ÷ 10). |
+| `orderCount` | `number` | Yes | Number of rounds. Minimum 2, no fixed maximum (the current per-round \$10 minimum effectively caps it at your deposit in USD ÷ 10). |
 | `intervalSeconds` | `number` | Yes | Seconds between rounds, from 60 (1 minute) to 31,536,000 (1 year). |
 | `orderType` | `string` | No | `time_based` (default) or `price_conditional`. |
 | `minPriceUsd` | `number` | No | Lower price bound. Price-conditional only. |
@@ -171,7 +171,7 @@ The API validates the request before any funds move, so a rejected order costs n
 
 | Rule | Error on failure |
 | :--- | :--- |
-| Each round worth ≥ \$10 (`inputAmount ÷ orderCount`, \$0.20 tolerance) | `Each order must be at least 10 USD (current value: X USD)` |
+| Each round worth ≥ \$10, currently (the minimum is per-environment; `inputAmount ÷ orderCount`, \$0.20 tolerance) | `Each order must be at least 10 USD (current value: X USD)` |
 | `orderCount` ≥ 2 | `Too small: expected number to be >=2` |
 | `intervalSeconds` between 60 and 31,536,000 | `Too small/big: expected number to be >=60 / <=31536000` |
 | `inputMint` ≠ `outputMint` | `Input mint and output mint cannot be the same` |

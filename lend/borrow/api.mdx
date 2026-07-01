@@ -19,7 +19,7 @@ The Borrow API lets you read borrow vaults and user positions, and build borrow 
 <Accordion title="Dependencies">
 
   ```bash
-  npm install @solana/web3.js@1 # Using v1 of web3.js instead of v2
+  npm install @solana/web3.js@1 @solana/spl-token # web3.js v1; spl-token is used to wrap SOL for WSOL-collateral vaults
   ```
 </Accordion>
 
@@ -57,7 +57,9 @@ const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
 
 ## Markets
 
-All borrow endpoints accept an optional `market` parameter: `main` (default) or `ethena`. Pass it as a query parameter on the read endpoints (`?market=ethena`) or in the body on operate calls. Omitting it uses the `main` market.
+All borrow endpoints accept an optional `market` parameter: `main` (default) or `ethena`. Pass it as a query parameter (`?market=ethena`) on any endpoint, including operate calls. Omitting it uses the `main` market.
+
+Vault and position IDs are scoped to a market. The same `vaultId` refers to a different vault in `main` than in `ethena`, so always pass the same `market` to operate that you used to read the vault or position.
 
 ## Read vault and position data
 
@@ -147,7 +149,7 @@ The API creates the borrow-token associated token account for the `signer` when 
 
 The API does not wrap or unwrap native SOL. This matters whenever a vault's `supplyToken` or `borrowToken` is `So11111111111111111111111111111111111111112` (WSOL):
 
-- **Depositing WSOL collateral:** wrap SOL into your WSOL token account first. Without a funded WSOL account, the deposit fails with a token-program `insufficient funds` error.
+- **Depositing WSOL collateral:** wrap SOL into your WSOL token account first. Without a funded WSOL account, the deposit fails with a token-program `insufficient funds` error. Wrap slightly more than you deposit: depositing your exact WSOL balance can fail because the transfer rounds up by a few base units.
 - **Borrowing or withdrawing WSOL:** you receive wrapped SOL in your WSOL token account. Close the account yourself if you want native SOL back.
 
 <Note>
@@ -258,15 +260,23 @@ import {
     Connection,
     Keypair,
     PublicKey,
+    SystemProgram,
     TransactionMessage,
     TransactionInstruction,
     VersionedTransaction,
 } from "@solana/web3.js";
+import {
+    NATIVE_MINT,
+    getAssociatedTokenAddressSync,
+    createAssociatedTokenAccountIdempotentInstruction,
+    createSyncNativeInstruction,
+} from "@solana/spl-token";
 import fs from "fs";
 
 const API = "https://api.jup.ag/lend/v1";
 const API_KEY = "your-api-key";
 const VAULT_ID = 1; // WSOL collateral -> USDC borrow
+const COLLATERAL_LAMPORTS = 30_000_000; // 0.03 SOL of WSOL collateral
 
 // 1. Load wallet and connection
 const wallet = Keypair.fromSecretKey(
@@ -290,8 +300,30 @@ async function signSend(b64: string, label: string) {
     return sig;
 }
 
-// 2. Create position + deposit collateral via /operate (positionId: 0)
-//    For WSOL vaults, wrap SOL into your WSOL token account first.
+// 2. Wrap SOL into WSOL. Vault 1 uses WSOL collateral and the API does not
+//    wrap native SOL for you. Wrap slightly more than you deposit to cover rounding.
+const wsolAta = getAssociatedTokenAddressSync(NATIVE_MINT, wallet.publicKey);
+const wrapTx = new VersionedTransaction(
+    new TransactionMessage({
+        payerKey: wallet.publicKey,
+        recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+        instructions: [
+            createAssociatedTokenAccountIdempotentInstruction(wallet.publicKey, wsolAta, wallet.publicKey, NATIVE_MINT),
+            SystemProgram.transfer({ fromPubkey: wallet.publicKey, toPubkey: wsolAta, lamports: COLLATERAL_LAMPORTS + 10_000 }),
+            createSyncNativeInstruction(wsolAta),
+        ],
+    }).compileToV0Message()
+);
+wrapTx.sign([wallet]);
+const wrapSig = await connection.sendRawTransaction(wrapTx.serialize(), {
+    skipPreflight: false,
+    maxRetries: 5,
+    preflightCommitment: "confirmed",
+});
+await connection.confirmTransaction(wrapSig, "confirmed");
+console.log(`wrap: https://solscan.io/tx/${wrapSig}`);
+
+// 3. Create position + deposit collateral via /operate (positionId: 0)
 const deposit = await (
     await fetch(`${API}/borrow/operate`, {
         method: "POST",
@@ -300,7 +332,7 @@ const deposit = await (
             vaultId: VAULT_ID,
             positionId: 0,
             signer,
-            colAmount: "30000000", // 0.03 SOL
+            colAmount: String(COLLATERAL_LAMPORTS), // 0.03 WSOL (wrapped above)
             debtAmount: "0",
         }),
     })
@@ -308,7 +340,7 @@ const deposit = await (
 const nftId = deposit.nftId;
 await signSend(deposit.transaction, "deposit");
 
-// 3. Borrow against the position via /operate-instructions
+// 4. Borrow against the position via /operate-instructions
 const borrow = await (
     await fetch(`${API}/borrow/operate-instructions`, {
         method: "POST",

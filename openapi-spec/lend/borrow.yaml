@@ -270,6 +270,18 @@ components:
         nativeStakeVoteAccount:
           type: string
           description: Present on native-stake collateral tokens when applicable.
+        scaledUiConfig:
+          type: object
+          description: Token-2022 scaled-UI-amount config. Present on scaled-UI tokens (e.g. tokenised stocks).
+          properties:
+            authority:
+              type: string
+            multiplier:
+              type: number
+            newMultiplier:
+              type: number
+            newMultiplierEffectiveTimestamp:
+              type: string
     OracleSource:
       required:
       - divisor

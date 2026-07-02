@@ -348,6 +348,26 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 
 ---
 
+# Jupiter Lend AMM
+
+## Sources
+
+- **Upstream docs:** `Instadapp/fluid-contracts-solana` (PRIVATE repo), `dex-deployments` branch — its DEX docs (integration guide + architecture) are the source for `lend/dex/*` (DEV-690). Because the repo is private, the docs pages must stay self-contained: never link to source files there, and don't cite its file paths here (this repo is public).
+- **SDKs:** `@jup-ag/lend-read` (quoting: `Dex.estimateSwapIn`/`estimateSwapOut`) and `@jup-ag/lend/dex` subpath (execution: `getSwapInIx`/`getSwapOutIx`).
+
+## Facts
+
+- [2026-07-02] The product is Fluid's concentrated-liquidity AMM running on the Jupiter Lend Liquidity Layer. Upstream calls it "Fluid DEX"; our docs brand it **Lend AMM** (YY decision, DEV-690; briefly "Jupiter Lend DEX" before YY set the AMM naming). In prose the on-chain program is called the "AMM program"; "dex"/"Dex" appears only in literal code identifiers (accounts, seeds, error names, SDK subpath, file paths). Program IDL: https://solscan.io/account/jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd#programIdl Audience framing: routers/aggregators routing Jupiter Lend as a DEX directly (Jupiter's own routing engine already integrates it). REST endpoints are planned: nav has an "AMM APIs (coming soon)" stub at `lend/dex/api.mdx`; replace the stub when they launch.
+- [2026-07-02] Program addresses: DEX `jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd`, Liquidity Layer `jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC`, Oracle `jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc`.
+- [2026-07-02] Swap-path essentials: `swap_in` (exact-in) / `swap_out` (exact-out) return the counter-amount as Anchor `u64` return data; `token0`/`token1` ordered by pubkey sort; all four supply/borrow position accounts are mandatory for swaps (`None` → 6077) even though deposit/withdraw gate them; external-center-price pools need `[center_price_address, ...sources]` as leading remaining accounts; `ADDRESS_DEAD` (all-zero) recipient is a deliberate simulate-only quoting sentinel (errors 6081/6082).
+- [2026-07-02] SDK availability at time of writing: `@jup-ag/lend-read@0.0.13` (latest) already ships the `Dex` quoting class, but the `./dex` execution subpath only exists in `@jup-ag/lend@0.2.0-beta.2` (`beta` dist-tag), NOT in latest 0.1.10. Upstream doc claims the IDL ships at `@jup-ag/lend/dist/idl/dex.json` — false in both published versions (no idl files in the tarballs), and the public `jup-ag/jupiter-lend` repo `target/idl/` has no `dex.json` either. The IDL IS published on-chain (verified: `anchor idl fetch jupZ4m2…` finds the account; needs Anchor 0.30+ to parse). Docs point CPI integrators at `anchor idl fetch` and note the beta tag on the TypeScript page. Re-check at DEX launch: when 0.2.x hits `latest`, drop the beta-tag Note.
+
+## Content Gaps
+
+- [2026-07-02] Upstream `docs/dex/` pages NOT ported (out of DEV-690 scope): pricing.md, swaps.md (internals), liquidity.md, arbitrage.md, parameters.md, deployments.md, and the top-level integration.md (full instruction surface incl. liquidity actions and `preview_dex_shares`). Port candidates if LP/liquidity-action docs are ever requested.
+
+---
+
 # Swap API V2 — Squads Multisig
 
 ## Architecture

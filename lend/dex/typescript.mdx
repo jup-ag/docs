@@ -1,0 +1,278 @@
+---
+title: "AMM SDK"
+description: "Quote and execute Lend AMM swaps with the @jup-ag/lend-read and @jup-ag/lend TypeScript SDKs."
+llmsDescription: "How to swap against the Jupiter Lend AMM using the TypeScript SDKs: quote off-chain with Dex.estimateSwapIn / estimateSwapOut from @jup-ag/lend-read, derive on-chain slippage guards (amountOutMin / amountInMax), then build and send the swap instruction with getSwapInIx / getSwapOutIx from @jup-ag/lend/dex. Covers the SwapResult quote fields, the builder return shape (ixs, accounts, remainingAccounts, addressLookupTableAccounts), versioned transactions with the pool's address lookup table, compute budget sizing, sending output to a different recipient, exact on-chain quoting via simulation with the ADDRESS_DEAD sentinel, and mapping AnchorError codes like DexNotEnoughAmountOut (6024) and DexExceedsAmountInMax (6051)."
+---
+
+Swapping against the Lend AMM from TypeScript is always three steps:
+
+1. **Quote** the swap off-chain with `@jup-ag/lend-read`.
+2. **Derive a slippage guard** from the quote (`amountOutMin` / `amountInMax`).
+3. **Build and send** the swap instruction with `@jup-ag/lend/dex`.
+
+Two packages, by design:
+
+| Package             | Role                | Swap API                                     |
+| ------------------- | ------------------- | -------------------------------------------- |
+| `@jup-ag/lend-read` | quoting (read-only) | `Dex.estimateSwapIn` / `estimateSwapOut`     |
+| `@jup-ag/lend`      | execution           | `getSwapInIx` / `getSwapOutIx` (from `/dex`) |
+
+## Install
+
+```bash
+npm install @jup-ag/lend @jup-ag/lend-read @solana/web3.js @coral-xyz/anchor bn.js
+```
+
+<Note>
+The `/dex` entry point ships from `@jup-ag/lend` v0.2.0. If the `latest` tag is still older, install the beta tag: `npm install @jup-ag/lend@beta`.
+</Note>
+
+## 1. Request a quote
+
+```typescript
+import { Connection } from "@solana/web3.js";
+import BN from "bn.js";
+import { Dex } from "@jup-ag/lend-read";
+
+const connection = new Connection("https://api.mainnet-beta.solana.com");
+const reader = new Dex(connection); // read-only; accepts a URL string or Connection
+
+const dexId = 1;
+const swap0to1 = true; // token0 -> token1
+
+// Exact-in: paying exactly this many base units of the INPUT token.
+const amountIn = new BN(1_000_000);
+
+const quote = await reader.estimateSwapIn(dexId, swap0to1, amountIn);
+console.log("amountIn ", quote.amountIn.toString());
+console.log("amountOut", quote.amountOut.toString()); // in the OUTPUT token's native units
+```
+
+`estimateSwapIn` / `estimateSwapOut` return a `SwapResult`:
+
+| Field                       | Meaning                                            |
+| --------------------------- | -------------------------------------------------- |
+| `amountIn`                  | input, in the **input token's** native units       |
+| `amountOut`                 | output, in the **output token's** native units     |
+| `colDeposit`, `colWithdraw` | amount routed through the collateral (supply) side |
+| `debtPayback`, `debtBorrow` | amount routed through the debt (borrow) side       |
+| `newPrice`                  | pool price after the swap                          |
+| `centerPrice`               | center price used for the quote                    |
+
+You normally only need `amountIn` / `amountOut`. The `col*` / `debt*` legs are the per-side routing split (they sum to the total) and are exposed for analytics.
+
+The quote is pure math on a fresh snapshot and mirrors the on-chain formulas, so it can `throw` before you build a transaction if the swap would be rejected on-chain, for example when the trade exceeds 50% of the input reserves, falls below the dust floor, or the pool's swaps are paused. Treat a thrown quote as "not executable right now".
+
+### Exact-out quoting
+
+```typescript
+const amountOut = new BN(500_000); // want exactly this many OUTPUT base units
+const quote = await reader.estimateSwapOut(dexId, swap0to1, amountOut);
+// quote.amountIn is what it will cost.
+```
+
+## 2. Derive the slippage guard
+
+The quote is a point-in-time estimate; the pool can move before your transaction lands. Turn the quote into a hard bound the program enforces.
+
+```typescript
+const slippageBps = 50; // 0.50%
+
+// swap_in: floor the output you'll accept.
+const amountOutMin = quote.amountOut
+  .mul(new BN(10_000 - slippageBps))
+  .div(new BN(10_000));
+
+// swap_out: cap the input you'll spend.
+const amountInMax = quote.amountIn
+  .mul(new BN(10_000 + slippageBps))
+  .div(new BN(10_000));
+```
+
+If the market moves past your bound, the swap reverts with [`DexNotEnoughAmountOut` (6024)](/lend/dex/errors) for `swap_in` or [`DexExceedsAmountInMax` (6051)](/lend/dex/errors) for `swap_out`. No funds move.
+
+## 3. Build and send the swap
+
+`getSwapInIx` / `getSwapOutIx` resolve every account for the pool (mints, token programs, reserves, vaults, the four liquidity positions), auto-attach the external center-price accounts when the pool needs them, and load the pool's address lookup table. They return the instruction(s) plus the loaded ALT. You sign and send.
+
+```typescript
+import {
+  PublicKey,
+  VersionedTransaction,
+  TransactionMessage,
+  ComputeBudgetProgram,
+  Keypair,
+} from "@solana/web3.js";
+import { getSwapInIx } from "@jup-ag/lend/dex";
+
+const wallet: Keypair = /* your signer */;
+
+const { ixs, addressLookupTableAccounts } = await getSwapInIx({
+  connection,
+  signer: wallet.publicKey, // a PublicKey; you build and sign the tx yourself
+  dexId,
+  swap0to1,
+  amountIn,
+  amountOutMin,
+  // recipient?: PublicKey  (defaults to signer)
+});
+
+// A routed two-pool swap runs two Liquidity-Layer CPIs + the oracle update,
+// so raise the compute budget above the 200k default.
+const instructions = [
+  ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }),
+  ...ixs,
+];
+
+const { blockhash } = await connection.getLatestBlockhash();
+const message = new TransactionMessage({
+  payerKey: wallet.publicKey,
+  recentBlockhash: blockhash,
+  instructions,
+}).compileToV0Message(addressLookupTableAccounts); // the ALT keeps the tx under size
+
+const tx = new VersionedTransaction(message);
+tx.sign([wallet]);
+const sig = await connection.sendTransaction(tx);
+console.log("swap tx:", sig);
+```
+
+Exact-out is symmetric: `getSwapOutIx` takes `amountOut` + `amountInMax`.
+
+```typescript
+import { getSwapOutIx } from "@jup-ag/lend/dex";
+
+const { ixs, addressLookupTableAccounts } = await getSwapOutIx({
+  connection,
+  signer: wallet.publicKey,
+  dexId,
+  swap0to1,
+  amountOut,
+  amountInMax,
+});
+```
+
+### Return shape
+
+Both builders return:
+
+| Field                         | Use                                                          |
+| ----------------------------- | ------------------------------------------------------------ |
+| `ixs`                         | the swap instruction(s) to include in your transaction       |
+| `accounts`                    | the resolved named accounts (for inspection / composition)   |
+| `remainingAccounts`           | center-price accounts (empty for internal-price pools)       |
+| `addressLookupTableAddresses` | the pool's ALT address(es)                                   |
+| `addressLookupTableAccounts`  | the **loaded** ALT account(s), pass to `compileToV0Message`  |
+
+Because the builders return raw instructions, you can compose a swap with your own instructions (wrap/unwrap SOL, create an ATA, etc.) in the same transaction. Include all of them and pass `addressLookupTableAccounts` when compiling.
+
+### Sending output to a different recipient
+
+Pass `recipient` (a `PublicKey`) to deliver the output elsewhere; the builder derives that owner's ATAs for both mints. The recipient's associated token account for the output mint must already exist (or be created in the same transaction).
+
+```typescript
+await getSwapInIx({
+  connection,
+  signer,
+  dexId,
+  swap0to1,
+  amountIn,
+  amountOutMin,
+  recipient,
+});
+```
+
+## Full example: quote to swap (exact-in)
+
+```typescript
+import {
+  Connection,
+  Keypair,
+  VersionedTransaction,
+  TransactionMessage,
+  ComputeBudgetProgram,
+} from "@solana/web3.js";
+import BN from "bn.js";
+import { Dex } from "@jup-ag/lend-read";
+import { getSwapInIx } from "@jup-ag/lend/dex";
+
+export async function swapExactIn(
+  connection: Connection,
+  wallet: Keypair,
+  dexId: number,
+  swap0to1: boolean,
+  amountIn: BN,
+  slippageBps = 50,
+) {
+  // 1. quote
+  const quote = await new Dex(connection).estimateSwapIn(
+    dexId,
+    swap0to1,
+    amountIn,
+  );
+
+  // 2. slippage guard
+  const amountOutMin = quote.amountOut
+    .mul(new BN(10_000 - slippageBps))
+    .div(new BN(10_000));
+
+  // 3. build & send
+  const { ixs, addressLookupTableAccounts } = await getSwapInIx({
+    connection,
+    signer: wallet.publicKey,
+    dexId,
+    swap0to1,
+    amountIn,
+    amountOutMin,
+  });
+
+  const { blockhash } = await connection.getLatestBlockhash();
+  const msg = new TransactionMessage({
+    payerKey: wallet.publicKey,
+    recentBlockhash: blockhash,
+    instructions: [
+      ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 }),
+      ...ixs,
+    ],
+  }).compileToV0Message(addressLookupTableAccounts);
+
+  const tx = new VersionedTransaction(msg);
+  tx.sign([wallet]);
+  return {
+    sig: await connection.sendTransaction(tx),
+    expectedOut: quote.amountOut,
+    minOut: amountOutMin,
+  };
+}
+```
+
+## Why a versioned transaction and lookup table
+
+A swap touches ~25 fixed accounts, plus the oracle and its price sources for external-center-price pools. A legacy transaction can exceed the 1232-byte limit, so always send a versioned (v0) transaction and pass the pool's ALT (returned by the builders as `addressLookupTableAccounts`). This is not optional for external-center-price pools and is good practice for all of them.
+
+## Exact on-chain quoting via simulation (optional)
+
+`estimateSwapIn` / `estimateSwapOut` are kept in lockstep with the program and are enough for production. If you want the pool's exact on-chain result (for example, to cross-check), build a swap whose recipient is the all-zero pubkey (`PublicKey.default`, the `ADDRESS_DEAD` sentinel) and **simulate** it. The instruction runs the full pricing path and deliberately reverts, logging:
+
+```
+DexSwapInResult: [<swap0to1>, <amount_in>, <amount_out>]
+```
+
+Parse the log from `simulateTransaction`. This never moves funds.
+
+<Warning>
+Never use the `ADDRESS_DEAD` recipient in a real (non-simulated) swap. The instruction always reverts with it.
+</Warning>
+
+## Error handling
+
+Anchor throws an `AnchorError`; read `err.error.errorCode.number` and map it. The full table is in [Errors](/lend/dex/errors); the ones you'll hit most:
+
+| Code | Name                                  | Cause                           | Fix                       |
+| ---- | ------------------------------------- | ------------------------------- | ------------------------- |
+| 6024 | `DexNotEnoughAmountOut`               | price moved past `amountOutMin` | re-quote / widen slippage |
+| 6051 | `DexExceedsAmountInMax`               | price moved past `amountInMax`  | re-quote / widen slippage |
+| 6052 | `DexSwapInLimitingAmounts`            | trade > 50% of input reserves   | split into smaller swaps  |
+| 6060 | `DexLimitingAmountsSwapAndNonPerfect` | amount below the dust floor     | increase size             |
+| 6048 | `DexOracleUpdateHugeSwapDiff`         | swap would move price > 5%      | split into smaller swaps  |
+| 6050 | `DexSwapAndArbitragePaused`           | swaps paused on this pool       | none, pool is paused      |

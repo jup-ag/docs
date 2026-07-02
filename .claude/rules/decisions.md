@@ -24,6 +24,18 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-07-02] Lend AMM integration guide as lend/dex/ ("Lend AMM" nav group)
+**Status:** implemented
+**Scope:** new-section | navigation
+**Files affected:** `lend/dex/index.mdx`, `lend/dex/typescript.mdx`, `lend/dex/api.mdx`, `lend/dex/cpi.mdx`, `lend/dex/errors.mdx`, `docs.json`, `lend/program-addresses.mdx`
+**Linear issue:** DEV-690
+
+**Context:** Fluid (who built Jupiter Lend) published a swap integration guide for their Solana DEX so that routers/aggregators other than Jupiter can route through Jupiter Lend as a DEX. Source is the DEX docs on the `dex-deployments` branch of the private `Instadapp/fluid-contracts-solana` repo.
+**Decision:** Port as a public "Lend AMM" group in the Lend nav, ordered Earn → Borrow → Lend AMM (directly after Borrow, per YY). Page titles: "AMM Overview" (`index`, includes condensed architecture), "AMM SDK" (`typescript`), "AMM APIs" (`api`, coming-soon stub with `sidebarTitle: "AMM APIs (coming soon)"`), "AMM CPI Integration" (`cpi`), "AMM Errors" (`errors`). Product branded **Lend AMM** in prose (was briefly "Jupiter Lend DEX"; renamed per YY). "DEX" is reserved for the on-chain program (the DEX program, `jupZ4m2…`) and code identifiers (`Dex`, `dex_id`, `DexOperation`, `Dex*` error names). File paths stay at `lend/dex/` (match the program name; preview links already shared). No links to the private source repo; pages are self-contained.
+**Rationale:** YY initially asked for preview-link-only, then decided pages go in nav un-hidden, then set the AMM naming convention. 5 source pages collapsed: the standalone architecture page was background the overview half-duplicated, so it was folded into the index. TypeScript and CPI stay separate (distinct audiences, each near the ~200-line split threshold); errors is a shared lookup reference linked from both.
+**Alternatives considered:** (1) Hidden pages (original ask), superseded by YY's call to publish in nav. (2) Merging errors into CPI, rejected because the TypeScript path needs the same table. (3) Porting the full upstream doc set (pricing, swaps internals, liquidity actions), out of scope, swaps only. (4) Renaming paths to `lend/amm/`, rejected to keep preview links stable.
+**Migration notes:** New paths only, no redirects needed.
+
 ### [2026-06-17] Portal nav ordered by developer journey, not feature-vs-reference
 **Status:** implemented
 **Scope:** navigation

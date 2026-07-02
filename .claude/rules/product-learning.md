@@ -10,8 +10,12 @@ and a future session would benefit from knowing it.
 
 **Format:** Every entry is a dated bullet under the appropriate heading.
 Keep entries concise — one line if possible, a short paragraph if needed.
-Cite the source on a learning where known (e.g. `Source: <repo>/<path>` or the live endpoint),
-so a future session can re-verify it.
+Cite the source on a learning where known so a future session can re-verify it.
+
+**This repo is PUBLIC.** Cite private-repo sources at repo + service/component level only
+(e.g. `Source: datapipes search server` or `jup-ag/prediction-market, order dispatch`).
+Never include file paths, directory layouts, or local machine paths from private repos —
+a session with repo access can grep from the description.
 
 **Sources convention:** A product section may open with a `## Sources` subsection naming where
 ground truth lives for that product: the live API host, the OpenAPI spec path in this repo, the
@@ -133,10 +137,10 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 
 ## Undocumented Behavior
 
-- [2026-06-19] `audit.topHoldersPercentage` and `audit.devBalancePercentage` are percentages on a **0-100 scale** (e.g. USDC `topHoldersPercentage=25.07` means 25.07%), NOT 0-1 fractions. Source: `datapipes/internal/pkg/searchserver/asset.go:164` → `topHolders/totalSupply*100`, clamped [0,100]. Verified live (USDC 25.07, SOL 0.586). A DX bounty integrator read it as a fraction and rejected every token with a `> 0.50` filter (DEV-571). Docs now state the scale explicitly.
-- [2026-06-19] `audit.isSus` is serialized `omitempty` in source (`datapipes/.../model/assetupdate.go`), so it is **only present when a token is flagged suspicious** — absence is intentional and is not a guarantee of safety. Confirmed absent on SOL/USDC live. Check field presence, not value.
+- [2026-06-19] `audit.topHoldersPercentage` and `audit.devBalancePercentage` are percentages on a **0-100 scale** (e.g. USDC `topHoldersPercentage=25.07` means 25.07%), NOT 0-1 fractions. Source: `datapipes` search server asset mapping → `topHolders/totalSupply*100`, clamped [0,100]. Verified live (USDC 25.07, SOL 0.586). A DX bounty integrator read it as a fraction and rejected every token with a `> 0.50` filter (DEV-571). Docs now state the scale explicitly.
+- [2026-06-19] `audit.isSus` is serialized `omitempty` in source (`datapipes` asset-update model), so it is **only present when a token is flagged suspicious** — absence is intentional and is not a guarantee of safety. Confirmed absent on SOL/USDC live. Check field presence, not value.
 - [2026-06-19] `/tokens/v2/search?query=` accepts **comma-separated mint addresses, up to 100 per call**, returning full mint info in one request. This is the supported batch-by-mint path; there is no dedicated `/by-mint/:mint` route and one is not needed (DEV-568). Verified live with `SOL,USDC`.
-- [2026-06-19] Tokens stats `priceChange` (stats5m/1h/6h/24h) is a **percentage**, same as Price API `priceChange24h`. Source: `datapipes/internal/pkg/percent/percent.go` → `(new-old)/old*100`.
+- [2026-06-19] Tokens stats `priceChange` (stats5m/1h/6h/24h) is a **percentage**, same as Price API `priceChange24h`. Source: `datapipes` shared percent helper → `(new-old)/old*100`.
 
 ## Ambiguities
 
@@ -154,8 +158,8 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 
 ## Undocumented Behavior
 
-- [2026-06-19] `priceChange24h` is a **percentage** (e.g. SOL `-3.47` = -3.47%), not a 0-1 fraction. Source: `datapipes/.../percent/percent.go`. Already correct in the V3 OpenAPI spec; the `price/index.mdx` prose now annotates it too (DEV-567).
-- [2026-06-19] `/price/v3` **silently omits** mints it cannot price reliably: the mint gets no key at all (not a `null` value), with no error and no per-mint reason string. Source: `datapipes/.../searchserver/query.go` → `if !ok { continue }`; no reason is surfaced internally. Verified live: requested 6 mints (incl. an invalid one), got 4 keys back. Detect dropped mints by diffing requested `ids` against returned keys. Surfacing `{usdPrice: null, reason}` would be an API change; out of docs scope (DEV-566 kept docs-only by decision).
+- [2026-06-19] `priceChange24h` is a **percentage** (e.g. SOL `-3.47` = -3.47%), not a 0-1 fraction. Source: `datapipes` shared percent helper. Already correct in the V3 OpenAPI spec; the `price/index.mdx` prose now annotates it too (DEV-567).
+- [2026-06-19] `/price/v3` **silently omits** mints it cannot price reliably: the mint gets no key at all (not a `null` value), with no error and no per-mint reason string. Source: `datapipes` search server query path → `if !ok { continue }`; no reason is surfaced internally. Verified live: requested 6 mints (incl. an invalid one), got 4 keys back. Detect dropped mints by diffing requested `ids` against returned keys. Surfacing `{usdPrice: null, reason}` would be an API change; out of docs scope (DEV-566 kept docs-only by decision).
 
 ## Ambiguities
 
@@ -217,12 +221,12 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 
 # Jupiter Forecast (BisonFi provider)
 
-Jupiter Forecast is a new in-house primitive: native Solana binary prediction markets, currently 15-minute BTC up/down. All facts below were verified live on 2026-06-29 with two real mainnet trades (buy `4USH17JArjQP5rCFqnEcLND38bwWN9XCe2CMPRpqReRnLBNX8mzQJLgPYT7ZfBvSnXa2ED1JGU7F2b5mytLkW81o`, close `3FzTLzmLNFsSDpjDaUkmuhuTkrrUxrFwNs6gtDTMxmnYyNrCM3n7wfR3dCFDXZFyRdAMQfxSTpvN7QAyd2kdjzPM`), then cross-checked against source on 2026-07-02. E2E scripts: `~/Dev/jup-workbench/forecast-e2e.cjs` + `forecast-close.cjs`.
+Jupiter Forecast is a new in-house primitive: native Solana binary prediction markets, currently 15-minute BTC up/down. All facts below were verified live on 2026-06-29 with two real mainnet trades (buy `4USH17JArjQP5rCFqnEcLND38bwWN9XCe2CMPRpqReRnLBNX8mzQJLgPYT7ZfBvSnXa2ED1JGU7F2b5mytLkW81o`, close `3FzTLzmLNFsSDpjDaUkmuhuTkrrUxrFwNs6gtDTMxmnYyNrCM3n7wfR3dCFDXZFyRdAMQfxSTpvN7QAyd2kdjzPM`), then cross-checked against source on 2026-07-02. E2E scripts: `forecast-e2e.cjs` + `forecast-close.cjs` in the local workbench.
 
 ## Sources
 
 - **Live API:** `api.jup.ag/prediction/v1` — Forecast surfaces via `provider=bisonfi`.
-- **Source code:** `github.com/jup-ag/prediction-market` — the public API is `app/src` (execute route `app/src/api/execute/`, Forecast builds `app/src/services/BisonfiTradeService.ts`, order dispatch + size limits `app/src/services/OrderCreateService.ts`, positions `app/src/services/BisonfiPositionService.ts`, lifecycle `app/src/services/bisonfi-lifecycle.ts`). On-chain indexing lives in `tracker/src/bisonfi/`.
+- **Source code:** `github.com/jup-ag/prediction-market` — the public API app (execute route, Forecast trade builds, order dispatch + size limits, position reads, lifecycle derivation) plus an on-chain indexer for issuer markets and settlement.
 - **OpenAPI spec (this repo):** `openapi-spec/prediction/prediction.yaml`.
 - **Integration gist:** julianfssen gist (0738f0a2546afb1110e0319b763bc29b) — useful walkthrough but drifts from source (stated a 100 USDC max; source enforces 250).
 
@@ -255,9 +259,9 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 ## Open Questions
 
 - ~~[2026-06-29] Is there a max order size?~~ RESOLVED 2026-07-02: 250 USDC, app-side at build, Prediction API path only (see Constraints).
-- ~~[2026-06-29] Do winning Forecast positions auto-settle or require `POST /positions/{pubkey}/claim`?~~ RESOLVED 2026-07-02 from source: **no manual claim.** `BisonfiPositionService` hardcodes `claimable: false` ("observe-only settlement; no claim action in this app") and `claimMethod: "automatic"`; the issuer auto-settles via Token-2022 permanent delegate and v1 indexes only auto-settle markets (`shared/db/src/schemas/bisonfi-details.ts`). Never document a claim step for Forecast.
-- ~~[2026-06-29] Confirm the real round cadence (continuous 15m rotation vs scheduled).~~ RESOLVED 2026-07-02: rounds are created by the issuer program and merely indexed by the tracker (`tracker/src/bisonfi/index-events.ts` polls on-chain every ~4s), so the API cannot promise a cadence — sparse windows (13:45–14:00 then ~18:00) are expected. Docs say "scheduled by the issuer, poll `/events`".
-- [2026-07-02] Source has more breadth wired than what is live/documented: a hidden `GET /events/crypto/timed` route with `subcategory` enum `btc|eth|xrp|sol|hype|doge|bnb` and `tags` enum `5m|15m` (`app/src/api/events/schema.ts`). Only BTC 15m observed live so far; revisit the Forecast page when other assets/intervals launch.
+- ~~[2026-06-29] Do winning Forecast positions auto-settle or require `POST /positions/{pubkey}/claim`?~~ RESOLVED 2026-07-02 from source: **no manual claim.** `BisonfiPositionService` hardcodes `claimable: false` ("observe-only settlement; no claim action in this app") and `claimMethod: "automatic"`; the issuer auto-settles via Token-2022 permanent delegate and v1 indexes only auto-settle markets. Never document a claim step for Forecast.
+- ~~[2026-06-29] Confirm the real round cadence (continuous 15m rotation vs scheduled).~~ RESOLVED 2026-07-02: rounds are created by the issuer program and merely indexed by the API's tracker (polls on-chain every ~4s), so the API cannot promise a cadence — sparse windows (13:45–14:00 then ~18:00) are expected. Docs say "scheduled by the issuer, poll `/events`".
+- [2026-07-02] Source has more breadth wired than what is live/documented: a hidden `GET /events/crypto/timed` route with `subcategory` enum `btc|eth|xrp|sol|hype|doge|bnb` and `tags` enum `5m|15m` (events API schema). Only BTC 15m observed live so far; revisit the Forecast page when other assets/intervals launch.
 
 ---
 
@@ -281,7 +285,7 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 
 ## Source Code
 
-- [2026-03-10] V2 API source: `Documents/Projects/trigger-order/api-v2/` — Hono.js on Cloudflare Workers with Zod OpenAPI validation.
+- [2026-03-10] V2 API source: the `trigger-order` repo (V2 API app) — Hono.js on Cloudflare Workers with Zod OpenAPI validation.
 - [2026-03-10] Vault register returns 200 on success, 409 if vault already exists (not 201 despite the source returning 200 — user confirmed 201 is the intended documented behaviour).
 - [2026-03-10] DCA order routes exist in source (`/orders/dca/`) but are intentionally excluded from docs.
 - [2026-03-10] Vault link routes (`/vault/link`) exist but are hidden/internal.
@@ -300,7 +304,7 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 - **Live API:** `api.jup.ag/lend/v1` (earn + borrow). Borrow read endpoints returned data without `x-api-key` during DEV-461 testing; confirm before relying on keyless.
 - **OpenAPI spec:** `openapi-spec/lend/lend.yaml` — drifts from live in places (e.g. `InstructionResponse` shape); live wins.
 - **SDK:** `@jup-ag/lend` (build) and `@jup-ag/lend-read` (read). Mainnet-only; amounts are `BN`; subpath exports (`/api`, `/earn`, `/borrow`, `/flashloan`). SDK does not create ATAs (REST does).
-- **First-party FE:** `TeamRaccoons/monorepo` → `apps/jupiter-ui/src/components/Borrowing`. Builds instructions with the SDK and reads vault/position data from Fluid's backend, not the public REST API.
+- **First-party FE:** `TeamRaccoons/monorepo` (jupiter-ui Borrowing components). Builds instructions with the SDK and reads vault/position data from Fluid's backend, not the public REST API.
 - **Backend:** `api.solana.fluid.io/v1` (`borrowing/vaults`, `borrowing/users/{addr}/nfts`) — what the FE actually reads from. The public REST surface is not dogfooded by the FE.
 
 ## Architecture
@@ -327,7 +331,7 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 - [2026-06-24] **REST API does not wrap/unwrap native SOL** (both directions verified): WSOL-collateral deposit fails without pre-wrapped SOL (token-program 0x1), and withdrawing WSOL collateral returns *wrapped* SOL to the WSOL ATA (it stays wrapped, caller must close to get native). The FE handles wrap/unwrap only because it uses the SDK path; for deposit it wraps, for native borrow/withdraw it appends a close-WSOL ix, for native repay it wraps the repay amount (+100 lamports buffer on full repay).
 - [2026-06-25] Official borrow OpenAPI received from YY (`jup-lend-borrow.json`) and plugged in as `openapi-spec/lend/borrow.yaml` (its own spec file, NOT merged into `lend.yaml` — the official `LiquiditySupplyData`/`Token` schemas would collide with Earn's). Normalized on import: server changed from `lite-api.jup.ag/lend` to `api.jup.ag/lend/v1` (no lite-api per decision), `/v1/borrow/*` path prefix stripped, `ApiKeyAuth` added to match Earn, and the broken `operate-instructions` example (`addressLookupTableAddresses` was a float, programId was the lending program) fixed to real values. The 4 `api-reference/lend/borrow/*` pages point at `borrow.yaml`.
 - [2026-06-25] **Borrow endpoints accept an optional `market` param: `main` (default) or `ethena`** (query on reads, body on operate). Verified live on api.jup.ag: `market=main` → 78 vaults, `market=ethena` → 3 vaults, no param → 78, `market=bogus` → 400. `GET /borrow/vaults` also accepts an optional `rpcUrl` query param to resolve on-chain vault state via a custom RPC.
-- [2026-06-24] **FE monorepo (`TeamRaccoons/monorepo`, `apps/jupiter-ui/src/components/Borrowing`) does NOT use the public REST borrow endpoints.** It builds instructions with the SDK `getOperateIx` and reads vault/position data from Fluid's backend (`https://api.solana.fluid.io/v1`, paths `borrowing/vaults`, `borrowing/users/{addr}/nfts`), not `api.jup.ag/lend/v1/borrow/*`. It also gates sends behind an address-registration check (`datapi.jup.ag/v1/lend/register`) — a FE/ToS gate, NOT an on-chain requirement (the mainnet e2e succeeded with an unregistered wallet). The FE corroborates operate semantics (signed amounts, `positionId:0`=new, `positionOwner`, MIN_I128 = `MAX_REPAY_AMOUNT`/`MAX_WITHDRAW_AMOUNT` for repay/withdraw-all) but is not a reference for the public REST surface.
+- [2026-06-24] **FE monorepo (`TeamRaccoons/monorepo`, jupiter-ui Borrowing components) does NOT use the public REST borrow endpoints.** It builds instructions with the SDK `getOperateIx` and reads vault/position data from Fluid's backend (`https://api.solana.fluid.io/v1`, paths `borrowing/vaults`, `borrowing/users/{addr}/nfts`), not `api.jup.ag/lend/v1/borrow/*`. It also gates sends behind an address-registration check (`datapi.jup.ag/v1/lend/register`) — a FE/ToS gate, NOT an on-chain requirement (the mainnet e2e succeeded with an unregistered wallet). The FE corroborates operate semantics (signed amounts, `positionId:0`=new, `positionOwner`, MIN_I128 = `MAX_REPAY_AMOUNT`/`MAX_WITHDRAW_AMOUNT` for repay/withdraw-all) but is not a reference for the public REST surface.
 
 ## Terminology
 
@@ -362,8 +366,8 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 
 ## Source of Truth
 
-- [2026-04-06] Canonical endpoint docs: `github.com/jup-ag/squads-integration-ultra-test/blob/main/app/squads-endpoint-docs.md`
-- [2026-04-06] API source code: `github.com/jup-ag/ultra-api/tree/main/src/routes/squads`
+- [2026-04-06] Canonical endpoint docs: `squads-endpoint-docs.md` in `github.com/jup-ag/squads-integration-ultra-test`
+- [2026-04-06] API source code: `github.com/jup-ag/ultra-api` (squads routes)
 
 ---
 
@@ -402,7 +406,7 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 
 ## Multi-Currency Payment
 
-- [2026-06-30] `paymentCurrency` is a token symbol: `JUP` (default), `SOL`, `USDC`, or `JUPUSD` (not a mint). JUP transfers directly (Ultra `/transfer/craft-token`). Non-JUP swaps to JUP (Ultra `/order`): the backend works out how much input buys 1000 JUP, adds a 50 bps buffer (`SIZING_BUFFER_BPS`), and swaps that fixed amount, so the output is a little above 1000 JUP. Mints: JUP `JUPyiwr…`, SOL `So111…112`, USDC `EPjF…Dt1v`, JUPUSD `Juprjzn…55USD`. Source: `vrfd/hub-api/apps/token-verification/src/routes/combined/{craftExpressTxn,executeExpressTxn,helpers}.ts`.
+- [2026-06-30] `paymentCurrency` is a token symbol: `JUP` (default), `SOL`, `USDC`, or `JUPUSD` (not a mint). JUP transfers directly (Ultra `/transfer/craft-token`). Non-JUP swaps to JUP (Ultra `/order`): the backend works out how much input buys 1000 JUP, adds a 50 bps buffer (`SIZING_BUFFER_BPS`), and swaps that fixed amount, so the output is a little above 1000 JUP. Mints: JUP `JUPyiwr…`, SOL `So111…112`, USDC `EPjF…Dt1v`, JUPUSD `Juprjzn…55USD`. Source: `vrfd/hub-api` token-verification service (combined express-txn routes).
 - [2026-06-30] On non-JUP paths, `craft-txn` also returns `inputMint`, `inputDecimals`, `quotedInputAmount`, `maxInputAmount`. `quotedInputAmount` and `maxInputAmount` are the same value (the swap input is fixed). `mint`/`amount` stay JUP: `amount` is a little above 1000 JUP on swaps, exactly `1000000000` on the JUP path. `feeLamports`/`feeAmount` are 0 on swap paths.
 - [2026-06-30] `execute` body adds `paymentCurrency`, `paymentAmount`, `jupOutputAmount`. `paymentAmount` (atomic input paid) is required for non-JUP — the API returns 400 without it. `jupOutputAmount` (the craft `amount`) is optional and only used for revenue reporting. Use craft `quotedInputAmount` for `paymentAmount`. `paymentCurrency` must match what craft-txn used.
 

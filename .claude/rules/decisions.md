@@ -24,6 +24,18 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-07-02] Jupiter Lend DEX integration guide as lend/dex/ with 4 pages
+**Status:** implemented
+**Scope:** new-section | navigation
+**Files affected:** `lend/dex/index.mdx`, `lend/dex/typescript.mdx`, `lend/dex/cpi.mdx`, `lend/dex/errors.mdx`, `docs.json`, `lend/program-addresses.mdx`
+**Linear issue:** DEV-690
+
+**Context:** Fluid (who built Jupiter Lend) published a swap integration guide for their Solana DEX so that routers/aggregators other than Jupiter can route through Jupiter Lend as a DEX. Source is the private `Instadapp/fluid-contracts-solana` repo (`dex-deployments` branch, `docs/dex/integration/` + `architecture.md`).
+**Decision:** Port as a public "DEX Integration" group in the Lend nav (between Liquidity and Advanced), 4 pages: `index` (overview + condensed architecture), `typescript`, `cpi`, `errors`. Branded "Jupiter Lend DEX" (upstream says "Fluid DEX"). No links to the private source repo; pages are self-contained.
+**Rationale:** YY initially asked for preview-link-only, then decided pages go in nav un-hidden. 5 pages collapsed to 4: the standalone architecture page was background the overview half-duplicated, so it was folded into the index. TypeScript and CPI stay separate (distinct audiences, each near the ~200-line split threshold); errors is a shared lookup reference linked from both.
+**Alternatives considered:** (1) Hidden pages (original ask), superseded by YY's call to publish in nav. (2) Merging errors into CPI, rejected because the TypeScript path needs the same table. (3) Porting the full upstream doc set (pricing, swaps internals, liquidity actions), out of scope, swaps only.
+**Migration notes:** New paths only, no redirects needed.
+
 ### [2026-06-17] Portal nav ordered by developer journey, not feature-vs-reference
 **Status:** implemented
 **Scope:** navigation

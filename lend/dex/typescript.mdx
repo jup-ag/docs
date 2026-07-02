@@ -1,10 +1,10 @@
 ---
-title: "TypeScript Swap Integration"
-description: "Quote and execute swaps against the Jupiter Lend DEX with @jup-ag/lend-read and @jup-ag/lend."
-llmsDescription: "How to swap against the Jupiter Lend DEX from TypeScript: quote off-chain with Dex.estimateSwapIn / estimateSwapOut from @jup-ag/lend-read, derive on-chain slippage guards (amountOutMin / amountInMax), then build and send the swap instruction with getSwapInIx / getSwapOutIx from @jup-ag/lend/dex. Covers the SwapResult quote fields, the builder return shape (ixs, accounts, remainingAccounts, addressLookupTableAccounts), versioned transactions with the pool's address lookup table, compute budget sizing, sending output to a different recipient, exact on-chain quoting via simulation with the ADDRESS_DEAD sentinel, and mapping AnchorError codes like DexNotEnoughAmountOut (6024) and DexExceedsAmountInMax (6051)."
+title: "AMM SDK"
+description: "Quote and execute Lend AMM swaps with the @jup-ag/lend-read and @jup-ag/lend TypeScript SDKs."
+llmsDescription: "How to swap against the Jupiter Lend AMM (on-chain DEX program) using the TypeScript SDKs: quote off-chain with Dex.estimateSwapIn / estimateSwapOut from @jup-ag/lend-read, derive on-chain slippage guards (amountOutMin / amountInMax), then build and send the swap instruction with getSwapInIx / getSwapOutIx from @jup-ag/lend/dex. Covers the SwapResult quote fields, the builder return shape (ixs, accounts, remainingAccounts, addressLookupTableAccounts), versioned transactions with the pool's address lookup table, compute budget sizing, sending output to a different recipient, exact on-chain quoting via simulation with the ADDRESS_DEAD sentinel, and mapping AnchorError codes like DexNotEnoughAmountOut (6024) and DexExceedsAmountInMax (6051)."
 ---
 
-Swapping against the Jupiter Lend DEX from TypeScript is always three steps:
+Swapping against the Lend AMM from TypeScript is always three steps:
 
 1. **Quote** the swap off-chain with `@jup-ag/lend-read`.
 2. **Derive a slippage guard** from the quote (`amountOutMin` / `amountInMax`).

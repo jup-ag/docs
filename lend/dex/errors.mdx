@@ -1,10 +1,10 @@
 ---
-title: "DEX Swap Errors"
-description: "Error codes on the Jupiter Lend DEX swap path, what triggers them, and how to handle them."
-llmsDescription: "Reference table of Jupiter Lend DEX program errors on the swap path. Covers slippage errors (DexNotEnoughAmountOut 6024, DexExceedsAmountInMax 6051), size and dust limits (DexSwapInLimitingAmounts 6052, DexSwapOutLimitingAmounts 6053, DexLimitingAmountsSwapAndNonPerfect 6060, DexOracleUpdateHugeSwapDiff 6048), reserve and utilization errors (6022, 6057, 6058, 6059, 6025, 6023), pool state errors (DexSwapAndArbitragePaused 6050, DexAlreadyEntered 6017, 6021, 6019, 6020), external center-price errors (6067, 6068, 6056), CPI account errors (DexValidateInvalidLiquidityPosition 6077, 6078, 6066, 6079), the intentional simulation sentinels (DexSwapInResult 6081, DexSwapOutResult 6082), and how to read the custom error code from a failed transaction in TypeScript or CPI."
+title: "AMM Errors"
+description: "Error codes on the Lend AMM swap path, what triggers them, and how to handle them."
+llmsDescription: "Reference table of Jupiter Lend AMM (on-chain DEX program) errors on the swap path. Covers slippage errors (DexNotEnoughAmountOut 6024, DexExceedsAmountInMax 6051), size and dust limits (DexSwapInLimitingAmounts 6052, DexSwapOutLimitingAmounts 6053, DexLimitingAmountsSwapAndNonPerfect 6060, DexOracleUpdateHugeSwapDiff 6048), reserve and utilization errors (6022, 6057, 6058, 6059, 6025, 6023), pool state errors (DexSwapAndArbitragePaused 6050, DexAlreadyEntered 6017, 6021, 6019, 6020), external center-price errors (6067, 6068, 6056), CPI account errors (DexValidateInvalidLiquidityPosition 6077, 6078, 6066, 6079), the intentional simulation sentinels (DexSwapInResult 6081, DexSwapOutResult 6082), and how to read the custom error code from a failed transaction in TypeScript or CPI."
 ---
 
-These are the DEX program errors an integrator can hit on the **swap path** of the Jupiter Lend DEX. Codes are the Anchor custom-error numbers (the program's error enum starts at `6000`); the name is the `ErrorCodes` variant. The on-chain message string is the SCREAMING_SNAKE form of the name (e.g. `DEX_NOT_ENOUGH_AMOUNT_OUT`).
+These are the DEX program errors an integrator can hit on the **swap path** of the Lend AMM. Codes are the Anchor custom-error numbers (the program's error enum starts at `6000`); the name is the `ErrorCodes` variant. The on-chain message string is the SCREAMING_SNAKE form of the name (e.g. `DEX_NOT_ENOUGH_AMOUNT_OUT`).
 
 ## Slippage
 

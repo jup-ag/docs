@@ -4,7 +4,7 @@ description: "Route swaps directly through the Jupiter Lend DEX, a concentrated-
 llmsDescription: "Overview of integrating swaps against the Jupiter Lend DEX on Solana, a concentrated-liquidity AMM built on the Jupiter Lend Liquidity Layer. Covers pool shapes (collateral pool, debt pool, collateral + debt), the swap_in (exact-in) and swap_out (exact-out) instructions, slippage guards enforced on-chain, token0/token1 pubkey ordering, native-unit amounts, pool-favouring rounding, dex_id pool addressing, program addresses (DEX jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd, Liquidity Layer jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC, Oracle jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc), PDA seeds, and how pools sit on the Liquidity Layer (shares, interest accrual, re-entrancy, pausing). Entry point for routers, aggregators, and on-chain programs that want to route swaps through Jupiter Lend as a DEX via the TypeScript SDKs or Rust CPI."
 ---
 
-The Jupiter Lend DEX is a concentrated-liquidity AMM that runs on top of the Jupiter Lend Liquidity Layer. The Jupiter routing engine already routes through it. This guide is for routers, aggregators, and on-chain programs that want to swap against the DEX directly.
+The Jupiter Lend DEX is a concentrated-liquidity AMM that runs on top of the Jupiter Lend Liquidity Layer. This guide is for routers, aggregators, and on-chain programs that want to swap against the DEX directly.
 
 The guide is self-contained: the on-chain behaviour relevant to swaps is described here, and the SDKs mirror it. You do not need access to the program source. It covers the two paths integrators build on:
 

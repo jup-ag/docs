@@ -1,14 +1,14 @@
 ---
 title: "AMM CPI Integration"
 description: "Call swap_in and swap_out on the Lend AMM from your own Solana program via CPI."
-llmsDescription: "How to swap against the Jupiter Lend AMM (on-chain DEX program) from an on-chain Solana program via cross-program invocation (CPI). Covers generating the CPI client from the published IDL with Anchor's declare_program! macro, the full 25-account DexOperation context in exact order, why all four supply/borrow position accounts are mandatory for swaps, reading the u64 return value with .get(), signing as a PDA with new_with_signer, passing external center-price oracle accounts as remaining accounts, Token-2022 handling, compute budget sizing, and a raw instruction recipe (discriminators and Borsh argument layout) for non-Anchor programs. DEX program id jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd."
+llmsDescription: "How to swap against the Jupiter Lend AMM from an on-chain Solana program via cross-program invocation (CPI). Covers generating the CPI client from the published IDL with Anchor's declare_program! macro, the full 25-account DexOperation context in exact order, why all four supply/borrow position accounts are mandatory for swaps, reading the u64 return value with .get(), signing as a PDA with new_with_signer, passing external center-price oracle accounts as remaining accounts, Token-2022 handling, compute budget sizing, and a raw instruction recipe (discriminators and Borsh argument layout) for non-Anchor programs. AMM program id jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd."
 ---
 
-This page is for **on-chain** integrators: programs that swap against the Lend AMM as part of their own instruction (a vault, router, strategy, or aggregator hop). You invoke `swap_in` / `swap_out` on the DEX program and read the returned amount.
+This page is for **on-chain** integrators: programs that swap against the Lend AMM as part of their own instruction (a vault, router, strategy, or aggregator hop). You invoke `swap_in` / `swap_out` on the AMM program and read the returned amount.
 
-You do not need the DEX program's source crate. Anchor's `declare_program!` macro generates a full CPI client from the published **IDL**, which is published on-chain. If you're not on Anchor, a raw instruction recipe is at the [bottom](#raw-instruction-without-anchor).
+You do not need the AMM program's source crate. Anchor's `declare_program!` macro generates a full CPI client from the program's published [IDL](https://solscan.io/account/jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd#programIdl). If you're not on Anchor, a raw instruction recipe is at the [bottom](#raw-instruction-without-anchor).
 
-DEX program id: `jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd`.
+AMM program id: `jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd`.
 
 ## Generate the CPI client from the IDL
 
@@ -168,6 +168,6 @@ If you can't use `declare_program!`, build the instruction by hand. Discriminato
 
 `bool` is 1 byte (`0`/`1`); each `u64` is 8 bytes little-endian. So the data is `discriminator ++ [swap0to1] ++ amount_a.to_le_bytes() ++ amount_b.to_le_bytes()` (17 bytes of args).
 
-Account metas follow the [25-account order above](#the-account-context-dexoperation) with the listed `signer` / `writable` flags, then any center-price remaining accounts (all readonly). For an **omitted optional** account (`recipient` when you want output to go to the signer), pass the **DEX program id** as the placeholder pubkey (readonly, non-signer) in that slot. This is the Anchor convention for `None`. Then `invoke` / `invoke_signed` the `Instruction`.
+Account metas follow the [25-account order above](#the-account-context-dexoperation) with the listed `signer` / `writable` flags, then any center-price remaining accounts (all readonly). For an **omitted optional** account (`recipient` when you want output to go to the signer), pass the **AMM program id** as the placeholder pubkey (readonly, non-signer) in that slot. This is the Anchor convention for `None`. Then `invoke` / `invoke_signed` the `Instruction`.
 
 See [Errors](/lend/dex/errors) for the full swap-path error table.

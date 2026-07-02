@@ -1,7 +1,7 @@
 ---
 title: "AMM Overview"
 description: "Route swaps directly through the Lend AMM, Jupiter Lend's concentrated-liquidity AMM on the Liquidity Layer."
-llmsDescription: "Overview of integrating swaps against the Jupiter Lend AMM (on-chain DEX program) on Solana, a concentrated-liquidity AMM built on the Jupiter Lend Liquidity Layer. Covers pool shapes (collateral pool, debt pool, collateral + debt), the swap_in (exact-in) and swap_out (exact-out) instructions, slippage guards enforced on-chain, token0/token1 pubkey ordering, native-unit amounts, pool-favouring rounding, dex_id pool addressing, program addresses (DEX jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd, Liquidity Layer jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC, Oracle jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc), PDA seeds, and how pools sit on the Liquidity Layer (shares, interest accrual, re-entrancy, pausing). Entry point for routers, aggregators, and on-chain programs that want to route swaps through Jupiter Lend as a DEX via the TypeScript SDKs or Rust CPI."
+llmsDescription: "Overview of integrating swaps against the Jupiter Lend AMM on Solana, a concentrated-liquidity AMM built on the Jupiter Lend Liquidity Layer. Covers pool shapes (collateral pool, debt pool, collateral + debt), the swap_in (exact-in) and swap_out (exact-out) instructions, slippage guards enforced on-chain, token0/token1 pubkey ordering, native-unit amounts, pool-favouring rounding, dex_id pool addressing, program addresses (Lend AMM jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd, Liquidity Layer jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC, Oracle jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc), PDA seeds, and how pools sit on the Liquidity Layer (shares, interest accrual, re-entrancy, pausing). Entry point for routers, aggregators, and on-chain programs that want to route swaps through Jupiter Lend as a DEX via the TypeScript SDKs or Rust CPI."
 ---
 
 The Lend AMM is a concentrated-liquidity AMM that runs on top of the Jupiter Lend Liquidity Layer. This guide is for routers, aggregators, and on-chain programs that want to swap against the AMM directly.
@@ -52,22 +52,20 @@ For swapping you don't need to care which shape a pool is. The program routes ac
 
 ## Program addresses
 
-The AMM's on-chain program is the **DEX program**. Prose and account names below use DEX where they refer to this program.
-
 | Program         | Address                                       |
 | --------------- | --------------------------------------------- |
-| DEX             | `jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd` |
+| Lend AMM        | `jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd` |
 | Liquidity Layer | `jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC` |
 | Oracle          | `jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc` |
 
 ## PDAs
 
-The AMM's own PDAs are derived against the **DEX** program id; the Liquidity Layer accounts a swap touches are derived against the **Liquidity Layer** program id. Seeds (all strings are ASCII bytes; `dex_id` is a little-endian `u16`):
+The AMM's own PDAs are derived against the **Lend AMM** program id; the Liquidity Layer accounts a swap touches are derived against the **Liquidity Layer** program id. Seeds (all strings are ASCII bytes; `dex_id` is a little-endian `u16`):
 
 | Account              | Program   | Seeds                                 |
 | -------------------- | --------- | ------------------------------------- |
-| Dex (pool)           | DEX       | `["dex", dex_id]`                     |
-| DexMetadata          | DEX       | `["dex_metadata", dex_id]`            |
+| Dex (pool)           | Lend AMM  | `["dex", dex_id]`                     |
+| DexMetadata          | Lend AMM  | `["dex_metadata", dex_id]`            |
 | Reserve              | Liquidity | `["reserve", mint]`                   |
 | Rate model           | Liquidity | `["rate_model", mint]`                |
 | User supply position | Liquidity | `["user_supply_position", mint, dex]` |

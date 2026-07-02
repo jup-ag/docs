@@ -1,10 +1,10 @@
 ---
 title: "AMM Errors"
 description: "Error codes on the Lend AMM swap path, what triggers them, and how to handle them."
-llmsDescription: "Reference table of Jupiter Lend AMM (on-chain DEX program) errors on the swap path. Covers slippage errors (DexNotEnoughAmountOut 6024, DexExceedsAmountInMax 6051), size and dust limits (DexSwapInLimitingAmounts 6052, DexSwapOutLimitingAmounts 6053, DexLimitingAmountsSwapAndNonPerfect 6060, DexOracleUpdateHugeSwapDiff 6048), reserve and utilization errors (6022, 6057, 6058, 6059, 6025, 6023), pool state errors (DexSwapAndArbitragePaused 6050, DexAlreadyEntered 6017, 6021, 6019, 6020), external center-price errors (6067, 6068, 6056), CPI account errors (DexValidateInvalidLiquidityPosition 6077, 6078, 6066, 6079), the intentional simulation sentinels (DexSwapInResult 6081, DexSwapOutResult 6082), and how to read the custom error code from a failed transaction in TypeScript or CPI."
+llmsDescription: "Reference table of Jupiter Lend AMM program errors on the swap path. Covers slippage errors (DexNotEnoughAmountOut 6024, DexExceedsAmountInMax 6051), size and dust limits (DexSwapInLimitingAmounts 6052, DexSwapOutLimitingAmounts 6053, DexLimitingAmountsSwapAndNonPerfect 6060, DexOracleUpdateHugeSwapDiff 6048), reserve and utilization errors (6022, 6057, 6058, 6059, 6025, 6023), pool state errors (DexSwapAndArbitragePaused 6050, DexAlreadyEntered 6017, 6021, 6019, 6020), external center-price errors (6067, 6068, 6056), CPI account errors (DexValidateInvalidLiquidityPosition 6077, 6078, 6066, 6079), the intentional simulation sentinels (DexSwapInResult 6081, DexSwapOutResult 6082), and how to read the custom error code from a failed transaction in TypeScript or CPI."
 ---
 
-These are the DEX program errors an integrator can hit on the **swap path** of the Lend AMM. Codes are the Anchor custom-error numbers (the program's error enum starts at `6000`); the name is the `ErrorCodes` variant. The on-chain message string is the SCREAMING_SNAKE form of the name (e.g. `DEX_NOT_ENOUGH_AMOUNT_OUT`).
+These are the AMM program errors an integrator can hit on the **swap path** of the Lend AMM. Codes are the Anchor custom-error numbers (the program's error enum starts at `6000`); the name is the `ErrorCodes` variant. The on-chain message string is the SCREAMING_SNAKE form of the name (e.g. `DEX_NOT_ENOUGH_AMOUNT_OUT`).
 
 ## Slippage
 
@@ -74,4 +74,4 @@ These are **intentional**: the off-chain quote-by-simulation path (see [TypeScri
 ## Reading the code from a failed transaction
 
 - **TypeScript:** Anchor throws an `AnchorError`; read `err.error.errorCode.number` (e.g. `6024`) and `err.error.errorMessage`. Raw logs contain `Program ... failed: custom program error: 0x1798`, which is the code in hex: `0x1798` = `6040`, `6024` = `0x1788`.
-- **CPI:** the inner error propagates to your program. Wrap the `dex::cpi::*` call in a `match` and map the failure to your own error if you want a cleaner message; otherwise let it bubble up and the transaction fails with the DEX code above.
+- **CPI:** the inner error propagates to your program. Wrap the `dex::cpi::*` call in a `match` and map the failure to your own error if you want a cleaner message; otherwise let it bubble up and the transaction fails with the error code above.

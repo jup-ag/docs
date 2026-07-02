@@ -79,19 +79,22 @@ A DEX pool holds no token balances of its own. It is registered as a protocol on
 - The **collateral pool** is a pair of Liquidity Layer **supply** positions (one for `token0`, one for `token1`). Liquidity providers deposit, and the supplied tokens earn the lending supply rate while also serving swaps.
 - The **debt pool** is a pair of Liquidity Layer **borrow** positions. Borrowers draw debt against the pool, and that outstanding debt is itself the liquidity a swap trades against.
 
-```
-            ┌──────────────────────────────────────────────┐
-            │                  DEX pool                     │
-            │   token0 / token1, center price, ranges,      │
-            │   fee, shares, oracle state                   │
-            └───────────────┬───────────────┬──────────────┘
-                            │ CPI           │ CPI
-              supply legs   ▼               ▼   borrow legs
-            ┌──────────────────────────────────────────────┐
-            │              Liquidity Layer                  │
-            │  token0 supply pos   token0 borrow pos        │
-            │  token1 supply pos   token1 borrow pos        │
-            └──────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+  DEX["DEX pool<br/>token0 / token1, center price, ranges,<br/>fee, shares, oracle state"]
+  subgraph LL["Liquidity Layer"]
+    direction LR
+    subgraph COL["Collateral pool"]
+      S0["token0 supply position"]
+      S1["token1 supply position"]
+    end
+    subgraph DEBT["Debt pool"]
+      B0["token0 borrow position"]
+      B1["token1 borrow position"]
+    end
+  end
+  DEX -- "CPI (supply legs)" --> COL
+  DEX -- "CPI (borrow legs)" --> DEBT
 ```
 
 Every swap drives this CPI flow: the DEX computes amounts, then calls the Liquidity Layer to move the actual tokens and update the positions. Because the reserves are Liquidity Layer positions, they carry exchange prices (interest accrual): the DEX converts raw position amounts into current-value amounts before doing any AMM math, so a pool reflects accrued interest automatically.

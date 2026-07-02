@@ -215,6 +215,52 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 
 ---
 
+# Jupiter Forecast (BisonFi provider)
+
+Jupiter Forecast is a new in-house primitive: native Solana binary prediction markets, currently 15-minute BTC up/down. All facts below were verified live on 2026-06-29 with two real mainnet trades (buy `4USH17JArjQP5rCFqnEcLND38bwWN9XCe2CMPRpqReRnLBNX8mzQJLgPYT7ZfBvSnXa2ED1JGU7F2b5mytLkW81o`, close `3FzTLzmLNFsSDpjDaUkmuhuTkrrUxrFwNs6gtDTMxmnYyNrCM3n7wfR3dCFDXZFyRdAMQfxSTpvN7QAyd2kdjzPM`), then cross-checked against source on 2026-07-02. E2E scripts: `~/Dev/jup-workbench/forecast-e2e.cjs` + `forecast-close.cjs`.
+
+## Sources
+
+- **Live API:** `api.jup.ag/prediction/v1` — Forecast surfaces via `provider=bisonfi`.
+- **Source code:** `github.com/jup-ag/prediction-market` — the public API is `app/src` (execute route `app/src/api/execute/`, Forecast builds `app/src/services/BisonfiTradeService.ts`, order dispatch + size limits `app/src/services/OrderCreateService.ts`, positions `app/src/services/BisonfiPositionService.ts`, lifecycle `app/src/services/bisonfi-lifecycle.ts`). On-chain indexing lives in `tracker/src/bisonfi/`.
+- **OpenAPI spec (this repo):** `openapi-spec/prediction/prediction.yaml`.
+- **Integration gist:** julianfssen gist (0738f0a2546afb1110e0319b763bc29b) — useful walkthrough but drifts from source (stated a 100 USDC max; source enforces 250).
+
+## Architecture
+
+- [2026-06-29] Forecast markets are surfaced under the existing Prediction API with `provider=bisonfi`. Discovery: `GET /prediction/v1/events?provider=bisonfi&category=crypto&tag=15m&includeMarkets=true`. Each event = one 15m BTC round and holds two markets: `BISON-<marketPda>-UP` and `BISON-<marketPda>-DOWN`. UP resolves win if BTC close >= open (Chainlink BTC/USD data stream). Markets are tradable only during their live `openTime..closeTime` window. ~~Outside it, build returns `no_route`~~ — [2026-07-02] corrected from source: a closed round is rejected pre-routing with `bisonfi_market_not_tradable`; `no_route` means the underlying Jupiter routing call failed (which is what an out-of-window build produced empirically on 2026-06-29). Dust sells that fail routing below 10_000 micro (0.01 token) return `bisonfi_position_too_small`. `/orderbook` outside a window returns `orderbook_bad_status`.
+- [2026-06-29] Forecast market objects carry fields NOT in the current Prediction OpenAPI `Market` schema: `outcomeMint` (the outcome token, Token-2022 program `TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb`), `outcomeTokenProgram`, `marketPda`, `outcomeSide` (`up`/`down`), `sideLabel`, `lifecycleStatus`, `tradable`. The `/events` `provider` enum in the spec only listed `kalshi|polymarket` and the param was documented as `tags`, but live `provider=bisonfi` + `tag=15m` both work (source has both `tag` single and `tags` comma-separated). Spec fixed in PR #927.
+- [2026-06-29] On-chain (verified via getAccountInfo): issuer program `2sVcg2dBSUzXkmdZ8M5cp1LbnzDrWJmr6hktkHwB8nY3` (executable), config PDA `8LczfBkVZJhGnTYH8nQke2YC3b83GFZ8qZtfuMRe6AN6` and each `marketPda` are owned by the issuer program. Settlement/deposit mint is USDC. BTC Chainlink feed id `0x00039d9e45394f473ab1f050a1b963e6b05351e52d71e507509ada0c95ed75b8`.
+
+## Execute model (`/execute` is general, but Forecast behaves differently)
+
+- [2026-07-01] **Correction to an earlier assumption: `/execute` and the `execution` object are NOT Forecast-only.** Live builds show every prediction order build returns `execution {endpoint:"/api/v1/execute", context:{...}}` + `transaction` + `txMeta`. Verified with polymarket (`POLY-558936`): `execution.context = {type:"create_order"}`, `executionModel:null`, `settlement:null`, `jupiterSwapRequestId:null`, and a non-null `order.orderPubkey`. So `/execute` is a general Prediction endpoint. Do NOT claim in docs that Forecast "uses an execute endpoint unlike other prediction markets" — unverified/false. What IS Forecast-specific: `context.type:"bisonfi_swap"`, `executionModel:"atomic_swap"`, `settlement:"auto"`, non-null `jupiterSwapRequestId`, and `order.orderPubkey:null`.
+- [2026-06-29] Forecast (bisonfi) buy: `POST /prediction/v1/orders` returns `execution {endpoint:"/api/v1/execute", context:{type:"bisonfi_swap", jupiterSwapRequestId, ownerPubkey}}`, `executionModel:"atomic_swap"`, `settlement:"auto"`, `jupiterSwapRequestId`, plus `transaction`+`txMeta`. Flow: sign `transaction`, then `POST https://api.jup.ag/prediction/v1/execute` with body `{signedTransaction, context: build.execution.context}` → `{status:"Success", signature, error}`. The `execution.endpoint` value `/api/v1/execute` resolves to `https://api.jup.ag/prediction/v1/execute` (verified 200; the gist's `predictionUrl()` helper was undefined). `/execute` errors return the standard `ErrorResponse` envelope (400): missing/non-string `signedTransaction` → `code:"invalid_type"`; missing `context` or bad tx → `code:"execute_failed"`.
+- [2026-06-29] Because Forecast is `atomic_swap`, `order.orderPubkey` is `null` and there is NO keeper order — `GET /orders/status/{orderPubkey}` returns `order_history_not_found`. The position appears immediately in `GET /positions?ownerPubkey=` after execute (keyed by `positionPubkey` from the build). Do not document the order-status polling step for Forecast (it applies to keeper-filled orders like polymarket, which have a non-null orderPubkey).
+- [2026-07-01] Added to the Prediction OpenAPI spec (PR #927): `/execute` path (`ExecuteRequest`/`ExecuteResponse`/`Execution` schemas), `execution`/`executionModel`/`settlement`/`jupiterSwapRequestId` on `CreateOrderResponse`, `outcomeMint`/`outcomeTokenProgram`/`marketPda`/`outcomeSide`/`tradable`/`lifecycleStatus` on `Market`, and `bisonfi` in the `/events` (+search, +suggested) `provider` enum. `bisonfi` verified accepted on all three provider endpoints. Per source, `ExecuteRequest.context` is optional (Forecast can alternatively pass top-level `jupiterSwapRequestId` + `ownerPubkey`), `requestId` is an optional echo, and `status` is the enum `Success | Failed`.
+- [2026-07-02] `isYes` is vestigial for Forecast: the per-side market ID already selects UP/DOWN, the build ignores the flag, and the response hardcodes `isYes: true` (source: `BisonfiTradeService.buildResult`). Docs example passes `isYes: true` with a comment saying so.
+- [2026-06-29] Close/sell uses the same model: `DELETE /prediction/v1/positions/{positionPubkey}` body `{ownerPubkey}` returns the same `execution`/`executionModel:atomic_swap`/`settlement:auto` shape; sign + POST to `/prediction/v1/execute` with `context: close.execution.context`. Verified 200 on-chain.
+- [2026-06-29] Under the hood the Prediction-API Forecast buy IS a Jupiter swap (context.type `bisonfi_swap`, carries a `jupiterSwapRequestId`). That is why the Swap API path works directly against `outcomeMint`.
+
+## Swap API path
+
+- [2026-06-29] Forecast outcome tokens trade directly via Swap API: `GET /swap/v2/order?inputMint=USDC&outputMint=<market.outcomeMint>&amount=&taker=&slippageBps=10000` routes (verified `router: metis`, returns `transaction`+`requestId`); execute with the standard `POST /swap/v2/execute {signedTransaction, requestId}`. The gist frames this as the path for integrators managing their own ledgers/position tracking (NOT "lower latency" — the gist makes no latency claim). Outcome prices move fast near expiry, hence the 10000 bps slippage recommendation.
+
+## Constraints (tested)
+
+- [2026-06-29] Minimum order is 5 USDC: `depositAmount` < 5000000 → `{code:"min...",message:"Minimum order is $5"}` (validated pre-routing). USDC-only: non-USDC `depositMint` → `{code:"bisonfi_usdc_only", message:"Forecast orders can only use USDC"}` (validated pre-routing).
+- [2026-06-29] **Gist's "Maximum buy: 100 USDC" was NOT reproduced.** During a live window, `POST /orders` built fine for 100, 100.000001, 150, and 200 USDC with no max error. [2026-07-02] RESOLVED from source: **the cap is 250 USDC** (`BISONFI_MAX_DEPOSIT_MICRO_USDC = 250_000_000` in `OrderCreateService`, error `"Maximum order is $250"`), enforced app-side at build on the Prediction API path only — "there is no on-chain limit on the Jupiter swap" per the source comment, so the direct Swap API path has no cap. The 200 USDC test passed because it was under 250; the gist's 100 is stale.
+- [2026-07-02] Limit orders are rejected for Forecast markets (`OrderCreateService` throws unsupported-provider on `orderType: "limit"` when the provider is bisonfi). Market orders only.
+
+## Open Questions
+
+- ~~[2026-06-29] Is there a max order size?~~ RESOLVED 2026-07-02: 250 USDC, app-side at build, Prediction API path only (see Constraints).
+- ~~[2026-06-29] Do winning Forecast positions auto-settle or require `POST /positions/{pubkey}/claim`?~~ RESOLVED 2026-07-02 from source: **no manual claim.** `BisonfiPositionService` hardcodes `claimable: false` ("observe-only settlement; no claim action in this app") and `claimMethod: "automatic"`; the issuer auto-settles via Token-2022 permanent delegate and v1 indexes only auto-settle markets (`shared/db/src/schemas/bisonfi-details.ts`). Never document a claim step for Forecast.
+- ~~[2026-06-29] Confirm the real round cadence (continuous 15m rotation vs scheduled).~~ RESOLVED 2026-07-02: rounds are created by the issuer program and merely indexed by the tracker (`tracker/src/bisonfi/index-events.ts` polls on-chain every ~4s), so the API cannot promise a cadence — sparse windows (13:45–14:00 then ~18:00) are expected. Docs say "scheduled by the issuer, poll `/events`".
+- [2026-07-02] Source has more breadth wired than what is live/documented: a hidden `GET /events/crypto/timed` route with `subcategory` enum `btc|eth|xrp|sol|hype|doge|bnb` and `tags` enum `5m|15m` (`app/src/api/events/schema.ts`). Only BTC 15m observed live so far; revisit the Forecast page when other assets/intervals launch.
+
+---
+
 # Trigger Order API
 
 ## Architecture

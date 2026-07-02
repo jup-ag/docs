@@ -1,0 +1,194 @@
+---
+title: "Jupiter Forecast"
+sidebarTitle: "Forecast"
+description: "Jupiter Forecast is a native prediction market on Solana. Trade 15-minute BTC up/down markets through the Prediction API or Swap API."
+llmsDescription: "Jupiter Forecast is a native Solana binary prediction market, currently 15-minute BTC up/down rounds settled from the Chainlink BTC/USD data stream. Forecast markets are exposed under the Prediction API with provider=bisonfi. Two integration paths: (1) Prediction API, GET /prediction/v1/events?provider=bisonfi&category=crypto&tag=15m to discover markets (IDs BISON-<marketPda>-UP / -DOWN, each with an outcomeMint), POST /prediction/v1/orders to build a USDC buy, then sign and POST /prediction/v1/execute with {signedTransaction, context} (executionModel atomic_swap, settlement auto, position appears immediately, no order-status polling), and DELETE /prediction/v1/positions/{positionPubkey} to sell; (2) Swap API, GET /swap/v2/order from USDC to the market outcomeMint then POST /swap/v2/execute, for integrators managing their own position tracking. Deposits are USDC only; the Prediction API path enforces a 5 to 250 USDC order size (the direct Swap path has no cap). Forecast has no manual claim step: winning tokens settle automatically. Includes complete TypeScript examples."
+---
+
+<Note>
+**BETA**
+
+The Prediction Market API is currently in beta and subject to breaking changes as we continue to improve the product. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
+</Note>
+
+Jupiter Forecast is a native prediction market on Solana. The current markets are 15-minute Bitcoin up/down rounds: buy the side you think BTC will land on, settled from the Chainlink BTC/USD price. Forecast runs on the existing [Prediction API](/prediction) under the `bisonfi` provider, and its outcome tokens can also be traded directly through the [Swap API](/swap).
+
+## Markets
+
+Each Forecast event is one 15-minute BTC round with two binary markets:
+
+| Market ID                | Wins when                                    |
+|--------------------------|----------------------------------------------|
+| `BISON-<marketPda>-UP`   | BTC's price at close is at or above its open |
+| `BISON-<marketPda>-DOWN` | BTC's price at close is below its open        |
+
+Each side is a Token-2022 mint (`outcomeMint`) worth \$1 if it wins and \$0 if it loses. Rounds are scheduled by the issuer rather than rotating continuously, so poll `/events` to find live ones. A round accepts orders only between its `openTime` and `closeTime`: a closed round returns `bisonfi_market_not_tradable`, while an open round with no routable liquidity returns `no_route`.
+
+## Two ways to integrate
+
+| Path | Endpoints | Use it when |
+|------|-----------|-------------|
+| **Prediction API** (recommended) | `/prediction/v1/orders` + `/prediction/v1/execute` | You want Jupiter to track positions, P&L, and settlement. |
+| **Swap API** | `/swap/v2/order` + `/swap/v2/execute` | You manage your own position tracking and trade the outcome tokens directly. |
+
+Both paths trade the same tokens: a Prediction API order executes as an atomic USDC-to-outcome-token swap, which is why the `outcomeMint` is also tradable through the Swap API. Deposits are **USDC only**. The Prediction API path enforces a **5 to 250 USDC** order size at build time; the direct Swap API path has no such cap.
+
+## Prerequisites
+
+- An API key from the [Developer Platform](https://developers.jup.ag/portal), sent as the `x-api-key` header. The Prediction API is [IP-restricted in some regions](/prediction#geographical-restrictions).
+- A Solana wallet funded with USDC (plus a little SOL for fees).
+- [`@solana/web3.js`](/get-started/environment-setup) for signing.
+
+```typescript
+import { Keypair, VersionedTransaction } from "@solana/web3.js";
+
+const PREDICTION_API = "https://api.jup.ag/prediction/v1";
+const SWAP_API = "https://api.jup.ag/swap/v2";
+const API_KEY = process.env.JUPITER_API_KEY!;
+const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const wallet = Keypair.fromSecretKey(/* your secret key */);
+```
+
+## Prediction API path
+
+Every order, buy or sell, is built by the API, signed by you, then submitted to [`/execute`](/api-reference/prediction/execute) with the build's `execution.context`. This helper covers the sign-and-execute half:
+
+```typescript
+async function signAndExecute(build: any) {
+  if (!build.transaction) throw new Error(`build failed: ${build.code} ${build.message}`);
+
+  const tx = VersionedTransaction.deserialize(Buffer.from(build.transaction, "base64"));
+  tx.sign([wallet]);
+
+  const res = await fetch(`${PREDICTION_API}/execute`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": API_KEY },
+    body: JSON.stringify({
+      signedTransaction: Buffer.from(tx.serialize()).toString("base64"),
+      context: build.execution.context,
+    }),
+  });
+  const result = await res.json(); // { status: "Success", signature, error: null }
+  if (result.status !== "Success" || result.error) {
+    throw new Error(`execute failed: ${JSON.stringify(result)}`);
+  }
+  return result.signature;
+}
+```
+
+### Discover markets
+
+Filter events by the `bisonfi` provider, with markets inline:
+
+```typescript
+async function getForecastMarkets() {
+  const res = await fetch(
+    `${PREDICTION_API}/events?provider=bisonfi&category=crypto&tag=15m&includeMarkets=true`,
+    { headers: { "x-api-key": API_KEY } }
+  );
+  const { data } = await res.json();
+  return data
+    .flatMap((event: any) => event.markets ?? [])
+    .filter((market: any) => market.provider === "bisonfi" && market.tradable);
+}
+```
+
+### Buy
+
+```typescript
+const build = await fetch(`${PREDICTION_API}/orders`, {
+  method: "POST",
+  headers: { "content-type": "application/json", "x-api-key": API_KEY },
+  body: JSON.stringify({
+    ownerPubkey: wallet.publicKey.toBase58(),
+    marketId: market.marketId, // from getForecastMarkets(), e.g. BISON-<marketPda>-UP
+    isBuy: true,
+    isYes: true,               // always true for Forecast; the market ID selects the side
+    depositAmount: "5000000",  // micro-USDC (6 decimals): 5 USDC
+    depositMint: USDC_MINT,
+  }),
+}).then((r) => r.json());
+
+const signature = await signAndExecute(build);
+```
+
+Forecast orders settle atomically (`executionModel: "atomic_swap"`), so there is no keeper order to poll: the position appears in `GET /positions` as soon as `/execute` returns. See [Create Order](/api-reference/prediction/create-order) for the full build response.
+
+### Sell
+
+`DELETE` returns a sell transaction in the same shape, so it reuses the helper. You can sell only while the round is tradable, down to a minimum of 0.01 tokens (smaller dust returns `bisonfi_position_too_small`). There is no claim step for Forecast: after a round resolves, winning tokens settle automatically and are redeemed on the issuer side.
+
+```typescript
+const build = await fetch(`${PREDICTION_API}/positions/${positionPubkey}`, {
+  method: "DELETE",
+  headers: { "content-type": "application/json", "x-api-key": API_KEY },
+  body: JSON.stringify({ ownerPubkey: wallet.publicKey.toBase58() }),
+}).then((r) => r.json());
+
+const signature = await signAndExecute(build);
+```
+
+Read holdings with `GET /positions?ownerPubkey=<wallet>` (filter to Forecast by a `marketId` starting `BISON-`); see [Position Data & History](/prediction/position-data) for the fields.
+
+<Warning>
+Amount fields (`contractsMicro`, `valueUsd`, `depositAmount`) are strings in base units (`1000000` = 1 contract or \$1.00) and can exceed JavaScript's safe-integer range. Parse them with `BigInt` or a decimal library, never `parseFloat` or `Number`.
+</Warning>
+
+## Swap API path
+
+To manage your own position tracking, trade the outcome token directly as a swap from USDC into `market.outcomeMint`, using the standard [Order & Execute](/swap/order-and-execute) flow. Use a high `slippageBps` because outcome prices swing sharply near expiry. To exit, swap the outcome token back to USDC.
+
+```typescript
+const params = new URLSearchParams({
+  inputMint: USDC_MINT,
+  outputMint: market.outcomeMint,
+  amount: "5000000",
+  taker: wallet.publicKey.toBase58(),
+  slippageBps: "10000",
+});
+const order = await fetch(`${SWAP_API}/order?${params}`, {
+  headers: { "x-api-key": API_KEY },
+}).then((r) => r.json());
+if (!order.transaction) throw new Error(`swap order failed: ${order.error}`);
+
+const tx = VersionedTransaction.deserialize(Buffer.from(order.transaction, "base64"));
+tx.sign([wallet]);
+
+const result = await fetch(`${SWAP_API}/execute`, {
+  method: "POST",
+  headers: { "content-type": "application/json", "x-api-key": API_KEY },
+  body: JSON.stringify({
+    signedTransaction: Buffer.from(tx.serialize()).toString("base64"),
+    requestId: order.requestId,
+  }),
+}).then((r) => r.json());
+```
+
+## Reference
+
+Verified on-chain configuration for Forecast (mainnet-beta):
+
+| Item                | Value                                                              |
+|---------------------|-------------------------------------------------------------------|
+| Issuer program      | `2sVcg2dBSUzXkmdZ8M5cp1LbnzDrWJmr6hktkHwB8nY3`                     |
+| Config PDA          | `8LczfBkVZJhGnTYH8nQke2YC3b83GFZ8qZtfuMRe6AN6`                     |
+| Deposit / settlement mint | USDC `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`          |
+| Outcome token program | Token-2022 `TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb`         |
+| BTC Chainlink feed  | `0x00039d9e45394f473ab1f050a1b963e6b05351e52d71e507509ada0c95ed75b8` |
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Execute Order" href="/api-reference/prediction/execute" icon="code">
+    API reference and "try it" panel for `/execute`.
+  </Card>
+  <Card title="About Prediction" href="/prediction" icon="circle-info">
+    How events, markets, positions, and settlement work.
+  </Card>
+  <Card title="Order & Execute" href="/swap/order-and-execute" icon="bolt">
+    The Swap API flow behind the direct outcome-token path.
+  </Card>
+  <Card title="Position Data & History" href="/prediction/position-data" icon="chart-line">
+    Read holdings, P&L, and trade history.
+  </Card>
+</CardGroup>

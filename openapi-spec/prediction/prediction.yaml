@@ -228,6 +228,21 @@ components:
           type: string
           nullable: true
           description: Outcome side for Jupiter Forecast markets (`up` or `down`).
+        tradable:
+          type: boolean
+          description: >-
+            Whether this Jupiter Forecast side can be traded right now. The
+            Discover example filters on this field.
+        lifecycleStatus:
+          type: string
+          enum:
+            - open
+            - resolving
+            - settled
+          description: >-
+            Jupiter Forecast trading lifecycle: `open`, `resolving` after the
+            close time, or `settled` after issuer resolution. Only `open` is
+            tradable.
         pricing:
           $ref: "#/components/schemas/MarketPricing"
       required:
@@ -721,25 +736,35 @@ components:
         context:
           type: object
           additionalProperties: true
-          description: The `execution.context` object from the order build, passed unchanged.
+          description: >-
+            Optional. The `execution.context` object from the order build, passed
+            unchanged. Validated against the signed transaction when present. For a
+            Forecast swap it carries `jupiterSwapRequestId` and `ownerPubkey`.
+        requestId:
+          type: string
+          description: Optional client correlation ID, echoed back in the response.
       required:
         - signedTransaction
-        - context
     ExecuteResponse:
       type: object
       properties:
         status:
           type: string
-          description: Execution status.
-          example: Success
+          enum:
+            - Success
+            - Failed
+          description: Transaction execution result.
         signature:
           type: string
           nullable: true
-          description: Transaction signature when execution succeeds.
+          description: Transaction signature (base58) when execution succeeds.
         error:
           type: string
           nullable: true
-          description: Error detail, or `null` on success.
+          description: Error message if the transaction failed, or `null` on success.
+        requestId:
+          type: string
+          description: Echoed from the request when provided.
       required:
         - status
     Position:

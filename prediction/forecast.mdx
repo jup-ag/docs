@@ -2,7 +2,7 @@
 title: "Jupiter Forecast"
 sidebarTitle: "Forecast"
 description: "Jupiter Forecast is a native prediction market on Solana. Trade 15-minute BTC up/down markets through the Prediction API or Swap API."
-llmsDescription: "Jupiter Forecast is a native Solana binary prediction market, currently 15-minute BTC up/down rounds settled from the Chainlink BTC/USD data stream. Forecast markets are exposed under the Prediction API with provider=bisonfi. Two integration paths: (1) Prediction API, GET /prediction/v1/events?provider=bisonfi&category=crypto&tag=15m to discover markets (IDs BISON-<marketPda>-UP / -DOWN, each with an outcomeMint), POST /prediction/v1/orders to build a USDC buy, then sign and POST /prediction/v1/execute with {signedTransaction, context} (executionModel atomic_swap, settlement auto, position appears immediately, no order-status polling), and DELETE /prediction/v1/positions/{positionPubkey} to sell; (2) Swap API, GET /swap/v2/order from USDC to the market outcomeMint then POST /swap/v2/execute, for integrators managing their own position tracking. Deposits are USDC only, minimum 5 USDC. Includes complete TypeScript examples."
+llmsDescription: "Jupiter Forecast is a native Solana binary prediction market, currently 15-minute BTC up/down rounds settled from the Chainlink BTC/USD data stream. Forecast markets are exposed under the Prediction API with provider=bisonfi. Two integration paths: (1) Prediction API, GET /prediction/v1/events?provider=bisonfi&category=crypto&tag=15m to discover markets (IDs BISON-<marketPda>-UP / -DOWN, each with an outcomeMint), POST /prediction/v1/orders to build a USDC buy, then sign and POST /prediction/v1/execute with {signedTransaction, context} (executionModel atomic_swap, settlement auto, position appears immediately, no order-status polling), and DELETE /prediction/v1/positions/{positionPubkey} to sell; (2) Swap API, GET /swap/v2/order from USDC to the market outcomeMint then POST /swap/v2/execute, for integrators managing their own position tracking. Deposits are USDC only; the Prediction API path enforces a 5 to 250 USDC order size (the direct Swap path has no cap). Forecast has no manual claim step: winning tokens settle automatically. Includes complete TypeScript examples."
 ---
 
 <Note>
@@ -22,7 +22,7 @@ Each Forecast event is one 15-minute BTC round with two binary markets:
 | `BISON-<marketPda>-UP`   | BTC's price at close is at or above its open |
 | `BISON-<marketPda>-DOWN` | BTC's price at close is below its open        |
 
-Each side is a Token-2022 mint (`outcomeMint`) worth \$1 if it wins and \$0 if it loses. A round only accepts orders between its `openTime` and `closeTime`; outside that window, order builds return `no_route`.
+Each side is a Token-2022 mint (`outcomeMint`) worth \$1 if it wins and \$0 if it loses. Rounds are scheduled by the issuer rather than rotating continuously, so poll `/events` to find live ones. A round accepts orders only between its `openTime` and `closeTime`: a closed round returns `bisonfi_market_not_tradable`, while an open round with no routable liquidity returns `no_route`.
 
 ## Two ways to integrate
 
@@ -31,7 +31,7 @@ Each side is a Token-2022 mint (`outcomeMint`) worth \$1 if it wins and \$0 if i
 | **Prediction API** (recommended) | `/prediction/v1/orders` + `/prediction/v1/execute` | You want Jupiter to track positions, P&L, and settlement. |
 | **Swap API** | `/swap/v2/order` + `/swap/v2/execute` | You manage your own position tracking and trade the outcome tokens directly. |
 
-Both paths trade the same tokens: a Prediction API order executes as an atomic USDC-to-outcome-token swap, which is why the `outcomeMint` is also tradable through the Swap API. Deposits are **USDC only**, minimum **5 USDC**; other mints or smaller amounts are rejected at build time.
+Both paths trade the same tokens: a Prediction API order executes as an atomic USDC-to-outcome-token swap, which is why the `outcomeMint` is also tradable through the Swap API. Deposits are **USDC only**. The Prediction API path enforces a **5 to 250 USDC** order size at build time; the direct Swap API path has no such cap.
 
 ## Prerequisites
 
@@ -103,7 +103,7 @@ const build = await fetch(`${PREDICTION_API}/orders`, {
     ownerPubkey: wallet.publicKey.toBase58(),
     marketId: market.marketId, // from getForecastMarkets(), e.g. BISON-<marketPda>-UP
     isBuy: true,
-    isYes: true,
+    isYes: true,               // always true for Forecast; the market ID selects the side
     depositAmount: "5000000",  // micro-USDC (6 decimals): 5 USDC
     depositMint: USDC_MINT,
   }),
@@ -114,11 +114,9 @@ const signature = await signAndExecute(build);
 
 Forecast orders settle atomically (`executionModel: "atomic_swap"`), so there is no keeper order to poll: the position appears in `GET /positions` as soon as `/execute` returns. See [Create Order](/api-reference/prediction/create-order) for the full build response.
 
-{/* TODO(team): the integration gist states a 100 USDC maximum, but during a live window POST /orders built successfully for 100, 150, and 200 USDC with no max error. Confirm whether a maximum is enforced (and where) before documenting a hard cap. */}
-
 ### Sell
 
-`DELETE` returns a sell transaction in the same shape, so it reuses the helper. You can sell only while the market is tradable; after it resolves, winning tokens settle automatically (see [Claim Payouts](/prediction/claim-payouts)).
+`DELETE` returns a sell transaction in the same shape, so it reuses the helper. You can sell only while the round is tradable, down to a minimum of 0.01 tokens (smaller dust returns `bisonfi_position_too_small`). There is no claim step for Forecast: after a round resolves, winning tokens settle automatically and are redeemed on the issuer side.
 
 ```typescript
 const build = await fetch(`${PREDICTION_API}/positions/${positionPubkey}`, {
@@ -190,7 +188,7 @@ Verified on-chain configuration for Forecast (mainnet-beta):
   <Card title="Order & Execute" href="/swap/order-and-execute" icon="bolt">
     The Swap API flow behind the direct outcome-token path.
   </Card>
-  <Card title="Claim Payouts" href="/prediction/claim-payouts" icon="hand-holding-dollar">
-    Settle and claim winnings after a market resolves.
+  <Card title="Position Data & History" href="/prediction/position-data" icon="chart-line">
+    Read holdings, P&L, and trade history.
   </Card>
 </CardGroup>

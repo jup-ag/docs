@@ -200,7 +200,16 @@ Do the work following the Writing and Reviewing guidelines below. After writing:
 
 #### Changelog
 
-If your changes affect a public API or product, add a changelog entry to `updates/index.mdx`.
+The changelog lives on the Developer Platform blog, NOT in this repo (decided 2026-07-07, DEV-595).
+It is published as one blog post per month in the `developer-platform` repo at
+`web/content/blog/changelog-YYYY-MM.mdx`, tagged `["Changelog"]`, rendered at
+https://developers.jup.ag/blog?tag=Changelog.
+
+If your changes affect a public API or product, add (or update) the current month's changelog
+post in `~/Documents/Projects/developer-platform/web/content/blog/`. Follow the format in that
+repo's `web/content/blog/_changelog-template.mdx` and the rules in `web/content/blog/README.md`
+(breaking changes first, one section per product area, bold one-line change + "WTM" explanation
++ full docs URLs). This is a separate repo, so it means a separate PR there.
 
 **When to add an entry:**
 - New API endpoints or products
@@ -213,21 +222,6 @@ If your changes affect a public API or product, add a changelog entry to `update
 - Typo fixes, formatting, or docs-only restructuring
 - Internal refactors with no user-facing change
 - Adding guides or blog posts (these are content, not changelog)
-
-**Format:** Use the existing `<Update>` component, grouped by month (newest first):
-
-```mdx
-<Update label="March 2026" description="">
-## Feature or Change Title
-
-Brief description of what changed and what developers need to do.
-
-- Key detail or migration step
-- Link to relevant docs page
-</Update>
-```
-
-Within a month, order entries by importance. Use clear headings that describe the change.
 
 #### Capture learnings
 
@@ -435,7 +429,7 @@ Always run/check before committing:
 6. No placeholder text like "TODO" or "Lorem ipsum" left in content
 7. OpenAPI spec changes in `openapi-spec/` are reflected in `api-reference/` pages
 8. Images/assets added to `static/` are actually referenced somewhere
-9. Changelog entry in `updates/index.mdx` if changes affect a public API or product
+9. Changelog entry added to the current month's post in the `developer-platform` repo (`web/content/blog/changelog-YYYY-MM.mdx`) if changes affect a public API or product
 10. `.claude/rules/` updated if you discovered product behaviour, made IA decisions, or established conventions
 
 ## Pull Requests
@@ -483,7 +477,7 @@ gh pr diff
 - [ ] All pages have `title`, `description`, `llmsDescription`
 - [ ] `docs.json` navigation updated (if applicable)
 - [ ] Redirects added (if paths changed)
-- [ ] Changelog entry added to `updates/index.mdx` (if API/product change)
+- [ ] Changelog entry added to the current month's post in the `developer-platform` repo (if API/product change)
 - [ ] `.claude/rules/` updated with any learnings or decisions
 ```
 

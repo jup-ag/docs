@@ -2,10 +2,10 @@
 title: "Jupiter Trading MCP"
 sidebarTitle: "Trading MCP"
 description: "Execute Jupiter trades and DeFi operations from any MCP client."
-llmsDescription: "Jupiter's hosted Trading MCP server at https://mcp.jup.ag gives AI agents access to Jupiter's trading infrastructure through the Model Context Protocol. It exposes 47 tools across 8 domains: Swap (quote, execute), Tokens (search, discovery), Price, Trigger (limit orders), Recurring (DCA), Lend (earn yield), Prediction (prediction markets), and Portfolio (positions, staked JUP). Authentication is a stateless per-request Bearer token set to your Jupiter API key from the Developer Platform; the server stores no keys. Transport is HTTP (Streamable HTTP). Covers setup for Claude Desktop, Claude Code, Cursor, and Windsurf, plus example prompts. This is the read-write operations server, distinct from the read-only Documentation MCP."
+llmsDescription: "Jupiter's hosted Trading MCP server at https://mcp.jup.ag gives AI agents access to Jupiter's trading infrastructure through the Model Context Protocol. It exposes 75 tools across 11 domains: Swap (quote, execute), Tokens (search, discovery, verification), Price, Trigger (limit orders, v2 vault flow), Recurring (DCA), Lend (earn yield), Prediction (prediction markets), Portfolio (positions, staked JUP), Send (invite-based transfers), Studio (token launch pools), and Transaction (land signed transactions). An API key is optional: requests without one work at a lower rate limit, and passing your Jupiter API key from the Developer Platform as a Bearer token raises the limit. Transport is HTTP (Streamable HTTP). Covers setup for Claude Desktop, Claude Code, Cursor, and Windsurf, plus example prompts. This is the read-write operations server, distinct from the read-only Documentation MCP."
 ---
 
-The Jupiter Trading MCP is a hosted [Model Context Protocol](https://modelcontextprotocol.io/) server that lets AI agents trade and run DeFi operations on Jupiter. Connect any MCP client to `https://mcp.jup.ag`, authenticate with your Jupiter API key, and your agent can swap tokens, place orders, lend, and read on-chain positions.
+The Jupiter Trading MCP is a hosted [Model Context Protocol](https://modelcontextprotocol.io/) server that lets AI agents trade and run DeFi operations on Jupiter. Connect any MCP client to `https://mcp.jup.ag` and your agent can swap tokens, place orders, lend, and read on-chain positions. An API key is optional and only raises your rate limit.
 
 <Note>
 This server executes operations. For an AI assistant that searches and reads Jupiter's documentation instead, see the read-only [Documentation MCP](/ai/mcp).
@@ -13,26 +13,29 @@ This server executes operations. For an AI assistant that searches and reads Jup
 
 ## What You Can Do
 
-The server exposes **47 tools across 8 domains**. Your MCP client discovers them automatically once connected.
+The server exposes **75 tools across 11 domains**. Your MCP client discovers them automatically once connected.
 
 | Domain | What it does |
 |:-------|:-------------|
 | **Swap** | Get a quote and a ready-to-sign transaction, then execute the swap with managed landing. |
-| **Tokens** | Search tokens by name, symbol, or mint, and list tokens by tag, category, or recent listings. |
+| **Tokens** | Search tokens by name, symbol, or mint, list by tag, category, or recent listings, and run token verification. |
 | **Price** | Fetch real-time USD prices, liquidity, and 24h change for one or more tokens. |
-| **Trigger** | Create, cancel, and list limit orders that execute when a token hits a target price. |
+| **Trigger** | Create, update, cancel, and list limit orders that execute when a token hits a target price. |
 | **Recurring** | Set up and manage dollar-cost averaging (DCA) orders that buy at regular intervals. |
 | **Lend** | Deposit into and withdraw from Jupiter Lend to earn yield, and read your lending positions. |
-| **Prediction** | Browse prediction market events, place and close bets, and claim payouts. |
+| **Prediction** | Browse prediction market events, place and close bets, claim payouts, and read scores and forecasts. |
 | **Portfolio** | Read a wallet's positions across Solana protocols and its staked JUP. |
+| **Send** | Send tokens via Jupiter Send invites, claw back unclaimed invites, and list invite history. |
+| **Studio** | Create Jupiter Studio token-launch (Dynamic Bonding Curve) pools and claim creator fees. |
+| **Transaction** | Land any signed Solana transaction on-chain through Jupiter's Beam landing infrastructure. |
 
-## Get a Jupiter API Key
+## API Key (Optional)
 
-The server authenticates every request with your own Jupiter API key. Create one in the [Developer Platform](https://developers.jup.ag/portal). This key is the Bearer token in the setup below. The server forwards it to Jupiter's API on your behalf and never stores it, so you use your own rate limits and permissions.
+The server works without an API key at a lower rate limit, which is enough to try it out. For higher rate limits, create a key in the [Developer Platform](https://developers.jup.ag/portal) and pass it as a Bearer token (shown in the setup below). The server forwards the key to Jupiter's API on your behalf and never stores it, so you use your own rate limits and permissions.
 
 ## Connect Your Client
 
-Add the server to your MCP client's configuration. The key detail is passing your Jupiter API key as a Bearer token in the `Authorization` header. Replace `YOUR_JUPITER_API_KEY` with your key in every example.
+Add the server to your MCP client's configuration. To use a higher rate limit, pass your Jupiter API key as a Bearer token in the `Authorization` header and replace `YOUR_JUPITER_API_KEY` with your key. To start without a key, drop the `headers` block entirely.
 
 <Tabs>
   <Tab title="Claude Desktop">
@@ -126,14 +129,15 @@ Add the server to your MCP client's configuration. The key detail is passing you
 
 ### Other MCP-Compatible Tools
 
-Any tool that supports the MCP protocol can connect to `https://mcp.jup.ag` over HTTP transport, with the Jupiter API key in the `Authorization: Bearer` header.
+Any tool that supports the MCP protocol can connect to `https://mcp.jup.ag` over HTTP transport. Add a Jupiter API key in the `Authorization: Bearer` header for a higher rate limit, or connect without one.
 
 ## Authentication
 
-Authentication is stateless: each request carries your Jupiter API key as a Bearer token, and the server stores nothing.
+Authentication is optional and stateless. When you send a key, each request carries it as a Bearer token and the server stores nothing.
 
-- Pass the key on every request via the `Authorization: Bearer YOUR_JUPITER_API_KEY` header.
-- Requests without a valid Bearer token receive a `401 Unauthorized` response.
+- No key: requests work at a lower rate limit. Omit the `Authorization` header.
+- With a key: pass `Authorization: Bearer YOUR_JUPITER_API_KEY` for a higher rate limit.
+- A `401 Unauthorized` response means the key you sent is invalid, not that a key is missing.
 - The MCP endpoint is `https://mcp.jup.ag`. A separate `GET /health` endpoint needs no auth.
 
 ## Example Prompts
@@ -144,7 +148,7 @@ Once connected, ask your AI assistant in plain language. Each prompt maps to one
 |:-------|:-----------|
 | "What is the current price of SOL and JUP?" | `price_get` |
 | "Swap 10 USDC for SOL" | `swap_get_order`, then `swap_execute_order` |
-| "Place a limit order to sell 50 USDC for SOL at the current price." | `trigger_build_order` |
+| "Place a limit order to sell 50 USDC for SOL at a target price." | `trigger_get_challenge` → `trigger_verify_challenge` → `trigger_build_deposit` → `trigger_create_order` |
 | "DCA 100 USDC into SOL daily for 10 days." | `recurring_build_order` |
 | "What tokens can I lend on Jupiter and what APY do they offer?" | `lend_list_tokens` |
 | "Are there any prediction markets about Bitcoin?" | `prediction_search_events` |
@@ -152,14 +156,14 @@ Once connected, ask your AI assistant in plain language. Each prompt maps to one
 Trading prompts that move funds return an unsigned transaction. Your client signs it with your wallet and submits it, so you stay in control of every transaction.
 
 <Tip>
-If a tool call returns `401 Unauthorized`, check that the `Authorization: Bearer` header is set correctly in your client config.
+If a tool call returns `401 Unauthorized`, the Jupiter API key you passed is invalid. Remove the `Authorization` header to run keyless at the lower rate limit, or replace it with a valid key from the [Developer Platform](https://developers.jup.ag/portal).
 </Tip>
 
 ## Resources
 
 <CardGroup cols={2}>
   <Card title="Developer Platform" icon="key" href="https://developers.jup.ag/portal">
-    Create the Jupiter API key used as your Bearer token.
+    Create an optional Jupiter API key for a higher rate limit.
   </Card>
   <Card title="Documentation MCP" icon="plug" href="/ai/mcp">
     The read-only server for searching and querying Jupiter docs.

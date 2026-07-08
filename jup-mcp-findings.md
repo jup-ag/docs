@@ -13,22 +13,34 @@ Date: 2026-06-30. MCP commit: `main` HEAD at time of check.
 
 ---
 
+> **Update (2026-07-08, from PR review by the MCP maintainer + re-verification against the live
+> server).** The server has grown since the original cross-check. It now exposes **75 tools across
+> 11 domains** (added **Send** 4, **Studio** 4, **Transaction** 1; Lend 7→11, Tokens 4→7,
+> Prediction 20→27, Trigger 5→10). **Trigger has migrated to `/trigger/v2`** (JWT + Privy vault
+> flow), so **F1 is resolved** and `trigger_build_order` / `trigger_build_cancel_batch` /
+> `trigger_execute` no longer exist. **An API key is now optional** — keyless requests work at a
+> lower rate limit (`tools/list` and `price_get` verified returning `200` with no auth header); a
+> `401` now means the key sent is invalid, not that a key is missing. The counts and version notes
+> below are the original 2026-06-30 state, kept for history; the docs page reflects the current
+> state.
+
 ## Summary
 
 - The server is **live** at `https://mcp.jup.ag` (`GET /health` → `200`).
-- **47 tools across 8 domains**, confirmed from source (re-verified).
-- Most domains call the **current** API version (price v3, swap v2, tokens v2). Two flags for the
-  MCP repo: **Trigger** calls the unmaintained `/trigger/v1/*` API (F1), and the README links the
-  wrong **portal URL** (F3).
-- The DEV-480 description has several inaccuracies (endpoint, Prediction count, tokens/trigger/lend
+- **75 tools across 11 domains** (current; see the update note above). Original cross-check found 47
+  tools across 8 domains.
+- Domains now call current API versions across the board, including **Trigger on `/trigger/v2`**.
+  The one remaining repo flag is F3 (README links the wrong **portal URL**).
+- The DEV-480 description had several inaccuracies (endpoint, Prediction count, tokens/trigger/lend
   domain descriptions) — corrected in section A.
 
-Re-verification (2026-06-30): live checks — `mcp.jup.ag/health` `200`, `mcp.jup.ag/` `401`
-(auth required), `api.jup.ag/mcp` `404`. Source tool counts confirmed exactly: lend 7,
-portfolio 3, prediction 20, price 1, recurring 4, swap 3, tokens 4, trigger 5 = **47**. API
-version prefixes confirmed: price `/v3`, swap `/v2`, tokens `/v2`, recurring/lend/portfolio/
-prediction/trigger `/v1`. Portal redirect confirmed: `portal.jup.ag` → `developers.jup.ag/`
-(docs root), while `developers.jup.ag/portal` → portal sign-in.
+Current counts (2026-07-08, live `tools/list`): lend 11, portfolio 3, prediction 27, price 1,
+recurring 4, swap 3, tokens 7, trigger 10, send 4, studio 4, transaction 1 = **75**.
+
+Original re-verification (2026-06-30): source tool counts were lend 7, portfolio 3, prediction 20,
+price 1, recurring 4, swap 3, tokens 4, trigger 5 = **47**; version prefixes price `/v3`,
+swap `/v2`, tokens `/v2`, others `/v1`. Portal redirect confirmed: `portal.jup.ag` →
+`developers.jup.ag/` (docs root), while `developers.jup.ag/portal` → portal sign-in.
 
 ---
 
@@ -51,21 +63,15 @@ Jupiter API key from portal.jup.ag; the server never stores it and forwards it a
 
 ## B. MCP-vs-docs staleness (flag to the MCP / Labs team)
 
-### F1 — high: Trigger tools use the unmaintained Trigger V1 API
-All 5 trigger tools call `/trigger/v1/*`:
-
-| Tool | Path |
-|------|------|
-| `trigger_build_order` | `POST /trigger/v1/createOrder` |
-| `trigger_build_cancel` | `POST /trigger/v1/cancelOrder` |
-| `trigger_build_cancel_batch` | `POST /trigger/v1/cancelOrders` |
-| `trigger_execute` | `POST /trigger/v1/execute` |
-| `trigger_list_orders` | `GET /trigger/v1/getTriggerOrders` |
-
-Our docs mark **Trigger V1 as unmaintained** (superseded by Trigger V2: `api.jup.ag/trigger/v2`,
-vault-based, JWT challenge-response, `/orders/price`). Trigger V1 still works, so the MCP is
-functional, but it is a generation behind the current product. The docs page describes this as
-generic "limit orders" and does not claim V2.
+### F1 — RESOLVED (2026-07-08): Trigger migrated to `/trigger/v2`
+Originally, all 5 trigger tools called the unmaintained `/trigger/v1/*` API. As of the
+2026-07-08 review, Trigger is on **`/trigger/v2`** with the current vault-based, JWT
+challenge-response flow, and now has **10 tools**: `trigger_get_challenge`,
+`trigger_verify_challenge`, `trigger_get_vault`, `trigger_register_vault`, `trigger_build_deposit`,
+`trigger_create_order`, `trigger_update_order`, `trigger_build_cancel`, `trigger_confirm_cancel`,
+`trigger_list_orders`. The old `trigger_build_order`, `trigger_build_cancel_batch`, and
+`trigger_execute` tools are gone. Placing a limit order is now: `trigger_get_challenge` →
+`trigger_verify_challenge` → `trigger_build_deposit` → `trigger_create_order`. No action needed.
 
 ### F3 — medium: README links the wrong portal URL
 The README sends users to `https://portal.jup.ag/` to create an API key (3 places: quickstart
@@ -113,10 +119,14 @@ and 2-cycle minimums against the live API / `recurring` source, then add them to
 | Price | `GET /price/v3` (max 50 mints, 24h change) | Current. Matches `price/index.mdx`. |
 | Swap | `GET /swap/v2/order`, `GET /swap/v2/build`, `POST /swap/v2/execute` | Current V2. `/build` Metis-only / no-RFQ matches docs. |
 | Tokens | `GET /tokens/v2/search \| /tag \| /{category}/{interval} \| /recent` | Current V2. (Minor: `tokens_search` omits the comma-separated batch-by-mint up-to-100 capability our docs note — tool-richness nit, not staleness.) |
+| Trigger | `/trigger/v2/*` (JWT + Privy vault flow, 10 tools) | Current V2 (as of 2026-07-08; see F1). |
 | Recurring | `POST /recurring/v1/*`, `GET /recurring/v1/getRecurringOrders` | V1 is the only public version. Consistent. |
-| Lend | `/lend/v1/earn/*` (deposit, withdraw, mint, redeem, positions, earnings, tokens) | Earn side, current. Correctly labelled "Jupiter Lend/Earn" in source. |
-| Prediction | `/prediction/v1/*` (20 tools) | V1 beta. Amount in micro USD (1,000,000 = $1.00); price 0–1. Consistent. |
+| Lend | `/lend/v1/earn/*` (deposit, withdraw, mint, redeem, positions, earnings, tokens; +instructions variants, 11 tools) | Earn side, current. Correctly labelled "Jupiter Lend/Earn" in source. |
+| Prediction | `/prediction/v1/*` (27 tools) | V1 beta. Amount in micro USD (1,000,000 = $1.00); price 0–1. Consistent. |
 | Portfolio | `GET /portfolio/v1/platforms`, `/positions/{address}`, `/staked-jup/{address}` | V1 beta. Matches `portfolio/index.mdx` exactly. |
+| Send | Jupiter Send invite transfers/clawback (4 tools) | New domain since original cross-check. |
+| Studio | Jupiter Studio DBC launch pools + creator fees (4 tools) | New domain since original cross-check. |
+| Transaction | `transaction_submit` (land signed tx via Beam, 1 tool) | New domain since original cross-check. |
 
 ---
 
@@ -176,13 +186,16 @@ surfaces as an `API error (401)` inside a tool result, not as a connection-time 
 
 ---
 
-## Tool inventory (47 total)
+## Tool inventory (75 total, live `tools/list` on 2026-07-08)
 
-- **Swap (3):** `swap_get_order`, `swap_get_instructions`, `swap_execute_order`
-- **Tokens (4):** `tokens_search`, `tokens_list_by_tag`, `tokens_list_by_category`, `tokens_list_recent`
+- **Swap (3):** `swap_get_order`, `swap_execute_order`, `swap_get_instructions`
+- **Tokens (7):** `tokens_search`, `tokens_list_by_tag`, `tokens_list_by_category`, `tokens_list_recent`, `tokens_get_verification_eligibility`, `tokens_build_verification_payment`, `tokens_execute_verification`
 - **Price (1):** `price_get`
-- **Trigger (5):** `trigger_build_order`, `trigger_build_cancel`, `trigger_build_cancel_batch`, `trigger_execute`, `trigger_list_orders`
+- **Trigger (10):** `trigger_get_challenge`, `trigger_verify_challenge`, `trigger_get_vault`, `trigger_register_vault`, `trigger_build_deposit`, `trigger_create_order`, `trigger_update_order`, `trigger_build_cancel`, `trigger_confirm_cancel`, `trigger_list_orders`
 - **Recurring (4):** `recurring_build_order`, `recurring_build_cancel`, `recurring_execute`, `recurring_list_orders`
-- **Lend (7):** `lend_build_deposit`, `lend_build_withdraw`, `lend_build_mint_shares`, `lend_build_redeem_shares`, `lend_get_positions`, `lend_get_earnings`, `lend_list_tokens`
-- **Prediction (20):** events (`get_event`, `list_events`, `search_events`, `list_suggested_events`), markets (`get_market`, `list_markets`, `get_orderbook`), orders (`build_order`, `list_orders`, `get_order`, `get_order_status`), positions (`list_positions`, `get_position`, `build_close_position`, `build_close_all_positions`, `build_claim_payout`), profile/feed (`get_profile`, `get_leaderboard`, `get_trade_history`, `list_trades`)
-- **Portfolio (3):** `portfolio_list_platforms`, `portfolio_get_positions`, `portfolio_get_staked_jup`
+- **Lend (11):** `lend_build_deposit`, `lend_build_withdraw`, `lend_build_mint_shares`, `lend_build_redeem_shares`, `lend_get_deposit_instructions`, `lend_get_withdraw_instructions`, `lend_get_mint_instructions`, `lend_get_redeem_instructions`, `lend_list_tokens`, `lend_get_positions`, `lend_get_earnings`
+- **Prediction (27):** events (`search_events`, `list_events`, `get_event`, `list_suggested_events`), markets (`list_markets`, `get_market`, `get_orderbook`, `get_event_market`), orders (`build_order`, `list_orders`, `get_order`, `get_order_status`), positions (`list_positions`, `get_position`, `build_close_position`, `build_close_all_positions`, `build_claim_payout`), profile/feed (`get_profile`, `get_leaderboard`, `get_trade_history`, `list_trades`, `get_pnl_history`), live/scores (`get_trading_status`, `get_live_scores`, `get_event_score`, `get_forecast`, `get_vault_info`)
+- **Portfolio (3):** `portfolio_get_positions`, `portfolio_list_platforms`, `portfolio_get_staked_jup`
+- **Send (4):** `send_build_transfer`, `send_build_clawback`, `send_list_pending_invites`, `send_list_invite_history`
+- **Studio (4):** `studio_build_create_pool`, `studio_get_pool_addresses`, `studio_get_fees`, `studio_build_claim_fee`
+- **Transaction (1):** `transaction_submit`

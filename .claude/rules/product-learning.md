@@ -187,6 +187,15 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 
 ---
 
+# Mintlify Platform
+
+## Facts
+
+- [2026-07-08] Mintlify's compiled CSS is Tailwind v4 and puts utilities inside native cascade layers (`@layer utilities`). The banner (`div#banner`) forces its text colour with important utilities (`[&_*]:text-white/95!` → `color:#fffffff2!important` in `@layer utilities`) and sets `bg-primary-dark` (from `docs.json` `colors.dark`). Consequence for `style.css`: **layered `!important` beats unlayered `!important` regardless of specificity**, so unlayered custom overrides like `#banner * { color: black !important }` silently lose to Mintlify's layered important utilities, while unlayered important still beats their *normal* declarations (e.g. background). This produced the white-on-yellow banner fixed in DEV-723 (resolved by dropping the custom banner colours). If a custom override must beat a layered important utility, wrap it in `@layer utilities { ... }` so specificity applies again (an ID selector then outranks their class utilities). Verified against the deployed chunk `/docs/_next/static/chunks/f80c22dc4fd41578.css`.
+- [2026-07-08] `mint dev` local preview renders the banner and injects custom CSS client-side only, so curl/static inspection of the local HTML cannot verify banner styling; inspect the production/preview deployment HTML instead (prod inlines `style.css` as `<style data-custom-css-path="style.css">` and server-renders `div#banner`).
+
+---
+
 # AI Resources
 
 ## Facts

@@ -202,8 +202,7 @@ Do the work following the Writing and Reviewing guidelines below. After writing:
 
 The changelog lives on the Developer Platform blog, NOT in this repo (decided 2026-07-07, DEV-595).
 It is published as one blog post per month in the `developer-platform` repo at
-`web/content/blog/changelog-YYYY-MM.mdx`, tagged `["Changelog"]`, rendered at
-https://developers.jup.ag/blog?tag=Changelog.
+`web/content/changelog/YYYY-MM.mdx`, rendered at https://developers.jup.ag/changelog.
 
 If your changes affect a public API or product, add (or update) the current month's changelog
 post in `~/Documents/Projects/developer-platform/web/content/blog/`. Follow the format in that
@@ -429,7 +428,7 @@ Always run/check before committing:
 6. No placeholder text like "TODO" or "Lorem ipsum" left in content
 7. OpenAPI spec changes in `openapi-spec/` are reflected in `api-reference/` pages
 8. Images/assets added to `static/` are actually referenced somewhere
-9. Changelog entry added to the current month's post in the `developer-platform` repo (`web/content/blog/changelog-YYYY-MM.mdx`) if changes affect a public API or product
+9. Changelog entry added to the current month's post in the `developer-platform` repo (`web/content/changelog/YYYY-MM.mdx`) if changes affect a public API or product
 10. `.claude/rules/` updated if you discovered product behaviour, made IA decisions, or established conventions
 
 ## Pull Requests

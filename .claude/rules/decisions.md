@@ -216,7 +216,7 @@ Track all redirects added to `vercel.json` here for visibility:
 | `/docs/studio/*` | `/studio/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
 | `/docs/trigger/*` | `/trigger/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
 | `/docs/ultra/*` | `/ultra/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
-| `developers.jup.ag/docs/changelog` | `https://developers.jup.ag/blog?tag=Changelog` | 2026-07-07 | Changelog consolidated on dev platform blog, Cloudflare domain-level rule (DEV-718) |
+| `developers.jup.ag/docs/changelog` | `https://developers.jup.ag/changelog` | 2026-07-07 | Changelog consolidated on dev platform blog, Cloudflare domain-level rule (DEV-718) |
 
 ### [2026-04-06] Hidden pages for private integrator docs
 **Status:** implemented
@@ -276,8 +276,8 @@ Track all redirects added to `vercel.json` here for visibility:
 **Files affected:** `docs.json`, `changelog/index.mdx` (deleted), `AGENTS.md`/`CLAUDE.md`, `llms.txt`
 **Linear issue:** DEV-595 (sub-issues DEV-717 blog backfill, DEV-718 docs redirect)
 
-**Context:** Two changelogs existed: the docs Changelog tab (`changelog/index.mdx`) and the Developer Platform blog's Changelog section (`/blog?tag=Changelog`). The blog has far more visibility and sits alongside the platform, and dual-maintenance guaranteed drift.
-**Decision:** The blog is the single changelog home. All docs changelog history (Jan 2025 – Jun 2026) was backfilled as one blog post per month (`changelog-YYYY-MM` slugs) in the `developer-platform` repo. The docs Changelog tab became an external `href` to `https://developers.jup.ag/blog?tag=Changelog`, `changelog/index.mdx` was deleted, and `developers.jup.ag/docs/changelog` hard-redirects to the blog via a Cloudflare domain-level rule (same mechanism as DEVREL-133).
+**Context:** Two changelogs existed: the docs Changelog tab (`changelog/index.mdx`) and the Developer Platform site's changelog (`developers.jup.ag/changelog`). The blog has far more visibility and sits alongside the platform, and dual-maintenance guaranteed drift.
+**Decision:** The blog is the single changelog home. All docs changelog history (Jan 2025 – Jun 2026) was backfilled as one post per month (`/changelog/YYYY-MM` URLs, content in `web/content/changelog/`) in the `developer-platform` repo. The docs Changelog tab became an external `href` to `https://developers.jup.ag/changelog`, `changelog/index.mdx` was deleted, and `developers.jup.ag/docs/changelog` hard-redirects to the blog via a Cloudflare domain-level rule (same mechanism as DEVREL-133).
 **Rationale:** One source of truth, more visibility, and a standardised monthly format (breaking changes first, per-product sections, "WTM" explanations, modelled on the solana_devs changelog and Linear's changelog method). The format is codified in `developer-platform` `web/content/blog/_changelog-template.mdx` and `web/content/blog/README.md`.
 **Alternatives considered:** (1) Keep the docs page as a frozen archive with the tab linking out — rejected, two URLs for one concept. (2) Cross-post to both — rejected, guaranteed drift.
 **Migration notes:** Existing `/updates → /changelog` redirects in `docs.json` kept (they chain into the Cloudflare rule). New changelog entries go to the `developer-platform` repo; see the Changelog section of `AGENTS.md`.

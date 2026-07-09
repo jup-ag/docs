@@ -285,6 +285,6 @@ Track all redirects added to `vercel.json` here for visibility:
 **Rationale:** A one-line endpoint change (set RPC URL to `tx.jup.ag`) is the lowest-friction integration story and matches how the product is now built. Keeping the legacy REST endpoint documented as a `<Note>` avoids breaking the (unused but live) path while steering new integrations to the RPC endpoint.
 **Open questions (flagged in PR, not resolved here):**
 1. Whether the `Swap` API-key permission covers the `tx.jup.ag` host (gateway path-prefix mapping). `portal/api-keys.mdx` line left unchanged pending confirmation
-2. Whether the dedicated rate-limit bucket RPS numbers are identical on `tx.jup.ag`
+2. `tx.jup.ag` rate limits are NOT governed by this gateway. Verified in `developer-platform`: `quota.toml`'s 20/50/100 submit bucket is keyed by the REST paths `/tx/v1/submit` and `/swap/v2/submit` on host `api.jup.ag`; `tx.jup.ag` is a separate direct-to-beam LB absent from that repo, so its limits are set elsewhere and are unconfirmed. Docs now scope the bucket to the REST path and note `tx.jup.ag` routes around the gateway. Still open: what are `tx.jup.ag`'s actual limits?
 3. Deprecation timeline for the REST `POST /tx/v1/submit`
 4. Follow-up: update the `/build` code examples in `swap/build/index.mdx` and the mention in `swap/quote-and-swap.mdx` once `tx.jup.ag` is confirmed GA

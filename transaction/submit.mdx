@@ -54,7 +54,7 @@ A successful response returns the signature in `result`. A transaction without a
 | **API access** | Pass your Jupiter API key in the `x-api-key` header. Keyless access (no header) works at a lower rate limit |
 
 <Tip>
-Transaction submission has its own dedicated rate limit bucket (Keyless 20, Free 50, Paid 100 RPS), separate from your general API limit. See [Rate Limits](/portal/rate-limits#buckets).
+The API-gateway submit path `POST api.jup.ag/tx/v1/submit` has a dedicated rate limit bucket (Keyless 20, Free 50, Paid 100 RPS), separate from your general API limit. See [Rate Limits](/portal/rate-limits#buckets). `tx.jup.ag` routes directly to Beam rather than through the API gateway, so its rate limits are applied separately.
 </Tip>
 
 ## Code example

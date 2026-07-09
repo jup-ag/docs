@@ -283,8 +283,16 @@ Track all redirects added to `vercel.json` here for visibility:
 - Reshape the OpenAPI spec from a REST body to the JSON-RPC envelope; keep the legacy REST endpoint mentioned in a `<Note>` rather than deleting it
 - Endpoint auth verified by live probe: no `x-api-key` = keyless (allowed), invalid key = `401`
 **Rationale:** A one-line endpoint change (set RPC URL to `tx.jup.ag`) is the lowest-friction integration story and matches how the product is now built. Keeping the legacy REST endpoint documented as a `<Note>` avoids breaking the (unused but live) path while steering new integrations to the RPC endpoint.
-**Open questions (flagged in PR, not resolved here):**
-1. Whether the `Swap` API-key permission covers the `tx.jup.ag` host (gateway path-prefix mapping). `portal/api-keys.mdx` line left unchanged pending confirmation
-2. `tx.jup.ag` rate limits are NOT governed by this gateway. Verified in `developer-platform`: `quota.toml`'s 20/50/100 submit bucket is keyed by the REST paths `/tx/v1/submit` and `/swap/v2/submit` on host `api.jup.ag`; `tx.jup.ag` is a separate direct-to-beam LB absent from that repo, so its limits are set elsewhere and are unconfirmed. Docs now scope the bucket to the REST path and note `tx.jup.ag` routes around the gateway. Still open: what are `tx.jup.ag`'s actual limits?
-3. Deprecation timeline for the REST `POST /tx/v1/submit`
-4. Follow-up: update the `/build` code examples in `swap/build/index.mdx` and the mention in `swap/quote-and-swap.mdx` once `tx.jup.ag` is confirmed GA
+**Resolved (Kyle / groovie, 2026-07-09):**
+- Methods: advertise ONLY `sendTransaction`. `sendJitoBundle` is internal-teams-only; `sendAndConfirmTransaction` is scheduled for deprecation. Docs updated.
+- Auth: `tx.jup.ag` will require an API key (not keyless). Keyless advertising removed from the docs; `security` in the OpenAPI made required.
+- Rate limits: a single limit across all tiers (anti-abuse only, generous), API key required. Exact number not set yet, so the docs describe the model without a number. The tiered 20/50/100 bucket in `quota.toml` is for the api.jup.ag REST paths only.
+- Analytics/logs: confirmed the dev platform will surface transaction-landing analytics/logs (Beam telemetry → ClickHouse). Docs follow-up on `portal/analytics` + `portal/logs` deferred until the submit-page UI ships.
+
+**Still open:**
+1. Whether the `Swap` API-key permission covers the `tx.jup.ag` host. `portal/api-keys.mdx` line left unchanged pending confirmation.
+2. Credits/metering on `tx.jup.ag` (docs say zero credit cost; unverified since it bypasses the gateway's credit metering).
+3. `tx.jup.ag`'s exact rate-limit number.
+4. Deprecation timeline for the REST `POST /tx/v1/submit`.
+5. Publishing timing: Kyle wants to advertise `sendTransaction` now; groovie wants to hold until internal-team migration and all integrations work. PR should not merge until aligned.
+6. Follow-up: update the `/build` code examples in `swap/build/index.mdx` and the mention in `swap/quote-and-swap.mdx` once `tx.jup.ag` is confirmed GA.

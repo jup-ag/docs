@@ -1,10 +1,10 @@
 ---
 title: "Transaction Submission"
 description: "Land signed transactions through Jupiter's infrastructure by pointing a Solana JSON-RPC client at tx.jup.ag"
-llmsDescription: "How to land signed transactions through Jupiter's proprietary transaction landing infrastructure using the Solana JSON-RPC endpoint at https://tx.jup.ag. tx.jup.ag is a drop-in Solana RPC endpoint that implements the standard Solana sendTransaction method: point any Solana client (@solana/web3.js Connection or @solana/kit) at it and authenticate with your Jupiter API key in the x-api-key header. Keyless access works with no header at a lower rate limit. It is send-only, so keep your own RPC for blockhash and confirmation. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) that includes a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 tip receiver accounts. Zero credit cost, available on all plans including free and keyless access. Provides MEV protection by removing all intermediaries between your transaction and the leader. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips. Replaces the legacy REST POST api.jup.ag/tx/v1/submit endpoint."
+llmsDescription: "How to land signed transactions through Jupiter's proprietary transaction landing infrastructure using the Solana JSON-RPC endpoint at https://tx.jup.ag. tx.jup.ag is a drop-in Solana RPC endpoint that implements the standard Solana sendTransaction method: point any Solana client (@solana/web3.js Connection or @solana/kit) at it and authenticate with your Jupiter API key in the x-api-key header. It is send-only, so keep your own RPC for blockhash and confirmation. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) that includes a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 tip receiver accounts. Requires a Jupiter API key. Zero credit cost, available on all plans. Provides MEV protection by removing all intermediaries between your transaction and the leader. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips. Replaces the legacy REST POST api.jup.ag/tx/v1/submit endpoint."
 ---
 
-`tx.jup.ag` is a Solana JSON-RPC endpoint that lands your signed transactions through Jupiter's proprietary infrastructure, the same stack that powers Jupiter's own swap products. Point any Solana client at it, authenticate with your Jupiter API key, and call `sendTransaction` as you would against any RPC node. It accepts any valid signed Solana transaction with a SOL tip, costs zero API credits, and works on all plans including keyless access.
+`tx.jup.ag` is a Solana JSON-RPC endpoint that lands your signed transactions through Jupiter's proprietary infrastructure, the same stack that powers Jupiter's own swap products. Point any Solana client at it, authenticate with your Jupiter API key, and call `sendTransaction` as you would against any RPC node. It accepts any valid signed Solana transaction with a SOL tip, requires a Jupiter API key, and costs zero API credits.
 
 ## Why it's competitive
 
@@ -51,10 +51,10 @@ A successful response returns the signature in `result`. A transaction without a
 | **Valid signed transaction** | Must be a valid Solana transaction with all required signatures |
 | **SOL tip** | Minimum 1,000,000 lamports (0.001 SOL) transferred to one of the 16 tip receiver accounts |
 | **Transaction size** | Must not exceed the Solana transaction size limit (1232 bytes) |
-| **API access** | Pass your Jupiter API key in the `x-api-key` header. Keyless access (no header) works at a lower rate limit |
+| **API access** | Requires a Jupiter API key in the `x-api-key` header |
 
 <Tip>
-The API-gateway submit path `POST api.jup.ag/tx/v1/submit` has a dedicated rate limit bucket (Keyless 20, Free 50, Paid 100 RPS), separate from your general API limit. See [Rate Limits](/portal/rate-limits#buckets). `tx.jup.ag` routes directly to Beam rather than through the API gateway, so its rate limits are applied separately.
+`tx.jup.ag` applies a single rate limit across all plan tiers, sized to limit abuse rather than to meter usage (the exact limit is being finalised). This is separate from the tiered buckets on the legacy REST endpoint. See [Rate Limits](/portal/rate-limits#buckets).
 </Tip>
 
 ## Code example

@@ -10,7 +10,7 @@ components:
       type: apiKey
       in: header
       name: x-api-key
-      description: Get API key via https://developers.jup.ag/portal. Optional. Keyless access works with no header at a lower rate limit.
+      description: Get API key via https://developers.jup.ag/portal
 paths:
   /:
     post:
@@ -23,7 +23,7 @@ paths:
 
         It is send-only: `getLatestBlockhash`, `simulateTransaction`, and confirmation queries are not served. Keep your own RPC for those.
 
-        **Authentication:** pass your Jupiter API key in the `x-api-key` header. Keyless access (no header) works at a lower rate limit.
+        **Authentication:** requires your Jupiter API key in the `x-api-key` header.
 
         **Validation:**
         - Transaction must be a valid signed Solana transaction with all required signatures
@@ -37,7 +37,6 @@ paths:
         Randomise which account you send to across transactions to reduce write-lock contention.
       security:
         - ApiKeyAuth: []
-        - {}
       requestBody:
         content:
           application/json:

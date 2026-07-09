@@ -1,7 +1,7 @@
 ---
 title: "Rate Limits"
 description: "Rate limits for Jupiter APIs by plan tier."
-llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per organisation, not per API key. Most API requests share the main rate limit bucket, but /swap/v2/execute and /tx/v1/submit each have their own dedicated buckets separate from the main limit and from each other: Keyless 20 RPS, Free 50 RPS, Paid (Developer/Launch/Pro) 100 RPS. Rate-limited responses include x-ratelimit-remaining, x-ratelimit-current, and x-ratelimit-reset headers (on successful and 429 responses, not on 401/403). Firewall rules can impose additional per-IP, per-API-key, or per-team limits on top of the plan limit. Returns HTTP 429 when exceeded."
+llmsDescription: "Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per organisation, not per API key. Most API requests share the main rate limit bucket, but /swap/v2/execute and transaction submission (tx.jup.ag) each have their own dedicated buckets separate from the main limit and from each other: Keyless 20 RPS, Free 50 RPS, Paid (Developer/Launch/Pro) 100 RPS. Rate-limited responses include x-ratelimit-remaining, x-ratelimit-current, and x-ratelimit-reset headers (on successful and 429 responses, not on 401/403). Firewall rules can impose additional per-IP, per-API-key, or per-team limits on top of the plan limit. Returns HTTP 429 when exceeded."
 ---
 
 ## Overview
@@ -29,9 +29,9 @@ Some endpoints have their own bucket, separate from the main limit and from each
 | Bucket | Keyless | Free | Paid (Developer / Launch / Pro) |
 | :--- | :--- | :--- | :--- |
 | [`/swap/v2/execute`](/swap/order-and-execute#execute-the-transaction) | 20 RPS | 50 RPS | 100 RPS |
-| [`/tx/v1/submit`](/transaction/submit) | 20 RPS | 50 RPS | 100 RPS |
+| [Transaction submission](/transaction/submit) (`tx.jup.ag`) | 20 RPS | 50 RPS | 100 RPS |
 
-Calls to these endpoints do not count toward your main bucket, and each bucket is independent. For example, a Developer plan organisation (10 RPS main) can simultaneously make 10 main API requests, 100 `/execute` requests, and 100 `/submit` requests per second.
+Calls to these endpoints do not count toward your main bucket, and each bucket is independent. For example, a Developer plan organisation (10 RPS main) can simultaneously make 10 main API requests, 100 `/execute` requests, and 100 transaction submissions per second.
 
 ## Rate limit headers
 

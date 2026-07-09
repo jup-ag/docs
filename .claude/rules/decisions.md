@@ -268,3 +268,23 @@ Track all redirects added to `vercel.json` here for visibility:
 - Reorganise sidebar: Swap (overview), Meta-Aggregator (order-and-execute + API refs), Router (build + submit + API refs), Advanced, Routing Integration, Guides, Migration
 **Rationale:** Two clear paths reduce decision fatigue. Absorbing fees and routing eliminates page-hopping for core concepts. Profile-targeted migration pages let developers find their specific upgrade path without reading irrelevant content.
 **Migration notes:** Redirects added for `swap/fees` → `swap/order-and-execute`, `swap/routing` → `swap`, `swap/build/other-instructions` → `swap/build/common-instructions`.
+
+### [2026-07-09] Document transaction submission against tx.jup.ag (Solana JSON-RPC)
+**Status:** implemented
+**Scope:** content | api-reference
+**Files affected:** `transaction/submit.mdx`, `api-reference/transaction/submit.mdx`, `openapi-spec/transaction/transaction.yaml`, `changelog/index.mdx`, `swap/index.mdx`, `portal/rate-limits.mdx`
+**Source:** `jup-ag/beam` (Beam v2), Slack thread with Kyle/Groovie/Sayantan
+
+**Context:** Beam v2 exposes a direct Solana JSON-RPC endpoint at `https://tx.jup.ag` that implements `sendTransaction`. The team wants to promote it as the primary transaction landing path over the REST `POST api.jup.ag/tx/v1/submit`, which no external integrators currently use. The REST endpoint still works.
+**Decision:**
+- `transaction/submit.mdx` leads with `tx.jup.ag`: point any Solana client (`@solana/web3.js` `Connection` or `@solana/kit`) at it, authenticate with the `x-api-key` header, call `sendTransaction`
+- Document it as send-only (only `send*` methods) so integrators keep their own RPC for blockhash and confirmation
+- Keep the tip requirement and the 16 tip receiver accounts unchanged (verified in the beam source)
+- Reshape the OpenAPI spec from a REST body to the JSON-RPC envelope; keep the legacy REST endpoint mentioned in a `<Note>` rather than deleting it
+- Endpoint auth verified by live probe: no `x-api-key` = keyless (allowed), invalid key = `401`
+**Rationale:** A one-line endpoint change (set RPC URL to `tx.jup.ag`) is the lowest-friction integration story and matches how the product is now built. Keeping the legacy REST endpoint documented as a `<Note>` avoids breaking the (unused but live) path while steering new integrations to the RPC endpoint.
+**Open questions (flagged in PR, not resolved here):**
+1. Whether the `Swap` API-key permission covers the `tx.jup.ag` host (gateway path-prefix mapping). `portal/api-keys.mdx` line left unchanged pending confirmation
+2. Whether the dedicated rate-limit bucket RPS numbers are identical on `tx.jup.ag`
+3. Deprecation timeline for the REST `POST /tx/v1/submit`
+4. Follow-up: update the `/build` code examples in `swap/build/index.mdx` and the mention in `swap/quote-and-swap.mdx` once `tx.jup.ag` is confirmed GA

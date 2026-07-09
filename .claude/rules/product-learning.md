@@ -300,6 +300,7 @@ Keep entries concise — one line if possible, a short paragraph if needed.
 - [2026-04-07] Jupiter operates one of the highest-staked validators on Solana. `/submit` opens this landing pipeline to integrators. Key selling points: validator stake, MEV protection (no intermediaries), sub-second landing, zero credit cost.
 - [2026-04-07] Recommended integration pattern: run `/submit` in parallel with existing RPC submission for zero-risk comparison. Whichever lands first wins.
 - [2026-04-16] `/submit` costs zero API credits on all plans (free, Developer, Launch, Pro) and works with keyless access. The only cost is the SOL tip in the transaction.
+- [2026-07-09] Transaction submission is now primarily a Solana JSON-RPC endpoint at `https://tx.jup.ag` (Beam v2), not the REST `POST api.jup.ag/tx/v1/submit` (which still works). It implements `sendTransaction` (and `sendAndConfirmTransaction`), so integrators point any Solana client at it and authenticate with the `x-api-key` header; keyless (no header) works at a lower limit, an invalid key returns `401`. It is send-only (only the `send*` methods; `getHealth` etc. return "Method not found"), so integrators keep their own RPC for blockhash and confirmation. The public path enforces a Jupiter tip (min 0.001 SOL) to one of the same 16 tip receiver accounts. Confirmed against the `jup-ag/beam` repo (`beam_cli` test harness, `beamv2-testscripts/`) and live probes against `tx.jup.ag`.
 
 ---
 

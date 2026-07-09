@@ -3,70 +3,105 @@ info:
   title: Jupiter Transaction API
   version: "1.0"
 servers:
-  - url: https://api.jup.ag/tx/v1
-security:
-  - ApiKeyAuth: []
+  - url: https://tx.jup.ag
 components:
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
       in: header
       name: x-api-key
-      description: Get API key via https://developers.jup.ag/portal
+      description: Get API key via https://developers.jup.ag/portal. Optional. Keyless access works with no header at a lower rate limit.
 paths:
-  /submit:
+  /:
     post:
-      operationId: postSubmit
+      operationId: sendTransaction
       tags:
         - Submit
-      summary: Submit a transaction
+      summary: Send a transaction
       description: |
-        Submits a signed transaction through Jupiter's transaction landing infrastructure. Accepts any valid signed Solana transaction.
+        `tx.jup.ag` is a Solana JSON-RPC endpoint that lands signed transactions through Jupiter's transaction landing infrastructure. It implements the standard Solana [`sendTransaction`](https://solana.com/docs/rpc/http/sendtransaction) method, so any Solana client can point at it.
+
+        It is send-only: `getLatestBlockhash`, `simulateTransaction`, and confirmation queries are not served. Keep your own RPC for those.
+
+        **Authentication:** pass your Jupiter API key in the `x-api-key` header. Keyless access (no header) works at a lower rate limit.
 
         **Validation:**
-        - Transaction must be a valid signed Solana transaction
-        - All signatures must be valid
+        - Transaction must be a valid signed Solana transaction with all required signatures
         - Transaction must contain a SOL transfer of >= 1,000,000 lamports (0.001 SOL) to one of the 16 tip receiver accounts
-        - Transaction must not exceed max transaction size
+        - Transaction must not exceed the Solana transaction size limit
 
         **Tip receiver accounts (16 Jupiter V6 program authorities):**
 
         `GGztQqQ6pCPaJQnNpXBgELr5cs3WwDakRbh1iEMzjgSJ`, `2MFoS3MPtvyQ4Wh4M9pdfPjz6UhVoNbFbGJAskCPCj3h`, `BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV`, `6U91aKa8pmMxkJwBCfPTmUEfZi6dHe7DcFq2ALvB2tbB`, `4xDsmeTWPNjgSVSS1VTfzFq3iHZhp77ffPkAmkZkdu71`, `CapuXNQoDviLvU1PxFiizLgPNQCxrsag1uMeyk6zLVps`, `9nnLbotNTcUhvbrsA6Mdkx45Sm82G35zo28AqUvjExn8`, `6LXutJvKUw8Q5ue2gCgKHQdAN4suWW8awzFVC6XCguFx`, `HFqp6ErWHY6Uzhj8rFyjYuDya2mXUpYEk8VW75K9PSiY`, `DSN3j1ykL3obAVNv7ZX49VsFCPe4LqzxHnmtLiPwY6xg`, `69yhtoJR4JYPPABZcSNkzuqbaFbwHsCkja1sP1Q2aVT5`, `HU23r7UoZbqTUuh3vA7emAGztFtqwTeVips789vqxxBw`, `3LoAYHuSd7Gh8d7RTFnhvYtiTiefdZ5ByamU42vkzd76`, `3CgvbiM3op4vjrrjH2zcrQUwsqh5veNVRjFCB9N6sRoD`, `GP8StUXNYSZjPikyRsvkTbvRV1GBxMErb59cpeCJnDf1`, `7iWnBRRhBCiNXXPhqiGzvvBkKrvFSWqqmxRyu9VyYBxE`
 
         Randomise which account you send to across transactions to reduce write-lock contention.
+      security:
+        - ApiKeyAuth: []
+        - {}
       requestBody:
         content:
           application/json:
             schema:
               type: object
-              properties:
-                signedTransaction:
-                  type: string
-                  description: Base64-encoded signed transaction
               required:
-                - signedTransaction
+                - jsonrpc
+                - id
+                - method
+                - params
+              properties:
+                jsonrpc:
+                  type: string
+                  enum: ["2.0"]
+                id:
+                  oneOf:
+                    - type: integer
+                    - type: string
+                  description: Request identifier echoed back in the response
+                method:
+                  type: string
+                  enum: [sendTransaction]
+                params:
+                  type: array
+                  description: "`[signedTransaction, config]`"
+                  items: {}
+                  example:
+                    - "AQID...base64-encoded-signed-transaction"
+                    - encoding: base64
+                      skipPreflight: true
       responses:
         "200":
-          description: Successful response
+          description: |
+            JSON-RPC response. On success, `result` is the transaction signature. On a JSON-RPC error (e.g. missing or insufficient tip, invalid signatures, oversized transaction), `error` is populated instead.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  signature:
+                  jsonrpc:
                     type: string
-                    description: Transaction signature
-                required:
-                  - signature
-        "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
+                    enum: ["2.0"]
+                  id:
+                    oneOf:
+                      - type: integer
+                      - type: string
+                  result:
+                    type: string
+                    description: Transaction signature (base58)
                   error:
+                    type: object
+                    properties:
+                      code:
+                        type: integer
+                      message:
+                        type: string
+        "401":
+          description: Unauthorized. The `x-api-key` header was present but invalid.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
                     type: string
-                    description: Error message detailing why the transaction was rejected (e.g. missing or insufficient tip, invalid signatures, oversized transaction)
-                required:
-                  - error

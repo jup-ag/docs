@@ -27,6 +27,22 @@ Jupiter's transaction landing stack is purpose-built for high throughput and low
 
 For `/build` transactions, use the `tipAmount` parameter to have the tip instruction included automatically. For non-Jupiter transactions, add a standard SOL transfer instruction to one of the [tip receiver accounts](#adding-tip-instruction-manually).
 
+The request is a standard JSON-RPC call, so any language works:
+
+```bash
+curl https://tx.jup.ag \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $JUPITER_API_KEY" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "sendTransaction",
+    "params": ["<base64-signed-transaction>", { "encoding": "base64", "skipPreflight": true }]
+  }'
+```
+
+A successful response returns the signature in `result`. A transaction without a valid tip is rejected with the JSON-RPC error `Transaction must include a Jupiter tip instruction`.
+
 ## Requirements
 
 | Requirement | Details |

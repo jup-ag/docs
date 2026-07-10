@@ -4,17 +4,7 @@ description: "Land signed transactions through Jupiter's infrastructure by point
 llmsDescription: "How to land signed transactions through Jupiter's proprietary transaction landing infrastructure using the Solana JSON-RPC endpoint at https://tx.jup.ag. tx.jup.ag is a drop-in Solana RPC endpoint that implements the standard Solana sendTransaction method: point any Solana client (@solana/web3.js Connection or @solana/kit) at it and authenticate with your Jupiter API key in the x-api-key header. It is send-only, so keep your own RPC for blockhash and confirmation. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) that includes a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 tip receiver accounts. Requires a Jupiter API key. Zero credit cost, available on all plans. Provides MEV protection by removing all intermediaries between your transaction and the leader. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips. Replaces the legacy REST POST api.jup.ag/tx/v1/submit endpoint."
 ---
 
-`tx.jup.ag` is a Solana JSON-RPC endpoint that lands your signed transactions through Jupiter's proprietary infrastructure, the same stack that powers Jupiter's own swap products. Point any Solana client at it, authenticate with your Jupiter API key, and call `sendTransaction` as you would against any RPC node. It accepts any valid signed Solana transaction with a SOL tip, requires a Jupiter API key, and costs zero API credits.
-
-## Why it's competitive
-
-Jupiter's transaction landing stack is purpose-built for high throughput and low latency:
-
-- **[SWQoS via high-stake validator](https://solana.com/developers/guides/advanced/stake-weighted-qos).** Jupiter operates [one of the highest-staked validators on Solana](https://solanabeach.io/validators). Solana's Stake-Weighted Quality of Service (SWQoS) reserves ~80% of a leader's TPU capacity for staked validators proportional to their stake. Higher stake means more reserved bandwidth when forwarding transactions to the current leader.
-- **Beam (custom TPU forwarder).** Jupiter's own TPU client bypasses standard RPC nodes and sends transactions directly to leaders via staked QUIC connections. This removes intermediaries that could be malicious actors and eliminates RPC processing overhead.
-- **[DoubleZero](https://doublezero.xyz/).** Dedicated fiber network for validator communication, with FPGA-based spam filtering and transaction deduplication at the network edge. Cleaner transaction set, faster propagation between validators.
-- **Ultra-low-latency fiber.** Private fiber links from Tokyo to Frankfurt reduce physical propagation time between Jupiter's infrastructure and leader validators globally.
-- **High-performance, scalable infrastructure.** Built to handle the volume of Jupiter's own products, where millions of swaps land daily.
+`tx.jup.ag` is a Solana JSON-RPC endpoint that lands your signed transactions through Jupiter's proprietary infrastructure, the same stack that powers Jupiter's own swap products. Point any Solana client at it, authenticate with your Jupiter API key, and call `sendTransaction` as you would against any RPC node. It accepts any valid signed Solana transaction with a SOL tip and costs zero API credits.
 
 ## How it works
 
@@ -47,11 +37,20 @@ A successful response returns the signature in `result`. A transaction without a
 
 | Requirement | Details |
 |---|---|
-| **Endpoint** | `POST https://tx.jup.ag`, JSON-RPC method `sendTransaction`, `encoding: "base64"` |
+| **Endpoint** | `POST https://tx.jup.ag`, JSON-RPC method `sendTransaction` |
 | **Valid signed transaction** | Must be a valid Solana transaction with all required signatures |
 | **SOL tip** | Minimum 1,000,000 lamports (0.001 SOL) transferred to one of the 16 tip receiver accounts |
 | **Transaction size** | Must not exceed the Solana transaction size limit (1232 bytes) |
 | **API access** | Requires a Jupiter API key in the `x-api-key` header |
+
+The `sendTransaction` config (the second param) takes:
+
+| Field | Value |
+|---|---|
+| `encoding` | Must be `base64` |
+| `skipPreflight` | Must be `true`. An explicit `false` is rejected; omit to default to `true` |
+| `maxRetries` | Must be `0`. A non-zero value is rejected; omit to default to `0` |
+| `swqosOnly` | Optional. `true` routes only through stake-weighted QoS for lowest latency, no Jito tip needed. Set it in the raw JSON-RPC config, as SDK send helpers may not forward it |
 
 <Tip>
 `tx.jup.ag` applies a single rate limit across all plan tiers, sized to limit abuse rather than to meter usage (the exact limit is being finalised). This is separate from the tiered buckets on the legacy REST endpoint. See [Rate Limits](/portal/rate-limits#buckets).
@@ -537,13 +536,18 @@ const tipIx = getTransferSolInstruction({
 ## Best practices
 
 - **Randomise tip accounts:** there are 16 tip receiver accounts. Randomise which one you send to on each transaction to reduce write-lock contention across concurrent submissions.
-- **Use `tipAmount` with `/build`:** pass `tipAmount` as a query parameter to have the tip instruction included automatically, rather than adding it manually.
-- **`skipPreflight` must be `true` and `maxRetries` must be `0`.** `tx.jup.ag` sends directly to the TPU and does not simulate, so it rejects an explicit `skipPreflight: false` or a non-zero `maxRetries` with error `-1015`. Both default correctly when omitted. Own your retry logic so you can refresh the blockhash between attempts.
-- **`swqosOnly: true` for lowest latency (optional):** an extra `sendTransaction` config field that routes exclusively through Jupiter's stake-weighted QoS path instead of also trying Jito, so it lands fast without needing a Jito tip. Omit it to keep the default routing. Set it in the JSON-RPC config; SDK helpers that only expose the standard send options won't forward it.
 - **Run in parallel with your own RPC:** submitting the same signed transaction through both `tx.jup.ag` and your existing RPC is a zero-risk way to compare landing. Whichever confirms first wins; the duplicate is dropped by the network.
 - **Poll for confirmation on your own RPC:** `tx.jup.ag` is send-only. Confirm with the blockhash and `lastValidBlockHeight` from your transaction. If the blockhash expires without confirmation, rebuild with a fresh blockhash and resubmit.
-- **Simulate before sending:** if you require simulation, do it against your own RPC first, since `tx.jup.ag` only accepts `sendTransaction`.
 - **Colocate for lowest latency:** Jupiter's API gateway runs in [six AWS regions](/portal/latency). Deploy your servers in the nearest region to minimise round-trip time.
+
+## Why it lands fast
+
+Jupiter's transaction landing stack is purpose-built for high throughput and low latency:
+
+- **[SWQoS via high-stake validator](https://solana.com/developers/guides/advanced/stake-weighted-qos).** Jupiter operates [one of the highest-staked validators on Solana](https://solanabeach.io/validators). Solana's Stake-Weighted Quality of Service (SWQoS) reserves ~80% of a leader's TPU capacity for staked validators proportional to their stake. Higher stake means more reserved bandwidth when forwarding transactions to the current leader.
+- **Beam (custom TPU forwarder).** Jupiter's own TPU client bypasses standard RPC nodes and sends transactions directly to leaders via staked QUIC connections. This removes intermediaries that could be malicious actors and eliminates RPC processing overhead.
+- **[DoubleZero](https://doublezero.xyz/).** Dedicated fiber network for validator communication, with FPGA-based spam filtering and transaction deduplication at the network edge. Cleaner transaction set, faster propagation between validators.
+- **Ultra-low-latency fiber.** Private fiber links from Tokyo to Frankfurt reduce physical propagation time between Jupiter's infrastructure and leader validators globally.
 
 ## How this differs from /execute
 

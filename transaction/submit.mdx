@@ -1,10 +1,10 @@
 ---
 title: "Transaction Submission"
 description: "Land signed transactions through Jupiter's infrastructure by pointing a Solana JSON-RPC client at tx.jup.ag"
-llmsDescription: "How to land signed transactions through Jupiter's proprietary transaction landing infrastructure using the Solana JSON-RPC endpoint at https://tx.jup.ag. tx.jup.ag is a drop-in Solana RPC endpoint that implements the standard Solana sendTransaction method: point any Solana client (@solana/web3.js Connection or @solana/kit) at it and authenticate with your Jupiter API key in the x-api-key header. It is send-only, so keep your own RPC for blockhash and confirmation. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) that includes a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 tip receiver accounts. Requires a Jupiter API key. Zero credit cost, available on all plans. Provides MEV protection by removing all intermediaries between your transaction and the leader. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips. Replaces the legacy REST POST api.jup.ag/tx/v1/submit endpoint."
+llmsDescription: "How to land signed transactions through Jupiter's proprietary transaction landing infrastructure using the Solana JSON-RPC endpoint at https://tx.jup.ag. tx.jup.ag is a drop-in Solana RPC endpoint that implements the standard Solana sendTransaction method: point any Solana client (@solana/web3.js Connection or @solana/kit) at it and authenticate with your Jupiter API key in the x-api-key header. It is send-only, so keep your own RPC for blockhash and confirmation. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) that includes a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 tip receiver accounts. Requires a Jupiter API key. Provides MEV protection by removing all intermediaries between your transaction and the leader. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips. Replaces the legacy REST POST api.jup.ag/tx/v1/submit endpoint."
 ---
 
-`tx.jup.ag` is a Solana JSON-RPC endpoint that lands your signed transactions through Jupiter's proprietary infrastructure, the same stack that powers Jupiter's own swap products. Point any Solana client at it, authenticate with your Jupiter API key, and call `sendTransaction` as you would against any RPC node. It accepts any valid signed Solana transaction with a SOL tip and costs zero API credits.
+`tx.jup.ag` is a Solana JSON-RPC endpoint that lands your signed transactions through Jupiter's proprietary infrastructure, the same stack that powers Jupiter's own swap products. Point any Solana client at it, authenticate with your Jupiter API key, and call `sendTransaction` as you would against any RPC node. It accepts any valid signed Solana transaction with a SOL tip.
 
 ## How it works
 
@@ -50,10 +50,6 @@ The `sendTransaction` config (the second param) takes:
 | `encoding` | Must be `base64` |
 | `skipPreflight` | Must be `true`. An explicit `false` is rejected; omit to default to `true` |
 | `maxRetries` | Must be `0`. A non-zero value is rejected; omit to default to `0` |
-
-<Tip>
-`tx.jup.ag` applies a single rate limit across all plan tiers, sized to limit abuse rather than to meter usage (the exact limit is being finalised). This is separate from the tiered buckets on the legacy REST endpoint. See [Rate Limits](/portal/rate-limits#buckets).
-</Tip>
 
 ## Code example
 
@@ -557,7 +553,6 @@ Jupiter's transaction landing stack is purpose-built for high throughput and low
 | **Interface** | REST `POST /swap/v2/execute` | Solana JSON-RPC `sendTransaction` |
 | **Fee model** | Jupiter swap fees (included in the order) | SOL tips (minimum 0.001 SOL) |
 | **Transaction source** | Must match the exact transaction from `/order` | Any valid signed Solana transaction |
-| **Credit cost** | 0 credits | 0 credits |
 | **Use case** | Managed swap execution for `/order` transactions | Any transaction: `/build` swaps, non-Jupiter transactions |
 
 ## API reference
@@ -575,5 +570,4 @@ The legacy REST endpoint `POST https://api.jup.ag/tx/v1/submit` still accepts th
 - [Build](/swap/build): build custom transactions with `/build` (use `tipAmount` for automatic tip inclusion)
 - [Order & Execute](/swap/order-and-execute): the standard swap flow using `/order` + `/execute`
 - [Reduce Latency](/swap/advanced/reduce-latency): use `mode=fast` on `/build` for faster routing
-- [Plans and Pricing](/portal/plans): all plans include transaction submission at zero credit cost
 - [Latency and Server Locations](/portal/latency): API gateway regions and colocation guidance

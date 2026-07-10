@@ -296,6 +296,7 @@ Track all redirects added to `vercel.json` here for visibility:
 4. Deprecation timeline for the REST `POST /tx/v1/submit`.
 5. Publishing timing: Kyle wants to advertise `sendTransaction` now; groovie wants to hold until internal-team migration and all integrations work. PR should not merge until aligned.
 6. Follow-up: update the `/build` code examples in `swap/build/index.mdx` and the mention in `swap/quote-and-swap.mdx` once `tx.jup.ag` is confirmed GA.
+7. Jito tips + priority-fee guidance (groovie, check in later): `swqosOnly` is not shipped yet, so it has been removed from the docs. A future section should advise how and when to use jito tips and priority fees, including that beam adds a jito tip when `swqosOnly` is false and none is set.
 
 ### [2026-07-10] Move transaction submission out of Swap into a "Transaction Landing" section
 **Status:** implemented

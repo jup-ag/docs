@@ -66,13 +66,11 @@ paths:
                     - `encoding`: must be `base64`
                     - `skipPreflight`: must be `true` (an explicit `false` is rejected with `-1015`; omitting it defaults to `true`)
                     - `maxRetries`: must be `0` (a non-zero value is rejected with `-1015`; omitting it defaults to `0`)
-                    - `swqosOnly` (optional): `true` routes exclusively through stake-weighted QoS for lowest latency without a Jito tip; omit for default routing
                   items: {}
                   example:
                     - "AQID...base64-encoded-signed-transaction"
                     - encoding: base64
                       skipPreflight: true
-                      swqosOnly: true
       responses:
         "200":
           description: |

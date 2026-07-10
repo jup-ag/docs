@@ -50,7 +50,6 @@ The `sendTransaction` config (the second param) takes:
 | `encoding` | Must be `base64` |
 | `skipPreflight` | Must be `true`. An explicit `false` is rejected; omit to default to `true` |
 | `maxRetries` | Must be `0`. A non-zero value is rejected; omit to default to `0` |
-| `swqosOnly` | Optional. `true` routes only through stake-weighted QoS for lowest latency, no Jito tip needed. Set it in the raw JSON-RPC config, as SDK send helpers may not forward it |
 
 <Tip>
 `tx.jup.ag` applies a single rate limit across all plan tiers, sized to limit abuse rather than to meter usage (the exact limit is being finalised). This is separate from the tiered buckets on the legacy REST endpoint. See [Rate Limits](/portal/rate-limits#buckets).

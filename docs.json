@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "banner": {
-    "content": "The Jupiter Developer Platform is live. Previous portal users keep their rate limits for free until **30 June 2026** — set up billing on the [**new platform**](https://developers.jup.ag/portal) before then. See the [**Migration Guide**](/docs/portal/migration) for details."
+    "content": "Manage your API keys, billing, and usage on the [**Developer Platform**](https://developers.jup.ag/portal). Questions? Reach us via [**Support**](/docs/resources/support)."
   },
   "theme": "mint",
   "name": "Jupiter",
@@ -315,6 +315,16 @@
                       "api-reference/lend/earn/positions",
                       "api-reference/lend/earn/earnings"
                     ]
+                  },
+                  {
+                    "group": "Borrow",
+                    "tag": "BETA",
+                    "pages": [
+                      "api-reference/lend/borrow/vaults",
+                      "api-reference/lend/borrow/positions",
+                      "api-reference/lend/borrow/operate",
+                      "api-reference/lend/borrow/operate-instructions"
+                    ]
                   }
                 ]
               }
@@ -414,6 +424,7 @@
                 "tag": "BETA",
                 "pages": [
                   "prediction/index",
+                  "prediction/forecast",
                   "prediction/trading-lifecycle",
                   "prediction/events-and-markets",
                   "prediction/open-positions",
@@ -464,7 +475,8 @@
                       "api-reference/prediction/get-orders",
                       "api-reference/prediction/get-order",
                       "api-reference/prediction/get-order-status",
-                      "api-reference/prediction/create-order"
+                      "api-reference/prediction/create-order",
+                      "api-reference/prediction/execute"
                     ]
                   },
                   {
@@ -786,16 +798,8 @@
       "destination": "/api-reference/tokens/:slug*"
     },
     {
-      "source": "/api-reference/trigger/cancel-order",
-      "destination": "/api-reference/trigger/v1/cancel-order"
-    },
-    {
       "source": "/api-reference/trigger/cancel-orders",
       "destination": "/api-reference/trigger/v1/cancel-orders"
-    },
-    {
-      "source": "/api-reference/trigger/create-order",
-      "destination": "/api-reference/trigger/v1/create-order"
     },
     {
       "source": "/api-reference/trigger/execute",

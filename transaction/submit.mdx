@@ -544,6 +544,7 @@ const tipIx = getTransferSolInstruction({
 
 Jupiter's transaction landing stack is purpose-built for high throughput and low latency:
 
+- **Direct to Beam.** `tx.jup.ag` routes straight to the landing infrastructure. The legacy `api.jup.ag/tx/v1/submit` proxies through the API gateway first, so `tx.jup.ag` removes that hop.
 - **[SWQoS via high-stake validator](https://solana.com/developers/guides/advanced/stake-weighted-qos).** Jupiter operates [one of the highest-staked validators on Solana](https://solanabeach.io/validators). Solana's Stake-Weighted Quality of Service (SWQoS) reserves ~80% of a leader's TPU capacity for staked validators proportional to their stake. Higher stake means more reserved bandwidth when forwarding transactions to the current leader.
 - **Beam (custom TPU forwarder).** Jupiter's own TPU client bypasses standard RPC nodes and sends transactions directly to leaders via staked QUIC connections. This removes intermediaries that could be malicious actors and eliminates RPC processing overhead.
 - **[DoubleZero](https://doublezero.xyz/).** Dedicated fiber network for validator communication, with FPGA-based spam filtering and transaction deduplication at the network edge. Cleaner transaction set, faster propagation between validators.

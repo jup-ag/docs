@@ -538,7 +538,8 @@ const tipIx = getTransferSolInstruction({
 
 - **Randomise tip accounts:** there are 16 tip receiver accounts. Randomise which one you send to on each transaction to reduce write-lock contention across concurrent submissions.
 - **Use `tipAmount` with `/build`:** pass `tipAmount` as a query parameter to have the tip instruction included automatically, rather than adding it manually.
-- **Set `skipPreflight: true` and `maxRetries: 0`:** `tx.jup.ag` sends directly to the TPU and does not simulate, so preflight adds nothing. Let your application own retry logic so you can refresh the blockhash between attempts.
+- **`skipPreflight` must be `true` and `maxRetries` must be `0`.** `tx.jup.ag` sends directly to the TPU and does not simulate, so it rejects an explicit `skipPreflight: false` or a non-zero `maxRetries` with error `-1015`. Both default correctly when omitted. Own your retry logic so you can refresh the blockhash between attempts.
+- **`swqosOnly: true` for lowest latency (optional):** an extra `sendTransaction` config field that routes exclusively through Jupiter's stake-weighted QoS path instead of also trying Jito, so it lands fast without needing a Jito tip. Omit it to keep the default routing. Set it in the JSON-RPC config; SDK helpers that only expose the standard send options won't forward it.
 - **Run in parallel with your own RPC:** submitting the same signed transaction through both `tx.jup.ag` and your existing RPC is a zero-risk way to compare landing. Whichever confirms first wins; the duplicate is dropped by the network.
 - **Poll for confirmation on your own RPC:** `tx.jup.ag` is send-only. Confirm with the blockhash and `lastValidBlockHeight` from your transaction. If the blockhash expires without confirmation, rebuild with a fresh blockhash and resubmit.
 - **Simulate before sending:** if you require simulation, do it against your own RPC first, since `tx.jup.ag` only accepts `sendTransaction`.

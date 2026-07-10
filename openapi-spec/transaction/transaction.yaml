@@ -61,16 +61,22 @@ paths:
                   enum: [sendTransaction]
                 params:
                   type: array
-                  description: "`[signedTransaction, config]`"
+                  description: |
+                    `[signedTransaction, config]`, where `config` is:
+                    - `encoding`: must be `base64`
+                    - `skipPreflight`: must be `true` (an explicit `false` is rejected with `-1015`; omitting it defaults to `true`)
+                    - `maxRetries`: must be `0` (a non-zero value is rejected with `-1015`; omitting it defaults to `0`)
+                    - `swqosOnly` (optional): `true` routes exclusively through stake-weighted QoS for lowest latency without a Jito tip; omit for default routing
                   items: {}
                   example:
                     - "AQID...base64-encoded-signed-transaction"
                     - encoding: base64
                       skipPreflight: true
+                      swqosOnly: true
       responses:
         "200":
           description: |
-            JSON-RPC response. On success, `result` is the transaction signature. On a JSON-RPC error (e.g. `Transaction must include a Jupiter tip instruction`, invalid signatures, oversized transaction), `error` is populated instead.
+            JSON-RPC response. On success, `result` is the transaction signature. On failure, `error` is populated instead. Common error codes: `-1013` Jupiter tip below the minimum, `-1014` missing Jupiter tip, `-1015` invalid parameter (e.g. `skipPreflight` not `true`, or `maxRetries` not `0`), `-1016` encoding not `base64`.
           content:
             application/json:
               schema:

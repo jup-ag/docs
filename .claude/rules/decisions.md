@@ -296,3 +296,15 @@ Track all redirects added to `vercel.json` here for visibility:
 4. Deprecation timeline for the REST `POST /tx/v1/submit`.
 5. Publishing timing: Kyle wants to advertise `sendTransaction` now; groovie wants to hold until internal-team migration and all integrations work. PR should not merge until aligned.
 6. Follow-up: update the `/build` code examples in `swap/build/index.mdx` and the mention in `swap/quote-and-swap.mdx` once `tx.jup.ag` is confirmed GA.
+
+### [2026-07-10] Move transaction submission out of Swap into a "Transaction Landing" section
+**Status:** implemented
+**Scope:** navigation
+**Files affected:** `docs.json`
+**Linear issue:** DEV-328 (seeds YY's broader "transactions and landing" section)
+
+**Context:** `/transaction/submit` documents `tx.jup.ag`, a product-neutral landing endpoint that accepts any signed transaction, not just swaps. It was nested under Docs > Swap > Router as a discovery convenience (see [2026-04-07]), but it isn't swap-specific. YY raised making it a dedicated section and anmol agreed it should live outside Swap.
+**Decision:** Add a new Docs-tab `menu` item "Transaction Landing" (sibling to Swap, Lend, etc.) and move `transaction/submit` + `api-reference/transaction/submit` into it, out of the Swap "Router" group. Supersedes the [2026-04-07] "keep in the Swap sidebar for now" placement.
+**Rationale:** Landing is cross-cutting (any transaction, not just swaps). A dedicated section is the home for DEV-328's planned content (transaction types, landing optimisation, Beam, glossary); this seeds it with the submit page for YY to expand.
+**Alternatives considered:** Keep under Swap/Router (rejected: not swap-specific). A new top-level tab (rejected: products are `menu` items under the Docs tab, not tabs).
+**Migration notes:** Nav-only. URLs unchanged (`/transaction/submit`, `/api-reference/transaction/submit`), so no redirects needed and cross-links are unaffected.

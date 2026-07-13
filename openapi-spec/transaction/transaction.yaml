@@ -19,7 +19,7 @@ paths:
         - Submit
       summary: Send a transaction
       description: |
-        `tx.jup.ag` is a Solana JSON-RPC endpoint that forwards signed transactions to the Solana cluster through Jupiter's landing infrastructure. It implements the standard Solana [`sendTransaction`](https://solana.com/docs/rpc/http/sendtransaction) method, so any Solana client can point at it. A success response means the transaction was accepted and forwarded, not that it landed; confirm landing on your own RPC.
+        `tx.jup.ag` is a Solana RPC-compatible endpoint (compatible where possible) that forwards signed transactions to the Solana cluster through Jupiter's landing infrastructure. It implements the standard Solana [`sendTransaction`](https://solana.com/docs/rpc/http/sendtransaction) method, so any Solana client can point at it. A success response means the transaction was accepted and forwarded, not that it landed; confirm landing on your own RPC.
 
         It is send-only: `getLatestBlockhash`, `simulateTransaction`, and confirmation queries are not served. Keep your own RPC for those.
 
@@ -66,7 +66,7 @@ paths:
                     - `encoding`: defaults to `base64` (the only supported value)
                     - `skipPreflight`: preflight is not supported; defaults to `true`; an explicit `false` is rejected with `-1015`
                     - `maxRetries`: defaults to `0`; a non-zero value is rejected with `-1015`
-                    - `swqosOnly` (optional): `false` (default) uses SWQoS + Jito, `true` uses SWQoS only; changes the Jito-tip strategy
+                    - `swqosOnly` (optional): `false` (default) uses SWQoS + Jito, `true` uses SWQoS only; see the tip guidance
                   items: {}
                   example:
                     - "AQID...base64-encoded-signed-transaction"

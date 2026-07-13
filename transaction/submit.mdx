@@ -127,9 +127,8 @@ function toInstruction(ix: ApiInstruction): TransactionInstruction {
 
 const API_KEY = process.env.JUPITER_API_KEY!;
 const connection = new Connection(process.env.RPC_URL!);
-// Send-only connection to Jupiter's landing infrastructure. Used for
-// sendRawTransaction; blockhash and confirmation stay on your own RPC above.
-const beamConnection = new Connection("https://tx.jup.ag", {
+// Send-only endpoint; blockhash and confirmation stay on your own RPC.
+const txConnection = new Connection("https://tx.jup.ag", {
   httpHeaders: { "x-api-key": API_KEY },
 });
 const signer = Keypair.fromSecretKey(
@@ -212,7 +211,7 @@ const transaction = new VersionedTransaction(messageV0);
 transaction.sign([signer]);
 
 // 6. Submit the signed transaction through tx.jup.ag (or use your own RPC / transaction pipeline)
-const signature = await beamConnection.sendRawTransaction(
+const signature = await txConnection.sendRawTransaction(
   transaction.serialize(),
   { skipPreflight: true, maxRetries: 0 },
 );
@@ -360,9 +359,8 @@ function buildTransaction(
 
 const API_KEY = process.env.JUPITER_API_KEY!;
 const rpc = createSolanaRpc(process.env.RPC_URL!);
-// Send-only transport to Jupiter's landing infrastructure. Used for
-// sendTransaction; blockhash and confirmation stay on your own RPC above.
-const beamRpc = createSolanaRpcFromTransport(
+// Send-only endpoint; blockhash and confirmation stay on your own RPC.
+const txRpc = createSolanaRpcFromTransport(
   createDefaultRpcTransport({
     url: "https://tx.jup.ag",
     headers: { "x-api-key": API_KEY },
@@ -443,7 +441,7 @@ const compiledTx = buildTransaction(
 // 6. Sign and submit through tx.jup.ag (or use your own RPC / transaction pipeline)
 const signedTx = await signTransaction([signer.keyPair], compiledTx);
 
-const signature = await beamRpc
+const signature = await txRpc
   .sendTransaction(getBase64EncodedWireTransaction(signedTx), {
     encoding: "base64",
     skipPreflight: true,
@@ -545,6 +543,7 @@ const tipIx = getTransferSolInstruction({
 - **Randomise tip accounts:** there are 16 tip receiver accounts. Randomise which one you send to on each transaction to reduce write-lock contention across concurrent submissions.
 - **Run in parallel with your own RPC:** submitting the same signed transaction through both `tx.jup.ag` and your existing RPC is a zero-risk way to compare landing. Whichever confirms first wins; the duplicate is dropped by the network.
 - **Poll for confirmation on your own RPC:** `tx.jup.ag` is send-only. Confirm with the blockhash and `lastValidBlockHeight` from your transaction. If the blockhash expires without confirmation, rebuild with a fresh blockhash and resubmit.
+- **Simulate on your own RPC first:** `tx.jup.ag` does not simulate, so run any preflight simulation against your own RPC before submitting.
 - **Colocate for lowest latency:** Jupiter's API gateway runs in [six AWS regions](/portal/latency). Deploy your servers in the nearest region to minimise round-trip time.
 
 ## Why it lands fast

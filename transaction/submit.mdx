@@ -1,10 +1,10 @@
 ---
 title: "Transaction Submission"
-description: "Land signed transactions through Jupiter's infrastructure by pointing a Solana JSON-RPC client at tx.jup.ag"
-llmsDescription: "How to land signed transactions through Jupiter's proprietary transaction landing infrastructure using the Solana JSON-RPC endpoint at https://tx.jup.ag. tx.jup.ag is a drop-in Solana RPC endpoint that implements the standard Solana sendTransaction method: point any Solana client (@solana/web3.js Connection or @solana/kit) at it and authenticate with your Jupiter API key in the x-api-key header. It is send-only, so keep your own RPC for blockhash and confirmation. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) that includes a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 tip receiver accounts. Requires a Jupiter API key. Provides MEV protection by removing all intermediaries between your transaction and the leader. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips. Replaces the legacy REST POST api.jup.ag/tx/v1/submit endpoint."
+description: "Submit signed transactions to the Solana cluster through Jupiter's landing infrastructure by pointing a JSON-RPC client at tx.jup.ag"
+llmsDescription: "How to submit signed transactions to the Solana cluster through Jupiter's landing infrastructure using the Solana JSON-RPC endpoint at https://tx.jup.ag. tx.jup.ag is a drop-in Solana RPC endpoint that implements the standard Solana sendTransaction method: point any Solana client (@solana/web3.js Connection or @solana/kit) at it and authenticate with your Jupiter API key in the x-api-key header. It is send-only, so keep your own RPC for blockhash and confirmation. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) that includes a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 tip receiver accounts. Requires a Jupiter API key. Provides MEV protection by removing all intermediaries between your transaction and the leader. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips. Replaces the legacy REST POST api.jup.ag/tx/v1/submit endpoint."
 ---
 
-`tx.jup.ag` is a Solana JSON-RPC endpoint that lands your signed transactions through Jupiter's proprietary infrastructure, the same stack that powers Jupiter's own swap products. Point any Solana client at it, authenticate with your Jupiter API key, and call `sendTransaction` as you would against any RPC node. It accepts any valid signed Solana transaction with a SOL tip.
+`tx.jup.ag` is a Solana JSON-RPC endpoint that forwards your signed transactions to the Solana cluster through Jupiter's proprietary landing infrastructure, the same stack that powers Jupiter's own swap products. Point any Solana client at it, authenticate with your Jupiter API key, and call `sendTransaction` as you would against any RPC node. It accepts any valid signed Solana transaction with a SOL tip.
 
 ## How it works
 
@@ -27,11 +27,11 @@ curl https://tx.jup.ag \
     "jsonrpc": "2.0",
     "id": 1,
     "method": "sendTransaction",
-    "params": ["<base64-signed-transaction>", { "encoding": "base64", "skipPreflight": true }]
+    "params": ["<base64-signed-transaction>", { "encoding": "base64" }]
   }'
 ```
 
-A successful response returns the signature in `result`. A transaction without a valid tip is rejected with the JSON-RPC error `Transaction must include a Jupiter tip instruction`.
+A successful response returns the signature in `result`. This means the transaction was accepted and forwarded, not that it landed, so confirm on your own RPC. A transaction without a valid tip is rejected with `Transaction must include a Jupiter tip instruction`.
 
 ## Requirements
 
@@ -47,9 +47,21 @@ The `sendTransaction` config (the second param) takes:
 
 | Field | Value |
 |---|---|
-| `encoding` | Must be `base64` |
-| `skipPreflight` | Must be `true`. An explicit `false` is rejected; omit to default to `true` |
-| `maxRetries` | Must be `0`. A non-zero value is rejected; omit to default to `0` |
+| `encoding` | Defaults to `base64` (the only supported value) |
+| `skipPreflight` | Preflight is not supported; defaults to `true`. An explicit `false` is rejected with `-1015` |
+| `maxRetries` | Defaults to `0`. A non-zero value is rejected with `-1015` |
+| `swqosOnly` | Optional. `false` (default) uses SWQoS + Jito; `true` uses SWQoS only. Changes the Jito-tip strategy, see [Tips and fees](#tips-and-fees) |
+
+## Tips and fees
+
+Every transaction must include the **Jupiter tip** instruction (minimum 0.001 SOL) or it is rejected. The Jupiter tip is flat: tipping more does not improve landing. Add **priority fees** when the network is congested.
+
+Whether to add a **Jito tip** depends on `swqosOnly`:
+
+| `swqosOnly` | Routing | Jito tip |
+|---|---|---|
+| `false` (default) | SWQoS + Jito | Not needed, Beam adds a small one. Optionally add your own to boost Jito landing. |
+| `true` | SWQoS only | Do not add, it will not help. |
 
 ## Code example
 

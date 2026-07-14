@@ -38,7 +38,7 @@ Execute a swap when the USD price of a token crosses a threshold. See [Create Or
 
 | Type | Description | Use case |
 | :--- | :--- | :--- |
-| **Single** | Triggers when USD price crosses above or below a threshold | Standard limit orders, stop-loss |
+| **Single** | Triggers when USD price crosses above or below a threshold. Supports a trailing trigger that follows the market | Standard limit orders, stop-loss, trailing stop loss |
 | **OCO** | Two orders sharing one deposit: one take-profit, one stop-loss. When one fills, the other cancels automatically | Risk management with TP/SL brackets (e.g. sell SOL at \$300 TP or \$200 SL while market is \$250) |
 | **OTOCO** | A parent order triggers first, then activates a TP/SL pair (OCO) on the output | Conditional entry with automatic exit strategy |
 

@@ -90,6 +90,16 @@ Orders that have been fully or partially filled include extra fields:
 | `inputUsed` | Total input tokens consumed |
 | `fillPercent` | Fill ratio (1.0 = fully filled) |
 
+### Trailing Stop Loss Fields
+
+Single orders created with `trailingBps` (a [trailing stop loss](/trigger/create-order#trailing-stop-loss)) report these extra fields. `triggerPriceUsd` holds the current trailing trigger, which the keeper rewrites as the watermark moves.
+
+| Field | Description |
+| :--- | :--- |
+| `trailingBps` | Trail distance in basis points. `null` for non-trailing orders. |
+| `highWatermark` | Highest observed trigger-mint price (sell-below trailing). `null` otherwise. |
+| `lowWatermark` | Lowest observed trigger-mint price (buy-above trailing). `null` otherwise. |
+
 ### Execution Attempts
 
 Order history includes execution attempts for each order. When an order fails to execute (due to slippage, quote generation failure, or other reasons), the attempt is recorded in the history. The reason for failure is not included in the response.

@@ -41,6 +41,9 @@ components:
         txSignature:
           type: string
           description: On-chain transaction signature
+        depositConfirmed:
+          type: boolean
+          description: Whether the deposit has landed and the order is active
       required:
         - id
         - txSignature
@@ -97,6 +100,18 @@ components:
         fillPercent:
           type: number
           nullable: true
+        trailingBps:
+          type: number
+          nullable: true
+          description: Trailing stop loss trail distance in basis points. Null for non-trailing orders.
+        highWatermark:
+          type: number
+          nullable: true
+          description: Highest observed trigger-mint price (sell-below trailing).
+        lowWatermark:
+          type: number
+          nullable: true
+          description: Lowest observed trigger-mint price (buy-above trailing).
         events:
           type: array
           items:
@@ -615,7 +630,12 @@ paths:
                   description: Single/OTOCO only
                 triggerPriceUsd:
                   type: number
-                  description: Single/OTOCO parent trigger price
+                  description: Single/OTOCO trigger price. For single orders, required unless trailingBps is set.
+                trailingBps:
+                  type: number
+                  minimum: 50
+                  maximum: 9000
+                  description: "Trailing stop loss trail distance in basis points (50-9000). Single orders only; set instead of triggerPriceUsd. Direction from triggerCondition: below = sell-below (triggerMint === inputMint), above = buy-above (triggerMint === outputMint)."
                 slippageBps:
                   type: number
                   description: Slippage tolerance (0-10000 bps)
@@ -667,6 +687,7 @@ paths:
               example:
                 id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
                 txSignature: "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d..."
+                depositConfirmed: true
         '400':
           description: Validation error
           content:
@@ -704,6 +725,12 @@ paths:
                   enum: [single, oco, otoco]
                 triggerPriceUsd:
                   type: number
+                  description: New trigger price. Cannot be set on a trailing stop loss order.
+                trailingBps:
+                  type: number
+                  minimum: 50
+                  maximum: 9000
+                  description: New trailing stop loss trail distance in basis points (50-9000), for an order that is already trailing.
                 slippageBps:
                   type: number
                 tpPriceUsd:

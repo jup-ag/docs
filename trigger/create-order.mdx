@@ -17,7 +17,7 @@ Set `orderType` on the create call to choose the variant.
 
 | Type | Behaviour |
 | :--- | :--- |
-| `single` | Triggers a swap when `triggerMint`'s USD price crosses above or below a target. Standard limit order or stop-loss. |
+| `single` | Triggers a swap when `triggerMint`'s USD price crosses above or below a target. Standard limit order, stop-loss, or [trailing stop loss](#trailing-stop-loss). |
 | `oco` | A take-profit and stop-loss pair sharing one deposit. When one side fills, the other cancels automatically. |
 | `otoco` | A parent trigger that executes first, then activates a TP/SL (OCO) pair on the output. |
 
@@ -130,12 +130,13 @@ async function createLimitOrder() {
 createLimitOrder().catch(console.error);
 ```
 
-The deposit lands on-chain during the create call, so a `200` means the order is live. The response is `{ id, txSignature }`, where `id` is the order identifier you use to [track](/trigger/order-history), [update, or cancel](/trigger/manage-orders) it, and `txSignature` is the on-chain deposit signature:
+The deposit lands on-chain during the create call. The response is `{ id, txSignature, depositConfirmed }`: `id` is the order identifier you use to [track](/trigger/order-history), [update, or cancel](/trigger/manage-orders) it, `txSignature` is the on-chain deposit signature, and `depositConfirmed` is `true` once the deposit has landed and the order is active:
 
 ```json
 {
   "id": "order-uuid",
-  "txSignature": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d..."
+  "txSignature": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d...",
+  "depositConfirmed": true
 }
 ```
 
@@ -208,6 +209,49 @@ const order = await fetch(`${BASE}/orders/price`, {
 }).then((r) => r.json());
 ```
 
+## Trailing stop loss
+
+A trailing stop loss is a `single` order that tracks the market instead of using a fixed price. Set `trailingBps` instead of `triggerPriceUsd`: the trigger follows the price in your favour and holds when the price reverses. Provide exactly one of `triggerPriceUsd` (static) or `trailingBps` (trailing).
+
+`trailingBps` is the trail distance in basis points, from 50 to 9000 (0.5% to 90%). `triggerCondition` sets the direction:
+
+| `triggerCondition` | Use | `triggerMint` | Trigger price |
+| :--- | :--- | :--- | :--- |
+| `below` | Sell-below (stop loss): protect a position, sell if the price falls | `inputMint` | `highWatermark × (1 − trailingBps/10000)` |
+| `above` | Buy-above: enter as the price rises off a low | `outputMint` | `lowWatermark × (1 + trailingBps/10000)` |
+
+At create, the API seeds the trigger from the current market price. The keeper then tracks a running watermark (the high for `below`, the low for `above`) and rewrites the trigger as the watermark moves in your favour. The trigger never moves against you. Watermark updates are batched, not per price tick.
+
+Craft the deposit with `orderSubType: "single"`, then submit a single order with `trailingBps` and no `triggerPriceUsd`:
+
+```typescript
+// deposit crafted with orderSubType: "single"; hold SOL, sell if it falls 10% from its peak
+const order = await fetch(`${BASE}/orders/price`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify({
+    orderType: "single",
+    depositRequestId: deposit.requestId,
+    depositSignedTx,
+    userPubkey: owner,
+    inputMint: SOL,           // selling the asset you hold
+    outputMint: USDC,
+    inputAmount: "200000000", // 0.2 SOL
+    triggerMint: SOL,         // "below" requires triggerMint === inputMint
+    triggerCondition: "below",
+    trailingBps: 1000,        // trail 10% below the peak; no triggerPriceUsd
+    slippageBps: 100,
+    expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+  }),
+}).then((r) => r.json());
+```
+
+`slippageBps` is the execution buffer beneath the trigger, the same as a static order. Track the live trigger and watermark with [Order History](/trigger/order-history) (`triggerPriceUsd`, `trailingBps`, `highWatermark`/`lowWatermark`), and change the trail distance later by [updating](/trigger/manage-orders) `trailingBps`.
+
+<Note>
+Trailing rules: provide exactly one of `triggerPriceUsd` or `trailingBps` (else `400 "exactly one of triggerPriceUsd or trailingBps must be set"`); `trailingBps` must be 50–9000; and `triggerMint` must be the `inputMint` for `below` or the `outputMint` for `above`.
+</Note>
+
 ## Order parameters reference
 
 ### Common fields (all order types)
@@ -229,7 +273,8 @@ const order = await fetch(`${BASE}/orders/price`, {
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
 | `triggerCondition` | `string` | Yes | `above` or `below` |
-| `triggerPriceUsd` | `number` | Yes | USD price that triggers execution |
+| `triggerPriceUsd` | `number` | Cond. | USD price that triggers execution. Required unless `trailingBps` is set. |
+| `trailingBps` | `number` | Cond. | Trail distance in basis points (50–9000) for a [trailing stop loss](#trailing-stop-loss). Set instead of `triggerPriceUsd`. |
 | `slippageBps` | `number` | No | Slippage tolerance in basis points (0-10000) |
 
 ### OCO order fields
@@ -271,6 +316,7 @@ Stop-loss orders use a higher default because execution certainty is more import
 - Slippage: 0-10000 basis points
 - `expiresAt` is required and must be a future timestamp (milliseconds)
 - OCO/OTOCO: take-profit price must be greater than stop-loss price
+- Trailing: set exactly one of `triggerPriceUsd` or `trailingBps`; `trailingBps` must be 50–9000; `triggerMint` must be `inputMint` for `below` or `outputMint` for `above`
 
 <Note>
 Unlike V1 where orders could exist indefinitely, V2 requires an expiration on every order. Adding a TTL allows the system to prune orders that are unlikely to fill, improving execution quality for active orders. For long-lived orders, use a far-future timestamp (e.g. 30 days).

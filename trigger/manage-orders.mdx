@@ -68,6 +68,19 @@ const result = await updateResponse.json();
 }
 ```
 
+**Trailing stop loss:**
+```json
+{
+  "orderType": "single",
+  "trailingBps": 800,
+  "slippageBps": 150
+}
+```
+
+<Note>
+On a [trailing stop loss](/trigger/create-order#trailing-stop-loss), update `trailingBps` (50–9000) to change the trail distance. You cannot set `triggerPriceUsd` on a trailing order (`400 "Cannot set trigger price on trailing stop loss order"`), convert a static order to trailing or back (`400 "Cannot convert to trailing stop loss order"`), or set a `trailingBps` whose new band would fire immediately (`400 "Trailing order would immediately trigger"`).
+</Note>
+
 ## Cancel an Order
 
 Cancellation is a two-step process. The first step returns a withdrawal transaction that moves funds from the vault back to your wallet. You sign and submit it in the second step.

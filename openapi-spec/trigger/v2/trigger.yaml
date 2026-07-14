@@ -1256,8 +1256,8 @@ paths:
     get:
       summary: Get DCA order
       description: |
-        Get a single DCA order by ID, including fill history and events. Use this DCA-specific
-        path; the price-order path `GET /orders/history/{id}` returns 404 for DCA orders.
+        Get a single DCA order by ID, including fill history and events. The path requires
+        the `dca` segment.
       security:
         - ApiKeyAuth: []
           BearerAuth: []

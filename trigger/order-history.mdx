@@ -1,5 +1,6 @@
 ---
 title: "Order History"
+sidebarTitle: "Track"
 description: "Query order history, filter by state, and understand the order lifecycle."
 llmsDescription: "GET /trigger/v2/orders/history returns paginated order history with state, events, and fill details. Filter by state (active/past), mint, and sort by updated_at/created_at/expires_at."
 ---
@@ -76,6 +77,8 @@ const history = await historyResponse.json();
 }
 ```
 
+`initialInputAmount` is the `inputAmount` you submitted on create; `remainingInputAmount` is the amount not yet filled.
+
 ### Additional Fields for Filled Orders
 
 Orders that have been fully or partially filled include extra fields:
@@ -123,7 +126,7 @@ Fill events include additional fields:
 
 ## Order States
 
-Orders follow a state machine from creation to completion. The `orderState` field provides a human-friendly state, while `rawState` shows the exact internal state. For a high-level view of how an order moves through these states, including OCO and OTOCO branching, see the [Lifecycle](/trigger/lifecycle#order-state-lifecycle) page.
+Orders follow a state machine from creation to completion. The `orderState` field provides a human-friendly state, while `rawState` shows the exact internal state. For a high-level view of how an order moves through these states, including OCO and OTOCO branching, see the [Integration Flow](/trigger/lifecycle#order-state-lifecycle) page.
 
 ### Display States
 

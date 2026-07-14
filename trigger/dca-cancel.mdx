@@ -1,0 +1,63 @@
+---
+title: "Cancel a DCA Order"
+sidebarTitle: "Cancel"
+description: "Withdraw the unfilled remainder of a DCA order through the two-step cancel flow."
+llmsDescription: "How to cancel a Trigger V2 DCA order and withdraw the unfilled remainder: two-step flow, POST /trigger/v2/orders/dca/cancel/{id} (returns an unsigned withdrawal transaction plus refundAmount and roundsRemaining) then POST /trigger/v2/orders/dca/confirm-cancel/{id} (submit the signed transaction). Covers that re-calling cancel while withdrawing is idempotent, that a failed confirm-cancel leaves the order in withdrawing (it does not roll back to active), and that DCA orders cannot be edited (no PATCH route). Rounds that have already filled are not reversed."
+---
+
+DCA orders cannot be edited, only cancelled. Cancelling returns the unfilled remainder to your wallet; rounds that have already filled are not reversed. Every request needs the JWT from [authentication](/trigger/authentication).
+
+<Note>
+There is no update endpoint (`PATCH /trigger/v2/orders/dca/{id}` returns `404`). To change the schedule or amounts, cancel the order and [create a new one](/trigger/dca).
+</Note>
+
+## Cancelling an order
+
+Cancelling uses the same two-step withdrawal flow as price orders.
+
+**Step 1** moves the order to `withdrawing` and returns an unsigned withdrawal transaction, along with `refundAmount` and `roundsRemaining`:
+
+```typescript
+const cancel = await fetch(`${BASE}/orders/dca/cancel/${orderId}`, { method: "POST", headers }).then((r) => r.json());
+// { id, roundsRemaining, refundAmount, transaction, requestId }
+```
+
+**Step 2** signs that transaction and confirms the withdrawal:
+
+```typescript
+const tx = VersionedTransaction.deserialize(Buffer.from(cancel.transaction, "base64"));
+tx.sign([wallet]);
+
+const confirmed = await fetch(`${BASE}/orders/dca/confirm-cancel/${orderId}`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify({
+    signedTransaction: Buffer.from(tx.serialize()).toString("base64"),
+    cancelRequestId: cancel.requestId,
+  }),
+}).then((r) => r.json());
+// { id, txSignature }
+```
+
+If the withdrawal does not land, call `cancel` again to re-craft it; the order stays in `withdrawing` and the request is idempotent. A failed `confirm-cancel` leaves the order in `withdrawing` so you can retry; it does not roll back to `active`.
+
+<Note>
+Cancel-specific errors: `400 "Cannot cancel DCA order in '<state>' state"` when the order is not `active` or `withdrawing`, and `400 "Withdrawal transaction not found in cache. Please initiate cancel again."` when `cancelRequestId` is stale. See the full list under [Errors](/trigger/dca#errors).
+</Note>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Create a DCA Order" href="/trigger/dca" icon="circle-plus">
+    Set up the deposit and schedule.
+  </Card>
+  <Card title="Track a DCA Order" href="/trigger/dca-history" icon="magnifying-glass">
+    Monitor progress, fills, and state.
+  </Card>
+  <Card title="Cancel DCA (API)" href="/api-reference/trigger/cancel-dca" icon="code">
+    Full cancel request and response schema.
+  </Card>
+  <Card title="Authentication" href="/trigger/authentication" icon="key">
+    The challenge-response JWT flow every request needs.
+  </Card>
+</CardGroup>

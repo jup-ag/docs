@@ -1,6 +1,6 @@
 ---
 title: "Trigger Order API Overview"
-sidebarTitle: "About Trigger API"
+sidebarTitle: "Overview"
 description: "Create advanced trigger orders on Solana with vault-based execution: limit orders, take-profit/stop-loss (OCO), conditional chains (OTOCO), and recurring DCA."
 llmsDescription: "Jupiter Trigger Order API V2 enables vault-based automated orders on Solana. Two order families: price orders (single limit, OCO for TP/SL, OTOCO conditional chains) and DCA (dollar-cost averaging, recurring time- or price-conditional swaps). Requires JWT authentication via challenge-response flow. Deposits go into Privy-managed vault accounts shared across all your orders."
 ---
@@ -62,10 +62,12 @@ Your Wallet ──→ Vault (1 per wallet) ──→ Order A
 Each wallet gets a single vault (a Privy-managed custodial account). When you create orders, tokens are deposited from your wallet into your vault. The vault holds funds for all your active orders.
 
 1. [**Authenticate**](/trigger/authentication): Sign a challenge with your wallet to receive a JWT token
-2. [**Get your vault**](/trigger/create-order#step-1-get-your-vault): Retrieve your vault, or register one on first use
-3. **Create an order**: Deposit tokens into your vault and submit a [price order](/trigger/create-order) or a [DCA order](/trigger/dca)
-4. **Monitor**: Track order state and history via the [history endpoint](/trigger/order-history)
-5. [**Manage**](/trigger/manage-orders): Update order parameters, or cancel with a two-step withdrawal flow
+2. [**Set up your vault and deposit**](/trigger/deposit): Resolve your vault (or register one on first use), then craft and sign a deposit that funds the order
+3. **Create an order**: Submit a [price order](/trigger/create-order) or a [DCA order](/trigger/dca) with the signed deposit
+4. **Monitor**: Track order state, fills, and events for [price orders](/trigger/order-history) or [DCA orders](/trigger/dca-history)
+5. **Manage**: Update or cancel [price orders](/trigger/manage-orders), or cancel [DCA orders](/trigger/dca-cancel)
+
+See [Integration Flow](/trigger/lifecycle) for the full call sequence and how each call's output feeds the next.
 
 ## Base URL
 

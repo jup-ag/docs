@@ -1,8 +1,11 @@
 ---
 title: "Manage Orders"
+sidebarTitle: "Manage"
 description: "Update order parameters, cancel orders with two-step withdrawal, and withdraw funds from your vault."
 llmsDescription: "PATCH /trigger/v2/orders/price/{orderId} updates order parameters. POST /trigger/v2/orders/price/cancel/{orderId} initiates cancellation and returns a withdrawal transaction. POST /trigger/v2/orders/price/confirm-cancel/{orderId} confirms with the signed withdrawal transaction."
 ---
+
+Update an order in place, or cancel it with a two-step withdrawal. Every request needs the JWT `token` from [authentication](/trigger/authentication) and the `orderId` returned when you [created the order](/trigger/create-order) (the same value as `id` in [order history](/trigger/order-history)).
 
 ## Prerequisites
 

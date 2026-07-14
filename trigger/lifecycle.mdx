@@ -1,19 +1,20 @@
 ---
-title: "Lifecycle"
-description: "The end-to-end sequence of Trigger Order API calls, the data that flows between them, and the states an order moves through."
-llmsDescription: "Maps the full Jupiter Trigger Order V2 integration flow across endpoints: POST /trigger/v2/auth/challenge and /auth/verify to get a JWT, GET /trigger/v2/vault (or /vault/register) to resolve the vault, POST /trigger/v2/deposit/craft to build a deposit and get a requestId, sign the deposit client-side, POST /trigger/v2/orders/price to create the order (id/ocoId), GET /trigger/v2/orders/history to monitor state, PATCH /trigger/v2/orders/price/{id} to update, and POST /trigger/v2/orders/price/cancel/{id} + /confirm-cancel/{id} to cancel and withdraw. Shows the call order, the data dependencies between calls (token, vaultPubkey, requestId, depositSignedTx, id, cancelRequestId), the order state machine (open, executing, filled, expired, cancelled, pending_withdraw), how OCO and OTOCO orders branch, and how to recover a cancellation that was interrupted. Use this page to understand which endpoints to call in what order before integrating."
+title: "Integration Flow"
+sidebarTitle: "Integration Flow"
+description: "The end-to-end sequence of Trigger API calls for both limit orders and DCA, the data that flows between them, and where the two families diverge."
+llmsDescription: "Maps the full Jupiter Trigger Order V2 integration flow for both order families (price/limit orders and DCA) across endpoints: POST /trigger/v2/auth/challenge and /auth/verify to get a JWT, GET /trigger/v2/vault (or /vault/register) to resolve the vault, POST /trigger/v2/deposit/craft to build a deposit and get a requestId, sign the deposit client-side, then the family-specific create call (POST /trigger/v2/orders/price with orderType single/oco/otoco, or POST /trigger/v2/orders/dca), monitoring (GET /trigger/v2/orders/history or /orders/history/dca), editing (PATCH /trigger/v2/orders/price/{id}, limit orders only), and the shared two-step cancel and withdraw (POST /orders/{price|dca}/cancel/{id} + /confirm-cancel/{id}). Shows the shared call order, the data dependencies (token, vaultPubkey, requestId, depositSignedTx, id, cancelRequestId), the order state machine, and how to recover an interrupted cancellation. Includes a limit-order vs DCA endpoint comparison table. Use this page to understand which endpoints to call in what order before integrating either family."
 ---
 
-This page maps a trigger order from start to finish: which endpoints to call, in what order, the data that flows from one call into the next, and the states an order moves through. Each endpoint has its own detail page, linked at every step.
+This page maps a trigger order from start to finish: which endpoints to call, in what order, the data that flows from one call into the next, and the states an order moves through. Both order families, price (limit) orders and DCA, follow the same spine. They differ only at the create, monitor, and manage steps. Each endpoint has its own detail page, linked at every step.
 
 ## Prerequisites
 
 - An API key from the [Portal](https://developers.jup.ag/portal). All requests require the `x-api-key` header.
 - A Solana wallet. Every step that moves funds (deposit, withdrawal) is signed client-side by the wallet owner.
 
-## Integration at a Glance
+## The Flow
 
-A trigger order moves through authentication, a one-time vault setup, the deposit-and-create flow, then monitoring and an optional cancel-and-withdraw. The key to integrating is the data hand-off: each call produces the value the next call needs.
+Authenticate once, set up your vault once, then repeat deposit-and-create per order. The key to integrating is the data hand-off: each call produces the value the next call needs. The shared spine:
 
 ```text
 POST /auth/challenge              ─▶ challenge (or transaction)
@@ -21,14 +22,28 @@ POST /auth/verify                 ─▶ token (JWT, 24h)
 GET  /vault   (or /vault/register)─▶ vaultPubkey
 POST /deposit/craft               ─▶ transaction + requestId
   └ sign deposit client-side      ─▶ depositSignedTx
-POST /orders/price                ─▶ id (ocoId) + txSignature
-GET  /orders/history              ─▶ orderState / rawState
-POST /orders/price/cancel/{id}    ─▶ withdrawal transaction + requestId (cancelRequestId)
+POST /orders/price  or  /orders/dca ─▶ id + txSignature   ◀── family-specific
+GET  /orders/history  or  /orders/history/dca ─▶ state    ◀── family-specific
+POST /orders/{price|dca}/cancel/{id}      ─▶ withdrawal transaction + cancelRequestId
   └ sign withdrawal client-side
-POST /orders/price/confirm-cancel/{id} ─▶ txSignature
+POST /orders/{price|dca}/confirm-cancel/{id} ─▶ txSignature
 ```
 
 All endpoints are under `https://api.jup.ag/trigger/v2`.
+
+## Limit orders vs DCA
+
+The two families share authentication, the vault, and the deposit endpoint. They diverge at the calls below.
+
+| Step | Limit orders | DCA |
+| :--- | :--- | :--- |
+| Deposit `orderType` | `price` (with `orderSubType`) | `dca` |
+| Create | `POST /orders/price` | `POST /orders/dca` |
+| Order types | `single`, `oco`, `otoco` | `time_based`, `price_conditional` |
+| Track | `GET /orders/history` | `GET /orders/history/dca` |
+| Edit | `PATCH /orders/price/{id}` | Not supported |
+| Cancel | `POST /orders/price/cancel/{id}` + `/confirm-cancel/{id}` | `POST /orders/dca/cancel/{id}` + `/confirm-cancel/{id}` |
+| Detail pages | [Create](/trigger/create-order), [Track](/trigger/order-history), [Manage](/trigger/manage-orders) | [Create](/trigger/dca), [Track](/trigger/dca-history), [Cancel](/trigger/dca-cancel) |
 
 ## Step by Step
 
@@ -42,56 +57,50 @@ See [Authentication](/trigger/authentication) for the message and transaction fl
 
 ### 2. Get or register your vault
 
-Call `GET /vault` to resolve your vault, or `GET /vault/register` on first use. The vault is a Privy-managed custodial account that holds deposits for your orders. The vault address is resolved from your JWT, so you do not pass it into later calls.
+Call `GET /vault` to resolve your vault, or `GET /vault/register` on first use. The vault is a Privy-managed custodial account that holds deposits for all your orders. The vault address is resolved from your JWT, so you do not pass it into later calls.
 
-See [Create Order](/trigger/create-order#step-1-get-your-vault).
+See [Vault & Deposit](/trigger/deposit).
 
 ### 3. Craft and sign a deposit
 
-Call `POST /deposit/craft` with the input/output mints, amount, `orderType: "price"`, and the `orderSubType` that matches the order you will create (`single`, `oco`, or `otoco`). It returns an unsigned `transaction` and a `requestId`. Sign the transaction client-side to produce `depositSignedTx`.
+Call `POST /deposit/craft` with the input/output mints, amount, and `orderType`. For a price order, also pass the `orderSubType` that matches the order you will create (`single`, `oco`, or `otoco`); for DCA, use `orderType: "dca"` with no subtype. It returns an unsigned `transaction` and a `requestId`. Sign the transaction client-side to produce `depositSignedTx`.
 
 The API stores the deposit's token accounts against the `requestId`, so you carry only the `requestId` and `depositSignedTx` into the next step.
 
-See [Create Order](/trigger/create-order#step-2-craft-a-deposit-transaction).
+See [Vault & Deposit](/trigger/deposit).
 
 ### 4. Create the order
 
-Call `POST /orders/price` with `depositRequestId`, `depositSignedTx`, and your order parameters. The `orderType` determines which fields are required:
+Call your family's create endpoint with `depositRequestId`, `depositSignedTx`, and your order parameters.
 
-| Order type | Behaviour |
-| :--- | :--- |
-| `single` | One price order that triggers when `triggerMint` crosses the target price |
-| `oco` | A take-profit and stop-loss pair sharing one deposit. When one side fills, the other cancels |
-| `otoco` | A parent trigger that, once filled, activates an OCO pair on the output tokens |
+- **Limit orders:** `POST /orders/price`. The `orderType` (`single`, `oco`, `otoco`) determines which fields are required. The response returns the order `id` (the `ocoId`, your primary identifier) and a `txSignature`. See [Create Order](/trigger/create-order).
+- **DCA:** `POST /orders/dca` with `orderCount`, `intervalSeconds`, and `orderType` (`time_based` or `price_conditional`). The response returns `{ id, txSignature }`. See [Create a DCA Order](/trigger/dca).
 
-The response returns the order `id` (the `ocoId`, your primary identifier for the order or group) and a `txSignature` confirming the deposit landed. The order is now active.
-
-See [Create Order](/trigger/create-order#step-4-create-the-order).
+For both families the deposit lands on-chain during this call, so a `200` means the order is live.
 
 ### 5. Monitor order state
 
-Call `GET /orders/history` to track an order through its lifecycle. Each order carries an `orderState` (human-friendly) and `rawState` (exact internal state), plus an `events` array of deposits, fills, withdrawals, cancellations, and expirations.
+Track an order through its lifecycle:
 
-See [Order History](/trigger/order-history) and the [Order State Lifecycle](#order-state-lifecycle) below.
+- **Limit orders:** `GET /orders/history`. Each order carries an `orderState` (display) and `rawState` (internal), plus an `events` array. See [Order History](/trigger/order-history).
+- **DCA:** `GET /orders/history/dca` (or `/orders/history/dca/{id}` for one order). Each order reports its schedule, `roundsFilled`, `fillPercent`, `state`/`displayState`, and `events`. See [Track a DCA Order](/trigger/dca-history).
 
-### 6. Update or cancel
+### 6. Edit or cancel
 
-While an order is `open` you can:
+- **Limit orders** can be updated in place while `open`: `PATCH /orders/price/{id}` to change the trigger price, slippage, or expiry. No new deposit is needed. See [Manage Orders](/trigger/manage-orders).
+- **DCA orders cannot be edited.** To change a schedule, cancel and create a new order. See [Cancel a DCA Order](/trigger/dca-cancel).
 
-- **Update** it in place with `PATCH /orders/price/{id}` to change the trigger price, slippage, or expiry. No new deposit is needed.
-- **Cancel** it with `POST /orders/price/cancel/{id}`, which returns a withdrawal transaction to sign.
-
-See [Manage Orders](/trigger/manage-orders).
+To cancel either family, call the family's `cancel` endpoint, which returns a withdrawal transaction to sign (step 7).
 
 ### 7. Confirm cancellation
 
-Sign the withdrawal transaction from step 6 and submit it to `POST /orders/price/confirm-cancel/{id}` with the `cancelRequestId`. This returns the funds to your wallet and moves the order to `cancelled`.
+Sign the withdrawal transaction from step 6 and submit it to the family's `confirm-cancel` endpoint (`POST /orders/price/confirm-cancel/{id}` or `POST /orders/dca/confirm-cancel/{id}`) with the `cancelRequestId`. This returns the unfilled funds to your wallet.
 
 See [Cancellation and Recovery](#cancellation-and-recovery) for what happens if this step is interrupted.
 
 ## Order State Lifecycle
 
-An order moves through a state machine from creation to completion. `GET /orders/history` reports both an `orderState` (display) and a `rawState` (internal). The high-level flow:
+A limit order moves through a state machine from creation to completion. `GET /orders/history` reports both an `orderState` (display) and a `rawState` (internal). The high-level flow:
 
 ```text
 pending ──▶ open ──▶ executing ──▶ filled
@@ -112,27 +121,27 @@ pending ──▶ open ──▶ executing ──▶ filled
 
 **OTOCO orders:** the child OCO pair only activates after the parent order reaches `filled`. If the parent expires or fails, the children are never created.
 
-For the complete `orderState` ↔ `rawState` mapping and the `events` schema, see [Order History](/trigger/order-history#order-states).
+For the complete `orderState` ↔ `rawState` mapping and the `events` schema, see [Order History](/trigger/order-history#order-states). DCA orders use a separate set of states (`depositing`, `active`, `executing`, `withdrawing`, `completed`, `cancelled`); see [Track a DCA Order](/trigger/dca-history#order-states).
 
 ## Cancellation and Recovery
 
-Cancellation is a two-step process designed so funds are never at risk mid-flow:
+Cancellation is a two-step process designed so funds are never at risk mid-flow. It works the same way for both families (swap `price` for `dca` in the paths):
 
-1. **Initiate** with `POST /orders/price/cancel/{id}`. The order moves from `open` to `ready_to_cancel` (display: `pending_withdraw`) immediately, so it can no longer be filled. The call returns an unsigned withdrawal transaction and a `cancelRequestId`.
-2. **Confirm** by signing that transaction and submitting it to `POST /orders/price/confirm-cancel/{id}`. The funds return to your wallet and the order becomes `cancelled`.
+1. **Initiate** with `POST /orders/price/cancel/{id}`. The order stops accepting fills immediately, and the call returns an unsigned withdrawal transaction and a `cancelRequestId`.
+2. **Confirm** by signing that transaction and submitting it to `POST /orders/price/confirm-cancel/{id}`. The unfilled funds return to your wallet.
 
-Between the two steps the order sits safely in `ready_to_cancel`: fills are stopped and the deposit remains in the vault.
+Between the two steps the order is safe: fills are stopped and the deposit remains in the vault.
 
 <Note>
 If the second step is interrupted (the tab closes, or the transaction does not land):
 
-- **You still have the withdrawal transaction and `cancelRequestId`:** retry `POST /orders/price/confirm-cancel/{id}` with the same `cancelRequestId`.
-- **You lost the withdrawal transaction:** call `POST /orders/price/cancel/{id}` again. The order is already in `ready_to_cancel`, so the call simply crafts and returns a fresh withdrawal transaction to sign.
+- **You still have the withdrawal transaction and `cancelRequestId`:** retry `confirm-cancel` with the same `cancelRequestId`.
+- **You lost the withdrawal transaction:** call `cancel` again. The order is already mid-cancel, so the call simply crafts and returns a fresh withdrawal transaction to sign.
 
-The order remains in `ready_to_cancel` until a withdrawal confirms on-chain, so funds are never stranded.
+The order stays mid-cancel until a withdrawal confirms on-chain, so funds are never stranded.
 </Note>
 
-The same two-step flow retrieves funds from an `expired` order: initiate cancellation, sign, and confirm.
+The same two-step flow retrieves funds from a limit order that has `expired`.
 
 ## Related
 
@@ -140,14 +149,14 @@ The same two-step flow retrieves funds from an `expired` order: initiate cancell
   <Card title="Authentication" href="/trigger/authentication" icon="key">
     Challenge-response signing and the JWT token lifecycle.
   </Card>
-  <Card title="Create Order" href="/trigger/create-order" icon="circle-plus">
-    The vault, deposit, and order-creation request shapes.
+  <Card title="Vault & Deposit" href="/trigger/deposit" icon="vault">
+    Resolve your vault and craft the deposit both families share.
   </Card>
-  <Card title="Manage Orders" href="/trigger/manage-orders" icon="sliders">
-    Update orders and the two-step cancel-and-withdraw flow.
+  <Card title="Create Order (Limit)" href="/trigger/create-order" icon="circle-plus">
+    Single, OCO, and OTOCO price orders.
   </Card>
-  <Card title="Order History" href="/trigger/order-history" icon="clock-rotate-left">
-    Full order state mapping and the events schema.
+  <Card title="Create a DCA Order" href="/trigger/dca" icon="circle-plus">
+    Time-based and price-conditional schedules.
   </Card>
   <Card title="Best Practices" href="/trigger/best-practices" icon="lightbulb">
     Expiry, slippage, and integration guidance.

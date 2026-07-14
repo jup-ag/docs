@@ -6,14 +6,10 @@ th {
     color: white !important;
 }
 
-#banner {
-    background-color: #f2e584 !important;
-}
-#banner * {
-    color: black !important;
-    font-size: 0.75rem !important;
-    text-align: left;
-}
+/* Banner uses Mintlify default colours (bg from docs.json colors.dark, white text).
+   Custom colour overrides were removed: Mintlify's Tailwind v4 utilities set the
+   banner text colour with important declarations inside @layer utilities, which
+   beat unlayered important overrides regardless of specificity. */
 
 /* Hide dismiss button on desktop (show only on mobile) */
 @media screen and (min-width: 768px) {
@@ -23,9 +19,6 @@ th {
     #banner [data-dismiss],
     #banner button[type="button"] {
         display: none !important;
-    }
-    #banner {
-        text-align: center !important;
     }
 }
 

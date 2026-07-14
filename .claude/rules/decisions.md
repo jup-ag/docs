@@ -162,9 +162,9 @@ Track all redirects added to `vercel.json` here for visibility:
 
 | Old Path | New Path | Date | Reason |
 |----------|----------|------|--------|
-| `/api-reference/trigger/create-order` | `/api-reference/trigger/v1/create-order` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
+| `/api-reference/trigger/create-order` | `/api-reference/trigger/v1/create-order` | 2026-03-10 | V1/V2 restructure (DEVREL-75). REMOVED 2026-07-09 (DEV-724): after DEVREL-115 the V2 page lives at the unprefixed URL, so this redirect shadowed it. Unprefixed URL now serves V2. |
 | `/api-reference/trigger/execute` | `/api-reference/trigger/v1/execute` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
-| `/api-reference/trigger/cancel-order` | `/api-reference/trigger/v1/cancel-order` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
+| `/api-reference/trigger/cancel-order` | `/api-reference/trigger/v1/cancel-order` | 2026-03-10 | V1/V2 restructure (DEVREL-75). REMOVED 2026-07-09 (DEV-724): same shadowing as create-order. |
 | `/api-reference/trigger/cancel-orders` | `/api-reference/trigger/v1/cancel-orders` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
 | `/api-reference/trigger/get-trigger-orders` | `/api-reference/trigger/v1/get-trigger-orders` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
 | `/ai/ecosystem` | `/ai` | 2026-03-23 | Ecosystem page removed in AI section rework (PR #857) |

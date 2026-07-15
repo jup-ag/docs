@@ -169,6 +169,10 @@ the work, not just the state of the code.
 - Keep it 1:1 — one issue per PR. If scope expands during a task, update the
   existing issue rather than creating a second issue on the same PR. If the work
   is truly separate, it should be a separate PR.
+  - Exception: a change that needs a changelog entry has TWO PRs on one issue —
+    the docs PR here and the companion changelog PR in the `developer-platform`
+    repo (see the Changelog section). Attach both PRs to the same issue; do not
+    create a separate issue for the changelog entry.
 
 ### 4. Branch (Worktree)
 
@@ -199,15 +203,31 @@ Do the work following the Writing and Reviewing guidelines below. After writing:
 
 #### Changelog
 
-The changelog lives on the Developer Platform blog, NOT in this repo (decided 2026-07-07, DEV-595).
-It is published as one blog post per month in the `developer-platform` repo at
+The changelog lives on the Developer Platform site, NOT in this repo (decided 2026-07-07, DEV-595).
+It is published as one post per month in the `developer-platform` repo at
 `web/content/changelog/YYYY-MM.mdx`, rendered at https://developers.jup.ag/changelog.
 
-If your changes affect a public API or product, add (or update) the current month's changelog
-post in `~/Documents/Projects/developer-platform/web/content/changelog/`. Follow the format in that
-repo's `web/content/changelog/_template.mdx` and the rules in `web/content/blog/README.md`
-(breaking changes first, one section per product area, bold one-line change + "WTM" explanation
-+ full docs URLs). This is a separate repo, so it means a separate PR there.
+The monthly post is a living document, not an end-of-month digest. Entries are appended as
+changes ship: the first API-affecting change of a month creates `YYYY-MM.mdx`, every later
+change that month appends to it. Breaking changes with future deadlines go in immediately
+as pre-announcements. There is no separate "hot list"; the current month's post is it.
+
+**Companion PR workflow.** If your changes affect a public API or product, the changelog
+entry is part of shipping, not a follow-up. As soon as the docs PR is open:
+
+1. Go to your local clone of `jup-ag/developer-platform`. If you don't have one, clone it
+   as a sibling of this repo: `git clone https://github.com/jup-ag/developer-platform.git`.
+2. Branch from `origin/develop` and open the PR against `develop` (the integration branch:
+   pushes to it build the staging site, and production ships when a `web-v*` release is cut).
+   Branch naming: `<user>/dev-XXX-description` matching the Linear issue.
+3. Add or update the current month's post in `web/content/changelog/`. Follow the format in
+   `web/content/changelog/_template.mdx` and the rules in `web/content/blog/README.md`
+   (breaking changes first, one section per product area, each entry a `<ChangelogItem>`
+   with a one-line change + "WTM" explanation + full docs URLs).
+4. Open the companion PR there and attach it to the SAME Linear issue as the docs PR
+   (no separate issue; this is the documented exception to the 1:1 issue-per-PR rule).
+5. The issue stays `In Review` until BOTH PRs are merged. Merge the changelog PR after
+   (or together with) the docs PR so the changelog never links to unpublished docs.
 
 **When to add an entry:**
 - New API endpoints or products
@@ -242,6 +262,8 @@ Once the work is ready:
 - Commit and push the branch
 - Open a PR via `gh` CLI
 - Reference the Linear issue in the PR body with a link: `Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX)`
+- If the change affects a public API or product, open the companion changelog PR in the
+  `developer-platform` repo now and attach it to the same Linear issue (see Changelog in §5)
 - Update the Linear issue to `In Review`
 
 After PR is merged:

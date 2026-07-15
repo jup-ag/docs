@@ -39,7 +39,6 @@ jup-ag/docs/
 ├── guide/                 # Guides and tutorials
 ├── blog/                  # Developer blog posts
 ├── resources/             # Support, brand kit, and community resources
-├── updates/               # Changelog / developer updates
 ├── snippets/              # Reusable MDX snippet components
 ├── static/                # Static assets (images, etc.)
 │
@@ -73,7 +72,7 @@ jup-ag/docs/
 | Tool Kits           | SDKs and toolkits for developers                   | `tool-kits/`    |
 | AI                  | AI workflow and resources for AI agents            | `ai/`           |
 | Resources           | Support, brand kit, and community resources        | `resources/`    |
-| Updates             | Changelog / developer updates                      | `updates/`      |
+| Changelog           | External link to developers.jup.ag/changelog (lives in the `developer-platform` repo) | (none)  |
 
 ## Products & APIs
 
@@ -205,8 +204,8 @@ It is published as one blog post per month in the `developer-platform` repo at
 `web/content/changelog/YYYY-MM.mdx`, rendered at https://developers.jup.ag/changelog.
 
 If your changes affect a public API or product, add (or update) the current month's changelog
-post in `~/Documents/Projects/developer-platform/web/content/blog/`. Follow the format in that
-repo's `web/content/blog/_changelog-template.mdx` and the rules in `web/content/blog/README.md`
+post in `~/Documents/Projects/developer-platform/web/content/changelog/`. Follow the format in that
+repo's `web/content/changelog/_template.mdx` and the rules in `web/content/blog/README.md`
 (breaking changes first, one section per product area, bold one-line change + "WTM" explanation
 + full docs URLs). This is a separate repo, so it means a separate PR there.
 

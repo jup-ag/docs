@@ -52,9 +52,7 @@ paths:
                   type: string
                   enum: ["2.0"]
                 id:
-                  oneOf:
-                    - type: integer
-                    - type: string
+                  type: integer
                   description: Request identifier echoed back in the response
                 method:
                   type: string
@@ -62,11 +60,15 @@ paths:
                 params:
                   type: array
                   description: |
-                    `[signedTransaction, config]`, where `config` is:
+                    A two-element positional array: `[signedTransaction, config]`.
+
+                    **`signedTransaction`** — string. The base64-encoded signed transaction.
+
+                    **`config`** — object. Accepts:
                     - `encoding`: defaults to `base64` (the only supported value)
                     - `skipPreflight`: preflight is not supported; defaults to `true`; an explicit `false` is rejected with `-1015`
                     - `maxRetries`: defaults to `0`; a non-zero value is rejected with `-1015`
-                    - `swqosOnly` (optional): `false` (default) uses SWQoS + Jito, `true` uses SWQoS only; see the tip guidance
+                    - `swqosOnly` (optional): `false` (default) uses SWQoS + Jito, `true` uses SWQoS only; see [Tips and fees](/transaction/submit#tips-and-fees) in the guide
                   items: {}
                   example:
                     - "AQID...base64-encoded-signed-transaction"
@@ -84,9 +86,7 @@ paths:
                     type: string
                     enum: ["2.0"]
                   id:
-                    oneOf:
-                      - type: integer
-                      - type: string
+                    type: integer
                   result:
                     type: string
                     description: Transaction signature (base58)

@@ -19,6 +19,26 @@ llmsDescription: "Changelog for Jupiter developer APIs, SDKs, and docs. Tracks b
 
 ---
 
+<Update label="July 2026" description="">
+
+## Transaction Submission: tx.jup.ag RPC-compatible endpoint
+
+Land signed transactions through Jupiter's infrastructure by pointing any Solana client at `https://tx.jup.ag`. It implements the standard Solana `sendTransaction` JSON-RPC method, so adoption is a one-line endpoint change: set your RPC URL to `tx.jup.ag` and pass your Jupiter API key in the `x-api-key` header.
+
+* Same infrastructure that powers Jupiter's swap products (Beam, SWQoS, DoubleZero), now reachable as a drop-in RPC endpoint
+* Requires a minimum tip of 0.001 SOL to one of the 16 tip receiver accounts
+* Send-only: keep your own RPC for blockhash and confirmation
+* Requires a Jupiter API key
+
+The legacy REST endpoint `POST https://api.jup.ag/tx/v1/submit` continues to work.
+
+- [Transaction Submission Docs](/transaction/submit)
+- [API Reference](/api-reference/transaction/submit)
+
+</Update>
+
+---
+
 <Update label="June 2026" description="">
 
 ## Swap API: JupiterZ Integrator Fees

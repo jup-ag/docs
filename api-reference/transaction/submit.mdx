@@ -1,6 +1,6 @@
 ---
-openapi: /openapi-spec/transaction/transaction.yaml post /submit
-title: "Submit Transaction"
-description: "Submit a signed transaction through Jupiter's landing infrastructure"
-llmsDescription: "POST /submit endpoint for Jupiter Transaction API at api.jup.ag/tx/v1/submit. Submits any valid signed Solana transaction through Jupiter's transaction landing infrastructure. Requires a SOL tip of at least 0.001 SOL (1,000,000 lamports) to one of the 16 tip receiver accounts. Request body: signedTransaction (base64-encoded signed transaction). Response: signature (transaction signature). Works with /build swap transactions, non-Jupiter transactions, or any other signed transaction. Requires x-api-key header."
+openapi: /openapi-spec/transaction/transaction.yaml post /
+title: "Send Transaction"
+description: "Forward a signed transaction to the Solana cluster through Jupiter's landing infrastructure via the tx.jup.ag Solana RPC-compatible endpoint"
+llmsDescription: "sendTransaction JSON-RPC method for the Jupiter Transaction API at https://tx.jup.ag. Lands any valid signed Solana transaction through Jupiter's transaction landing infrastructure. tx.jup.ag implements the standard Solana sendTransaction method (encoding base64), so any Solana client can point at it. Requires a SOL tip of at least 0.001 SOL (1,000,000 lamports) to one of the 16 tip receiver accounts. Request body: JSON-RPC 2.0 envelope with method sendTransaction and params [base64-signed-transaction, config]. Response: JSON-RPC result is the transaction signature. Requires the x-api-key header. Send-only: keep your own RPC for blockhash and confirmation."
 ---

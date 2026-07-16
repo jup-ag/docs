@@ -33,7 +33,7 @@ Setup guides for environment, tooling, and first API calls.
 #### Plans & Limits
 
 - [Plans and Pricing](https://developers.jup.ag/docs/portal/plans.md): Jupiter Developer Platform pricing tiers: Free (1 RPS, no payment), Developer ($25/mo, 10 RPS, 25M credits), Launch ($100/mo, 50 RPS, 100M credits), Pro ($500/mo, 150 RPS, 500M credits). Overage billing applies to usage beyond included credits. Per-endpoint credit costs vary from 0 (execute endpoints) to 100 (portfolio positions). Keyless access available at 0.5 RPS.
-- [Rate Limits](https://developers.jup.ag/docs/portal/rate-limits.md): Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per organisation, not per API key. Most API requests share the main rate limit bucket, but /swap/v2/execute and /tx/v1/submit each have their own dedicated buckets separate from the main limit and from each other: Keyless 20 RPS, Free 50 RPS, Paid (Developer/Launch/Pro) 100 RPS. Rate-limited responses include x-ratelimit-remaining, x-ratelimit-current, and x-ratelimit-reset headers (on successful and 429 responses, not on 401/403). Firewall rules can impose additional per-IP, per-API-key, or per-team limits on top of the plan limit. Returns HTTP 429 when exceeded.
+- [Rate Limits](https://developers.jup.ag/docs/portal/rate-limits.md): Jupiter API rate limits by plan tier: Keyless 0.5 RPS, Free 1 RPS, Developer 10 RPS, Launch 50 RPS, Pro 150 RPS. All tiers use a 60-second sliding window. Rate limits apply per organisation, not per API key. Most API requests share the main rate limit bucket, but /swap/v2/execute has its own dedicated bucket separate from the main limit: Keyless 20 RPS, Free 50 RPS, Paid (Developer/Launch/Pro) 100 RPS. Rate-limited responses include x-ratelimit-remaining, x-ratelimit-current, and x-ratelimit-reset headers (on successful and 429 responses, not on 401/403). Firewall rules can impose additional per-IP, per-API-key, or per-team limits on top of the plan limit. Returns HTTP 429 when exceeded.
 
 #### Platform Features
 
@@ -79,9 +79,7 @@ Token swap API with managed execution (/order) and custom transaction building (
 
 - [Build](https://developers.jup.ag/docs/swap/build/index.md): How to use Jupiter's Router path via the GET /swap/v2/build endpoint to get raw swap instructions for building custom transactions. Uses Metis onchain routing only (no JupiterZ RFQ market makers). Returns computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions, tipInstruction, and address lookup tables. Integrators assemble their own transaction, add custom instructions (CPI, memo, SOL transfer, etc.), simulate for compute units, compile to v0 transaction, sign, and send via their own RPC or via /submit for Jupiter's transaction landing. Optional parameters include slippageBps (number or 'rtse' for RTSE), tipAmount (for /submit), mode='fast', maxAccounts, platformFeeBps, payer (gasless). /execute is not available for /build. No Jupiter swap fees. Full @solana/kit and @solana/web3.js TypeScript code examples included.
 - [Common Instructions](https://developers.jup.ag/docs/swap/build/common-instructions.md): Reference of common Solana instructions that developers compose with Jupiter /build swap instructions. Covers: creating associated token accounts (ATA) with createAssociatedTokenAccountIdempotent, closing token accounts to reclaim rent, adding SOL transfers (tips, payments), attaching memo instructions, and general guidance on instruction ordering. Each instruction includes a @solana/kit code example showing how to build the instruction and where to place it relative to the swap instructions.
-- [Transaction Submission](https://developers.jup.ag/docs/transaction/submit.md): How to submit signed transactions through Jupiter's proprietary transaction landing infrastructure using POST api.jup.ag/tx/v1/submit. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) with a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 tip receiver accounts. Zero credit cost, available on all plans including free and keyless access. Provides MEV protection by removing all intermediaries between your transaction and the leader. Can run in parallel with existing RPC submission for zero-risk comparison. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips.
 - [Build Transaction](https://developers.jup.ag/docs/openapi-spec/swap/v2/swap.yaml): GET /build endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/build. Returns a swap quote with raw instructions (computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions) and address lookup tables. Integrators build their own transactions, add custom instructions (CPI, memo, transfer), simulate, sign, and send via their own RPC. Metis-only routing. No Jupiter swap fees. /execute is not available for /build transactions.
-- [Submit Transaction](https://developers.jup.ag/docs/openapi-spec/transaction/transaction.yaml): POST /submit endpoint for Jupiter Transaction API at api.jup.ag/tx/v1/submit. Submits any valid signed Solana transaction through Jupiter's transaction landing infrastructure. Requires a SOL tip of at least 0.001 SOL (1,000,000 lamports) to one of the 16 tip receiver accounts. Request body: signedTransaction (base64-encoded signed transaction). Response: signature (transaction signature). Works with /build swap transactions, non-Jupiter transactions, or any other signed transaction. Requires x-api-key header.
 
 ### Advanced
 
@@ -153,10 +151,85 @@ Real-time heuristics-based USD token pricing.
 
 - [Price](https://developers.jup.ag/docs/openapi-spec/price/v3/price.yaml): Returns prices of specified tokens
 
-## JupUSD
+## Prediction
 
-- [Mint & Redeem](https://developers.jup.ag/docs/jupusd/index.md): How to mint and redeem JupUSD programmatically using the @jup-ag/jup-usd-sdk TypeScript SDK, the JupUSD Web API (api.jupusd.money), or the web UI (jupusd.money/mint). Covers benefactor requirements (KYC/KYB whitelisting), Pyth oracle integration for peg validation and exchange rates, per-window rate limiting (config, vault, benefactor levels), key program addresses (JupUSD mint, program, custodian, reserves, multisig), and a complete error reference for all mint/redeem failure modes.
-- [JUICED Collateral Integration](https://developers.jup.ag/docs/jupusd/juiced.md): Technical guide for integrating JUICED as a collateral asset. JUICED is a yield-bearing SPL token from Jupiter Lend Earn representing deposited JupUSD. Covers token details (mint address, decimals), onchain pricing via get_underlying_balance and get_exchange_price functions, deposit/withdraw flows using both the Lend API (HTTP endpoints at api.jup.ag/lend/v1/earn/) and Lend SDK (@jup-ag/lend), read functions for querying token data, withdrawal behaviour (Automated Debt Ceiling), program IDs, and risk considerations for lending protocols (exchange rate monotonicity, JupUSD peg dependency, T-bill yield variability, smart contract risk).
+Binary prediction markets for real-world events.
+
+### Prediction
+
+- [About Prediction](https://developers.jup.ag/docs/prediction/index.md): Overview of Jupiter Prediction Market
+- [Jupiter Forecast](https://developers.jup.ag/docs/prediction/forecast.md): Jupiter Forecast is a native Solana binary prediction market, currently 15-minute BTC up/down rounds settled from the Chainlink BTC/USD data stream. Forecast markets are exposed under the Prediction API with provider=bisonfi. Two integration paths: (1) Prediction API, GET /prediction/v1/events?provider=bisonfi&category=crypto&tag=15m to discover markets (IDs BISON-<marketPda>-UP / -DOWN, each with an outcomeMint), POST /prediction/v1/orders to build a USDC buy, then sign and POST /prediction/v1/execute with {signedTransaction, context} (executionModel atomic_swap, settlement auto, position appears immediately, no order-status polling), and DELETE /prediction/v1/positions/{positionPubkey} to sell; (2) Swap API, GET /swap/v2/order from USDC to the market outcomeMint then POST /swap/v2/execute, for integrators managing their own position tracking. Deposits are USDC only; the Prediction API path enforces a 5 to 250 USDC order size (the direct Swap path has no cap). Forecast has no manual claim step: winning tokens settle automatically. Includes complete TypeScript examples.
+- [Trading Lifecycle](https://developers.jup.ag/docs/prediction/trading-lifecycle.md): Maps the full Jupiter Prediction Market trading flow across endpoints: GET /events or /events/search to discover events, read marketId from event.markets[], GET /markets/{marketId} for pricing, GET /orderbook/{marketId} for depth, GET /trading-status to confirm the exchange is open, POST /orders to place and sign the order, GET /orders/status/{orderPubkey} and GET /positions to track the fill, and POST /positions/{positionPubkey}/claim to settle. Shows call order and the data dependencies between calls. Use this page to understand which endpoints to call in what order before integrating.
+- [Events & Markets](https://developers.jup.ag/docs/prediction/events-and-markets.md): GET /events lists events with filters. GET /events/search searches by keyword. GET /markets/{marketId} returns market details with pricing in micro USD. GET /orderbook/{marketId} provides bid/ask depth.
+- [Open Positions](https://developers.jup.ag/docs/prediction/open-positions.md): POST /orders creates buy orders for YES/NO contracts. Required parameters: ownerPubkey, marketId, isYes, isBuy. Returns base64 transaction to sign and submit to Solana.
+- [Manage Positions](https://developers.jup.ag/docs/prediction/manage-positions.md): GET /positions lists holdings with P&L. GET /orders lists your orders. DELETE /positions/{positionPubkey} closes a single position. DELETE /positions closes all open positions and requires minSellPriceSlippageBps.
+- [Claim Payouts](https://developers.jup.ag/docs/prediction/claim-payouts.md): POST /positions/{positionPubkey}/claim creates payout transaction for winning positions. Check position.claimable=true to verify eligibility. No claim fees - winning contracts pay $1 each.
+
+### Data & Analytics
+
+- [Position Data & History](https://developers.jup.ag/docs/prediction/position-data.md): GET /positions returns holdings with P&L. GET /orders lists orders with fill status. GET /history provides transaction history with event types: order_created, order_filled, order_failed, position_updated, position_lost, payout_claimed.
+- [Social Features](https://developers.jup.ag/docs/prediction/social-features.md): GET /profiles/{pubkey} returns user stats. GET /profiles/{pubkey}/pnl-history returns time-series P&L. GET /leaderboards returns rankings by pnl/volume/win_rate. GET /trades provides the global trade feed.
+
+### Guides
+
+- [How to Build a Prediction Market App on Solana](https://developers.jup.ag/docs/guides/how-to-build-a-prediction-market-app-on-solana.md): Jupiter Prediction API brings prediction markets to Solana. Binary YES/NO trading on real-world events (sports, crypto, politics, elections). Aggregates liquidity from Polymarket and Kalshi. Full API for order creation, position management, P&L tracking, and payout claims. Base URL: https://api.jup.ag/prediction/v1. Requires x-api-key header from developers.jup.ag/portal.
+
+### API Reference
+
+#### Events
+
+- [Get Events](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get a list of all available prediction events with optional filtering and pagination
+- [Search Events](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Search for events by title or keyword
+- [Get Event](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific event
+- [Get Suggested Events](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get personalized event suggestions based on user activity
+- [Get Live Scores](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get the latest live scores for a set of events
+- [Get Event Score](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get the latest live score for a single event
+
+#### Markets
+
+- [Get Event Markets](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get all markets for a specific event
+- [Get Event Market](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed market information for a specific market within an event
+- [Get Market](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed market information by market ID
+
+#### Orders
+
+- [Get Orders](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get a list of orders with optional filtering by owner or market
+- [Get Order](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific order
+- [Get Order Status](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get the latest status and history for an order
+- [Create Order](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to create a new order
+- [Execute Order](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Submit a signed order transaction, including Jupiter Forecast orders
+
+#### Positions
+
+- [Get Positions](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get a list of positions with optional filtering
+- [Get Position](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific position
+- [Close Position](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to sell all contracts in a position
+- [Close All Positions](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request unsigned transactions to close all open positions
+- [Claim Position](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to claim payout from a winning position
+
+#### History & Data
+
+- [Get History](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get trading history and event records for an account
+- [Get Orderbook](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get orderbook data for a specific market
+- [Get Trading Status](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get current trading status of the prediction market
+
+#### Profile & Social
+
+- [Get Profile](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get profile statistics for a user
+- [Get PnL History](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get historical PnL data for charting
+- [Get Trades](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get recent filled trades across all markets
+- [Get Leaderboards](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get leaderboard rankings by various metrics
+
+#### Vault
+
+- [Get Vault Info](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get vault account information and balance
+
+## Transaction Landing
+
+### Transaction Landing
+
+- [Transaction Submission](https://developers.jup.ag/docs/transaction/submit.md): How to submit signed transactions to the Solana cluster through Jupiter's landing infrastructure using the Solana RPC-compatible endpoint at https://tx.jup.ag. tx.jup.ag is a drop-in Solana RPC endpoint (compatible where possible) that implements the standard Solana sendTransaction method: point any Solana client (@solana/web3.js Connection or @solana/kit) at it and authenticate with your Jupiter API key in the x-api-key header. It is send-only, so keep your own RPC for blockhash and confirmation. Jupiter's infrastructure stack includes one of the highest-staked validators on Solana (providing SWQoS reserved bandwidth), a custom TPU forwarder (Beam), DoubleZero fiber network, and ultra-low-latency fiber from Tokyo to Frankfurt. Accepts any signed Solana transaction (swaps, transfers, program calls) that includes a SOL tip (minimum 0.001 SOL / 1,000,000 lamports) to one of 16 tip receiver accounts. Requires a Jupiter API key. Provides MEV protection by removing all intermediaries between your transaction and the leader. Use /build's tipAmount parameter for automatic tip inclusion. Differs from /execute which is tied to the /order flow and uses swap fees instead of SOL tips. Replaces the legacy REST POST api.jup.ag/tx/v1/submit endpoint.
+- [Send Transaction](https://developers.jup.ag/docs/openapi-spec/transaction/transaction.yaml): sendTransaction JSON-RPC method for the Jupiter Transaction API at https://tx.jup.ag. Lands any valid signed Solana transaction through Jupiter's transaction landing infrastructure. tx.jup.ag implements the standard Solana sendTransaction method (encoding base64), so any Solana client can point at it. Requires a SOL tip of at least 0.001 SOL (1,000,000 lamports) to one of the 16 tip receiver accounts. Request body: JSON-RPC 2.0 envelope with method sendTransaction and params [base64-signed-transaction, config]. Response: JSON-RPC result is the transaction signature. Requires the x-api-key header. Send-only: keep your own RPC for blockhash and confirmation.
 
 ## Lend
 
@@ -181,6 +254,7 @@ Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and F
 - [Read Earn Data](https://developers.jup.ag/docs/lend/earn/read-data.md): Read Earn (supply) balances, positions, and pool metrics using the @jup-ag/lend-read Read SDK. Covers Client setup, getAllJlTokens, getJlTokenDetails (supply rate, rewards rate, conversion rates), getUserPosition, getUserPositions, getPreviews, getExchangePrice, and getJlTokenRewards. Includes SDK type definitions for UserPosition and TokenDetails.
 
 - [Earn CPI Integration](https://developers.jup.ag/docs/lend/earn/cpi.md): How to integrate Jupiter Lend Earn via Cross-Program Invocation (CPI) from an on-chain Solana program. Covers deposit and withdraw function discriminators (sha256 global:deposit and global:withdraw), complete Rust DepositParams and WithdrawParams structs with all account fields and mutability, account explanation tables, PDA derivation patterns (LENDING_SEED, F_TOKEN_MINT_SEED, LENDING_ADMIN_SEED), error codes (FTokenMinAmountOut, FTokenMaxAmount, etc.), and TypeScript context helpers (getDepositContext, getWithdrawContext) from @jup-ag/lend/earn for resolving CPI accounts from the frontend. Programs: Lending jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9, Liquidity jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC.
+- [JUICED Collateral Integration](https://developers.jup.ag/docs/jupusd/juiced.md): Technical guide for integrating JUICED as a collateral asset. JUICED is a yield-bearing SPL token from Jupiter Lend Earn representing deposited JupUSD. Covers token details (mint address, decimals), onchain pricing via get_underlying_balance and get_exchange_price functions, deposit/withdraw flows using both the Lend API (HTTP endpoints at api.jup.ag/lend/v1/earn/) and Lend SDK (@jup-ag/lend), read functions for querying token data, withdrawal behaviour (Automated Debt Ceiling), program IDs, and risk considerations for lending protocols (exchange rate monotonicity, JupUSD peg dependency, T-bill yield variability, smart contract risk).
 
 ### Borrow
 
@@ -295,6 +369,10 @@ Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.
 
 - [Order History](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Get historical trigger orders for an account
 
+## JupUSD
+
+- [Mint & Redeem](https://developers.jup.ag/docs/jupusd/index.md): How to mint and redeem JupUSD programmatically using the @jup-ag/jup-usd-sdk TypeScript SDK, the JupUSD Web API (api.jupusd.money), or the web UI (jupusd.money/mint). Covers benefactor requirements (KYC/KYB whitelisting), Pyth oracle integration for peg validation and exchange rates, per-window rate limiting (config, vault, benefactor levels), key program addresses (JupUSD mint, program, custodian, reserves, multisig), and a complete error reference for all mint/redeem failure modes.
+
 ## Recurring
 
 Automated dollar-cost averaging (DCA) with time-based recurring orders.
@@ -322,79 +400,6 @@ Automated dollar-cost averaging (DCA) with time-based recurring orders.
 - [Execute](https://developers.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Execute the signed transaction and get the execution status
 - [Cancel Order](https://developers.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Request for a base64-encoded unsigned recurring order cancellation transaction to be used in POST /recurring/v1/execute
 - [Get Recurring Orders](https://developers.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Request for active or historical recurring orders associated to the provided account
-
-## Prediction
-
-Binary prediction markets for real-world events.
-
-### Prediction
-
-- [About Prediction](https://developers.jup.ag/docs/prediction/index.md): Overview of Jupiter Prediction Market
-- [Jupiter Forecast](https://developers.jup.ag/docs/prediction/forecast.md): Jupiter Forecast is a native Solana binary prediction market, currently 15-minute BTC up/down rounds settled from the Chainlink BTC/USD data stream. Forecast markets are exposed under the Prediction API with provider=bisonfi. Two integration paths: (1) Prediction API, GET /prediction/v1/events?provider=bisonfi&category=crypto&tag=15m to discover markets (IDs BISON-<marketPda>-UP / -DOWN, each with an outcomeMint), POST /prediction/v1/orders to build a USDC buy, then sign and POST /prediction/v1/execute with {signedTransaction, context} (executionModel atomic_swap, settlement auto, position appears immediately, no order-status polling), and DELETE /prediction/v1/positions/{positionPubkey} to sell; (2) Swap API, GET /swap/v2/order from USDC to the market outcomeMint then POST /swap/v2/execute, for integrators managing their own position tracking. Deposits are USDC only; the Prediction API path enforces a 5 to 250 USDC order size (the direct Swap path has no cap). Forecast has no manual claim step: winning tokens settle automatically. Includes complete TypeScript examples.
-- [Trading Lifecycle](https://developers.jup.ag/docs/prediction/trading-lifecycle.md): Maps the full Jupiter Prediction Market trading flow across endpoints: GET /events or /events/search to discover events, read marketId from event.markets[], GET /markets/{marketId} for pricing, GET /orderbook/{marketId} for depth, GET /trading-status to confirm the exchange is open, POST /orders to place and sign the order, GET /orders/status/{orderPubkey} and GET /positions to track the fill, and POST /positions/{positionPubkey}/claim to settle. Shows call order and the data dependencies between calls. Use this page to understand which endpoints to call in what order before integrating.
-- [Events & Markets](https://developers.jup.ag/docs/prediction/events-and-markets.md): GET /events lists events with filters. GET /events/search searches by keyword. GET /markets/{marketId} returns market details with pricing in micro USD. GET /orderbook/{marketId} provides bid/ask depth.
-- [Open Positions](https://developers.jup.ag/docs/prediction/open-positions.md): POST /orders creates buy orders for YES/NO contracts. Required parameters: ownerPubkey, marketId, isYes, isBuy. Returns base64 transaction to sign and submit to Solana.
-- [Manage Positions](https://developers.jup.ag/docs/prediction/manage-positions.md): GET /positions lists holdings with P&L. GET /orders lists your orders. DELETE /positions/{positionPubkey} closes a single position. DELETE /positions closes all open positions and requires minSellPriceSlippageBps.
-- [Claim Payouts](https://developers.jup.ag/docs/prediction/claim-payouts.md): POST /positions/{positionPubkey}/claim creates payout transaction for winning positions. Check position.claimable=true to verify eligibility. No claim fees - winning contracts pay $1 each.
-
-### Data & Analytics
-
-- [Position Data & History](https://developers.jup.ag/docs/prediction/position-data.md): GET /positions returns holdings with P&L. GET /orders lists orders with fill status. GET /history provides transaction history with event types: order_created, order_filled, order_failed, position_updated, position_lost, payout_claimed.
-- [Social Features](https://developers.jup.ag/docs/prediction/social-features.md): GET /profiles/{pubkey} returns user stats. GET /profiles/{pubkey}/pnl-history returns time-series P&L. GET /leaderboards returns rankings by pnl/volume/win_rate. GET /trades provides the global trade feed.
-
-### Guides
-
-- [How to Build a Prediction Market App on Solana](https://developers.jup.ag/docs/guides/how-to-build-a-prediction-market-app-on-solana.md): Jupiter Prediction API brings prediction markets to Solana. Binary YES/NO trading on real-world events (sports, crypto, politics, elections). Aggregates liquidity from Polymarket and Kalshi. Full API for order creation, position management, P&L tracking, and payout claims. Base URL: https://api.jup.ag/prediction/v1. Requires x-api-key header from developers.jup.ag/portal.
-
-### API Reference
-
-#### Events
-
-- [Get Events](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get a list of all available prediction events with optional filtering and pagination
-- [Search Events](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Search for events by title or keyword
-- [Get Event](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific event
-- [Get Suggested Events](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get personalized event suggestions based on user activity
-- [Get Live Scores](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get the latest live scores for a set of events
-- [Get Event Score](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get the latest live score for a single event
-
-#### Markets
-
-- [Get Event Markets](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get all markets for a specific event
-- [Get Event Market](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed market information for a specific market within an event
-- [Get Market](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed market information by market ID
-
-#### Orders
-
-- [Get Orders](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get a list of orders with optional filtering by owner or market
-- [Get Order](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific order
-- [Get Order Status](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get the latest status and history for an order
-- [Create Order](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to create a new order
-- [Execute Order](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Submit a signed order transaction, including Jupiter Forecast orders
-
-#### Positions
-
-- [Get Positions](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get a list of positions with optional filtering
-- [Get Position](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get detailed information about a specific position
-- [Close Position](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to sell all contracts in a position
-- [Close All Positions](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request unsigned transactions to close all open positions
-- [Claim Position](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Request an unsigned transaction to claim payout from a winning position
-
-#### History & Data
-
-- [Get History](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get trading history and event records for an account
-- [Get Orderbook](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get orderbook data for a specific market
-- [Get Trading Status](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get current trading status of the prediction market
-
-#### Profile & Social
-
-- [Get Profile](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get profile statistics for a user
-- [Get PnL History](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get historical PnL data for charting
-- [Get Trades](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get recent filled trades across all markets
-- [Get Leaderboards](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get leaderboard rankings by various metrics
-
-#### Vault
-
-- [Get Vault Info](https://developers.jup.ag/docs/openapi-spec/prediction/prediction.yaml): Get vault account information and balance
 
 ## More
 

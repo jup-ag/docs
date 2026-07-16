@@ -268,3 +268,44 @@ Track all redirects added to `vercel.json` here for visibility:
 - Reorganise sidebar: Swap (overview), Meta-Aggregator (order-and-execute + API refs), Router (build + submit + API refs), Advanced, Routing Integration, Guides, Migration
 **Rationale:** Two clear paths reduce decision fatigue. Absorbing fees and routing eliminates page-hopping for core concepts. Profile-targeted migration pages let developers find their specific upgrade path without reading irrelevant content.
 **Migration notes:** Redirects added for `swap/fees` → `swap/order-and-execute`, `swap/routing` → `swap`, `swap/build/other-instructions` → `swap/build/common-instructions`.
+
+### [2026-07-09] Document transaction submission against tx.jup.ag (Solana JSON-RPC)
+**Status:** implemented
+**Scope:** content | api-reference
+**Files affected:** `transaction/submit.mdx`, `api-reference/transaction/submit.mdx`, `openapi-spec/transaction/transaction.yaml`, `changelog/index.mdx`, `swap/index.mdx`, `portal/rate-limits.mdx`
+**Source:** `jup-ag/beam` (Beam v2), Slack thread with Kyle/Groovie/Sayantan
+
+**Context:** Beam v2 exposes a direct Solana JSON-RPC endpoint at `https://tx.jup.ag` that implements `sendTransaction`. The team wants to promote it as the primary transaction landing path over the REST `POST api.jup.ag/tx/v1/submit`, which no external integrators currently use. The REST endpoint still works.
+**Decision:**
+- `transaction/submit.mdx` leads with `tx.jup.ag`: point any Solana client (`@solana/web3.js` `Connection` or `@solana/kit`) at it, authenticate with the `x-api-key` header, call `sendTransaction`
+- Document it as send-only (only `send*` methods) so integrators keep their own RPC for blockhash and confirmation
+- Keep the tip requirement and the 16 tip receiver accounts unchanged (verified in the beam source)
+- Reshape the OpenAPI spec from a REST body to the JSON-RPC envelope; keep the legacy REST endpoint mentioned in a `<Note>` rather than deleting it
+- Endpoint auth verified by live probe: no `x-api-key` = keyless (allowed), invalid key = `401`
+**Rationale:** A one-line endpoint change (set RPC URL to `tx.jup.ag`) is the lowest-friction integration story and matches how the product is now built. Keeping the legacy REST endpoint documented as a `<Note>` avoids breaking the (unused but live) path while steering new integrations to the RPC endpoint.
+**Resolved (Kyle / groovie, 2026-07-09):**
+- Methods: advertise ONLY `sendTransaction`. `sendJitoBundle` is internal-teams-only; `sendAndConfirmTransaction` is scheduled for deprecation. Docs updated.
+- Auth: `tx.jup.ag` will require an API key (not keyless). Keyless advertising removed from the docs; `security` in the OpenAPI made required.
+- Rate limits: a single limit across all tiers (anti-abuse only, generous), API key required. Exact number not set yet, so the docs describe the model without a number. The tiered 20/50/100 bucket in `quota.toml` is for the api.jup.ag REST paths only. `portal/rate-limits.mdx` and `faq.mdx` no longer document any transaction-submission bucket (2026-07-16, anmol): the legacy `/tx/v1/submit` row was removed because that endpoint is being deprecated, and no rate limit is confirmed for `tx.jup.ag` (Kyle/groovie haven't stated a number). Rather than document a soon-to-be-legacy or an unconfirmed number, transaction submission is left out of the rate-limit docs entirely. The `/swap/v2/execute` bucket row is unaffected.
+- Analytics/logs: confirmed the dev platform will surface transaction-landing analytics/logs (Beam telemetry → ClickHouse). Docs follow-up on `portal/analytics` + `portal/logs` deferred until the submit-page UI ships.
+
+**Still open:**
+1. Whether the `Swap` API-key permission covers the `tx.jup.ag` host. `portal/api-keys.mdx` line left unchanged pending confirmation.
+2. Credits/metering on `tx.jup.ag` (docs say zero credit cost; unverified since it bypasses the gateway's credit metering).
+3. `tx.jup.ag`'s exact rate-limit number.
+4. Deprecation timeline for the REST `POST /tx/v1/submit`.
+5. Publishing timing: Kyle wants to advertise `sendTransaction` now; groovie wants to hold until internal-team migration and all integrations work. PR should not merge until aligned.
+6. Follow-up: update the `/build` code examples in `swap/build/index.mdx` and the mention in `swap/quote-and-swap.mdx` once `tx.jup.ag` is confirmed GA.
+7. RESOLVED (groovie, 2026-07-13): `swqosOnly` is shipped; re-added with a "Tips and fees" section (Jupiter tip flat/required, priority fees when congested, Jito tip depends on `swqosOnly`). Kyle's sign-off on the tip economics was still pending when groovie posted it.
+
+### [2026-07-10] Move transaction submission out of Swap into a "Transaction Landing" section
+**Status:** implemented
+**Scope:** navigation
+**Files affected:** `docs.json`
+**Linear issue:** DEV-328 (seeds YY's broader "transactions and landing" section)
+
+**Context:** `/transaction/submit` documents `tx.jup.ag`, a product-neutral landing endpoint that accepts any signed transaction, not just swaps. It was nested under Docs > Swap > Router as a discovery convenience (see [2026-04-07]), but it isn't swap-specific. YY raised making it a dedicated section and anmol agreed it should live outside Swap.
+**Decision:** Add a new Docs-tab `menu` item "Transaction Landing" (sibling to Swap, Lend, etc.) and move `transaction/submit` + `api-reference/transaction/submit` into it, out of the Swap "Router" group. Supersedes the [2026-04-07] "keep in the Swap sidebar for now" placement.
+**Rationale:** Landing is cross-cutting (any transaction, not just swaps). A dedicated section is the home for DEV-328's planned content (transaction types, landing optimisation, Beam, glossary); this seeds it with the submit page for YY to expand.
+**Alternatives considered:** Keep under Swap/Router (rejected: not swap-specific). A new top-level tab (rejected: products are `menu` items under the Docs tab, not tabs).
+**Migration notes:** Nav-only. URLs unchanged (`/transaction/submit`, `/api-reference/transaction/submit`), so no redirects needed and cross-links are unaffected. The Docs-tab `menu` was also reordered to `Swap, Tokens, Price, Prediction, Transaction Landing, Lend, Trigger, JupUSD, Recurring, More` (anmol-directed): high-traffic products first, Transaction Landing placed next to the swap/price cluster it's most used with. Item contents unchanged — order only.

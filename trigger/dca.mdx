@@ -39,6 +39,10 @@ Set `orderType` on create to choose how rounds execute.
 
 Both types retry a stuck round within a window of `min(max(30, intervalSeconds / 2), 7200)` seconds before rescheduling it.
 
+<Note>
+The deposit's `orderType` is `dca` (with no `orderSubType`). That is a different field from the create call's `orderType` (`time_based` or `price_conditional`) above, which selects the DCA behaviour.
+</Note>
+
 ## Quick start
 
 Creating a DCA order is four calls: authenticate, get your vault, craft and sign the deposit, then submit the order.
@@ -244,7 +248,6 @@ Beyond the create-time [validation](#validation) above, these are the runtime er
 | `userPubkey` does not match the authenticated wallet | `403` | `Forbidden: userPubkey must match authenticated user` |
 | `depositRequestId` not found or already used | `400` | `Deposit transaction not found in cache. Please craft a new deposit first.` |
 | `triggerMint` is the stablecoin leg of the pair | `400` | `Trigger mint is not supported` |
-| Create called with a trailing slash | `404` | `Not Found` (use `POST /orders/dca`, no trailing slash) |
 | Cancelling an order that is not `active` or `withdrawing` | `400` | `Cannot cancel DCA order in '<state>' state` |
 | Confirm-cancel with a stale or wrong `cancelRequestId` | `400` | `Withdrawal transaction not found in cache. Please initiate cancel again.` |
 

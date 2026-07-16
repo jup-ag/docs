@@ -11,10 +11,12 @@ Every order, limit or DCA, is funded from a single per-wallet vault. Before crea
 
 Each wallet has one vault, a Privy-managed custodial account that holds deposits for all your orders. The vault address is resolved from your JWT, so you never pass it into later calls.
 
-```text
-Your Wallet ──→ Vault (1 per wallet) ──→ Order A
-                                    ──→ Order B
-                                    ──→ Order C
+```mermaid
+flowchart LR
+    W["Your Wallet"] --> V["Vault<br/>(1 per wallet)"]
+    V --> O1["Order A"]
+    V --> O2["Order B"]
+    V --> O3["Order C"]
 ```
 
 The examples below assume a `headers` object carrying your API key and the JWT from [authentication](/trigger/authentication):

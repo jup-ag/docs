@@ -5,13 +5,17 @@ description: "Create advanced trigger orders on Solana with vault-based executio
 llmsDescription: "Jupiter Trigger Order API V2 enables vault-based automated orders on Solana. Two order families: price orders (single limit, OCO for TP/SL, OTOCO conditional chains) and DCA (dollar-cost averaging, recurring time- or price-conditional swaps). Requires JWT authentication via challenge-response flow. Deposits go into Privy-managed vault accounts shared across all your orders."
 ---
 
-The Jupiter Trigger Order API enables automated order types on Solana. **Price orders** execute a swap when a USD price condition is met (limit orders, take-profit, stop-loss). **DCA** orders split a deposit into recurring swaps on a schedule. Both share one vault, authentication, and deposit flow.
+The Jupiter Trigger Order API enables automated order types on Solana. **Price orders** execute a swap when a USD price condition is met (limit orders, take-profit, stop-loss). **DCA orders** split a deposit into recurring swaps on a schedule. Both share one vault, authentication, and deposit flow.
 
-V1 required traders to think in pool ratios — calculating how many tokens per SOL a pool needed to reach before an order would trigger. V2 replaces this with USD price triggers: set a dollar price and Jupiter handles conversion, routing, and execution. Orders are stored off-chain and private by default, closing the most common MEV attack vector of visible pending orders.
+Orders are stored off-chain and private by default, closing the most common MEV attack vector of visible pending orders. When an order triggers, Jupiter handles the swap: conversion, routing, and execution.
 
 ## What's New in V2
 
-| Feature | V1 | V2 |
+Trigger V2 unifies two products that previously had separate APIs: limit orders (Trigger V1) and DCA (the Recurring V1 API). Here is what changes if you are migrating from either.
+
+### Limit orders: Trigger V1 vs V2
+
+| Feature | Trigger V1 | Trigger V2 |
 | :--- | :--- | :--- |
 | **Trigger type** | Pool rate only (e.g. "1 Fartcoin = 0.00025 SOL") | USD price |
 | **Order direction** | Buy below, sell above | Buy above, buy below, sell above, sell below |
@@ -24,9 +28,21 @@ V1 required traders to think in pool ratios — calculating how many tokens per 
 | **Deposits** | Program-derived address (PDA) order accounts | Vault accounts (custodial) by Privy |
 | **Route prefix** | `/trigger/v1` | `/trigger/v2` |
 
-<Note>
-There are no current plans to deprecate V1. However, all development efforts, research, and maintenance are focused entirely on V2. V1 will only receive updates for critical issues.
-</Note>
+Trigger V1 is not scheduled for deprecation, but all development is focused on V2; V1 receives critical-only updates.
+
+### DCA: Recurring V1 vs Trigger V2
+
+DCA integrators are coming from the [Recurring API](/recurring), which is now unmaintained. What changes under Trigger V2:
+
+| Feature | Recurring V1 | DCA (Trigger V2) |
+| :--- | :--- | :--- |
+| **Status** | Unmaintained | Actively maintained |
+| **Schedule** | Time-based interval, optional min/max price (price-based strategy deprecated) | `time_based` or `price_conditional` (price band) |
+| **Minimum size** | 100 USD total; time-based 50 USD per order, 2+ orders | 10 USD per round, 2+ rounds |
+| **Authentication** | API key only | Challenge-response JWT + API key |
+| **Deposits** | On-chain order accounts | Vault accounts (custodial) by Privy, shared across orders |
+| **Token-2022** | Not supported | Supported, except transfer-fee or transfer-hook mints (unless whitelisted) |
+| **Route prefix** | `/recurring/v1` | `/trigger/v2` |
 
 ## Order Families
 
@@ -53,10 +69,12 @@ Split a single deposit into multiple swaps that execute on a fixed schedule. See
 
 ## How It Works
 
-```
-Your Wallet ──→ Vault (1 per wallet) ──→ Order A
-                                    ──→ Order B
-                                    ──→ Order C
+```mermaid
+flowchart LR
+    W["Your Wallet"] --> V["Vault<br/>(1 per wallet)"]
+    V --> O1["Order A"]
+    V --> O2["Order B"]
+    V --> O3["Order C"]
 ```
 
 Each wallet gets a single vault (a Privy-managed custodial account). When you create orders, tokens are deposited from your wallet into your vault. The vault holds funds for all your active orders.
@@ -83,12 +101,12 @@ All endpoints require an API key via the `x-api-key` header. Authenticated endpo
 
 <AccordionGroup>
 
-<Accordion title="What happens to my funds if an order expires?">
-Funds remain in the vault. To retrieve them, use the same two-step cancel flow: initiate cancellation on the expired order, sign the withdrawal transaction, and confirm. See [Expired Order Withdrawal](/trigger/manage-orders#expired-order-withdrawal).
+<Accordion title="How do I get my funds back from an order?">
+For a price order that expired or that you no longer want, funds stay in the vault; retrieve them with the two-step cancel flow (initiate, sign the withdrawal, confirm). See [Expired Order Withdrawal](/trigger/manage-orders#expired-order-withdrawal). For a DCA order, cancelling returns the unfilled remainder to your wallet; rounds already filled are not reversed. See [Cancel a DCA Order](/trigger/dca-cancel).
 </Accordion>
 
 <Accordion title="Can I edit an order after creating it?">
-Yes. You can update trigger prices and slippage in-place without cancelling and recreating the order. See [Update an Order](/trigger/manage-orders#update-an-order).
+Price orders can be updated in-place (trigger price and slippage) without cancelling and recreating. See [Update an Order](/trigger/manage-orders#update-an-order). DCA orders cannot be edited: to change a DCA, cancel it and create a new one.
 </Accordion>
 
 <Accordion title="Why is the output amount not guaranteed?">
@@ -96,7 +114,7 @@ V2 uses USD price triggers rather than pool rate triggers. When the price condit
 </Accordion>
 
 <Accordion title="What is the minimum order size?">
-10 USD equivalent.
+Price orders: 10 USD equivalent. DCA: at least 10 USD per round, so the total minimum is 10 USD × the number of rounds (a 2-round DCA needs at least 20 USD).
 </Accordion>
 
 <Accordion title="What happens if my JWT expires while I have open orders?">
@@ -115,8 +133,16 @@ A One-Triggers-One-Cancels-Other order has a parent trigger that executes first.
 A DCA (dollar-cost averaging) order splits one deposit into multiple swaps that run on a schedule. You set the total amount, the number of rounds (2 or more), and the interval (1 minute to 1 year). Rounds can run unconditionally (`time_based`) or only within a price band (`price_conditional`). Each round must currently be worth at least 10 USD. See [DCA](/trigger/dca).
 </Accordion>
 
+<Accordion title="How do I stop a DCA order and get unspent funds back?">
+Cancel it. Cancelling withdraws the unfilled remainder to your wallet; rounds already filled are not reversed. See [Cancel a DCA Order](/trigger/dca-cancel).
+</Accordion>
+
+<Accordion title="What is a price-conditional DCA?">
+A DCA order type that fills a round only while the trigger mint's USD price is inside `[minPriceUsd, maxPriceUsd]`. While the price is out of band, the round waits and reschedules to the next interval. See [Price-conditional orders](/trigger/dca#price-conditional-orders).
+</Accordion>
+
 <Accordion title="What is the default slippage?">
-Take-profit and buy-below orders use auto slippage via RTSE (Real-Time Slippage Estimator). Stop-loss and buy-above orders default to 20% (2000 bps) because execution certainty is more important when cutting losses. You can always set a custom slippage.
+For price orders: take-profit and buy-below orders use auto slippage via RTSE (Real-Time Slippage Estimator), and stop-loss and buy-above orders default to 20% (2000 bps) because execution certainty matters more when cutting losses. You can set a custom slippage. DCA orders have no slippage parameter: the keeper sets slippage per round from live market conditions at fill time.
 </Accordion>
 
 <Accordion title="Can I set a trigger based on market cap?">

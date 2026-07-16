@@ -16,18 +16,16 @@ This page maps a trigger order from start to finish: which endpoints to call, in
 
 Authenticate once, set up your vault once, then repeat deposit-and-create per order. The key to integrating is the data hand-off: each call produces the value the next call needs. The shared spine:
 
-```text
-POST /auth/challenge              ─▶ challenge (or transaction)
-POST /auth/verify                 ─▶ token (JWT, 24h)
-GET  /vault   (or /vault/register)─▶ vaultPubkey
-POST /deposit/craft               ─▶ transaction + requestId
-  └ sign deposit client-side      ─▶ depositSignedTx
-POST /orders/price  or  /orders/dca ─▶ id + txSignature   ◀── family-specific
-GET  /orders/history  or  /orders/history/dca ─▶ state    ◀── family-specific
-POST /orders/{price|dca}/cancel/{id}      ─▶ withdrawal transaction + cancelRequestId
-  └ sign withdrawal client-side
-POST /orders/{price|dca}/confirm-cancel/{id} ─▶ txSignature
+```mermaid
+flowchart TD
+    A["Authenticate<br/>/auth/challenge + /auth/verify"] -->|"token · JWT 24h"| B["Get vault<br/>/vault or /vault/register"]
+    B -->|"vaultPubkey"| C["Craft + sign deposit<br/>/deposit/craft"]
+    C -->|"requestId + depositSignedTx"| D["Create order<br/>/orders/price or /orders/dca"]
+    D -->|"id + txSignature"| E["Monitor<br/>/orders/history or .../history/dca"]
+    E -.->|"cancel (optional)"| F["Cancel + withdraw<br/>cancel + confirm-cancel"]
 ```
+
+Create and monitor are the family-specific steps (price orders vs DCA); everything else is shared.
 
 All endpoints are under `https://api.jup.ag/trigger/v2`.
 
@@ -100,35 +98,51 @@ See [Cancellation and Recovery](#cancellation-and-recovery) for what happens if 
 
 ## Order State Lifecycle
 
-A limit order moves through a state machine from creation to completion. `GET /orders/history` reports both an `orderState` (display) and a `rawState` (internal). The high-level flow:
+Each family has its own state machine. Both report a display state and an internal state through their history endpoint.
 
-```text
-pending ──▶ open ──▶ executing ──▶ filled
-   │          │          │
-   │          │          └──▶ failed
-   └──▶ failed│
-   (deposit)  ├──▶ expired
-              │
-              └──▶ pending_withdraw ──▶ cancelled
-                   (cancel initiated)
+### Price orders
+
+```mermaid
+flowchart TD
+    P["pending<br/>(deposit)"] --> O["open"]
+    P --> XF["failed"]
+    O --> EX["executing"]
+    O --> EXP["expired"]
+    O -->|"cancel initiated"| PW["pending_withdraw"]
+    EX --> FL["filled"]
+    EX --> XF
+    PW --> CAN["cancelled"]
 ```
 
 - **`open`** orders can be updated or cancelled. Updates and cancellation are only valid from this state.
 - **`executing`** covers the swap from trigger detection to output withdrawal, including partial fills.
 - **`expired`** orders did not fill before `expiresAt`. The deposit is still in the vault and is retrieved with the same cancel flow (see below).
 
-**OCO orders:** the take-profit and stop-loss legs share one deposit. When one leg fills, the other transitions to `cancelled` automatically (shown as `oco_cancelled` in the raw state).
+**OCO orders:** the take-profit and stop-loss legs share one deposit. When one leg fills, the other transitions to `cancelled` automatically (`oco_cancelled` in the raw state). **OTOCO orders:** the child OCO pair only activates after the parent order reaches `filled`; if the parent expires or fails, the children are never created.
 
-**OTOCO orders:** the child OCO pair only activates after the parent order reaches `filled`. If the parent expires or fails, the children are never created.
+For the complete `orderState` ↔ `rawState` mapping and the `events` schema, see [Order History](/trigger/order-history#order-states).
 
-For the complete `orderState` ↔ `rawState` mapping and the `events` schema, see [Order History](/trigger/order-history#order-states). DCA orders use a separate set of states (`depositing`, `active`, `executing`, `withdrawing`, `completed`, `cancelled`); see [Track a DCA Order](/trigger/dca-history#order-states).
+### DCA
+
+```mermaid
+flowchart TD
+    DP["depositing"] --> AC["active"]
+    DP --> DF["deposit_failed"]
+    AC -->|"round due"| EX["executing"]
+    EX -->|"more rounds remain"| AC
+    EX -->|"last round"| CO["completed"]
+    AC -->|"cancel initiated"| WD["withdrawing"]
+    WD --> CAN["cancelled"]
+```
+
+DCA states map to a display state: `depositing`→`pending`, `active`, `executing`, `withdrawing`→`pending_withdraw`, `completed`, `cancelled`, and `deposit_failed`→`failed`. There is no `open` or `expired` state; a DCA ends at `completed` when its budget is spent. A `price_conditional` round that is out of band does not fill: the order stays `active` with `roundsFilled` unchanged until the price re-enters the band. For the full mapping, see [Track a DCA Order](/trigger/dca-history#order-states).
 
 ## Cancellation and Recovery
 
-Cancellation is a two-step process designed so funds are never at risk mid-flow. It works the same way for both families (swap `price` for `dca` in the paths):
+Cancellation is a two-step process designed so funds are never at risk mid-flow. It works the same way for both families; the paths differ only by segment (`price` or `dca`):
 
-1. **Initiate** with `POST /orders/price/cancel/{id}`. The order stops accepting fills immediately, and the call returns an unsigned withdrawal transaction and a `cancelRequestId`.
-2. **Confirm** by signing that transaction and submitting it to `POST /orders/price/confirm-cancel/{id}`. The unfilled funds return to your wallet.
+1. **Initiate** with `POST /orders/{price|dca}/cancel/{id}`. The order stops accepting fills immediately, and the call returns an unsigned withdrawal transaction and a `cancelRequestId`.
+2. **Confirm** by signing that transaction and submitting it to `POST /orders/{price|dca}/confirm-cancel/{id}`. The unfilled funds return to your wallet.
 
 Between the two steps the order is safe: fills are stopped and the deposit remains in the vault.
 
@@ -136,12 +150,12 @@ Between the two steps the order is safe: fills are stopped and the deposit remai
 If the second step is interrupted (the tab closes, or the transaction does not land):
 
 - **You still have the withdrawal transaction and `cancelRequestId`:** retry `confirm-cancel` with the same `cancelRequestId`.
-- **You lost the withdrawal transaction:** call `cancel` again. The order is already mid-cancel, so the call simply crafts and returns a fresh withdrawal transaction to sign.
+- **You lost the withdrawal transaction:** call `cancel` again. The order is already mid-cancel, so the call crafts and returns a fresh withdrawal transaction to sign (idempotent).
 
 The order stays mid-cancel until a withdrawal confirms on-chain, so funds are never stranded.
 </Note>
 
-The same two-step flow retrieves funds from a limit order that has `expired`.
+The details differ slightly by family. A price order can be cancelled while `open`, and the same flow retrieves funds from one that has `expired`. A DCA order can be cancelled while `active` or `withdrawing`; a failed `confirm-cancel` leaves it in `withdrawing` and does not roll back to `active`. Cancelling a DCA returns the unfilled remainder (`refundAmount`, `roundsRemaining`); rounds already filled are not reversed. See [Cancel a DCA Order](/trigger/dca-cancel).
 
 ## Related
 

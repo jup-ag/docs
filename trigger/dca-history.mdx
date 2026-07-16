@@ -92,6 +92,8 @@ The response carries two status fields: `state` is the raw internal status, and 
 | `cancelled` | `cancelled` | Cancelled by you. |
 | `deposit_failed` | `failed` | The deposit failed on-chain. |
 
+For how these states fit the end-to-end flow, see the [Integration Flow](/trigger/lifecycle#order-state-lifecycle).
+
 ## How rounds fill
 
 When a round comes due, the keeper swaps `amountPerRound` and **delivers the output straight to your wallet**, and pays the swap's transaction fee itself. You never withdraw filled output manually; only the unfilled remainder is returned, and only when you [cancel](/trigger/dca-cancel). A round that is due now typically fills within a few seconds.
@@ -111,6 +113,8 @@ Each fill appends an event and advances `roundsFilled`, `outputAmountTotal`, `in
 ```
 
 A `price_conditional` round that is out of band does not fill: the order stays `active` with `roundsFilled` unchanged until the price re-enters the range, then resumes on the next interval.
+
+If a round cannot execute (for example, not enough liquidity within slippage), the keeper retries it within a window of `min(max(30, intervalSeconds / 2), 7200)` seconds, then reschedules it to the next interval. `roundsFilled` stays the same and `nextFillAt` advances. A round's `fill` event carries a `state` of `success`, `failed`, `executing`, or `pending`.
 
 ## Fees and slippage
 

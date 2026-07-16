@@ -445,6 +445,7 @@ const signature = await txRpc
   .sendTransaction(getBase64EncodedWireTransaction(signedTx), {
     encoding: "base64",
     skipPreflight: true,
+    maxRetries: 0,
   })
   .send();
 console.log("Submitted:", `https://solscan.io/tx/${signature}`);

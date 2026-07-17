@@ -1,8 +1,12 @@
 ---
 title: "Withdraw Price Order"
 description: "Deprecated: Withdraw funds from a price-based recurring order. Use time-based orders instead."
-llmsDescription: "DEPRECATED: POST /recurring/v1/priceWithdraw withdraws funds from a price-based recurring order. Use time-based orders instead."
+llmsDescription: "UNMAINTAINED: POST /recurring/v1/priceWithdraw withdraws funds from a price-based recurring order. Use time-based orders instead."
 ---
+
+<Warning>
+The Recurring API is no longer actively maintained and has been superseded by [DCA](/trigger/dca).
+</Warning>
 
 **This endpoint is deprecated.** Price-based recurring orders are no longer supported via the API. Use time-based orders (`params.time`) with the [`/createOrder` endpoint](/recurring/create-order) instead. The documentation below is preserved for reference only.
 

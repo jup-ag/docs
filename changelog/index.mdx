@@ -19,7 +19,32 @@ llmsDescription: "Changelog for Jupiter developer APIs, SDKs, and docs. Tracks b
 
 ---
 
+<Update label="July 2026" description="">
+
+## Trigger API: Trailing Stop Loss
+
+Price orders now support a trailing stop loss. Instead of a fixed `triggerPriceUsd`, set `trailingBps` (50–9000 basis points) on a `single` order: the trigger follows the market in your favour and holds when the price reverses.
+
+- `triggerCondition: "below"` trails a sell (stop loss); `"above"` trails a buy entry
+- The keeper seeds the trigger from the current price and rewrites it as the watermark moves
+- Track the live trigger and peak with `trailingBps` and `highWatermark`/`lowWatermark` in order history
+- Change the trail distance by updating `trailingBps`
+- [Trailing stop loss](/trigger/create-order#trailing-stop-loss)
+
+</Update>
+
+---
+
 <Update label="June 2026" description="">
+
+## Trigger API: Dollar-Cost Averaging (DCA) Orders
+
+The Trigger API now documents DCA orders. A DCA order splits one deposit into multiple swaps that run on a fixed schedule, using the same vault, authentication, and deposit flow as price orders.
+
+- Create with `POST /trigger/v2/orders/dca` (`time_based` or `price_conditional`)
+- `orderCount` 2 or more, `intervalSeconds` 60s–1 year, currently 10 USD minimum per round
+- Cancel via the two-step withdrawal flow to refund the unfilled remainder
+- [DCA guide](/trigger/dca)
 
 ## Swap API: JupiterZ Integrator Fees
 

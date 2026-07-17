@@ -34,10 +34,8 @@ const SECTION_SUMMARIES = {
   Lend: "Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and Flashloans.",
   Perps:
     "Leveraged perpetuals trading on Solana (on-chain program, no REST API).",
-  Trigger:
-    "Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.",
-  Recurring:
-    "Automated dollar-cost averaging (DCA) with time-based recurring orders.",
+  "LO & DCA":
+    "Vault-based trigger orders: limit orders (single, OCO for TP/SL, OTOCO) and DCA (time-based and price-conditional recurring swaps).",
   Prediction: "Binary prediction markets for real-world events.",
   More: "Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).",
   // Tabs
@@ -284,8 +282,7 @@ emit(
 emit(
   "- [Swap API V2](https://developers.jup.ag/docs/swap/index.md) (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`\n",
 );
-emit("- [Trigger](https://developers.jup.ag/docs/trigger/index.md) (limit orders): `POST /trigger/v2/orders/price`\n");
-emit("- [Recurring](https://developers.jup.ag/docs/recurring/index.md) (DCA): `POST /recurring/v1/createOrder`\n");
+emit("- [LO & DCA](https://developers.jup.ag/docs/trigger/index.md) (limit orders & DCA): `POST /trigger/v2/orders/price`, `POST /trigger/v2/orders/dca`\n");
 emit("- [Lend](https://developers.jup.ag/docs/lend/index.md): `POST /lend/v1/earn/deposit`\n");
 emit("- [Price](https://developers.jup.ag/docs/price/index.md): `GET /price/v3?ids={mints}`\n");
 emit("- [Tokens](https://developers.jup.ag/docs/tokens/index.md): `GET /tokens/v2/search?query={query}`\n");

@@ -1,254 +1,283 @@
 ---
 title: "Create Order"
-description: "Create trigger orders with vault-based deposits. Supports single limit orders, OCO (take-profit/stop-loss), and OTOCO (conditional chains)."
-llmsDescription: "How to create Trigger V2 price orders using POST /trigger/v2/deposit/craft and POST /trigger/v2/orders/price. Covers the vault-based deposit flow, required craft-deposit fields including orderType: price and orderSubType (single, oco, otoco), client-side signing, create-order request bodies for single limit orders, OCO (one-cancels-other), and OTOCO (one-triggers-OCO), validation rules, and response handling."
+sidebarTitle: "Create"
+description: "Create price-triggered limit orders: single, OCO (take-profit/stop-loss), and OTOCO (conditional chains)."
+llmsDescription: "How to create Trigger V2 price orders with POST /trigger/v2/orders/price. Includes a complete runnable TypeScript example (authenticate, get vault, craft and sign deposit, submit the order). Covers the single, OCO (one-cancels-other TP/SL), and OTOCO (one-triggers-OCO) order types, the common and per-type parameters (triggerMint, triggerCondition, triggerPriceUsd, tpPriceUsd, slPriceUsd, slippageBps, expiresAt), default slippage by order side, validation rules (10 USD minimum, distinct mints, required future expiry), and the response ({ id, txSignature }). The shared vault and deposit reference lives on the Vault & Deposit page."
 ---
 
-Creating an order in V2 is a two-step process: craft and sign a deposit transaction, then submit it alongside your order parameters.
-
-<Warning>
-**Action required:** This change is planned for Thursday, May 14, 2026 at 4:00 AM UTC / 12:00 PM SGT. Price-order deposits crafted with `POST /trigger/v2/deposit/craft` must include `orderType: "price"` and `orderSubType`. Requests missing either field will return a `4xx`.
-</Warning>
+Price orders execute a swap when a token's USD price crosses a threshold: limit orders, take-profit, and stop-loss. This page covers the create call and its order types. The vault and deposit setup is shared with DCA: the example below includes it inline, and [Vault & Deposit](/trigger/deposit) is the full reference.
 
 <Tip>
 For a working reference of the full order creation flow, see how [jup.ag](https://jup.ag) handles it. The frontend implements the same API with validation, error handling, and UX patterns you can use as a guide.
 </Tip>
 
-## Prerequisites
+## Order types
 
-Signing deposit transactions requires `@solana/web3.js`:
+Set `orderType` on the create call to choose the variant.
+
+| Type | Behaviour |
+| :--- | :--- |
+| `single` | Triggers a swap when `triggerMint`'s USD price crosses above or below a target. Standard limit order, stop-loss, or [trailing stop loss](#trailing-stop-loss). |
+| `oco` | A take-profit and stop-loss pair sharing one deposit. When one side fills, the other cancels automatically. |
+| `otoco` | A parent trigger that executes first, then activates a TP/SL (OCO) pair on the output. |
+
+<Note>
+On the create call, `orderType` is the variant (`single`, `oco`, `otoco`). That is different from the deposit's `orderType` (`price` or `dca`). Craft the deposit with `orderType: "price"` and an `orderSubType` that matches the create `orderType`.
+</Note>
+
+## Quick start
+
+Creating a price order is four calls: authenticate, get your vault, craft and sign the deposit, then submit the order.
+
+<Accordion title="Prerequisites">
+
+Install the signing dependencies:
 
 ```bash
-npm install @solana/web3.js
+npm install @solana/web3.js bs58 tweetnacl
 ```
 
-## End-to-End Flow
+You also need a [Jupiter API key](https://developers.jup.ag/portal) and a funded wallet. The example below loads the wallet from `BS58_PRIVATE_KEY` and the key from `JUPITER_API_KEY` in your `.env`. For the browser-wallet (`signMessage` / `signTransaction`) version of authentication and signing, see [Authentication](/trigger/authentication) and [Vault & Deposit](/trigger/deposit).
 
-```
-1. Get vault          →  GET /v2/vault (or /v2/vault/register on first use)
-2. Craft deposit      →  POST /v2/deposit/craft
-3. Sign deposit tx    →  (client-side)
-4. Create order       →  POST /v2/orders/price (with signed tx)
-```
+<Warning>
+Never commit private keys. Use environment variables for testing and a proper key-management solution in production.
+</Warning>
+</Accordion>
 
-## Step 1: Get Your Vault
+```typescript expandable
+import { Keypair, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+import nacl from "tweetnacl";
 
-Retrieve your vault, or register one if this is your first time. The vault is a Privy-managed custodial account that holds deposits for your orders.
+const BASE = "https://api.jup.ag/trigger/v2";
+const API_KEY = process.env.JUPITER_API_KEY!;
+const SOL = "So11111111111111111111111111111111111111112";
+const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 
-```typescript
-let vaultResponse = await fetch('https://api.jup.ag/trigger/v2/vault', {
-  headers: {
-    'x-api-key': 'your-api-key',
-    'Authorization': `Bearer ${token}`,
-  },
-});
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.BS58_PRIVATE_KEY!));
+const owner = wallet.publicKey.toBase58();
 
-// First time user — register a new vault
-if (!vaultResponse.ok) {
-  vaultResponse = await fetch('https://api.jup.ag/trigger/v2/vault/register', {
-    headers: {
-      'x-api-key': 'your-api-key',
-      'Authorization': `Bearer ${token}`,
-    },
-  });
+// 1. Authenticate: sign the challenge to get a 24h JWT (see /trigger/authentication)
+async function authenticate(): Promise<string> {
+  const { challenge } = await fetch(`${BASE}/auth/challenge`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-api-key": API_KEY },
+    body: JSON.stringify({ walletPubkey: owner, type: "message" }),
+  }).then((r) => r.json());
+
+  const signature = nacl.sign.detached(new TextEncoder().encode(challenge), wallet.secretKey);
+  const { token } = await fetch(`${BASE}/auth/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-api-key": API_KEY },
+    body: JSON.stringify({ type: "message", walletPubkey: owner, signature: bs58.encode(signature) }),
+  }).then((r) => r.json());
+  return token;
 }
 
-const vault = await vaultResponse.json();
-// { userPubkey: "...", vaultPubkey: "...", privyVaultId: "..." }
+async function createLimitOrder() {
+  const token = await authenticate();
+  const headers = { "Content-Type": "application/json", "x-api-key": API_KEY, Authorization: `Bearer ${token}` };
+
+  // 2. Get your vault, registering one on first use
+  let vault = await fetch(`${BASE}/vault`, { headers });
+  if (!vault.ok) vault = await fetch(`${BASE}/vault/register`, { headers });
+  if (!vault.ok) throw new Error(`vault failed: ${vault.status}`);
+
+  // 3. Craft the deposit (orderType: "price", orderSubType matches the create orderType below)
+  const deposit = await fetch(`${BASE}/deposit/craft`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      inputMint: SOL,
+      outputMint: USDC,
+      userAddress: owner,
+      amount: "1000000000", // 1 SOL
+      orderType: "price",
+      orderSubType: "single",
+    }),
+  }).then((r) => r.json());
+  if (!deposit.requestId) throw new Error(`craft failed: ${JSON.stringify(deposit)}`);
+
+  // 4. Sign the deposit and submit the order
+  const tx = VersionedTransaction.deserialize(Buffer.from(deposit.transaction, "base64"));
+  tx.sign([wallet]);
+  const depositSignedTx = Buffer.from(tx.serialize()).toString("base64");
+
+  const order = await fetch(`${BASE}/orders/price`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      orderType: "single",
+      depositRequestId: deposit.requestId,
+      depositSignedTx,
+      userPubkey: owner,
+      inputMint: SOL,
+      outputMint: USDC,
+      inputAmount: "1000000000",
+      triggerMint: SOL,
+      triggerCondition: "above", // fill when SOL climbs above the target
+      triggerPriceUsd: 200,
+      slippageBps: 100,          // 1%
+      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+    }),
+  }).then((r) => r.json());
+  if (!order.id) throw new Error(`create failed: ${JSON.stringify(order)}`);
+
+  console.log(`Order ${order.id}, deposit tx https://solscan.io/tx/${order.txSignature}`);
+  return order.id as string;
+}
+
+createLimitOrder().catch(console.error);
 ```
 
-## Step 2: Craft a Deposit Transaction
+The deposit lands on-chain during the create call. The response is `{ id, txSignature, depositConfirmed }`: `id` is the order identifier you use to [track](/trigger/order-history), [update, or cancel](/trigger/manage-orders) it, `txSignature` is the on-chain deposit signature, and `depositConfirmed` is `true` once the deposit has landed and the order is active:
 
-The deposit endpoint builds an unsigned transaction that transfers tokens from your wallet to your vault.
-
-```typescript
-const depositResponse = await fetch('https://api.jup.ag/trigger/v2/deposit/craft', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'your-api-key',
-    'Authorization': `Bearer ${token}`,
-  },
-  body: JSON.stringify({
-    inputMint: 'So11111111111111111111111111111111111111112',  // SOL
-    outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',  // USDC
-    userAddress: walletAddress,
-    amount: '1000000000',  // 1 SOL in lamports
-    orderType: 'price',
-    orderSubType: 'single',
-  }),
-});
-
-const deposit = await depositResponse.json();
-```
-
-Set `orderSubType` to match the price order you will create:
-
-| Order create type | Deposit `orderSubType` | Use it for |
-| :--- | :--- | :--- |
-| `single` | `single` | A standalone price order |
-| `oco` | `oco` | A one-cancels-other pair sharing one deposit |
-| `otoco` | `otoco` | A parent trigger that activates an OCO pair. This also provisions an output token account. |
-
-**Response:**
 ```json
 {
-  "transaction": "Base64EncodedUnsignedTransaction...",
-  "requestId": "01234567-89ab-cdef-0123-456789abcdef",
-  "receiverAddress": "VaultPublicKey...",
-  "mint": "So11111111111111111111111111111111111111112",
-  "amount": "1000000000",
-  "tokenDecimals": 9,
-  "inputTokenAccount": "InputTokenAccountPubkey..."
+  "id": "order-uuid",
+  "txSignature": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d...",
+  "depositConfirmed": true
 }
 ```
 
 <Note>
-The vault address is automatically resolved from your JWT. You do not specify it in the request. You also do not pass `inputTokenAccount` or `outputTokenAccount` into `POST /trigger/v2/orders/price`; the API stores those accounts against the deposit `requestId`.
+The vault address is resolved from your JWT, so you never pass it. The deposit `requestId` is single-use and is consumed by the create call as `depositRequestId`.
 </Note>
 
-For `orderSubType: "otoco"`, the response also includes `outputTokenAccount` for the output token account used by the conditional OCO pair.
+## Other order types
 
-## Step 3: Sign the Deposit Transaction
+The OCO and OTOCO bodies replace step 4's create call. Each needs its deposit crafted with the matching `orderSubType`.
 
-```typescript
-import { VersionedTransaction } from '@solana/web3.js';
-
-const transaction = VersionedTransaction.deserialize(
-  Buffer.from(deposit.transaction, 'base64')
-);
-const signedTransaction = await wallet.signTransaction(transaction);
-const depositSignedTx = Buffer.from(signedTransaction.serialize()).toString('base64');
-```
-
-## Step 4: Create the Order
-
-Submit the signed deposit alongside your order parameters. The order type determines which fields are required.
-
-### Single Order (Limit)
-
-A single order triggers when the price of `triggerMint` crosses above or below the target price.
-
-```typescript
-const orderResponse = await fetch('https://api.jup.ag/trigger/v2/orders/price', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'your-api-key',
-    'Authorization': `Bearer ${token}`,
-  },
-  body: JSON.stringify({
-    orderType: 'single',
-    depositRequestId: deposit.requestId,
-    depositSignedTx: depositSignedTx,
-    userPubkey: walletAddress,
-    inputMint: 'So11111111111111111111111111111111111111112',
-    inputAmount: '1000000000',
-    outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-    triggerMint: 'So11111111111111111111111111111111111111112',
-    triggerCondition: 'above',  // 'above' or 'below'
-    triggerPriceUsd: 200.00,
-    slippageBps: 100,  // 1%
-    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,  // 7 days
-  }),
-});
-
-const order = await orderResponse.json();
-// { id: "order-uuid", txSignature: "..." }
-```
-
-### OCO Order (One-Cancels-Other)
+### OCO (One-Cancels-Other)
 
 An OCO order creates a take-profit and stop-loss pair sharing one deposit. When one side fills, the other cancels automatically.
 
 ```typescript
-const orderResponse = await fetch('https://api.jup.ag/trigger/v2/orders/price', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'your-api-key',
-    'Authorization': `Bearer ${token}`,
-  },
+// deposit crafted with orderSubType: "oco"
+const order = await fetch(`${BASE}/orders/price`, {
+  method: "POST",
+  headers,
   body: JSON.stringify({
-    orderType: 'oco',
+    orderType: "oco",
     depositRequestId: deposit.requestId,
-    depositSignedTx: depositSignedTx,
-    userPubkey: walletAddress,
-    inputMint: 'So11111111111111111111111111111111111111112',
-    inputAmount: '1000000000',
-    outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-    triggerMint: 'So11111111111111111111111111111111111111112',
-    tpPriceUsd: 250.00,    // Take profit price
-    slPriceUsd: 150.00,    // Stop loss price
+    depositSignedTx,
+    userPubkey: owner,
+    inputMint: SOL,
+    outputMint: USDC,
+    inputAmount: "1000000000",
+    triggerMint: SOL,
+    tpPriceUsd: 250, // take profit
+    slPriceUsd: 150, // stop loss
     tpSlippageBps: 100,
     slSlippageBps: 100,
     expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
   }),
-});
+}).then((r) => r.json());
 ```
 
 <Note>
 The take-profit price must be greater than the stop-loss price.
 </Note>
 
-### OTOCO Order (One-Triggers-One-Cancels-Other)
+### OTOCO (One-Triggers-One-Cancels-Other)
 
 An OTOCO order has a parent trigger that executes first. Once filled, it automatically activates a TP/SL pair (OCO) on the output tokens.
 
 ```typescript
-const orderResponse = await fetch('https://api.jup.ag/trigger/v2/orders/price', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'your-api-key',
-    'Authorization': `Bearer ${token}`,
-  },
+// deposit crafted with orderSubType: "otoco"
+const order = await fetch(`${BASE}/orders/price`, {
+  method: "POST",
+  headers,
   body: JSON.stringify({
-    orderType: 'otoco',
+    orderType: "otoco",
     depositRequestId: deposit.requestId,
-    depositSignedTx: depositSignedTx,
-    userPubkey: walletAddress,
-    inputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-    inputAmount: '200000000',  // 200 USDC
-    outputMint: 'So11111111111111111111111111111111111111112',
-    triggerMint: 'So11111111111111111111111111111111111111112',
-    triggerCondition: 'below',
-    triggerPriceUsd: 180.00,   // Entry: buy SOL when it drops to \$180
-    tpPriceUsd: 220.00,       // Take profit at \$220
-    slPriceUsd: 160.00,       // Stop loss at \$160
-    slippageBps: 100,         // Parent order slippage
+    depositSignedTx,
+    userPubkey: owner,
+    inputMint: USDC,
+    outputMint: SOL,
+    inputAmount: "200000000", // 200 USDC
+    triggerMint: SOL,
+    triggerCondition: "below",
+    triggerPriceUsd: 180, // entry: buy SOL when it drops to \$180
+    tpPriceUsd: 220,      // take profit at \$220
+    slPriceUsd: 160,      // stop loss at \$160
+    slippageBps: 100,     // parent order slippage
     tpSlippageBps: 100,
     slSlippageBps: 100,
-    expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,  // 30 days
+    expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days
   }),
-});
+}).then((r) => r.json());
 ```
 
-## Order Parameters Reference
+## Trailing stop loss
 
-### Common Fields (All Order Types)
+A trailing stop loss is a `single` order that tracks the market instead of using a fixed price. Set `trailingBps` instead of `triggerPriceUsd`: the trigger follows the price in your favour and holds when the price reverses. Provide exactly one of `triggerPriceUsd` (static) or `trailingBps` (trailing).
+
+`trailingBps` is the trail distance in basis points, from 50 to 9000 (0.5% to 90%). `triggerCondition` sets the direction:
+
+| `triggerCondition` | Use | `triggerMint` | Trigger price |
+| :--- | :--- | :--- | :--- |
+| `below` | Sell-below (stop loss): protect a position, sell if the price falls | `inputMint` | `highWatermark × (1 − trailingBps/10000)` |
+| `above` | Buy-above: enter as the price rises off a low | `outputMint` | `lowWatermark × (1 + trailingBps/10000)` |
+
+At create, the API seeds the trigger from the current market price. The keeper then tracks a running watermark (the high for `below`, the low for `above`) and rewrites the trigger as the watermark moves in your favour. The trigger never moves against you. Watermark updates are batched, not per price tick.
+
+Craft the deposit with `orderSubType: "single"`, then submit a single order with `trailingBps` and no `triggerPriceUsd`:
+
+```typescript
+// deposit crafted with orderSubType: "single"; hold SOL, sell if it falls 10% from its peak
+const order = await fetch(`${BASE}/orders/price`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify({
+    orderType: "single",
+    depositRequestId: deposit.requestId,
+    depositSignedTx,
+    userPubkey: owner,
+    inputMint: SOL,           // selling the asset you hold
+    outputMint: USDC,
+    inputAmount: "200000000", // 0.2 SOL
+    triggerMint: SOL,         // "below" requires triggerMint === inputMint
+    triggerCondition: "below",
+    trailingBps: 1000,        // trail 10% below the peak; no triggerPriceUsd
+    slippageBps: 100,
+    expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+  }),
+}).then((r) => r.json());
+```
+
+`slippageBps` is the execution buffer beneath the trigger, the same as a static order. Track the live trigger and watermark with [Order History](/trigger/order-history) (`triggerPriceUsd`, `trailingBps`, `highWatermark`/`lowWatermark`), and change the trail distance later by [updating](/trigger/manage-orders) `trailingBps`.
+
+<Note>
+Trailing rules: provide exactly one of `triggerPriceUsd` or `trailingBps` (else `400 "exactly one of triggerPriceUsd or trailingBps must be set"`); `trailingBps` must be 50–9000; and `triggerMint` must be the `inputMint` for `below` or the `outputMint` for `above`.
+</Note>
+
+## Order parameters reference
+
+### Common fields (all order types)
 
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
 | `orderType` | `string` | Yes | `single`, `oco`, or `otoco` |
-| `depositRequestId` | `string` | Yes | From the deposit craft response |
+| `depositRequestId` | `string` | Yes | The `requestId` from the deposit craft response |
 | `depositSignedTx` | `string` | Yes | Base64-encoded signed deposit transaction |
-| `userPubkey` | `string` | Yes | Your wallet public key |
+| `userPubkey` | `string` | Yes | Your wallet public key. Must match the JWT |
 | `inputMint` | `string` | Yes | Mint address of the token to sell |
 | `inputAmount` | `string` | Yes | Amount in smallest unit (lamports, etc.) |
 | `outputMint` | `string` | Yes | Mint address of the token to buy |
-| `triggerMint` | `string` | Yes | Mint address to monitor for price trigger |
+| `triggerMint` | `string` | Yes | Mint address to monitor for the price trigger |
 | `expiresAt` | `number` | Yes | Expiration timestamp in milliseconds |
 
-### Single Order Fields
+### Single order fields
 
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
 | `triggerCondition` | `string` | Yes | `above` or `below` |
-| `triggerPriceUsd` | `number` | Yes | USD price that triggers execution |
+| `triggerPriceUsd` | `number` | Cond. | USD price that triggers execution. Required unless `trailingBps` is set. |
+| `trailingBps` | `number` | Cond. | Trail distance in basis points (50–9000) for a [trailing stop loss](#trailing-stop-loss). Set instead of `triggerPriceUsd`. |
 | `slippageBps` | `number` | No | Slippage tolerance in basis points (0-10000) |
 
-### OCO Order Fields
+### OCO order fields
 
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
@@ -257,7 +286,7 @@ const orderResponse = await fetch('https://api.jup.ag/trigger/v2/orders/price', 
 | `tpSlippageBps` | `number` | No | Take-profit slippage (basis points) |
 | `slSlippageBps` | `number` | No | Stop-loss slippage (basis points) |
 
-### OTOCO Order Fields
+### OTOCO order fields
 
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
@@ -269,7 +298,7 @@ const orderResponse = await fetch('https://api.jup.ag/trigger/v2/orders/price', 
 | `tpSlippageBps` | `number` | No | Take-profit slippage |
 | `slSlippageBps` | `number` | No | Stop-loss slippage |
 
-## Default Slippage
+## Default slippage
 
 If slippage is not specified, defaults vary by order type and trigger condition:
 
@@ -280,25 +309,32 @@ If slippage is not specified, defaults vary by order type and trigger condition:
 
 Stop-loss orders use a higher default because execution certainty is more important than price precision when cutting losses.
 
-## Validation Rules
+## Validation rules
 
 - Minimum order size: 10 USD
 - Input and output mints must be different
 - Slippage: 0-10000 basis points
 - `expiresAt` is required and must be a future timestamp (milliseconds)
 - OCO/OTOCO: take-profit price must be greater than stop-loss price
+- Trailing: set exactly one of `triggerPriceUsd` or `trailingBps`; `trailingBps` must be 50–9000; `triggerMint` must be `inputMint` for `below` or `outputMint` for `above`
 
 <Note>
 Unlike V1 where orders could exist indefinitely, V2 requires an expiration on every order. Adding a TTL allows the system to prune orders that are unlikely to fill, improving execution quality for active orders. For long-lived orders, use a far-future timestamp (e.g. 30 days).
 </Note>
 
-## Response
+## Related
 
-```json
-{
-  "id": "order-uuid",
-  "txSignature": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d..."
-}
-```
-
-The `txSignature` confirms the deposit transaction landed on-chain. The order is now active and will execute when price conditions are met.
+<CardGroup cols={2}>
+  <Card title="Vault & Deposit" href="/trigger/deposit" icon="vault">
+    Resolve your vault and craft the deposit this call consumes.
+  </Card>
+  <Card title="Order History" href="/trigger/order-history" icon="clock-rotate-left">
+    Track order state, fills, and events.
+  </Card>
+  <Card title="Manage Orders" href="/trigger/manage-orders" icon="sliders">
+    Update trigger prices or cancel and withdraw.
+  </Card>
+  <Card title="Create Order (API)" href="/api-reference/trigger/create-order" icon="code">
+    Full create request and response schema.
+  </Card>
+</CardGroup>

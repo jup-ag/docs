@@ -7,8 +7,7 @@
 > **AI tools**: Jupiter CLI (`npm i -g @jup-ag/cli`) for terminal and agent use, agent skills via `npx skills add`, MCP server at developers.jup.ag/mcp for in-editor docs, and llms-full.txt for complete documentation content.
 
 - [Swap API V2](https://developers.jup.ag/docs/swap/index.md) (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`
-- [Trigger](https://developers.jup.ag/docs/trigger/index.md) (limit orders): `POST /trigger/v2/orders/price`
-- [Recurring](https://developers.jup.ag/docs/recurring/index.md) (DCA): `POST /recurring/v1/createOrder`
+- [LO & DCA](https://developers.jup.ag/docs/trigger/index.md) (limit orders & DCA): `POST /trigger/v2/orders/price`, `POST /trigger/v2/orders/dca`
 - [Lend](https://developers.jup.ag/docs/lend/index.md): `POST /lend/v1/earn/deposit`
 - [Price](https://developers.jup.ag/docs/price/index.md): `GET /price/v3?ids={mints}`
 - [Tokens](https://developers.jup.ag/docs/tokens/index.md): `GET /tokens/v2/search?query={query}`
@@ -21,7 +20,7 @@ Setup guides for environment, tooling, and first API calls.
 
 ### Get Started
 
-- [Jupiter Developer Docs](https://developers.jup.ag/docs/get-started/index.md): Welcome page for Jupiter Developer Docs. Introduces Jupiter as Solana DeFi infrastructure and provides quick navigation to product APIs (Swap, Tokens, Price, Lend, Trigger, Recurring, Prediction, Perps), developer resources (Guides, API Reference, Developer Platform), AI resources (CLI, Skills, MCP, llms.txt), community links, socials (Blog and X), and get-started setup pages.
+- [Jupiter Developer Docs](https://developers.jup.ag/docs/get-started/index.md): Welcome page for Jupiter Developer Docs. Introduces Jupiter as Solana DeFi infrastructure and provides quick navigation to product APIs (Swap, Tokens, Price, Lend, LO & DCA, Prediction, Perps), developer resources (Guides, API Reference, Developer Platform), AI resources (CLI, Skills, MCP, llms.txt), community links, socials (Blog and X), and get-started setup pages.
 - [Environment Setup](https://developers.jup.ag/docs/get-started/environment-setup.md): Install Solana web3.js and spl-token libraries, configure an RPC connection, and set up a development wallet to build with the Jupiter API.
 - [Development Basics](https://developers.jup.ag/docs/get-started/development-basics.md): Solana fundamentals for Jupiter developers: accounts, programs, instructions, transactions, priority fees, compute units, slippage, and how the Swap API V2 simplifies it all. Use the /order + /execute path for managed execution (no RPC needed) or /build for custom transactions.
 - [Developer Guides](https://developers.jup.ag/docs/guides/index.md): Jupiter developer guides: practical tutorials for common Solana development tasks. Covers token swaps with Swap API V2 /order (recommended, two API calls, no RPC needed), token information (metadata, verification, organic score), token prices (USD pricing), swap widget embedding (Plugin), custom swap transactions with Swap API V2 /build (routing, CPI, custom instructions), and prediction markets (binary event trading). Each guide includes working code examples in JavaScript, Python, and curl.
@@ -259,69 +258,62 @@ Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and F
 - [Operate](https://developers.jup.ag/docs/openapi-spec/lend/borrow.yaml): Request a base64-encoded unsigned borrow operate transaction (deposit, borrow, repay, withdraw)
 - [Operate Instructions](https://developers.jup.ag/docs/openapi-spec/lend/borrow.yaml): Request the instructions and address lookup tables for a borrow operate transaction
 
-## Trigger
+## LO & DCA
 
-Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.
+Vault-based trigger orders: limit orders (single, OCO for TP/SL, OTOCO) and DCA (time-based and price-conditional recurring swaps).
 
-### Trigger
+### Get Started
 
-- [Trigger Order API Overview](https://developers.jup.ag/docs/trigger/index.md): Jupiter Trigger Order API V2 enables vault-based limit orders on Solana. Supports single price orders, OCO (one-cancels-other for TP/SL), and OTOCO (one-triggers-OCO) order types. Requires JWT authentication via challenge-response flow. Deposits go into vault accounts managed by Privy.
-- [Lifecycle](https://developers.jup.ag/docs/trigger/lifecycle.md): Maps the full Jupiter Trigger Order V2 integration flow across endpoints: POST /trigger/v2/auth/challenge and /auth/verify to get a JWT, GET /trigger/v2/vault (or /vault/register) to resolve the vault, POST /trigger/v2/deposit/craft to build a deposit and get a requestId, sign the deposit client-side, POST /trigger/v2/orders/price to create the order (id/ocoId), GET /trigger/v2/orders/history to monitor state, PATCH /trigger/v2/orders/price/{id} to update, and POST /trigger/v2/orders/price/cancel/{id} + /confirm-cancel/{id} to cancel and withdraw. Shows the call order, the data dependencies between calls (token, vaultPubkey, requestId, depositSignedTx, id, cancelRequestId), the order state machine (open, executing, filled, expired, cancelled, pending_withdraw), how OCO and OTOCO orders branch, and how to recover a cancellation that was interrupted. Use this page to understand which endpoints to call in what order before integrating.
+- [Trigger Order API Overview](https://developers.jup.ag/docs/trigger/index.md): Jupiter Trigger Order API V2 enables vault-based automated orders on Solana. Two order families: price orders (single limit, OCO for TP/SL, OTOCO conditional chains) and DCA (dollar-cost averaging, recurring time- or price-conditional swaps). Requires JWT authentication via challenge-response flow. Deposits go into Privy-managed vault accounts shared across all your orders.
 - [Authentication](https://developers.jup.ag/docs/trigger/authentication.md): POST /trigger/v2/auth/challenge requests a challenge (message or transaction). POST /trigger/v2/auth/verify submits the signed challenge and returns a JWT token (24h TTL). Use the JWT in Authorization: Bearer header for all authenticated endpoints.
-- [Create Order](https://developers.jup.ag/docs/trigger/create-order.md): How to create Trigger V2 price orders using POST /trigger/v2/deposit/craft and POST /trigger/v2/orders/price. Covers the vault-based deposit flow, required craft-deposit fields including orderType: price and orderSubType (single, oco, otoco), client-side signing, create-order request bodies for single limit orders, OCO (one-cancels-other), and OTOCO (one-triggers-OCO), validation rules, and response handling.
-- [Manage Orders](https://developers.jup.ag/docs/trigger/manage-orders.md): PATCH /trigger/v2/orders/price/{orderId} updates order parameters. POST /trigger/v2/orders/price/cancel/{orderId} initiates cancellation and returns a withdrawal transaction. POST /trigger/v2/orders/price/confirm-cancel/{orderId} confirms with the signed withdrawal transaction.
+- [Vault & Deposit](https://developers.jup.ag/docs/trigger/deposit.md): Canonical vault and deposit reference for the Jupiter Trigger V2 API, shared by both limit orders and DCA. Covers resolving your vault with GET /trigger/v2/vault (or /vault/register, 409 if already registered), crafting the funding transaction with POST /trigger/v2/deposit/craft (inputMint, outputMint, userAddress, amount, orderType price or dca, and orderSubType single/oco/otoco for price orders), the response fields (transaction, requestId, receiverAddress, mint, amount, tokenDecimals, inputTokenAccount, plus outputTokenAccount for otoco), and signing the deposit client-side to produce depositSignedTx. The vault is resolved from your JWT and the single-use requestId is consumed by the create call as depositRequestId.
+- [Integration Flow](https://developers.jup.ag/docs/trigger/lifecycle.md): Maps the full Jupiter Trigger Order V2 integration flow for both order families (price/limit orders and DCA) across endpoints: POST /trigger/v2/auth/challenge and /auth/verify to get a JWT, GET /trigger/v2/vault (or /vault/register) to resolve the vault, POST /trigger/v2/deposit/craft to build a deposit and get a requestId, sign the deposit client-side, then the family-specific create call (POST /trigger/v2/orders/price with orderType single/oco/otoco, or POST /trigger/v2/orders/dca), monitoring (GET /trigger/v2/orders/history or /orders/history/dca), editing (PATCH /trigger/v2/orders/price/{id}, limit orders only), and the shared two-step cancel and withdraw (POST /orders/{price|dca}/cancel/{id} + /confirm-cancel/{id}). Shows the shared call order, the data dependencies (token, vaultPubkey, requestId, depositSignedTx, id, cancelRequestId), the order state machine, and how to recover an interrupted cancellation. Includes a limit-order vs DCA endpoint comparison table. Use this page to understand which endpoints to call in what order before integrating either family.
+
+### Limit Orders
+
+- [Create Order](https://developers.jup.ag/docs/trigger/create-order.md): How to create Trigger V2 price orders with POST /trigger/v2/orders/price. Includes a complete runnable TypeScript example (authenticate, get vault, craft and sign deposit, submit the order). Covers the single, OCO (one-cancels-other TP/SL), and OTOCO (one-triggers-OCO) order types, the common and per-type parameters (triggerMint, triggerCondition, triggerPriceUsd, tpPriceUsd, slPriceUsd, slippageBps, expiresAt), default slippage by order side, validation rules (10 USD minimum, distinct mints, required future expiry), and the response ({ id, txSignature }). The shared vault and deposit reference lives on the Vault & Deposit page.
 - [Order History](https://developers.jup.ag/docs/trigger/order-history.md): GET /trigger/v2/orders/history returns paginated order history with state, events, and fill details. Filter by state (active/past), mint, and sort by updated_at/created_at/expires_at.
-- [Best Practices](https://developers.jup.ag/docs/trigger/best-practices.md): Best practices for Trigger Order V2 integrations: order expiry is required (TTL improves execution quality), slippage recommendations by order type, error handling patterns, reference jup.ag frontend for implementation guidance.
-- [Error Reference](https://developers.jup.ag/docs/trigger/errors.md): Per-endpoint error reference for the Jupiter Trigger Order V2 API. Documents the JSON error envelope and the status codes returned by each endpoint: POST /trigger/v2/auth/challenge and /auth/verify, GET /trigger/v2/vault and /vault/register, POST /trigger/v2/deposit/craft, POST /trigger/v2/orders/price, PATCH /trigger/v2/orders/price/{id}, POST /trigger/v2/orders/price/cancel/{id} and /confirm-cancel/{id}, and GET /trigger/v2/orders/history. Explains common causes: 400 validation and state errors, 401 missing/expired JWT, 403 wallet mismatch, 404 order or vault not found, and 409 vault already registered.
+- [Manage Orders](https://developers.jup.ag/docs/trigger/manage-orders.md): PATCH /trigger/v2/orders/price/{orderId} updates order parameters. POST /trigger/v2/orders/price/cancel/{orderId} initiates cancellation and returns a withdrawal transaction. POST /trigger/v2/orders/price/confirm-cancel/{orderId} confirms with the signed withdrawal transaction.
+
+### DCA
+
+- [Dollar-Cost Averaging (DCA)](https://developers.jup.ag/docs/trigger/dca.md): How to create a Trigger V2 DCA (dollar-cost averaging) order: POST /trigger/v2/deposit/craft (orderType: dca) then POST /trigger/v2/orders/dca. Covers the shared vault + JWT deposit flow, the time_based and price_conditional order types, all create parameters (orderCount min 2 with no fixed max, intervalSeconds 60s-1yr, minPriceUsd, maxPriceUsd, triggerMint, beginFillAt), validation (min 10 USD per round, max 10 active orders, beginFillAt at most 30 days out), and create-time errors. Includes a complete runnable TypeScript example. See Track a DCA Order for monitoring and Cancel a DCA Order for withdrawal.
+- [Track a DCA Order](https://developers.jup.ag/docs/trigger/dca-history.md): How to track a Trigger V2 DCA order: GET /trigger/v2/orders/history/dca (list) and GET /trigger/v2/orders/history/dca/{id} (single order), with query params (state active/past, mint, limit 1-100 default 20, offset, sort updated_at/created_at/next_fill_at, dir asc/desc). Documents the response fields (inputAmountInitial/inputAmountRemaining, amountPerRound, outputAmountTotal, inputAmountUsed, numberOfRounds/roundsFilled/fillPercent, nextFillAt/lastFillAt, state/displayState, events), the full state-to-displayState mapping, how the keeper fills each round and delivers the output straight to the wallet, and how fees and slippage work (keeper-set, no slippage parameter).
+- [Cancel a DCA Order](https://developers.jup.ag/docs/trigger/dca-cancel.md): How to cancel a Trigger V2 DCA order and withdraw the unfilled remainder: two-step flow, POST /trigger/v2/orders/dca/cancel/{id} (returns an unsigned withdrawal transaction plus refundAmount and roundsRemaining) then POST /trigger/v2/orders/dca/confirm-cancel/{id} (submit the signed transaction). Covers that re-calling cancel while withdrawing is idempotent, that a failed confirm-cancel leaves the order in withdrawing (it does not roll back to active), and that DCA orders cannot be edited (no PATCH route). Rounds that have already filled are not reversed.
+
+### Resources
+
+- [Best Practices](https://developers.jup.ag/docs/trigger/best-practices.md): Best practices for Trigger Order V2 integrations across both order families. Price orders require an expiresAt and take a slippage setting (RTSE auto or fixed bps); DCA orders have no expiry (duration is orderCount times intervalSeconds, optional beginFillAt) and no slippage parameter (keeper-set per round). Covers error handling (400 details, 401 re-auth), the 10 USD minimum (per price order, or per DCA round), Token-2022 restrictions, and per-family order states.
+- [Error Reference](https://developers.jup.ag/docs/trigger/errors.md): Per-endpoint error reference for the Jupiter Trigger Order V2 API. Documents the JSON error envelope and the status codes returned by each endpoint: POST /trigger/v2/auth/challenge and /auth/verify, GET /trigger/v2/vault and /vault/register, POST /trigger/v2/deposit/craft, POST /trigger/v2/orders/price, PATCH /trigger/v2/orders/price/{id}, POST /trigger/v2/orders/price/cancel/{id} and /confirm-cancel/{id}, and GET /trigger/v2/orders/history. Explains common causes: 400 validation and state errors, 401 missing/expired JWT, 403 wallet mismatch, 404 order or vault not found, and 409 vault already registered. Covers price-order and shared endpoints only; DCA endpoint errors (/orders/dca, /orders/history/dca, /orders/dca/cancel, /confirm-cancel) are documented on the DCA pages.
 
 ### API Reference
 
-#### Authenticate
+#### Authenticate & Vault
 
 - [Request Challenge](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Request a sign-in challenge for wallet authentication
 - [Verify Challenge](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Submit the signed challenge to receive a JWT token
 - [Get Vault](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Get vault information and balance for an account
 - [Register Vault](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Register a new trigger vault for the account
-
-#### Order Management
-
 - [Craft Deposit](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): API reference for POST /trigger/v2/deposit/craft, which builds an unsigned deposit transaction for Trigger V2 vault-based orders. Covers required request fields including inputMint, outputMint, userAddress, amount, orderType, and orderSubType for price orders, plus response fields such as transaction, requestId, receiverAddress, inputTokenAccount, and outputTokenAccount.
+
+#### Limit Order
+
 - [Create Order](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Create a new trigger order
 - [Update Order](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Update parameters of an existing trigger order
 - [Cancel Order](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Cancel a pending trigger order
 - [Confirm Cancel](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Confirm and execute a pending order cancellation
 
+#### DCA
+
+- [Create DCA Order](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Create a recurring dollar-cost averaging order
+- [Cancel DCA Order](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Initiate cancellation of a DCA order and craft the withdrawal transaction
+- [Confirm Cancel DCA Order](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Submit the signed withdrawal transaction to finalize a DCA cancellation
+- [List DCA Orders](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): List your DCA orders with full event history
+- [Get DCA Order](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Get a single DCA order by ID, including fills and events
+
 #### History
 
 - [Order History](https://developers.jup.ag/docs/openapi-spec/trigger/v2/trigger.yaml): Get historical trigger orders for an account
-
-## Recurring
-
-Automated dollar-cost averaging (DCA) with time-based recurring orders.
-
-### Recurring
-
-- [Recurring (DCA) API Overview](https://developers.jup.ag/docs/recurring/index.md): Set up automated dollar-cost averaging (DCA) with time-based recurring orders on Solana.
-- [Create Order](https://developers.jup.ag/docs/recurring/create-order.md): POST /recurring/v1/createOrder sets up a DCA order with configurable cycle frequency, amount per cycle, and optional start time.
-- [Execute Order](https://developers.jup.ag/docs/recurring/execute-order.md): POST /recurring/v1/execute triggers the next cycle of a recurring order. Jupiter keeper bots handle this automatically.
-
-### Order Management
-
-- [Cancel Order](https://developers.jup.ag/docs/recurring/cancel-order.md): POST /recurring/v1/cancelOrder cancels an active recurring (DCA) order and returns remaining funds to the user.
-- [Deposit Price Order](https://developers.jup.ag/docs/recurring/deposit-price-order.md): DEPRECATED: POST /recurring/v1/priceDeposit deposits funds into a price-based recurring order. Use time-based orders instead.
-- [Withdraw Price Order](https://developers.jup.ag/docs/recurring/withdraw-price-order.md): DEPRECATED: POST /recurring/v1/priceWithdraw withdraws funds from a price-based recurring order. Use time-based orders instead.
-- [Get Recurring Orders](https://developers.jup.ag/docs/recurring/get-recurring-orders.md): GET /recurring/v1/getRecurringOrders returns active and historical DCA orders filtered by wallet or status.
-
-### Debugging
-
-- [Best Practices](https://developers.jup.ag/docs/recurring/best-practices.md): Guidelines for recurring order minimum amounts, cycle requirements, and token compatibility (Token-2022 not supported).
-
-### API Reference
-
-- [Create Order](https://developers.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Request for a base64-encoded unsigned recurring order creation transaction to be used in POST /recurring/v1/execute
-- [Execute](https://developers.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Execute the signed transaction and get the execution status
-- [Cancel Order](https://developers.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Request for a base64-encoded unsigned recurring order cancellation transaction to be used in POST /recurring/v1/execute
-- [Get Recurring Orders](https://developers.jup.ag/docs/openapi-spec/recurring/recurring.yaml): Request for active or historical recurring orders associated to the provided account
 
 ## Prediction
 

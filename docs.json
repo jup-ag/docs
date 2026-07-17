@@ -331,18 +331,37 @@
             ]
           },
           {
-            "item": "Trigger",
+            "item": "LO & DCA",
             "icon": "crosshairs",
             "groups": [
               {
-                "group": "Trigger",
+                "group": "Get Started",
                 "pages": [
                   "trigger/index",
-                  "trigger/lifecycle",
                   "trigger/authentication",
+                  "trigger/deposit",
+                  "trigger/lifecycle"
+                ]
+              },
+              {
+                "group": "Limit Orders",
+                "pages": [
                   "trigger/create-order",
-                  "trigger/manage-orders",
                   "trigger/order-history",
+                  "trigger/manage-orders"
+                ]
+              },
+              {
+                "group": "DCA",
+                "pages": [
+                  "trigger/dca",
+                  "trigger/dca-history",
+                  "trigger/dca-cancel"
+                ]
+              },
+              {
+                "group": "Resources",
+                "pages": [
                   "trigger/best-practices",
                   "trigger/errors"
                 ]
@@ -351,18 +370,18 @@
                 "group": "API Reference",
                 "pages": [
                   {
-                    "group": "Authenticate",
+                    "group": "Authenticate & Vault",
                     "pages": [
                       "api-reference/trigger/challenge",
                       "api-reference/trigger/verify",
                       "api-reference/trigger/vault",
-                      "api-reference/trigger/vault-register"
+                      "api-reference/trigger/vault-register",
+                      "api-reference/trigger/deposit-craft"
                     ]
                   },
                   {
-                    "group": "Order Management",
+                    "group": "Limit Order",
                     "pages": [
-                      "api-reference/trigger/deposit-craft",
                       "api-reference/trigger/create-order",
                       "api-reference/trigger/update-order",
                       "api-reference/trigger/cancel-order",
@@ -370,47 +389,19 @@
                     ]
                   },
                   {
+                    "group": "DCA",
+                    "pages": [
+                      "api-reference/trigger/create-dca",
+                      "api-reference/trigger/cancel-dca",
+                      "api-reference/trigger/confirm-cancel-dca",
+                      "api-reference/trigger/dca-history",
+                      "api-reference/trigger/dca-order"
+                    ]
+                  },
+                  {
                     "group": "History",
                     "pages": ["api-reference/trigger/order-history"]
                   }
-                ]
-              }
-            ]
-          },
-          {
-            "item": "Recurring",
-            "icon": "clock-rotate-left",
-            "groups": [
-              {
-                "group": "Recurring",
-                "pages": [
-                  "recurring/index",
-                  "recurring/create-order",
-                  "recurring/execute-order"
-                ]
-              },
-              {
-                "group": "Order Management",
-                "pages": [
-                  "recurring/cancel-order",
-                  "recurring/deposit-price-order",
-                  "recurring/withdraw-price-order",
-                  "recurring/get-recurring-orders"
-                ]
-              },
-              {
-                "group": "Debugging",
-                "pages": ["recurring/best-practices"]
-              },
-              {
-                "group": "API Reference",
-                "pages": [
-                  "api-reference/recurring/create-order",
-                  "api-reference/recurring/execute",
-                  "api-reference/recurring/cancel-order",
-                  "api-reference/recurring/price-deposit",
-                  "api-reference/recurring/price-withdraw",
-                  "api-reference/recurring/get-recurring-orders"
                 ]
               }
             ]

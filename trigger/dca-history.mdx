@@ -2,7 +2,7 @@
 title: "Track a DCA Order"
 sidebarTitle: "Track"
 description: "Monitor a DCA order's progress, fills, and state through the history endpoints."
-llmsDescription: "How to track a Trigger V2 DCA order: GET /trigger/v2/orders/history/dca (list) and GET /trigger/v2/orders/history/dca/{id} (single order), with query params (state active/past, mint, limit 1-100 default 20, offset, sort updated_at/created_at/next_fill_at, dir asc/desc). Documents the response fields (inputAmountInitial/inputAmountRemaining, amountPerRound, outputAmountTotal, inputAmountUsed, numberOfRounds/roundsFilled/fillPercent, nextFillAt/lastFillAt, state/displayState, events), the full state-to-displayState mapping, how the keeper fills each round and delivers the output straight to the wallet, and how fees and slippage work (keeper-set, no slippage parameter)."
+llmsDescription: "How to track a Trigger V2 DCA order: GET /trigger/v2/orders/history/dca (list) and GET /trigger/v2/orders/history/dca/{id} (single order), with query params (state active/past, mint, limit 1-100 default 20, offset, sort updated_at/created_at/next_fill_at, dir asc/desc). Documents the response fields (inputAmountInitial/inputAmountRemaining, amountPerRound, outputAmountTotal, inputAmountUsed, numberOfRounds/roundsFilled/fillPercent, nextFillAt/lastFillAt, state/displayState, jlEnabled/jlYieldUsd for Earn While You Wait orders, events), the full state-to-displayState mapping, how the keeper fills each round and delivers the output straight to the wallet, and how fees and slippage work (keeper-set, no slippage parameter)."
 ---
 
 Track a DCA order's schedule, progress, and fill history through the order-history endpoints. Every request needs the JWT from [authentication](/trigger/authentication).
@@ -32,6 +32,7 @@ Each order reports its schedule, progress, and event history:
 | `numberOfRounds` / `roundsFilled` / `fillPercent` | Total rounds, rounds completed, and progress from 0 to 1. |
 | `nextFillAt` / `lastFillAt` | Next scheduled round, and the most recent fill. |
 | `state` / `displayState` | Raw and human-friendly status (see below). |
+| `jlEnabled` / `jlYieldUsd` | Whether [Earn While You Wait](/trigger/dca#earn-while-you-wait) is on, and the yield accrued so far in USD (`null` when not JL-enabled or a required price is uncached). |
 | `events` | Ordered history of `deposit`, `fill`, `withdrawal`, and `cancelled` events. |
 
 <Accordion title="Full order response">
@@ -53,6 +54,8 @@ Each order reports its schedule, progress, and event history:
   "maxPriceUsd": null,
   "triggerMint": null,
   "retryWindowSeconds": 30,
+  "jlEnabled": false,
+  "jlYieldUsd": null,
   "numberOfRounds": 2,
   "intervalSeconds": 60,
   "beginFillAt": "2026-06-26T07:53:57.767Z",
@@ -114,7 +117,7 @@ Each fill appends an event and advances `roundsFilled`, `outputAmountTotal`, `in
 
 A `price_conditional` round that is out of band does not fill: the order stays `active` with `roundsFilled` unchanged until the price re-enters the range, then resumes on the next interval.
 
-If a round cannot execute (for example, not enough liquidity within slippage), the keeper retries it within a window of `min(max(30, intervalSeconds / 2), 7200)` seconds, then reschedules it to the next interval. `roundsFilled` stays the same and `nextFillAt` advances. A round's `fill` event carries a `state` of `success`, `failed`, `executing`, or `pending`.
+If a round cannot execute (for example, not enough liquidity within slippage), the keeper retries it within a window of `min(max(30, intervalSeconds / 2), 7200)` seconds, then reschedules it to the next interval. `roundsFilled` stays the same and `nextFillAt` advances. A round's `fill` event carries a `state` of `success`, `failed`, `rescheduled`, or `pending`.
 
 ## Fees and slippage
 

@@ -31,6 +31,15 @@ Price orders now support a trailing stop loss. Instead of a fixed `triggerPriceU
 - Change the trail distance by updating `trailingBps`
 - [Trailing stop loss](/trigger/create-order#trailing-stop-loss)
 
+## Trigger API: Earn While You Wait (DCA)
+
+DCA orders can now earn Jupiter Lend yield on idle capital. Set `jlEnabled: true` on a `time_based` DCA order with a supported stablecoin input (USDC, USDT, or JupUSD): the budget that has not been swapped yet is supplied to Jupiter Lend between rounds and accrues yield until each round draws from it.
+
+- Craft the deposit with `jlMint`, the Jupiter Lend earn token for your input stablecoin
+- Track accrued yield with `jlYieldUsd` in order history
+- Cancelling unwinds the Lend position and returns the remainder plus yield
+- [Earn While You Wait](/trigger/dca#earn-while-you-wait)
+
 </Update>
 
 ---

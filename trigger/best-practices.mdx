@@ -1,7 +1,7 @@
 ---
 title: "Best Practices"
-description: "Guidelines for order expiry, slippage, error handling, and integration patterns for the Trigger Order V2 API."
-llmsDescription: "Best practices for Trigger Order V2 integrations: order expiry is required (TTL improves execution quality), slippage recommendations by order type, error handling patterns, reference jup.ag frontend for implementation guidance."
+description: "Guidelines for error handling, token compatibility, and integration patterns across price orders and DCA in the Trigger Order V2 API."
+llmsDescription: "Best practices for Trigger Order V2 integrations across both order families. Price orders require an expiresAt and take a slippage setting (RTSE auto or fixed bps); DCA orders have no expiry (duration is orderCount times intervalSeconds, optional beginFillAt) and no slippage parameter (keeper-set per round). Covers error handling (400 details, 401 re-auth), the 10 USD minimum (per price order, or per DCA round), Token-2022 restrictions, and per-family order states."
 ---
 
 <Info>
@@ -17,9 +17,9 @@ The [jup.ag](https://jup.ag) frontend is the canonical reference for how to inte
 - Error handling and retry logic
 - Order state management and polling
 
-## Order Expiry
+## Order Expiry (Price Orders)
 
-Every order requires an `expiresAt` timestamp. Unlike V1 where orders could exist indefinitely, V2 enforces expiry on all orders. This allows the system to prune stale orders, improving execution quality for active orders.
+Every price order requires an `expiresAt` timestamp. Unlike V1 where orders could exist indefinitely, V2 enforces expiry on all price orders. This allows the system to prune stale orders, improving execution quality for active orders.
 
 | Use case | Recommended expiry |
 | :--- | :--- |
@@ -29,12 +29,16 @@ Every order requires an `expiresAt` timestamp. Unlike V1 where orders could exis
 
 For long-lived orders, set a 30-day expiry and renew by updating the order before it expires via the [update endpoint](/trigger/manage-orders#update-an-order). There is no "no expiry" option by design.
 
-## Slippage
+DCA orders have no `expiresAt`. A DCA runs until its budget is spent: its duration is `orderCount × intervalSeconds`, and an optional `beginFillAt` (default now, at most 30 days out) sets when the first round starts.
+
+## Slippage (Price Orders)
+
+Slippage settings apply to price orders. DCA orders have no slippage parameter: the keeper sets slippage per round from live market conditions at fill time.
 
 | Order type | Default | Recommendation |
 | :--- | :--- | :--- |
 | Take-profit / buy below | Auto (RTSE) | Use the default unless you have specific requirements |
-| Stop-loss / buy above | 20% (2000 bps) | Keep high for execution certainty -- tighten only if you accept missed fills |
+| Stop-loss / buy above | 20% (2000 bps) | Keep high for execution certainty; tighten only if you accept missed fills |
 | Parent (OTOCO) | Auto (RTSE) | Use the default |
 
 Stop-loss orders use a higher default because execution certainty matters more than price precision when cutting losses. If you lower stop-loss slippage, the order may not fill during volatile conditions.
@@ -43,7 +47,7 @@ Stop-loss orders use a higher default because execution certainty matters more t
 
 - **Validation errors** (400) include a `details` object with per-field messages. Parse these to surface specific issues to users.
 - **Authentication errors** (401) mean the JWT has expired. Re-authenticate with a new challenge-response flow rather than retrying the same token.
-- **Minimum order size** is 10 USD. Enforce this client-side to avoid unnecessary API calls.
+- **Minimum order size** is 10 USD: per price order, or per DCA round (`inputAmount / orderCount`). Enforce this client-side to avoid unnecessary API calls.
 - Handle unknown fields in responses gracefully. As the API evolves during beta, new fields may be added to response objects.
 
 ## Order Summary
@@ -56,14 +60,18 @@ Display a human-readable summary of what the order will do before the user confi
 
 This helps users catch mistakes before submitting. For OCO and OTOCO orders, include both the trigger conditions and the child order parameters in the summary.
 
+For DCA, summarise the schedule (number of rounds × interval), the per-round amount (`inputAmount / orderCount`, with the last round absorbing any remainder), and for `price_conditional` orders the `[minPriceUsd, maxPriceUsd]` band and which mint is the trigger.
+
 ## Token Compatibility
 
-- Tokens with transfer tax extensions (Token-2022) are not supported
+- Tokens with transfer-fee or transfer-hook extensions are rejected at deposit unless whitelisted
 - Input and output mints must be different
 
 ## Order Lifecycle
 
-Poll the [history endpoint](/trigger/order-history) to track order state. Key states to handle:
+Poll the history endpoint to track order state; the states differ by family.
+
+**Price orders** ([`GET /orders/history`](/trigger/order-history#order-states)):
 
 | State | Meaning | Action |
 | :--- | :--- | :--- |
@@ -72,3 +80,5 @@ Poll the [history endpoint](/trigger/order-history) to track order state. Key st
 | `cancelled` | Cancelled by user | Confirm funds returned to vault |
 | `expired` | Past `expiresAt` | Prompt user to withdraw funds or recreate |
 | `failed` | Execution failed | Show error, suggest retry with adjusted parameters |
+
+**DCA** ([`GET /orders/history/dca`](/trigger/dca-history#order-states)) uses a different set: `pending`, `active`, `executing`, `completed` (all rounds filled), `pending_withdraw`, `cancelled`, and `failed`. There is no `open` or `expired` state; a DCA ends at `completed` when its budget is spent.

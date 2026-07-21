@@ -24,6 +24,36 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-07-13] Split the DCA guide into Create / Track / Cancel pages
+**Status:** implemented
+**Scope:** folder-structure | navigation
+**Files affected:** `trigger/dca.mdx`, `trigger/dca-history.mdx` (new), `trigger/dca-cancel.mdx` (new), `docs.json`
+**Linear issue:** DEV-623 (DCA v2 Docs)
+
+**Context:** The DCA guide was a single ~410-line page while the sibling Limit Order product is split across four pages (Lifecycle, Create Order, Manage Orders, Order History). The lopsided sidebar prompted the split.
+**Decision:** Split DCA into three pages under the `DCA` sidebar group, mirroring Limit Order's shape:
+- `trigger/dca` (unchanged URL) — Create: how it works, order types, quick start, params, validation, price-conditional, create-time errors.
+- `trigger/dca-history` (new) — Track: history endpoints, fields, states, how rounds fill, fees and slippage.
+- `trigger/dca-cancel` (new) — Cancel: two-step withdrawal, no-edit note.
+The canonical error table stays on `trigger/dca` (`#errors`); the other two link to it.
+**Rationale:** Parity with Limit Order and shorter, task-focused pages. Keeping `/trigger/dca` as the create/overview URL means no redirect (the page was new and unmerged, so the two new URLs break nothing).
+**Migration notes:** No redirects (page was not yet public). `llms.txt` regenerated; all three pages carry scoped `llmsDescription`.
+
+### [2026-07-10] Rename "Trigger" nav item to "LO & DCA"; mark Recurring (DCA V1) unmaintained
+**Status:** implemented
+**Scope:** navigation | rename | unmaintained
+**Files affected:** `docs.json`, `recurring/*` (8 guide pages), `api-reference/recurring/*` (6 pages)
+**Linear issue:** DEV-623 (DCA v2 Docs)
+
+**Context:** Trigger V2 unified Limit Orders (LOv2) and DCA (DCAv2) under one backend, all served at `/trigger/v2/*` (confirmed by Yusuf, DCA lead: the `/trigger` prefix is the platform-side surface). The docs had a "Trigger" dropdown item (holding LOv2 + DCAv2) plus a separate legacy "Recurring" item, which is the standalone DCA V1 API, now superseded.
+**Decision:**
+- Rename the "Trigger" Docs-dropdown item to **"LO & DCA"** (label only, no page paths change).
+- Regroup its sidebar into shared + product sub-sections: `Get Started` (index, authentication), `Limit Order` (lifecycle, create-order, manage-orders, order-history), `DCA` (dca), `Resources` (best-practices, errors). API Reference split into `Authenticate & Vault` (incl. shared deposit-craft), `Limit Order`, `DCA`, `History`.
+- Mark the standalone **Recurring (DCA V1)** product unmaintained: remove the "Recurring" item from nav, keep the `recurring/*` files on disk (URLs stay live), add an `UNMAINTAINED:` `llmsDescription` prefix and a `<Warning>` pointing to [DCA](/trigger/dca) on every Recurring guide and API-reference page. No `deprecated: true`.
+**Rationale:** LOv2 and DCAv2 are the same product family ("trigger orders", time- vs price-triggered) on one API, so one dropdown with clear LO/DCA sub-sections matches the API shape without duplicating the shared auth/vault/deposit flow. Renaming the nav label (not the file paths) avoids any redirect. Marking Recurring unmaintained (not deprecated) matches the Trigger V1 / Metis V1 precedent: it still works, just superseded.
+**Alternatives considered:** (1) Separate "Limit Order API" and "DCA API" dropdown items — rejected because auth/vault/deposit are shared; one item with sub-sections avoids duplication. (2) Rename the legacy "Recurring" item instead of "Trigger" — rejected, the LOv2+DCAv2 content already lives under "Trigger" and Recurring is V1.
+**Migration notes:** No path changes, so no redirects. `recurring/*` URLs remain reachable directly; the generator excludes them from `llms.txt` once out of nav (UNMAINTAINED prefix is the safety net for direct hits).
+
 ### [2026-06-17] Portal nav ordered by developer journey, not feature-vs-reference
 **Status:** implemented
 **Scope:** navigation
@@ -132,9 +162,9 @@ Track all redirects added to `vercel.json` here for visibility:
 
 | Old Path | New Path | Date | Reason |
 |----------|----------|------|--------|
-| `/api-reference/trigger/create-order` | `/api-reference/trigger/v1/create-order` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
+| `/api-reference/trigger/create-order` | `/api-reference/trigger/v1/create-order` | 2026-03-10 | V1/V2 restructure (DEVREL-75). REMOVED 2026-07-09 (DEV-724): after DEVREL-115 the V2 page lives at the unprefixed URL, so this redirect shadowed it. Unprefixed URL now serves V2. |
 | `/api-reference/trigger/execute` | `/api-reference/trigger/v1/execute` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
-| `/api-reference/trigger/cancel-order` | `/api-reference/trigger/v1/cancel-order` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
+| `/api-reference/trigger/cancel-order` | `/api-reference/trigger/v1/cancel-order` | 2026-03-10 | V1/V2 restructure (DEVREL-75). REMOVED 2026-07-09 (DEV-724): same shadowing as create-order. |
 | `/api-reference/trigger/cancel-orders` | `/api-reference/trigger/v1/cancel-orders` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
 | `/api-reference/trigger/get-trigger-orders` | `/api-reference/trigger/v1/get-trigger-orders` | 2026-03-10 | V1/V2 restructure (DEVREL-75) |
 | `/ai/ecosystem` | `/ai` | 2026-03-23 | Ecosystem page removed in AI section rework (PR #857) |

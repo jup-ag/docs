@@ -638,12 +638,7 @@
       },
       {
         "tab": "Changelog",
-        "groups": [
-          {
-            "group": " ",
-            "pages": ["changelog/index"]
-          }
-        ]
+        "href": "https://developers.jup.ag/changelog"
       },
       {
         "tab": "Resources",
@@ -947,6 +942,10 @@
     {
       "source": "/updates/:slug*",
       "destination": "/changelog/:slug*"
+    },
+    {
+      "source": "/changelog",
+      "destination": "https://developers.jup.ag/changelog"
     },
     {
       "source": "/misc",

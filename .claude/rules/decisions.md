@@ -246,6 +246,7 @@ Track all redirects added to `vercel.json` here for visibility:
 | `/docs/studio/*` | `/studio/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
 | `/docs/trigger/*` | `/trigger/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
 | `/docs/ultra/*` | `/ultra/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
+| `/changelog` | `https://developers.jup.ag/changelog` | 2026-07-15 | Changelog consolidated on dev platform blog. `docs.json` redirect with an external destination; Mintlify's schema only documents internal paths, so verify in prod after deploy (DEV-718) |
 
 ### [2026-04-06] Hidden pages for private integrator docs
 **Status:** implemented
@@ -298,3 +299,15 @@ Track all redirects added to `vercel.json` here for visibility:
 - Reorganise sidebar: Swap (overview), Meta-Aggregator (order-and-execute + API refs), Router (build + submit + API refs), Advanced, Routing Integration, Guides, Migration
 **Rationale:** Two clear paths reduce decision fatigue. Absorbing fees and routing eliminates page-hopping for core concepts. Profile-targeted migration pages let developers find their specific upgrade path without reading irrelevant content.
 **Migration notes:** Redirects added for `swap/fees` → `swap/order-and-execute`, `swap/routing` → `swap`, `swap/build/other-instructions` → `swap/build/common-instructions`.
+
+### [2026-07-07] Changelog consolidated on the Developer Platform blog
+**Status:** implemented
+**Scope:** navigation | redirect
+**Files affected:** `docs.json`, `changelog/index.mdx` (deleted), `AGENTS.md`/`CLAUDE.md`, `llms.txt`
+**Linear issue:** DEV-595 (sub-issues DEV-717 blog backfill, DEV-718 docs redirect)
+
+**Context:** Two changelogs existed: the docs Changelog tab (`changelog/index.mdx`) and the Developer Platform site's changelog (`developers.jup.ag/changelog`). The blog has far more visibility and sits alongside the platform, and dual-maintenance guaranteed drift.
+**Decision:** The blog is the single changelog home. All docs changelog history (Jan 2025 – Jun 2026) was backfilled as one post per month (`/changelog/YYYY-MM` URLs, content in `web/content/changelog/`) in the `developer-platform` repo. The docs Changelog tab became an external `href` to `https://developers.jup.ag/changelog`, `changelog/index.mdx` was deleted, and a `docs.json` redirect sends `/changelog` to the external URL. No Cloudflare rule (judged unnecessary complexity for one URL). Caveat: Mintlify's schema only documents internal paths as redirect destinations, so the external redirect must be verified in prod after deploy; if it does not work, fall back to a hidden stub page at `changelog/index.mdx` linking out.
+**Rationale:** One source of truth, more visibility, and a standardised monthly format (breaking changes first, per-product sections, "WTM" explanations, modelled on the solana_devs changelog and Linear's changelog method). The format is codified in `developer-platform` `web/content/changelog/_template.mdx` and `web/content/blog/README.md`.
+**Alternatives considered:** (1) Keep the docs page as a frozen archive with the tab linking out — rejected, two URLs for one concept. (2) Cross-post to both — rejected, guaranteed drift.
+**Migration notes:** Existing `/updates → /changelog` redirects in `docs.json` kept (they chain into the new `/changelog` external redirect). New changelog entries go to the `developer-platform` repo; see the Changelog section of `AGENTS.md`. llms.txt keeps a signpost: the generator emits a `## Developer Platform` footer section (changelog, portal, blog) with a preamble telling agents these are human-facing browser pages with no machine-readable version yet, so agents hand the user the link instead of fetching. Update that preamble if the platform site ever ships an llms-friendly changelog.

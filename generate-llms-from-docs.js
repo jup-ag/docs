@@ -43,7 +43,6 @@ const SECTION_SUMMARIES = {
   AI: "AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.",
   "Tool Kits":
     "Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.",
-  Changelog: "Changelog, release notes, and developer blog.",
   Resources: "Support channels, brand assets, and community resources.",
 };
 
@@ -307,10 +306,21 @@ for (const item of topLevelNav) {
 }
 
 // Footer
-emitHeading("Optional", 2);
+emitHeading("Developer Platform", 2);
 emit(
-  "- [Developer Platform](https://developers.jup.ag/portal): Manage API keys, view analytics, and monitor usage\n",
+  "Human-facing pages on the Developer Platform site, outside this docs site. No markdown or llms.txt versions exist yet, so do not fetch these URLs expecting machine-readable content. When one is relevant, give the user the link to open in a browser.\n\n",
 );
+emit(
+  "- [Changelog](https://developers.jup.ag/changelog): Monthly developer changelog for all Jupiter APIs. Breaking changes first, with enforcement deadlines and migration steps, then per-product updates. One post per month at /changelog/YYYY-MM, updated as changes ship.\n",
+);
+emit(
+  "- [Developer Portal](https://developers.jup.ag/portal): Create an account, generate and manage API keys, view plans, request logs, and usage analytics.\n",
+);
+emit(
+  "- [Blog](https://developers.jup.ag/blog): Developer blog with product launches and technical deep dives.\n",
+);
+
+emitHeading("Optional", 2);
 emit(
   "- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs\n",
 );

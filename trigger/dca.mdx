@@ -2,7 +2,7 @@
 title: "Dollar-Cost Averaging (DCA)"
 sidebarTitle: "Create"
 description: "Split a single deposit into recurring swaps on a schedule, with optional price conditions."
-llmsDescription: "How to create a Trigger V2 DCA (dollar-cost averaging) order: POST /trigger/v2/deposit/craft (orderType: dca) then POST /trigger/v2/orders/dca. Covers the shared vault + JWT deposit flow, the time_based and price_conditional order types, all create parameters (orderCount min 2 with no fixed max, intervalSeconds 60s-1yr, minPriceUsd, maxPriceUsd, triggerMint, beginFillAt), validation (min 10 USD per round, max 10 active orders, beginFillAt at most 30 days out), and create-time errors. Includes a complete runnable TypeScript example. See Track a DCA Order for monitoring and Cancel a DCA Order for withdrawal."
+llmsDescription: "How to create a Trigger V2 DCA (dollar-cost averaging) order: POST /trigger/v2/deposit/craft (orderType: dca) then POST /trigger/v2/orders/dca. Covers the shared vault + JWT deposit flow, the time_based and price_conditional order types, all create parameters (orderCount min 2 with no fixed max, intervalSeconds 60s-1yr, minPriceUsd, maxPriceUsd, triggerMint, beginFillAt), and Earn While You Wait (jlEnabled/jlMint: idle stablecoin earns Jupiter Lend yield between rounds, time_based and supported stablecoins USDC/USDT/JupUSD only). Covers validation (min 10 USD per round, max 10 active orders, beginFillAt at most 30 days out) and create-time errors. Includes a complete runnable TypeScript example. See Track a DCA Order for monitoring and Cancel a DCA Order for withdrawal."
 ---
 
 A DCA order splits one deposit into a series of swaps that run automatically on a fixed schedule, so you buy a little at a time instead of all at once. You deposit your full budget, choose how many rounds and how often, and Jupiter's keeper executes each round and sends the output to your wallet.
@@ -169,6 +169,8 @@ The body of `POST /trigger/v2/orders/dca`:
 | `maxPriceUsd` | `number` | No | Upper price bound. Price-conditional only. |
 | `triggerMint` | `string` | Cond. | Mint whose USD price is checked against the band. **Required** for `price_conditional`. Must be the input or output mint, and cannot be the stablecoin leg (use the volatile leg, usually `outputMint`). Ignored for `time_based`. |
 | `beginFillAt` | `string` | No | ISO-8601 time to start the first round. Defaults to now, up to 30 days out. |
+| `jlEnabled` | `boolean` | No | Earn While You Wait: hold idle capital as a yield-bearing Jupiter Lend token between rounds. `time_based` and supported-stablecoin input only. Defaults `false`, and requires a deposit crafted with `jlMint`. See [Earn While You Wait](#earn-while-you-wait). |
+| `jlMint` | `string` | Cond. | Jupiter Lend earn token for your input stablecoin (from `GET /lend/v1/earn/tokens`). **Required** when `jlEnabled` is `true`, and must match the `jlMint` passed to `/deposit/craft`. |
 
 ## Validation
 
@@ -205,38 +207,31 @@ To accumulate only within a target price range, set `orderType: "price_condition
 
 `triggerMint` must be the input or output mint, and cannot be the stablecoin side of the pair. In practice that is the volatile leg (here, SOL). A stablecoin trigger such as USDC is rejected with `400 "Trigger mint is not supported"`, and a pair where both legs are stable returns `400 "Mint pair is not supported"`. Omitting the bounds or the trigger returns a `400` identifying the missing field, and a `time_based` order that sets price bounds is rejected.
 
-{/* UNRELEASED — Earn While You Wait (Jupiter Lend yield on idle DCA capital).
-    Backend merged in trigger-order PR #516 (2026-06-24) and live on the API, but the feature
-    is NOT publicly released: the LO/DCA Linear project LODCA-133 is still In Progress.
-    Do NOT uncomment until the DCA team confirms public launch. When it ships, restore this
-    section, the jlEnabled/jlMint create params, the jlEnabled response field, and the
-    matching jl* fields commented out in openapi-spec/trigger/v2/trigger.yaml.
+## Earn While You Wait
 
-    Additional create parameters:
-    - jlEnabled (boolean, default false): opt in to Earn While You Wait. time_based +
-      stablecoin input only; requires the JL deposit craft.
-    - jlMint (string): the Jupiter Lend earn token for your input stablecoin (from
-      GET /lend/v1/earn/tokens). Required on the deposit craft and create when jlEnabled is true.
+Set `jlEnabled: true` to earn yield on the part of your budget that has not been swapped yet. While the stablecoin sits in the vault between rounds, it is supplied to [Jupiter Lend](/lend) and earns yield until each round draws from it. The yield accrues to you and is returned when the order finishes or is cancelled.
 
-    ## Earn While You Wait
+Earn While You Wait has two requirements:
 
-    Set jlEnabled: true to earn yield on the budget that has not been swapped yet. While the
-    stablecoin sits in the vault between rounds it is supplied to Jupiter Lend (/lend) and earns
-    yield until each round draws from it. Requirements:
-    - The order must be time_based (price_conditional + jlEnabled returns 400).
-    - The input mint must be a supported stablecoin (else 400 "jlEnabled is not supported for this input mint").
+- The order must be `time_based`. A `price_conditional` order with `jlEnabled: true` returns `400 "jlEnabled is only supported for time_based orders"`.
+- The input mint must be a supported stablecoin. Any other input returns `400 "jlEnabled is not supported for this input mint"`.
 
-    Flow:
-    1. Find the JL token: GET https://api.jup.ag/lend/v1/earn/tokens, match assetAddress to your
-       inputMint, use its address as jlMint. USDC -> 9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D (jlUSDC).
-    2. Craft the deposit with jlMint (POST /deposit/craft + orderType dca). The response returns
-       jlTokenAccount instead of inputTokenAccount. Wrong jlMint -> 400 "jlMint does not match the JL token for this input mint".
-    3. Create with jlEnabled: true (and jlMint) on POST /orders/dca.
+Supported stablecoins and their Jupiter Lend tokens:
 
-    The order response carries jlEnabled: true. Cancelling unwinds the Lend position and returns
-    the remaining stablecoin (with yield) to the wallet. Verified live e2e on 2026-06-27
-    (order 019f0592-966e-736b-aedd-80fa56e2e399).
-*/}
+| Input stablecoin | `jlMint` (Jupiter Lend earn token) |
+| :--- | :--- |
+| USDC (`EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`) | `9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D` (jlUSDC) |
+| USDT (`Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB`) | `Cmn4v2wipYV41dkakDvCgFJpxhtaaKt11NyWV8pjSE8A` (jlUSDT) |
+| JupUSD (`JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD`) | `7GxATsNMnaC88vdwd2t3mwrFuQwwGvmYPrUQ4D6FotXk` (jlJUPUSD) |
+
+You can also resolve the pairing at runtime: `GET https://api.jup.ag/lend/v1/earn/tokens`, match `assetAddress` to your `inputMint`, and use that token's address as `jlMint`.
+
+To create an Earn While You Wait order:
+
+1. Craft the deposit with `jlMint` (`POST /trigger/v2/deposit/craft` with `orderType: "dca"` and `jlMint`). The response returns `jlTokenAccount` instead of `inputTokenAccount`. A `jlMint` that is not the Lend token for your input stablecoin returns `400 "jlMint does not match the JL token for this input mint"`.
+2. Create the order with `jlEnabled: true` and the same `jlMint` on `POST /trigger/v2/orders/dca`.
+
+The create response is unchanged (`{ id, txSignature }`). When you [track the order](/trigger/dca-history), it carries `jlEnabled: true` and `jlYieldUsd` (yield accrued so far in USD, or `null` while a required price is uncached). [Cancelling](/trigger/dca-cancel) unwinds the Lend position and returns the remaining stablecoin, plus the accrued yield, to your wallet.
 
 ## Errors
 

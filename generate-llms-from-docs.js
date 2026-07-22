@@ -34,10 +34,8 @@ const SECTION_SUMMARIES = {
   Lend: "Lending protocol with Earn (deposit yield), Borrow (collateralised loans), and Flashloans.",
   Perps:
     "Leveraged perpetuals trading on Solana (on-chain program, no REST API).",
-  Trigger:
-    "Vault-based limit orders with single, OCO (TP/SL), and OTOCO order types.",
-  Recurring:
-    "Automated dollar-cost averaging (DCA) with time-based recurring orders.",
+  "LO & DCA":
+    "Vault-based trigger orders: limit orders (single, OCO for TP/SL, OTOCO) and DCA (time-based and price-conditional recurring swaps).",
   Prediction: "Binary prediction markets for real-world events.",
   More: "Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).",
   // Tabs
@@ -45,7 +43,6 @@ const SECTION_SUMMARIES = {
   AI: "AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.",
   "Tool Kits":
     "Drop-in UI components (Plugin, Wallet Kit) and the Referral Program SDK.",
-  Changelog: "Changelog, release notes, and developer blog.",
   Resources: "Support channels, brand assets, and community resources.",
 };
 
@@ -284,8 +281,7 @@ emit(
 emit(
   "- [Swap API V2](https://developers.jup.ag/docs/swap/index.md) (recommended): `GET /swap/v2/order` + `POST /swap/v2/execute` or `GET /swap/v2/build`\n",
 );
-emit("- [Trigger](https://developers.jup.ag/docs/trigger/index.md) (limit orders): `POST /trigger/v2/orders/price`\n");
-emit("- [Recurring](https://developers.jup.ag/docs/recurring/index.md) (DCA): `POST /recurring/v1/createOrder`\n");
+emit("- [LO & DCA](https://developers.jup.ag/docs/trigger/index.md) (limit orders & DCA): `POST /trigger/v2/orders/price`, `POST /trigger/v2/orders/dca`\n");
 emit("- [Lend](https://developers.jup.ag/docs/lend/index.md): `POST /lend/v1/earn/deposit`\n");
 emit("- [Price](https://developers.jup.ag/docs/price/index.md): `GET /price/v3?ids={mints}`\n");
 emit("- [Tokens](https://developers.jup.ag/docs/tokens/index.md): `GET /tokens/v2/search?query={query}`\n");
@@ -310,10 +306,21 @@ for (const item of topLevelNav) {
 }
 
 // Footer
-emitHeading("Optional", 2);
+emitHeading("Developer Platform", 2);
 emit(
-  "- [Developer Platform](https://developers.jup.ag/portal): Manage API keys, view analytics, and monitor usage\n",
+  "Human-facing pages on the Developer Platform site, outside this docs site. No markdown or llms.txt versions exist yet, so do not fetch these URLs expecting machine-readable content. When one is relevant, give the user the link to open in a browser.\n\n",
 );
+emit(
+  "- [Changelog](https://developers.jup.ag/changelog): Monthly developer changelog for all Jupiter APIs. Breaking changes first, with enforcement deadlines and migration steps, then per-product updates. One post per month at /changelog/YYYY-MM, updated as changes ship.\n",
+);
+emit(
+  "- [Developer Portal](https://developers.jup.ag/portal): Create an account, generate and manage API keys, view plans, request logs, and usage analytics.\n",
+);
+emit(
+  "- [Blog](https://developers.jup.ag/blog): Developer blog with product launches and technical deep dives.\n",
+);
+
+emitHeading("Optional", 2);
 emit(
   "- [API Status](https://status.jup.ag/): Check the status of Jupiter APIs\n",
 );

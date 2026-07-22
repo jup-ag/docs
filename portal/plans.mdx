@@ -68,7 +68,7 @@ Credit costs are subject to change. The latest costs are always reflected in you
     | `/swap/v1/program-id-to-label` | 1 |
   </Accordion>
 
-  <Accordion title="Trigger">
+  <Accordion title="LO & DCA">
     | Endpoint | Credits |
     | :--- | :--- |
     | `/trigger/v2/auth/challenge` | 1 |
@@ -80,13 +80,17 @@ Credit costs are subject to change. The latest costs are always reflected in you
     | `/trigger/v2/orders/price/{orderId}` | 1 |
     | `/trigger/v2/orders/price/cancel/{orderId}` | 1 |
     | `/trigger/v2/orders/price/confirm-cancel/{orderId}` | 1 |
+    | `/trigger/v2/orders/dca` | 1 |
+    | `/trigger/v2/orders/dca/cancel/{orderId}` | 1 |
+    | `/trigger/v2/orders/dca/confirm-cancel/{orderId}` | 1 |
     | `/trigger/v2/orders/history` | 1 |
+    | `/trigger/v2/orders/history/dca` | 1 |
     | `/trigger/v1/createOrder` | 1 |
     | `/trigger/v1/cancelOrders` | 1 |
     | `/trigger/v1/execute` | 0 |
   </Accordion>
 
-  <Accordion title="Recurring">
+  <Accordion title="Recurring (unmaintained)">
     | Endpoint | Credits |
     | :--- | :--- |
     | `/recurring/v1/createOrder` | 1 |

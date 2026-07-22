@@ -39,7 +39,6 @@ jup-ag/docs/
 ├── guide/                 # Guides and tutorials
 ├── blog/                  # Developer blog posts
 ├── resources/             # Support, brand kit, and community resources
-├── updates/               # Changelog / developer updates
 ├── snippets/              # Reusable MDX snippet components
 ├── static/                # Static assets (images, etc.)
 │
@@ -73,7 +72,7 @@ jup-ag/docs/
 | Tool Kits           | SDKs and toolkits for developers                   | `tool-kits/`    |
 | AI                  | AI workflow and resources for AI agents            | `ai/`           |
 | Resources           | Support, brand kit, and community resources        | `resources/`    |
-| Updates             | Changelog / developer updates                      | `updates/`      |
+| Changelog           | External link to developers.jup.ag/changelog (lives in the `developer-platform` repo) | (none)  |
 
 ## Products & APIs
 
@@ -170,6 +169,10 @@ the work, not just the state of the code.
 - Keep it 1:1 — one issue per PR. If scope expands during a task, update the
   existing issue rather than creating a second issue on the same PR. If the work
   is truly separate, it should be a separate PR.
+  - Exception: a change that needs a changelog entry has TWO PRs on one issue —
+    the docs PR here and the companion changelog PR in the `developer-platform`
+    repo (see the Changelog section). Attach both PRs to the same issue; do not
+    create a separate issue for the changelog entry.
 
 ### 4. Branch (Worktree)
 
@@ -200,7 +203,31 @@ Do the work following the Writing and Reviewing guidelines below. After writing:
 
 #### Changelog
 
-If your changes affect a public API or product, add a changelog entry to `updates/index.mdx`.
+The changelog lives on the Developer Platform site, NOT in this repo (decided 2026-07-07, DEV-595).
+It is published as one post per month in the `developer-platform` repo at
+`web/content/changelog/YYYY-MM.mdx`, rendered at https://developers.jup.ag/changelog.
+
+The monthly post is a living document, not an end-of-month digest. Entries are appended as
+changes ship: the first API-affecting change of a month creates `YYYY-MM.mdx`, every later
+change that month appends to it. Breaking changes with future deadlines go in immediately
+as pre-announcements. There is no separate "hot list"; the current month's post is it.
+
+**Companion PR workflow.** If your changes affect a public API or product, the changelog
+entry is part of shipping, not a follow-up. As soon as the docs PR is open:
+
+1. Go to your local clone of `jup-ag/developer-platform`. If you don't have one, clone it
+   as a sibling of this repo: `git clone https://github.com/jup-ag/developer-platform.git`.
+2. Branch from `origin/develop` and open the PR against `develop` (the integration branch:
+   pushes to it build the staging site, and production ships when a `web-v*` release is cut).
+   Branch naming: `<user>/dev-XXX-description` matching the Linear issue.
+3. Add or update the current month's post in `web/content/changelog/`. Follow the format in
+   `web/content/changelog/_template.mdx` and the rules in `web/content/blog/README.md`
+   (breaking changes first, one section per product area, each entry a `<ChangelogItem>`
+   with a one-line change + "WTM" explanation + full docs URLs).
+4. Open the companion PR there and attach it to the SAME Linear issue as the docs PR
+   (no separate issue; this is the documented exception to the 1:1 issue-per-PR rule).
+5. The issue stays `In Review` until BOTH PRs are merged. Merge the changelog PR after
+   (or together with) the docs PR so the changelog never links to unpublished docs.
 
 **When to add an entry:**
 - New API endpoints or products
@@ -213,21 +240,6 @@ If your changes affect a public API or product, add a changelog entry to `update
 - Typo fixes, formatting, or docs-only restructuring
 - Internal refactors with no user-facing change
 - Adding guides or blog posts (these are content, not changelog)
-
-**Format:** Use the existing `<Update>` component, grouped by month (newest first):
-
-```mdx
-<Update label="March 2026" description="">
-## Feature or Change Title
-
-Brief description of what changed and what developers need to do.
-
-- Key detail or migration step
-- Link to relevant docs page
-</Update>
-```
-
-Within a month, order entries by importance. Use clear headings that describe the change.
 
 #### Capture learnings
 
@@ -250,6 +262,8 @@ Once the work is ready:
 - Commit and push the branch
 - Open a PR via `gh` CLI
 - Reference the Linear issue in the PR body with a link: `Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX)`
+- If the change affects a public API or product, open the companion changelog PR in the
+  `developer-platform` repo now and attach it to the same Linear issue (see Changelog in §5)
 - Update the Linear issue to `In Review`
 
 After PR is merged:
@@ -435,7 +449,7 @@ Always run/check before committing:
 6. No placeholder text like "TODO" or "Lorem ipsum" left in content
 7. OpenAPI spec changes in `openapi-spec/` are reflected in `api-reference/` pages
 8. Images/assets added to `static/` are actually referenced somewhere
-9. Changelog entry in `updates/index.mdx` if changes affect a public API or product
+9. Changelog entry added to the current month's post in the `developer-platform` repo (`web/content/changelog/YYYY-MM.mdx`) if changes affect a public API or product
 10. `.claude/rules/` updated if you discovered product behaviour, made IA decisions, or established conventions
 
 ## Pull Requests
@@ -483,7 +497,7 @@ gh pr diff
 - [ ] All pages have `title`, `description`, `llmsDescription`
 - [ ] `docs.json` navigation updated (if applicable)
 - [ ] Redirects added (if paths changed)
-- [ ] Changelog entry added to `updates/index.mdx` (if API/product change)
+- [ ] Changelog entry added to the current month's post in the `developer-platform` repo (if API/product change)
 - [ ] `.claude/rules/` updated with any learnings or decisions
 ```
 

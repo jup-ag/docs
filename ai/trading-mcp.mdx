@@ -21,7 +21,7 @@ The server exposes **75 tools across 11 domains**. Your MCP client discovers the
 | **Tokens** | Search tokens by name, symbol, or mint, list by tag, category, or recent listings, and run token verification. |
 | **Price** | Fetch real-time USD prices, liquidity, and 24h change for one or more tokens. |
 | **Trigger** | Create, update, cancel, and list limit orders that execute when a token hits a target price. |
-| **Recurring** | Set up and manage dollar-cost averaging (DCA) orders that buy at regular intervals. |
+| **Recurring** | Set up and manage dollar-cost averaging (DCA) orders that buy at regular intervals. Calls the previous-generation Recurring API; for direct integrations, current DCA lives in the [Trigger API](/trigger/dca). |
 | **Lend** | Deposit into and withdraw from Jupiter Lend to earn yield, and read your lending positions. |
 | **Prediction** | Browse prediction market events, place and close bets, claim payouts, and read scores and forecasts. |
 | **Portfolio** | Read a wallet's positions across Solana protocols and its staked JUP. |
@@ -39,23 +39,13 @@ Add the server to your MCP client's configuration. To use a higher rate limit, p
 
 <Tabs>
   <Tab title="Claude Desktop">
-  Open **Settings > Developer > Edit Config** and add:
+  Claude Desktop adds remote MCP servers as custom connectors, not through `claude_desktop_config.json` (the config file only supports local stdio servers and ignores remote entries).
 
-  ```json
-  {
-    "mcpServers": {
-      "jupiter": {
-        "type": "http",
-        "url": "https://mcp.jup.ag",
-        "headers": {
-          "Authorization": "Bearer YOUR_JUPITER_API_KEY"
-        }
-      }
-    }
-  }
-  ```
+  1. Open **Settings > Connectors**.
+  2. Select **Add custom connector**.
+  3. Enter a name (for example `Jupiter`) and the URL `https://mcp.jup.ag`, then confirm.
 
-  Restart Claude Desktop to load the server.
+  The connector flow does not take an `Authorization` header, so Claude Desktop connects keyless at the lower rate limit.
   </Tab>
 
   <Tab title="Claude Code">
@@ -65,7 +55,7 @@ Add the server to your MCP client's configuration. To use a higher rate limit, p
   claude mcp add --transport http jupiter https://mcp.jup.ag --header "Authorization: Bearer YOUR_JUPITER_API_KEY"
   ```
 
-  Or add it manually to `.claude/settings.json`:
+  Or add it manually to `.mcp.json` in your project root (use `~/.claude.json` to make it available in every project):
 
   ```json
   {
@@ -148,7 +138,7 @@ Once connected, ask your AI assistant in plain language. Each prompt maps to one
 |:-------|:-----------|
 | "What is the current price of SOL and JUP?" | `price_get` |
 | "Swap 10 USDC for SOL" | `swap_get_order`, then `swap_execute_order` |
-| "Place a limit order to sell 50 USDC for SOL at a target price." | `trigger_get_challenge` → `trigger_verify_challenge` → `trigger_build_deposit` → `trigger_create_order` |
+| "Place a limit order to sell 50 USDC for SOL at a target price." | `trigger_get_challenge` → `trigger_verify_challenge` → `trigger_build_deposit` → `trigger_create_order` (plus `trigger_register_vault` the first time a wallet uses Trigger) |
 | "DCA 100 USDC into SOL daily for 10 days." | `recurring_build_order` |
 | "What tokens can I lend on Jupiter and what APY do they offer?" | `lend_list_tokens` |
 | "Are there any prediction markets about Bitcoin?" | `prediction_search_events` |

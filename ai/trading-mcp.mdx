@@ -2,7 +2,7 @@
 title: "Jupiter Trading MCP"
 sidebarTitle: "Trading MCP"
 description: "Execute Jupiter trades and DeFi operations from any MCP client."
-llmsDescription: "Jupiter's hosted Trading MCP server at https://mcp.jup.ag gives AI agents access to Jupiter's trading infrastructure through the Model Context Protocol. It exposes 75 tools across 11 domains: Swap (quote, execute), Tokens (search, discovery, verification), Price, Trigger (limit orders, v2 vault flow), Recurring (DCA), Lend (earn yield), Prediction (prediction markets), Portfolio (positions, staked JUP), Send (invite-based transfers), Studio (token launch pools), and Transaction (land signed transactions). An API key is optional: requests without one work at a lower rate limit, and passing your Jupiter API key from the Developer Platform as a Bearer token raises the limit. Transport is HTTP (Streamable HTTP). Covers setup for Claude Desktop, Claude Code, Cursor, and Windsurf, plus example prompts. This is the read-write operations server, distinct from the read-only Documentation MCP."
+llmsDescription: "Jupiter's hosted Trading MCP server at https://mcp.jup.ag gives AI agents access to Jupiter's trading infrastructure through the Model Context Protocol. It exposes 75 tools across 11 domains: Swap (quote, execute), Tokens (search, discovery, verification), Price, Trigger (limit orders, v2 vault flow), Recurring (DCA on the Trigger v2 flow), Lend (earn yield), Prediction (prediction markets), Portfolio (positions, staked JUP), Send (invite-based transfers), Studio (token launch pools), and Transaction (land signed transactions). An API key is optional: requests without one work at a lower rate limit, and passing your Jupiter API key from the Developer Platform as a Bearer token raises the limit. Transport is HTTP (Streamable HTTP). Covers setup for Claude Desktop, Claude Code, Cursor, and Windsurf, plus example prompts. This is the read-write operations server, distinct from the read-only Documentation MCP."
 ---
 
 The Jupiter Trading MCP is a hosted [Model Context Protocol](https://modelcontextprotocol.io/) server that lets AI agents trade and run DeFi operations on Jupiter. Connect any MCP client to `https://mcp.jup.ag` and your agent can swap tokens, place orders, lend, and read on-chain positions. An API key is optional and only raises your rate limit.
@@ -21,7 +21,7 @@ The server exposes **75 tools across 11 domains**. Your MCP client discovers the
 | **Tokens** | Search tokens by name, symbol, or mint, list by tag, category, or recent listings, and run token verification. |
 | **Price** | Fetch real-time USD prices, liquidity, and 24h change for one or more tokens. |
 | **Trigger** | Create, update, cancel, and list limit orders that execute when a token hits a target price. |
-| **Recurring** | Set up and manage dollar-cost averaging (DCA) orders that buy at regular intervals. Calls the previous-generation Recurring API; for direct integrations, current DCA lives in the [Trigger API](/trigger/dca). |
+| **Recurring** | Set up and manage dollar-cost averaging (DCA) orders that buy at regular intervals, built on the [Trigger API](/trigger/dca)'s DCA flow. |
 | **Lend** | Deposit into and withdraw from Jupiter Lend to earn yield, and read your lending positions. |
 | **Prediction** | Browse prediction market events, place and close bets, claim payouts, and read scores and forecasts. |
 | **Portfolio** | Read a wallet's positions across Solana protocols and its staked JUP. |
@@ -139,7 +139,7 @@ Once connected, ask your AI assistant in plain language. Each prompt maps to one
 | "What is the current price of SOL and JUP?" | `price_get` |
 | "Swap 10 USDC for SOL" | `swap_get_order`, then `swap_execute_order` |
 | "Place a limit order to sell 50 USDC for SOL at a target price." | `trigger_get_challenge` → `trigger_verify_challenge` → `trigger_build_deposit` → `trigger_create_order` (plus `trigger_register_vault` the first time a wallet uses Trigger) |
-| "DCA 100 USDC into SOL daily for 10 days." | `recurring_build_order` |
+| "DCA 100 USDC into SOL daily for 10 days." | `trigger_get_challenge` → `trigger_verify_challenge` → `recurring_build_order` → `recurring_execute` |
 | "What tokens can I lend on Jupiter and what APY do they offer?" | `lend_list_tokens` |
 | "Are there any prediction markets about Bitcoin?" | `prediction_search_events` |
 

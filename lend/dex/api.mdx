@@ -1,0 +1,19 @@
+---
+title: "AMM APIs"
+sidebarTitle: "AMM APIs (Coming soon)"
+description: "REST endpoints for quoting and building Lend AMM swaps. Coming soon."
+llmsDescription: "Placeholder for the upcoming Jupiter Lend AMM REST API. REST endpoints for quoting and building swaps against the Lend AMM over HTTP are not yet available. Until they launch, integrate with the TypeScript SDKs (@jup-ag/lend-read for quoting, @jup-ag/lend/dex for building swap instructions) or via Rust CPI from an on-chain program."
+---
+
+REST endpoints for quoting and building Lend AMM swaps over HTTP are coming soon.
+
+Until they launch, two integration paths are available:
+
+<CardGroup cols={2}>
+  <Card icon="code" href="/lend/dex/typescript" title="AMM SDK">
+    Quote with `@jup-ag/lend-read`, build and send the swap with `@jup-ag/lend/dex`.
+  </Card>
+  <Card icon="link" href="/lend/dex/cpi" title="AMM CPI Integration">
+    Call `swap_in` / `swap_out` from your own program via CPI.
+  </Card>
+</CardGroup>

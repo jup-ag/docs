@@ -139,7 +139,7 @@ Once connected, ask your AI assistant in plain language. Each prompt maps to one
 | "What is the current price of SOL and JUP?" | `price_get` |
 | "Swap 10 USDC for SOL" | `swap_get_order`, then `swap_execute_order` |
 | "Place a limit order to sell 50 USDC for SOL at a target price." | `trigger_get_challenge` → `trigger_verify_challenge` → `trigger_build_deposit` → `trigger_create_order` (plus `trigger_register_vault` the first time a wallet uses Trigger) |
-| "DCA 100 USDC into SOL daily for 10 days." | `trigger_get_challenge` → `trigger_verify_challenge` → `recurring_build_order` → `recurring_execute` |
+| "DCA 100 USDC into SOL daily for 10 days." | `trigger_get_challenge` → `trigger_verify_challenge` → `recurring_build_order` → `recurring_execute` (plus `trigger_register_vault` the first time a wallet uses Trigger) |
 | "What tokens can I lend on Jupiter and what APY do they offer?" | `lend_list_tokens` |
 | "Are there any prediction markets about Bitcoin?" | `prediction_search_events` |
 

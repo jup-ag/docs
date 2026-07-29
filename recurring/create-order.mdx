@@ -1,8 +1,12 @@
 ---
 title: "Create Order"
 description: "Create a recurring DCA order with configurable frequency, amount, and start time."
-llmsDescription: "POST /recurring/v1/createOrder sets up a DCA order with configurable cycle frequency, amount per cycle, and optional start time."
+llmsDescription: "UNMAINTAINED: POST /recurring/v1/createOrder sets up a DCA order with configurable cycle frequency, amount per cycle, and optional start time."
 ---
+
+<Warning>
+The Recurring API is no longer actively maintained and has been superseded by [DCA](/trigger/dca).
+</Warning>
 
 This is a POST request to `/createOrder` endpoint, where you pass in the necessary parameters and our backend will create the transaction for you to sign and send to the network seamlessly.
 

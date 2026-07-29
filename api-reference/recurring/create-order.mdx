@@ -2,7 +2,12 @@
 openapi: /openapi-spec/recurring/recurring.yaml post /createOrder
 title: "Create Order"
 description: "Request for a base64-encoded unsigned recurring order creation transaction to be used in POST /recurring/v1/execute"
+llmsDescription: "UNMAINTAINED: POST /recurring/v1/createOrder returns a base64-encoded unsigned recurring order creation transaction for the legacy Recurring / DCA V1 API, superseded by DCA (Trigger V2)."
 ---
+
+<Warning>
+The Recurring API is no longer actively maintained and has been superseded by [DCA](/trigger/dca).
+</Warning>
 
 <Info>
   **NOTE**

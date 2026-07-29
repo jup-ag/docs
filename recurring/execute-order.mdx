@@ -1,8 +1,12 @@
 ---
 title: "Execute Order"
 description: "Submit a signed recurring order transaction for on-chain execution."
-llmsDescription: "POST /recurring/v1/execute triggers the next cycle of a recurring order. Jupiter keeper bots handle this automatically."
+llmsDescription: "UNMAINTAINED: POST /recurring/v1/execute triggers the next cycle of a recurring order. Jupiter keeper bots handle this automatically."
 ---
+
+<Warning>
+The Recurring API is no longer actively maintained and has been superseded by [DCA](/trigger/dca).
+</Warning>
 
 After getting the order transaction, you can sign and send to the network yourself or use the Recurring API's `/execute` endpoint to do it for you.
 

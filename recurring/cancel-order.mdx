@@ -1,8 +1,12 @@
 ---
 title: "Cancel Order"
 description: "Cancel an active recurring order and reclaim remaining funds."
-llmsDescription: "POST /recurring/v1/cancelOrder cancels an active recurring (DCA) order and returns remaining funds to the user."
+llmsDescription: "UNMAINTAINED: POST /recurring/v1/cancelOrder cancels an active recurring (DCA) order and returns remaining funds to the user."
 ---
+
+<Warning>
+The Recurring API is no longer actively maintained and has been superseded by [DCA](/trigger/dca).
+</Warning>
 
 The `POST /recurring/v1/cancelOrder` endpoint cancels an active recurring order and returns remaining funds to the user. The endpoint supports one cancellation per transaction. Retrieve order accounts via `/getRecurringOrders` first, then sign and submit the cancel transaction.
 

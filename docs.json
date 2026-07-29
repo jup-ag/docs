@@ -192,105 +192,6 @@
             ]
           },
           {
-            "item": "Prediction",
-            "icon": "check-to-slot",
-            "groups": [
-              {
-                "group": "Prediction",
-                "tag": "BETA",
-                "pages": [
-                  "prediction/index",
-                  "prediction/forecast",
-                  "prediction/trading-lifecycle",
-                  "prediction/events-and-markets",
-                  "prediction/open-positions",
-                  "prediction/manage-positions",
-                  "prediction/claim-payouts"
-                ]
-              },
-              {
-                "group": "Data & Analytics",
-                "tag": "BETA",
-                "pages": [
-                  "prediction/position-data",
-                  "prediction/social-features"
-                ]
-              },
-              {
-                "group": "Guides",
-                "pages": [
-                  "guides/how-to-build-a-prediction-market-app-on-solana"
-                ]
-              },
-              {
-                "group": "API Reference",
-                "tag": "BETA",
-                "pages": [
-                  {
-                    "group": "Events",
-                    "pages": [
-                      "api-reference/prediction/get-events",
-                      "api-reference/prediction/search-events",
-                      "api-reference/prediction/get-event",
-                      "api-reference/prediction/get-suggested-events",
-                      "api-reference/prediction/get-event-scores",
-                      "api-reference/prediction/get-event-score"
-                    ]
-                  },
-                  {
-                    "group": "Markets",
-                    "pages": [
-                      "api-reference/prediction/get-event-markets",
-                      "api-reference/prediction/get-event-market",
-                      "api-reference/prediction/get-market"
-                    ]
-                  },
-                  {
-                    "group": "Orders",
-                    "pages": [
-                      "api-reference/prediction/get-orders",
-                      "api-reference/prediction/get-order",
-                      "api-reference/prediction/get-order-status",
-                      "api-reference/prediction/create-order",
-                      "api-reference/prediction/execute"
-                    ]
-                  },
-                  {
-                    "group": "Positions",
-                    "pages": [
-                      "api-reference/prediction/get-positions",
-                      "api-reference/prediction/get-position",
-                      "api-reference/prediction/close-position",
-                      "api-reference/prediction/close-all-positions",
-                      "api-reference/prediction/claim-position"
-                    ]
-                  },
-                  {
-                    "group": "History & Data",
-                    "pages": [
-                      "api-reference/prediction/get-history",
-                      "api-reference/prediction/get-orderbook",
-                      "api-reference/prediction/get-trading-status"
-                    ]
-                  },
-                  {
-                    "group": "Profile & Social",
-                    "pages": [
-                      "api-reference/prediction/get-profile",
-                      "api-reference/prediction/get-pnl-history",
-                      "api-reference/prediction/get-trades",
-                      "api-reference/prediction/get-leaderboards"
-                    ]
-                  },
-                  {
-                    "group": "Vault",
-                    "pages": ["api-reference/prediction/get-vault-info"]
-                  }
-                ]
-              }
-            ]
-          },
-          {
             "item": "Transaction Landing",
             "icon": "paper-plane",
             "groups": [
@@ -300,6 +201,16 @@
                   "transaction/submit",
                   "api-reference/transaction/submit"
                 ]
+              }
+            ]
+          },
+          {
+            "item": "JupUSD",
+            "icon": "money-bill",
+            "groups": [
+              {
+                "group": " ",
+                "pages": ["jupusd/index", "jupusd/juiced"]
               }
             ]
           },
@@ -431,18 +342,37 @@
             ]
           },
           {
-            "item": "Trigger",
+            "item": "LO & DCA",
             "icon": "crosshairs",
             "groups": [
               {
-                "group": "Trigger",
+                "group": "Get Started",
                 "pages": [
                   "trigger/index",
-                  "trigger/lifecycle",
                   "trigger/authentication",
+                  "trigger/deposit",
+                  "trigger/lifecycle"
+                ]
+              },
+              {
+                "group": "Limit Orders",
+                "pages": [
                   "trigger/create-order",
-                  "trigger/manage-orders",
                   "trigger/order-history",
+                  "trigger/manage-orders"
+                ]
+              },
+              {
+                "group": "DCA",
+                "pages": [
+                  "trigger/dca",
+                  "trigger/dca-history",
+                  "trigger/dca-cancel"
+                ]
+              },
+              {
+                "group": "Resources",
+                "pages": [
                   "trigger/best-practices",
                   "trigger/errors"
                 ]
@@ -451,22 +381,32 @@
                 "group": "API Reference",
                 "pages": [
                   {
-                    "group": "Authenticate",
+                    "group": "Authenticate & Vault",
                     "pages": [
                       "api-reference/trigger/challenge",
                       "api-reference/trigger/verify",
                       "api-reference/trigger/vault",
-                      "api-reference/trigger/vault-register"
+                      "api-reference/trigger/vault-register",
+                      "api-reference/trigger/deposit-craft"
                     ]
                   },
                   {
-                    "group": "Order Management",
+                    "group": "Limit Order",
                     "pages": [
-                      "api-reference/trigger/deposit-craft",
                       "api-reference/trigger/create-order",
                       "api-reference/trigger/update-order",
                       "api-reference/trigger/cancel-order",
                       "api-reference/trigger/confirm-cancel"
+                    ]
+                  },
+                  {
+                    "group": "DCA",
+                    "pages": [
+                      "api-reference/trigger/create-dca",
+                      "api-reference/trigger/cancel-dca",
+                      "api-reference/trigger/confirm-cancel-dca",
+                      "api-reference/trigger/dca-history",
+                      "api-reference/trigger/dca-order"
                     ]
                   },
                   {
@@ -478,49 +418,100 @@
             ]
           },
           {
-            "item": "JupUSD",
-            "icon": "money-bill",
+            "item": "Prediction",
+            "icon": "check-to-slot",
             "groups": [
               {
-                "group": " ",
-                "pages": ["jupusd/index", "jupusd/juiced"]
-              }
-            ]
-          },
-          {
-            "item": "Recurring",
-            "icon": "clock-rotate-left",
-            "groups": [
-              {
-                "group": "Recurring",
+                "group": "Prediction",
+                "tag": "BETA",
                 "pages": [
-                  "recurring/index",
-                  "recurring/create-order",
-                  "recurring/execute-order"
+                  "prediction/index",
+                  "prediction/forecast",
+                  "prediction/trading-lifecycle",
+                  "prediction/events-and-markets",
+                  "prediction/open-positions",
+                  "prediction/manage-positions",
+                  "prediction/claim-payouts"
                 ]
               },
               {
-                "group": "Order Management",
+                "group": "Data & Analytics",
+                "tag": "BETA",
                 "pages": [
-                  "recurring/cancel-order",
-                  "recurring/deposit-price-order",
-                  "recurring/withdraw-price-order",
-                  "recurring/get-recurring-orders"
+                  "prediction/position-data",
+                  "prediction/social-features"
                 ]
               },
               {
-                "group": "Debugging",
-                "pages": ["recurring/best-practices"]
+                "group": "Guides",
+                "pages": [
+                  "guides/how-to-build-a-prediction-market-app-on-solana"
+                ]
               },
               {
                 "group": "API Reference",
+                "tag": "BETA",
                 "pages": [
-                  "api-reference/recurring/create-order",
-                  "api-reference/recurring/execute",
-                  "api-reference/recurring/cancel-order",
-                  "api-reference/recurring/price-deposit",
-                  "api-reference/recurring/price-withdraw",
-                  "api-reference/recurring/get-recurring-orders"
+                  {
+                    "group": "Events",
+                    "pages": [
+                      "api-reference/prediction/get-events",
+                      "api-reference/prediction/search-events",
+                      "api-reference/prediction/get-event",
+                      "api-reference/prediction/get-suggested-events",
+                      "api-reference/prediction/get-event-scores",
+                      "api-reference/prediction/get-event-score"
+                    ]
+                  },
+                  {
+                    "group": "Markets",
+                    "pages": [
+                      "api-reference/prediction/get-event-markets",
+                      "api-reference/prediction/get-event-market",
+                      "api-reference/prediction/get-market"
+                    ]
+                  },
+                  {
+                    "group": "Orders",
+                    "pages": [
+                      "api-reference/prediction/get-orders",
+                      "api-reference/prediction/get-order",
+                      "api-reference/prediction/get-order-status",
+                      "api-reference/prediction/create-order",
+                      "api-reference/prediction/execute"
+                    ]
+                  },
+                  {
+                    "group": "Positions",
+                    "pages": [
+                      "api-reference/prediction/get-positions",
+                      "api-reference/prediction/get-position",
+                      "api-reference/prediction/close-position",
+                      "api-reference/prediction/close-all-positions",
+                      "api-reference/prediction/claim-position"
+                    ]
+                  },
+                  {
+                    "group": "History & Data",
+                    "pages": [
+                      "api-reference/prediction/get-history",
+                      "api-reference/prediction/get-orderbook",
+                      "api-reference/prediction/get-trading-status"
+                    ]
+                  },
+                  {
+                    "group": "Profile & Social",
+                    "pages": [
+                      "api-reference/prediction/get-profile",
+                      "api-reference/prediction/get-pnl-history",
+                      "api-reference/prediction/get-trades",
+                      "api-reference/prediction/get-leaderboards"
+                    ]
+                  },
+                  {
+                    "group": "Vault",
+                    "pages": ["api-reference/prediction/get-vault-info"]
+                  }
                 ]
               }
             ]
@@ -614,6 +605,7 @@
               "ai/llms-txt",
               "ai/skills",
               "ai/mcp",
+              "ai/trading-mcp",
               "ai/cli"
             ]
           }
@@ -658,12 +650,7 @@
       },
       {
         "tab": "Changelog",
-        "groups": [
-          {
-            "group": " ",
-            "pages": ["changelog/index"]
-          }
-        ]
+        "href": "https://developers.jup.ag/changelog"
       },
       {
         "tab": "Resources",
@@ -967,6 +954,10 @@
     {
       "source": "/updates/:slug*",
       "destination": "/changelog/:slug*"
+    },
+    {
+      "source": "/changelog",
+      "destination": "https://developers.jup.ag/changelog"
     },
     {
       "source": "/misc",

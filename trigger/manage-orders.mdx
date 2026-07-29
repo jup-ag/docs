@@ -1,8 +1,11 @@
 ---
 title: "Manage Orders"
+sidebarTitle: "Manage"
 description: "Update order parameters, cancel orders with two-step withdrawal, and withdraw funds from your vault."
 llmsDescription: "PATCH /trigger/v2/orders/price/{orderId} updates order parameters. POST /trigger/v2/orders/price/cancel/{orderId} initiates cancellation and returns a withdrawal transaction. POST /trigger/v2/orders/price/confirm-cancel/{orderId} confirms with the signed withdrawal transaction."
 ---
+
+Update an order in place, or cancel it with a two-step withdrawal. Every request needs the JWT `token` from [authentication](/trigger/authentication) and the `orderId` returned when you [created the order](/trigger/create-order) (the same value as `id` in [order history](/trigger/order-history)).
 
 ## Prerequisites
 
@@ -64,6 +67,19 @@ const result = await updateResponse.json();
   "slPriceUsd": 155.00
 }
 ```
+
+**Trailing stop loss:**
+```json
+{
+  "orderType": "single",
+  "trailingBps": 800,
+  "slippageBps": 150
+}
+```
+
+<Note>
+On a [trailing stop loss](/trigger/create-order#trailing-stop-loss), update `trailingBps` (50–9000) to change the trail distance. You cannot set `triggerPriceUsd` on a trailing order (`400 "Cannot set trigger price on trailing stop loss order"`), convert a static order to trailing or back (`400 "Cannot convert to trailing stop loss order"`), or set a `trailingBps` whose new band would fire immediately (`400 "Trailing order would immediately trigger"`).
+</Note>
 
 ## Cancel an Order
 

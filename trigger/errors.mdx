@@ -1,16 +1,24 @@
 ---
 title: "Error Reference"
 description: "HTTP status codes returned by each Trigger Order API endpoint and what causes them."
-llmsDescription: "Per-endpoint error reference for the Jupiter Trigger Order V2 API. Documents the JSON error envelope and the status codes returned by each endpoint: POST /trigger/v2/auth/challenge and /auth/verify, GET /trigger/v2/vault and /vault/register, POST /trigger/v2/deposit/craft, POST /trigger/v2/orders/price, PATCH /trigger/v2/orders/price/{id}, POST /trigger/v2/orders/price/cancel/{id} and /confirm-cancel/{id}, and GET /trigger/v2/orders/history. Explains common causes: 400 validation and state errors, 401 missing/expired JWT, 403 wallet mismatch, 404 order or vault not found, and 409 vault already registered."
+llmsDescription: "Per-endpoint error reference for the Jupiter Trigger Order V2 API. Documents the JSON error envelope and the status codes returned by each endpoint: POST /trigger/v2/auth/challenge and /auth/verify, GET /trigger/v2/vault and /vault/register, POST /trigger/v2/deposit/craft, POST /trigger/v2/orders/price, PATCH /trigger/v2/orders/price/{id}, POST /trigger/v2/orders/price/cancel/{id} and /confirm-cancel/{id}, and GET /trigger/v2/orders/history. Explains common causes: 400 validation and state errors, 401 missing/expired JWT, 403 wallet mismatch, 404 order or vault not found, and 409 vault already registered. Covers price-order and shared endpoints only; DCA endpoint errors (/orders/dca, /orders/history/dca, /orders/dca/cancel, /confirm-cancel) are documented on the DCA pages."
 ---
 
-Every error response is JSON with an `error` message:
+Most error responses are JSON with an `error` message:
 
 ```json
 { "error": "Order not found" }
 ```
 
-Some responses include an extra `details` object (for example, `GET /vault/register` when a vault already exists).
+Validation failures add a `details` object with per-field messages, so parse `details` when you get a `400`:
+
+```json
+{ "error": "Request validation failed", "details": { "orderSubType": "Invalid input" } }
+```
+
+`GET /vault/register` also returns the existing vault in `details` on a `409`. Access errors from the API gateway (for example, an API key without Trigger access) use a different shape: `{ "code": 403, "message": "..." }`.
+
+This page covers the price-order and shared (auth, vault, deposit) endpoints. For DCA endpoint errors (`/orders/dca`, `/orders/history/dca`, `/orders/dca/cancel`, `/confirm-cancel`), see [DCA errors](/trigger/dca#errors).
 
 ## Authentication errors apply everywhere
 
@@ -20,7 +28,7 @@ Every endpoint except `POST /auth/challenge` and `POST /auth/verify` requires a 
 { "error": "Unauthorized" }
 ```
 
-with status `401`. When you see a `401` on an authenticated call, re-run the [challenge-response flow](/trigger/authentication) to get a fresh token. The tables below list the errors specific to each endpoint on top of this shared `401`.
+with status `401`. When you see a `401` on an authenticated call, re-run the [challenge-response flow](/trigger/authentication) to get a fresh token. The tables below list the errors specific to each endpoint on top of this shared `401`. The DCA endpoints share this `401` rule; their endpoint-specific errors are on the [DCA pages](/trigger/dca#errors).
 
 ## Authentication
 
@@ -112,7 +120,10 @@ with status `401`. When you see a `401` on an authenticated call, re-run the [ch
 ## Related
 
 <CardGroup cols={2}>
-  <Card title="Lifecycle" href="/trigger/lifecycle" icon="diagram-project">
+  <Card title="DCA Errors" href="/trigger/dca#errors" icon="triangle-exclamation">
+    Errors for the DCA create, track, and cancel endpoints.
+  </Card>
+  <Card title="Integration Flow" href="/trigger/lifecycle" icon="diagram-project">
     The full call sequence and order state machine.
   </Card>
   <Card title="Manage Orders" href="/trigger/manage-orders" icon="sliders">

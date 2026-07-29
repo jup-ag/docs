@@ -2,7 +2,12 @@
 openapi: /openapi-spec/recurring/recurring.yaml post /cancelOrder
 title: "Cancel Order"
 description: "Request for a base64-encoded unsigned recurring order cancellation transaction to be used in POST /recurring/v1/execute"
+llmsDescription: "UNMAINTAINED: POST /recurring/v1/cancelOrder returns a base64-encoded unsigned transaction to cancel a recurring order, for use with POST /recurring/v1/execute. This is the legacy Recurring / DCA V1 API, superseded by DCA (Trigger V2)."
 ---
+
+<Warning>
+The Recurring API is no longer actively maintained and has been superseded by [DCA](/trigger/dca).
+</Warning>
 
 <Info>
   **NOTE**

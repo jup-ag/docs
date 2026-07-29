@@ -160,8 +160,8 @@ When a token expires, repeat the challenge-response flow to obtain a new one. Th
 
 The JWT grants limited access. An attacker with a leaked token can:
 
-- **Cancel orders**: This transitions the order from `open` to `ready_to_cancel`, but does **not** withdraw funds. Withdrawal requires signing a transaction with the wallet private key.
-- **Edit order parameters**: Updating trigger prices or slippage does not require transaction signing.
+- **Cancel orders**: This stops an order from filling, but does **not** withdraw funds. Withdrawal requires signing a transaction with the wallet private key.
+- **Edit price-order parameters**: Updating a price order's trigger price or slippage does not require transaction signing. DCA orders cannot be edited.
 
 An attacker **cannot**:
 

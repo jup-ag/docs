@@ -301,7 +301,7 @@ paths:
                     type: number
                   priceImpact:
                     type: number
-                    description: Price impact as a decimal (e.g. -0.001 = -0.1%)
+                    description: Price impact in percentage points (e.g. -0.1 = -0.1%). Divide by 100 to convert to a decimal fraction.
                   swapUsdValue:
                     type: number
                   otherAmountThreshold:
@@ -313,7 +313,7 @@ paths:
                     type: number
                   priceImpactPct:
                     type: string
-                    description: "Deprecated: use priceImpact instead"
+                    description: "Deprecated: decimal price impact ratio. Use priceImpact divided by 100 instead."
                     deprecated: true
                   routePlan:
                     type: array

@@ -157,12 +157,10 @@ description of what needs to be done, which files to touch, and when it's done.
 | `Todo`        | Issue created, work is planned                        |
 | `In Progress` | Actively working on the code changes                  |
 | `In Review`   | PR is open and waiting for human review               |
-| `Content`     | PR merged, but there's a content/marketing opportunity (video, blog, tweet) |
-| `Done`        | All follow-up content is shipped, or no content needed |
+| `Done`        | PR merged                                             |
 
-Never mark an issue as `Done` until any content follow-up is complete (or
-explicitly not needed). The issue status must reflect the actual state of
-the work, not just the state of the code.
+The issue status must reflect the actual state of the work, not just the
+state of the code.
 
 - If a PR is rejected or needs changes, move the issue back to `In Progress`.
 - Keep it 1:1 — one issue per PR. If scope expands during a task, update the
@@ -272,10 +270,7 @@ After PR is merged:
   git worktree remove ../docs--{type}-{short-description}
   git pull origin main
   ```
-- Move the Linear issue to `Content` if the work creates a content opportunity
-  (video walkthrough, blog post, tweet, etc.). Most docs work does.
-- Only move to `Done` if there is genuinely no content follow-up needed
-  (e.g. typo fixes, config changes)
+- Move the Linear issue to `Done`
 
 ---
 

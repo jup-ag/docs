@@ -142,8 +142,9 @@ Create a Linear issue for the work using the Linear MCP tools:
   - Files affected — explicit list
   - Acceptance criteria — checkbox list so it's clear when the task is done
   - Out of scope — what this issue does NOT cover
-- **Labels** from the Build team's label set where one fits (e.g. `Feature` for new content or tooling, `Chore` for config and cleanup, `Content` for content work); skip labels if none fit
 - **Initial status:** `Todo` (work is planned but not yet actively being worked on)
+
+No labels needed — the issue just needs to be under the `Docs` project on the `Build` team.
 
 If the work breaks down into distinct, self-contained pieces, create sub-issues
 under the parent. Each sub-issue should be independently completable — a clear
@@ -441,7 +442,7 @@ Always run/check before committing:
 
 1. `node generate-llms-from-docs.js` — regenerate llms.txt
 2. `mint broken-links` — check for broken links
-3. `node check-redirects.js` — check `docs.json` redirects for conflicts, chains, and shadowed pages
+3. `node check-redirects.js` — only if you added or changed a redirect in `docs.json`; checks for conflicts, chains, and shadowed pages
 4. `docs.json` is valid JSON
 5. Any new pages are added to `docs.json` navigation
 6. All new/updated pages have `title`, `description`, AND `llmsDescription`
@@ -493,7 +494,7 @@ gh pr diff
 ## Checklist
 - [ ] `node generate-llms-from-docs.js` run
 - [ ] `mint broken-links` passes
-- [ ] `node check-redirects.js` passes
+- [ ] `node check-redirects.js` passes (if redirects changed)
 - [ ] All pages have `title`, `description`, `llmsDescription`
 - [ ] `docs.json` navigation updated (if applicable)
 - [ ] Redirects added (if paths changed)

@@ -247,6 +247,7 @@ Track all redirects added to `vercel.json` here for visibility:
 | `/docs/trigger/*` | `/trigger/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
 | `/docs/ultra/*` | `/ultra/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
 | `/changelog` | `https://developers.jup.ag/changelog` | 2026-07-15 | Changelog consolidated on dev platform blog. `docs.json` redirect with an external destination; Mintlify's schema only documents internal paths, so verify in prod after deploy (DEV-718) |
+| `/api-reference/trigger/v2` | `/api-reference/trigger/challenge` | 2026-08-03 | Destination fix (BUILD-472): previously pointed at `/api-reference/trigger/index`, which 404s in prod (no such page). Repointed to the first Trigger V2 API reference page, matching the `/api-reference/swap/v1` → `.../quote` pattern. Caught by `check-redirects.js` on its first run |
 
 ### [2026-04-06] Hidden pages for private integrator docs
 **Status:** implemented

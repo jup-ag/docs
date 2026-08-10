@@ -1,10 +1,10 @@
 ---
 title: "Integrate DEX into Metis"
-description: "Requirements and steps to integrate your DEX into the Metis routing engine, including the Jupiter AMM Interface SDK and security audit prerequisites."
-llmsDescription: "How to integrate a decentralized exchange (DEX) into Jupiter's Metis routing engine. Requires implementing the Jupiter AMM Interface SDK, passing security audits and code health checks, and demonstrating traction. Metis routing powers both /order and /build endpoints. Covers the AMM Interface specification, integration requirements, audit prerequisites, and how to submit your DEX for review. Also explains how proprietary AMMs (propAMMs) detect Jupiter frontend flow by verifying the dedicated signer sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF, letting them classify the trade as non-toxic order flow and quote tighter spreads."
+description: "Implement the Jupiter AMM Interface, verify quote parity with the test kit, and submit your DEX for Metis routing."
+llmsDescription: "How to integrate a decentralized exchange (DEX) into Jupiter's Metis routing engine, which powers both /order and /build endpoints. Covers the self-serve integration workflow: implement the Amm trait from the jupiter-amm-interface Rust crate, verify that Amm::quote() matches on-chain execution with the jupiter-amm-test-kit parity harness in the same repository (it snapshots a live pool, executes the native swap in LiteSVM, and asserts the quoted amounts equal the on-chain token deltas exactly), then submit the SDK for review via the AMM integrators support form at support.jup.ag. Implementation mechanics (trait definition, test-suite pattern, fixtures) live in the jup-ag/jupiter-amm-interface repository READMEs; this page covers Jupiter-side requirements: integration prerequisites (security audit, code health, traction), the no-network-calls rule, SDK fork access, and the submission process. Also explains how proprietary AMMs (propAMMs) detect Jupiter frontend flow by verifying the dedicated signer sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF, letting them classify the trade as non-toxic order flow and quote tighter spreads."
 ---
 
-This guide covers how to integrate your decentralized exchange (DEX) into Jupiter's Metis routing engine. You will need to provide a DEX SDK implementing the Jupiter AMM Interface, pass security and code health checks, and demonstrate traction.
+This guide covers how to integrate your decentralized exchange (DEX) into Jupiter's Metis routing engine. The workflow is self-serve: implement the Jupiter AMM Interface, prove that your quotes match on-chain execution with the test kit, then submit your SDK for review.
 
 Jupiter is one of the most widely integrated protocols, so a lot of work is involved in minimizing issues on new integrations and making each integration valuable to our users and partners. Our top priority is ensuring security and providing the best prices and the best token selection for our users, so we will focus on DEXes that will bring the most benefits to them.
 
@@ -17,104 +17,38 @@ As Solana grows and more DEXes are built, we have to be more cautious in the DEX
 * **Traction**: We look at the traction of the DEX to ensure it has market demand and is well-used.
 * **Team and backers**: This is a good indicator of the quality of the DEX if they are backed by or built by reputable or verifiable entities.
 
-### AMM Interface
+## Step 1: Implement the AMM Interface
 
-To facilitate integration of your DEX into the Jupiter Core Engine:
+Implement the `Amm` trait from the [`jupiter-amm-interface`](https://docs.rs/crate/jupiter-amm-interface) crate for your DEX. The [jup-ag/jupiter-amm-interface](https://github.com/jup-ag/jupiter-amm-interface) repository is the source of truth for the trait definition and implementation guidance, follow its READMEs.
 
-* Provide a DEX SDK that works with the [Jupiter AMM Interface](https://docs.rs/crate/jupiter-amm-interface).
+Jupiter-side requirements:
+
 * Enable us to fork your SDK, this ensures our users that we can guarantee maintenance, support for the SDK, and fix potential bugs related to integrated DEXs.
+* Limit the `Amm` implementation to deserializing state and quoting. Keep the detailed math in your SDK, and do heavy deserialization and precomputation in `update` rather than `quote`.
 
 <Info>
 **NOTE**
 
-  `get_accounts_to_update` provides the necessary accounts to fetch, they are batched and cached by the Jupiter Core Engine and delivered through `update` to the AMM instance, there might be multiple calls to `quote` using the same cache so **we do not allow any network calls** in the entire implementation.
+  `get_accounts_to_update` provides the necessary accounts to fetch. They are batched and cached on our end, then delivered through `update` to the AMM instance. There might be multiple calls to `quote` using the same cache, so **we do not allow any network calls** in the entire implementation.
 </Info>
 
-<Note>
-**RESOURCE AND SUPPORT**
+## Step 2: Verify quote parity with the test kit
 
-  You can refer to the implementation guide [https://github.com/jup-ag/rust-amm-implementation](https://github.com/jup-ag/rust-amm-implementation) for easier integration with Jupiter.
+Before submitting, prove that your implementation quotes exactly what the on-chain program executes. The `jupiter-amm-test-kit` crate in the same repository automates this: it snapshots a live pool, runs your `Amm::quote`, executes your program's native swap instruction in LiteSVM, and asserts the on-chain token deltas equal the quote exactly.
 
-  If you require assistance or have questions, reach out to us at [Discord](https://discord.gg/jup)
-</Note>
+Follow the [test kit README](https://github.com/jup-ag/jupiter-amm-interface/tree/main/test-kit) for the test-suite pattern and fixtures. The [SPL Token Swap reference suite](https://github.com/jup-ag/jupiter-amm-interface/blob/main/test-kit/tests/spl_token_swap.rs) is a complete working example to copy.
 
-<Accordion title="AMM Interface Code Example">
-  ```js
-  pub trait Amm {
-    // Maybe trait was made too restrictive?
-    fn from_keyed_account(keyed_account: &KeyedAccount, amm_context: &AmmContext) -> Result<Self>
-    where
-        Self: Sized;
-    /// A human readable label of the underlying DEX
-    fn label(&self) -> String;
-    fn program_id(&self) -> Pubkey;
-    /// The pool state or market state address
-    fn key(&self) -> Pubkey;
-    /// The mints that can be traded
-    fn get_reserve_mints(&self) -> Vec<Pubkey>;
-    /// The accounts necessary to produce a quote
-    fn get_accounts_to_update(&self) -> Vec<Pubkey>;
-    /// Picks necessary accounts to update it's internal state
-    /// Heavy deserialization and precomputation caching should be done in this function
-    fn update(&mut self, account_map: &AccountMap) -> Result<()>;
+The kit covers the common case first: ExactIn swaps that run as a single top-level instruction with one signer. If one of its documented limitations blocks you, [open an issue](https://github.com/jup-ag/jupiter-amm-interface/issues) on the repository rather than working around it silently.
 
-    fn quote(&self, quote_params: &QuoteParams) -> Result<Quote>;
+## Step 3: Submit your integration
 
-    /// Indicates which Swap has to be performed along with all the necessary account metas
-    fn get_swap_and_account_metas(&self, swap_params: &SwapParams) -> Result<SwapAndAccountMetas>;
+Once your parity tests pass, submit your DEX for review through the [AMM integrators support form](https://support.jup.ag/requests/new/amm-integrators). Include:
 
-    /// Indicates if get_accounts_to_update might return a non constant vec
-    fn has_dynamic_accounts(&self) -> bool {
-        false
-    }
+* A link to your SDK repository, with the parity test suite and committed fixtures, and access for us to fork it.
+* Your security audit.
+* Traction metrics and information about your team and backers.
 
-    /// Indicates whether `update` needs to be called before `get_reserve_mints`
-    fn requires_update_for_reserve_mints(&self) -> bool {
-        false
-    }
-
-    // Indicates that whether ExactOut mode is supported
-    fn supports_exact_out(&self) -> bool {
-        false
-    }
-
-    fn get_user_setup(&self) -> Option<AmmUserSetup> {
-        None
-    }
-
-    fn clone_amm(&self) -> Box<dyn Amm + Send + Sync>;
-
-    /// It can only trade in one direction from its first mint to second mint, assuming it is a two mint AMM
-    fn unidirectional(&self) -> bool {
-        false
-    }
-
-    /// For testing purposes, provide a mapping of dependency programs to function
-    fn program_dependencies(&self) -> Vec<(Pubkey, String)> {
-        vec![]
-    }
-
-    fn get_accounts_len(&self) -> usize {
-        32 // Default to a near whole legacy transaction to penalize no implementation
-    }
-
-    /// The identifier of the underlying liquidity
-    ///
-    /// Example:
-    /// For RaydiumAmm uses Openbook market A this will return Some(A)
-    /// For Openbook market A, it will also return Some(A)
-    fn underlying_liquidities(&self) -> Option<HashSet<Pubkey>> {
-        None
-    }
-
-    /// Provides a shortcut to establish if the AMM can be used for trading
-    /// If the market is active at all
-    fn is_active(&self) -> bool {
-        true
-    }
-}
-  ```
-</Accordion>
+After your DEX is integrated, markets on it must meet the liquidity criteria described in [Market Listing](/swap/routing/market-listing) to remain routable.
 
 ## More
 

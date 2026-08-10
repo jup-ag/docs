@@ -1,7 +1,7 @@
 ---
 title: "Integrate DEX into Metis"
 description: "Implement the Jupiter AMM Interface, verify quote parity with the test kit, and submit your DEX for Metis routing."
-llmsDescription: "How to integrate a decentralized exchange (DEX) into Jupiter's Metis routing engine, which powers both /order and /build endpoints. Covers the self-serve integration workflow: implement the Amm trait from the jupiter-amm-interface Rust crate, verify that Amm::quote() matches on-chain execution with the jupiter-amm-test-kit parity harness (snapshots a live pool, executes the native swap in LiteSVM, asserts the quoted amounts equal the on-chain token deltas), then submit the SDK for review via the AMM integrators support form at support.jup.ag. Documents the test kit's limitations (ExactIn only, single top-level instruction, one signer, plain token accounts) and integration prerequisites (security audit, code health, traction). Also explains how proprietary AMMs (propAMMs) detect Jupiter frontend flow by verifying the dedicated signer sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF, letting them classify the trade as non-toxic order flow and quote tighter spreads."
+llmsDescription: "How to integrate a decentralized exchange (DEX) into Jupiter's Metis routing engine, which powers both /order and /build endpoints. Covers the self-serve integration workflow: implement the Amm trait from the jupiter-amm-interface Rust crate, verify that Amm::quote() matches on-chain execution with the jupiter-amm-test-kit parity harness in the same repository (it snapshots a live pool, executes the native swap in LiteSVM, and asserts the quoted amounts equal the on-chain token deltas exactly), then submit the SDK for review via the AMM integrators support form at support.jup.ag. Implementation mechanics (trait definition, test-suite pattern, fixtures) live in the jup-ag/jupiter-amm-interface repository READMEs; this page covers Jupiter-side requirements: integration prerequisites (security audit, code health, traction), the no-network-calls rule, SDK fork access, and the submission process. Also explains how proprietary AMMs (propAMMs) detect Jupiter frontend flow by verifying the dedicated signer sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF, letting them classify the trade as non-toxic order flow and quote tighter spreads."
 ---
 
 This guide covers how to integrate your decentralized exchange (DEX) into Jupiter's Metis routing engine. The workflow is self-serve: implement the Jupiter AMM Interface, prove that your quotes match on-chain execution with the test kit, then submit your SDK for review.
@@ -19,179 +19,26 @@ As Solana grows and more DEXes are built, we have to be more cautious in the DEX
 
 ## Step 1: Implement the AMM Interface
 
-The [jup-ag/jupiter-amm-interface](https://github.com/jup-ag/jupiter-amm-interface) repository is a Cargo workspace with two crates:
+Implement the `Amm` trait from the [`jupiter-amm-interface`](https://docs.rs/crate/jupiter-amm-interface) crate for your DEX. The [jup-ag/jupiter-amm-interface](https://github.com/jup-ag/jupiter-amm-interface) repository is the source of truth for the trait definition and implementation guidance, follow its READMEs.
 
-| Crate | Purpose |
-|-------|---------|
-| [`jupiter-amm-interface`](https://docs.rs/crate/jupiter-amm-interface) | The `Amm` trait your DEX SDK implements to be routed by Jupiter |
-| `jupiter-amm-test-kit` | A harness that verifies your `Amm::quote()` matches the on-chain program |
+Jupiter-side requirements:
 
-To integrate with the Jupiter Core Engine:
-
-* Provide a DEX SDK that implements the `Amm` trait from the [`jupiter-amm-interface`](https://docs.rs/crate/jupiter-amm-interface) crate.
 * Enable us to fork your SDK, this ensures our users that we can guarantee maintenance, support for the SDK, and fix potential bugs related to integrated DEXs.
 * Limit the `Amm` implementation to deserializing state and quoting. Keep the detailed math in your SDK, and do heavy deserialization and precomputation in `update` rather than `quote`.
 
 <Info>
 **NOTE**
 
-  `get_accounts_to_update` provides the necessary accounts to fetch, they are batched and cached by the Jupiter Core Engine and delivered through `update` to the AMM instance, there might be multiple calls to `quote` using the same cache so **we do not allow any network calls** in the entire implementation.
+  `get_accounts_to_update` provides the necessary accounts to fetch. They are batched and cached on our end, then delivered through `update` to the AMM instance. There might be multiple calls to `quote` using the same cache, so **we do not allow any network calls** in the entire implementation.
 </Info>
-
-<Accordion title="AMM Interface Code Example">
-  The current trait definition lives in [`interface/src/lib.rs`](https://github.com/jup-ag/jupiter-amm-interface/blob/main/interface/src/lib.rs), which is the source of truth.
-
-  ```rust
-  pub trait Amm: Clone {
-      /// Deserializes on-chain account data and optional params into an AMM instance
-      fn from_keyed_account(
-          keyed_account: &KeyedAccount,
-          amm_context: &AmmContext,
-      ) -> Result<Self, AmmError>
-      where
-          Self: Sized;
-
-      /// A human readable label of the underlying DEX
-      fn label(&self) -> AmmLabel;
-
-      /// The on-chain program that owns this AMM's accounts and executes its swaps
-      fn program_id(&self) -> Pubkey;
-
-      /// The pool state or market state address
-      fn key(&self) -> Pubkey;
-
-      /// The mints that can be traded
-      fn get_reserve_mints(&self) -> Vec<Pubkey>;
-
-      /// The accounts necessary to produce a quote
-      fn get_accounts_to_update(&self) -> Vec<Pubkey>;
-
-      /// Picks necessary accounts to update it's internal state
-      /// Heavy deserialization and precomputation caching should be done in this function
-      fn update(&mut self, account_provider: impl AccountProvider) -> Result<(), AmmError>;
-
-      /// Computes the expected token amounts and fees for a swap without executing it
-      fn quote(&self, quote_params: &QuoteParams) -> Result<Quote, AmmError>;
-
-      /// Indicates which Swap has to be performed along with all the necessary account metas
-      fn get_swap_and_account_metas(
-          &self,
-          swap_params: &SwapParams,
-      ) -> Result<SwapAndAccountMetas, AmmError>;
-
-      /// Indicates if get_accounts_to_update might return a non constant vec
-      fn has_dynamic_accounts(&self) -> bool {
-          false
-      }
-
-      /// Indicates whether `update` needs to be called before `get_reserve_mints`
-      fn requires_update_for_reserve_mints(&self) -> bool {
-          false
-      }
-
-      // Indicates that whether ExactOut mode is supported
-      fn supports_exact_out(&self) -> bool {
-          false
-      }
-
-      /// It can only trade in one direction from its first mint to second mint, assuming it is a two mint AMM
-      fn unidirectional(&self) -> bool {
-          false
-      }
-
-      /// For testing purposes, provide a mapping of dependency programs to function
-      fn program_dependencies(&self) -> Vec<(Pubkey, String)> {
-          vec![]
-      }
-
-      fn get_accounts_len(&self) -> usize {
-          32 // Default to a near whole legacy transaction to penalize no implementation
-      }
-
-      /// The identifier of the underlying liquidity
-      ///
-      /// Example:
-      /// For RaydiumAmm uses Openbook market A this will return Some(A)
-      /// For Openbook market A, it will also return Some(A)
-      fn underlying_liquidities(&self) -> Option<HashSet<Pubkey>> {
-          None
-      }
-
-      /// Provides a shortcut to establish if the AMM can be used for trading
-      /// If the market is active at all
-      fn is_active(&self) -> bool {
-          true
-      }
-  }
-  ```
-</Accordion>
 
 ## Step 2: Verify quote parity with the test kit
 
-Before submitting, prove that your implementation quotes exactly what the on-chain program executes. The `jupiter-amm-test-kit` crate in the same repository automates this:
+Before submitting, prove that your implementation quotes exactly what the on-chain program executes. The `jupiter-amm-test-kit` crate in the same repository automates this: it snapshots a live pool, runs your `Amm::quote`, executes your program's native swap instruction in LiteSVM, and asserts the on-chain token deltas equal the quote exactly.
 
-1. Loads a pool snapshot (accounts dumped from a live pool).
-2. Runs your pure `Amm::quote`.
-3. Executes the AMM program's native swap instruction in LiteSVM.
-4. Asserts the realized on-chain token delta equals the quote exactly.
+Follow the [test kit README](https://github.com/jup-ag/jupiter-amm-interface/tree/main/test-kit) for the test-suite pattern and fixtures. The [SPL Token Swap reference suite](https://github.com/jup-ag/jupiter-amm-interface/blob/main/test-kit/tests/spl_token_swap.rs) is a complete working example to copy.
 
-Besides the `Amm` implementation itself, the only extra code you write is a small encoder function that builds your program's native swap instruction data, plus one `PoolTest` per pool. The [SPL Token Swap reference suite](https://github.com/jup-ag/jupiter-amm-interface/blob/main/test-kit/tests/spl_token_swap.rs) is a complete working example to copy.
-
-```rust
-use jupiter_amm_interface::Swap;
-use jupiter_amm_test_kit::{PoolTest, assert_pool_parity};
-
-#[test]
-fn my_pool() {
-    let test = PoolTest::new(POOL)
-        .add_swap(INPUT_MINT, OUTPUT_MINT, 100_000_000) // add as many swaps as needed
-        .add_swap(OUTPUT_MINT, INPUT_MINT, 50_000_000); // each runs against a fresh SVM
-
-    assert_pool_parity::<MyAmm>(&test, encode_swap);
-}
-
-/// Builds the program's native swap instruction data (discriminator plus args).
-fn encode_swap(swap: &Swap, in_amount: u64) -> Vec<u8> {
-    match swap {
-        Swap::Placeholder { .. } => {
-            let mut data = Vec::with_capacity(1 + 8 + 8);
-            data.push(1); // discriminator
-            data.extend_from_slice(&in_amount.to_le_bytes());
-            data.extend_from_slice(&0u64.to_le_bytes()); // minimum out, the kit asserts the exact amount instead
-            data
-        }
-        other => panic!("unexpected swap variant: {other:?}"),
-    }
-}
-```
-
-A new AMM does not have its own `Swap` variant until Jupiter integrates it, so return `Swap::Placeholder { data }` from `get_swap_and_account_metas`. The `data` field is how your `Amm` passes information to the encoder, such as a direction flag or an operation tag when your program has several swap instructions.
-
-### Fixtures
-
-Fixtures follow a fixed convention, no configuration required: account snapshots live at `tests/fixtures/accounts/<pool>`, your program loads from `tests/fixtures/<label>.so` (label lowercased, spaces as underscores), and any program you CPI into comes from `Amm::program_dependencies()`.
-
-With the `rpc` feature (on by default), the kit snapshots a live pool for you when a test's fixtures are missing:
-
-```bash
-RPC=<mainnet-url> cargo test --test my_amm
-```
-
-To refresh existing fixtures, add `REFRESH=1` or delete the pool's fixtures directory and rerun. Commit the fixtures and the parity tests run fully offline.
-
-### Test kit limitations
-
-The kit covers the common case first. Today that means:
-
-* **ExactIn only.** Every swap is quoted and executed as `SwapMode::ExactIn`. No ExactOut assertions yet.
-* **One native instruction per swap.** The encoder can route different `Swap` variants to different instructions, but a swap that needs orchestration around the instruction in production (SOL wrapping, ephemeral accounts, multi-instruction flows) cannot be reproduced.
-* **The swap must work as a plain top-level instruction.** Programs that introspect the instructions sysvar and reject anything but a CPI from an approved caller cannot be driven this way yet.
-* **Account metas are used verbatim.** `get_swap_and_account_metas` must return exactly the native instruction's accounts in on-chain order.
-* **One signer.** The user keypair is the only signer.
-* **Plain token accounts.** The user's accounts are freshly created ATAs. Token-2022 mints work, but transfer logic that needs extra per-account state (such as transfer-hook side accounts) may not.
-* **Defaults for the rest.** `FeeMode::Normal`, no referrer, and the SVM clock pinned to the snapshot moment.
-
-If one of these blocks you, or the kit is not flexible enough in some other way, [open an issue](https://github.com/jup-ag/jupiter-amm-interface/issues) on the repository rather than working around it silently. These limits reflect what integrators have needed so far, not hard design walls.
+The kit covers the common case first: ExactIn swaps that run as a single top-level instruction with one signer. If one of its documented limitations blocks you, [open an issue](https://github.com/jup-ag/jupiter-amm-interface/issues) on the repository rather than working around it silently.
 
 ## Step 3: Submit your integration
 

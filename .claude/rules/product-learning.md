@@ -514,3 +514,20 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 ## Architecture
 
 - [2026-06-30] The Jupiter frontend (jup.ag) appends the dedicated signer `sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF` to swap transactions and signs the transaction with it. PropAMMs detect Jupiter frontend (retail / non-toxic) flow by verifying this signature is present and valid, then quote tighter spreads. This is the technical mechanism behind "Ultra Signaling" (named but not previously explained in `ultra/index.mdx`). Trust model is a real signature, not just the address: only Jupiter holds the private key so it cannot be forged, which is why the address is safe to publish. Documented as a section on `swap/routing/dex-integration.mdx` (DEV-649). Example tx: `4PUVAsfdagLZcHbxso5w7eH13fnmAmobrRLih5uyqAFjQqRL5TgmVD5Fyrnbfm2mvpEn7dutk9wvGYNZrzQc6tbH`.
+
+---
+
+# Routing — DEX Integration (jupiter-amm-interface)
+
+## Sources
+
+- **Interface + test kit:** `github.com/jup-ag/jupiter-amm-interface` (Cargo workspace; READMEs at root, `interface/`, `test-kit/`). Crates: `jupiter-amm-interface` 0.6.1 (crates.io), `jupiter-amm-test-kit` 0.1.0.
+- **Docs page:** `swap/routing/dex-integration.mdx`.
+
+## Facts
+
+- [2026-08-10] The repo was restructured into a Cargo workspace (PR #37, merged 2026-08-07): `interface/` (the `Amm` trait) + a new `test-kit/` crate. The test kit is a self-serve quote-parity harness: loads a `PoolSnapshot`, runs the SDK's pure `Amm::quote`, executes the program's native swap instruction in LiteSVM, asserts the on-chain token delta equals the quote exactly. Integrator writes one `PoolTest` per pool + an `encode_swap(swap, in_amount) -> Vec<u8>` encoder; new AMMs return `Swap::Placeholder { data }` (no dedicated `Swap` variant until Jupiter integrates them). Fixtures auto-snapshot from live RPC (`RPC=<mainnet-url> cargo test --test my_amm`, `REFRESH=1` to refresh) and run offline once committed. Reference suite: `test-kit/tests/spl_token_swap.rs` (BUILD-774).
+- [2026-08-10] The docs page's inline `Amm` trait had drifted badly from the crate; refreshed in BUILD-774. Current trait (v0.6.1): `Amm: Clone` (no more `clone_amm`), `update(&mut self, account_provider: impl AccountProvider)` (was `&AccountMap`), `label() -> AmmLabel` (`&'static str`, was `String`), all methods return `Result<_, AmmError>`, `QuoteParams` gained `fee_mode: FeeMode` (`Normal | Ultra`), `get_user_setup` removed. When quoting the trait in docs, copy verbatim from `interface/src/lib.rs`.
+- [2026-08-10] `jup-ag/rust-amm-implementation` is superseded by the in-workspace test kit (it used the old `snapshot-amm` CLI harness and is pinned to interface 0.4.4/0.5.1). Removed from the docs in BUILD-774; do not reference it for new integrations.
+- [2026-08-10] Test kit limitations (from `test-kit/README.md`, surfaced on the docs page): ExactIn only; one native instruction per swap (no SOL-wrap/multi-ix orchestration); plain top-level instruction only (no instructions-sysvar introspection/CPI-gated programs); account metas used verbatim in on-chain order; one signer; fresh-ATA token accounts (transfer-hook side accounts may not work); `FeeMode::Normal`, no referrer, clock pinned to snapshot. Escalation path is a repo issue, not silent workarounds. Dependency caveat: LiteSVM 0.14 pins the Solana crate generation (do not `cargo update` `solana-clock`/`solana-last-restart-slot`/`solana-slot-history` past 3.2.0).
+- [2026-08-10] AMM integration triage runs through the support form `https://support.jup.ag/requests/new/amm-integrators` (per YY, BUILD-774): the docs link the form only (Discord removed from the DEX integration page); the form is also listed on `resources/support.mdx`. The upstream repo READMEs still point to Discord `#developer-support` for questions.

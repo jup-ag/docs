@@ -1,0 +1,77 @@
+---
+title: "AMM Errors"
+description: "Error codes on the Lend AMM swap path, what triggers them, and how to handle them."
+llmsDescription: "Reference table of Jupiter Lend AMM program errors on the swap path. Covers slippage errors (DexNotEnoughAmountOut 6024, DexExceedsAmountInMax 6051), size and dust limits (DexSwapInLimitingAmounts 6052, DexSwapOutLimitingAmounts 6053, DexLimitingAmountsSwapAndNonPerfect 6060, DexOracleUpdateHugeSwapDiff 6048), reserve and utilization errors (6022, 6057, 6058, 6059, 6025, 6023), pool state errors (DexSwapAndArbitragePaused 6050, DexAlreadyEntered 6017, 6021, 6019, 6020), external center-price errors (6067, 6068, 6056), CPI account errors (DexValidateInvalidLiquidityPosition 6077, 6078, 6066, 6079), the intentional simulation sentinels (DexSwapInResult 6081, DexSwapOutResult 6082), and how to read the custom error code from a failed transaction in TypeScript or CPI."
+---
+
+These are the AMM program errors an integrator can hit on the **swap path** of the Lend AMM. Codes are the Anchor custom-error numbers (the program's error enum starts at `6000`); the name is the `ErrorCodes` variant. The on-chain message string is the SCREAMING_SNAKE form of the name (e.g. `DEX_NOT_ENOUGH_AMOUNT_OUT`).
+
+## Slippage
+
+| Code   | Name                    | When                                          | Fix                             |
+| ------ | ----------------------- | --------------------------------------------- | ------------------------------- |
+| `6024` | `DexNotEnoughAmountOut` | `swap_in` output would be `< amount_out_min`. | Re-quote and/or widen slippage. |
+| `6051` | `DexExceedsAmountInMax` | `swap_out` input would be `> amount_in_max`.  | Re-quote and/or widen slippage. |
+
+These are the expected failures when the market moves between quote and execution. No funds move. Re-quote with a fresh snapshot and retry.
+
+## Size and dust limits
+
+| Code   | Name                                  | When                                                                          | Fix                       |
+| ------ | ------------------------------------- | ----------------------------------------------------------------------------- | ------------------------- |
+| `6052` | `DexSwapInLimitingAmounts`            | Adjusted input `> 50%` of combined input-side imaginary reserves.              | Split into smaller swaps. |
+| `6053` | `DexSwapOutLimitingAmounts`           | Adjusted output `> 50%` of combined output-side imaginary reserves.            | Split into smaller swaps. |
+| `6060` | `DexLimitingAmountsSwapAndNonPerfect` | Input/output below the dust floor (`~1e6` in 9-dec terms, `1e2` native).       | Increase the amount.      |
+| `6048` | `DexOracleUpdateHugeSwapDiff`         | The swap would move the pool price more than the oracle's 5%-per-swap bound.   | Split into smaller swaps. |
+
+## Reserves and utilization
+
+| Code   | Name                           | When                                                                          | Fix                                          |
+| ------ | ------------------------------ | ------------------------------------------------------------------------------ | -------------------------------------------- |
+| `6022` | `DexTokenReservesTooLow`       | A post-swap real reserve would fall below the minimum-liquidity floor.         | Smaller swap / other direction.              |
+| `6057` | `DexDebtReservesTooLow`        | Debt-pool reserves insufficient for the routed leg.                            | Smaller swap.                                |
+| `6058` | `DexInvalidCollateralReserves` | Collateral reserves in an invalid state for the trade.                         | Smaller swap / re-quote.                     |
+| `6059` | `DexInvalidDebtReserves`       | Debt reserves in an invalid state for the trade.                               | Smaller swap / re-quote.                     |
+| `6025` | `DexUtilizationCapReached`     | Post-swap Liquidity Layer utilization exceeds the token's `max_utilization`.   | Wait for utilization to ease / smaller swap. |
+| `6023` | `DexNoSwapRoute`               | Neither side can service the requested direction.                              | Check the pool has the needed side enabled.  |
+
+## Pool state
+
+| Code   | Name                        | When                                                                   | Fix                              |
+| ------ | --------------------------- | ---------------------------------------------------------------------- | -------------------------------- |
+| `6050` | `DexSwapAndArbitragePaused` | Swaps and arbitrage are paused on this pool.                            | None, pool is paused by admin.   |
+| `6017` | `DexAlreadyEntered`         | Re-entrancy lock held (e.g. two swaps on one pool in one instruction).  | Don't re-enter the same pool.    |
+| `6021` | `DexPoolNotInitialized`     | Pool not set up / no side enabled.                                      | Use a live `dex_id`.             |
+| `6019` | `DexSmartColNotEnabled`     | Collateral (supply) side not enabled.                                   | Use a pool with the side enabled.|
+| `6020` | `DexSmartDebtNotEnabled`    | Debt (borrow) side not enabled.                                         | Use a pool with the side enabled.|
+
+## Center price (external-oracle pools)
+
+| Code   | Name                            | When                                                                     | Fix                                                              |
+| ------ | ------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| `6067` | `DexMissingExternalCenterPrice` | Pool needs an external center price but no oracle accounts were passed.  | Pass `[center_price_address, ...sources]` as remaining accounts. |
+| `6068` | `DexInvalidExternalCenterPrice` | `remaining_accounts[0]` is not the pool's `center_price_address`.         | Pass the correct oracle first.                                   |
+| `6056` | `DexCenterPriceOutOfRange`      | Resolved center price outside the pool's configured clamps.               | Transient: retry. Persistent: pool misconfigured.                |
+
+## Accounts (CPI integrators)
+
+| Code   | Name                                  | When                                                                    | Fix                                                        |
+| ------ | ------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| `6077` | `DexValidateInvalidLiquidityPosition` | A required supply/borrow position account was `None` or wrong.            | Pass **all four** positions (see [CPI](/lend/dex/cpi)).    |
+| `6078` | `DexValidateMissingLiquidityPosition` | A liquidity position required for an enabled leg is missing.              | Include the leg's position.                                |
+| `6066` | `DexInvalidTokenAccount`              | A token account's mint/authority/program doesn't match.                   | Fix ATA owner / mint / token program.                      |
+| `6079` | `DexInvalidRecipientPositionWithdraw` | Output routed to a recipient but its token account is missing/invalid.    | Provide a valid `recipient_token_*_account`.               |
+
+## Simulation sentinel (not a real failure)
+
+| Code   | Name               | When                                                                         |
+| ------ | ------------------ | ----------------------------------------------------------------------------- |
+| `6081` | `DexSwapInResult`  | Recipient is `ADDRESS_DEAD`; `swap_in` reverts with the result in the log.    |
+| `6082` | `DexSwapOutResult` | Recipient is `ADDRESS_DEAD`; `swap_out` reverts with the result in the log.   |
+
+These are **intentional**: the off-chain quote-by-simulation path (see [TypeScript: exact on-chain quoting via simulation](/lend/dex/typescript#exact-on-chain-quoting-via-simulation-optional)). A real swap must never use the `ADDRESS_DEAD` recipient.
+
+## Reading the code from a failed transaction
+
+- **TypeScript:** Anchor throws an `AnchorError`; read `err.error.errorCode.number` (e.g. `6024`) and `err.error.errorMessage`. Raw logs contain `Program ... failed: custom program error: 0x1798`, which is the code in hex: `0x1798` = `6040`, `6024` = `0x1788`.
+- **CPI:** the inner error propagates to your program. Wrap the `dex::cpi::*` call in a `match` and map the failure to your own error if you want a cleaner message; otherwise let it bubble up and the transaction fails with the error code above.

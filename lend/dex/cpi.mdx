@@ -1,0 +1,173 @@
+---
+title: "AMM CPI Integration"
+description: "Call swap_in and swap_out on the Lend AMM from your own Solana program via CPI."
+llmsDescription: "How to swap against the Jupiter Lend AMM from an on-chain Solana program via cross-program invocation (CPI). Covers generating the CPI client from the published IDL with Anchor's declare_program! macro, the full 25-account DexOperation context in exact order, why all four supply/borrow position accounts are mandatory for swaps, reading the u64 return value with .get(), signing as a PDA with new_with_signer, passing external center-price oracle accounts as remaining accounts, Token-2022 handling, compute budget sizing, and a raw instruction recipe (discriminators and Borsh argument layout) for non-Anchor programs. AMM program id jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd."
+---
+
+This page is for **on-chain** integrators: programs that swap against the Lend AMM as part of their own instruction (a vault, router, strategy, or aggregator hop). You invoke `swap_in` / `swap_out` on the AMM program and read the returned amount.
+
+You do not need the AMM program's source crate. Anchor's `declare_program!` macro generates a full CPI client from the program's published [IDL](https://solscan.io/account/jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd#programIdl). If you're not on Anchor, a raw instruction recipe is at the [bottom](#raw-instruction-without-anchor).
+
+AMM program id: `jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd`.
+
+## Generate the CPI client from the IDL
+
+Fetch the on-chain IDL into your program's `idls/` directory (requires Anchor 0.30+):
+
+```bash
+anchor idl fetch jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd \
+  --provider.cluster mainnet -o idls/dex.json
+```
+
+Then generate the client:
+
+```rust
+use anchor_lang::prelude::*;
+
+// Reads ./idls/dex.json and generates `dex::cpi`, `dex::accounts`, `dex::client`.
+declare_program!(dex);
+```
+
+This gives you `dex::cpi::swap_in` / `swap_out`, the `dex::cpi::accounts::DexOperation` account struct, and the program id, all matching the deployed program.
+
+## The account context (DexOperation)
+
+A swap uses **25 accounts**, in this exact order. Your instruction declares them in its own `#[derive(Accounts)]`, then maps them into `DexOperation`:
+
+| #   | Account                       | Flags         | What it is                               |
+| --- | ----------------------------- | ------------- | ---------------------------------------- |
+| 1   | `signer`                      | mut, signer   | funds leave its token account            |
+| 2   | `dex`                         | mut           | the `Dex` pool account                   |
+| 3   | `user_token_0_account`        | mut           | signer's token0 ATA (authority = signer) |
+| 4   | `user_token_1_account`        | mut           | signer's token1 ATA (authority = signer) |
+| 5   | `recipient`                   | optional      | output owner; omit for signer            |
+| 6   | `recipient_token_0_account`   | mut, optional | recipient's token0 ATA                   |
+| 7   | `recipient_token_1_account`   | mut, optional | recipient's token1 ATA                   |
+| 8   | `token_0`                     | readonly      | token0 mint                              |
+| 9   | `token_1`                     | readonly      | token1 mint                              |
+| 10  | `token_0_reserve`             | mut           | Liquidity Layer reserve for token0       |
+| 11  | `token_1_reserve`             | mut           | Liquidity Layer reserve for token1       |
+| 12  | `token_0_rate_model`          | readonly      | Liquidity Layer rate model for token0    |
+| 13  | `token_1_rate_model`          | readonly      | Liquidity Layer rate model for token1    |
+| 14  | `token_0_vault`               | mut           | Liquidity Layer vault ATA for token0     |
+| 15  | `token_1_vault`               | mut           | Liquidity Layer vault ATA for token1     |
+| 16  | `dex_supply_position_token_0` | mut, optional | pool's token0 supply position            |
+| 17  | `dex_supply_position_token_1` | mut, optional | pool's token1 supply position            |
+| 18  | `dex_borrow_position_token_0` | mut, optional | pool's token0 borrow position            |
+| 19  | `dex_borrow_position_token_1` | mut, optional | pool's token1 borrow position            |
+| 20  | `liquidity`                   | readonly      | Liquidity Layer root account             |
+| 21  | `liquidity_program`           | readonly      | Liquidity Layer program                  |
+| 22  | `token_0_program`             | readonly      | Token / Token-2022 for token0            |
+| 23  | `token_1_program`             | readonly      | Token / Token-2022 for token1            |
+| 24  | `oracle_program`              | readonly      | Oracle program                           |
+| 25  | `associated_token_program`    | readonly      | ATA program                              |
+
+All addresses are deterministic: derive them from the seeds in the [overview](/lend/dex#pdas), or read them from the pool's lookup table. The Liquidity Layer accounts are validated inside the Liquidity Layer CPI; you don't verify them yourself.
+
+<Warning>
+**All four positions (16 to 19) are mandatory for swaps.** Unlike deposit/withdraw (which gate positions on which side is enabled), the swap path unconditionally loads both supply and borrow positions for the legs it touches. Passing `None` for any of the four fails with [`DexValidateInvalidLiquidityPosition` (6077)](/lend/dex/errors). They exist from pool setup, so always pass all four `Some(...)`.
+
+`recipient` (5 to 7) is genuinely optional: omit it (`None`) to send output to the signer.
+</Warning>
+
+## Calling swap_in / swap_out
+
+```rust
+pub fn my_swap(ctx: Context<MySwap>, amount_in: u64, amount_out_min: u64) -> Result<()> {
+    let cpi_accounts = dex::cpi::accounts::DexOperation {
+        signer: ctx.accounts.signer.to_account_info(),
+        dex: ctx.accounts.dex.to_account_info(),
+        user_token_0_account: ctx.accounts.user_token_0.to_account_info(),
+        user_token_1_account: ctx.accounts.user_token_1.to_account_info(),
+        recipient: None,                     // output -> signer
+        recipient_token_0_account: None,
+        recipient_token_1_account: None,
+        token_0: ctx.accounts.token_0.to_account_info(),
+        token_1: ctx.accounts.token_1.to_account_info(),
+        token_0_reserve: ctx.accounts.token_0_reserve.to_account_info(),
+        token_1_reserve: ctx.accounts.token_1_reserve.to_account_info(),
+        token_0_rate_model: ctx.accounts.token_0_rate_model.to_account_info(),
+        token_1_rate_model: ctx.accounts.token_1_rate_model.to_account_info(),
+        token_0_vault: ctx.accounts.token_0_vault.to_account_info(),
+        token_1_vault: ctx.accounts.token_1_vault.to_account_info(),
+        dex_supply_position_token_0: Some(ctx.accounts.supply_pos_0.to_account_info()),
+        dex_supply_position_token_1: Some(ctx.accounts.supply_pos_1.to_account_info()),
+        dex_borrow_position_token_0: Some(ctx.accounts.borrow_pos_0.to_account_info()),
+        dex_borrow_position_token_1: Some(ctx.accounts.borrow_pos_1.to_account_info()),
+        liquidity: ctx.accounts.liquidity.to_account_info(),
+        liquidity_program: ctx.accounts.liquidity_program.to_account_info(),
+        token_0_program: ctx.accounts.token_0_program.to_account_info(),
+        token_1_program: ctx.accounts.token_1_program.to_account_info(),
+        oracle_program: ctx.accounts.oracle_program.to_account_info(),
+        associated_token_program: ctx.accounts.associated_token_program.to_account_info(),
+    };
+
+    let cpi_ctx = CpiContext::new(ctx.accounts.dex_program.to_account_info(), cpi_accounts);
+
+    let swap0to1 = true;
+    let amount_out: u64 = dex::cpi::swap_in(cpi_ctx, swap0to1, amount_in, amount_out_min)?.get();
+
+    msg!("received {} out", amount_out);
+    Ok(())
+}
+```
+
+Exact-out is identical with `dex::cpi::swap_out(cpi_ctx, swap0to1, amount_out, amount_in_max)?.get()`, which returns the `amount_in` spent.
+
+### Reading the return value
+
+Both instructions return `Result<u64>`. Through CPI that arrives as an Anchor `Return<u64>`; call `.get()`. This is the authoritative amount (the same value the `LogSwap` event records). No `get_return_data` boilerplate or log parsing needed.
+
+## Signing as a PDA
+
+If the swapper is a **PDA your program owns** (the usual case: a vault paying from its own token account), build the context with `new_with_signer` and your seeds:
+
+```rust
+let seeds: &[&[&[u8]]] = &[&[b"my_vault", &[bump]]];
+let cpi_ctx = CpiContext::new_with_signer(
+    ctx.accounts.dex_program.to_account_info(),
+    cpi_accounts,
+    seeds,
+);
+let out = dex::cpi::swap_in(cpi_ctx, swap0to1, amount_in, amount_out_min)?.get();
+```
+
+The `user_token_*_account`s must have `authority = signer`: the PDA must own the token accounts funds leave from.
+
+## External center price and remaining accounts
+
+Pools priced by an external oracle require the oracle plus its price sources as **leading remaining accounts**, in order `[center_price_address, ...sources]`. `remaining_accounts[0]` **must** equal the pool's `center_price_address`, or the swap fails with [`DexInvalidExternalCenterPrice` (6068)](/lend/dex/errors) / [`DexMissingExternalCenterPrice` (6067)](/lend/dex/errors).
+
+```rust
+let cpi_ctx = CpiContext::new(dex_program, cpi_accounts)
+    .with_remaining_accounts(center_price_accounts); // [oracle, sources...]
+```
+
+Internal-price pools take no remaining accounts. Read `Dex.center_price_address` (all-zero means internal) to tell which a pool uses.
+
+## Edge cases and gotchas
+
+- **All four positions required.** The most common CPI mistake. `None` fails with error `6077`.
+- **`token0`/`token1` ordering is fixed by pubkey sort**, not by your call. `swap0to1 = true` always means "lower-pubkey mint to higher-pubkey mint". Derive the direction from the mints you hold.
+- **Token-2022.** `token_0_program` / `token_1_program` must each match the mint's owning program; a pool can mix classic SPL and Token-2022. Don't hardcode `TOKEN_PROGRAM_ID`.
+- **All-or-nothing.** A routed swap performs up to two Liquidity Layer CPIs plus the oracle update; if any leg reverts, the whole swap reverts (no partial fill).
+- **Re-entrancy lock.** The pool locks for the duration; a second swap on the same pool within one instruction fails with [`DexAlreadyEntered` (6017)](/lend/dex/errors).
+- **Compute budget.** A two-pool routed swap plus oracle update is CU-heavy. Add a `ComputeBudgetProgram::set_compute_unit_limit` to the outer transaction; the default 200k is often not enough with your own logic included.
+- **`ADDRESS_DEAD` recipient reverts.** If `recipient` resolves to the all-zero pubkey, the instruction intentionally errors ([`DexSwapInResult` 6081 / `DexSwapOutResult` 6082](/lend/dex/errors)). That's the off-chain simulation sentinel; never pass it from a real CPI.
+- **Slippage still applies.** `amount_out_min` / `amount_in_max` are enforced inside the CPI. Pass a real bound; `0` / `u64::MAX` disables the guard.
+- **Dust and size floors** apply as they do off-chain. See [`DexLimitingAmountsSwapAndNonPerfect` (6060)](/lend/dex/errors) and [`DexSwapInLimitingAmounts` (6052)](/lend/dex/errors).
+
+## Raw instruction (without Anchor)
+
+If you can't use `declare_program!`, build the instruction by hand. Discriminator (8 bytes) plus Borsh args, in order:
+
+| Instruction | Discriminator (bytes)           | Args (Borsh)                                              |
+| ----------- | ------------------------------- | --------------------------------------------------------- |
+| `swap_in`   | `[141,172,10,208,69,9,56,154]`  | `swap0to1: bool`, `amount_in: u64`, `amount_out_min: u64` |
+| `swap_out`  | `[206,36,149,14,163,132,148,1]` | `swap0to1: bool`, `amount_out: u64`, `amount_in_max: u64` |
+
+`bool` is 1 byte (`0`/`1`); each `u64` is 8 bytes little-endian. So the data is `discriminator ++ [swap0to1] ++ amount_a.to_le_bytes() ++ amount_b.to_le_bytes()` (17 bytes of args).
+
+Account metas follow the [25-account order above](#the-account-context-dexoperation) with the listed `signer` / `writable` flags, then any center-price remaining accounts (all readonly). For an **omitted optional** account (`recipient` when you want output to go to the signer), pass the **AMM program id** as the placeholder pubkey (readonly, non-signer) in that slot. This is the Anchor convention for `None`. Then `invoke` / `invoke_signed` the `Instruction`.
+
+See [Errors](/lend/dex/errors) for the full swap-path error table.

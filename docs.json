@@ -97,9 +97,7 @@
                 "pages": [
                   "swap/build/index",
                   "swap/build/common-instructions",
-                  "transaction/submit",
-                  "api-reference/swap/build",
-                  "api-reference/transaction/submit"
+                  "api-reference/swap/build"
                 ]
               },
               {
@@ -190,6 +188,19 @@
               {
                 "group": "API Reference",
                 "pages": ["api-reference/price/index"]
+              }
+            ]
+          },
+          {
+            "item": "Transaction Landing",
+            "icon": "paper-plane",
+            "groups": [
+              {
+                "group": "Transaction Landing",
+                "pages": [
+                  "transaction/submit",
+                  "api-reference/transaction/submit"
+                ]
               }
             ]
           },
@@ -661,6 +672,7 @@
               "resources/brand-kit",
               "resources/stats",
               "resources/audits",
+              "resources/security",
               "resources/references"
             ]
           },
@@ -695,7 +707,7 @@
       "discord": "https://discord.gg/jup",
       "telegram": "https://t.me/jup_dev",
       "github": "https://github.com/jup-ag",
-      "youtube": "https://www.youtube.com/@Jupiter-Exchange"
+      "youtube": "https://www.youtube.com/@JupiterOnchain"
     },
     "links": [
       {
@@ -808,7 +820,7 @@
     },
     {
       "source": "/api-reference/trigger/v2",
-      "destination": "/api-reference/trigger/index"
+      "destination": "/api-reference/trigger/challenge"
     },
     {
       "source": "/api-reference/trigger/v2/:slug*",

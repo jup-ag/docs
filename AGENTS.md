@@ -133,7 +133,7 @@ Before creating a new issue, search existing issues to avoid duplicates.
 
 Create a Linear issue for the work using the Linear MCP tools:
 - **Project:** `Docs` (ID: `docs-18ccf0a02c86`)
-- **Team:** `Developer Platform` (issues are prefixed `DEV-`)
+- **Team:** `Build` (issues are prefixed `BUILD-`)
 - **Title:** Action-oriented, specific — `[Area] Verb + what`
   - ✅ `[Ultra] Rewrite get-order page with complete code example`
   - ❌ `Update Ultra docs`
@@ -142,10 +142,9 @@ Create a Linear issue for the work using the Linear MCP tools:
   - Files affected — explicit list
   - Acceptance criteria — checkbox list so it's clear when the task is done
   - Out of scope — what this issue does NOT cover
-- **Labels** from this taxonomy:
-  - Area: `ultra`, `swap`, `tokens`, `price`, `routing`, `toolkits`, `portal`, `platform`, `ai`, `guides`, `get-started`
-  - Type: `content-new`, `content-update`, `restructure`, `cleanup`, `config`
 - **Initial status:** `Todo` (work is planned but not yet actively being worked on)
+
+No labels needed — the issue just needs to be under the `Docs` project on the `Build` team.
 
 If the work breaks down into distinct, self-contained pieces, create sub-issues
 under the parent. Each sub-issue should be independently completable — a clear
@@ -158,12 +157,10 @@ description of what needs to be done, which files to touch, and when it's done.
 | `Todo`        | Issue created, work is planned                        |
 | `In Progress` | Actively working on the code changes                  |
 | `In Review`   | PR is open and waiting for human review               |
-| `Content`     | PR merged, but there's a content/marketing opportunity (video, blog, tweet) |
-| `Done`        | All follow-up content is shipped, or no content needed |
+| `Done`        | PR merged                                             |
 
-Never mark an issue as `Done` until any content follow-up is complete (or
-explicitly not needed). The issue status must reflect the actual state of
-the work, not just the state of the code.
+The issue status must reflect the actual state of the work, not just the
+state of the code.
 
 - If a PR is rejected or needs changes, move the issue back to `In Progress`.
 - Keep it 1:1 — one issue per PR. If scope expands during a task, update the
@@ -219,7 +216,7 @@ entry is part of shipping, not a follow-up. As soon as the docs PR is open:
    as a sibling of this repo: `git clone https://github.com/jup-ag/developer-platform.git`.
 2. Branch from `origin/develop` and open the PR against `develop` (the integration branch:
    pushes to it build the staging site, and production ships when a `web-v*` release is cut).
-   Branch naming: `<user>/dev-XXX-description` matching the Linear issue.
+   Branch naming: `<user>/build-XXX-description` matching the Linear issue.
 3. Add or update the current month's post in `web/content/changelog/`. Follow the format in
    `web/content/changelog/_template.mdx` and the rules in `web/content/blog/README.md`
    (breaking changes first, one section per product area, each entry a `<ChangelogItem>`
@@ -261,7 +258,7 @@ Once the work is ready:
 - Run through the Reviewing and Pre-Commit checklists
 - Commit and push the branch
 - Open a PR via `gh` CLI
-- Reference the Linear issue in the PR body with a link: `Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX)`
+- Reference the Linear issue in the PR body with a link: `Fixes [BUILD-XX](https://linear.app/raccoons/issue/BUILD-XX)`
 - If the change affects a public API or product, open the companion changelog PR in the
   `developer-platform` repo now and attach it to the same Linear issue (see Changelog in §5)
 - Update the Linear issue to `In Review`
@@ -273,10 +270,7 @@ After PR is merged:
   git worktree remove ../docs--{type}-{short-description}
   git pull origin main
   ```
-- Move the Linear issue to `Content` if the work creates a content opportunity
-  (video walkthrough, blog post, tweet, etc.). Most docs work does.
-- Only move to `Done` if there is genuinely no content follow-up needed
-  (e.g. typo fixes, config changes)
+- Move the Linear issue to `Done`
 
 ---
 
@@ -443,14 +437,15 @@ Always run/check before committing:
 
 1. `node generate-llms-from-docs.js` — regenerate llms.txt
 2. `mint broken-links` — check for broken links
-3. `docs.json` is valid JSON
-4. Any new pages are added to `docs.json` navigation
-5. All new/updated pages have `title`, `description`, AND `llmsDescription`
-6. No placeholder text like "TODO" or "Lorem ipsum" left in content
-7. OpenAPI spec changes in `openapi-spec/` are reflected in `api-reference/` pages
-8. Images/assets added to `static/` are actually referenced somewhere
-9. Changelog entry added to the current month's post in the `developer-platform` repo (`web/content/changelog/YYYY-MM.mdx`) if changes affect a public API or product
-10. `.claude/rules/` updated if you discovered product behaviour, made IA decisions, or established conventions
+3. `node check-redirects.js` — only if you added or changed a redirect in `docs.json`; checks for conflicts, chains, and shadowed pages
+4. `docs.json` is valid JSON
+5. Any new pages are added to `docs.json` navigation
+6. All new/updated pages have `title`, `description`, AND `llmsDescription`
+7. No placeholder text like "TODO" or "Lorem ipsum" left in content
+8. OpenAPI spec changes in `openapi-spec/` are reflected in `api-reference/` pages
+9. Images/assets added to `static/` are actually referenced somewhere
+10. Changelog entry added to the current month's post in the `developer-platform` repo (`web/content/changelog/YYYY-MM.mdx`) if changes affect a public API or product
+11. `.claude/rules/` updated if you discovered product behaviour, made IA decisions, or established conventions
 
 ## Pull Requests
 
@@ -488,12 +483,13 @@ gh pr diff
 
 ## Linear Issues
 {Link each issue with its Linear URL}
-- Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX) — {issue title}
-- Fixes [DEV-XX](https://linear.app/raccoons/issue/DEV-XX) — {issue title}
+- Fixes [BUILD-XX](https://linear.app/raccoons/issue/BUILD-XX) — {issue title}
+- Fixes [BUILD-XX](https://linear.app/raccoons/issue/BUILD-XX) — {issue title}
 
 ## Checklist
 - [ ] `node generate-llms-from-docs.js` run
 - [ ] `mint broken-links` passes
+- [ ] `node check-redirects.js` passes (if redirects changed)
 - [ ] All pages have `title`, `description`, `llmsDescription`
 - [ ] `docs.json` navigation updated (if applicable)
 - [ ] Redirects added (if paths changed)
@@ -517,7 +513,8 @@ references, bookmarks, and indexed search results. The cost is always higher tha
   1. Add a redirect in `docs.json` (under the `redirects` array)
   2. Update all internal links repo-wide (`grep` for the old path)
   3. Run `mint broken-links` and confirm zero breakage
-  4. Note the redirect in `.claude/rules/decisions.md` under the Redirect Log
+  4. Run `node check-redirects.js` and confirm the new redirect introduces no conflicts or chains
+  5. Note the redirect in `.claude/rules/decisions.md` under the Redirect Log
 - If you're unsure whether a rename is worth it, **don't do it** — ask the user.
 
 ## Unmaintained Pages

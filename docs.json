@@ -101,6 +101,15 @@
                 ]
               },
               {
+                "group": "JupiterZ (RFQ)",
+                "pages": [
+                  "swap/jupiterz/index",
+                  "api-reference/swap/jupiterz/order",
+                  "api-reference/swap/jupiterz/global-order",
+                  "api-reference/swap/jupiterz/execute"
+                ]
+              },
+              {
                 "group": "Advanced",
                 "pages": [
                   "swap/advanced/index",
@@ -114,9 +123,20 @@
               {
                 "group": "Routing Integration",
                 "pages": [
-                  "swap/routing/dex-integration",
-                  "swap/routing/market-listing",
-                  "swap/routing/rfq-integration"
+                  {
+                    "group": "Integrate AMM into Metis",
+                    "pages": [
+                      "swap/routing/dex-integration",
+                      "swap/routing/market-listing"
+                    ]
+                  },
+                  {
+                    "group": "Integrate MM into JupiterZ (RFQ)",
+                    "pages": [
+                      "swap/routing/rfq-integration",
+                      "swap/routing/rfq-streaming"
+                    ]
+                  }
                 ]
               },
               {

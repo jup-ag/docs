@@ -1,0 +1,6 @@
+---
+openapi: /openapi-spec/swap/v2/jupiterz.yaml get /order
+title: "Get Order"
+description: "Get a firm RFQ quote and unsigned transaction from JupiterZ market makers"
+llmsDescription: "GET /order endpoint for the standalone JupiterZ API at api.jup.ag/swap/v2/jupiterz/order. Asks every eligible market maker for a price and returns the best firm quote plus a base64-encoded unsigned versioned transaction for the taker to sign. Required params: inputMint, outputMint, amount. Without taker, returns an indicative quote with transaction null. Optional params include swapMode (ExactIn/ExactOut), feeBps, receiver, ataAccountPayer, integratorFee/integratorTokenAccount/integratorFeeSide for integrator fees, and settingsPda/signers for Squads vault swaps. Response includes requestId and quoteId (both required by /execute), maker, provider, orderInfo with equal startAmount/endAmount (no slippage range), and expireAt. Requires x-api-key."
+---

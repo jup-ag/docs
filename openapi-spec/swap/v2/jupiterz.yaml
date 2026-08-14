@@ -1,0 +1,509 @@
+openapi: 3.0.3
+info:
+  title: JupiterZ API
+  version: 1.0.0
+  description: |
+    Standalone JupiterZ (RFQ) API. Request a firm quote and unsigned transaction from
+    Jupiter's market makers (`/order`, `/global-order`), have the taker sign the transaction,
+    and submit it for the market maker to co-sign and execute (`/execute`).
+
+servers:
+  - url: https://api.jup.ag/swap/v2/jupiterz
+    description: JupiterZ API Endpoint
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+
+  parameters:
+    inputMint:
+      name: inputMint
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Input token mint address
+      example: So11111111111111111111111111111111111111112
+    outputMint:
+      name: outputMint
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Output token mint address
+      example: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+    amount:
+      name: amount
+      in: query
+      required: true
+      schema:
+        type: string
+      description: |
+        Amount in the token's smallest unit, as a string.
+        Input amount for `ExactIn`, output amount for `ExactOut`
+      example: "1000000000"
+    taker:
+      name: taker
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |
+        Taker wallet address. Required to receive a `transaction` in the response.
+        Without it the response is an indicative quote with `transaction: null`
+    swapMode:
+      name: swapMode
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [ExactIn, ExactOut]
+        default: ExactIn
+      description: |
+        Swap mode. `ExactIn` fixes the input amount, `ExactOut` fixes the output amount.
+        `exactIn` and `exact_in` spellings are also accepted (same for `ExactOut`).
+        Responses always use the camelCase form `exactIn` / `exactOut`
+    version:
+      name: version
+      in: query
+      required: false
+      schema:
+        type: string
+        default: v1
+      description: RFQ protocol version
+    feeBps:
+      name: feeBps
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 10000
+      description: Market maker fee in basis points
+    isWsol:
+      name: isWsol
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: Set when the swap involves wSOL rather than native SOL
+    receiver:
+      name: receiver
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Address receiving the output tokens, when different from the taker
+    ataAccountPayer:
+      name: ataAccountPayer
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Address paying for Associated Token Account creation
+    inputTokenAccount:
+      name: inputTokenAccount
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Existing taker-owned input token account. Bypasses ATA derivation
+    outputTokenAccount:
+      name: outputTokenAccount
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Existing taker-owned output token account. Bypasses ATA derivation
+    integratorTokenAccount:
+      name: integratorTokenAccount
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |
+        Token account that receives your integrator fee.
+        Must be provided together with `integratorFee`
+    integratorFee:
+      name: integratorFee
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 10000
+      description: |
+        Your integrator fee in basis points (max `10000`).
+        Must be provided together with `integratorTokenAccount`
+    integratorFeeSide:
+      name: integratorFeeSide
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [input, output]
+      description: |
+        Side of the swap the integrator fee is charged on. When omitted, defaults to the
+        user-fixed side: `input` for `ExactIn`, `output` for `ExactOut`.
+        Requires `integratorTokenAccount`
+    settingsPda:
+      name: settingsPda
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Squads V5 settings PDA address. Required for Squads vault swaps
+    signers:
+      name: signers
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |
+        Comma-separated signer pubkeys for Squads vault swaps.
+        The first signer is the fee payer
+
+  schemas:
+    OrderIO:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token mint address
+          example: So11111111111111111111111111111111111111112
+        startAmount:
+          type: string
+          description: Amount in the token's smallest unit
+          example: "1000000000"
+        endAmount:
+          type: string
+          description: |
+            Amount in the token's smallest unit. Equal to `startAmount` for RFQ fills,
+            market makers quote a firm price with no slippage range
+          example: "1000000000"
+      required: [token, startAmount, endAmount]
+
+    QuoteResponse:
+      type: object
+      properties:
+        routing:
+          type: string
+          enum: [spot, onchain]
+          description: Routing type. `spot` for RFQ fills
+          example: spot
+        requestId:
+          type: string
+          description: |
+            Identifies this quote request. Pass it to `/execute` unchanged.
+            For `/global-order`, identifies the winning leg
+          example: 629bddf3-0038-43a6-8956-f5433d6b1191
+        quoteId:
+          type: string
+          description: Identifies this specific quote. Pass it to `/execute` unchanged
+          example: 59db3e19-c7b0-4753-a8aa-206701004498
+        maker:
+          type: string
+          description: Market maker wallet filling the order
+          example: maker2p9zXHQ5GKdZjSxLu7BfVz8YmF9oQ7TEd1rWqw
+        provider:
+          type: string
+          description: Name of the market maker the `maker` address belongs to
+          example: MM Trading
+        swapMode:
+          type: string
+          enum: [exactIn, exactOut]
+          description: Swap mode of the quote
+          example: exactIn
+        orderInfo:
+          type: object
+          properties:
+            input:
+              $ref: "#/components/schemas/OrderIO"
+            output:
+              $ref: "#/components/schemas/OrderIO"
+          required: [input, output]
+        transaction:
+          type: string
+          nullable: true
+          description: |
+            Base64-encoded versioned transaction for the taker to sign. The market maker
+            adds the final signature and submits it on-chain. `null` for indicative quotes
+            (no `taker` provided, or the transaction could not be built, see `error`)
+        expireAt:
+          type: string
+          nullable: true
+          description: |
+            Unix timestamp (seconds) after which the transaction is no longer valid.
+            Sign and execute before this time
+          example: "1736968572"
+        error:
+          type: string
+          enum: [insufficientBalance, missingAtaAccount]
+          description: |
+            Present only when `taker` was provided but no transaction could be built.
+            `insufficientBalance`: the taker does not hold enough of the input token.
+            `missingAtaAccount`: a token account required by the swap does not exist on-chain
+      required:
+        [routing, requestId, quoteId, maker, provider, swapMode, orderInfo]
+
+    ExecuteRequest:
+      type: object
+      properties:
+        requestId:
+          type: string
+          description: "`requestId` from the order response, unchanged"
+          example: 629bddf3-0038-43a6-8956-f5433d6b1191
+        quoteId:
+          type: string
+          description: "`quoteId` from the order response, unchanged"
+          example: 59db3e19-c7b0-4753-a8aa-206701004498
+        transaction:
+          type: string
+          description: |
+            The order's `transaction`, signed by the taker and re-encoded as base64.
+            Sign the transaction as-is: rebuilding it, reordering instructions, or changing
+            amounts invalidates it
+      required: [requestId, quoteId, transaction]
+
+    ExecuteResponse:
+      type: object
+      properties:
+        quoteId:
+          type: string
+          description: Echo of the quote ID
+          example: 59db3e19-c7b0-4753-a8aa-206701004498
+        state:
+          type: string
+          enum: [confirmed, accepted, rejected, invalid, failed]
+          description: |
+            Outcome of the swap.
+            `confirmed`: the swap landed on-chain (terminal).
+            `accepted`: the market maker accepted and submitted the swap, on-chain
+            confirmation is pending. Call `/execute` again with the same body to re-check.
+            `rejected`: the market maker declined to fill.
+            `invalid`: the transaction did not pass validation.
+            `failed`: network error or timeout reaching the market maker
+          example: confirmed
+        signature:
+          type: string
+          nullable: true
+          description: Transaction signature, present once the fill is known
+      required: [quoteId, state]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Human-readable error message. Always present
+          example: No quote found
+        errorCode:
+          type: string
+          nullable: true
+          description: |
+            Machine-readable error code. `null` unless the failure maps to a known code:
+            `NO_QUOTE_FOUND` (no market maker quoted the pair), `QUOTE_EXPIRED` (the quote
+            expired before `/execute`), `0x1` (taker has insufficient funds), `0xbc4`
+            (a required token account is missing), `0x11` (a token account is frozen),
+            `SIMULATION_FAILED`, `TRANSACTION_ERROR`, `INSTRUCTION_ERROR` (simulation failures)
+          example: NO_QUOTE_FOUND
+      required: [error]
+
+paths:
+  /order:
+    get:
+      operationId: getJupiterzOrder
+      summary: Get a quote and unsigned transaction from JupiterZ market makers
+      description: |
+        Asks every eligible market maker for a price and returns the best quote, along with
+        an unsigned transaction ready for the taker to sign. Without `taker`, returns an
+        indicative quote with `transaction: null`.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: "#/components/parameters/inputMint"
+        - $ref: "#/components/parameters/outputMint"
+        - $ref: "#/components/parameters/amount"
+        - $ref: "#/components/parameters/taker"
+        - $ref: "#/components/parameters/swapMode"
+        - $ref: "#/components/parameters/version"
+        - $ref: "#/components/parameters/feeBps"
+        - $ref: "#/components/parameters/isWsol"
+        - $ref: "#/components/parameters/receiver"
+        - $ref: "#/components/parameters/ataAccountPayer"
+        - $ref: "#/components/parameters/inputTokenAccount"
+        - $ref: "#/components/parameters/outputTokenAccount"
+        - $ref: "#/components/parameters/integratorTokenAccount"
+        - $ref: "#/components/parameters/integratorFee"
+        - $ref: "#/components/parameters/integratorFeeSide"
+        - $ref: "#/components/parameters/settingsPda"
+        - $ref: "#/components/parameters/signers"
+      responses:
+        "200":
+          description: Quote retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteResponse"
+        "400":
+          description: Invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Missing or invalid `x-api-key` header
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No market maker quoted this pair
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: No quote found
+                errorCode: NO_QUOTE_FOUND
+        "429":
+          description: Rate limit exceeded
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /global-order:
+    get:
+      operationId: getJupiterzGlobalOrder
+      summary: Get the best quote across multiple candidate output mints
+      description: |
+        Quotes one input mint against a comma-separated list of candidate output mints and
+        returns only the leg worth the most in USD. `ExactIn` only. The response has the
+        same shape as `/order`: `orderInfo.output.token` identifies the winning mint, and
+        `requestId` identifies the winning leg. Pass it to `/execute` unchanged.
+
+        The candidate list is capped server-side (currently 3 mints). Passing zero mints or
+        more than the cap returns `400` with the allowed range in the error message.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: "#/components/parameters/inputMint"
+        - name: outputMint
+          in: query
+          required: true
+          schema:
+            type: string
+          description: |
+            Comma-separated list of candidate output token mint addresses
+            (currently up to 3). Duplicates are ignored
+          example: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v,Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB
+        - $ref: "#/components/parameters/amount"
+        - $ref: "#/components/parameters/taker"
+        - $ref: "#/components/parameters/version"
+        - $ref: "#/components/parameters/feeBps"
+        - $ref: "#/components/parameters/isWsol"
+        - $ref: "#/components/parameters/receiver"
+        - $ref: "#/components/parameters/ataAccountPayer"
+        - $ref: "#/components/parameters/inputTokenAccount"
+        - $ref: "#/components/parameters/outputTokenAccount"
+        - $ref: "#/components/parameters/integratorTokenAccount"
+        - $ref: "#/components/parameters/integratorFee"
+        - $ref: "#/components/parameters/integratorFeeSide"
+        - $ref: "#/components/parameters/settingsPda"
+        - $ref: "#/components/parameters/signers"
+      responses:
+        "200":
+          description: Quote retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteResponse"
+        "400":
+          description: Invalid or missing parameters, `ExactOut` requested, or too many output mints
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Missing or invalid `x-api-key` header
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No market maker quoted any candidate leg
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: No quote found
+                errorCode: NO_QUOTE_FOUND
+        "429":
+          description: Rate limit exceeded
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /execute:
+    post:
+      operationId: executeJupiterzOrder
+      summary: Submit a taker-signed transaction for the market maker to fill
+      description: |
+        Takes the transaction from `/order` or `/global-order`, now signed by the taker,
+        and hands it to the market maker, who adds the final signature and submits it to
+        Solana. A rejected or failed swap still returns `200 OK` with the state in the
+        body. Calling `/execute` again with the same `requestId` is safe: it does not
+        re-execute the swap, it re-checks the existing one.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExecuteRequest"
+      responses:
+        "200":
+          description: Swap processed. Check `state` in the body, not just the HTTP status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExecuteResponse"
+        "400":
+          description: "Malformed `requestId`, `quoteId`, or transaction, or the quote expired (`errorCode: QUOTE_EXPIRED`)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: 59db3e19-c7b0-4753-a8aa-206701004498
+                errorCode: QUOTE_EXPIRED
+        "401":
+          description: Missing or invalid `x-api-key` header
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: No quote matching this `requestId`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limit exceeded
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"

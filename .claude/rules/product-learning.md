@@ -529,6 +529,43 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 
 ---
 
+# JupiterZ (RFQ)
+
+## Sources
+
+- **Live API (integrators):** `api.jup.ag/swap/v2/jupiterz` (`/order`, `/global-order`, `/execute`). Gateway maps to `rfq-api` `/v1/*`.
+- **Source code:** `jup-ag/rfq` (private), local clone `~/Documents/Projects/rfq` — always read `origin/main`. Public integrator API: `rfq-api/src/server.rs` (routes + utoipa annotations), `rfq-common/src/rfq_api/{requests,responses,enums}.rs`, errors in `rfq-api/src/errors.rs`, global-order logic in `rfq-api/src/aggregator/core/quote.rs`, prod config in `.charts/rfq-api/values.yaml`. V2 ingestion service: `market-maker-ingestion-service/`.
+- **MM toolkit (V1 webhook):** `github.com/jup-ag/rfq-webhook-toolkit` (public) — webhook OpenAPI schema, sample server, squads-sdk, order-engine program + IDL + audit, tests. The `webhook-api` crate there defines the shared request/response types (`SwapRequest = {requestId, quoteId, transaction}`).
+- **MM SDK (V2 streaming):** `github.com/jup-ag/rfq-v2-sdk` (public) — Rust + Python SDKs, `protos/market_maker.proto`, fill-decoder, e2e tests.
+- **Retired docs site:** `jup-ag/rfq-docs` (Docusaurus, jupiterz.jup.ag). Content ported to this repo in BUILD-812; that repo is no longer maintained. Do not cite it as ground truth.
+- **OpenAPI spec (this repo):** `openapi-spec/swap/v2/jupiterz.yaml`.
+
+## Standalone integrator API
+
+- [2026-08-14] **Live endpoints were unreachable at documentation time.** Every path under `api.jup.ag/swap/v2/jupiterz/*` (including `/bogus`) returned an empty-body `500` keyed and keyless, while unknown prefixes 404 — the gateway prefix is registered but the upstream was not serving. All schemas in `jupiterz.yaml` are source-verified (rfq repo @ origin/main), not live-verified. Re-verify against live (esp. auth behaviour: docs claim missing key → 401) once the service is up, before or shortly after the docs ship.
+- [2026-08-14] The route is **`/global-order` (singular)** — `rfq-api/src/server.rs` `.route("/global-order", ...)`. The BUILD-812 issue title says "global-orders"; that plural does not exist.
+- [2026-08-14] **Global-order candidate mint cap is 3 in prod**, not the "up to 5" in the retired rfq-docs. `max_output_mints` defaults to 4 in code, and `.charts/rfq-api/values.yaml` sets `MAX_OUTPUT_MINTS=3` (PR #612 "limit token out list to 3 addresses"). Env-driven, so docs say "currently 3" and note the 400 error message reports the allowed range. `/global-order` is ExactIn only (`"global quotes support ExactIn only"`), duplicates in the list are deduped, winning leg = highest USD value, unpriced legs are dropped rather than ranked zero, and the fee is NOT netted out of the ranking.
+- [2026-08-14] `/execute` body is `{requestId, quoteId, transaction}` (webhook-api `SwapRequest`). Response `{quoteId, state, signature}`. A failed/rejected fill returns **200 OK** with `state: rejected` (see `RFQError::SwapFailed` → 200 + SwapResponse), so integrators must check `state`, not HTTP status. Re-POSTing `/execute` with the same `requestId` re-checks a pending swap rather than re-executing.
+- [2026-08-14] Public `EventState` values surfaced on `/execute`: `confirmed`, `accepted`, `rejected`, `invalid`, `failed`. The enum also has internal states (`pending`, `delayed`, `dropped`, `legacy`) that integrators should not see on this path.
+- [2026-08-14] Error body is `{error, errorCode}` (camelCase); `errorCode` null unless mapped. Codes: `NO_QUOTE_FOUND` (404), `QUOTE_EXPIRED` (400 on execute), simulation codes `0x1` (insufficient funds), `0xbc4` (missing ATA), `0x11` (frozen account), `INSTRUCTION_ERROR`, `TRANSACTION_ERROR`, `SIMULATION_FAILED` (`rfq-rpc/src/simulation.rs`).
+- [2026-08-14] **Undocumented public routes** in `rfq-api` (kept out of the docs deliberately): `GET /v1/event-status/{request_uuid}` (returns `{requestId, state, log?}`, sits OUTSIDE the auth middleware) and `GET /v1/health`. Gateway exposure unverified. Candidate for documenting as a status-polling endpoint if the team confirms it is meant to be public.
+- [2026-08-14] Internal-only query params on `/order`/`/global-order`, not documented: `qos`, `webhookId` (both marked "RFQ specific parameter, ignore in prod"), `attributes`.
+- [2026-08-14] Quote TTL is 55s in prod (`QUOTE_TTL_SECONDS=55`); `/execute` rejects a swap unless at least `SWAP_BUFFER_SECONDS=25` remain before `expireAt` (deadline check in `aggregator/core/swap.rs`), reserving that buffer for the MM to verify/sign/land. So the user's effective window is ~30s. Both the old docs-page split ("35s webhook + 20s user") and the rfq-docs FAQ split ("20s MM + 35s user") were stale; the docs now describe TTL + buffer.
+
+## MM integration (V1 webhook + V2 streaming)
+
+- [2026-08-14] V1 (webhook) and V2 (gRPC streaming, technical name "RFQ v2") run **concurrently**; V2 does not replace V1. Docs: `swap/routing/rfq-integration.mdx` (V1) + `swap/routing/rfq-streaming.mdx` (V2), streamlined on the BUILD-774 rule (docs own process/architecture/operations; code mechanics live in the public toolkit/SDK repos).
+- [2026-08-14] MM onboarding contact is the support form (`support.jup.ag/requests/new`) + Discord #developer-support for pre-integration questions (YY, BUILD-812). The retired rfq-docs pointed MMs at a personal Telegram (dexterdev8); do not reintroduce it.
+- [2026-08-14] V2 on-chain program is `rfq_v2` (`fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5`, single `fill_exact_in` instruction) — distinct from the V1 Order Engine (`61DFfeTKM7trxYcPQCM78bJ794ddZprZpAwAnLiwTpYH`). V2 footguns worth keeping in docs: swap stream must be open before quoting; `quote_expiry_time` is SECONDS ≥ 10 (not micros, proto comment misleading); tampering with the swap transaction forces the maker offline immediately, bypassing the circuit breaker; fill-rate breaker is disabled by default but the ~10s last-look deadline is always enforced.
+- [2026-08-14] Not ported from rfq-docs (deliberate, YY-approved): the Stats section — `stats/overview.md` was a "being rewritten" placeholder and `rfq_stats.md` documented a localhost:8080 RFQ indexer API orphaned from every sidebar. If a public JupiterZ stats API ships, it needs fresh docs.
+
+## Open Questions
+
+- [2026-08-14] When does the standalone API go live on the gateway? Docs merged ahead of a working upstream (see the 500s above). Coordinate publishing/announcement with the RFQ team.
+- [2026-08-14] Should `GET /v1/event-status/{request_uuid}` be public documentation? It is unauthenticated in source and useful for status polling, but the rfq-docs integrator pages omitted it.
+
+---
+
 # Routing — Frontend Flow Signaling (propAMM)
 
 ## Architecture

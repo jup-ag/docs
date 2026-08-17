@@ -1,13 +1,13 @@
 ---
 title: "Webhook Integration (V1)"
 description: "Provide RFQ liquidity to JupiterZ by hosting a quote-and-swap webhook."
-llmsDescription: "How to integrate a market maker into Jupiter's JupiterZ RFQ (Request for Quote) system using the V1 webhook model. Market makers host a webhook with quote, swap, tokens, and optional permissioned-tokens endpoints; Jupiter calls the webhook to request quotes (250ms timeout) and forward taker-signed transactions for the market maker to co-sign and land (95% fulfillment requirement). Covers the integration process and onboarding, webhook endpoint requirements and response codes, quote expiry (55-second TTL with a 25-second fill buffer), fees, the non-standard 3-byte payload, token advertising including permissioned tokens for just-in-time minted RWAs, Request ID vs Quote ID, the fill circuit breaker, Squads V5 multisig takers, testing, and the Order Engine program. Code mechanics live in the jup-ag/rfq-webhook-toolkit repository. For the gRPC streaming model, see Streaming Integration (V2)."
+llmsDescription: "How to integrate a market maker into Jupiter's JupiterZ RFQ (Request for Quote) system using the V1 webhook model. Market makers host a webhook with quote, swap, tokens, and optional permissioned-tokens endpoints; Jupiter calls the webhook to request quotes (250ms timeout) and forward taker-signed transactions for the market maker to co-sign and land (95% fulfillment requirement). Covers the integration process and onboarding (V1 works directly in the JupiterZ program and APIs, unlike V2 streaming whose liquidity is consumed by Metis), webhook endpoint requirements and response codes, quote expiry (55-second TTL with a 25-second fill buffer), fees, the non-standard 3-byte payload, token advertising including permissioned tokens for just-in-time minted RWAs, Request ID vs Quote ID, the fill circuit breaker, Squads V5 multisig takers, testing, and the Order Engine program. Code mechanics live in the jup-ag/rfq-webhook-toolkit repository. For the gRPC streaming model, see Streaming Integration (V2)."
 ---
 
 This guide covers how to provide liquidity to JupiterZ, Jupiter's RFQ (Request For Quote) system, using the V1 webhook model. You host a webhook implementing the RFQ API schema, Jupiter sends it quote requests and taker-signed transactions, and your system co-signs and lands the fills.
 
 <Note>
-V1 (webhook) and [V2 (gRPC streaming)](/swap/routing/rfq-streaming) run concurrently. V2 does not replace V1: you can integrate with either or both. Choose V1 for a request-response integration, V2 for persistent streams with an in-memory orderbook.
+V1 (webhook) and [V2 (gRPC streaming)](/swap/routing/rfq-streaming) run concurrently. V2 does not replace V1: you can integrate with either or both. They sit in different parts of Jupiter's stack: V1 works directly in the JupiterZ program and APIs (your quotes are served on the JupiterZ paths and fills settle through the [Order Engine program](#order-engine)), while V2 streams orderbooks that Metis consumes, with fills executing through the Jupiter v6 swap aggregator program.
 </Note>
 
 <Frame>

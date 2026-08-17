@@ -1,13 +1,13 @@
 ---
 title: "Streaming Integration (V2)"
 description: "Provide RFQ liquidity to JupiterZ over persistent gRPC streams."
-llmsDescription: "How to integrate a market maker into Jupiter's JupiterZ RFQ system using the V2 gRPC streaming model. Market makers hold two persistent streams open: StreamQuotes to push multi-level orderbook snapshots into Jupiter's in-memory cache, and StreamSwap to receive taker-signed transactions for last-look validation and co-signing at signature index 1 within a 10-second deadline. Covers the streaming architecture and V1 comparison, integration requirements (API key, maker ID, gRPC endpoint from Jupiter, Rust or Python SDK from jup-ag/rfq-v2-sdk), protocol rules (swap stream must be open before quoting, strictly increasing sequence numbers, quote_expiry_time in seconds minimum 10, ack draining, top-5 levels, snapshot-replace semantics), price and volume encoding with lot_size_base, last-look safety including the fill exclusivity check and the rfq_v2 on-chain program, maker lifecycle states (prod, offline, suspended) and the fill-rate circuit breaker, and testing. Runs concurrently with the V1 webhook model."
+llmsDescription: "How to integrate a market maker into Jupiter's JupiterZ RFQ system using the V2 gRPC streaming model. Market makers hold two persistent streams open: StreamQuotes to push multi-level orderbook snapshots into Jupiter's in-memory cache, and StreamSwap to receive taker-signed transactions for last-look validation and co-signing at signature index 1 within a 10-second deadline. Covers the streaming architecture and V1 comparison (V1 works directly in the JupiterZ program and APIs; V2 liquidity is consumed by Metis and fills execute through the Jupiter v6 swap aggregator program into the rfq_v2 fill program), integration requirements (API key, maker ID, gRPC endpoint from Jupiter, Rust or Python SDK from jup-ag/rfq-v2-sdk), protocol rules (swap stream must be open before quoting, strictly increasing sequence numbers, quote_expiry_time in seconds minimum 10, ack draining, top-5 levels, snapshot-replace semantics), price and volume encoding with lot_size_base, last-look safety including the fill exclusivity check and the rfq_v2 on-chain program, maker lifecycle states (prod, offline, suspended) and the fill-rate circuit breaker, and testing. Runs concurrently with the V1 webhook model."
 ---
 
 This guide covers how to provide liquidity to JupiterZ using the V2 streaming model (technical name: RFQ v2). Instead of answering webhook requests per quote, you hold two persistent gRPC streams open: one pushing your orderbooks into Jupiter's in-memory cache, one receiving swaps for you to validate and co-sign.
 
 <Note>
-V2 runs concurrently with the [V1 webhook model](/swap/routing/rfq-integration); it does not replace it. You can integrate with either or both. Both settle through on-chain order-engine programs.
+V2 runs concurrently with the [V1 webhook model](/swap/routing/rfq-integration); it does not replace it. You can integrate with either or both. The two models sit in different parts of Jupiter's stack: V1 works directly in the JupiterZ program and APIs, while V2 liquidity is consumed by Metis and fills execute through the Jupiter v6 swap aggregator program.
 </Note>
 
 ## How it differs from V1
@@ -19,6 +19,8 @@ V2 runs concurrently with the [V1 webhook model](/swap/routing/rfq-integration);
 | Quote freshness | Per-request | Each snapshot carries an expiry, stale prices auto-drop |
 | Swap flow | `POST /swap` to your webhook | `SwapUpdate` pushed over the swap stream |
 | Last look | Verify before signing | Verify before signing, same idea |
+| Quoted by | The JupiterZ RFQ system directly (the `jupiterz` router and the [JupiterZ API](/swap/jupiterz)) | Metis, Jupiter's onchain routing engine, quoting from your cached orderbooks |
+| Settlement | Directly through the JupiterZ [Order Engine program](/swap/routing/rfq-integration#order-engine) in a dedicated RFQ transaction | Through the Jupiter v6 swap aggregator program (`JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4`) as part of a Metis route, which invokes the `rfq_v2` fill program |
 
 The two streams:
 
@@ -79,7 +81,7 @@ Never modify the transaction. The server compares the message bytes you return a
 
 The deadline to return `SWAP_SUBMIT` is 10 seconds by default and is always enforced. Missing it expires the swap; there is no fallback to the next quote in V2.
 
-On-chain, fills settle through the `rfq_v2` program ([`fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5`](https://solscan.io/account/fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5)) with the single instruction `fill_exact_in`. The program reads the instructions sysvar and rejects the fill with `MakerAppearsInOtherInstruction` (error `6005`) if your keys appear in any other instruction, defeating wrap-and-drain attacks even if your off-chain check misses one.
+On-chain, fills settle through the `rfq_v2` program ([`fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5`](https://solscan.io/account/fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5)) with the single instruction `fill_exact_in`, invoked by the Jupiter v6 swap aggregator program as part of a Metis route. The program reads the instructions sysvar and rejects the fill with `MakerAppearsInOtherInstruction` (error `6005`) if your keys appear in any other instruction, defeating wrap-and-drain attacks even if your off-chain check misses one.
 
 ## Maker lifecycle
 

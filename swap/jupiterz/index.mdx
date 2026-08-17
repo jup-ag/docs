@@ -1,7 +1,7 @@
 ---
 title: "Order & Execute"
 description: "Source RFQ liquidity from Jupiter's market makers directly"
-llmsDescription: "How to use the standalone JupiterZ API at api.jup.ag/swap/v2/jupiterz to source RFQ (Request for Quote) liquidity directly from Jupiter's market makers. GET /order returns the best firm quote and a base64-encoded unsigned versioned transaction, the taker partially signs it, and POST /execute hands it to the market maker who co-signs and submits it on-chain. GET /global-order quotes one input mint against multiple candidate output mints (ExactIn only) and returns the leg worth the most in USD. Covers authentication with x-api-key, the full quote-sign-execute lifecycle with @solana/kit and @solana/web3.js code examples, indicative quotes without a taker, quote expiry, execute states (confirmed, accepted, rejected, invalid, failed) with safe re-polling, and the error format with errorCode values like NO_QUOTE_FOUND and QUOTE_EXPIRED. For wallets, aggregators, trading UIs and bots consuming JupiterZ quotes."
+llmsDescription: "How to use the standalone JupiterZ API at api.jup.ag/swap/v2/jupiterz to source RFQ (Request for Quote) liquidity directly from Jupiter's market makers. GET /order returns the best firm quote and a base64-encoded unsigned versioned transaction, the taker partially signs it, and POST /execute hands it to the market maker who co-signs and submits it on-chain. GET /global-order quotes one input mint against multiple candidate output mints (ExactIn only) and returns the leg worth the most in USD. Covers authentication with x-api-key (access is whitelisted, requested via the Jupiter enterprise form), the full quote-sign-execute lifecycle with @solana/kit and @solana/web3.js code examples, indicative quotes without a taker, quote expiry, execute states (confirmed, accepted, rejected, invalid, failed) with safe re-polling, and the error format with errorCode values like NO_QUOTE_FOUND and QUOTE_EXPIRED. For wallets, aggregators, trading UIs and bots consuming JupiterZ quotes."
 ---
 
 The JupiterZ API lets you source RFQ liquidity directly: request a firm quote from Jupiter's market makers, have the user sign the returned transaction, and send it back for execution. The market maker co-signs and submits the transaction on-chain, so you never build or land the transaction yourself.
@@ -15,6 +15,10 @@ https://api.jup.ag/swap/v2/jupiterz
 ```
 
 Every request must carry an API key from the [Developer Platform](https://developers.jup.ag/portal) in the `x-api-key` header. Requests without it return `401 Unauthorized`.
+
+<Note>
+Access to the JupiterZ API is whitelisted: your API key must be enabled for it before the endpoints respond. To request access, reach out via the [enterprise form](https://airtable.com/apppC9l7PaT9XG8jN/pagjXGV6PFNwUd9P2/form).
+</Note>
 
 | Endpoint | Method | Purpose |
 | :--- | :--- | :--- |

@@ -7,6 +7,9 @@ info:
     Jupiter's market makers (`/order`, `/global-order`), have the taker sign the transaction,
     and submit it for the market maker to co-sign and execute (`/execute`).
 
+    Access is whitelisted: your API key must be enabled for the JupiterZ API.
+    Request access via the enterprise form at https://airtable.com/apppC9l7PaT9XG8jN/pagjXGV6PFNwUd9P2/form
+
 servers:
   - url: https://api.jup.ag/swap/v2/jupiterz
     description: JupiterZ API Endpoint

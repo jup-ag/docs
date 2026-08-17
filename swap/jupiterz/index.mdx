@@ -1,5 +1,5 @@
 ---
-title: "JupiterZ API"
+title: "Order & Execute"
 description: "Source RFQ liquidity from Jupiter's market makers directly"
 llmsDescription: "How to use the standalone JupiterZ API at api.jup.ag/swap/v2/jupiterz to source RFQ (Request for Quote) liquidity directly from Jupiter's market makers. GET /order returns the best firm quote and a base64-encoded unsigned versioned transaction, the taker partially signs it, and POST /execute hands it to the market maker who co-signs and submits it on-chain. GET /global-order quotes one input mint against multiple candidate output mints (ExactIn only) and returns the leg worth the most in USD. Covers authentication with x-api-key, the full quote-sign-execute lifecycle with @solana/kit and @solana/web3.js code examples, indicative quotes without a taker, quote expiry, execute states (confirmed, accepted, rejected, invalid, failed) with safe re-polling, and the error format with errorCode values like NO_QUOTE_FOUND and QUOTE_EXPIRED. For wallets, aggregators, trading UIs and bots consuming JupiterZ quotes."
 ---

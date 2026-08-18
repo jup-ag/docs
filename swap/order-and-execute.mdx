@@ -344,7 +344,7 @@ These are guidelines, not guarantees of execution. Prices can move against you e
 Jupiter handles:
 
 - Optimised slippage via [RTSE](/swap/advanced/slippage) (Real-Time Slippage Estimator), applied at order time to balance trade success and price protection
-- Optimised priority fee strategy for current network conditions
+- Optimised priority fee strategy for current network conditions. To bound the priority fee yourself, set `priorityFeeLamports` on `/order` to a fixed value. This overrides Jupiter's estimate and counts as a custom parameter (see [Order mode](#order-mode))
 - Jupiter Beam (our own proprietary transaction execution pipeline) for accelerated transaction sending and landing across multiple RPC providers
 - Confirmation polling
 - Parses both successful and failed transactions

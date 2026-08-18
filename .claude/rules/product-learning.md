@@ -119,6 +119,8 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 
 ## Known Issues
 
+- [2026-08-18] CUP estimation on the V2 endpoints can spike when recent blocks contain transactions bidding extreme compute unit prices (integrator report via SPOT-189: 82 billion micro-lamports baked into a returned transaction). SPOT-189 tracks the eng fix (outlier-block exclusion + hard cap), unshipped as of this entry. Docs carry interim capping guidance: `swap/advanced/compute-units.mdx` (#cap-the-compute-unit-price, decode/clamp snippet), `swap/quote-and-swap.mdx` (CUL note area), `swap/order-and-execute.mdx` (`priorityFeeLamports` as the `/order` bound). When the fix ships, document the new behaviour (spec + prose) and revisit the guidance. `setComputeUnitPrice` data layout verified against @solana/web3.js: base64, 1-byte discriminator `3`, u64 LE micro-lamports.
+
 ## Open Questions
 
 ## Content Gaps

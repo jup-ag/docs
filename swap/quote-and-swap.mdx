@@ -134,6 +134,8 @@ The `addressesByLookupTableAddress` mapping contains every ALT needed to compile
 Per-route CU sizing is possible at ~30–100ms additional routing latency. Contact the swap team if you need it.
 </Note>
 
+The estimated compute unit price tracks recent network priority fees and can spike when recent blocks contain transactions bidding extreme values. Because the CU limit is pinned at 1,400,000, an inflated compute unit price multiplies into `prioritizationFeeLamports` directly. Compare the `computeUnitPrice` response field against your own maximum before signing a `/swap` transaction. On `/swap-instructions`, decode and clamp the `SetComputeUnitPrice(...)` instruction in `computeBudgetInstructions`; see [Cap the compute unit price](/swap/advanced/compute-units#cap-the-compute-unit-price) for the pattern.
+
 ### Errors
 
 Both endpoints return JSON of the form `{ "error": "<message>" }`. Status codes:

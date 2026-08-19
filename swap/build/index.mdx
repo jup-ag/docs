@@ -594,6 +594,8 @@ Why: integrators using `/build` typically add their own instructions, so the CU 
 
 Both code examples above demonstrate this: simulate with max CU limit, then rebuild with 1.2x the simulated value plus the CU price from the response. See [Solana fee structure](https://solana.com/docs/core/fees/fee-structure) for more on compute units and [Estimate Compute Units](/swap/advanced/compute-units) for a standalone guide.
 
+Validate the compute unit price from the response before signing. The estimate tracks recent network priority fees and can spike when recent blocks contain transactions bidding extreme values. See [Cap the compute unit price](/swap/advanced/compute-units#cap-the-compute-unit-price) for a decode-and-clamp snippet.
+
 ### 4. Build a v0 transaction
 
 The response includes address lookup tables in `addressesByLookupTableAddress`. Use these to compile a v0 (versioned) transaction, which supports more accounts than legacy transactions.

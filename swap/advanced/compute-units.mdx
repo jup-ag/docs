@@ -33,6 +33,34 @@ When `mode=fast` is set and no `computeUnitPricePercentile` is provided, the def
 
 You can also override entirely by replacing the `computeBudgetInstructions` from the response with your own `setComputeUnitPrice` instruction.
 
+## Cap the compute unit price
+
+<Warning>
+The estimated compute unit price tracks recent network priority fees. When recent blocks contain transactions bidding extreme values, the estimate can spike far above what is needed to land. Validate the compute unit price before signing.
+</Warning>
+
+Decode the compute unit price from the `setComputeUnitPrice` instruction in `computeBudgetInstructions` and clamp it to your own maximum. The instruction data is base64: a 1-byte discriminator (`3` for `setComputeUnitPrice`) followed by the price as a little-endian u64 in micro-lamports.
+
+```typescript
+const COMPUTE_BUDGET_PROGRAM = 'ComputeBudget111111111111111111111111111111';
+const MAX_CUP_MICRO_LAMPORTS = 10_000_000n; // set your own maximum
+
+for (const ix of build.computeBudgetInstructions) {
+  if (ix.programId !== COMPUTE_BUDGET_PROGRAM) continue;
+  const data = Buffer.from(ix.data, 'base64');
+  if (data[0] !== 3) continue; // 3 = setComputeUnitPrice
+  const cup = data.readBigUInt64LE(1);
+  if (cup > MAX_CUP_MICRO_LAMPORTS) {
+    data.writeBigUInt64LE(MAX_CUP_MICRO_LAMPORTS, 1);
+    ix.data = data.toString('base64');
+  }
+}
+```
+
+Run this on the raw `/build` response before converting the instructions for your SDK, so the same check works with both @solana/kit and @solana/web3.js. With the clamp in place, your worst-case priority fee is bounded: `CUP cap × CU limit`. A lower cap can slow landing during congestion, so pick a maximum that matches the fees you are willing to pay.
+
+If you already maintain your own priority fee estimate, you can skip the decode: drop the returned `computeBudgetInstructions` and set your own `setComputeUnitPrice` with the lower of your estimate and your cap. A low `computeUnitPricePercentile` is not a substitute for a cap, because a percentile of an inflated fee distribution can still be extreme.
+
 ## Estimate compute unit limit
 
 1. Build the transaction with all your instructions + **max CU limit** (1,400,000)

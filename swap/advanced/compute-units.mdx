@@ -59,6 +59,8 @@ for (const ix of build.computeBudgetInstructions) {
 
 Run this on the raw `/build` response before converting the instructions for your SDK, so the same check works with both @solana/kit and @solana/web3.js. With the clamp in place, your worst-case priority fee is bounded: `CUP cap × CU limit`. A lower cap can slow landing during congestion, so pick a maximum that matches the fees you are willing to pay.
 
+If you already maintain your own priority fee estimate, you can skip the decode: drop the returned `computeBudgetInstructions` and set your own `setComputeUnitPrice` with the lower of your estimate and your cap. A low `computeUnitPricePercentile` is not a substitute for a cap, because a percentile of an inflated fee distribution can still be extreme.
+
 ## Estimate compute unit limit
 
 1. Build the transaction with all your instructions + **max CU limit** (1,400,000)

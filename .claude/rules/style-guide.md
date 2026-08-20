@@ -41,11 +41,11 @@ Technical but approachable. Professional and precise, not cold or overly formal.
 |-----------------------------|-------------------------------------------------------------------|
 | Juno                        | Jupiter's liquidity engine (multi-source aggregation, self-learning) |
 | Metis                       | Jupiter's onchain routing engine for DEX integrations. API router value: `metis`. Do not use "Iris" (legacy name). |
-| JupiterZ                    | RFQ-based routing engine for market maker integrations            |
+| JupiterZ                    | RFQ system: routing engine in the Meta-Aggregator, standalone API at `api.jup.ag/swap/v2/jupiterz`, and MM integrations (webhook V1, streaming V2) |
 | Jupiter Beam                | Transaction landing infrastructure (sub-second)                   |
 | RTSE                        | Real-Time Slippage Estimator — always define on first use per page |
 | Dynamic Rate Limits         | Rate limits that scale with swap volume — not "auto-scaling limits"|
-| Lite API / Dynamic API      | Two access tiers: `lite-api.jup.ag` vs `api.jup.ag`              |
+| Lite API / Dynamic API      | Do NOT use `lite-api.jup.ag` anywhere (YY, 2026-08-14). All URLs use `api.jup.ag` |
 
 ### Words to Avoid
 
@@ -106,7 +106,7 @@ METHOD https://full-url.jup.ag/path
 ```
 
 Not just `/path`. Developers copy-paste from docs — give them the full URL.
-Use the Lite URL as default, note the Dynamic URL variant where relevant.
+Always use `api.jup.ag` (or the product host, e.g. `tx.jup.ag`). Never use `lite-api.jup.ag` (YY directive, 2026-08-14).
 
 ### Parameters and Responses
 
@@ -211,3 +211,6 @@ Format: `- [YYYY-MM-DD] Decision: rationale`
 - [2026-07-02] Diagrams use Mermaid (```mermaid code blocks, rendered natively by Mintlify), not ASCII art. First used on `lend/dex/index.mdx` (YY request). Port ASCII diagrams from upstream sources to Mermaid.
 - [2026-07-02] Lend AMM naming: the product is the **Lend AMM** ("Jupiter Lend AMM" only where the Jupiter context isn't already established). Nav group "Lend AMM"; page titles "AMM Overview", "AMM SDK", "AMM APIs", "AMM CPI Integration", "AMM Errors". In prose, the on-chain program is the "AMM program" and program-address tables say "Lend AMM" / "Jupiter Lend (AMM)". Never say "DEX program" or explain AMM-vs-DEX naming (YY: too confusing). "dex"/"Dex" survives ONLY in literal code identifiers: `Dex` account, `DexMetadata`, `dex_id`, `DexOperation`, `Dex*` error names, `["dex", ...]` seeds, the `@jup-ag/lend/dex` subpath, and file paths (`lend/dex/`). IDL link: https://solscan.io/account/jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd#programIdl
 - [2026-07-09] Transaction submission is documented against the `tx.jup.ag` Solana JSON-RPC endpoint (`sendTransaction`), not the REST `POST api.jup.ag/tx/v1/submit` (which still works, treated as legacy). Code examples point a Solana client (`Connection` for web3.js, `createSolanaRpcFromTransport` for kit) at `https://tx.jup.ag` with the API key in the `x-api-key` header, and note it is send-only (keep your own RPC for blockhash and confirmation). Supersedes the [2026-04-07] REST-URL guidance below.
+- [2026-08-14] Never use `lite-api.jup.ag` anywhere (YY: "this is WRONG. no longer use this anywhere"). All endpoint URLs, code examples, and OpenAPI servers use `api.jup.ag`. Supersedes the old "Lite URL as default" rule. Existing lite-api mentions on untouched pages are cleanup candidates, not precedent.
+- [2026-08-14] JupiterZ naming (BUILD-812): the Swap-menu group for the standalone integrator API is "JupiterZ (RFQ)"; the docs page title is "Order & Execute" (mirrors the Meta-Aggregator page naming; YY chose it over "Overview"/"JupiterZ API" 2026-08-17). In prose, call the product the "JupiterZ API". The sibling Router nav group was renamed "Metis (Onchain Router)" for parallel engine-first labels (YY; "AMM Router" rejected, collides with AMM-integrator and Lend AMM naming). Nav labels only: prose keeps "Router" for the integration path per the existing rule. MM integration pages are "Webhook Integration (V1)" and "Streaming Integration (V2)" under the nested nav group "Integrate MM into JupiterZ (RFQ)". V1/V2 here are CONCURRENT variants (both live, integrate with either or both), not the unmaintained-version pattern; never mark V1 unmaintained while it runs.
+- [2026-08-14] Integrator-facing Metis routing pages say "AMM", not "DEX" (YY, BUILD-812): page title "Integrate AMM into Metis", nested nav group "Integrate AMM into Metis". "DEX" survives in file paths (swap/routing/dex-integration) and code identifiers only.

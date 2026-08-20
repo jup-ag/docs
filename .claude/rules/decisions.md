@@ -24,6 +24,18 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-08-14] JupiterZ docs consolidated under Swap; rfq-docs site retired
+**Status:** implemented
+**Scope:** navigation | new-section
+**Files affected:** `swap/jupiterz/index.mdx`, `openapi-spec/swap/v2/jupiterz.yaml`, `api-reference/swap/jupiterz/{order,global-order,execute}.mdx`, `swap/routing/rfq-integration.mdx`, `swap/routing/rfq-streaming.mdx`, `swap/routing/dex-integration.mdx`, `docs.json`
+**Linear issue:** BUILD-812
+
+**Context:** JupiterZ/RFQ docs lived in a separate Docusaurus site (`jup-ag/rfq-docs`, jupiterz.jup.ag). The site is no longer maintained; this repo is now the only home. Its PR #12 added integrator docs for the new standalone JupiterZ API (`api.jup.ag/swap/v2/jupiterz`).
+**Decision:** Everything nests under the Swap menu (YY). New group **"JupiterZ (RFQ)"** directly under Router: `swap/jupiterz/index` + 3 API reference pages backed by `openapi-spec/swap/v2/jupiterz.yaml`. Routing Integration regrouped into two nested sub-groups: **"Integrate AMM into Metis"** (`dex-integration` retitled DEX → AMM, `market-listing`) and **"Integrate MM into JupiterZ (RFQ)"** (`rfq-integration` reworked in place as "Webhook Integration (V1)", new `rfq-streaming` as "Streaming Integration (V2)"). MM docs are streamlined on the BUILD-774 rule: docs own process/architecture/operations; code mechanics defer to the public `rfq-webhook-toolkit` and `rfq-v2-sdk` repos. The rfq-docs Stats section was deliberately not ported (placeholder + orphaned localhost indexer doc).
+**Rationale:** The standalone API is a swap API and MM integration is routing integration, so one product menu keeps JupiterZ discoverable next to the paths it competes with. Reworking `rfq-integration` in place preserves the URL (no redirect); nesting keeps the Routing Integration group scannable as it grows.
+**Alternatives considered:** (1) A new top-level "JupiterZ" Docs menu item — rejected by YY, stays under Swap. (2) Porting all 24 rfq-docs pages 1:1 — rejected, mechanics belong next to the code (drift failure mode from BUILD-774).
+**Migration notes:** No path changes in this repo, no redirects. New URLs only. Follow-ups outside this repo: retire/redirect jupiterz.jup.ag to these pages, and repoint `rfq-webhook-toolkit`/`rfq-v2-sdk` READMEs at developers.jup.ag.
+
 ### [2026-07-13] Split the DCA guide into Create / Track / Cancel pages
 **Status:** implemented
 **Scope:** folder-structure | navigation

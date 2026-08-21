@@ -115,7 +115,7 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 - [2026-04-09] `/build` has a `computeUnitPricePercentile` param (shipped in jup-ag/ultra-api#1375): named levels map to bps (`medium`=2500/25th, `high`=5000/50th, `veryHigh`=7500/75th) or raw integer 0-10000. Controls the `setComputeUnitPrice` instruction in `computeBudgetInstructions`. Defaults: 50th percentile normally, 90th in `mode=fast`. When provided, overrides both defaults. See https://solana.com/docs/core/fees/fee-structure for CUP/CUL context.
 - [2026-04-09] `/build` transactions cannot use `/execute` for two reasons: (1) `/build` does not return `requestId`, and (2) `/execute` validates the transaction to prevent modifications, which defeats the purpose of `/build`.
 - [2026-06-19] `/build` supports `forJitoBundle=true` to exclude DEXes incompatible with Jito bundles (same behaviour as V1's `forJitoBundle` on `/quote`). Only available on `/build`, not `/order`.
-- [2026-06-19] `/build` response `blockhashWithMetadata` includes `fetchedAt` (ISO 8601 timestamp) not previously in the OpenAPI spec. Added in DEV-564.
+- [2026-06-19] `/build` response `blockhashWithMetadata` includes `fetchedAt` not previously in the OpenAPI spec. Added in DEV-564. **Correction [2026-08-21] (BUILD-815):** `fetchedAt` is NOT an ISO 8601 string. The live `api.jup.ag/swap/v2/build` returns a Rust `SystemTime` object `{ secs_since_epoch, nanos_since_epoch }` (both integers). The value originates in Metis (Rust) and passes straight through the TS layer, which is why the `swap-api` `BlockhashData` type (`metis/client.ts`) doesn't model it and the shape is serde-default, not ISO. Spec fixed to the object shape.
 
 ## Known Issues
 

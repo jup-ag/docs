@@ -1,5 +1,6 @@
 ---
 title: "Streaming Integration (V2)"
+sidebarTitle: "Overview"
 description: "Provide RFQ liquidity to JupiterZ over persistent gRPC streams."
 llmsDescription: "How to integrate a market maker into Jupiter's JupiterZ RFQ system using the V2 gRPC streaming model. Market makers hold two persistent streams open: StreamQuotes to push multi-level orderbook snapshots into Jupiter's in-memory cache, and StreamSwap to receive taker-signed transactions for last-look validation and co-signing at signature index 1 within a 10-second deadline. Covers the streaming architecture and V1 comparison (V1 works directly in the JupiterZ program and APIs; V2 liquidity is consumed by Metis and fills execute through the Jupiter v6 swap aggregator program into the rfq_v2 fill program), integration requirements (API key, maker ID, gRPC endpoint from Jupiter, Rust or Python SDK from jup-ag/rfq-v2-sdk), protocol rules (swap stream must be open before quoting, strictly increasing sequence numbers, quote_expiry_time in seconds minimum 10, ack draining, top-5 levels, snapshot-replace semantics), price and volume encoding with lot_size_base, last-look safety including the fill exclusivity check and the rfq_v2 on-chain program, maker lifecycle states (prod, offline, suspended) and the fill-rate circuit breaker, and testing. Runs concurrently with the V1 webhook model."
 ---

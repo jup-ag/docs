@@ -1,5 +1,6 @@
 ---
 title: "Webhook Integration (V1)"
+sidebarTitle: "Overview"
 description: "Provide RFQ liquidity to JupiterZ by hosting a quote-and-swap webhook."
 llmsDescription: "Overview and onboarding for integrating a market maker into Jupiter's JupiterZ RFQ (Request for Quote) system using the V1 webhook model. You host a webhook implementing the RFQ API schema; Jupiter calls it to request quotes and forward taker-signed transactions for you to co-sign and land. This landing page covers what the V1 webhook model is, how it differs from V2 streaming (V1 works directly in the JupiterZ program and APIs; V2 liquidity is consumed by Metis), the integration process and onboarding, and links to the detail pages: Webhook API (endpoints and contract), Quoting and fills (fulfillment rules, expiry, fees), and Settlement and special cases (Order Engine, Squads takers, circuit breaker, testing). Code mechanics live in jup-ag/rfq-webhook-toolkit. For the gRPC streaming model, see Streaming Integration (V2)."
 ---

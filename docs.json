@@ -133,11 +133,21 @@
                   {
                     "group": "Integrate MM into JupiterZ (RFQ)",
                     "pages": [
-                      "swap/routing/rfq/v1/overview",
-                      "swap/routing/rfq/v1/webhook-api",
-                      "swap/routing/rfq/v1/quoting",
-                      "swap/routing/rfq/v1/settlement",
-                      "swap/routing/rfq/v2/streaming"
+                      {
+                        "group": "Webhook (V1)",
+                        "pages": [
+                          "swap/routing/rfq/v1/overview",
+                          "swap/routing/rfq/v1/webhook-api",
+                          "swap/routing/rfq/v1/quoting",
+                          "swap/routing/rfq/v1/settlement"
+                        ]
+                      },
+                      {
+                        "group": "Streaming (V2)",
+                        "pages": [
+                          "swap/routing/rfq/v2/streaming"
+                        ]
+                      }
                     ]
                   }
                 ]

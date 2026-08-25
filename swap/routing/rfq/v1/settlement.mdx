@@ -1,0 +1,64 @@
+---
+title: "Settlement and special cases"
+description: "Order Engine settlement, Squads multisig takers, the fill circuit breaker, and testing."
+llmsDescription: "Settlement and edge cases for a JupiterZ V1 market-maker webhook. Covers the on-chain Order Engine program (61DFfeTKM7trxYcPQCM78bJ794ddZprZpAwAnLiwTpYH) fills settle through, with source, IDL, and audit links; handling Squads V5 multisig takers where the RFQ API wraps fill instructions into an executeTransactionSyncV2 CPI (detect with the toolkit squads-sdk, unwrap and validate the inner fill, sign the maker slot, never write signatures[0]); the fill circuit breaker (what counts as success/failure, suspension with exponential backoff from ~5 to 30 minutes, permanent disable after repeated trips requiring manual recovery); testing with the toolkit's acceptance and integration test suites; and an FAQ. Part of the Webhook Integration (V1) guide; code mechanics live in jup-ag/rfq-webhook-toolkit."
+---
+
+This page is part of the [Webhook Integration (V1)](/swap/routing/rfq/v1/overview) guide. It covers where fills settle on-chain, the Squads multisig taker case, the fill circuit breaker, and testing.
+
+## Order Engine
+
+Fills settle through the Order Engine program on mainnet: [`61DFfeTKM7trxYcPQCM78bJ794ddZprZpAwAnLiwTpYH`](https://solscan.io/account/61DFfeTKM7trxYcPQCM78bJ794ddZprZpAwAnLiwTpYH).
+
+- **Source code**: [programs/order-engine](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/programs/order-engine)
+- **IDL**: [idls directory](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/idls)
+- **Audit**: [Offside Labs audit report](https://github.com/jup-ag/rfq-webhook-toolkit/blob/main/audits/Jupiter-RFQ-Nov-2024-OffsideLabs.pdf)
+
+## Squads multisig takers
+
+When the taker is a [Squads V5](https://squads.so/) multisig, the RFQ API wraps the fill instructions into a single `executeTransactionSyncV2` CPI before delivering the transaction to `POST /swap`. Your webhook needs extra handling for this case:
+
+1. Detect the wrap with the toolkit's `squads-sdk` (`is_squads_transaction`, no RPC required).
+2. Resolve Address Lookup Tables and unwrap the transaction to recover the inner fill instructions.
+3. Validate the inner fill against the quote by comparing pubkeys. The recovered `is_signer` and `is_writable` flags are not faithful, so do not trust them.
+4. Sign the **maker slot**: look up your maker key's position in the outer signers by pubkey.
+
+<Warning>
+Do not write to `signatures[0]`. For Squads-wrapped transactions, slot 0 is a member's signature and overwriting it breaks the message. The sample server assumes the non-wrapped flow and must be adjusted here.
+</Warning>
+
+The full flow, code examples, and error mapping live in the [squads-sdk](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/squads-sdk) crate of the toolkit.
+
+## Fill circuit breaker
+
+Jupiter runs a per-webhook circuit breaker over your fill outcomes to protect the system from unreliable fills:
+
+- **What counts**: confirmed swaps record success; rejected, dropped, and failed swaps record failure. Rejections caused by a slow user (more than 20 seconds of user delay) are not counted against you. Successes decay your accumulated failure count.
+- **Suspension**: accumulating failures past a threshold trips the breaker and suspends the webhook, with an exponentially increasing timeout (from around 5 minutes up to 30 minutes) between recovery attempts. A successful fill after the timeout restores normal operation.
+- **Disable**: repeated trips permanently disable the webhook. Recovery from disabled state is manual: contact Jupiter through the support channels on the [overview page](/swap/routing/rfq/v1/overview).
+
+## Testing
+
+The toolkit ships two test suites: acceptance tests that simulate Jupiter calling your webhook (run locally, no registration needed), and integration tests that run against Edge and perform real swaps on mainnet. See the [tests directory](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/tests) for commands and the [troubleshooting guide](https://github.com/jup-ag/rfq-webhook-toolkit/blob/main/tests/README.md#troubleshooting) for common failures.
+
+The most common issue: your webhook quotes, but the RFQ system returns 404. The quote failed simulation, usually because of insufficient maker inventory, insufficient SOL for fees, or a missing ATA for an advertised token.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Does RFQ support native SOL?">
+    Yes, native SOL is fully supported in the order-engine program for both the taker (user) and the maker. However, makers should use wSOL (Wrapped SOL) in their systems; the program handles wrapping and unwrapping for users.
+  </Accordion>
+
+  <Accordion title="Do faster quotes receive priority?">
+    No. The RFQ system dispatches the quote request to all registered webhooks simultaneously, and all quotes received within the timeout are compared on value. Speed is only a tiebreaker between identical values.
+  </Accordion>
+
+  <Accordion title="Shall a webhook verify swap requests?">
+    Yes. The RFQ system verifies swap requests before forwarding them, but webhooks should verify as well. The checks the RFQ system performs are in the <a href="https://github.com/jup-ag/rfq-webhook-toolkit/blob/de46a38c3cfbda730c026a9b4bea85591c83f9e5/order-engine-sdk/src/fill.rs#L151" target="_blank" rel="noopener noreferrer">validate_similar_fill_sanitized_message</a> function of the order-engine-sdk.
+  </Accordion>
+
+  <Accordion title="Is there a penalty for not providing a quote (status code 404)?">
+    No. It is up to the webhook to respond with a quote (200) or decline (404), for example when the amount is outside your quoting range or you only quote one direction of a pair.
+  </Accordion>
+</AccordionGroup>

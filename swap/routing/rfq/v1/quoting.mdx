@@ -1,0 +1,41 @@
+---
+title: "Quoting and fills"
+description: "Fulfillment requirements, quote expiry, and fees for a JupiterZ V1 webhook."
+llmsDescription: "The quoting and fill rules for a JupiterZ V1 market-maker webhook. Covers fulfillment requirements (fill 95% of won quotes within a 1-hour window, respond within 250ms, high uptime), quote expiry (55-second TTL with a 25-second safety buffer reserved for the maker to verify/sign/land, frontend re-quotes every 3 seconds), fees (dynamic in Ultra mode, flat in manual mode, applied by the RFQ system during transaction building, do not account for fees when quoting, stable-to-stable exempt), and the non-standard 3-byte payload appended to the instruction data (fee bps as u16 plus an exact-in/exact-out bit mask). Part of the Webhook Integration (V1) guide."
+---
+
+This page is part of the [Webhook Integration (V1)](/swap/routing/rfq/v1/overview) guide. It covers what you must meet to keep receiving quote requests, how quotes expire, and how fees work.
+
+## Fulfillment requirements
+
+- **Fulfillment**: fill **95%** of the quotes you win within a 1-hour window. Falling below results in suspension.
+- **Response time**: respond to quote requests within **250 ms**. Slower responses are excluded from the round.
+- **Uptime**: high availability is expected. Persistent 5xx errors suspend the webhook.
+
+<Warning>
+A suspended webhook must be manually re-enabled. Reach out through the support channels on the [overview page](/swap/routing/rfq/v1/overview) if this happens.
+</Warning>
+
+## Quote expiry
+
+Quotes and transactions have a fixed expiry, so you never specify custom expiry times:
+
+- A quote is valid for **55 seconds** from creation.
+- The swap is only forwarded to your webhook while a safety buffer (currently **25 seconds**) remains before expiry, so you always have at least that long to verify, sign, and land the transaction. The time before that is the user's window to accept the quote.
+- The Jupiter frontend re-quotes every 3 seconds.
+
+These thresholds are server-configured and may be adjusted based on performance and feedback.
+
+## Fees
+
+JupiterZ lets you provide liquidity without being subject to on-chain gas volatility, and RFQ fills are around 10x less compute-intensive than AMM swaps. In Ultra mode, JupiterZ charges a dynamic fee selected based on factors like tokens and size; in manual mode the fee is flat.
+
+Do not account for fees when quoting. The fee amount is forwarded to your webhook in the quote request parameters, is contained in the message both taker and maker sign, and is applied by the RFQ system during transaction building:
+
+- For a quote of 1 SOL to 1,000 USDC with a 100 bps fee, only 990 USDC is transferred out of your account. 10 USDC is collected as the fee.
+- The fee is not transferred automatically; it is accounted for asynchronously on a regular basis.
+- Stable-to-stable swaps are exempt from fees.
+
+### Non-standard payload
+
+Beside the order-engine instruction data, the transaction carries 3 additional bytes appended to the instruction data. They are not processed by the program and exist for off-chain consumers: the first 2 bytes are the fee amount in basis points (u16), the third byte (u8) is a bit mask whose least significant bit indicates exact-in (0) or exact-out (1).

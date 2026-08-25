@@ -126,15 +126,18 @@
                   {
                     "group": "Integrate AMM into Metis",
                     "pages": [
-                      "swap/routing/dex-integration",
-                      "swap/routing/market-listing"
+                      "swap/routing/amm/integration",
+                      "swap/routing/amm/market-listing"
                     ]
                   },
                   {
                     "group": "Integrate MM into JupiterZ (RFQ)",
                     "pages": [
-                      "swap/routing/rfq-integration",
-                      "swap/routing/rfq-streaming"
+                      "swap/routing/rfq/v1/overview",
+                      "swap/routing/rfq/v1/webhook-api",
+                      "swap/routing/rfq/v1/quoting",
+                      "swap/routing/rfq/v1/settlement",
+                      "swap/routing/rfq/v2/streaming"
                     ]
                   }
                 ]
@@ -1024,15 +1027,31 @@
     },
     {
       "source": "/routing/dex-integration",
-      "destination": "/swap/routing/dex-integration"
+      "destination": "/swap/routing/amm/integration"
     },
     {
       "source": "/routing/market-listing",
-      "destination": "/swap/routing/market-listing"
+      "destination": "/swap/routing/amm/market-listing"
     },
     {
       "source": "/routing/rfq-integration",
-      "destination": "/swap/routing/rfq-integration"
+      "destination": "/swap/routing/rfq/v1/overview"
+    },
+    {
+      "source": "/swap/routing/dex-integration",
+      "destination": "/swap/routing/amm/integration"
+    },
+    {
+      "source": "/swap/routing/market-listing",
+      "destination": "/swap/routing/amm/market-listing"
+    },
+    {
+      "source": "/swap/routing/rfq-integration",
+      "destination": "/swap/routing/rfq/v1/overview"
+    },
+    {
+      "source": "/swap/routing/rfq-streaming",
+      "destination": "/swap/routing/rfq/v2/streaming"
     },
     {
       "source": "/routing/token-listing",

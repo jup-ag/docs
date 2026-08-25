@@ -1,0 +1,61 @@
+---
+title: "Webhook API"
+description: "The RFQ webhook endpoints your market-maker service implements for JupiterZ V1."
+llmsDescription: "The webhook API contract for a JupiterZ V1 market-maker integration. Covers the four endpoints Jupiter calls on your webhook (quote, swap, tokens, and optional permissioned-tokens), the X-API-KEY header, HTTP response codes and their meaning (200/404/400/401/50x), request timeouts (250ms quote, 25s swap via the x-request-start and x-request-timeout headers), how to advertise supported tokens via GET /tokens (refreshed every 10 minutes) including permissioned tokens for just-in-time minted RWAs, and the difference between Request ID (deterministic hash of quote params, for idempotency) and Quote ID (unique per quote response, identifies which quote to execute). Part of the Webhook Integration (V1) guide; code mechanics live in jup-ag/rfq-webhook-toolkit."
+---
+
+This page is part of the [Webhook Integration (V1)](/swap/routing/rfq/v1/overview) guide. It describes the webhook endpoints your service implements and the request and response contract Jupiter uses to call them.
+
+## Webhook API
+
+You provide a base URL; Jupiter registers the endpoints below against it.
+
+| Endpoint | Method | Example URL | Description |
+| :--- | :--- | :--- | :--- |
+| Quote | POST | `https://your-api.com/jupiter/rfq/quote` | Called to request quotes |
+| Swap | POST | `https://your-api.com/jupiter/rfq/swap` | Called to execute swaps |
+| Tokens | GET | `https://your-api.com/jupiter/rfq/tokens` | Called every 10 minutes to fetch supported tokens |
+| Permissioned tokens | GET | `https://your-api.com/jupiter/rfq/permissioned-tokens` | Optional. Tokens you mint or burn just-in-time, see [permissioned tokens](#permissioned-tokens) |
+
+If your endpoints require an API key, provide it during registration. Jupiter passes it to the webhook in the `X-API-KEY` header.
+
+### Response codes
+
+Return appropriate HTTP status codes with error messages:
+
+| Status code | Description |
+| :--- | :--- |
+| `200 OK` | The request was successful and the webhook returns a quote |
+| `404 Not Found` | The webhook will not quote this request (for example, the pair or size is not supported). No penalty |
+| `400 Bad Request` | The request sent to the webhook is malformed |
+| `401 Unauthorized` | Authorization failed, for example a missing or incorrect `X-API-KEY` |
+| `50x Server Errors` | The webhook is offline or unable to respond. Persistent 5xx errors lead to temporary suspension |
+
+### Timeouts
+
+Quote requests carry two headers: `x-request-start` (millisecond timestamp when the request was sent) and `x-request-timeout` (the millisecond timeout, currently 250 ms). Swap requests have a 25-second timeout.
+
+## Advertising supported tokens
+
+To receive relevant quote requests, advertise the tokens you support: respond to `GET /tokens` with a JSON array of mint addresses. Jupiter refreshes the list every 10 minutes, so you can add and remove tokens dynamically based on inventory.
+
+Only advertise tokens you hold liquidity for and can fill at the 95% rate, and make sure every advertised token has its Associated Token Account (ATA) configured on your maker wallet, including wSOL. A missing ATA fails simulation and your quotes are silently dropped.
+
+### Permissioned tokens
+
+`GET /permissioned-tokens` is optional. It advertises tokens you cannot hold as ordinary inventory but mint or burn just-in-time alongside the fill, such as tokenised RWAs (Ondo, xStocks). Same response shape as `/tokens`; a non-200 response is treated as an empty list.
+
+Your supported set is the union of both lists, and a mint is flagged permissioned only if it appears in `/permissioned-tokens`. For permissioned pairs:
+
+- **No quote-time simulation.** Jupiter skips straight to the maximum compute unit limit (200,000 by default), so your fill must complete within that budget. A fill that would have failed simulation now fails on-chain and counts against your fill rate.
+- **No taker balance pre-check.** The taker's input balance is only enforced on-chain. If the taker cannot pay, reject the swap with `InsufficientBalance`; Jupiter re-checks the balance itself and only penalises rejections it finds dishonest.
+- The mint or burn must land atomically with the fill through your own execution infrastructure. The transaction message is fixed by the time it reaches `/swap`, so you cannot append instructions.
+
+<Warning>
+Moving a mint from `/tokens` to `/permissioned-tokens` alone is a no-op: Jupiter hashes the sorted union to detect changes, and the union is identical. Introduce the move together with another change to your token set, or ask your Jupiter contact to force a re-sync.
+</Warning>
+
+## Request ID and Quote ID
+
+- **Request ID**: a deterministic identifier Jupiter generates by hashing the quote request parameters. Identical parameters produce the same Request ID, which enables idempotency and deduplication. Use it for traceability.
+- **Quote ID**: a unique identifier for each quote response, derived from your webhook's internal UUID and the Request ID. Unique even for repeated identical requests. The Quote ID in a swap request identifies exactly which quote to execute, so track quote validity and expiry by Quote ID.

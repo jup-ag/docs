@@ -78,14 +78,6 @@ components:
         type: string
         default: v1
       description: RFQ protocol version
-    feeBps:
-      name: feeBps
-      in: query
-      required: false
-      schema:
-        type: integer
-        maximum: 10000
-      description: Market maker fee in basis points
     isWsol:
       name: isWsol
       in: query
@@ -128,7 +120,9 @@ components:
       schema:
         type: string
       description: |
-        Token account that receives your integrator fee.
+        Token account that receives your integrator fee. It must already exist
+        (be pre-initialised): the API does not create it. Create the associated
+        token account for the fee mint before requesting an order.
         Must be provided together with `integratorFee`
     integratorFee:
       name: integratorFee
@@ -300,7 +294,10 @@ components:
       properties:
         error:
           type: string
-          description: Human-readable error message. Always present
+          description: |
+            Error description. Always present. Usually human-readable
+            (for example `Unauthorized`, `No quote found`), but some hard
+            failures return an opaque request identifier here instead
           example: No quote found
         errorCode:
           type: string
@@ -332,7 +329,6 @@ paths:
         - $ref: "#/components/parameters/taker"
         - $ref: "#/components/parameters/swapMode"
         - $ref: "#/components/parameters/version"
-        - $ref: "#/components/parameters/feeBps"
         - $ref: "#/components/parameters/isWsol"
         - $ref: "#/components/parameters/receiver"
         - $ref: "#/components/parameters/ataAccountPayer"
@@ -390,8 +386,8 @@ paths:
         same shape as `/order`: `orderInfo.output.token` identifies the winning mint, and
         `requestId` identifies the winning leg. Pass it to `/execute` unchanged.
 
-        The candidate list is capped server-side (currently 3 mints). Passing zero mints or
-        more than the cap returns `400` with the allowed range in the error message.
+        The candidate list is capped server-side (currently 3 mints, duplicates ignored).
+        Passing zero mints or more than the cap returns `400`.
       security:
         - ApiKeyAuth: []
       parameters:
@@ -408,7 +404,6 @@ paths:
         - $ref: "#/components/parameters/amount"
         - $ref: "#/components/parameters/taker"
         - $ref: "#/components/parameters/version"
-        - $ref: "#/components/parameters/feeBps"
         - $ref: "#/components/parameters/isWsol"
         - $ref: "#/components/parameters/receiver"
         - $ref: "#/components/parameters/ataAccountPayer"

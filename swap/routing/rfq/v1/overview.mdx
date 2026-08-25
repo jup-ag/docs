@@ -1,0 +1,49 @@
+---
+title: "Webhook Integration (V1)"
+description: "Provide RFQ liquidity to JupiterZ by hosting a quote-and-swap webhook."
+llmsDescription: "Overview and onboarding for integrating a market maker into Jupiter's JupiterZ RFQ (Request for Quote) system using the V1 webhook model. You host a webhook implementing the RFQ API schema; Jupiter calls it to request quotes and forward taker-signed transactions for you to co-sign and land. This landing page covers what the V1 webhook model is, how it differs from V2 streaming (V1 works directly in the JupiterZ program and APIs; V2 liquidity is consumed by Metis), the integration process and onboarding, and links to the detail pages: Webhook API (endpoints and contract), Quoting and fills (fulfillment rules, expiry, fees), and Settlement and special cases (Order Engine, Squads takers, circuit breaker, testing). Code mechanics live in jup-ag/rfq-webhook-toolkit. For the gRPC streaming model, see Streaming Integration (V2)."
+---
+
+This guide covers how to provide liquidity to JupiterZ, Jupiter's RFQ (Request For Quote) system, using the V1 webhook model. You host a webhook implementing the RFQ API schema, Jupiter sends it quote requests and taker-signed transactions, and your system co-signs and lands the fills.
+
+<Note>
+V1 (webhook) and [V2 (gRPC streaming)](/swap/routing/rfq/v2/streaming) run concurrently. V2 does not replace V1: you can integrate with either or both. They sit in different parts of Jupiter's stack: V1 works directly in the JupiterZ program and APIs (your quotes are served on the JupiterZ paths and fills settle through the [Order Engine program](/swap/routing/rfq/v1/settlement#order-engine)), while V2 streams orderbooks that Metis consumes, with fills executing through the Jupiter v6 swap aggregator program.
+</Note>
+
+<Frame>
+  <img src="/static/images/rfq-flow.png" alt="RFQ Flow" />
+</Frame>
+
+## Integration process
+
+1. Host a service that implements the RFQ webhook API schema, see [Webhook API](/swap/routing/rfq/v1/webhook-api).
+2. Complete the acceptance and integration tests from the [rfq-webhook-toolkit](https://github.com/jup-ag/rfq-webhook-toolkit).
+3. Register your webhook with Jupiter. You will be onboarded to Edge (pre-production) before going live.
+
+The [rfq-webhook-toolkit](https://github.com/jup-ag/rfq-webhook-toolkit) repository owns the code-level mechanics:
+
+- [Sample server](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/server-example): a Rust implementation of the webhook API.
+- [OpenAPI schema](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/openapi): the exact request and response shapes for every endpoint.
+- [Integration tests](https://github.com/jup-ag/rfq-webhook-toolkit/tree/main/tests): acceptance tests (offline, against your webhook) and integration tests (against Edge, real mainnet swaps).
+- [Troubleshooting](https://github.com/jup-ag/rfq-webhook-toolkit/blob/main/tests/README.md#troubleshooting): common issues during integration.
+
+<Info>
+To register your webhook and begin onboarding, submit a request through the [support form](https://support.jup.ag/requests/new). For pre-integration questions, ask in the [developer support channel](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.
+</Info>
+
+## Continue
+
+<CardGroup cols={2}>
+  <Card title="Webhook API" href="/swap/routing/rfq/v1/webhook-api">
+    The endpoints your service implements, response codes, timeouts, token advertising, and IDs.
+  </Card>
+  <Card title="Quoting and fills" href="/swap/routing/rfq/v1/quoting">
+    Fulfillment requirements, quote expiry, and how fees are applied.
+  </Card>
+  <Card title="Settlement and special cases" href="/swap/routing/rfq/v1/settlement">
+    The Order Engine program, Squads multisig takers, the circuit breaker, and testing.
+  </Card>
+  <Card title="Streaming Integration (V2)" href="/swap/routing/rfq/v2/streaming">
+    The gRPC streaming model, an alternative that runs concurrently with V1.
+  </Card>
+</CardGroup>

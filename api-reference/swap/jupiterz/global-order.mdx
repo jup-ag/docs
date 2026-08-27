@@ -1,6 +1,7 @@
 ---
 openapi: /openapi-spec/swap/v2/jupiterz.yaml get /global-order
 title: "Get Global Order"
+hidden: true
 description: "Get the best RFQ quote across multiple candidate output mints"
 llmsDescription: "GET /global-order endpoint for the standalone JupiterZ API at api.jup.ag/swap/v2/jupiterz/global-order. Quotes one input mint against a comma-separated list of candidate output mints (currently up to 3) and returns only the leg worth the most in USD. ExactIn only. Response has the same shape as /order: orderInfo.output.token identifies the winning mint and requestId identifies the winning leg to pass to /execute. Useful when any of several stablecoins or wrappers is acceptable and you want whichever pays best. Requires x-api-key."
 ---

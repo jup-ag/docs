@@ -1,6 +1,7 @@
 ---
 openapi: /openapi-spec/swap/v2/jupiterz.yaml post /execute
 title: "Execute Order"
+hidden: true
 description: "Submit a taker-signed transaction for the market maker to fill"
 llmsDescription: "POST /execute endpoint for the standalone JupiterZ API at api.jup.ag/swap/v2/jupiterz/execute. Takes the transaction from /order or /global-order signed by the taker, hands it to the market maker who co-signs and submits it to Solana. Body: requestId, quoteId, transaction (all from the order response, transaction signed as-is without modification). Response: quoteId, state (confirmed/accepted/rejected/invalid/failed), signature. Rejected and failed swaps return 200 OK, check state not HTTP status. Re-calling with the same requestId re-checks a pending swap instead of re-executing. QUOTE_EXPIRED errorCode on 400 when expireAt passed. Requires x-api-key."
 ---

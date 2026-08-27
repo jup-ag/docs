@@ -17,7 +17,7 @@ https://api.jup.ag/swap/v2/jupiterz
 Every request must carry an API key from the [Developer Platform](https://developers.jup.ag/portal) in the `x-api-key` header. Requests without it return `401 Unauthorized`.
 
 <Note>
-Access to the JupiterZ API is whitelisted: your API key must be enabled for it before the endpoints respond. To request access, reach out via the [enterprise form](https://airtable.com/apppC9l7PaT9XG8jN/pagjXGV6PFNwUd9P2/form).
+Access to the JupiterZ API is whitelisted per organization, not per key: your Developer Platform organization must be enabled for it, after which any API key belonging to that organization works. To request access, reach out via the [enterprise form](https://airtable.com/apppC9l7PaT9XG8jN/pagjXGV6PFNwUd9P2/form).
 </Note>
 
 | Endpoint | Method | Purpose |
@@ -235,7 +235,7 @@ All amounts are strings in the token's smallest unit, so no precision is lost: `
 
 ### Quote expiry
 
-`expireAt` is a Unix timestamp (seconds) after which the transaction is no longer valid. Sign and execute before it passes. Executing an expired quote returns `400` with `errorCode: "QUOTE_EXPIRED"`; request a fresh order instead.
+`expireAt` is a Unix timestamp (seconds) after which the transaction is no longer valid. You cannot execute right up to it: `/execute` needs a safety buffer of at least 20 seconds before `expireAt` to verify, sign, and land the fill, so it rejects once fewer than 20 seconds remain. In practice a 55-second quote is only executable for roughly its first 35 seconds. Do not build a user countdown off `expireAt`, subtract the buffer. Executing an expired quote returns `400` with `errorCode: "QUOTE_EXPIRED"`; request a fresh order instead.
 
 ### Indicative quotes
 
@@ -246,7 +246,7 @@ Two cases return a price but no `transaction`, so you can display pricing before
 
 | `error` | Meaning |
 | :--- | :--- |
-| `insufficientBalance` | The taker does not hold enough of the input token |
+| `insufficientBalance` | The taker cannot cover the swap. This is not only the input token: the taker also pays rent for any token account the swap has to create, so a taker holding plenty of the input token but too little SOL for that rent also returns `insufficientBalance` |
 | `missingAtaAccount` | A token account required by the swap does not exist on-chain |
 
 Always check that `transaction` is non-null before signing.
@@ -299,7 +299,7 @@ An `accepted` response means the transaction was submitted but not yet seen as c
 
 ## Errors
 
-Errors use a consistent JSON body:
+Errors raised while processing a request use this JSON body:
 
 ```json
 {
@@ -309,6 +309,11 @@ Errors use a consistent JSON body:
 ```
 
 `error` is always present. `errorCode` is `null` unless the failure maps to one of the codes below.
+
+Two things to know about the `error` field:
+
+- On a `400` from bad or missing parameters, `error` is a **request UUID**, not a readable message. The human-readable reason is written to Jupiter's logs, so quote this UUID when asking support.
+- Malformed query strings are rejected before this JSON body is produced. A missing query parameter returns **plain text**, not JSON, for example `Failed to deserialize query string: missing field \`amount\``. Only errors raised on the request body use the JSON shape above.
 
 | Status | Meaning |
 | :--- | :--- |

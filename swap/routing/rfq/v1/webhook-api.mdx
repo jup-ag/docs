@@ -1,7 +1,7 @@
 ---
 title: "Webhook API"
 description: "The RFQ webhook endpoints your market-maker service implements for JupiterZ V1."
-llmsDescription: "The webhook API contract for a JupiterZ V1 market-maker integration. Covers the four endpoints Jupiter calls on your webhook (quote, swap, tokens, and optional permissioned-tokens), the X-API-KEY header, HTTP response codes and their meaning (200/404/400/401/50x), request timeouts (250ms quote, 25s swap via the x-request-start and x-request-timeout headers), how to advertise supported tokens via GET /tokens (refreshed every 10 minutes) including permissioned tokens for just-in-time minted RWAs, and the difference between Request ID (deterministic hash of quote params, for idempotency) and Quote ID (unique per quote response, identifies which quote to execute). Part of the Webhook Integration (V1) guide; code mechanics live in jup-ag/rfq-webhook-toolkit."
+llmsDescription: "The webhook API contract for a JupiterZ V1 market-maker integration. Covers the four endpoints Jupiter calls on your webhook (quote, swap, tokens, and optional permissioned-tokens), the X-API-KEY header, HTTP response codes and their meaning (200/404/400/401/50x), request timeouts (500ms quote, 40s swap via the x-request-start and x-request-timeout headers), how to advertise supported tokens via GET /tokens (refreshed every 10 minutes) including permissioned tokens for just-in-time minted RWAs, and the difference between Request ID (deterministic hash of quote params, for idempotency) and Quote ID (unique per quote response, identifies which quote to execute). Part of the Webhook Integration (V1) guide; code mechanics live in jup-ag/rfq-webhook-toolkit."
 ---
 
 This page is part of the [Webhook Integration (V1)](/swap/routing/rfq/v1/overview) guide. It describes the webhook endpoints your service implements and the request and response contract Jupiter uses to call them.
@@ -33,7 +33,7 @@ Return appropriate HTTP status codes with error messages:
 
 ### Timeouts
 
-Quote requests carry two headers: `x-request-start` (millisecond timestamp when the request was sent) and `x-request-timeout` (the millisecond timeout, currently 250 ms). Swap requests have a 25-second timeout.
+Quote requests carry two headers: `x-request-start` (millisecond timestamp when the request was sent) and `x-request-timeout` (the millisecond timeout, currently 500 ms). Swap requests have a 40-second timeout.
 
 ## Advertising supported tokens
 

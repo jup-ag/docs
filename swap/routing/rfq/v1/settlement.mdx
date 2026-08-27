@@ -1,7 +1,7 @@
 ---
 title: "Settlement and special cases"
 description: "Order Engine settlement, Squads multisig takers, the fill circuit breaker, and testing."
-llmsDescription: "Settlement and edge cases for a JupiterZ V1 market-maker webhook. Covers the on-chain Order Engine program (61DFfeTKM7trxYcPQCM78bJ794ddZprZpAwAnLiwTpYH) fills settle through, with source, IDL, and audit links; handling Squads V5 multisig takers where the RFQ API wraps fill instructions into an executeTransactionSyncV2 CPI (detect with the toolkit squads-sdk, unwrap and validate the inner fill, sign the maker slot, never write signatures[0]); the fill circuit breaker (what counts as success/failure, suspension with exponential backoff from ~5 to 30 minutes, permanent disable after repeated trips requiring manual recovery); testing with the toolkit's acceptance and integration test suites; and an FAQ. Part of the Webhook Integration (V1) guide; code mechanics live in jup-ag/rfq-webhook-toolkit."
+llmsDescription: "Settlement and edge cases for a JupiterZ V1 market-maker webhook. Covers the on-chain Order Engine program (61DFfeTKM7trxYcPQCM78bJ794ddZprZpAwAnLiwTpYH) fills settle through, with source, IDL, and audit links; handling Squads V5 multisig takers where the RFQ API wraps fill instructions into an executeTransactionSyncV2 CPI (detect with the toolkit squads-sdk, unwrap and validate the inner fill, sign the maker slot, never write signatures[0]); the fill circuit breaker (what counts as success/failure, suspension around 5 failures with exponential backoff from 2.5 to 15 minutes, permanent disable around 8 requiring manual recovery); testing with the toolkit's acceptance and integration test suites; and an FAQ. Part of the Webhook Integration (V1) guide; code mechanics live in jup-ag/rfq-webhook-toolkit."
 ---
 
 This page is part of the [Webhook Integration (V1)](/swap/routing/rfq/v1/overview) guide. It covers where fills settle on-chain, the Squads multisig taker case, the fill circuit breaker, and testing.
@@ -33,9 +33,9 @@ The full flow, code examples, and error mapping live in the [squads-sdk](https:/
 
 Jupiter runs a per-webhook circuit breaker over your fill outcomes to protect the system from unreliable fills:
 
-- **What counts**: confirmed swaps record success; rejected, dropped, and failed swaps record failure. Rejections caused by a slow user (more than 20 seconds of user delay) are not counted against you. Successes decay your accumulated failure count.
-- **Suspension**: accumulating failures past a threshold trips the breaker and suspends the webhook, with an exponentially increasing timeout (from around 5 minutes up to 30 minutes) between recovery attempts. A successful fill after the timeout restores normal operation.
-- **Disable**: repeated trips permanently disable the webhook. Recovery from disabled state is manual: contact Jupiter through the support channels on the [overview page](/swap/routing/rfq/v1/overview).
+- **What counts**: confirmed swaps record success; rejected, dropped, and failed swaps record failure. Rejections caused by a slow user (more than 15 seconds of user delay) are not counted against you. Successes decay your accumulated failure count.
+- **Suspension**: accumulating around 5 failures trips the breaker and suspends the webhook, with an exponentially increasing timeout (from 2.5 minutes up to 15 minutes) between recovery attempts. A successful fill after the timeout restores normal operation.
+- **Disable**: repeated trips (around 8) permanently disable the webhook. Recovery from disabled state is manual: contact Jupiter through the support channels on the [overview page](/swap/routing/rfq/v1/overview).
 
 ## Testing
 

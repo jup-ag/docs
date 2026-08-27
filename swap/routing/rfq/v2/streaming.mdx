@@ -16,7 +16,7 @@ V2 runs concurrently with the [V1 webhook model](/swap/routing/rfq/v1/overview);
 | | V1 (webhook) | V2 (streaming) |
 | :--- | :--- | :--- |
 | Transport | HTTP webhook Jupiter calls per request | Persistent gRPC streams you hold open |
-| Quoting | Respond to each quote request within 250 ms | Stream orderbook snapshots at your own cadence; Jupiter quotes from its cache |
+| Quoting | Respond to each quote request within 500 ms | Stream orderbook snapshots at your own cadence; Jupiter quotes from its cache |
 | Quote freshness | Per-request | Each snapshot carries an expiry, stale prices auto-drop |
 | Swap flow | `POST /swap` to your webhook | `SwapUpdate` pushed over the swap stream |
 | Last look | Verify before signing | Verify before signing, same idea |

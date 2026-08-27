@@ -1,29 +1,29 @@
 ---
-title: "Integrate DEX into Metis"
-description: "Implement the Jupiter AMM Interface, verify quote parity with the test kit, and submit your DEX for Metis routing."
-llmsDescription: "How to integrate a decentralized exchange (DEX) into Jupiter's Metis routing engine, which powers both /order and /build endpoints. Covers the self-serve integration workflow: implement the Amm trait from the jupiter-amm-interface Rust crate, verify that Amm::quote() matches on-chain execution with the jupiter-amm-test-kit parity harness in the same repository (it snapshots a live pool, executes the native swap in LiteSVM, and asserts the quoted amounts equal the on-chain token deltas exactly), then submit the SDK for review via the AMM integrators support form at support.jup.ag. Implementation mechanics (trait definition, test-suite pattern, fixtures) live in the jup-ag/jupiter-amm-interface repository READMEs; this page covers Jupiter-side requirements: integration prerequisites (security audit, code health, traction), the no-network-calls rule, SDK fork access, and the submission process. Also explains how proprietary AMMs (propAMMs) detect Jupiter frontend flow by verifying the dedicated signer sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF, letting them classify the trade as non-toxic order flow and quote tighter spreads."
+title: "Integrate AMM into Metis"
+description: "Implement the Jupiter AMM Interface, verify quote parity with the test kit, and submit your AMM for Metis routing."
+llmsDescription: "How to integrate an AMM (automated market maker, also called a DEX) into Jupiter's Metis routing engine, which powers both /order and /build endpoints. Covers the self-serve integration workflow: implement the Amm trait from the jupiter-amm-interface Rust crate, verify that Amm::quote() matches on-chain execution with the jupiter-amm-test-kit parity harness in the same repository (it snapshots a live pool, executes the native swap in LiteSVM, and asserts the quoted amounts equal the on-chain token deltas exactly), then submit the SDK for review via the AMM integrators support form at support.jup.ag. Implementation mechanics (trait definition, test-suite pattern, fixtures) live in the jup-ag/jupiter-amm-interface repository READMEs; this page covers Jupiter-side requirements: integration prerequisites (security audit, code health, traction), the no-network-calls rule, SDK fork access, and the submission process. Also explains how proprietary AMMs (propAMMs) detect Jupiter frontend flow by verifying the dedicated signer sighWH8KaiT7QhtV4w29ReVF8kG6D5yG3EQP1KYyGVF, letting them classify the trade as non-toxic order flow and quote tighter spreads."
 ---
 
-This guide covers how to integrate your decentralized exchange (DEX) into Jupiter's Metis routing engine. The workflow is self-serve: implement the Jupiter AMM Interface, prove that your quotes match on-chain execution with the test kit, then submit your SDK for review.
+This guide covers how to integrate your AMM (automated market maker) into Jupiter's Metis routing engine. The workflow is self-serve: implement the Jupiter AMM Interface, prove that your quotes match on-chain execution with the test kit, then submit your SDK for review.
 
-Jupiter is one of the most widely integrated protocols, so a lot of work is involved in minimizing issues on new integrations and making each integration valuable to our users and partners. Our top priority is ensuring security and providing the best prices and the best token selection for our users, so we will focus on DEXes that will bring the most benefits to them.
+Jupiter is one of the most widely integrated protocols, so a lot of work is involved in minimizing issues on new integrations and making each integration valuable to our users and partners. Our top priority is ensuring security and providing the best prices and the best token selection for our users, so we will focus on AMMs that will bring the most benefits to them.
 
 ## Integration Prerequisites
 
-As Solana grows and more DEXes are built, we have to be more cautious in the DEXes we integrate, we look into a variety of factors.
+As Solana grows and more AMMs are built, we have to be more cautious in the AMMs we integrate, we look into a variety of factors.
 
 * **Code health**: It will help with integration and ensure maintainability in the future.
 * **Security audit**: This is important to ensure users' funds are secure and the program is not malicious.
-* **Traction**: We look at the traction of the DEX to ensure it has market demand and is well-used.
-* **Team and backers**: This is a good indicator of the quality of the DEX if they are backed by or built by reputable or verifiable entities.
+* **Traction**: We look at the traction of the AMM to ensure it has market demand and is well-used.
+* **Team and backers**: This is a good indicator of the quality of the AMM if they are backed by or built by reputable or verifiable entities.
 
 ## Step 1: Implement the AMM Interface
 
-Implement the `Amm` trait from the [`jupiter-amm-interface`](https://docs.rs/crate/jupiter-amm-interface) crate for your DEX. The [jup-ag/jupiter-amm-interface](https://github.com/jup-ag/jupiter-amm-interface) repository is the source of truth for the trait definition and implementation guidance, follow its READMEs.
+Implement the `Amm` trait from the [`jupiter-amm-interface`](https://docs.rs/crate/jupiter-amm-interface) crate for your AMM. The [jup-ag/jupiter-amm-interface](https://github.com/jup-ag/jupiter-amm-interface) repository is the source of truth for the trait definition and implementation guidance, follow its READMEs.
 
 Jupiter-side requirements:
 
-* Enable us to fork your SDK, this ensures our users that we can guarantee maintenance, support for the SDK, and fix potential bugs related to integrated DEXs.
+* Enable us to fork your SDK, this ensures our users that we can guarantee maintenance, support for the SDK, and fix potential bugs related to integrated AMMs.
 * Limit the `Amm` implementation to deserializing state and quoting. Keep the detailed math in your SDK, and do heavy deserialization and precomputation in `update` rather than `quote`.
 
 <Info>
@@ -42,13 +42,13 @@ The kit covers the common case first: ExactIn swaps that run as a single top-lev
 
 ## Step 3: Submit your integration
 
-Once your parity tests pass, submit your DEX for review through the [AMM integrators support form](https://support.jup.ag/requests/new/amm-integrators). Include:
+Once your parity tests pass, submit your AMM for review through the [AMM integrators support form](https://support.jup.ag/requests/new/amm-integrators). Include:
 
 * A link to your SDK repository, with the parity test suite and committed fixtures, and access for us to fork it.
 * Your security audit.
 * Traction metrics and information about your team and backers.
 
-After your DEX is integrated, markets on it must meet the liquidity criteria described in [Market Listing](/swap/routing/market-listing) to remain routable.
+After your AMM is integrated, markets on it must meet the liquidity criteria described in [Market Listing](/swap/routing/amm/market-listing) to remain routable.
 
 ## More
 

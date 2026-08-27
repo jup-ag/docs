@@ -1,0 +1,120 @@
+---
+title: "Streaming Integration (V2)"
+sidebarTitle: "Overview"
+description: "Provide RFQ liquidity to JupiterZ over persistent gRPC streams."
+llmsDescription: "How to integrate a market maker into Jupiter's JupiterZ RFQ system using the V2 gRPC streaming model. Market makers hold two persistent streams open: StreamQuotes to push multi-level orderbook snapshots into Jupiter's in-memory cache, and StreamSwap to receive taker-signed transactions for last-look validation and co-signing at signature index 1 within a 10-second deadline. Covers the streaming architecture and V1 comparison (V1 works directly in the JupiterZ program and APIs; V2 liquidity is consumed by Metis and fills execute through the Jupiter v6 swap aggregator program into the rfq_v2 fill program), integration requirements (API key, maker ID, gRPC endpoint from Jupiter, Rust or Python SDK from jup-ag/rfq-v2-sdk), protocol rules (swap stream must be open before quoting, strictly increasing sequence numbers, quote_expiry_time in seconds minimum 10, ack draining, top-5 levels, snapshot-replace semantics), price and volume encoding with lot_size_base, last-look safety including the fill exclusivity check and the rfq_v2 on-chain program, maker lifecycle states (prod, offline, suspended) and the fill-rate circuit breaker, and testing. Runs concurrently with the V1 webhook model."
+---
+
+This guide covers how to provide liquidity to JupiterZ using the V2 streaming model (technical name: RFQ v2). Instead of answering webhook requests per quote, you hold two persistent gRPC streams open: one pushing your orderbooks into Jupiter's in-memory cache, one receiving swaps for you to validate and co-sign.
+
+<Note>
+V2 runs concurrently with the [V1 webhook model](/swap/routing/rfq/v1/overview); it does not replace it. You can integrate with either or both. The two models sit in different parts of Jupiter's stack: V1 works directly in the JupiterZ program and APIs, while V2 liquidity is consumed by Metis and fills execute through the Jupiter v6 swap aggregator program.
+</Note>
+
+## How it differs from V1
+
+| | V1 (webhook) | V2 (streaming) |
+| :--- | :--- | :--- |
+| Transport | HTTP webhook Jupiter calls per request | Persistent gRPC streams you hold open |
+| Quoting | Respond to each quote request within 500 ms | Stream orderbook snapshots at your own cadence; Jupiter quotes from its cache |
+| Quote freshness | Per-request | Each snapshot carries an expiry, stale prices auto-drop |
+| Swap flow | `POST /swap` to your webhook | `SwapUpdate` pushed over the swap stream |
+| Last look | Verify before signing | Verify before signing, same idea |
+| Quoted by | The JupiterZ RFQ system directly (the `jupiterz` router) | Metis, Jupiter's onchain routing engine, quoting from your cached orderbooks |
+| Settlement | Directly through the JupiterZ [Order Engine program](/swap/routing/rfq/v1/settlement#order-engine) in a dedicated RFQ transaction | Through the Jupiter v6 swap aggregator program (`JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4`) as part of a Metis route, which invokes the `rfq_v2` fill program |
+
+The two streams:
+
+- **StreamQuotes**: you send `MarketMakerQuote` orderbook snapshots (up to 5 bid and 5 ask levels per pair); the server replies with `QuoteUpdate` acks (`UPDATE_TYPE_UPDATED` accepted, `UPDATE_TYPE_REJECTED` with a `status_message`).
+- **StreamSwap**: the server pushes `SwapUpdate` messages (`CONNECTION_READY`, `SWAP_AVAILABLE` with the transaction to co-sign, `TRANSACTION_CONFIRMED`, `ERROR`); you reply with `MarketMakerSwap` messages (`SWAP_SUBMIT` with the signed transaction, plus `PING`/`PONG` keep-alives).
+
+## Integration requirements
+
+There is no self-serve onboarding yet. Jupiter provides your credentials:
+
+- An **API key** (sent as `x-api-key` gRPC metadata) and a **maker ID**.
+- The **gRPC endpoint** to connect to. The SDK examples default to the edge (pre-production) endpoint.
+- You provide a **Solana keypair**: its public key is your maker address and must hold inventory with the token accounts (ATAs) for every token you quote.
+
+The [rfq-v2-sdk](https://github.com/jup-ag/rfq-v2-sdk) repository owns the code-level mechanics: type-safe **Rust and Python SDKs**, setup and build instructions, runnable examples (`production_streaming`), the [proto definitions](https://github.com/jup-ag/rfq-v2-sdk/blob/main/protos/market_maker.proto), the fill-decoder for last-look validation, and the unit and end-to-end test suites.
+
+<Info>
+To begin onboarding, submit a request through the [support form](https://support.jup.ag/requests/new). For pre-integration questions, ask in the [developer support channel](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.
+</Info>
+
+## Protocol rules
+
+These rules are enforced server-side; break them and your quotes are rejected or your maker is benched.
+
+- **Open the swap stream before you quote.** Quotes from a maker without a live swap stream are rejected. On reconnection, re-open the swap stream first.
+- **Sequence numbers are strictly increasing** per maker, across every quote you send. Fetch the correct starting value with the `GetLastSequenceNumber` RPC (the SDKs do this for you when opening the quote stream with sync).
+- **`quote_expiry_time` is a duration in seconds, minimum 10.** It is not a microsecond timestamp, despite other fields using microseconds. With the SDK, use `expiry_time_secs(n)`; a microsecond value produces an absurdly long expiry because the server reads the field as seconds.
+- **Drain the acks.** Read the `QuoteUpdate` replies between sends. An unread ack backlog creates back-pressure and drops the stream.
+- **Snapshots replace.** Each `MarketMakerQuote` for a pair replaces your previous orderbook for that pair. The server keeps the top 5 levels per side.
+- **Keep-alive**: send periodic `PING` messages on the swap stream and treat `PONG` replies as liveness.
+- **Reconnection is your job.** The streams do not auto-reconnect. Implement backoff, re-open the swap stream, then re-open the quote stream with a sequence re-sync.
+
+### Quote validation
+
+A quote snapshot is accepted only if: your maker status is `prod`, your swap stream is live, `lot_size_base` matches the expected value for the pair, the expiry meets the minimum, at least one level has price and volume greater than zero, the sequence number is in order, and your maker wallet actually holds the inventory (ATAs must exist; levels are dropped above the first level your balance cannot cover). Rejections arrive as `UPDATE_TYPE_REJECTED` with the reason in `status_message`.
+
+### Price and volume encoding
+
+- `volume`: base-token atoms, `human_amount × 10^base_decimals`.
+- `price`: quote-token atoms per one whole base token, `human_price × 10^quote_decimals`.
+- `lot_size_base = 10^(base_decimals − quote_decimals)`.
+- Timestamps are Unix time in microseconds (except `quote_expiry_time`, see above).
+
+Worked example for SOL/USDC (9 and 6 decimals): 1 SOL offered at 153.45 USDC is `volume = 1000000000`, `price = 153450000`, `lot_size_base = 1000`.
+
+## Last look and maker safety
+
+A `SWAP_AVAILABLE` update carries a `swap_uuid` and an `unsigned_tx`: a base64-encoded versioned transaction already signed by the taker at signature index 0. Your job, within the deadline:
+
+1. Decode the transaction and validate that the fill matches a quote you streamed (the SDK's fill-decoder extracts the fill parameters; Python integrations decode with `solders` or use the Rust fill-decoder as a sidecar).
+2. Check **fill exclusivity**: your authority and token accounts must appear only in the fill instruction. The fill-decoder's `check_fill_exclusivity` is the off-chain mirror of the on-chain check.
+3. Sign the message and place your signature at **index 1**.
+4. Return the transaction as a `SWAP_SUBMIT` message.
+
+<Warning>
+Never modify the transaction. The server compares the message bytes you return against what it sent; any difference beyond your signature rejects the swap and **forces your maker offline immediately**, bypassing the circuit breaker.
+</Warning>
+
+The deadline to return `SWAP_SUBMIT` is 10 seconds by default and is always enforced. Missing it expires the swap; there is no fallback to the next quote in V2.
+
+On-chain, fills settle through the `rfq_v2` program ([`fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5`](https://solscan.io/account/fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5)) with the single instruction `fill_exact_in`, invoked by the Jupiter v6 swap aggregator program as part of a Metis route. The program reads the instructions sysvar and rejects the fill with `MakerAppearsInOtherInstruction` (error `6005`) if your keys appear in any other instruction, defeating wrap-and-drain attacks even if your off-chain check misses one.
+
+## Maker lifecycle
+
+| Status | Meaning | Recovery |
+| :--- | :--- | :--- |
+| `prod` | Healthy: quotes accepted, swaps routed to you | - |
+| `offline` | No live swap stream, or a tampered fill was detected | Automatic when your swap stream reconnects (tampering may require contacting Jupiter) |
+| `suspended` | Benched by the fill-rate circuit breaker | Automatic after the suspension window elapses |
+
+The **fill-rate circuit breaker** benches makers who repeatedly win quotes but do not complete the fill. It is disabled by default and server-configured; when enabled, it evaluates your fill rate over a rolling window (default 1 hour, minimum 10 swaps, 50% threshold) and suspends for a fixed window (default 10 minutes). The 10-second last-look deadline applies regardless of whether the breaker is enabled.
+
+Staying healthy: keep the swap stream connected, respond within the deadline, quote prices you will honour, hold the inventory you quote, and never modify the transaction.
+
+## gRPC API surface
+
+Five RPCs, defined in [market_maker.proto](https://github.com/jup-ag/rfq-v2-sdk/blob/main/protos/market_maker.proto):
+
+| RPC | Type | Purpose |
+| :--- | :--- | :--- |
+| `StreamQuotes` | Bidirectional stream | Push orderbook snapshots, receive acks |
+| `StreamSwap` | Bidirectional stream | Receive swaps, return co-signed transactions |
+| `GetLastSequenceNumber` | Unary | Fetch your last accepted sequence number for re-sync |
+| `GetAllOrderbooks` | Unary | Snapshot of all active orderbooks |
+| `GetQuotes` | Unary | Fetch quotes by token pair (prefer stream acks) |
+
+## Testing
+
+The SDK repository ships unit tests (offline) and end-to-end tests that exercise the full quote-sign-execute loop against the pre-production environment. The end-to-end tests move real funds on mainnet, so use a taker wallet holding only what you are willing to spend. Commands, environment variables, and the maker-safety test suite are documented in the [rfq-v2-sdk README](https://github.com/jup-ag/rfq-v2-sdk).
+
+Before requesting production access, confirm: unit and end-to-end tests pass for the pairs you quote, your quote stream stays stable and refreshes before expiry, your swap stream stays connected and answers pings, last look validates fills and checks exclusivity, you co-sign at index 1 without modifying the message, you respond within the deadline, and reconnection with backoff and sequence re-sync works.
+
+## Related
+
+- [Webhook Integration (V1)](/swap/routing/rfq/v1/overview): the request-response integration model
+- [rfq-v2-sdk](https://github.com/jup-ag/rfq-v2-sdk): SDKs, proto, examples, and tests

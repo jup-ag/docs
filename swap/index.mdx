@@ -1,7 +1,7 @@
 ---
 title: "Overview"
 description: "One API for all swap use cases on Jupiter"
-llmsDescription: "Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Two integration paths: Meta-Aggregator (GET /order + POST /execute) where all routing engines compete (Metis, JupiterZ RFQ, Dflow, OKX) for the best price with managed transaction landing, gasless support, and MEV protection; and Router (GET /build + POST /submit) for raw swap instructions with full transaction control, CPI composability, no swap fees, and Metis onchain routing only. Includes routing engine descriptions, availability by path, why JupiterZ is Meta-Aggregator exclusive, and comparison table covering fees, execution, gasless, and transaction modification. Start with Meta-Aggregator unless you need to modify the transaction."
+llmsDescription: "Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Two integration paths: Meta-Aggregator (GET /order + POST /execute) where all routing engines compete (Metis, JupiterZ RFQ, Dflow, OKX) for the best price with managed transaction landing, gasless support, and MEV protection; and Router (GET /build + POST /submit) for raw swap instructions with full transaction control, CPI composability, no swap fees, and Metis onchain routing only. Includes routing engine descriptions, availability by path, and a comparison table covering fees, execution, gasless, and transaction modification. Start with Meta-Aggregator unless you need to modify the transaction."
 ---
 
 The Swap API unifies Jupiter's swap capabilities into a single entry point at `https://api.jup.ag/swap/v2`. Two paths cover every use case:
@@ -47,9 +47,9 @@ Jupiter's routing combines multiple engines and selects the best execution price
 | **OKX** | Third-party OKX liquidity. | Meta-Aggregator only |
 
 <Note>
-JupiterZ (RFQ) is only available through the Meta-Aggregator.
+JupiterZ (RFQ) is not available on the Router path. It is available through the Meta-Aggregator, where it competes with the other engines.
 - Jupiter runs safety and validation mechanisms between integrators and market makers, and market makers have last-look execution rights, which requires controlled transaction handling to ensure validity and prevent spam.
-- Transactions routed through JupiterZ cannot be modified after `/order` returns them, so use cases that require CPI, custom instructions, or any transaction modification must use the Router path.
+- Transactions routed through JupiterZ cannot be modified after they are returned, so use cases that require CPI, custom instructions, or any transaction modification must use the Router path.
 </Note>
 
 ## Endpoints
@@ -86,5 +86,5 @@ All endpoints require an API key via the `x-api-key` header. Get one at [Portal]
 
 If you want your liquidity routed through Jupiter:
 
-- **DEX operators**: [Integrate DEX into Metis](/swap/routing/dex-integration) to get your markets included in Jupiter's onchain routing.
-- **Market makers**: [Integrate into JupiterZ (RFQ)](/swap/routing/rfq-integration) to provide off-chain liquidity via the RFQ system.
+- **AMM operators**: [Integrate AMM into Metis](/swap/routing/amm/integration) to get your markets included in Jupiter's onchain routing.
+- **Market makers**: integrate into JupiterZ to provide off-chain liquidity via the RFQ system, over a [webhook (V1)](/swap/routing/rfq/v1/overview) or [gRPC streams (V2)](/swap/routing/rfq/v2/streaming).

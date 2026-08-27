@@ -24,6 +24,34 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-08-25] Split the MM webhook (V1) page; version-scoped routing slugs
+**Status:** implemented
+**Scope:** folder-structure | navigation | rename | redirect
+**Files affected:** `swap/routing/amm/{integration,market-listing}.mdx`, `swap/routing/rfq/v1/{overview,webhook-api,quoting,settlement}.mdx`, `swap/routing/rfq/v2/streaming.mdx`, `docs.json`, plus cross-link updates in `swap/index.mdx`, `swap/jupiterz/index.mdx`, `resources/support.mdx`, `swap/v1/common-errors.mdx`, `guides/how-to-build-a-custom-swap-with-metis.mdx`
+**Linear issue:** BUILD-812
+
+**Context:** Refinement of the 2026-08-14 decision. YY flagged (1) the MM webhook (V1) page was too loaded (16 topics in 177 lines) and (2) the routing slugs were generic/stale (`rfq-integration` gave no version signal; `dex-integration` still said "dex" after the DEX → AMM rename). Done pre-merge (PR #946 not yet public) so the rename is cheapest and redirects keep the briefly-public URLs working.
+**Decision:** Move the whole `swap/routing/` sub-tree to a version-scoped hierarchy chosen once so URLs never need changing again, and split the V1 page into a landing + 3 sub-pages (V2 stays one page, YY):
+- `swap/routing/amm/integration` (was `dex-integration`), `swap/routing/amm/market-listing` (was `market-listing`).
+- `swap/routing/rfq/v1/overview` (was `rfq-integration`, landing "Webhook Integration (V1)") + new siblings `rfq/v1/webhook-api` ("Webhook API"), `rfq/v1/quoting` ("Quoting and fills"), `rfq/v1/settlement` ("Settlement and special cases").
+- `swap/routing/rfq/v2/streaming` (was `rfq-streaming`).
+Content was moved verbatim, not rewritten; the landing gained a `<CardGroup>` to the sub-pages. The only anchor that moved (`#order-engine`) was repointed to `rfq/v1/settlement#order-engine` on both referencing pages.
+**Rationale:** `amm/*` + `rfq/v{1,2}/*` mirrors the two nav sub-groups and is future-proof (V3 → `rfq/v3/*`; new AMM pages → `amm/*`) without further URL churn. V1/V2 are concurrent variants, so both are version-scoped (not the latest-drops-the-prefix pattern). The 4-page V1 split matches the DCA/Limit-Order precedent (split at ~200 lines / 3+ topics).
+**Alternatives considered:** (1) RFQ-only rename leaving AMM stale — rejected by YY, fix both. (2) Keep existing URLs, only new sub-pages nested — rejected: mixed depths (`rfq-integration` at top level, its own children under `rfq/v1/`) read as inconsistent. (3) Split V2 too — rejected, 120 lines of tightly-coupled protocol.
+**Migration notes:** Four new `/swap/routing/*` → new-slug redirects added; the three pre-existing `/routing/*` redirects repointed directly to the final URLs to avoid chains. `check-redirects.js` and `mint broken-links` both pass. See the Redirect Log below.
+
+### [2026-08-14] JupiterZ docs consolidated under Swap; rfq-docs site retired
+**Status:** implemented
+**Scope:** navigation | new-section
+**Files affected:** `swap/jupiterz/index.mdx`, `openapi-spec/swap/v2/jupiterz.yaml`, `api-reference/swap/jupiterz/{order,global-order,execute}.mdx`, `swap/routing/rfq-integration.mdx`, `swap/routing/rfq-streaming.mdx`, `swap/routing/dex-integration.mdx`, `docs.json`
+**Linear issue:** BUILD-812
+
+**Context:** JupiterZ/RFQ docs lived in a separate Docusaurus site (`jup-ag/rfq-docs`, jupiterz.jup.ag). The site is no longer maintained; this repo is now the only home. Its PR #12 added integrator docs for the new standalone JupiterZ API (`api.jup.ag/swap/v2/jupiterz`).
+**Decision:** Everything nests under the Swap menu (YY). New group **"JupiterZ (RFQ)"** directly under Router: `swap/jupiterz/index` + 3 API reference pages backed by `openapi-spec/swap/v2/jupiterz.yaml`. Routing Integration regrouped into two nested sub-groups: **"Integrate AMM into Metis"** (`dex-integration` retitled DEX → AMM, `market-listing`) and **"Integrate MM into JupiterZ (RFQ)"** (`rfq-integration` reworked in place as "Webhook Integration (V1)", new `rfq-streaming` as "Streaming Integration (V2)"). MM docs are streamlined on the BUILD-774 rule: docs own process/architecture/operations; code mechanics defer to the public `rfq-webhook-toolkit` and `rfq-v2-sdk` repos. The rfq-docs Stats section was deliberately not ported (placeholder + orphaned localhost indexer doc).
+**Rationale:** The standalone API is a swap API and MM integration is routing integration, so one product menu keeps JupiterZ discoverable next to the paths it competes with. Reworking `rfq-integration` in place preserves the URL (no redirect); nesting keeps the Routing Integration group scannable as it grows.
+**Alternatives considered:** (1) A new top-level "JupiterZ" Docs menu item — rejected by YY, stays under Swap. (2) Porting all 24 rfq-docs pages 1:1 — rejected, mechanics belong next to the code (drift failure mode from BUILD-774).
+**Migration notes:** No path changes in this repo, no redirects. New URLs only. Follow-ups outside this repo: retire/redirect jupiterz.jup.ag to these pages, and repoint `rfq-webhook-toolkit`/`rfq-v2-sdk` READMEs at developers.jup.ag.
+
 ### [2026-07-13] Split the DCA guide into Create / Track / Cancel pages
 **Status:** implemented
 **Scope:** folder-structure | navigation
@@ -260,6 +288,10 @@ Track all redirects added to `vercel.json` here for visibility:
 | `/docs/ultra/*` | `/ultra/*` | 2026-03-28 | Product folders moved to root (DEVREL-133) |
 | `/changelog` | `https://developers.jup.ag/changelog` | 2026-07-15 | Changelog consolidated on dev platform blog. `docs.json` redirect with an external destination; Mintlify's schema only documents internal paths, so verify in prod after deploy (DEV-718) |
 | `/api-reference/trigger/v2` | `/api-reference/trigger/challenge` | 2026-08-03 | Destination fix (BUILD-472): previously pointed at `/api-reference/trigger/index`, which 404s in prod (no such page). Repointed to the first Trigger V2 API reference page, matching the `/api-reference/swap/v1` → `.../quote` pattern. Caught by `check-redirects.js` on its first run |
+| `/swap/routing/dex-integration` | `/swap/routing/amm/integration` | 2026-08-25 | Version-scoped routing slugs (BUILD-812): `dex-integration` renamed to `amm/integration` after the DEX → AMM rename. The old `/routing/dex-integration` redirect was repointed to the new URL to avoid a chain |
+| `/swap/routing/market-listing` | `/swap/routing/amm/market-listing` | 2026-08-25 | Version-scoped routing slugs (BUILD-812). Old `/routing/market-listing` redirect repointed to the new URL |
+| `/swap/routing/rfq-integration` | `/swap/routing/rfq/v1/overview` | 2026-08-25 | Version-scoped routing slugs (BUILD-812): MM webhook V1 page became the landing of the split `rfq/v1/*` group. Old `/routing/rfq-integration` redirect repointed to the new URL |
+| `/swap/routing/rfq-streaming` | `/swap/routing/rfq/v2/streaming` | 2026-08-25 | Version-scoped routing slugs (BUILD-812). `rfq-streaming` was new in PR #946 but briefly preview-public, so a redirect was added |
 
 ### [2026-04-06] Hidden pages for private integrator docs
 **Status:** implemented

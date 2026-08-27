@@ -67,7 +67,7 @@ Token swap API with managed execution (/order) and custom transaction building (
 
 ### Swap
 
-- [Overview](https://developers.jup.ag/docs/swap/index.md): Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Two integration paths: Meta-Aggregator (GET /order + POST /execute) where all routing engines compete (Metis, JupiterZ RFQ, Dflow, OKX) for the best price with managed transaction landing, gasless support, and MEV protection; and Router (GET /build + POST /submit) for raw swap instructions with full transaction control, CPI composability, no swap fees, and Metis onchain routing only. Includes routing engine descriptions, availability by path, the standalone JupiterZ API at /swap/v2/jupiterz for RFQ-only quotes, and comparison table covering fees, execution, gasless, and transaction modification. Start with Meta-Aggregator unless you need to modify the transaction.
+- [Overview](https://developers.jup.ag/docs/swap/index.md): Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Two integration paths: Meta-Aggregator (GET /order + POST /execute) where all routing engines compete (Metis, JupiterZ RFQ, Dflow, OKX) for the best price with managed transaction landing, gasless support, and MEV protection; and Router (GET /build + POST /submit) for raw swap instructions with full transaction control, CPI composability, no swap fees, and Metis onchain routing only. Includes routing engine descriptions, availability by path, and a comparison table covering fees, execution, gasless, and transaction modification. Start with Meta-Aggregator unless you need to modify the transaction.
 
 ### Meta-Aggregator
 

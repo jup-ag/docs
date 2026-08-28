@@ -1038,46 +1038,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServiceError'
 
-  '/positions/{address}/sse':
-    get:
-      operationId: streamPositions
-      summary: Stream positions (SSE)
-      description: >-
-        Server-Sent Events variant of Get Positions. Emits progressive results
-        as each fetcher completes, so you can render positions before the whole
-        request finishes.
-
-
-        The stream sends `text/event-stream` with these events:
-
-        - `start` — data `{ "total": number }`, the number of fetchers to expect.
-
-        - `fetcherResult` — data is a single `FetcherResult` (same shape as an
-          entry in the `fetcherResults` array).
-
-        - `done` — the stream completed successfully.
-
-        - `error` — the stream could not complete; retry shortly.
-
-
-        A heartbeat is sent every 15s and the stream has a 90s deadline. Same
-        query parameters as Get Positions.
-      parameters:
-        - $ref: '#/components/parameters/Address'
-        - $ref: '#/components/parameters/NetworkId'
-        - $ref: '#/components/parameters/FetcherIds'
-        - $ref: '#/components/parameters/ExcludedFetcherIds'
-        - $ref: '#/components/parameters/Unpriced'
-        - $ref: '#/components/parameters/JupOnly'
-        - $ref: '#/components/parameters/NoJup'
-      responses:
-        '200':
-          description: An event stream of positions results.
-          content:
-            text/event-stream:
-              schema:
-                type: string
-
   '/fluid/positions/{address}':
     get:
       operationId: getFluidPositions

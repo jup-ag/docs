@@ -2,7 +2,7 @@
 title: "Portfolio API V2"
 sidebarTitle: "Portfolio V2"
 description: "Query a wallet's positions with the Portfolio API V2"
-llmsDescription: "WHITELISTED ACCESS ONLY. How to use the Portfolio API V2 at api.jup.ag/portfolio/v2 to query a wallet's DeFi positions. Covers GET /positions/{address} (and the ?address= query form), the streaming GET /positions/{address}/sse variant, the Fluid compatibility variant GET /fluid/positions/{address}, the per-fetcher response envelope { date, duration, extended, fetcherResults[] }, the five element types and three asset types, the V2Amount fixed/floating union, error handling (HTTP 200 partial failures vs 503), and how to migrate from the v1 /positions response."
+llmsDescription: "WHITELISTED ACCESS ONLY. How to use the Portfolio API V2 at api.jup.ag/portfolio/v2 to query a wallet's DeFi positions. Covers GET /positions/{address} (and the ?address= query form), the Fluid compatibility variant GET /fluid/positions/{address}, the per-fetcher response envelope { date, duration, extended, fetcherResults[] }, the five element types and three asset types, the V2Amount fixed/floating union, error handling (HTTP 200 partial failures vs 503), and how to migrate from the v1 /positions response."
 hidden: true
 ---
 
@@ -30,7 +30,6 @@ works. A request with no key, or with a key whose organization is not whiteliste
 | Endpoint | Method | Purpose |
 | :--- | :--- | :--- |
 | [`/positions/{address}`](/api-reference/portfolio/v2/get-positions) | `GET` | All positions for a wallet |
-| [`/positions/{address}/sse`](/api-reference/portfolio/v2/stream-positions) | `GET` | Same data, streamed as it resolves |
 | [`/fluid/positions/{address}`](/api-reference/portfolio/v2/get-fluid-positions) | `GET` | Fluid compatibility variant |
 
 ## Get positions
@@ -174,51 +173,6 @@ A whole-request failure returns **HTTP 503** with a `Retry-After` header and a b
 `{ code, error, reason?, category?, stage?, scope?, fetcherId?, prefetcherId? }`. Retry after
 the suggested delay.
 
-## Stream positions
-
-For large wallets, stream results as each fetcher completes instead of waiting for the whole
-request. `GET /positions/{address}/sse` returns a `text/event-stream` with these events:
-
-| Event | Data |
-| :--- | :--- |
-| `start` | `{ "total": number }` — how many fetchers to expect |
-| `fetcherResult` | One `FetcherResult`, same shape as an entry in `fetcherResults` |
-| `done` | The stream completed successfully |
-| `error` | The stream could not complete; retry shortly |
-
-A heartbeat is sent every 15 seconds and the stream closes after 90 seconds. It accepts the
-same query parameters as Get Positions.
-
-```typescript
-const address = "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3";
-const res = await fetch(
-  `https://api.jup.ag/portfolio/v2/positions/${address}/sse`,
-  { headers: { "x-api-key": "YOUR_API_KEY" } },
-);
-
-const reader = res.body!.getReader();
-const decoder = new TextDecoder();
-let buffer = "";
-
-while (true) {
-  const { value, done } = await reader.read();
-  if (done) break;
-  buffer += decoder.decode(value, { stream: true });
-
-  // SSE frames are separated by a blank line
-  const frames = buffer.split("\n\n");
-  buffer = frames.pop() ?? "";
-  for (const frame of frames) {
-    const event = frame.match(/event: (.*)/)?.[1];
-    const data = frame.match(/data: (.*)/)?.[1];
-    if (event === "fetcherResult" && data) {
-      const result = JSON.parse(data);
-      console.log("fetcher", result.id, result.status);
-    }
-  }
-}
-```
-
 ## Fluid positions
 
 `GET /fluid/positions/{address}` is a compatibility variant for the Fluid integration. It is
@@ -312,12 +266,9 @@ getPositions("jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3").catch(console.error)
 
 ## API reference
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="Get Positions" href="/api-reference/portfolio/v2/get-positions">
     `GET /positions/{address}` — all positions for a wallet, grouped per fetcher.
-  </Card>
-  <Card title="Stream Positions (SSE)" href="/api-reference/portfolio/v2/stream-positions">
-    `GET /positions/{address}/sse` — the same data streamed as it resolves.
   </Card>
   <Card title="Get Fluid Positions" href="/api-reference/portfolio/v2/get-fluid-positions">
     `GET /fluid/positions/{address}` — Fluid compatibility variant.

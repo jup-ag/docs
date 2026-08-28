@@ -230,9 +230,12 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
   unknown; `stage` ∈ yield/price/serialization/cleanup; `scope` ∈ final/progressive. 503 `code`
   values seen in source: `FETCHER_EXECUTION_UNAVAILABLE`, `PREFETCHER_PREREQUISITE_UNAVAILABLE`,
   `PIPELINE_STAGE_TIMEOUT`, `FLUID_ENRICHMENT_UNAVAILABLE`, plus worker-admission codes.
-- [2026-08-28] **SSE** (`positions-sse.ts`): `text/event-stream`, events `start` (data
-  `{total}`), `fetcherResult` (data = one FetcherResult), `done`, `error`. Heartbeat 15s, retry
-  hint 5s, stream deadline 90s. `SSE_DISABLED` if disabled.
+- [2026-08-28] **SSE streaming (`/positions/:address/sse`) is NOT available and must NOT be
+  documented** (YY, 2026-08-28: "no longer available"). The route still exists in source
+  (`positions-sse.ts`: `text/event-stream`, events `start`/`fetcherResult`/`done`/`error`,
+  heartbeat 15s, deadline 90s, `SSE_DISABLED` when off) but it is not exposed, so the v2 docs,
+  spec, and API reference deliberately omit it. Do not re-add a streaming endpoint from source
+  discovery without confirming it is live again.
 - [2026-08-28] **`/fluid/positions/:address`** is a Fluid **compatibility serializer**
   (`routes/fluidResponse.ts`, ~1500 lines): Solana-only, always priced, restricted to a fixed
   fetcher set (`native-stake-solana`, `marinade-native`, `jito-mev-rewards`), and returns a

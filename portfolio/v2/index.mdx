@@ -1,0 +1,311 @@
+---
+title: "Portfolio API V2"
+sidebarTitle: "Portfolio V2"
+description: "Query a wallet's positions with the Portfolio API V2"
+llmsDescription: "WHITELISTED ACCESS ONLY. How to use the Portfolio API V2 at api.jup.ag/portfolio/v2 to query a wallet's DeFi positions. Covers GET /positions/{address} (and the ?address= query form), the streaming GET /positions/{address}/sse variant, the Fluid compatibility variant GET /fluid/positions/{address}, the per-fetcher response envelope { date, duration, extended, fetcherResults[] }, the five element types and three asset types, the V2Amount fixed/floating union, error handling (HTTP 200 partial failures vs 503), and how to migrate from the v1 /positions response."
+hidden: true
+---
+
+The Portfolio API V2 returns a wallet's DeFi positions across supported chains, grouped by the
+fetcher that produced them. It replaces the v1 positions response with a per-fetcher envelope,
+typed amounts, and multi-chain address identifiers.
+
+V2 covers positions only. There is no v2 equivalent of the v1 `/platforms` or `/staked-jup`
+endpoints; those remain on v1.
+
+## Base URL and authentication
+
+```
+https://api.jup.ag/portfolio/v2
+```
+
+Every request must carry an API key in the `x-api-key` header.
+
+<Note>
+The Portfolio API V2 is available to whitelisted organizations only. Your Developer Platform
+organization must be enabled for it, after which any API key belonging to that organization
+works. A request with no key, or with a key whose organization is not whitelisted, is rejected.
+</Note>
+
+| Endpoint | Method | Purpose |
+| :--- | :--- | :--- |
+| [`/positions/{address}`](/api-reference/portfolio/v2/get-positions) | `GET` | All positions for a wallet |
+| [`/positions/{address}/sse`](/api-reference/portfolio/v2/stream-positions) | `GET` | Same data, streamed as it resolves |
+| [`/fluid/positions/{address}`](/api-reference/portfolio/v2/get-fluid-positions) | `GET` | Fluid compatibility variant |
+
+## Get positions
+
+Request a wallet's positions with the address in the path:
+
+```typescript
+const address = "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3";
+
+const response = await fetch(
+  `https://api.jup.ag/portfolio/v2/positions/${address}`,
+  { headers: { "x-api-key": "YOUR_API_KEY" } },
+);
+
+if (!response.ok) {
+  throw new Error(`Portfolio request failed: ${response.status}`);
+}
+
+const positions = await response.json();
+```
+
+You can pass the wallet in the `address` query parameter instead of the path. The two forms
+are equivalent; the query form requires `address`.
+
+```
+GET https://api.jup.ag/portfolio/v2/positions?address=jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
+```
+
+### Query parameters
+
+| Parameter | Type | Required | Default | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `address` | `string` | Path form: no. Query form: yes | | Wallet to query. On `solana` this is a base58 address. |
+| `networkId` | `string` | No | `solana` | Network to resolve the address against. One of `bitcoin`, `solana`, `ethereum`, `avalanche`, `polygon`, `aptos`, `sui`, `sei`, `bnb`. |
+| `fetcherIds` | `string` | No | | Comma-separated allowlist of fetcher ids. Only these fetchers run. |
+| `excludedFetcherIds` | `string` | No | | Comma-separated denylist of fetcher ids to skip. |
+| `unpriced` | `boolean` | No | | When `true`, skip USD pricing. `value` fields are omitted. |
+| `jupOnly` | `boolean` | No | | When `true`, run Jupiter fetchers only. |
+| `noJup` | `boolean` | No | | When `true`, exclude Jupiter fetchers. |
+| `noTokenInfo` | `boolean` | No | | Accepted for compatibility. V2 does not emit a `tokenInfo` map. |
+
+## Response model
+
+The response is a per-fetcher envelope:
+
+```typescript
+type PositionsResponse = {
+  date: number;         // ms timestamp when the request completed
+  duration: number;     // total request time in ms
+  extended: true;
+  fetcherResults: FetcherResult[];
+};
+```
+
+Each `fetcherResult` is the outcome of one fetcher. Check `status` before reading `elements`
+or `error`:
+
+```typescript
+type FetcherResult = {
+  id: string;           // fetcher id
+  extended: true;
+  owner: string;        // AddressId, "networkId_address"
+  networkId: string;
+  date: number;
+  duration: number;
+} & (
+  | { status: "success"; elements: PortfolioElement[] }
+  | { status: "error"; error: FetcherError }
+);
+```
+
+A successful fetcher carries an array of `elements`, where each element is one position. Every
+element shares a common set of fields and a `type` that selects its `data` shape:
+
+| Field | Description |
+| :--- | :--- |
+| `id` | Unique element id |
+| `type` | `multiple`, `liquidity`, `borrowlend`, `leverage`, or `trade` |
+| `label` | Human-readable label, e.g. `Wallet`, `Staked`, `LiquidityPool`, `LimitOrder`, `DCA` |
+| `platformId` | Platform the position belongs to |
+| `serviceId` | Service within the platform |
+| `networkId` | Network the position is on |
+| `owner` / `ownerId` | Wallet the position belongs to (unified address / address id) |
+| `sourceFetcherId` | Fetcher that produced the element |
+| `value` | USD value, omitted when unpriced or unavailable |
+| `netApy` | Net APY as a fraction, when applicable |
+
+Assets inside an element are one of three types (`generic`, `token`, `collectible`), each with
+its own `data` shape. Token and collectible assets carry both a `UnifiedAddress` (`address`) and
+an `AddressId` (`addressId`).
+
+See the [API reference](/api-reference/portfolio/v2/get-positions) for the complete schema of
+every element and asset type.
+
+### Amounts
+
+Token amounts use a tagged union. Inspect `fixed` before reading the amount:
+
+```typescript
+type Amount =
+  | { fixed: true; raw: string; decimals?: number }    // integer base units
+  | { fixed: false; value: number; decimals?: number }; // decimal, already scaled
+
+function toNumber(amount: Amount): number {
+  if (amount.fixed) {
+    return Number(amount.raw) / 10 ** (amount.decimals ?? 0);
+  }
+  return amount.value;
+}
+```
+
+### Error handling
+
+A partial failure returns **HTTP 200**. The failing fetcher appears in `fetcherResults` with
+`status: "error"` and a public `error`, while other fetchers still return their `elements`.
+These responses carry `Cache-Control: no-store`.
+
+```typescript
+type FetcherError = {
+  code: "FETCHER_CIRCUIT_OPEN" | "FETCHER_TIMEOUT" | "FETCHER_UNAVAILABLE";
+  message: string;
+  retryAfterMs?: number; // FETCHER_CIRCUIT_OPEN only
+};
+```
+
+Read positions defensively:
+
+```typescript
+for (const result of positions.fetcherResults) {
+  if (result.status === "error") {
+    console.warn(`Fetcher ${result.id} failed: ${result.error.code}`);
+    continue;
+  }
+  for (const element of result.elements) {
+    console.log(element.type, element.label, element.value);
+  }
+}
+```
+
+A whole-request failure returns **HTTP 503** with a `Retry-After` header and a body of
+`{ code, error, reason?, category?, stage?, scope?, fetcherId?, prefetcherId? }`. Retry after
+the suggested delay.
+
+## Stream positions
+
+For large wallets, stream results as each fetcher completes instead of waiting for the whole
+request. `GET /positions/{address}/sse` returns a `text/event-stream` with these events:
+
+| Event | Data |
+| :--- | :--- |
+| `start` | `{ "total": number }` — how many fetchers to expect |
+| `fetcherResult` | One `FetcherResult`, same shape as an entry in `fetcherResults` |
+| `done` | The stream completed successfully |
+| `error` | The stream could not complete; retry shortly |
+
+A heartbeat is sent every 15 seconds and the stream closes after 90 seconds. It accepts the
+same query parameters as Get Positions.
+
+```typescript
+const address = "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3";
+const res = await fetch(
+  `https://api.jup.ag/portfolio/v2/positions/${address}/sse`,
+  { headers: { "x-api-key": "YOUR_API_KEY" } },
+);
+
+const reader = res.body!.getReader();
+const decoder = new TextDecoder();
+let buffer = "";
+
+while (true) {
+  const { value, done } = await reader.read();
+  if (done) break;
+  buffer += decoder.decode(value, { stream: true });
+
+  // SSE frames are separated by a blank line
+  const frames = buffer.split("\n\n");
+  buffer = frames.pop() ?? "";
+  for (const frame of frames) {
+    const event = frame.match(/event: (.*)/)?.[1];
+    const data = frame.match(/data: (.*)/)?.[1];
+    if (event === "fetcherResult" && data) {
+      const result = JSON.parse(data);
+      console.log("fetcher", result.id, result.status);
+    }
+  }
+}
+```
+
+## Fluid positions
+
+`GET /fluid/positions/{address}` is a compatibility variant for the Fluid integration. It is
+Solana-only, always priced, and returns a fixed set of staking positions (native stake, Marinade
+native, Jito MEV rewards) in a legacy-shaped body that differs from the V2 envelope above. Use
+Get Positions for the full position set; reach out to the Portfolio team if you need the exact
+Fluid response layout.
+
+## Migrate from v1
+
+V2 is a breaking change to the positions response. The endpoint set and the request parameters
+also change.
+
+**Request**
+
+- Base path is `/portfolio/v2` instead of `/portfolio/v1`.
+- The chain selector is `networkId` (default `solana`), replacing v1's `addressSystem`.
+- v1's `platforms` filter is replaced by `fetcherIds` / `excludedFetcherIds` (fetcher ids, not
+  platform ids), plus the `jupOnly` / `noJup` toggles.
+
+**Response**
+
+| v1 | v2 |
+| :--- | :--- |
+| Flat `elements[]` at the top level | `fetcherResults[]`, each with its own `elements[]` |
+| Top-level `owner` | `owner` / `ownerId` on each fetcher result, element, and asset |
+| Top-level `value` total | No total. Sum element `value` yourself |
+| `tokenInfo` map | Removed. Token metadata is not returned |
+| `fetcherReports[]` | Folded into `fetcherResults[]` (`status` and `error` per fetcher) |
+| Amounts as raw numbers | `Amount` union (`fixed: true` `raw` / `fixed: false` `value`) |
+| `sourceRefs[].address` | `sourceRefs[]` gain `addressId` alongside `address` |
+| `data.contract` on some elements | Removed. Use `link` on the element |
+| Partial failures in `fetcherReports` | Partial failures are `status: "error"` fetcher results (HTTP 200) |
+
+A minimal v1 → v2 read migration:
+
+```typescript
+// v1: iterate a flat elements array
+for (const element of v1Response.elements) { /* ... */ }
+
+// v2: iterate elements per fetcher, skipping failed fetchers
+for (const result of v2Response.fetcherResults) {
+  if (result.status !== "success") continue;
+  for (const element of result.elements) { /* ... */ }
+}
+```
+
+## Complete example
+
+```typescript
+type Amount =
+  | { fixed: true; raw: string; decimals?: number }
+  | { fixed: false; value: number; decimals?: number };
+
+const toNumber = (a: Amount) =>
+  a.fixed ? Number(a.raw) / 10 ** (a.decimals ?? 0) : a.value;
+
+async function getPositions(address: string) {
+  const res = await fetch(
+    `https://api.jup.ag/portfolio/v2/positions/${address}`,
+    { headers: { "x-api-key": "YOUR_API_KEY" } },
+  );
+
+  if (res.status === 503) {
+    const body = await res.json();
+    throw new Error(`Portfolio unavailable (${body.code}); retry shortly`);
+  }
+  if (!res.ok) {
+    throw new Error(`Portfolio request failed: ${res.status}`);
+  }
+
+  const positions = await res.json();
+  let total = 0;
+
+  for (const result of positions.fetcherResults) {
+    if (result.status === "error") {
+      console.warn(`skip ${result.id}: ${result.error.code}`);
+      continue;
+    }
+    for (const element of result.elements) {
+      if (typeof element.value === "number") total += element.value;
+    }
+  }
+
+  console.log(`Total priced value: $${total.toFixed(2)}`);
+  return positions;
+}
+
+getPositions("jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3").catch(console.error);
+```

@@ -2,7 +2,7 @@
 title: "Portfolio API V2"
 sidebarTitle: "Portfolio V2"
 description: "Query a wallet's positions with the Portfolio API V2"
-llmsDescription: "WHITELISTED ACCESS ONLY. How to use the Portfolio API V2 at api.jup.ag/portfolio/v2 to query a wallet's DeFi positions. Covers GET /positions/{address} (and the ?address= query form), the Fluid compatibility variant GET /fluid/positions/{address}, the per-fetcher response envelope { date, duration, extended, fetcherResults[] }, the five element types and three asset types, the V2Amount fixed/floating union, error handling (HTTP 200 partial failures vs 503), and how to migrate from the v1 /positions response."
+llmsDescription: "WHITELISTED ACCESS ONLY. How to use the Portfolio API V2 at api.jup.ag/portfolio/v2 to query a wallet's DeFi positions. Covers GET /positions/{address} (and the ?address= query form), the per-fetcher response envelope { date, duration, extended, fetcherResults[] }, the five element types and three asset types, the V2Amount fixed/floating union, error handling (HTTP 200 partial failures vs 503), and how to migrate from the v1 /positions response."
 hidden: true
 ---
 
@@ -30,7 +30,6 @@ works. A request with no key, or with a key whose organization is not whiteliste
 | Endpoint | Method | Purpose |
 | :--- | :--- | :--- |
 | [`/positions/{address}`](/api-reference/portfolio/v2/get-positions) | `GET` | All positions for a wallet |
-| [`/fluid/positions/{address}`](/api-reference/portfolio/v2/get-fluid-positions) | `GET` | Fluid compatibility variant |
 
 ## Get positions
 
@@ -173,14 +172,6 @@ A whole-request failure returns **HTTP 503** with a `Retry-After` header and a b
 `{ code, error, reason?, category?, stage?, scope?, fetcherId?, prefetcherId? }`. Retry after
 the suggested delay.
 
-## Fluid positions
-
-`GET /fluid/positions/{address}` is a compatibility variant for the Fluid integration. It is
-Solana-only, always priced, and returns a fixed set of staking positions (native stake, Marinade
-native, Jito MEV rewards) in a legacy-shaped body that differs from the V2 envelope above. Use
-Get Positions for the full position set; reach out to the Portfolio team if you need the exact
-Fluid response layout.
-
 ## Migrate from v1
 
 V2 is a breaking change to the positions response. The endpoint set and the request parameters
@@ -266,11 +257,6 @@ getPositions("jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3").catch(console.error)
 
 ## API reference
 
-<CardGroup cols={2}>
-  <Card title="Get Positions" href="/api-reference/portfolio/v2/get-positions">
-    `GET /positions/{address}` — all positions for a wallet, grouped per fetcher.
-  </Card>
-  <Card title="Get Fluid Positions" href="/api-reference/portfolio/v2/get-fluid-positions">
-    `GET /fluid/positions/{address}` — Fluid compatibility variant.
-  </Card>
-</CardGroup>
+<Card title="Get Positions" href="/api-reference/portfolio/v2/get-positions">
+  `GET /positions/{address}`: all positions for a wallet, grouped per fetcher.
+</Card>

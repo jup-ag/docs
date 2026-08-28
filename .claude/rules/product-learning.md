@@ -236,11 +236,13 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
   heartbeat 15s, deadline 90s, `SSE_DISABLED` when off) but it is not exposed, so the v2 docs,
   spec, and API reference deliberately omit it. Do not re-add a streaming endpoint from source
   discovery without confirming it is live again.
-- [2026-08-28] **`/fluid/positions/:address`** is a Fluid **compatibility serializer**
-  (`routes/fluidResponse.ts`, ~1500 lines): Solana-only, always priced, restricted to a fixed
-  fetcher set (`native-stake-solana`, `marinade-native`, `jito-mev-rewards`), and returns a
-  **legacy (v1-shaped)** body, not the v2 envelope. Documented lightly (purpose + constraints,
-  loose response schema) — do not model its bespoke shape in full; it is an integration shim.
+- [2026-08-28] **`/fluid/positions/:address` is deliberately NOT documented** (YY, 2026-08-28:
+  "drop it for now"). It is a Fluid **compatibility serializer** (`routes/fluidResponse.ts`,
+  ~1500 lines): Solana-only, always priced, restricted to a fixed fetcher set
+  (`native-stake-solana`, `marinade-native`, `jito-mev-rewards`), returning a **legacy
+  (v1-shaped)** body, not the v2 envelope. It exists only for one specific integration and is
+  not a general-purpose endpoint, so the v2 docs, spec, and API reference omit it. Re-add only
+  if a whitelisted org actually consumes it.
 
 ---
 

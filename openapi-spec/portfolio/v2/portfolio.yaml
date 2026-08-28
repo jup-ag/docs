@@ -974,7 +974,7 @@ components:
           description: >-
             Machine-readable code, e.g. FETCHER_EXECUTION_UNAVAILABLE,
             PREFETCHER_PREREQUISITE_UNAVAILABLE, PIPELINE_STAGE_TIMEOUT,
-            FLUID_ENRICHMENT_UNAVAILABLE, or a worker admission code.
+            or a worker admission code.
         error:
           type: string
           description: Human-readable message.
@@ -1038,30 +1038,3 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServiceError'
 
-  '/fluid/positions/{address}':
-    get:
-      operationId: getFluidPositions
-      summary: Get Fluid positions
-      description: >-
-        Fluid compatibility variant. Returns a fixed set of Solana staking
-        positions (native stake, Marinade native, Jito MEV rewards) in a
-        legacy-shaped response. Solana-only and always priced. Use the standard
-        Get Positions endpoint for the full position set and the V2 response
-        envelope; this endpoint exists for the specific Fluid integration.
-      parameters:
-        - $ref: '#/components/parameters/Address'
-      responses:
-        '200':
-          description: Legacy-shaped Fluid positions response.
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: true
-                description: Compatibility-shaped body keyed by fetcher. Contact the Portfolio team for the exact field layout.
-        '503':
-          description: A required Fluid enrichment dependency failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServiceError'

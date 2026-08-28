@@ -309,3 +309,17 @@ async function getPositions(address: string) {
 
 getPositions("jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3").catch(console.error);
 ```
+
+## API reference
+
+<CardGroup cols={3}>
+  <Card title="Get Positions" href="/api-reference/portfolio/v2/get-positions">
+    `GET /positions/{address}` — all positions for a wallet, grouped per fetcher.
+  </Card>
+  <Card title="Stream Positions (SSE)" href="/api-reference/portfolio/v2/stream-positions">
+    `GET /positions/{address}/sse` — the same data streamed as it resolves.
+  </Card>
+  <Card title="Get Fluid Positions" href="/api-reference/portfolio/v2/get-fluid-positions">
+    `GET /fluid/positions/{address}` — Fluid compatibility variant.
+  </Card>
+</CardGroup>

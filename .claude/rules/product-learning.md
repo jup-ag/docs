@@ -176,6 +176,76 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 
 ---
 
+# Jupiter Portfolio API
+
+## Sources
+
+- **Live API:** `api.jup.ag/portfolio/v2` (positions) and `api.jup.ag/portfolio/v1` (legacy;
+  also has `/platforms` and `/staked-jup`, which have no v2 equivalent). v2 access is
+  whitelist-gated per Developer Platform org; no public request path (YY: deliberately not
+  documented so there is no discoverable access point).
+- **OpenAPI spec (this repo):** `openapi-spec/portfolio/v2/portfolio.yaml` (v2, source-built),
+  `openapi-spec/portfolio/portfolio.yaml` (v1).
+- **Source repo:** `jup-ag/portfolio`, cloned at `/Users/yy/Documents/Projects/portfolio`
+  (verified @ HEAD `a5e347f`). Response types: `@jup-ag/portfolio-core`
+  (`portfolio/core-types/src/index.d.ts`, the `Extended = true` variant) and
+  `portfolio/core/src/fetcher/types/runFetcher.ts`. Request surface + error serialization:
+  `packages/routes-portfolio-v2/src/{routes/positions.ts,routes/positions-sse.ts,schemas.ts,workers/positionsPayload.ts,prefetcherUnavailable.ts}`.
+
+## V2 positions API (source-verified 2026-08-28, `a5e347f`)
+
+- [2026-08-28] Docs are **hidden** (`hidden: true` + not in `docs.json` nav → excluded from
+  `llms.txt`) and shared by direct URL with whitelisted orgs only. Guide `portfolio/v2/index.mdx`;
+  API reference `api-reference/portfolio/v2/{get-positions,stream-positions,get-fluid-positions}.mdx`.
+  v1 pages/spec/nav left untouched. Not a public API → no changelog entry (BUILD-829).
+- [2026-08-28] **Routes** (the route package mounts at `/positions`; the public `/portfolio/v2`
+  prefix is applied by the gateway, not in the repo — base URL `api.jup.ag/portfolio/v2` per YY):
+  `GET /positions?address=`, `GET /positions/:address`, `GET /positions/:address/sse` (SSE),
+  `GET /fluid/positions/:address` (only when `fluidEnabled`). No auth/whitelist logic in the
+  route package; it is gateway-side.
+- [2026-08-28] **Query params** (`schemas.ts`): `address` (required on the query form),
+  `networkId` (default `solana`), `fetcherIds`, `excludedFetcherIds`, `unpriced`, `jupOnly`,
+  `noJup`, `noTokenInfo`. No enum validation on params. `networkId` accepts the 9-value enum
+  bitcoin/solana/ethereum/avalanche/polygon/aptos/sui/sei/bnb (`portfolio-core` `NetworkId`).
+- [2026-08-28] **Response envelope** (`runFetcher.ts`): `{ date, duration, extended: true,
+  fetcherResults[] }`. Results are grouped **per fetcher**; each `fetcherResult` =
+  `{ id, extended, owner (AddressId), networkId, date, duration, status }` with `status:"success"`
+  → `elements[]` or `status:"error"` → `error{}`. No top-level `owner`, `value` total,
+  `tokenInfo`, `highlights`, or `fetcherReports` (all v1). `owner`/`ownerId` live on each
+  fetcher result, element, and asset.
+- [2026-08-28] **Amounts** are the `Amount` union `{fixed:true, raw:string, decimals?}` (integer
+  base units) | `{fixed:false, value:number, decimals?}` (decimal, already scaled). v1 returned
+  raw numbers — a breaking change. Element types: multiple, liquidity, borrowlend, leverage,
+  trade. Asset types: generic, token, collectible (token/collectible carry both `address`
+  UnifiedAddress and `addressId` AddressId). Leverage `data` has **no** `contract` and **no**
+  `link` (link is on the element) — corrects the draft PDF.
+- [2026-08-28] **Error model.** Partial failure = **HTTP 200** with the failing fetcher as
+  `status:"error"` + `Cache-Control: no-store`. Per-fetcher public error
+  (`workers/positionsPayload.ts`): `{ code, message, retryAfterMs? }` with code
+  `FETCHER_CIRCUIT_OPEN` (message "Fetcher data is temporarily unavailable", carries
+  `retryAfterMs`), `FETCHER_TIMEOUT`, or `FETCHER_UNAVAILABLE`. Whole-request failure =
+  **503** with body `{ code, error, reason?, category?, prefetcherId?, fetcherId?, stage?,
+  scope? }` (`schemas.ts` `responseSchema.503`): `reason` ∈ timeout/execution_error/
+  phase_timeout/worker_lost/protocol_error/unknown; `category` ∈ postgres/redis/rpc/mixed/
+  unknown; `stage` ∈ yield/price/serialization/cleanup; `scope` ∈ final/progressive. 503 `code`
+  values seen in source: `FETCHER_EXECUTION_UNAVAILABLE`, `PREFETCHER_PREREQUISITE_UNAVAILABLE`,
+  `PIPELINE_STAGE_TIMEOUT`, `FLUID_ENRICHMENT_UNAVAILABLE`, plus worker-admission codes.
+- [2026-08-28] **SSE streaming (`/positions/:address/sse`) is NOT available and must NOT be
+  documented** (YY, 2026-08-28: "no longer available"). The route still exists in source
+  (`positions-sse.ts`: `text/event-stream`, events `start`/`fetcherResult`/`done`/`error`,
+  heartbeat 15s, deadline 90s, `SSE_DISABLED` when off) but it is not exposed, so the v2 docs,
+  spec, and API reference deliberately omit it. Do not re-add a streaming endpoint from source
+  discovery without confirming it is live again.
+- [2026-08-28] **`/fluid/positions/:address` is deliberately NOT documented** (YY, 2026-08-28:
+  "drop it for now"). It is a Fluid **compatibility serializer** (`routes/fluidResponse.ts`,
+  ~1500 lines): Solana-only, always priced, restricted to a fixed fetcher set
+  (`native-stake-solana`, `marinade-native`, `jito-mev-rewards`), returning a **legacy
+  (v1-shaped)** body, not the v2 envelope. It exists only for one specific integration and is
+  not a general-purpose endpoint, so the v2 docs, spec, and API reference omit it. Re-add only
+  if a whitelisted org actually consumes it.
+
+---
+
 # Developer Platform
 
 ## Undocumented Behavior

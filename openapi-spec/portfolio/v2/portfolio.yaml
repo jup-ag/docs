@@ -1,0 +1,1040 @@
+openapi: 3.1.0
+info:
+  title: Jupiter Portfolio API V2
+  version: 2.0.0
+  description: >-
+    Portfolio V2 positions API. Returns a wallet's DeFi positions grouped per
+    fetcher, across multiple chains. Access is restricted to whitelisted
+    organizations. Authenticate with an `x-api-key` header from a whitelisted
+    Developer Platform organization.
+
+servers:
+  - url: https://api.jup.ag/portfolio/v2
+    description: Jupiter Portfolio API V2 endpoint
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: >-
+        API key from a whitelisted Developer Platform organization. Requests
+        without a key, or with a key whose organization is not whitelisted, are
+        rejected.
+
+  parameters:
+    Address:
+      name: address
+      in: path
+      required: true
+      description: Wallet address to query. On the default `solana` network this is a base58 Solana address.
+      schema:
+        type: string
+      example: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
+    NetworkId:
+      name: networkId
+      in: query
+      required: false
+      description: Network to resolve the address against. Defaults to `solana`.
+      schema:
+        $ref: '#/components/schemas/NetworkId'
+    FetcherIds:
+      name: fetcherIds
+      in: query
+      required: false
+      description: Comma-separated allowlist of fetcher ids. When set, only these fetchers run.
+      schema:
+        type: string
+      example: jupiter-perpetual,jupiter-limit
+    ExcludedFetcherIds:
+      name: excludedFetcherIds
+      in: query
+      required: false
+      description: Comma-separated denylist of fetcher ids to skip.
+      schema:
+        type: string
+    Unpriced:
+      name: unpriced
+      in: query
+      required: false
+      description: When `true`, skip USD pricing. Asset and element `value` fields are omitted.
+      schema:
+        type: boolean
+    JupOnly:
+      name: jupOnly
+      in: query
+      required: false
+      description: When `true`, run Jupiter fetchers only.
+      schema:
+        type: boolean
+    NoJup:
+      name: noJup
+      in: query
+      required: false
+      description: When `true`, exclude Jupiter fetchers.
+      schema:
+        type: boolean
+    NoTokenInfo:
+      name: noTokenInfo
+      in: query
+      required: false
+      description: Accepted for compatibility. V2 does not emit a `tokenInfo` map regardless of this value.
+      schema:
+        type: boolean
+
+  schemas:
+    NetworkId:
+      type: string
+      description: Supported network identifiers.
+      enum:
+        - bitcoin
+        - solana
+        - ethereum
+        - avalanche
+        - polygon
+        - aptos
+        - sui
+        - sei
+        - bnb
+      default: solana
+
+    AddressId:
+      type: string
+      description: >-
+        Globally unique address identifier in the form `networkId_unifiedAddress`
+        (e.g. `solana_So11111111111111111111111111111111111111112`).
+      example: solana_So11111111111111111111111111111111111111112
+
+    UnifiedAddress:
+      type: string
+      description: Address normalized for its network.
+      example: So11111111111111111111111111111111111111112
+
+    Amount:
+      description: >-
+        A token amount. `fixed: true` carries an integer `raw` string in base
+        units; `fixed: false` carries a decimal `value` already scaled by
+        `decimals`. Always inspect `fixed` before reading `raw` vs `value`.
+      oneOf:
+        - $ref: '#/components/schemas/FixedAmount'
+        - $ref: '#/components/schemas/FloatingAmount'
+      discriminator:
+        propertyName: fixed
+
+    FixedAmount:
+      type: object
+      required: [fixed, raw]
+      properties:
+        fixed:
+          type: boolean
+          const: true
+        raw:
+          type: string
+          description: Integer amount in base units, as a string.
+          example: "10000000000"
+        decimals:
+          type: number
+          description: Token decimals. May be omitted when unknown.
+
+    FloatingAmount:
+      type: object
+      required: [fixed, value]
+      properties:
+        fixed:
+          type: boolean
+          const: false
+        value:
+          type: number
+          description: Decimal amount, already scaled by `decimals`.
+          example: 10
+        decimals:
+          type: number
+          description: Token decimals. May be omitted when unknown.
+
+    Yield:
+      type: object
+      description: Yield information. Values are fractions (0.28 = 28%). Negative means it costs to hold.
+      required: [apr, apy]
+      properties:
+        name:
+          type: string
+        apr:
+          type: number
+          description: Annual Percentage Rate as a fraction.
+        apy:
+          type: number
+          description: Annual Percentage Yield as a fraction.
+        addressId:
+          $ref: '#/components/schemas/AddressId'
+
+    SourceRef:
+      type: object
+      description: Reference to an on-chain source account (pool, market, validator, etc).
+      required: [address, addressId, name]
+      properties:
+        address:
+          $ref: '#/components/schemas/UnifiedAddress'
+        addressId:
+          $ref: '#/components/schemas/AddressId'
+        name:
+          type: string
+          description: >-
+            Kind of source account. Common values include Pool, Farm, Market,
+            Vault, Lending Market, Strategy, NFT Mint, Reserve, Proposal,
+            Distributor, Locker, Custody, Pair, Validator.
+        value:
+          type: string
+          description: Optional identifier for a sub-resource scoped to the referenced address.
+
+    CollectibleAttribute:
+      type: object
+      additionalProperties: true
+      properties:
+        trait_type:
+          type: string
+        value: {}
+
+    CollectibleCollection:
+      type: object
+      properties:
+        id:
+          type: string
+        floorPrice:
+          type: number
+        name:
+          type: string
+
+    AssetAttributes:
+      type: object
+      description: Extra metadata attached to an asset.
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+        lock:
+          type: object
+          properties:
+            until:
+              type: number
+              description: Timestamp (ms) when the asset unlocks.
+            unbonding:
+              type: number
+              description: Unbonding period in ms.
+        isDeprecated:
+          type: boolean
+        isClaimable:
+          type: boolean
+        valuationStatus:
+          type: string
+          enum: [unavailable]
+          description: Present and set to `unavailable` when USD valuation is intentionally not available.
+        validator:
+          type: object
+          description: Present for native staking positions.
+          required: [address, yields]
+          properties:
+            name:
+              type: string
+            imageUri:
+              type: string
+            address:
+              type: string
+            yields:
+              type: array
+              items:
+                $ref: '#/components/schemas/Yield'
+        prediction:
+          type: object
+          description: Present for prediction-market positions.
+          required: [market, sideName, entryPrice, markPrice, size, sizeValue, pnlValue, pnlAfterFeesValue]
+          properties:
+            market:
+              type: object
+              required: [marketTitle]
+              properties:
+                marketTitle:
+                  type: string
+                eventTitle:
+                  type: string
+                closeTime:
+                  type: number
+                  description: Timestamp in ms.
+                settlementTime:
+                  type: number
+                  description: Timestamp in ms.
+            sideName:
+              type: string
+            feesPaidValue:
+              type: number
+            entryPrice:
+              type: number
+            markPrice:
+              type: number
+            size:
+              type: number
+            sizeValue:
+              type: number
+            pnlValue:
+              type: number
+            pnlPercent:
+              type: number
+            pnlAfterFeesValue:
+              type: number
+            pnlAfterFeesPercent:
+              type: number
+            createdAt:
+              type: number
+              description: Timestamp in ms.
+
+    AssetCommon:
+      type: object
+      required: [type, attributes, owner, ownerId, networkId]
+      properties:
+        type:
+          type: string
+          enum: [generic, token, collectible]
+        attributes:
+          $ref: '#/components/schemas/AssetAttributes'
+        name:
+          type: string
+        imageUri:
+          type: string
+          format: uri
+        refAddress:
+          $ref: '#/components/schemas/AddressId'
+        sourceRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceRef'
+        link:
+          type: string
+          format: uri
+        owner:
+          $ref: '#/components/schemas/UnifiedAddress'
+        ownerId:
+          $ref: '#/components/schemas/AddressId'
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        value:
+          type: number
+          description: USD value. Omitted when unpriced or unavailable.
+
+    AssetGeneric:
+      allOf:
+        - $ref: '#/components/schemas/AssetCommon'
+        - type: object
+          required: [type, data]
+          properties:
+            type:
+              type: string
+              const: generic
+            data:
+              type: object
+              required: [amount]
+              properties:
+                address:
+                  $ref: '#/components/schemas/UnifiedAddress'
+                addressId:
+                  $ref: '#/components/schemas/AddressId'
+                amount:
+                  $ref: '#/components/schemas/Amount'
+                price:
+                  type: number
+
+    AssetToken:
+      allOf:
+        - $ref: '#/components/schemas/AssetCommon'
+        - type: object
+          required: [type, data]
+          properties:
+            type:
+              type: string
+              const: token
+            data:
+              type: object
+              required: [address, addressId, amount]
+              properties:
+                address:
+                  $ref: '#/components/schemas/UnifiedAddress'
+                addressId:
+                  $ref: '#/components/schemas/AddressId'
+                amount:
+                  $ref: '#/components/schemas/Amount'
+                price:
+                  type: number
+                yields:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Yield'
+
+    AssetCollectible:
+      allOf:
+        - $ref: '#/components/schemas/AssetCommon'
+        - type: object
+          required: [type, data]
+          properties:
+            type:
+              type: string
+              const: collectible
+            data:
+              type: object
+              required: [address, addressId, amount]
+              properties:
+                address:
+                  $ref: '#/components/schemas/UnifiedAddress'
+                addressId:
+                  $ref: '#/components/schemas/AddressId'
+                amount:
+                  $ref: '#/components/schemas/Amount'
+                name:
+                  type: string
+                description:
+                  type: string
+                imageUri:
+                  type: string
+                  format: uri
+                dataUri:
+                  type: string
+                  format: uri
+                attributes:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CollectibleAttribute'
+                collection:
+                  $ref: '#/components/schemas/CollectibleCollection'
+                price:
+                  type: number
+
+    Asset:
+      description: A generic, token, or collectible asset.
+      oneOf:
+        - $ref: '#/components/schemas/AssetGeneric'
+        - $ref: '#/components/schemas/AssetToken'
+        - $ref: '#/components/schemas/AssetCollectible'
+      discriminator:
+        propertyName: type
+        mapping:
+          generic: '#/components/schemas/AssetGeneric'
+          token: '#/components/schemas/AssetToken'
+          collectible: '#/components/schemas/AssetCollectible'
+
+    ElementLabel:
+      type: string
+      enum:
+        - Wallet
+        - Staked
+        - LiquidityPool
+        - Farming
+        - Vault
+        - Lending
+        - Vesting
+        - Deposit
+        - Rewards
+        - Airdrop
+        - Margin
+        - LimitOrder
+        - DCA
+        - SmartDCA
+        - Leverage
+
+    ElementCommon:
+      type: object
+      required: [id, platformId, serviceId, type, label, owner, ownerId, networkId, sourceFetcherId]
+      properties:
+        id:
+          type: string
+        platformId:
+          type: string
+        serviceId:
+          type: string
+        type:
+          type: string
+          enum: [multiple, liquidity, borrowlend, leverage, trade]
+        label:
+          $ref: '#/components/schemas/ElementLabel'
+        name:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        valuationStatus:
+          type: string
+          enum: [unavailable]
+        refAddress:
+          $ref: '#/components/schemas/AddressId'
+        sourceRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceRef'
+        link:
+          type: string
+          format: uri
+        owner:
+          $ref: '#/components/schemas/UnifiedAddress'
+        ownerId:
+          $ref: '#/components/schemas/AddressId'
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        sourceFetcherId:
+          type: string
+        value:
+          type: number
+          description: USD value of the element. Omitted when unpriced or unavailable.
+        netApy:
+          type: number
+          description: Net APY as a fraction, including internal token yields.
+
+    LiquidityLp:
+      type: object
+      required: [mint, mintId, amount]
+      properties:
+        mint:
+          $ref: '#/components/schemas/UnifiedAddress'
+        mintId:
+          $ref: '#/components/schemas/AddressId'
+        amount:
+          $ref: '#/components/schemas/Amount'
+
+    LeverageLimitOrder:
+      type: object
+      required: [amount, locked]
+      properties:
+        price:
+          type: number
+        amount:
+          type: number
+        value:
+          type: number
+        locked:
+          type: boolean
+
+    IsoLevPosition:
+      type: object
+      required: [collateralValue, side, entryPrice, markPrice, size, sizeValue, pnlValue, liquidationPrice, value]
+      properties:
+        address:
+          $ref: '#/components/schemas/UnifiedAddress'
+        addressId:
+          $ref: '#/components/schemas/AddressId'
+        name:
+          type: string
+        imageUri:
+          type: string
+          format: uri
+        collateralValue:
+          type: number
+        side:
+          type: string
+          enum: [long, short]
+        entryPrice:
+          type: number
+        markPrice:
+          type: number
+        size:
+          type: number
+        sizeValue:
+          type: number
+        pnlValue:
+          type: number
+        liquidationPrice:
+          type: number
+        leverage:
+          type: number
+        tp:
+          type: number
+        sl:
+          type: number
+        limitOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeverageLimitOrder'
+        value:
+          type: number
+        refAddress:
+          $ref: '#/components/schemas/AddressId'
+        sourceRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceRef'
+
+    CrossLevPosition:
+      description: Same as IsoLevPosition without `collateralValue`.
+      type: object
+      required: [side, entryPrice, markPrice, size, sizeValue, pnlValue, liquidationPrice, value]
+      properties:
+        address:
+          $ref: '#/components/schemas/UnifiedAddress'
+        addressId:
+          $ref: '#/components/schemas/AddressId'
+        name:
+          type: string
+        imageUri:
+          type: string
+          format: uri
+        side:
+          type: string
+          enum: [long, short]
+        entryPrice:
+          type: number
+        markPrice:
+          type: number
+        size:
+          type: number
+        sizeValue:
+          type: number
+        pnlValue:
+          type: number
+        liquidationPrice:
+          type: number
+        leverage:
+          type: number
+        tp:
+          type: number
+        sl:
+          type: number
+        limitOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeverageLimitOrder'
+        value:
+          type: number
+        refAddress:
+          $ref: '#/components/schemas/AddressId'
+        sourceRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceRef'
+
+    ElementMultiple:
+      allOf:
+        - $ref: '#/components/schemas/ElementCommon'
+        - type: object
+          required: [type, data]
+          properties:
+            type:
+              type: string
+              const: multiple
+            data:
+              type: object
+              required: [assets]
+              properties:
+                assets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Asset'
+                assetsValue:
+                  type: number
+                assetsYields:
+                  type: array
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Yield'
+                rewardAssets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Asset'
+                rewardAssetsValue:
+                  type: number
+
+    ElementLiquidity:
+      allOf:
+        - $ref: '#/components/schemas/ElementCommon'
+        - type: object
+          required: [type, data]
+          properties:
+            type:
+              type: string
+              const: liquidity
+            data:
+              type: object
+              required: [assets, rewardAssets, yields]
+              properties:
+                assets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Asset'
+                assetsValue:
+                  type: number
+                rewardAssets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Asset'
+                rewardAssetsValue:
+                  type: number
+                yields:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Yield'
+                lp:
+                  $ref: '#/components/schemas/LiquidityLp'
+
+    ElementBorrowLend:
+      allOf:
+        - $ref: '#/components/schemas/ElementCommon'
+        - type: object
+          required: [type, data]
+          properties:
+            type:
+              type: string
+              const: borrowlend
+            data:
+              type: object
+              required:
+                - suppliedAssets
+                - suppliedValue
+                - borrowedAssets
+                - borrowedValue
+                - rewardAssets
+                - rewardValue
+                - value
+                - suppliedYields
+                - borrowedYields
+                - healthRatio
+              properties:
+                suppliedAssets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Asset'
+                suppliedValue:
+                  type: number
+                borrowedAssets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Asset'
+                borrowedValue:
+                  type: number
+                rewardAssets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Asset'
+                rewardValue:
+                  type: number
+                unsettled:
+                  type: object
+                  required: [assets, assetsValue]
+                  properties:
+                    assets:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Asset'
+                    assetsValue:
+                      type: number
+                value:
+                  type: number
+                suppliedYields:
+                  type: array
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Yield'
+                borrowedYields:
+                  type: array
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Yield'
+                healthRatio:
+                  oneOf:
+                    - type: number
+                    - type: 'null'
+                  description: 1 = full health, 0 or below = liquidatable, null = unknown.
+                expireOn:
+                  type: number
+                  description: Timestamp (ms) when the loan expires.
+                fixedTerms:
+                  type: object
+                  description: Present for fixed-terms (NFT-collateralized) loans.
+                  required: [isLender]
+                  properties:
+                    isLender:
+                      type: boolean
+
+    ElementLeverage:
+      allOf:
+        - $ref: '#/components/schemas/ElementCommon'
+        - type: object
+          required: [type, data]
+          properties:
+            type:
+              type: string
+              const: leverage
+            data:
+              type: object
+              required: [value]
+              properties:
+                isolated:
+                  type: object
+                  required: [positions, value]
+                  properties:
+                    positions:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/IsoLevPosition'
+                    value:
+                      type: number
+                cross:
+                  type: object
+                  required: [collateralValue, positions, value]
+                  properties:
+                    leverage:
+                      type: number
+                    collateralAssets:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Asset'
+                    collateralValue:
+                      type: number
+                    positions:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CrossLevPosition'
+                    value:
+                      type: number
+                value:
+                  type: number
+                  description: Total equity of the leverage element.
+
+    ElementTrade:
+      allOf:
+        - $ref: '#/components/schemas/ElementCommon'
+        - type: object
+          required: [type, data]
+          properties:
+            type:
+              type: string
+              const: trade
+            data:
+              type: object
+              required:
+                - assets
+                - inputAddress
+                - inputAddressId
+                - outputAddress
+                - outputAddressId
+                - initialInputAmount
+                - withdrawnOutputAmount
+                - filledPercentage
+              properties:
+                assets:
+                  type: object
+                  required: [input, output]
+                  properties:
+                    input:
+                      oneOf:
+                        - $ref: '#/components/schemas/Asset'
+                        - type: 'null'
+                    output:
+                      oneOf:
+                        - $ref: '#/components/schemas/Asset'
+                        - type: 'null'
+                inputAddress:
+                  $ref: '#/components/schemas/UnifiedAddress'
+                inputAddressId:
+                  $ref: '#/components/schemas/AddressId'
+                inputPrice:
+                  type: number
+                outputAddress:
+                  $ref: '#/components/schemas/UnifiedAddress'
+                outputAddressId:
+                  $ref: '#/components/schemas/AddressId'
+                outputPrice:
+                  type: number
+                initialInputAmount:
+                  $ref: '#/components/schemas/Amount'
+                withdrawnOutputAmount:
+                  $ref: '#/components/schemas/Amount'
+                expectedOutputAmount:
+                  $ref: '#/components/schemas/Amount'
+                filledPercentage:
+                  type: number
+                  description: Filled fraction between 0 and 1.
+                createdAt:
+                  type: number
+                  description: Timestamp in ms.
+                expireAt:
+                  type: number
+                  description: Timestamp in ms.
+                recurring:
+                  type: object
+                  required: [cycles, interval]
+                  properties:
+                    cycles:
+                      type: number
+                      description: Total number of orders.
+                    interval:
+                      type: number
+                      description: Interval between two orders in ms.
+                    priceRange:
+                      type: object
+                      properties:
+                        min:
+                          type: number
+                        max:
+                          type: number
+
+    PortfolioElement:
+      description: One position. The `type` field selects the `data` shape.
+      oneOf:
+        - $ref: '#/components/schemas/ElementMultiple'
+        - $ref: '#/components/schemas/ElementLiquidity'
+        - $ref: '#/components/schemas/ElementBorrowLend'
+        - $ref: '#/components/schemas/ElementLeverage'
+        - $ref: '#/components/schemas/ElementTrade'
+      discriminator:
+        propertyName: type
+        mapping:
+          multiple: '#/components/schemas/ElementMultiple'
+          liquidity: '#/components/schemas/ElementLiquidity'
+          borrowlend: '#/components/schemas/ElementBorrowLend'
+          leverage: '#/components/schemas/ElementLeverage'
+          trade: '#/components/schemas/ElementTrade'
+
+    FetcherError:
+      type: object
+      description: Public error for a single failed fetcher. Appears in the `error` branch of a fetcher result.
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum:
+            - FETCHER_CIRCUIT_OPEN
+            - FETCHER_TIMEOUT
+            - FETCHER_UNAVAILABLE
+        message:
+          type: string
+        retryAfterMs:
+          type: number
+          description: Present only for FETCHER_CIRCUIT_OPEN. Suggested wait before retrying this fetcher.
+
+    FetcherResult:
+      type: object
+      description: Result for a single fetcher. Inspect `status` before reading `elements` vs `error`.
+      required: [id, extended, owner, networkId, date, duration, status]
+      properties:
+        id:
+          type: string
+          description: Fetcher id.
+        extended:
+          type: boolean
+          const: true
+        owner:
+          $ref: '#/components/schemas/AddressId'
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        date:
+          type: number
+          description: Unix timestamp (ms) when this fetcher ran.
+        duration:
+          type: number
+          description: Fetcher execution time in ms.
+        status:
+          type: string
+          enum: [success, error]
+        elements:
+          type: array
+          description: Present when `status` is `success`.
+          items:
+            $ref: '#/components/schemas/PortfolioElement'
+        error:
+          $ref: '#/components/schemas/FetcherError'
+
+    PositionsResponse:
+      type: object
+      description: Positions envelope. Results are grouped per fetcher.
+      required: [date, duration, extended, fetcherResults]
+      properties:
+        date:
+          type: number
+          description: Unix timestamp (ms) when the request completed.
+        duration:
+          type: number
+          description: Total request time in ms.
+        extended:
+          type: boolean
+          const: true
+        fetcherResults:
+          type: array
+          items:
+            $ref: '#/components/schemas/FetcherResult'
+
+    ServiceError:
+      type: object
+      description: Whole-request failure body (HTTP 503).
+      required: [code, error]
+      properties:
+        code:
+          type: string
+          description: >-
+            Machine-readable code, e.g. FETCHER_EXECUTION_UNAVAILABLE,
+            PREFETCHER_PREREQUISITE_UNAVAILABLE, PIPELINE_STAGE_TIMEOUT,
+            or a worker admission code.
+        error:
+          type: string
+          description: Human-readable message.
+        reason:
+          type: string
+          enum: [timeout, execution_error, phase_timeout, worker_lost, protocol_error, unknown]
+        category:
+          type: string
+          enum: [postgres, redis, rpc, mixed, unknown]
+        prefetcherId:
+          type: string
+        fetcherId:
+          type: string
+        stage:
+          type: string
+          enum: [yield, price, serialization, cleanup]
+        scope:
+          type: string
+          enum: [final, progressive]
+
+paths:
+  '/positions/{address}':
+    get:
+      operationId: getPositions
+      summary: Get positions
+      description: >-
+        Return all positions for a wallet, grouped per fetcher. A partial
+        failure still returns HTTP 200 with an `error` branch inside the
+        affected `fetcherResults` entry (and `Cache-Control: no-store`); only a
+        whole-request failure returns 503.
+
+
+        You can also call `GET /positions?address={address}` with the wallet in
+        the `address` query parameter instead of the path. The query form
+        requires `address`; all other parameters are shared.
+      parameters:
+        - $ref: '#/components/parameters/Address'
+        - $ref: '#/components/parameters/NetworkId'
+        - $ref: '#/components/parameters/FetcherIds'
+        - $ref: '#/components/parameters/ExcludedFetcherIds'
+        - $ref: '#/components/parameters/Unpriced'
+        - $ref: '#/components/parameters/JupOnly'
+        - $ref: '#/components/parameters/NoJup'
+        - $ref: '#/components/parameters/NoTokenInfo'
+      responses:
+        '200':
+          description: Positions grouped per fetcher.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PositionsResponse'
+        '503':
+          description: The request was shed or a required stage failed.
+          headers:
+            Retry-After:
+              description: Suggested wait in seconds before retrying.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceError'
+

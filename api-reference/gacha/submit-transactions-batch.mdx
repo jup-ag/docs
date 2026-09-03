@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /transactions/submit-batch
+title: "Submit Transactions Batch"
+description: "Submit signed transactions for several intents at once"
+llmsDescription: "POST /gacha/v2/transactions/submit-batch submits several intents in one round trip, typically the plans built by POST /gacha/v2/buyback. Each submission {reference, signedTransactions} is dispatched independently and reported in request order with an ok flag, so a single failure never rejects the batch: a well-formed request returns 200 even when every entry failed. Same idempotency as the single submit endpoint."
+hidden: true
+---

@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml get /inventory/{address}
+title: "Get Wallet Inventory"
+description: "Gacha collectibles owned by a wallet, enriched"
+llmsDescription: "GET /gacha/v2/inventory/{address} returns the whitelisted gacha collectibles a Solana wallet owns, one page at a time in the offset envelope (page, limit up to 100), each enriched best-effort with grade, cert number, population, estimated value and a buyback quote. Filter by collection or platform. Cached 30 seconds per wallet with stale fallback; returns 502 das_unavailable when the asset index is down and nothing is cached."
+hidden: true
+---

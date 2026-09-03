@@ -1,0 +1,140 @@
+---
+title: "Conventions"
+description: "Identifiers, pagination, sorting, errors, headers and caching shared by every Gacha endpoint"
+llmsDescription: "The conventions shared by every Jupiter Gacha API endpoint at https://api.raccoons.dev/gacha/v2: identifier shapes (machine ids as platform:externalId, pack slugs, asset mint addresses, UUID transaction references), the two pagination envelopes (offset with total/page/limit/hasMore/items, and keyset with items/nextCursor), sort and order parameters, the error envelope with a complete table of HTTP status and snake_case error codes, response headers (X-Request-Id, X-Degraded-Sources, Deprecation, Sunset) and the optional X-Client-Platform request header, geo-blocking, and cache-control tiers with stale-on-error fallback."
+hidden: true
+---
+
+Every endpoint under `https://api.raccoons.dev/gacha/v2` follows the rules on this page. Read it once; the endpoint reference pages assume it.
+
+## Identifiers
+
+| Thing | Shape | Example |
+| --- | --- | --- |
+| Platform | Lowercase, hyphenated | `collector-crypt`, `phygitals`, `beezie` |
+| Machine | `${platform}:${externalId}` | `collector-crypt:pokemon_50` |
+| Pack (catalogue entry) | Jupiter slug, lowercase, `-` or `_` separated | `pokemon_50` |
+| Collectible / asset | Solana mint address (base58) | `6SLnowc5...F1fg` |
+| Collection | On-chain collection address | `CCryptUf...CRac` |
+| Wallet | Solana address (base58) | `7xKX...9Qm` |
+| Transaction reference | UUID issued by the gateway | `819c50e4-7c40-489b-9e7b-eac2e6080cc3` |
+
+Assets carry no platform prefix. The owning platform is inferred from the asset's whitelisted collection, so a mint address is all you need.
+
+A pack slug is Jupiter's and carries no platform either. The pack exposes the `machineId` it is bound to when you need the platform-scoped id. See [Packs](/gacha/packs).
+
+`platform` query parameters accept the hyphenated platform ids above. An unknown platform returns `400 invalid_request`.
+
+## Pagination
+
+Two envelopes are in use. Each endpoint reference page names which one it returns.
+
+### Offset pages
+
+Inventory, machine inventory and marketplace listings return:
+
+```json
+{
+  "total": 35899,
+  "page": 1,
+  "limit": 24,
+  "hasMore": true,
+  "items": []
+}
+```
+
+`page` is 1-based. Keep incrementing while `hasMore` is true. `limit` is capped at 100; the default varies per endpoint. Sort orders use a stable id tiebreak, so page boundaries do not shift between requests.
+
+### Keyset pages
+
+`GET /users/{wallet}/activity` and `GET /latest-pulls` return:
+
+```json
+{
+  "items": [],
+  "nextCursor": "184201"
+}
+```
+
+Pass `nextCursor` back as `cursor` to continue. `nextCursor` is absent on the last page. `limit` is capped at 100 and defaults to 25. Rows that land while you scroll never shift the page under you.
+
+`GET /latest-pulls` also accepts `since`, which polls forwards for pulls newer than a cursor. Pass `since` and `cursor` together to fetch a bounded window, which is how a client that fell behind by more than one page backfills the gap.
+
+## Sorting
+
+Sorting is expressed as `sort` plus `order` query parameters, for example `sort=value&order=desc`. Items missing the sorted field always sort last, in either direction.
+
+## Errors
+
+Every error uses one shape, with a request id you can quote when reporting issues:
+
+```json
+{
+  "error": {
+    "code": "machine_not_found",
+    "message": "Unknown machine collector-crypt:nope",
+    "requestId": "6bff6f1e-6328-470a-8823-86be4b4388d3"
+  },
+  "status": 404,
+  "message": "Unknown machine collector-crypt:nope"
+}
+```
+
+Branch on `error.code`, never on `message`. Codes are stable snake_case strings.
+
+| Status | Code | Meaning |
+| --- | --- | --- |
+| `400` | `invalid_request` | A path, query or body parameter failed validation |
+| `400` | `not_listed` | The asset has no active listing to buy or delist |
+| `400` | `wrong_platform` | A batch buyback contained an asset from another platform |
+| `400` | `upstream_rejected` | The platform's transaction builder refused the request. `message` carries the platform's reason |
+| `401` | `invalid_claim_proof` | The reward claim signature did not verify |
+| `402` | `insufficient_balance` | The wallet cannot pay for the purchase |
+| `403` | `not_owner` | The wallet does not hold the asset |
+| `404` | `machine_not_found`, `pack_not_found`, `asset_not_found`, `collectible_not_found`, `reference_not_found` | Unknown resource |
+| `409` | `sold_out`, `inactive` | The machine is sold out or switched off. On purchase nothing was built to sign. On open the payment never settled and nothing was charged |
+| `410` | `intent_expired` | The transaction intent expired. Build it again |
+| `413` | `body_too_large` | Request body over 1 MiB |
+| `414` | `uri_too_long` | Request URI too long |
+| `451` | `region_restricted` | Money-moving endpoints are not available in the caller's region |
+| `501` | `unsupported` | The platform behind this resource does not support the operation. See [Platform coverage](/gacha/platforms) |
+| `502` | `platform_unavailable`, `das_unavailable` | The upstream platform or asset index is down and nothing is cached |
+| `500` | `internal_error` | Unexpected failure. Quote the `requestId` when reporting |
+
+## Headers
+
+Response headers worth reading:
+
+| Header | Meaning |
+| --- | --- |
+| `X-Request-Id` | Correlates a response with server logs. Quote it in bug reports |
+| `X-Degraded-Sources` | Comma-separated platforms that failed during a cross-platform aggregation and were dropped from the result |
+| `Deprecation`, `Sunset` | Present on deprecated endpoints, currently `POST /marketplace/{asset}/sell` |
+
+You can send `X-Client-Platform` to attribute traffic (`jupiter.web`, `jupiter.mobile`, `jupiter.extension`). It is optional and never changes a response.
+
+CORS is open (`*`) with credentials disabled, so browsers can call the API directly.
+
+## Geo-blocking
+
+Purchase, open, marketplace buy, list and delist, buyback, and transaction submit are geo-blocked. A caller in a restricted region receives `451 region_restricted`. Read endpoints are never blocked.
+
+## Caching and degradation
+
+Successful `GET` responses carry `cache-control: public, max-age=N, stale-while-revalidate=N`. Errors and every non-`GET` response are `no-store`.
+
+| Endpoints | `max-age` |
+| --- | --- |
+| `/latest-pulls` | 5 seconds |
+| `/machines`, `/machines/{id}`, `/packs`, `/packs/{slug}`, `/marketplace`, `/marketplace/{asset}` | 30 seconds |
+| `/machines/inventory`, `/machines/{id}/inventory`, `/collectibles/{id}` | 60 seconds |
+| `/collections`, `/packs/categories` | 300 seconds |
+| `/inventory/{address}`, `/transactions/*`, `/rewards/*`, `/users/*` | `no-store` |
+
+Upstream feeds are cached server-side with stale-on-error fallback: if a platform goes down you get the last good data rather than an error. A platform that fails during a cross-platform aggregation drops out of the result instead of failing the request, and is named in `X-Degraded-Sources`.
+
+## Related
+
+- [Gacha API overview](/gacha)
+- [Transaction gateway](/gacha/transactions)
+- [Platform coverage](/gacha/platforms)

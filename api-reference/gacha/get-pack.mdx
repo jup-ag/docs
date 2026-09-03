@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml get /packs/{slug}
+title: "Get Pack"
+description: "One pack by its Jupiter slug"
+llmsDescription: "GET /gacha/v2/packs/{slug} returns one catalogue pack by its Jupiter slug (for example pokemon_50), including the machineId to buy through. Retired packs (listed: false) still resolve here so old links keep working; draft and archived packs return 404 pack_not_found. Pass include=machine to embed the bound machine."
+hidden: true
+---

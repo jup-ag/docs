@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml get /rewards/leaderboard
+title: "Get Leaderboard"
+description: "Top gacha spenders for a season"
+llmsDescription: "GET /gacha/v2/rewards/leaderboard returns the top wallets ranked by USD volume across every platform for a season (season query, defaults to the current one; limit 1 to 100, default 25), with each entry's rank, spend and prize. Spend is read from the shared pull ledger so pulls on every platform count the same."
+hidden: true
+---

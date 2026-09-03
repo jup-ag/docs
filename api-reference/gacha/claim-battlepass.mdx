@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /rewards/battlepass/claim
+title: "Claim Battlepass Tiers"
+description: "Claim every earned, unclaimed battlepass tier"
+llmsDescription: "POST /gacha/v2/rewards/battlepass/claim claims every battlepass tier the wallet has earned and not yet claimed, in one call. Pass wallet (base58) and a wallet signature over the canonical claim message; 401 invalid_claim_proof when the proof does not verify. Returns 202: the reward packs are queued, not delivered, so poll GET /gacha/v2/rewards/battlepass and watch each tier go delivering then delivered."
+hidden: true
+---

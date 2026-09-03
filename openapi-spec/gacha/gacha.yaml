@@ -1,0 +1,2741 @@
+openapi: 3.1.0
+info:
+  title: Jupiter Gacha API
+  version: 0.1.0
+  description: "One normalised API over every integrated collectible-gacha platform (Collector Crypt, Phygitals and Beezie): pack catalogue, machines, prize inventory, wallet collectibles, marketplace, buyback, rewards and the transaction gateway. No API key is required. Money-moving endpoints return 451 `region_restricted` from blocked regions."
+servers:
+  - url: https://api.raccoons.dev/gacha/v2
+    description: Jupiter Gacha API
+security: []
+tags:
+  - name: Packs
+    description: "Jupiter's curated pack catalogue: the storefront, its categories and each pack's live price."
+  - name: Machines
+    description: Every platform's live gacha machines, their prize pools, and the purchase and open flow.
+  - name: Inventory
+    description: A wallet's gacha collectibles and single-asset lookups, enriched with grades and values.
+  - name: Collections
+    description: The whitelisted collections whose assets count as gacha collectibles.
+  - name: Marketplace
+    description: Browse listings and build buy, list and delist transactions.
+  - name: Buyback
+    description: Instant-sell items back into a platform's standing bid.
+  - name: Transactions
+    description: The build, sign, submit gateway behind every money-moving flow.
+  - name: Pulls
+    description: The public, cross-platform feed of recent pulls.
+  - name: Users
+    description: Per-wallet lifetime stats and pull history.
+  - name: Rewards
+    description: Seasonal leaderboards, battlepass progress and prize claims.
+paths:
+  /inventory/{address}:
+    get:
+      summary: Gacha collectibles owned by a wallet
+      description: Fetches the wallet's assets from DAS, keeps only whitelisted gacha collections, and returns one page (sorted by asset id). Only the returned page is enriched, best-effort, via the collection's partner API. Inventory is cached 30s per wallet (stale-served if the upstream is down); enrichment is cached per asset with a long TTL.
+      tags:
+        - Inventory
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+          required: true
+          name: address
+          in: path
+        - schema:
+            type: integer
+            minimum: 1
+            default: 1
+          required: false
+          name: page
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: string
+            description: Filter to specific whitelisted collection address(es), comma-separated
+          required: false
+          description: Filter to specific whitelisted collection address(es), comma-separated
+          name: collection
+          in: query
+        - schema:
+            type: string
+            description: Filter to one platform's collections. Combines with `collection` by intersection.
+          required: false
+          description: Filter to one platform's collections. Combines with `collection` by intersection.
+          name: platform
+          in: query
+      responses:
+        "200":
+          description: Owned whitelisted collectibles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Inventory"
+        "502":
+          description: Asset provider unavailable and no cached inventory
+  /collectibles/{id}:
+    get:
+      summary: One collectible by asset id
+      description: Looks up a single asset via DAS, keeps it only if it belongs to a whitelisted gacha collection, and enriches it best-effort exactly like an inventory page item.
+      tags:
+        - Inventory
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+            description: Asset id (mint address)
+          required: true
+          description: Asset id (mint address)
+          name: id
+          in: path
+      responses:
+        "200":
+          description: Collectible
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collectible"
+        "404":
+          description: Unknown, burnt, or non-whitelisted asset
+        "502":
+          description: Asset provider unavailable
+  /machines:
+    get:
+      summary: All gacha machines across platforms
+      description: Aggregates every platform's live machine feed into one normalised list. Sold-out machines are omitted unless `status=sold_out` is requested. A failing platform drops out of the list rather than failing the request, it is named in the `x-degraded-sources` response header; feeds are cached 30s with stale fallback.
+      tags:
+        - Machines
+      parameters:
+        - schema:
+            type: string
+            description: Filter to one platform
+          required: false
+          description: Filter to one platform
+          name: platform
+          in: query
+        - schema:
+            type: string
+            enum:
+              - active
+              - sold_out
+              - inactive
+            description: Filter by machine status. Omitted, sold-out machines are excluded; pass `sold_out` to fetch them.
+          required: false
+          description: Filter by machine status. Omitted, sold-out machines are excluded; pass `sold_out` to fetch them.
+          name: status
+          in: query
+        - schema:
+            type: string
+            enum:
+              - price
+              - ev
+              - buyback
+            description: Sort by priceUsd, evUsd, or buybackPercent; feed order when omitted. Machines missing the sorted field sort last.
+          required: false
+          description: Sort by priceUsd, evUsd, or buybackPercent; feed order when omitted. Machines missing the sorted field sort last.
+          name: sort
+          in: query
+        - schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+          required: false
+          name: order
+          in: query
+      responses:
+        "200":
+          description: Machines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MachineV2"
+        "400":
+          description: Unknown platform
+  /machines/inventory:
+    get:
+      summary: Prize inventory across all machines
+      description: Every prize in every machine, each item attributed to the machine it is available in. Sorted by value (desc). A failing machine drops its items rather than failing the request. Phygitals only publishes chase (highlight) items, see `machine.coverage`.
+      tags:
+        - Machines
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: rarity
+          in: query
+        - schema:
+            type:
+              - number
+              - "null"
+          required: false
+          name: minValueUsd
+          in: query
+        - schema:
+            type:
+              - number
+              - "null"
+          required: false
+          name: maxValueUsd
+          in: query
+        - schema:
+            type: string
+            enum:
+              - value
+              - name
+            default: value
+            description: Items missing the sorted field go last
+          required: false
+          description: Items missing the sorted field go last
+          name: sort
+          in: query
+        - schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+          required: false
+          name: order
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            default: 1
+          required: false
+          name: page
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 24
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: string
+          required: false
+          name: platform
+          in: query
+        - schema:
+            type: string
+            enum:
+              - active
+              - sold_out
+              - inactive
+            description: Only machines with this status
+          required: false
+          description: Only machines with this status
+          name: status
+          in: query
+        - schema:
+            type: string
+            description: Filter to machine id(s) `{platform}:{platformMachineId}`, comma-separated
+          required: false
+          description: Filter to machine id(s) `{platform}:{platformMachineId}`, comma-separated
+          name: machine
+          in: query
+      responses:
+        "200":
+          description: Aggregated machine inventory
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MachineInventoryPage"
+        "400":
+          description: Unknown platform
+  /machines/{id}/inventory:
+    get:
+      summary: Prize inventory of one machine
+      tags:
+        - Machines
+      parameters:
+        - schema:
+            type: string
+            description: "`{platform}:{platformMachineId}`. Paste the raw id, no surrounding quotes."
+          required: true
+          description: "`{platform}:{platformMachineId}`. Paste the raw id, no surrounding quotes."
+          name: id
+          in: path
+          example: phygitals:starter-one-piece-pack-2xcfbo
+        - schema:
+            type: string
+          required: false
+          name: rarity
+          in: query
+        - schema:
+            type:
+              - number
+              - "null"
+          required: false
+          name: minValueUsd
+          in: query
+        - schema:
+            type:
+              - number
+              - "null"
+          required: false
+          name: maxValueUsd
+          in: query
+        - schema:
+            type: string
+            enum:
+              - value
+              - name
+            default: value
+            description: Items missing the sorted field go last
+          required: false
+          description: Items missing the sorted field go last
+          name: sort
+          in: query
+        - schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+          required: false
+          name: order
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            default: 1
+          required: false
+          name: page
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 24
+          required: false
+          name: limit
+          in: query
+      responses:
+        "200":
+          description: Machine inventory
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SingleMachineInventory"
+        "404":
+          description: Not found
+        "501":
+          description: Platform doesn't expose machine inventory
+      description: The prize pool of one machine, paged and filterable by rarity and value. Collector Crypt publishes the full pool; Phygitals and Beezie publish chase (highlight) items only, see `machine.coverage`. Returns 501 when the platform exposes no inventory.
+  /machines/{id}/purchase:
+    post:
+      summary: Initiate a pull purchase
+      description: |-
+        Normalised first step of every platform's purchase flow: one unsigned transaction per pack under `packs`, each with the `reference` and `intent` to open it. No money moves here. Complete the flow with POST /gacha/gacha/v2/machines/{id}/open, once per pack.
+
+        Every platform caps a single buy (Phygitals `max_per_mint` is 5 on $1 packs, 8 on most others), so a `quantity` above that cap is split into several transactions rather than rejected, `chunks` says how many, and each pack carries the `quantity` its open reveals. Platforms differ in how they divide a buy: Phygitals returns one transaction covering several packs, Collector Crypt one transaction per pack. Read `packs[].quantity` rather than assuming; the values always sum to the `quantity` requested. The split follows the machine's live `maxPerPurchase`, so a cap the platform raises applies without a deploy. Sign them all; a wallet's signAllTransactions keeps that to one approval. Not atomic: each transaction settles independently, so a partial result is possible and the client must report it.
+      tags:
+        - Machines
+      parameters:
+        - schema:
+            type: string
+            description: "`{platform}:{platformMachineId}`. Paste the raw id, no surrounding quotes."
+          required: true
+          description: "`{platform}:{platformMachineId}`. Paste the raw id, no surrounding quotes."
+          name: id
+          in: path
+          example: phygitals:starter-one-piece-pack-2xcfbo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                player:
+                  type: string
+                  pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+                  description: Player wallet paying for and receiving the pull
+                quantity:
+                  type: integer
+                  minimum: 1
+                  maximum: 20
+                  default: 1
+                  description: Total packs to buy, split across transactions as the machine's cap requires (max 20)
+                currency:
+                  type: string
+                  description: SPL mint address to pay in; must be one of the machine's `acceptedCurrencies`. Defaults to the machine's `currency` (USDC).
+                  example: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+              required:
+                - player
+      responses:
+        "200":
+          description: Purchase initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MachinePurchase"
+        "400":
+          description: Malformed request, a required field is missing or invalid
+        "402":
+          description: The wallet cannot cover the total cost of the requested quantity
+        "404":
+          description: Not found
+        "409":
+          description: The machine is sold out or switched off
+        "451":
+          description: Unavailable in the caller's region
+        "501":
+          description: Platform doesn't support purchase through this API
+        "502":
+          description: Platform unavailable
+  /machines/{id}/open:
+    post:
+      summary: Complete a purchase and reveal won items
+      description: Pass the `player`, `reference` and `intent` from purchase plus `signedTransactions`, one call per pack. A reference whose transaction has expired returns 410 `intent_expired`, call purchase again. While `status` is "pending" (Phygitals settles asynchronously) poll this endpoint with the reference it returned and no `signedTransactions`.
+      tags:
+        - Machines
+      parameters:
+        - schema:
+            type: string
+            description: "`{platform}:{platformMachineId}`. Paste the raw id, no surrounding quotes."
+          required: true
+          description: "`{platform}:{platformMachineId}`. Paste the raw id, no surrounding quotes."
+          name: id
+          in: path
+          example: phygitals:starter-one-piece-pack-2xcfbo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reference:
+                  type: string
+                  description: "With `signedTransactions`: the `reference` from purchase, rejected with 410 once expired. Without them: the session reference to poll."
+                intent:
+                  type: string
+                  description: "Collector Crypt: the `intent` returned alongside the pack, rejected with 410 once expired. Optional, omit to keep the pre-intent behaviour."
+                signedTransactions:
+                  type: array
+                  items:
+                    type: string
+                quantity:
+                  type: integer
+                  minimum: 1
+                  maximum: 20
+                currency:
+                  type: string
+                  description: SPL mint address to pay in; must be one of the machine's `acceptedCurrencies`. Defaults to the machine's `currency` (USDC).
+                  example: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+                player:
+                  type: string
+                  pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+                  description: "Player wallet the platform must deliver the won items to. Attribution follows delivery, so pass the same wallet on every poll. Required whenever `signedTransactions` are present: the payment settles for this wallet, and omitting it makes the platform reject the transaction the buyer signed. It must also be the wallet that signed those transactions, and the one the `reference` was issued to, a mismatch is rejected with 400 rather than delivering one wallet's cards against another wallet's payment."
+      responses:
+        "200":
+          description: Open result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MachineOpenResult"
+        "400":
+          description: Malformed request, a required field is missing or invalid
+        "404":
+          description: Not found
+        "409":
+          description: The machine sold out before the payment settled, nothing was charged
+        "410":
+          description: Purchase reference expired, call purchase again for a fresh transaction
+        "451":
+          description: Unavailable in the caller's region
+        "501":
+          description: Platform doesn't support open through this API
+        "502":
+          description: Platform unavailable
+  /machines/{id}:
+    get:
+      summary: One machine by id
+      tags:
+        - Machines
+      parameters:
+        - schema:
+            type: string
+            description: "`{platform}:{platformMachineId}`. Paste the raw id, no surrounding quotes."
+          required: true
+          description: "`{platform}:{platformMachineId}`. Paste the raw id, no surrounding quotes."
+          name: id
+          in: path
+          example: phygitals:starter-one-piece-pack-2xcfbo
+      responses:
+        "200":
+          description: Machine
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MachineV2"
+        "404":
+          description: Not found
+      description: One machine by its `${platform}:${externalId}` id, in the same shape as the list. Sold-out and inactive machines resolve here even though `GET /gacha/gacha/v2/machines` omits them by default.
+  /packs:
+    get:
+      summary: Jupiter's pack catalogue
+      description: "The packs Jupiter sells, in our own name, with our art and our merchandising order, one entry per curated pack, bound to a provider machine. Unlike /gacha/v2/machines this never drops a pack: one that is not buyable is still returned, with `available: false` and a machine-readable `unavailableReason`, so a client can render a coming-soon or sold-out tile. Retired packs are the one omission, pass `include=unlisted` for those. Price and odds are read live off the bound machine, and are absent as a group whenever it could not be resolved, a degraded platform (named in `x-degraded-sources`), but also a pack the provider does not list yet. Check `priceUsd`, not `unavailableReason`. Cached 30s."
+      tags:
+        - Packs
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+            description: Filter to featured packs
+          required: false
+          description: Filter to featured packs
+          name: featured
+          in: query
+        - schema:
+            type: string
+          required: false
+          name: tag
+          in: query
+        - schema:
+            type: string
+            description: Filter by backing platform
+          required: false
+          description: Filter by backing platform
+          name: platform
+          in: query
+        - schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+            description: "`true` returns buyable packs only, `false` only the ones that are not. Omitted, both are returned, the default, so a client can render coming-soon and sold-out tiles."
+          required: false
+          description: "`true` returns buyable packs only, `false` only the ones that are not. Omitted, both are returned, the default, so a client can render coming-soon and sold-out tiles."
+          name: available
+          in: query
+        - schema:
+            type: string
+            enum:
+              - unlisted
+            description: Pass `unlisted` to include retired packs, which browse surfaces omit. They remain reachable at GET /gacha/gacha/v2/packs/{slug} either way.
+          required: false
+          description: Pass `unlisted` to include retired packs, which browse surfaces omit. They remain reachable at GET /gacha/gacha/v2/packs/{slug} either way.
+          name: include
+          in: query
+      responses:
+        "200":
+          description: Packs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PackV2"
+  /packs/categories:
+    get:
+      summary: The category tabs
+      description: The categories a storefront groups packs under, in tab order. A pack belongs to a category when its `tags` carry the category's `id`; the pack's `category` field already resolves that, so a client only has to bucket. A pack whose tags name no category goes in an all-packs view alone. Icons are the client's, key them by `id`. Cached 300s.
+      tags:
+        - Packs
+      responses:
+        "200":
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PackCategory"
+  /packs/{slug}:
+    get:
+      summary: One pack by slug
+      description: "The pack detail. Buy with the `machineId` this returns, via POST /gacha/gacha/v2/machines/{id}/purchase, there is no pack-scoped purchase route. Draft and archived packs are not public and return 404. Retired packs (`listed: false`) resolve here normally even though GET /gacha/gacha/v2/packs omits them, so existing links keep working. A degraded backing platform is named in `x-degraded-sources`, the same as on the list."
+      tags:
+        - Packs
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: slug
+          in: path
+        - schema:
+            type: string
+            enum:
+              - machine
+            description: Pass `machine` to inline the full normalised machine
+          required: false
+          description: Pass `machine` to inline the full normalised machine
+          name: include
+          in: query
+      responses:
+        "200":
+          description: Pack
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackV2"
+        "404":
+          description: No published pack with that slug
+  /collections:
+    get:
+      summary: Whitelisted gacha collections
+      description: Every collection eligible as a gacha collectible, with its label, the collectible standard its enrichment follows, and which enrichment sources are configured. Valid values for /gacha/v2/inventory's `collection` filter.
+      tags:
+        - Collections
+      parameters:
+        - schema:
+            type: string
+            description: Filter to one platform
+          required: false
+          description: Filter to one platform
+          name: platform
+          in: query
+      responses:
+        "200":
+          description: Collections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Collection"
+  /marketplace:
+    get:
+      summary: Browse marketplace listings
+      description: Normalised listings browse per platform. `platform` is required, upstream marketplaces paginate independently, so cross-platform pages can't be merged coherently. Phygitals listings live on Tensor / Magic Eden (see `source`).
+      tags:
+        - Marketplace
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: platform
+          in: query
+        - schema:
+            type:
+              - number
+              - "null"
+          required: false
+          name: minPriceUsd
+          in: query
+        - schema:
+            type:
+              - number
+              - "null"
+          required: false
+          name: maxPriceUsd
+          in: query
+        - schema:
+            type: boolean
+            default: true
+          required: false
+          name: listedOnly
+          in: query
+        - schema:
+            type: string
+            enum:
+              - price
+              - name
+              - value
+            description: Recently-listed first when omitted. collector-crypt has no value ordering (falls back to price).
+          required: false
+          description: Recently-listed first when omitted. collector-crypt has no value ordering (falls back to price).
+          name: sort
+          in: query
+        - schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+          required: false
+          name: order
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            default: 1
+          required: false
+          name: page
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 24
+          required: false
+          name: limit
+          in: query
+      responses:
+        "200":
+          description: Listings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketPage"
+        "400":
+          description: Unknown platform
+        "502":
+          description: Platform unavailable
+  /marketplace/{asset}:
+    get:
+      summary: Market state of one asset
+      description: Listing status, price, offer count, and instant-sell quote for a whitelisted asset. The platform is inferred from the asset's collection.
+      tags:
+        - Marketplace
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+            description: NFT mint address
+          required: true
+          description: NFT mint address
+          name: asset
+          in: path
+      responses:
+        "200":
+          description: Market state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketState"
+        "404":
+          description: Unknown or non-whitelisted asset
+        "501":
+          description: Collection has no marketplace integration
+        "502":
+          description: Platform unavailable
+  /marketplace/{asset}/buy:
+    post:
+      summary: Buy a listed asset
+      description: Builds the purchase transaction for the active listing (collector-crypt only, Phygitals listings settle on Tensor / Magic Eden). Returns unsigned transaction(s) and a gateway `reference`; complete via POST /gacha/gacha/v2/transactions/submit.
+      tags:
+        - Marketplace
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+            description: NFT mint address
+          required: true
+          description: NFT mint address
+          name: asset
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wallet:
+                  type: string
+                  pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+                  description: Buyer wallet
+              required:
+                - wallet
+      responses:
+        "200":
+          description: Transaction plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketTxPlan"
+        "400":
+          description: Not listed / bad request
+        "403":
+          description: The wallet does not hold this asset
+        "404":
+          description: Unknown asset
+        "451":
+          description: Unavailable in the caller's region
+        "501":
+          description: Unsupported on this platform
+        "502":
+          description: Platform unavailable
+  /marketplace/{asset}/sell:
+    post:
+      summary: Instant-sell into the platform's standing bid (deprecated)
+      deprecated: true
+      description: "Deprecated, use POST /gacha/gacha/v2/buyback/{asset}, or POST /gacha/gacha/v2/buyback to sell several at once. Identical behaviour and response; only the path changed, because selling into the platform's own standing bid is a buyback rather than a marketplace trade. collector-crypt: gacha buyback. phygitals: take-claw-bid, priced for the seller's wallet, which co-signs and receives the proceeds (requires a configured API key). Returns unsigned transaction(s) and a gateway `reference`; complete via POST /gacha/gacha/v2/transactions/submit."
+      tags:
+        - Marketplace
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+            description: NFT mint address
+          required: true
+          description: NFT mint address
+          name: asset
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wallet:
+                  type: string
+                  pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+                  description: Seller wallet
+              required:
+                - wallet
+      responses:
+        "200":
+          description: Transaction plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketTxPlan"
+        "400":
+          description: Not listed / bad request
+        "403":
+          description: The wallet does not hold this asset
+        "404":
+          description: Unknown asset
+        "451":
+          description: Unavailable in the caller's region
+        "501":
+          description: Unsupported on this platform
+        "502":
+          description: Platform unavailable
+  /marketplace/{asset}/list:
+    post:
+      summary: Create a marketplace listing
+      description: collector-crypt only. 2% platform fee is deducted from seller proceeds. Returns unsigned transaction(s) and a gateway `reference`; complete via POST /gacha/gacha/v2/transactions/submit.
+      tags:
+        - Marketplace
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+            description: NFT mint address
+          required: true
+          description: NFT mint address
+          name: asset
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wallet:
+                  type: string
+                  pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+                priceUsd:
+                  type: number
+                  exclusiveMinimum: 0
+              required:
+                - wallet
+                - priceUsd
+      responses:
+        "200":
+          description: Transaction plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketTxPlan"
+        "400":
+          description: Not listed / bad request
+        "403":
+          description: The wallet does not hold this asset
+        "404":
+          description: Unknown asset
+        "451":
+          description: Unavailable in the caller's region
+        "501":
+          description: Unsupported on this platform
+        "502":
+          description: Platform unavailable
+  /marketplace/{asset}/delist:
+    post:
+      summary: Cancel an active listing
+      description: collector-crypt only. Returns unsigned transaction(s) and a gateway `reference`; complete via POST /gacha/gacha/v2/transactions/submit.
+      tags:
+        - Marketplace
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+            description: NFT mint address
+          required: true
+          description: NFT mint address
+          name: asset
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wallet:
+                  type: string
+                  pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+              required:
+                - wallet
+      responses:
+        "200":
+          description: Transaction plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketTxPlan"
+        "400":
+          description: Not listed / bad request
+        "403":
+          description: The wallet does not hold this asset
+        "404":
+          description: Unknown asset
+        "451":
+          description: Unavailable in the caller's region
+        "501":
+          description: Unsupported on this platform
+        "502":
+          description: Platform unavailable
+  /buyback/{asset}:
+    post:
+      summary: Instant-sell one item back to its platform
+      description: "Sells a single item into the platform's standing bid. Replaces POST /gacha/gacha/v2/marketplace/{asset}/sell, which is deprecated and behaves identically, selling into the platform's own bid is a buyback, not a marketplace trade, so it lives here. collector-crypt: gacha buyback. phygitals: take-claw-bid, priced for the seller's wallet, which co-signs and receives the proceeds. Complete with POST /gacha/gacha/v2/transactions/submit. To sell several at once, POST /gacha/gacha/v2/buyback instead."
+      tags:
+        - Buyback
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+            description: Asset mint address
+          required: true
+          description: Asset mint address
+          name: asset
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wallet:
+                  type: string
+                  pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+                  description: Seller wallet, which must hold the asset
+              required:
+                - wallet
+      responses:
+        "200":
+          description: Transaction plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BuybackTxPlan"
+        "400":
+          description: Not listed / bad request
+        "403":
+          description: The wallet does not hold this asset
+        "404":
+          description: Unknown asset
+        "451":
+          description: Unavailable in the caller's region
+        "501":
+          description: Platform doesn't support buyback through this API
+        "502":
+          description: Platform unavailable
+  /buyback:
+    post:
+      summary: Instant-sell several items back to their platform
+      description: "Builds one buyback transaction per asset in a single round trip, so a wallet can cover them all with one signAllTransactions approval. Not atomic: no platform accepts a batched sellback on this rail, so each asset is planned independently and settles independently. An asset the platform will not repurchase is reported under `failed` and the rest of the batch still returns 200, check both arrays. Each plan carries its own `reference`; complete them with POST /gacha/gacha/v2/transactions/submit-batch."
+      tags:
+        - Buyback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wallet:
+                  type: string
+                  pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+                  description: Seller wallet, which must hold every asset
+                platform:
+                  type: string
+                  description: The platform every asset in this batch belongs to. Optional. When given, each mint is checked against it and a mint from another platform fails the whole request with `wrong_platform` before anything is built.
+                assets:
+                  type: array
+                  items:
+                    type: string
+                    pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+                  minItems: 1
+                  maxItems: 10
+                  description: Asset mint addresses to sell back (max 10)
+              required:
+                - wallet
+                - assets
+      responses:
+        "200":
+          description: Buyback plans
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulkBuybackPlan"
+        "400":
+          description: Malformed request, an unknown `platform`, or a mint that belongs to a different platform
+        "403":
+          description: The wallet does not hold the asset
+        "404":
+          description: Unknown asset
+        "451":
+          description: Unavailable in the caller's region
+        "501":
+          description: Platform doesn't support buyback through this API
+        "502":
+          description: Platform unavailable
+  /rewards/leaderboard:
+    get:
+      summary: Top gacha spenders for a season
+      description: Ranked by dollar volume across every platform, spend is read from the shared pull ledger, so a Collector Crypt pull and a Phygitals pull count the same.
+      tags:
+        - Rewards
+      parameters:
+        - schema:
+            type: integer
+            exclusiveMinimum: 0
+            description: Defaults to the active season
+          required: false
+          description: Defaults to the active season
+          name: season
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          required: false
+          name: limit
+          in: query
+      responses:
+        "200":
+          description: Leaderboard
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entries:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/V1LeaderboardPrizeEntry"
+                  season:
+                    anyOf:
+                      - $ref: "#/components/schemas/V1LeaderboardSeasonMeta"
+                      - type: "null"
+                required:
+                  - entries
+                  - season
+        "400":
+          description: Malformed request
+  /rewards/leaderboard/me:
+    get:
+      summary: One wallet's leaderboard standing
+      description: Rank, spend and prize state for a wallet in the requested season.
+      tags:
+        - Rewards
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+          required: true
+          name: wallet
+          in: query
+        - schema:
+            type: integer
+            exclusiveMinimum: 0
+            description: Defaults to the active season
+          required: false
+          description: Defaults to the active season
+          name: season
+          in: query
+      responses:
+        "200":
+          description: Standing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entry:
+                    anyOf:
+                      - $ref: "#/components/schemas/V1LeaderboardPrizeEntry"
+                      - type: "null"
+                  season:
+                    anyOf:
+                      - $ref: "#/components/schemas/V1LeaderboardSeasonMeta"
+                      - type: "null"
+                  claimState:
+                    type: string
+                    enum:
+                      - locked
+                      - available
+                      - delivering
+                      - delivered
+                      - retryable
+                required:
+                  - entry
+                  - season
+                  - claimState
+        "400":
+          description: Malformed request
+  /rewards/leaderboard/seasons:
+    get:
+      summary: Configured leaderboard seasons
+      description: Every season in chronological order, with its state and rewards.
+      tags:
+        - Rewards
+      responses:
+        "200":
+          description: Seasons
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  seasons:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/V1LeaderboardSeasonMeta"
+                required:
+                  - seasons
+  /rewards/battlepass:
+    get:
+      summary: A wallet's battlepass progress
+      description: USD progress and per-tier claim state. Only spend on the campaign's `eligiblePackTypes` counts, so a wallet can have leaderboard spend and no battlepass progress.
+      tags:
+        - Rewards
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+          required: true
+          name: wallet
+          in: query
+      responses:
+        "200":
+          description: Progress
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  progressUsd:
+                    type: number
+                  eligiblePackTypes:
+                    type: array
+                    items:
+                      type: string
+                  tiers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/V1BattlepassTierStatus"
+                required:
+                  - enabled
+                  - progressUsd
+                  - eligiblePackTypes
+                  - tiers
+        "400":
+          description: Malformed request
+  /rewards/battlepass/claim:
+    post:
+      summary: Claim earned battlepass tiers
+      description: "Claims every tier the wallet has earned and not yet claimed, in one call. `wallet` must be a base58 Solana address. Requires a wallet signature over the canonical claim message. Returns 202: the packs are queued, not delivered, poll GET /gacha/gacha/v2/rewards/battlepass and watch each tier go `delivering` then `delivered`."
+      tags:
+        - Rewards
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - type: object
+                  properties:
+                    wallet:
+                      type: string
+                      minLength: 1
+                    signedMessage:
+                      type: string
+                      minLength: 1
+                      maxLength: 256
+                      description: 'Canonical claim message, signed as raw UTF-8: "Claim my Jupiter TCG rewards!\nWallet:<wallet>\nExpires:<unixMs>". Expires must be within 10 minutes of server time.'
+                    signature:
+                      type: string
+                      minLength: 1
+                      maxLength: 128
+                      description: base58 ed25519 signature of `signedMessage` (Solana convention).
+                  required:
+                    - wallet
+                    - signedMessage
+                    - signature
+                  additionalProperties: false
+                - type: object
+                  properties:
+                    wallet:
+                      type: string
+                      minLength: 1
+                    signedTransaction:
+                      type: string
+                      minLength: 1
+                      maxLength: 4096
+                      description: Base64-encoded, partially signed Solana transaction containing the canonical claim message as a Memo instruction, plus optional wallet-added compute-unit price and limit instructions. The API verifies it but never broadcasts it.
+                  required:
+                    - wallet
+                    - signedTransaction
+                  additionalProperties: false
+      responses:
+        "202":
+          description: Tiers queued for delivery
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scheduledTierIds:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - scheduledTierIds
+        "400":
+          description: Malformed request
+        "401":
+          description: Claim proof missing, invalid, or expired
+  /rewards/leaderboard/claim:
+    post:
+      summary: Claim earned leaderboard prizes
+      description: Claims every claimable season for the wallet. `wallet` must be a base58 Solana address. Same signature requirement and same 202 semantics as the battlepass claim.
+      tags:
+        - Rewards
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - type: object
+                  properties:
+                    wallet:
+                      type: string
+                      minLength: 1
+                    signedMessage:
+                      type: string
+                      minLength: 1
+                      maxLength: 256
+                      description: 'Canonical claim message, signed as raw UTF-8: "Claim my Jupiter TCG rewards!\nWallet:<wallet>\nExpires:<unixMs>". Expires must be within 10 minutes of server time.'
+                    signature:
+                      type: string
+                      minLength: 1
+                      maxLength: 128
+                      description: base58 ed25519 signature of `signedMessage` (Solana convention).
+                  required:
+                    - wallet
+                    - signedMessage
+                    - signature
+                  additionalProperties: false
+                - type: object
+                  properties:
+                    wallet:
+                      type: string
+                      minLength: 1
+                    signedTransaction:
+                      type: string
+                      minLength: 1
+                      maxLength: 4096
+                      description: Base64-encoded, partially signed Solana transaction containing the canonical claim message as a Memo instruction, plus optional wallet-added compute-unit price and limit instructions. The API verifies it but never broadcasts it.
+                  required:
+                    - wallet
+                    - signedTransaction
+                  additionalProperties: false
+      responses:
+        "202":
+          description: Seasons queued for delivery
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scheduledSeasons:
+                    type: array
+                    items:
+                      type: integer
+                required:
+                  - scheduledSeasons
+        "400":
+          description: Malformed request
+        "401":
+          description: Claim proof missing, invalid, or expired
+  /users/{wallet}/stats:
+    get:
+      summary: A wallet's lifetime volume, total and per platform
+      description: "Read from the shared pull ledger, so a Collector Crypt pull and a Phygitals pull count the same. Only settled purchases count, an intent that was created and never paid is excluded, so `spendUsd` agrees with the wallet's leaderboard volume. `wonUsd` is not measured identically across platforms: Collector Crypt reports a strict insured valuation, Phygitals falls back to the card's own quote."
+      tags:
+        - Users
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+          required: true
+          name: wallet
+          in: path
+      responses:
+        "200":
+          description: Lifetime stats; zeroed for a wallet that has never played
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStats"
+        "400":
+          description: Malformed request
+  /users/{wallet}/activity:
+    get:
+      summary: A wallet's pull history across every platform
+      description: Newest first. Paged by keyset on `id` rather than offset, so rows landing mid-scroll never shift the page under the reader, pass the previous response's `nextCursor` to continue.
+      tags:
+        - Users
+      parameters:
+        - schema:
+            type: string
+            pattern: ^[1-9A-HJ-NP-Za-km-z]{32,44}$
+          required: true
+          name: wallet
+          in: path
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: string
+            pattern: ^[1-9]\d*$
+            description: "`nextCursor` from the previous page"
+          required: false
+          description: "`nextCursor` from the previous page"
+          name: cursor
+          in: query
+      responses:
+        "200":
+          description: Pull history page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PullActivity"
+        "400":
+          description: Malformed request
+  /latest-pulls:
+    get:
+      summary: Recent pulls across every platform
+      description: |-
+        The live activity feed, newest first, read from Jupiter's own pull ledger, so it covers Collector Crypt, Phygitals and every future platform.
+
+        No wallet is returned: this feed is public, and who pulled what is not part of it.
+
+        Paged by keyset on `id` rather than offset, so pulls landing mid-scroll never shift the page under the reader. Two directions: `cursor` walks backwards into history, `since` polls forwards for what is new. Pass both to fetch a bounded window, which is how a client that fell behind by more than one page backfills the gap.
+      tags:
+        - Pulls
+      parameters:
+        - schema:
+            type: string
+            description: Filter to one machine, e.g. `phygitals:dollar-sport-pack`. Omit for every machine.
+            example: phygitals:dollar-sport-pack
+          required: false
+          description: Filter to one machine, e.g. `phygitals:dollar-sport-pack`. Omit for every machine.
+          name: machine
+          in: query
+        - schema:
+            type: string
+            pattern: ^[1-9]\d*$
+            description: "Poll for what is new: only pulls with an id greater than this. Pass the newest `id` you have already shown. Usually returns an empty list, which is the point."
+          required: false
+          description: "Poll for what is new: only pulls with an id greater than this. Pass the newest `id` you have already shown. Usually returns an empty list, which is the point."
+          name: since
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: string
+            pattern: ^[1-9]\d*$
+            description: "`nextCursor` from the previous page"
+          required: false
+          description: "`nextCursor` from the previous page"
+          name: cursor
+          in: query
+      responses:
+        "200":
+          description: Recent pulls
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LatestPulls"
+        "400":
+          description: Malformed request
+  /transactions/submit:
+    post:
+      summary: Submit signed transactions for any pending intent
+      description: The gateway for every build-sign-submit flow. Pass the `reference` returned by a build endpoint (marketplace buy/sell/list/delist, ...) plus the signed transaction(s); the gateway dispatches them to the right platform. Resubmitting a finalised reference replays its stored result (idempotent).
+      tags:
+        - Transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reference:
+                  type: string
+                  format: uuid
+                signedTransactions:
+                  type: array
+                  items:
+                    type: string
+                    minLength: 1
+                  minItems: 1
+              required:
+                - reference
+                - signedTransactions
+      responses:
+        "200":
+          description: Submission outcome
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TxSubmitResult"
+        "404":
+          description: Unknown reference
+        "410":
+          description: Intent expired before submission
+        "451":
+          description: Unavailable in the caller's region
+        "501":
+          description: No submitter registered for this intent kind
+  /transactions/submit-batch:
+    post:
+      summary: Submit signed transactions for several intents at once
+      description: "One round trip for a batch built by POST /gacha/gacha/v2/buyback. Each reference is dispatched independently and reported in request order, so a single failure never rejects the batch, a well-formed request returns 200 even when every entry failed, so branch on each entry's `ok`. Identical to calling POST /gacha/gacha/v2/transactions/submit per reference, including its idempotency: a replayed reference returns its stored result."
+      tags:
+        - Transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                submissions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      reference:
+                        type: string
+                        format: uuid
+                      signedTransactions:
+                        type: array
+                        items:
+                          type: string
+                          minLength: 1
+                        minItems: 1
+                    required:
+                      - reference
+                      - signedTransactions
+                  minItems: 1
+                  maxItems: 10
+              required:
+                - submissions
+      responses:
+        "200":
+          description: Per-reference outcomes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TxBatchSubmitResult"
+        "400":
+          description: Malformed request, a required field is missing or invalid
+        "451":
+          description: Unavailable in the caller's region
+  /transactions/{reference}:
+    get:
+      summary: Status of a transaction intent
+      tags:
+        - Transactions
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: reference
+          in: path
+      responses:
+        "200":
+          description: Intent status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TxIntentStatus"
+        "404":
+          description: Unknown reference
+      description: The current state of a transaction intent (`pending`, `submitted` or `failed`) with its stored result. Use it to poll a submission or audit one after the fact.
+components:
+  schemas:
+    BulkBuybackPlan:
+      type: object
+      properties:
+        plans:
+          type: array
+          items:
+            type: object
+            properties:
+              asset:
+                type: string
+              reference:
+                type: string
+                description: Transaction-gateway intent id; pass to POST /gacha/gacha/v2/transactions/submit-batch
+              platform:
+                type: string
+              transactions:
+                type: array
+                items:
+                  type: string
+                description: Base64 unsigned transaction(s) to sign
+              expiresAt:
+                type: string
+              detail:
+                type: object
+                additionalProperties: {}
+                description: Proceeds, when the platform reports them
+            required:
+              - asset
+              - reference
+              - platform
+              - transactions
+              - expiresAt
+        failed:
+          type: array
+          items:
+            type: object
+            properties:
+              asset:
+                type: string
+              code:
+                type: string
+              message:
+                type: string
+            required:
+              - asset
+              - code
+              - message
+          description: Assets that could not be sold; the rest of the batch still succeeded
+        next:
+          type: string
+          description: The route to call next
+      required:
+        - plans
+        - failed
+        - next
+    BuybackQuote:
+      type:
+        - object
+        - "null"
+      properties:
+        amountUsd:
+          type: number
+          description: USD the platform pays right now for this asset
+        amountUsdc:
+          type: integer
+          description: Same amount in USDC minor units (6 decimals), as quoted upstream
+        expiresAt:
+          type: string
+          description: ISO expiry when the platform's offer is time-boxed (Phygitals); absent means a standing bid (Collector Crypt)
+      required:
+        - amountUsd
+        - amountUsdc
+      description: Standing instant-sell (buyback) quote; null when the platform offers none for this asset or quoting is unavailable
+    BuybackTxPlan:
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Transaction-gateway intent id; pass to POST /gacha/gacha/v2/transactions/submit
+        platform:
+          type: string
+        action:
+          type: string
+          enum:
+            - buy
+            - sell
+            - list
+            - delist
+        asset:
+          type: string
+        transactions:
+          type: array
+          items:
+            type: string
+          description: Base64 unsigned transaction(s) to sign
+        expiresAt:
+          type: string
+        detail:
+          type: object
+          additionalProperties: {}
+        next:
+          type: string
+          description: The route to call next
+      required:
+        - reference
+        - platform
+        - action
+        - asset
+        - transactions
+        - expiresAt
+        - next
+    Collectible:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Asset id (mint address)
+        name:
+          type:
+            - string
+            - "null"
+        image:
+          type:
+            - string
+            - "null"
+        collection:
+          type: string
+          description: Whitelisted collection address
+        interface:
+          type: string
+          description: DAS interface, e.g. ProgrammableNFT / MplCoreAsset
+        owner:
+          type:
+            - string
+            - "null"
+          description: Current owner wallet (from DAS)
+        frozen:
+          type: boolean
+        jsonUri:
+          type:
+            - string
+            - "null"
+          description: Metaplex off-chain metadata URI
+        enrichment:
+          $ref: "#/components/schemas/Enrichment"
+        buyback:
+          $ref: "#/components/schemas/BuybackQuote"
+      required:
+        - id
+        - name
+        - image
+        - collection
+        - interface
+        - owner
+        - frozen
+        - jsonUri
+        - enrichment
+        - buyback
+    Collection:
+      type: object
+      properties:
+        collection:
+          type: string
+          description: On-chain collection address
+        label:
+          type: string
+        platform:
+          type: string
+        type:
+          type: string
+          description: Collectible standard items follow, e.g. "tcg"
+        enrichment:
+          type: object
+          properties:
+            onchain:
+              type: boolean
+            offchain:
+              type: boolean
+            partner:
+              type: boolean
+          required:
+            - onchain
+            - offchain
+            - partner
+          description: Which enrichment sources are configured for this collection
+      required:
+        - collection
+        - label
+        - platform
+        - type
+        - enrichment
+    Enrichment:
+      oneOf:
+        - $ref: "#/components/schemas/TcgCollectible"
+        - type: "null"
+      description: null when no enricher is configured for the collection, the provider is unavailable, or it does not know this asset
+    Inventory:
+      type: object
+      properties:
+        address:
+          type: string
+        total:
+          type: integer
+          description: Total whitelisted collectibles owned, across all pages
+        page:
+          type: integer
+        limit:
+          type: integer
+        hasMore:
+          type: boolean
+          description: True when later pages exist
+        byCollection:
+          type: array
+          items:
+            type: object
+            properties:
+              collection:
+                type: string
+              label:
+                type: string
+              type:
+                type: string
+                description: Collectible standard, e.g. "tcg"
+              total:
+                type: integer
+            required:
+              - collection
+              - label
+              - type
+              - total
+          description: Per-collection counts across the wallet's whole inventory (unaffected by the collection filter)
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Collectible"
+      required:
+        - address
+        - total
+        - page
+        - limit
+        - hasMore
+        - byCollection
+        - items
+    LatestPulls:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Pass as `cursor` to page past this row
+              platform:
+                type: string
+              machineId:
+                type: string
+              packType:
+                type: string
+              assetId:
+                type: string
+              insuredValueUsd:
+                type: number
+              result:
+                type: string
+              rarity:
+                type: string
+              signature:
+                type: string
+              at:
+                type: string
+            required:
+              - id
+              - platform
+              - packType
+              - at
+        nextCursor:
+          type: string
+          description: Absent on the last page
+      required:
+        - items
+    MachineInventoryItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Platform item id (CC: NFT mint address; Phygitals: card id)"
+        name:
+          type: string
+        image:
+          type: string
+        description:
+          type: string
+        rarity:
+          type: string
+          description: Lowercase tier, matching the machine's odds tiers
+        valueUsd:
+          type: number
+          description: Insured / fair-market value in USD
+        attributes:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: number
+        machine:
+          type: object
+          properties:
+            id:
+              type: string
+            platform:
+              type: string
+            name:
+              type: string
+            coverage:
+              type: string
+              enum:
+                - full
+                - chase
+          required:
+            - id
+            - platform
+            - name
+            - coverage
+      required:
+        - id
+        - name
+        - machine
+    MachineInventoryPage:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        hasMore:
+          type: boolean
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MachineInventoryItem"
+      required:
+        - total
+        - page
+        - limit
+        - hasMore
+        - items
+    MachineOddsEntry:
+      type: object
+      properties:
+        tier:
+          type: string
+        probability:
+          type: number
+          description: In [0,1]; entries sum to ~1
+        valueRangeUsd:
+          type: object
+          properties:
+            min:
+              type: number
+            max:
+              type: number
+          required:
+            - min
+            - max
+        color:
+          type: string
+      required:
+        - tier
+        - probability
+    MachineOpenResult:
+      type: object
+      properties:
+        machineId:
+          type: string
+        platform:
+          type: string
+        status:
+          type: string
+          enum:
+            - fulfilled
+            - pending
+            - failed
+        statusDetail:
+          type: string
+          description: 'Upstream state name when the platform distinguishes more than we do (phygitals: processing, debited, review). "review" stays pending but is parked for manual reconciliation and is never auto-refunded. collector-crypt: "turbo-mode-buyback" means the platform kept the won card and paid its buyback instead of delivering it, `status` is still "fulfilled", the item is reported with its `buybackUsd`, and the wallet will not receive it.'
+        reference:
+          type: string
+        wallet:
+          type: string
+          description: Wallet the platform delivers the won items to, when it accepts one
+        transactionSignature:
+          type: string
+          description: On-chain signature of the fulfilling transaction, when the platform returns one
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              image:
+                type: string
+              imageBack:
+                type: string
+                description: Back of the card, when the platform publishes one, for the reveal flip
+              enrichment:
+                allOf:
+                  - $ref: "#/components/schemas/Enrichment"
+                  - description: "Grade, year, set and cert, read from the asset's metadata. The platform's own open payload carries none of it. Best-effort: absent if the lookup failed."
+              rarity:
+                type: string
+              valueUsd:
+                type: number
+              insuredValueUsd:
+                type: number
+                description: Platform's insured valuation, when quoted separately from `valueUsd`. `valueUsd` prefers the card's own market quote and falls back to this.
+              buybackUsd:
+                type: number
+            required:
+              - id
+      required:
+        - machineId
+        - platform
+        - status
+        - reference
+    MachinePurchase:
+      type: object
+      properties:
+        machineId:
+          type: string
+        platform:
+          type: string
+        chunks:
+          type: integer
+          description: Transactions to sign, and therefore `open` calls to make. Usually 1, but more when the quantity exceeds the machine's `maxPerPurchase`, or when the platform issues one transaction per pack regardless of the cap (Collector Crypt does).
+        packs:
+          type: array
+          items:
+            type: object
+            properties:
+              reference:
+                type: string
+              transaction:
+                type: string
+              intent:
+                type: string
+                description: Gateway intent id; pass back as `intent` on open so a stale transaction is rejected here
+              quantity:
+                type: integer
+                description: Packs this transaction buys, and its open reveals
+            required:
+              - reference
+              - transaction
+              - quantity
+          description: Unsigned base64 transaction per pack, with the reference to open it
+        next:
+          type: string
+          description: The route to call next
+      required:
+        - machineId
+        - platform
+        - chunks
+        - next
+    MachineV2:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "`{platform}:{platformMachineId}`, e.g. `phygitals:starter-one-piece-pack-2xcfbo`"
+        platform:
+          type: string
+        platformMachineId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        collectibleType:
+          type: string
+          description: Collectible standard of the prizes, e.g. "tcg"
+        imageUrl:
+          type: string
+        videoUrl:
+          type: string
+        currency:
+          type: string
+          description: SPL mint address of the primary payment token (USDC)
+        acceptedCurrencies:
+          type: array
+          items:
+            type: string
+          description: All SPL mint addresses accepted for payment; always includes `currency`
+        priceUsd:
+          type: number
+        status:
+          type: string
+          enum:
+            - active
+            - sold_out
+            - inactive
+        inStock:
+          type: boolean
+        evUsd:
+          type: number
+        buybackPercent:
+          type: number
+          description: Instant-buyback % of item value, 0-100
+        maxPerPurchase:
+          type: integer
+        categories:
+          type: array
+          items:
+            type: string
+        stock:
+          type: object
+          additionalProperties:
+            type: number
+          description: Remaining inventory by tier
+        turboRequired:
+          type: boolean
+          description: A pull sells commons straight back instead of delivering them (Collector Crypt, below its common-stock floor). Absent where the platform has no such rule.
+        odds:
+          type: array
+          items:
+            $ref: "#/components/schemas/MachineOddsEntry"
+      required:
+        - id
+        - platform
+        - platformMachineId
+        - name
+        - collectibleType
+        - currency
+        - acceptedCurrencies
+        - priceUsd
+        - status
+        - inStock
+        - odds
+    MarketListing:
+      type: object
+      properties:
+        asset:
+          type: string
+          description: NFT mint address
+        platform:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+        priceUsd:
+          type: number
+          description: Active list price; absent when not listed
+        listed:
+          type: boolean
+        valueUsd:
+          type: number
+          description: Insured / fair-market value
+        seller:
+          type: string
+        grade:
+          type: string
+        gradingCompany:
+          type: string
+        category:
+          type: string
+        source:
+          type: string
+          description: Listing venue, e.g. CC | TENSOR | MAGICEDEN
+      required:
+        - asset
+        - platform
+        - name
+        - listed
+    MarketPage:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        hasMore:
+          type: boolean
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MarketListing"
+      required:
+        - total
+        - page
+        - limit
+        - hasMore
+        - items
+    MarketState:
+      type: object
+      properties:
+        asset:
+          type: string
+        platform:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+        listed:
+          type: boolean
+        listing:
+          type: object
+          properties:
+            priceUsd:
+              type: number
+            currency:
+              type: string
+            seller:
+              type: string
+          required:
+            - priceUsd
+            - currency
+        offersCount:
+          type: integer
+        instantSellUsd:
+          type: number
+          description: Standing instant-sell (buyback) quote, when the platform exposes one
+        valueUsd:
+          type: number
+      required:
+        - asset
+        - platform
+        - listed
+    MarketTxPlan:
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Transaction-gateway intent id; pass to POST /gacha/gacha/v2/transactions/submit
+        platform:
+          type: string
+        action:
+          type: string
+          enum:
+            - buy
+            - sell
+            - list
+            - delist
+        asset:
+          type: string
+        transactions:
+          type: array
+          items:
+            type: string
+          description: Base64 unsigned transaction(s) to sign
+        expiresAt:
+          type: string
+        detail:
+          type: object
+          additionalProperties: {}
+        next:
+          type: string
+          description: The route to call next
+      required:
+        - reference
+        - platform
+        - action
+        - asset
+        - transactions
+        - expiresAt
+        - next
+    PackAssets:
+      type: object
+      properties:
+        thumbnailUrl:
+          type: string
+        cardUrl:
+          type: string
+        cardNormalUrl:
+          type: string
+          description: Normal map for `cardUrl`, for the holographic foil. Absent when the pack has none, derive it by convention or skip the effect.
+        backgroundUrl:
+          type: string
+        video:
+          type: array
+          items:
+            $ref: "#/components/schemas/PackMediaSource"
+          description: The same video in several encodings, most-preferred first, play the first one you can decode, and fall back to `cardUrl` if none match. Listed by MIME type rather than by platform, so the client decides what it supports; web can pass the list straight to `<video>`.
+        lottieUrl:
+          type: string
+        colors:
+          type: object
+          properties:
+            primary:
+              type: string
+            secondary:
+              type: string
+            accent:
+              type: string
+    PackBadge:
+      type: object
+      properties:
+        label:
+          type: string
+        color:
+          type: string
+          description: CSS colour to tint the badge with
+      required:
+        - label
+    PackCategory:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Also a `tags` value: the packs in this category carry it"
+        label:
+          type: string
+          description: Tab title
+        franchise:
+          type: string
+          description: The name as it reads in prose ("Open a Watch pack"), where `label` is the tab ("Watches")
+        accent:
+          type: string
+          description: CSS colour for the tab and its tiles
+      required:
+        - id
+        - label
+        - franchise
+        - accent
+    PackMediaSource:
+      type: object
+      properties:
+        url:
+          type: string
+        type:
+          type: string
+          description: MIME type with codecs, as an HTML `<source type>` takes it, `video/webm; codecs=vp9`, `video/mp4; codecs=hvc1`.
+      required:
+        - url
+        - type
+    PackUnavailableReason:
+      type: string
+      enum:
+        - unpublished
+        - coming_soon
+        - ended
+        - provider_down
+        - inactive
+        - sold_out
+      description: Absent when `available` is true
+    PackV2:
+      type: object
+      properties:
+        slug:
+          type: string
+          description: Jupiter's own id for the pack, never a provider id
+        name:
+          type: string
+        shortName:
+          type: string
+          description: Compact label for tabs and chips, e.g. "Silver". Fall back to `name` when absent.
+        description:
+          type: string
+        machineId:
+          type: string
+          description: Bound provider machine. Pass this to POST /gacha/gacha/v2/machines/{id}/purchase.
+        platform:
+          type: string
+        assets:
+          $ref: "#/components/schemas/PackAssets"
+        featured:
+          type: boolean
+        listed:
+          type: boolean
+          description: "False for a retired pack: omitted from this list, but still resolvable by slug so existing links, replays and gift records keep rendering."
+        sortIndex:
+          type: integer
+          description: Catalogue order, ascending; ties broken by slug
+        badge:
+          $ref: "#/components/schemas/PackBadge"
+        isNew:
+          type: boolean
+          description: Drives the "new" treatment. Independent of `badge`.
+        tags:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+          description: The `PackCategory` id this pack's tags put it in, the tab to file it under. Absent when no tag names a category; such a pack belongs only in an all-packs view.
+        availableFrom:
+          type: string
+        availableUntil:
+          type: string
+        available:
+          type: boolean
+        unavailableReason:
+          $ref: "#/components/schemas/PackUnavailableReason"
+        priceUsd:
+          type: number
+          description: 'Live from the bound machine, never a stored copy. This and the other money fields are present together, or absent together when the machine could not be resolved, usually `unavailableReason: "provider_down"`, but a `coming_soon` or `ended` pack the provider does not list can be priceless too. Disable the buy affordance whenever this is absent, whatever the reason says.'
+        currency:
+          type: string
+        acceptedCurrencies:
+          type: array
+          items:
+            type: string
+        odds:
+          type: array
+          items:
+            $ref: "#/components/schemas/MachineOddsEntry"
+        evUsd:
+          type: number
+        buybackPercent:
+          type: number
+        maxPerPurchase:
+          type: integer
+        stock:
+          type: object
+          additionalProperties:
+            type: number
+          description: Remaining inventory by tier, when the platform reports it. Live, with the money fields.
+        turboRequired:
+          type: boolean
+          description: Commons are nearly gone, so a pull on this pack sells them straight back instead of delivering them. Live, with the money fields; show it before the buy button, not after the open.
+        machine:
+          allOf:
+            - $ref: "#/components/schemas/MachineV2"
+            - description: Only when `include=machine`
+      required:
+        - slug
+        - name
+        - machineId
+        - platform
+        - assets
+        - featured
+        - listed
+        - sortIndex
+        - isNew
+        - tags
+        - available
+    PullActivity:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Pass as `cursor` to page past this row
+              platform:
+                type: string
+              machineId:
+                type: string
+              packType:
+                type: string
+              assetId:
+                type: string
+              insuredValueUsd:
+                type: number
+              result:
+                type: string
+                description: '"card", or "turbo-mode-buyback" when the platform kept the card and paid out instead'
+              rarity:
+                type: string
+              signature:
+                type: string
+              at:
+                type: string
+            required:
+              - id
+              - platform
+              - packType
+              - at
+        nextCursor:
+          type: string
+          description: Absent on the last page
+      required:
+        - items
+    SingleMachineInventory:
+      type: object
+      properties:
+        machineId:
+          type: string
+        coverage:
+          type: string
+          enum:
+            - full
+            - chase
+          description: '"full" = whole prize pool; "chase" = platform only exposes highlight items'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        hasMore:
+          type: boolean
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MachineInventoryItem"
+      required:
+        - machineId
+        - coverage
+        - total
+        - page
+        - limit
+        - hasMore
+        - items
+    TcgCollectible:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - tcg
+        provider:
+          type: string
+        category:
+          type: string
+        grade:
+          type: string
+        gradingCompany:
+          type: string
+        certNumber:
+          type: string
+        cardName:
+          type: string
+        imageBack:
+          type: string
+          description: Back of the card, when the platform publishes a second image
+        setName:
+          type: string
+        cardNumber:
+          type: string
+        year:
+          type: string
+        language:
+          type: string
+        parallel:
+          type: string
+        rarity:
+          type: string
+        gradePopulation:
+          type: integer
+        estimatedValueUsd:
+          type: number
+        attributes:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: number
+      required:
+        - type
+        - provider
+    TxBatchSubmitResult:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              reference:
+                type: string
+              ok:
+                type: boolean
+              result:
+                description: The submit outcome, when it succeeded
+              code:
+                type: string
+                description: Error code, when it did not
+              message:
+                type: string
+            required:
+              - reference
+              - ok
+        submitted:
+          type: integer
+        failed:
+          type: integer
+      required:
+        - results
+        - submitted
+        - failed
+    TxIntentStatus:
+      type: object
+      properties:
+        reference:
+          type: string
+        platform:
+          type: string
+        action:
+          type: string
+        asset:
+          type:
+            - string
+            - "null"
+        wallet:
+          type: string
+        status:
+          type: string
+          enum:
+            - pending
+            - submitted
+            - failed
+        result: {}
+        createdAt:
+          type: string
+        expiresAt:
+          type: string
+      required:
+        - reference
+        - platform
+        - action
+        - asset
+        - wallet
+        - status
+        - createdAt
+        - expiresAt
+    TxSubmitResult:
+      type: object
+      properties:
+        reference:
+          type: string
+        platform:
+          type: string
+        action:
+          type: string
+        asset:
+          type:
+            - string
+            - "null"
+        status:
+          type: string
+          enum:
+            - submitted
+            - pending
+            - failed
+        signature:
+          type: string
+          description: On-chain transaction signature, when the platform returns one
+        detail: {}
+      required:
+        - reference
+        - platform
+        - action
+        - asset
+        - status
+    UserStats:
+      type: object
+      properties:
+        wallet:
+          type: string
+        total:
+          type: object
+          properties:
+            spendUsd:
+              type: number
+            pulls:
+              type: integer
+            wonUsd:
+              type: number
+          required:
+            - spendUsd
+            - pulls
+            - wonUsd
+        platforms:
+          type: array
+          items:
+            type: object
+            properties:
+              spendUsd:
+                type: number
+              pulls:
+                type: integer
+              wonUsd:
+                type: number
+              platform:
+                type: string
+            required:
+              - spendUsd
+              - pulls
+              - wonUsd
+              - platform
+          description: Highest spend first. Platforms the wallet has never played are omitted.
+      required:
+        - wallet
+        - total
+        - platforms
+    V1BattlepassTier:
+      type: object
+      properties:
+        tierId:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9_-]*$
+        thresholdUsd:
+          type: integer
+          minimum: 1
+        rewardPacks:
+          type: integer
+          minimum: 1
+          maximum: 20
+        packType:
+          type: string
+          minLength: 1
+      required:
+        - tierId
+        - thresholdUsd
+        - rewardPacks
+        - packType
+    V1BattlepassTierStatus:
+      allOf:
+        - $ref: "#/components/schemas/V1BattlepassTier"
+        - type: object
+          properties:
+            claimState:
+              type: string
+              enum:
+                - locked
+                - available
+                - delivering
+                - delivered
+                - retryable
+          required:
+            - claimState
+    V1LeaderboardEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+          minimum: 1
+        wallet:
+          type: string
+          minLength: 1
+        volumeUsd:
+          type: number
+      required:
+        - rank
+        - wallet
+        - volumeUsd
+    V1LeaderboardPrizeEntry:
+      allOf:
+        - $ref: "#/components/schemas/V1LeaderboardEntry"
+        - type: object
+          properties:
+            prize:
+              type:
+                - object
+                - "null"
+              properties:
+                packType:
+                  type: string
+                  minLength: 1
+                rewardPacks:
+                  type: integer
+                  minimum: 1
+                  maximum: 20
+              required:
+                - packType
+                - rewardPacks
+          required:
+            - prize
+    V1LeaderboardSeason:
+      type: object
+      properties:
+        season:
+          type: integer
+          minimum: 1
+        startAt:
+          type: string
+        endAt:
+          type: string
+        rewards:
+          type: object
+          properties:
+            minVolumeUsd:
+              type: number
+              minimum: 0
+              default: 0
+            prizeBands:
+              type: array
+              items:
+                $ref: "#/components/schemas/V1PrizeBand"
+              default: []
+      required:
+        - season
+        - startAt
+        - endAt
+        - rewards
+    V1LeaderboardSeasonMeta:
+      allOf:
+        - $ref: "#/components/schemas/V1LeaderboardSeason"
+        - type: object
+          properties:
+            state:
+              type: string
+              enum:
+                - pending
+                - ongoing
+                - completed
+          required:
+            - state
+    V1PrizeBand:
+      type: object
+      properties:
+        fromRank:
+          type: integer
+          minimum: 1
+          maximum: 1000
+        toRank:
+          type: integer
+          minimum: 1
+          maximum: 1000
+        rewardPacks:
+          type: integer
+          minimum: 1
+          maximum: 20
+        packType:
+          type: string
+          minLength: 1
+      required:
+        - fromRank
+        - toRank
+        - rewardPacks
+        - packType

@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml get /transactions/{reference}
+title: "Get Transaction Status"
+description: "Status of a transaction intent"
+llmsDescription: "GET /gacha/v2/transactions/{reference} returns the current state of a gateway intent (pending, submitted or failed) with its platform, action, asset, wallet and stored result, for polling a submission or auditing it afterwards. Returns 404 reference_not_found for unknown references."
+hidden: true
+---

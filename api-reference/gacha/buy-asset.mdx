@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /marketplace/{asset}/buy
+title: "Buy Asset"
+description: "Build the transaction to buy a listed asset"
+llmsDescription: "POST /gacha/v2/marketplace/{asset}/buy builds the purchase transaction for an active listing (Collector Crypt only; Phygitals listings settle on Tensor or Magic Eden). Pass the buyer wallet and receive unsigned base64 transactions plus a gateway reference and expiresAt; sign them and complete with POST /gacha/v2/transactions/submit. Errors: 400 not_listed or upstream_rejected, 451 region_restricted, 501 unsupported."
+hidden: true
+---

@@ -1,0 +1,178 @@
+---
+title: "Claim Fee (Beta)"
+---
+
+<Info>
+  **NOTE**
+
+  * Lite URL: `https://lite-api.jup.ag/studio/v1`: 100 requests per 5 minutes
+  * Pro URL: `https://api.jup.ag/studio/v1`: 10 requests per 10 seconds (for all Tiers)
+
+  To upgrade to Pro or understand our rate limiting, please refer to this section.
+
+  <CardGroup>
+    <Card title="API Key Setup" href="/docs/api-setup" icon="key" horizontal/>
+    <Card title="API Rate Limit" href="/docs/api-rate-limit" icon="gauge" horizontal/>
+  </CardGroup>
+</Info>
+
+<Tip>
+  **API REFERENCE**
+
+  To fully utilize the Studio API, check out the [Studio API Reference](/api/studio-api).
+</Tip>
+
+## Prerequisite
+
+<AccordionGroup>
+<Accordion title="Dependencies">
+
+```bash
+npm install @solana/web3.js@1 # Using v1 of web3.js instead of v2
+npm install dotenv # If required for wallet setup
+```
+</Accordion>
+
+<Accordion title="RPC">
+
+  **Set up RPC**
+
+<Info>
+  **NOTE**
+
+  Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters). However, as your application grows, we recommend you to always use your own or provision a 3rd party provider’s RPC endpoint such as [Helius](https://helius.dev/) or [Triton](https://triton.one/).
+</Info>
+
+```js
+import { Connection } from '@solana/web3.js';
+
+const connection = new Connection('https://api.mainnet-beta.solana.com');
+```
+</Accordion>
+
+<Accordion title="Wallet">
+
+  **Set up Development Wallet**
+
+<Info>
+  **NOTE**
+
+  * You can paste in your private key for testing purposes but this is not recommended for production applications.
+  * If you want to store your private key in the project directly, you can do it via a `.env` file.
+</Info>
+
+To set up a development wallet via `.env` file, you can use the following script.
+
+```js
+// index.js
+import { Keypair } from '@solana/web3.js';
+import dotenv from 'dotenv';
+require('dotenv').config();
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ''));
+  ```
+
+```bash
+# .envPRIVATE_KEY=''
+```
+
+To set up a development wallet via a wallet generated via [Solana CLI](https://solana.com/docs/intro/installation#solana-cli-basics), you can use the following script.
+
+```js
+import { Keypair } from '@solana/web3.js';
+import fs from 'fs';
+
+const privateKeyArray = JSON.parse(fs.readFileSync('/Path/To/.config/solana/id.json', 'utf8').trim());
+const wallet = Keypair.fromSecretKey(new Uint8Array(privateKeyArray));
+```
+</Accordion>
+
+<Accordion title="Transaction Sending Example">
+
+```js
+transaction.sign([wallet]);
+const transactionBinary = transaction.serialize();
+console.log(transactionBinary);
+console.log(transactionBinary.length);
+const blockhashInfo = await connection.getLatestBlockhashAndContext({ commitment: 'finalized' });
+
+const signature = await connection.sendRawTransaction(transactionBinary, {
+  maxRetries: 0,
+  skipPreflight: true,
+});
+
+console.log(`Transaction sent: https://solscan.io/tx/${signature}`);
+
+try {
+  const confirmation = await connection.confirmTransaction({
+    signature,
+    blockhash: blockhashInfo.value.blockhash,
+    lastValidBlockHeight: blockhashInfo.value.lastValidBlockHeight,
+  }, 'confirmed');
+
+  if (confirmation.value.err) {
+    console.error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+    console.log(`Examine the failed transaction: https://solscan.io/tx/${signature}`);
+  } else {
+    console.log(`Transaction successful: https://solscan.io/tx/${signature}`);
+  }
+} catch (error) {
+  console.error(`Error confirming transaction: ${error}`);
+  console.log(`Examine the transaction status: https://solscan.io/tx/${signature}`);
+};
+```
+</Accordion>
+</AccordionGroup>
+
+## Pool Address
+
+Your successfully created token via Jupiter Studio, should have a newly generated token mint. By using the mint, you can get the config key and pool addresses associated to it: Dynamic Bonding Curve pool and Meteora DAMM V2 pool.
+
+```js
+const poolAddressResponse = await (
+    await fetch(
+      `https://lite-api.jup.ag/studio/v1/dbc-pool/addresses/${mint}`,
+    )
+).json();
+```
+
+## Fee
+
+Using the Pool Address, you will be able to get the total and current unclaimed fees in the Dynamic Bonding Curve pool.
+
+```js
+const feeResponse = await (
+    await fetch (
+      'https://lite-api.jup.ag/studio/v1/dbc/fee',
+      {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            poolAddress: poolAddressResponse.data.dbcPoolAddress,
+        }, null, 2)
+    })
+).json();
+```
+
+## Claim Fee
+
+In order to claim fees from a Dynamic Bonding Curve pool, you will need to pass in the pool address into this endpoint and we will create the Claim Fee transaction for you. After receiving the transaction, you will need to sign and submit the transaction to the network on your own ([refer to Transaction Sending Example above](#prerequisite)).
+
+```js
+const claimTransaction = await (
+    await fetch (
+      'https://lite-api.jup.ag/studio/v1/dbc/fee/create-tx',
+      {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            ownerWallet: wallet.publicKey.toBase58(),
+            poolAddress: poolAddressResponse.data.dbcPoolAddress,
+            maxQuoteAmount: 1000000, // e.g. 1 USDC (depending on quote mint and decimals)
+        }, null, 2)
+    })
+).json();
+```

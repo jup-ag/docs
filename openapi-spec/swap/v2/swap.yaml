@@ -726,3 +726,30 @@ paths:
                     type: string
                   error:
                     type: string
+
+  /program-id-to-label:
+    get:
+      operationId: ProgramIdToLabelGet
+      tags:
+        - Swap
+      summary: Program ID to Label
+      description: |
+        Returns a hash, which key is the program id and value is the label.
+        This is used to help map error from transaction by identifying the fault program id.
+        This can be used in conjunction with the `excludeDexes` or `dexes` parameter.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        "200":
+          description: Default response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+              example:
+                JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4: "Jupiter V6"
+                whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc: "Orca Whirlpool"
+                CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK: "Raydium CLMM"
+                LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo: "Meteora DLMM"

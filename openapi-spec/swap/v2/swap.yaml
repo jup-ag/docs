@@ -276,6 +276,8 @@ paths:
             - Comma-separated list of DEXes to exclude from the Metis router
             - **Important**: This only affects the Metis router, not other routers
             - For example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
+            - Labels are case sensitive (`SolFi`, not `solfi`). Full list of DEXes here using the `/program-id-to-label` endpoint.
+            - On `/order` only `excludeDexes` is honoured, not `dexes`. Use `/build` to restrict routing to specific DEXes.
       responses:
         "200":
           description: Quote with optional assembled transaction
@@ -464,14 +466,18 @@ paths:
             type: string
           description: |
             - Comma-separated list of DEXes to restrict routing to.
-            - Mutually exclusive with excludeDexes.
+            - Labels are case sensitive (`SolFi`, not `solfi`). An unrecognised label is not a validation error: it returns `400 {"error": "No routes found"}`, indistinguishable from a pair with no liquidity.
+            - Mutually exclusive with excludeDexes. Passing both returns `400 {"error": "dexes and excludeDexes are mutually exclusive"}`.
+            - Full list of DEXes here using the `/program-id-to-label` endpoint.
         - name: excludeDexes
           in: query
           schema:
             type: string
           description: |
             - Comma-separated list of DEXes to exclude.
+            - Labels are case sensitive (`SolFi`, not `solfi`).
             - Mutually exclusive with dexes.
+            - Full list of DEXes here using the `/program-id-to-label` endpoint.
         - name: platformFeeBps
           in: query
           schema:
@@ -726,3 +732,25 @@ paths:
                     type: string
                   error:
                     type: string
+
+  /program-id-to-label:
+    get:
+      operationId: ProgramIdToLabelGet
+      tags:
+        - Swap
+      summary: Program ID to Label
+      description: |
+        Returns a hash, which key is the program id and value is the label.
+        This is used to help map error from transaction by identifying the fault program id.
+        This can be used in conjunction with the `excludeDexes` or `dexes` parameter.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        "200":
+          description: Default response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string

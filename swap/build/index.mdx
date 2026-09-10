@@ -633,8 +633,8 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 | `feeAccount` | - | Token account to collect platform fees |
 | `payer` | public key | Account that pays transaction fees and rent |
 | `wrapAndUnwrapSol` | true | Whether to wrap/unwrap SOL automatically |
-| `dexes` | (all) | Restrict routing to specific DEXes |
-| `excludeDexes` | (none) | Exclude specific DEXes from routing |
+| `dexes` | (all) | Restrict routing to specific DEXes. Labels are case sensitive. See the [full DEX label list](/api-reference/swap/program-id-to-label) |
+| `excludeDexes` | (none) | Exclude specific DEXes from routing. Labels are case sensitive. See the [full DEX label list](/api-reference/swap/program-id-to-label) |
 | `destinationTokenAccount` | - | SPL token account for output |
 | `nativeDestinationAccount` | - | Native SOL account for output |
 | `blockhashSlotsToExpiry` | 150 | Slots until blockhash expires (1-300) |

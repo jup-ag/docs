@@ -134,6 +134,15 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 - [2026-04-09] `/build` code examples now default to `/submit` as the submission path instead of `sendRawTransaction`. Comments note "or use your own RPC / transaction pipeline" for integrators not using `/submit`.
 - [2026-04-16] Code examples for `/build` and `/submit` must include confirmation polling as the final step (`confirmTransaction` with blockhash strategy). Step numbering must be consistent across pages that share the same flow (currently 7 steps: call API, collect instructions, prepare blockhash/ALTs, simulate CU, build final tx, sign and submit, confirm).
 
+## dexes / excludeDexes behaviour
+
+- [2026-09-10] `GET /swap/v2/program-id-to-label` is live, proxied from V1 (BUILD-880, PR #954). Verified by anmol on live: answers **keyless** on both `/swap/v1` and `/swap/v2` prefixes, and the two prefixes return **byte-identical maps** (107 program IDs, 104 unique labels; `Sanctum` is the only label mapping to more than one program ID). Documented at `api-reference/swap/program-id-to-label.mdx`; the response schema example was dropped per YY.
+- [2026-09-10] `dexes`/`excludeDexes` **labels are case sensitive**: `solfi` does NOT match `SolFi`. Source of ground truth for exact casing is the `/program-id-to-label` map.
+- [2026-09-10] An **unrecognised DEX label is not a validation error** — routing just returns `400 {"error": "No routes found"}`, which is byte-identical to a pair that genuinely has no liquidity. A typo is therefore indistinguishable from a dead pair, which is horrible to debug (anmol). Docs surface this on the `dexes` param description.
+- [2026-09-10] Passing **both `dexes` and `excludeDexes`** returns `400 {"error": "dexes and excludeDexes are mutually exclusive"}`.
+- [2026-09-10] **`dexes` is not honoured on `/order`, only `excludeDexes` is.** anmol asked `dexes=Whirlpool` on `/order` and got a Quantum route back. The `/order` spec is correct by omission (it only lists `excludeDexes`), but since `/order` and `/build` share most param names, the `/order` `excludeDexes` description now says this out loud. To restrict routing to specific DEXes, use `/build`.
+- [2026-09-10] The V1 spec's `dexes`/`excludeDexes` carried a "Full list of DEXes here using the `/program-id-to-label` endpoint" pointer; V2's did not until PR #954. Added the pointer to both `/build` params and the `/order` `excludeDexes`, plus a link from the `swap/build/index.mdx` params table, so integrators hitting the param are routed to the label list.
+
 ---
 
 # Tokens API

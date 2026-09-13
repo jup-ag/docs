@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /buyback
+title: "Buyback Several Assets"
+description: "Instant-sell several items back to their platform in one round trip"
+llmsDescription: "POST /gacha/v2/buyback builds one buyback transaction per asset in a single call so a wallet can approve them all with one signAllTransactions. Pass wallet, platform and assets[]. Not atomic: each asset is planned and settles independently; assets the platform refuses are reported under failed while the rest return 200, so check both arrays. Complete every plan with POST /gacha/v2/transactions/submit-batch."
+hidden: true
+---

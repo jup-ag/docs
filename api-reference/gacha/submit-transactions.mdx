@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /transactions/submit
+title: "Submit Transactions"
+description: "Submit signed transactions for a pending intent"
+llmsDescription: "POST /gacha/v2/transactions/submit is the gateway for every build, sign, submit flow: pass the reference returned by a build endpoint (marketplace buy, list, delist, buyback) plus signedTransactions[] and the gateway dispatches them to the right platform, returning status (submitted, pending, failed) and the on-chain signature when available. Resubmitting a finalised reference replays its stored result, so retries are safe. Errors: 404 reference_not_found, 410 intent_expired, 451 region_restricted."
+hidden: true
+---

@@ -1,0 +1,59 @@
+---
+title: "Platform coverage"
+description: "What each integrated gacha platform supports, and where the edges are"
+llmsDescription: "Capability matrix for the platforms behind the Jupiter Gacha API (Collector Crypt, Phygitals, Beezie): which support the machines feed, full or chase-only prize inventory, pack purchase and open, marketplace browse and buy, instant-sell buyback, and list or delist. Explains per-platform behaviour such as Collector Crypt stock floors and turboRequired, Phygitals listings settling on Tensor or Magic Eden, expiring buyback quotes and the one-request-per-second quote throttle, USDC-only purchases, inferred rarity, and Beezie being read-only. Describes the coverage signals in responses (machine.coverage, listing source, 501 unsupported)."
+hidden: true
+---
+
+The API normalises aggressively, but platforms do not all expose the same capabilities. A `501 unsupported` response tells you at runtime when an operation is not available. This matrix tells you why.
+
+| Capability | Collector Crypt | Phygitals | Beezie |
+| --- | --- | --- | --- |
+| Machines feed | Yes | Yes | Yes |
+| Prize inventory | Full pool | Chase items only | Chase items only |
+| Pack purchase and open | Yes | Yes | No |
+| Marketplace browse | Yes | Yes (Tensor and Magic Eden listings) | No |
+| Marketplace buy | Yes | No | No |
+| Instant sell (buyback) | Yes | Yes | No |
+| List and delist | Yes | No | No |
+
+Platform ids in requests and responses are `collector-crypt`, `phygitals` and `beezie`.
+
+## Collector Crypt
+
+- Full prize pools, capped at 5,000 items per machine.
+- Per-tier `stock` is published, and two sale rules ride on it. A machine whose uncommon, rare or epic count is down to 5 reads `sold_out` (and purchase refuses it) even while commons remain. Below 50 commons, `turboRequired` turns on: a pull then sells the common straight back instead of delivering it, and `open` reports `statusDetail: "turbo-mode-buyback"` with the item's `buybackUsd`.
+- Marketplace buy, list and delist are fully supported through the transaction gateway. The upstream transaction builder validates aggressively (balance checks, owner drift), surfaced as `400 upstream_rejected` with the platform's message.
+- Listing deducts a 2% platform fee from seller proceeds.
+- Upstream price ordering (`sort=price`) is only approximate because the platform's own sort is unreliable.
+- The buyback bid is standing and carries no expiry.
+
+## Phygitals
+
+- Prize inventory exposes only chase (highlight) cards. Check `machine.coverage` on inventory items.
+- Marketplace listings settle on Tensor or Magic Eden (see each listing's `source`), which is why there is no buy endpoint.
+- Purchase, open and buyback are brokered server-side. Instant sell is priced for the seller's own wallet, which co-signs the returned transaction and receives the proceeds.
+- `instantSellUsd` on market state, and `buyback` on inventory items, come from a standing offer that expires. Check `buyback.expiresAt`.
+- Quoting is throttled upstream to one request per second, so only the first few items of an inventory page are quoted; the rest return `buyback: null` until a later request warms the cache.
+- Purchase returns a pre-built `payment.transaction`. The platform accepts USDC only and rebuilds the transaction it expects from `payment.currency`, so send that value straight back as `currency` on open.
+- Open settles asynchronously. `status: "pending"` with `statusDetail` of `processing` or `debited` means keep polling; `review` stays pending, is parked for manual reconciliation and is never auto-refunded.
+- Pull results carry an inferred `rarity`: the platform reports no tier, so the item's value is matched against the machine's published odds bands. Item value is the reported `fmv` when present, otherwise derived from the buyback price and the machine's buyback percentage.
+
+## Beezie
+
+- Read-only: machines and chase inventory. The platform authenticates pulls with the end user's own session token, so server-brokered purchase flows are not possible.
+
+## Coverage signals in responses
+
+- Machine-inventory items carry `machine.coverage`: `"full"` or `"chase"`.
+- Marketplace listings carry `source`: the venue the listing actually lives on.
+- Unsupported operations return `501 unsupported` with a human-readable reason.
+- Platforms that failed during a cross-platform aggregation are named in the `X-Degraded-Sources` response header.
+
+## Related
+
+- [Get Machines](/api-reference/gacha/get-machines)
+- [Get Marketplace Listings](/api-reference/gacha/get-marketplace-listings)
+- [Buyback Asset](/api-reference/gacha/buyback-asset)
+- [Conventions](/gacha/conventions)
+- [Transaction gateway](/gacha/transactions)

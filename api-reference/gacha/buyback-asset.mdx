@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /buyback/{asset}
+title: "Buyback Asset"
+description: "Instant-sell one item back to its platform"
+llmsDescription: "POST /gacha/v2/buyback/{asset} builds the transaction that sells one owned item into its platform's standing bid (Collector Crypt gacha buyback, or the Phygitals claw bid priced for the seller's wallet). Pass the seller wallet, sign the returned transactions and complete with POST /gacha/v2/transactions/submit. To sell several items at once use POST /gacha/v2/buyback. Errors: 403 not_owner, 451 region_restricted, 501 unsupported."
+hidden: true
+---

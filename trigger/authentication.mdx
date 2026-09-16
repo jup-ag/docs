@@ -62,7 +62,7 @@ const challenge = await challengeResponse.json();
 ```json
 {
   "type": "message",
-  "challenge": "Sign this message to authenticate with Jupiter Trigger Order API..."
+  "challenge": "Sign this message to authenticate with Jupiter that you are the owner of <walletPubkey>.\n\nThis challenge expires at 2026-09-16T14:02:39.204Z with the nonce of 01a0aa82-4504-76ed-8c94-4fb787c6a2a9."
 }
 ```
 
@@ -135,7 +135,7 @@ const { accessToken, refreshToken, expiresAt } = await verifyResponse.json();
   "authMode": "access_refresh",
   "accessToken": "<jwt, expires in 15 minutes>",
   "refreshToken": "<opaque>",
-  "expiresAt": "2026-09-09T07:44:42.000Z",
+  "expiresAt": "2026-09-16T14:12:43.000Z",
   "tokenType": "Bearer"
 }
 ```
@@ -199,7 +199,7 @@ The response has the same fields as the `access_refresh` verify response, withou
 {
   "accessToken": "<jwt, expires in 15 minutes>",
   "refreshToken": "<opaque, rotated>",
-  "expiresAt": "2026-09-09T07:44:43.000Z",
+  "expiresAt": "2026-09-16T14:12:47.000Z",
   "tokenType": "Bearer"
 }
 ```

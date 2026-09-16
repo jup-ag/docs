@@ -361,7 +361,7 @@ paths:
                     required: [type, transaction]
               example:
                 type: "message"
-                challenge: "Sign this message to authenticate with Jupiter Trigger Order API: abc123..."
+                challenge: "Sign this message to authenticate with Jupiter that you are the owner of BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV.\n\nThis challenge expires at 2026-09-16T14:02:39.204Z with the nonce of 01a0aa82-4504-76ed-8c94-4fb787c6a2a9."
         '400':
           description: Invalid request
           content:
@@ -461,7 +461,7 @@ paths:
                 authMode: "access_refresh"
                 accessToken: "eyJhbGciOiJIUzI1NiIs..."
                 refreshToken: "01a08512-95d8-70ac-bab5-20c73aa002bb.6lr8kn3eMIsNGR9rXR1..."
-                expiresAt: "2026-09-09T07:44:42.000Z"
+                expiresAt: "2026-09-16T14:12:43.000Z"
                 tokenType: "Bearer"
         '400':
           description: Invalid request body or expired challenge
@@ -510,7 +510,7 @@ paths:
               example:
                 accessToken: "eyJhbGciOiJIUzI1NiIs..."
                 refreshToken: "01a08512-95d8-70ac-bab5-20c73aa002bb.UtUzQa8kUgtu2XR2..."
-                expiresAt: "2026-09-09T07:44:43.000Z"
+                expiresAt: "2026-09-16T14:12:47.000Z"
                 tokenType: "Bearer"
         '400':
           description: Missing or malformed refresh token

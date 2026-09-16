@@ -148,9 +148,14 @@ const { accessToken, refreshToken, expiresAt } = await verifyResponse.json();
 | `expiresAt` | `string` | ISO 8601 timestamp when `accessToken` expires. |
 | `tokenType` | `string` | Always `Bearer`. |
 
-<Note>
-If you omit `authMode`, the response is the deprecated `access_only` shape: `{ "authMode": "access_only", "token": "<jwt, expires in 24 hours>" }`, returned with `Deprecation` and `Link` headers. Read `accessToken`, not `token`, once you migrate.
-</Note>
+If you omit `authMode`, you get the deprecated `access_only` response instead: a single 24-hour `token` (read `accessToken`, not `token`, once you migrate), returned with `Deprecation` and `Link` headers.
+
+```json
+{
+  "authMode": "access_only",
+  "token": "<jwt, expires in 24 hours>"
+}
+```
 
 ## Using the access token
 

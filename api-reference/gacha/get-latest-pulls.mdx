@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml get /latest-pulls
+title: "Get Latest Pulls"
+description: "Recent pulls across every platform, newest first"
+llmsDescription: "GET /gacha/v2/latest-pulls is the public live activity feed of recent pulls across Collector Crypt, Phygitals and every other platform, read from Jupiter's pull ledger and newest first. No wallet is returned. Keyset paged: cursor walks backwards into history, since polls forwards for new pulls, and both together fetch a bounded window. Filter by machine; limit up to 100. Cached 5 seconds."
+hidden: true
+---

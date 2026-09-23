@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /machines/{id}/open
+title: "Open Packs"
+description: "Submit a signed purchase and reveal the won items"
+llmsDescription: "POST /gacha/v2/machines/{id}/open completes a pack purchase: pass the player, reference and intent from purchase plus signedTransactions, one call per pack, and receive the won items with rarity, valueUsd, buybackUsd and enrichment. status is fulfilled, pending or failed; while pending (Phygitals settles asynchronously) poll the same endpoint with the reference and no signedTransactions. A stale reference returns 410 intent_expired; a machine that sold out before payment settled returns 409 and nothing is charged."
+hidden: true
+---

@@ -1,0 +1,154 @@
+---
+title: "Packs"
+description: "Jupiter's curated pack catalogue, and how it differs from the raw machines feed"
+llmsDescription: "How the Jupiter Gacha API pack catalogue works: GET /gacha/v2/packs returns Jupiter's curated storefront (name, art, tags, category, live price and odds read off the bound machine) while GET /gacha/v2/machines is the raw provider feed. Covers explicit availability with the unavailableReason values (coming_soon, ended, provider_down, inactive, sold_out), retired packs and include=unlisted, live pricing fields that are absent as a group when the machine cannot be resolved, buying through the bound machineId, filtering, pack slugs, presentation fields, categories from GET /gacha/v2/packs/categories, and capability-based assets including the video encoding list."
+hidden: true
+---
+
+<Warning>
+Two different things are called a "pack". On this page a **pack** is a catalogue entry: a storefront tile Jupiter merchandises. That is unrelated to the `packs[]` array returned by `POST /machines/{id}/purchase`, which is a list of individual pull transactions to sign. They never appear in the same response.
+</Warning>
+
+`GET /machines` is the provider's view: every machine every integrated platform exposes, with their names, their art and their ordering. `GET /packs` is Jupiter's view: the packs Jupiter sells, in Jupiter's name, with Jupiter's assets and shelf order. Each pack is bound to exactly one machine.
+
+Use `/packs` to build the storefront. Use `/machines` when you want the raw, uncurated list.
+
+```bash
+curl "https://api.raccoons.dev/gacha/v2/packs"
+```
+
+## The catalogue is server-side
+
+The pack list, its art and its ordering all live in the API, so a client renders whatever is published at the time of the request. Launching a pack, reordering the shelf or pulling one from sale is a catalogue change: no app release, no API deploy.
+
+## Availability is explicit
+
+A machine that sells out disappears from `GET /machines`. The catalogue never does that. A pack that is not buyable is still returned, with `available: false` and a machine-readable reason, so you can render a coming-soon or sold-out tile instead of a gap in the grid.
+
+| `unavailableReason` | Meaning |
+| --- | --- |
+| `coming_soon` | Published, but `availableFrom` is still in the future |
+| `ended` | `availableUntil` has passed |
+| `provider_down` | The backing platform is degraded, or the binding is broken |
+| `inactive` | The platform has switched the machine off |
+| `sold_out` | Nothing left to pull, or a prize tier is down to its off-sale floor |
+
+Jupiter's own window is checked before the platform's state, so a pack that has not launched yet always reads `coming_soon`, never `sold_out`, even if the machine behind it happens to be empty.
+
+Draft and archived packs are not public at all: they are absent from the list and return `404 pack_not_found` on the detail route.
+
+## Retired packs
+
+`listed` is separate from availability and separate from state. A retired pack is dropped from `GET /packs` but still resolves at `GET /packs/{slug}`, because replay links, gift records and season prizes keep naming it long after it leaves the shelf.
+
+| | In the list | On the detail route |
+| --- | --- | --- |
+| Published, `listed: true` | Yes | `200` |
+| Published, `listed: false` | No, unless you pass `include=unlisted` | `200` |
+| Draft or archived | No | `404` |
+
+`listed: false` retires a pack while keeping its links alive; `state: "archived"` retires it from both surfaces. `listed` is on every pack in the response, so a client can tell "retired" from "never existed".
+
+## Price is live, never stored
+
+`priceUsd`, `currency`, `acceptedCurrencies`, `odds`, `evUsd`, `buybackPercent`, `stock`, `turboRequired` and `maxPerPurchase` are read off the bound machine on every request. The catalogue stores none of them, so it can never quote a price the platform is not charging.
+
+These fields are all-or-nothing: present together when the machine resolved, absent together when it did not. That is usually `unavailableReason: "provider_down"`, but a `coming_soon` pack whose machine the provider has not listed yet, and an `ended` one whose machine is gone, have no price either. Check `priceUsd` itself, not the reason: one check, not seven.
+
+<Note>
+Whenever `priceUsd` is absent, disable the buy affordance. The pack still carries its name and art, so the tile renders normally with a "temporarily unavailable" state. Degraded platforms are also named in the `X-Degraded-Sources` response header.
+</Note>
+
+## Buying a pack
+
+There is no pack-scoped purchase route. A pack exposes the `machineId` it is bound to; buy through the machine flow:
+
+```
+GET  https://api.raccoons.dev/gacha/v2/packs/pokemon_50
+     -> { "machineId": "collector-crypt:pokemon_50", ... }
+POST https://api.raccoons.dev/gacha/v2/machines/collector-crypt:pokemon_50/purchase
+POST https://api.raccoons.dev/gacha/v2/machines/collector-crypt:pokemon_50/open
+```
+
+See [Transaction gateway](/gacha/transactions) for the signing flow.
+
+## Filtering
+
+| Query | Effect |
+| --- | --- |
+| `featured=true` | Only featured packs |
+| `tag=pokemon` | Packs carrying that tag. A category id from `/packs/categories` is one such tag |
+| `platform=phygitals` | Packs backed by one platform |
+| `available=true` | Buyable packs only |
+| `include=unlisted` | Retired packs too, which the list otherwise omits |
+
+`available` is opt-in and filters both ways: `available=false` narrows to packs that are not buyable. Omit it and you get every published pack, unavailable ones included, which is usually what a storefront wants.
+
+Results come back in catalogue order (`sortIndex` ascending, ties broken by slug), which is admin-controlled. There is no client-side sort: the shelf order is a merchandising decision, unlike `/machines` where you can sort by price or EV.
+
+## Identifiers
+
+A pack is addressed by its slug (`pokemon_50`): Jupiter's, stable, and never a provider id. The `machineId` it exposes is the platform-scoped `${platform}:${externalId}` used everywhere else in the API.
+
+Slugs are lowercase with `-` or `_` separators. Underscores are allowed on purpose: a slug can then be byte-identical to the pack identifier the rest of the platform already uses, so nothing downstream has to carry a mapping table.
+
+## Presentation fields
+
+| Field | Use |
+| --- | --- |
+| `name` | Full title, for example "Pokemon Silver Pack" |
+| `shortName` | Compact label for tabs and chips, for example "Silver". Fall back to `name` when absent |
+| `badge` | `{ label, color? }`, a merchandising label with an optional tint |
+| `isNew` | Drives the "new" treatment. Independent of `badge`; a pack can carry both |
+| `category` | The tab to file the pack under. Absent when its tags name no category |
+| `stock` | Remaining inventory by tier, when the platform reports it. Live, with the money fields |
+| `turboRequired` | Commons are nearly gone, so a pull sells them straight back; the purchase enforces it. Live, with the money fields |
+| `assets.cardNormalUrl` | Normal map for `cardUrl`, for the holographic foil. Skip the effect when absent |
+| `assets.video` | The pack's motion art, in several encodings |
+
+## Categories
+
+`GET /packs/categories` returns the tabs a storefront groups packs under, in tab order:
+
+```json
+[
+  { "id": "pokemon", "label": "Pokémon", "franchise": "Pokémon", "accent": "#ffce47" }
+]
+```
+
+A pack belongs to a category when its `tags` carry the category's `id`, and the pack's own `category` field already resolves that, so a client buckets on one field. Icons are the client's, keyed by `id`. A pack whose tags name no category only appears in an all-packs view.
+
+The tab list is fixed in code while membership lives on the packs, so the two can disagree: a category can have no listed packs. Hide a tab that ends up empty rather than rendering it.
+
+## Assets are capability-based, not platform-based
+
+Every client gets the same `assets` payload. There is no `?platform=ios` and no per-platform bucket in the response: the API states what exists, and each surface uses what it can render.
+
+A pointer-driven foil shader wants `cardUrl` plus `cardNormalUrl`. A surface with no pointer plays `video` instead. One that can do neither renders `cardUrl` on its own. Those are three capabilities, not three operating systems, and any of them can appear on any OS.
+
+`assets.video` is a list because one video is published in several encodings:
+
+```json
+"video": [
+  { "url": "https://cdn.example/open.webm", "type": "video/webm; codecs=vp9" },
+  { "url": "https://cdn.example/open.mp4", "type": "video/mp4; codecs=hvc1" }
+]
+```
+
+Entries are ordered most-preferred first. Play the first entry you can decode, and fall back to `cardUrl` if none match. `type` is a MIME type with codecs, in exactly the form an HTML `<source type>` takes, so a web client can hand the array straight to `<video>` and let the browser choose:
+
+```jsx
+<video autoPlay loop muted playsInline>
+  {pack.assets.video?.map((s) => <source key={s.url} src={s.url} type={s.type} />)}
+</video>
+```
+
+Native clients match on the same string. Adding an encoding is one more array entry: no new field, no migration, and older clients keep picking the entry they already understood.
+
+## Related
+
+- [Get Packs](/api-reference/gacha/get-packs)
+- [Get Pack Categories](/api-reference/gacha/get-pack-categories)
+- [Get Pack](/api-reference/gacha/get-pack)
+- [Purchase Packs](/api-reference/gacha/purchase-machine)
+- [Transaction gateway](/gacha/transactions)

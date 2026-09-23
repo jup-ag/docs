@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml get /marketplace/{asset}
+title: "Get Market State"
+description: "Listing status, price and instant-sell quote for one asset"
+llmsDescription: "GET /gacha/v2/marketplace/{asset} returns the market state of one whitelisted asset by mint address: whether it is listed, its price, offer count and the platform's instant-sell (buyback) quote. The platform is inferred from the asset's collection. Returns 404 asset_not_found or 501 when the platform has no marketplace."
+hidden: true
+---

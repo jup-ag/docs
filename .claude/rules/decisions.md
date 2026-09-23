@@ -24,6 +24,18 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-09-03] Gacha v2 docs added as hidden pages
+**Status:** implemented
+**Scope:** new-section
+**Files affected:** `gacha/{index,conventions,packs,transactions,platforms}.mdx`, `api-reference/gacha/*.mdx` (32 pages), `openapi-spec/gacha/gacha.yaml`
+**Linear issue:** None (skipped by request)
+
+**Context:** `jup-ag/gacha-api` exposes a normalised `/v2` surface over Collector Crypt, Phygitals and Beezie, consumed by Jupiter mobile and web. It had its own Mintlify site inside the API repo but nothing on developers.jup.ag. The product is not public yet.
+**Decision:** Add the full v2 reference (one wrapper per operation) plus five guide pages as `hidden: true` pages in new `gacha/`, `api-reference/gacha/` and `openapi-spec/gacha/` folders. Not added to `docs.json` navigation, excluded from `llms.txt` by the generator, reachable by direct URL only. Base URL is `https://api.raccoons.dev/gacha/v2`, not `api.jup.ag` (Thomas). No changelog entry.
+**Rationale:** Same pattern as Portfolio v2 (PR #949): the docs can be reviewed and shared with integrators before launch without exposing the product in nav or search. Keeping the spec in this repo (rather than linking the API repo's site) means the pages render with the site's playground and style, and the un-hide step at launch is frontmatter plus nav.
+**Alternatives considered:** (1) Add to nav now under a Docs-tab `menu` item, rejected: product not announced. (2) Point at the API repo's own Mintlify site, rejected: two doc surfaces with different styles. (3) Reference pages only, no guides, rejected: the transaction gateway and pack catalog need prose to be usable.
+**Migration notes:** No redirects, nothing moved. At launch: add a "Gacha" `menu` item and an API reference group to `docs.json`, drop `hidden: true`, regenerate `llms.txt`, post a changelog entry in `developer-platform`. Spec is OpenAPI 3.1; paths are written without the `/v2` prefix because the server URL already carries it.
+
 ### [2026-08-25] Split the MM webhook (V1) page; version-scoped routing slugs
 **Status:** implemented
 **Scope:** folder-structure | navigation | rename | redirect

@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml get /users/{wallet}/stats
+title: "Get User Stats"
+description: "A wallet's lifetime gacha volume, total and per platform"
+llmsDescription: "GET /gacha/v2/users/{wallet}/stats returns a wallet's lifetime gacha activity from the shared pull ledger: pulls, spendUsd and wonUsd in total and per platform. Only settled purchases count, so spendUsd matches the wallet's leaderboard volume. Returns 400 for an invalid base58 address."
+hidden: true
+---

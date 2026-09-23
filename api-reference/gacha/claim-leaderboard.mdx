@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /rewards/leaderboard/claim
+title: "Claim Leaderboard Prizes"
+description: "Claim every claimable leaderboard season prize"
+llmsDescription: "POST /gacha/v2/rewards/leaderboard/claim claims the prizes for every ended season the wallet is entitled to, in one call. Pass wallet (base58) and a wallet signature over the canonical claim message; 401 invalid_claim_proof when the proof does not verify. Returns 202 with the same queued-then-delivered semantics as the battlepass claim; poll GET /gacha/v2/rewards/leaderboard/me."
+hidden: true
+---

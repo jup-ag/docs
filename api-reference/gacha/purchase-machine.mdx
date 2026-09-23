@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /machines/{id}/purchase
+title: "Purchase Packs"
+description: "Build the unsigned transactions to buy packs from a machine"
+llmsDescription: "POST /gacha/v2/machines/{id}/purchase is step one of buying packs: pass player (wallet), quantity and currency and receive one unsigned base64 transaction per pack under packs[], each with a reference and intent. No money moves here. Quantities above the machine's maxPerPurchase are split into several transactions (chunks). Sign them all, then call POST /gacha/v2/machines/{id}/open once per pack. Errors: 402 insufficient_balance, 409 sold_out or inactive, 451 region_restricted, 501 unsupported (Beezie)."
+hidden: true
+---

@@ -1,0 +1,12 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /marketplace/{asset}/sell
+title: "Sell Asset (Deprecated)"
+description: "Deprecated: use the buyback endpoints instead"
+llmsDescription: "DEPRECATED, use POST /gacha/v2/buyback/{asset} instead. POST /gacha/v2/marketplace/{asset}/sell instant-sells one asset into the platform's standing bid with identical behaviour and response to the buyback endpoint; only the path changed."
+hidden: true
+deprecated: true
+---
+
+<Warning>
+`POST /marketplace/{asset}/sell` is deprecated. Use [Buyback Asset](/api-reference/gacha/buyback-asset) for one item or [Buyback Several Assets](/api-reference/gacha/buyback-bulk) for a batch. Behaviour and response are identical; only the path changed.
+</Warning>

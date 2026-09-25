@@ -1062,6 +1062,1486 @@
     {
       "source": "/blog/:slug*",
       "destination": "https://developers.jup.ag/blog/:slug*"
+    },
+    {
+      "source": "/changelog/:slug*",
+      "destination": "https://developers.jup.ag/changelog"
+    },
+    {
+      "source": "/swap-api",
+      "destination": "/swap/v1"
+    },
+    {
+      "source": "/swap-api/get-quote",
+      "destination": "/swap/v1/get-quote"
+    },
+    {
+      "source": "/swap-api/build-swap-transaction",
+      "destination": "/swap/v1/build-swap-transaction"
+    },
+    {
+      "source": "/swap-api/send-swap-transaction",
+      "destination": "/swap/v1/send-swap-transaction"
+    },
+    {
+      "source": "/swap-api/add-fees-to-swap",
+      "destination": "/swap/v1/add-fees-to-swap"
+    },
+    {
+      "source": "/swap-api/common-errors",
+      "destination": "/swap/v1/common-errors"
+    },
+    {
+      "source": "/swap-api/payments-through-swap",
+      "destination": "/swap/v1/payments-through-swap"
+    },
+    {
+      "source": "/swap-api/requote-with-lower-max-accounts",
+      "destination": "/swap/v1/requote-with-lower-max-accounts"
+    },
+    {
+      "source": "/swap-api/program-errors",
+      "destination": "/swap/v1/common-errors"
+    },
+    {
+      "source": "/swap-api/self-hosted",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/swap-api/:slug*",
+      "destination": "/swap"
+    },
+    {
+      "source": "/swap-v2",
+      "destination": "/swap"
+    },
+    {
+      "source": "/swap-v2/:slug*",
+      "destination": "/swap"
+    },
+    {
+      "source": "/v6",
+      "destination": "/swap/v1"
+    },
+    {
+      "source": "/v6/swap-api",
+      "destination": "/swap/v1"
+    },
+    {
+      "source": "/v6-beta/swap-api",
+      "destination": "/swap/v1"
+    },
+    {
+      "source": "/apis",
+      "destination": "/swap"
+    },
+    {
+      "source": "/apis/swap-api",
+      "destination": "/swap/v1"
+    },
+    {
+      "source": "/apis/swap",
+      "destination": "/swap"
+    },
+    {
+      "source": "/apis/swap/v2",
+      "destination": "/swap"
+    },
+    {
+      "source": "/apis/quote-api",
+      "destination": "/swap/v1"
+    },
+    {
+      "source": "/apis/adding-fees",
+      "destination": "/swap/v1/add-fees-to-swap"
+    },
+    {
+      "source": "/apis/fees",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/apis/self-hosted",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/apis/landing-transactions",
+      "destination": "/transaction/submit"
+    },
+    {
+      "source": "/apis/payments-api",
+      "destination": "/swap/v1/payments-through-swap"
+    },
+    {
+      "source": "/apis/troubleshooting",
+      "destination": "/swap/v1/common-errors"
+    },
+    {
+      "source": "/apis/cpi",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/apis/flash-fill",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/apis/price-api",
+      "destination": "/price"
+    },
+    {
+      "source": "/apis/price-api-v2",
+      "destination": "/price"
+    },
+    {
+      "source": "/apis/price-api-v3",
+      "destination": "/price"
+    },
+    {
+      "source": "/apis/token-api",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/apis/rate-limits",
+      "destination": "/portal/rate-limits"
+    },
+    {
+      "source": "/apis/referral-program",
+      "destination": "/tool-kits/referral-program"
+    },
+    {
+      "source": "/apis/:slug*",
+      "destination": "/swap"
+    },
+    {
+      "source": "/old/apis/swap-api",
+      "destination": "/swap/v1"
+    },
+    {
+      "source": "/old/apis/self-hosted",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/old/apis/landing-transactions",
+      "destination": "/transaction/submit"
+    },
+    {
+      "source": "/old/apis/payments-api",
+      "destination": "/swap/v1/payments-through-swap"
+    },
+    {
+      "source": "/old/apis/troubleshooting",
+      "destination": "/swap/v1/common-errors"
+    },
+    {
+      "source": "/old/apis/price-api-v2",
+      "destination": "/price"
+    },
+    {
+      "source": "/old/apis/cpi",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/old/apis/flash-fill",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/old/legacy/apis/adding-fees",
+      "destination": "/swap/v1/add-fees-to-swap"
+    },
+    {
+      "source": "/old/legacy/apis/swap-api",
+      "destination": "/swap/v1"
+    },
+    {
+      "source": "/legacy/apis/adding-fees",
+      "destination": "/swap/v1/add-fees-to-swap"
+    },
+    {
+      "source": "/legacy/apis/swap-api",
+      "destination": "/swap/v1"
+    },
+    {
+      "source": "/old/additional-topics/links-and-contract-addresses",
+      "destination": "/resources/references"
+    },
+    {
+      "source": "/old/additional-topics/composing-with-versioned-transaction",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/old/dca/:slug*",
+      "destination": "/trigger/dca"
+    },
+    {
+      "source": "/old/limit-order/:slug*",
+      "destination": "/trigger"
+    },
+    {
+      "source": "/old/legal/privacy-policy",
+      "destination": "/legal/privacy-policy"
+    },
+    {
+      "source": "/old/legal/terms-of-use",
+      "destination": "/legal/terms-of-use"
+    },
+    {
+      "source": "/old/self-hosted",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/old/:slug*",
+      "destination": "/swap"
+    },
+    {
+      "source": "/self-hosted",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/additional-topics/wallet-list",
+      "destination": "https://docs.jup.ag/user-docs/manage/connect-wallet"
+    },
+    {
+      "source": "/additional-topics/referral-program",
+      "destination": "/tool-kits/referral-program"
+    },
+    {
+      "source": "/additional-topics/links-and-contract-addresses",
+      "destination": "/resources/references"
+    },
+    {
+      "source": "/additional-topics/:slug*",
+      "destination": "/resources/references"
+    },
+    {
+      "source": "/ultra-api",
+      "destination": "/ultra"
+    },
+    {
+      "source": "/ultra-api/get-order",
+      "destination": "/ultra/get-order"
+    },
+    {
+      "source": "/ultra-api/order",
+      "destination": "/ultra/get-order"
+    },
+    {
+      "source": "/ultra-api/execute-order",
+      "destination": "/ultra/execute-order"
+    },
+    {
+      "source": "/ultra-api/get-balances",
+      "destination": "/ultra/get-balances"
+    },
+    {
+      "source": "/ultra-api/get-holdings",
+      "destination": "/ultra/get-holdings"
+    },
+    {
+      "source": "/ultra-api/get-shield",
+      "destination": "/ultra/get-shield"
+    },
+    {
+      "source": "/ultra-api/shield",
+      "destination": "/ultra/get-shield"
+    },
+    {
+      "source": "/ultra-api/search-token",
+      "destination": "/ultra/search-token"
+    },
+    {
+      "source": "/ultra-api/add-fees-to-ultra",
+      "destination": "/ultra/add-fees-to-ultra"
+    },
+    {
+      "source": "/ultra-api/fees",
+      "destination": "/ultra/fees"
+    },
+    {
+      "source": "/ultra-api/gasless",
+      "destination": "/ultra/gasless"
+    },
+    {
+      "source": "/ultra-api/gasless-support",
+      "destination": "/ultra/gasless"
+    },
+    {
+      "source": "/ultra-api/get-started",
+      "destination": "/ultra/get-started"
+    },
+    {
+      "source": "/ultra-api/response",
+      "destination": "/ultra/response"
+    },
+    {
+      "source": "/ultra-api/:slug*",
+      "destination": "/ultra"
+    },
+    {
+      "source": "/ultra/add-fees",
+      "destination": "/ultra/add-fees-to-ultra"
+    },
+    {
+      "source": "/ultra/fee",
+      "destination": "/ultra/fees"
+    },
+    {
+      "source": "/ultra/gasless-support",
+      "destination": "/ultra/gasless"
+    },
+    {
+      "source": "/ultra/order",
+      "destination": "/ultra/get-order"
+    },
+    {
+      "source": "/ultra/shield",
+      "destination": "/ultra/get-shield"
+    },
+    {
+      "source": "/ultra/rtse",
+      "destination": "/swap/advanced/slippage"
+    },
+    {
+      "source": "/ultra/faq",
+      "destination": "/ultra"
+    },
+    {
+      "source": "/price-api",
+      "destination": "/price"
+    },
+    {
+      "source": "/price-api/:slug*",
+      "destination": "/price"
+    },
+    {
+      "source": "/price/v2",
+      "destination": "/price"
+    },
+    {
+      "source": "/price/v3/:slug*",
+      "destination": "/price"
+    },
+    {
+      "source": "/utility/price-api",
+      "destination": "/price"
+    },
+    {
+      "source": "/token-api",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/token-api/organic-score",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/token-api/verification",
+      "destination": "/tokens/verification"
+    },
+    {
+      "source": "/token-api/:slug*",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/tokens-api",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/tokens-api/:slug*",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/tokens/v1",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/tokens/v1/:slug*",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/tokens/search",
+      "destination": "/tokens/token-information"
+    },
+    {
+      "source": "/tokens/v2/:slug*",
+      "destination": "/tokens/token-information"
+    },
+    {
+      "source": "/tokens/token-verification",
+      "destination": "/tokens/verification"
+    },
+    {
+      "source": "/tokens/express-verification",
+      "destination": "/tokens/verification"
+    },
+    {
+      "source": "/token-verification",
+      "destination": "/tokens/verification"
+    },
+    {
+      "source": "/token-list",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/token-list/:slug*",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/token",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/token-2022",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/utility/token-api",
+      "destination": "/tokens"
+    },
+    {
+      "source": "/trigger-api",
+      "destination": "/trigger"
+    },
+    {
+      "source": "/trigger-api/create-order",
+      "destination": "/trigger/create-order"
+    },
+    {
+      "source": "/trigger-api/cancel-order",
+      "destination": "/trigger/manage-orders"
+    },
+    {
+      "source": "/trigger-api/get-trigger-orders",
+      "destination": "/trigger/order-history"
+    },
+    {
+      "source": "/trigger-api/execute-order",
+      "destination": "/trigger/v1/execute-order"
+    },
+    {
+      "source": "/trigger-api/best-practices",
+      "destination": "/trigger/best-practices"
+    },
+    {
+      "source": "/trigger-api/:slug*",
+      "destination": "/trigger"
+    },
+    {
+      "source": "/trigger-v1",
+      "destination": "/trigger/v1"
+    },
+    {
+      "source": "/trigger/cancel-order",
+      "destination": "/trigger/manage-orders"
+    },
+    {
+      "source": "/trigger/get-trigger-orders",
+      "destination": "/trigger/order-history"
+    },
+    {
+      "source": "/trigger/execute-order",
+      "destination": "/trigger/v1/execute-order"
+    },
+    {
+      "source": "/trigger/vault",
+      "destination": "/trigger/deposit"
+    },
+    {
+      "source": "/trigger/v2",
+      "destination": "/trigger"
+    },
+    {
+      "source": "/trigger/faq",
+      "destination": "/trigger"
+    },
+    {
+      "source": "/trigger/fees",
+      "destination": "/trigger"
+    },
+    {
+      "source": "/limit-order",
+      "destination": "/trigger"
+    },
+    {
+      "source": "/limit-order/:slug*",
+      "destination": "/trigger"
+    },
+    {
+      "source": "/dca",
+      "destination": "/trigger/dca"
+    },
+    {
+      "source": "/dca/:slug*",
+      "destination": "/trigger/dca"
+    },
+    {
+      "source": "/recurring-api",
+      "destination": "/recurring"
+    },
+    {
+      "source": "/recurring-api/:slug*",
+      "destination": "/recurring/:slug*"
+    },
+    {
+      "source": "/perp-api",
+      "destination": "/perps"
+    },
+    {
+      "source": "/perp-api/position-account",
+      "destination": "/perps/position-account"
+    },
+    {
+      "source": "/perp-api/position-request-account",
+      "destination": "/perps/position-request-account"
+    },
+    {
+      "source": "/perp-api/pool-account",
+      "destination": "/perps/pool-account"
+    },
+    {
+      "source": "/perp-api/custody-account",
+      "destination": "/perps/custody-account"
+    },
+    {
+      "source": "/perp-api/fees",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps/fees"
+    },
+    {
+      "source": "/perp-api/how-it-works",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps"
+    },
+    {
+      "source": "/perp-api/jlp",
+      "destination": "https://docs.jup.ag/user-docs/earn/jlp"
+    },
+    {
+      "source": "/perp-api/jlp-pool",
+      "destination": "https://docs.jup.ag/user-docs/earn/jlp"
+    },
+    {
+      "source": "/perp-api/:slug*",
+      "destination": "/perps"
+    },
+    {
+      "source": "/perps-api",
+      "destination": "/perps"
+    },
+    {
+      "source": "/perp",
+      "destination": "/perps"
+    },
+    {
+      "source": "/perp/:slug*",
+      "destination": "/perps"
+    },
+    {
+      "source": "/perps/fees",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps/fees"
+    },
+    {
+      "source": "/perps/how-it-works",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps"
+    },
+    {
+      "source": "/perps/overview",
+      "destination": "/perps"
+    },
+    {
+      "source": "/perps/jlp",
+      "destination": "https://docs.jup.ag/user-docs/earn/jlp"
+    },
+    {
+      "source": "/perps/jlp-pool",
+      "destination": "https://docs.jup.ag/user-docs/earn/jlp"
+    },
+    {
+      "source": "/perpetuals",
+      "destination": "/perps"
+    },
+    {
+      "source": "/perpetual-exchange",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps"
+    },
+    {
+      "source": "/perpetual-exchange/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps"
+    },
+    {
+      "source": "/perp-exchange/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps"
+    },
+    {
+      "source": "/lend-api",
+      "destination": "/lend"
+    },
+    {
+      "source": "/lend-api/oracle",
+      "destination": "/lend/oracles"
+    },
+    {
+      "source": "/lend-api/sdk",
+      "destination": "/lend/api-vs-sdk"
+    },
+    {
+      "source": "/lend-api/liquidation",
+      "destination": "/lend/borrow/liquidation"
+    },
+    {
+      "source": "/lend-api/earn",
+      "destination": "/lend/earn"
+    },
+    {
+      "source": "/lend-api/borrow",
+      "destination": "/lend/borrow"
+    },
+    {
+      "source": "/lend-api/:slug*",
+      "destination": "/lend"
+    },
+    {
+      "source": "/lend/api",
+      "destination": "/lend/api-vs-sdk"
+    },
+    {
+      "source": "/lend/overview",
+      "destination": "/lend"
+    },
+    {
+      "source": "/send-api",
+      "destination": "/send"
+    },
+    {
+      "source": "/send-api/:slug*",
+      "destination": "/send/:slug*"
+    },
+    {
+      "source": "/studio-api",
+      "destination": "/studio"
+    },
+    {
+      "source": "/studio-api/:slug*",
+      "destination": "/studio/:slug*"
+    },
+    {
+      "source": "/api-setup",
+      "destination": "/portal/setup"
+    },
+    {
+      "source": "/api-setup/:slug*",
+      "destination": "/portal/setup"
+    },
+    {
+      "source": "/api-key",
+      "destination": "/portal/api-keys"
+    },
+    {
+      "source": "/api-keys",
+      "destination": "/portal/api-keys"
+    },
+    {
+      "source": "/api-key-setup",
+      "destination": "/portal/api-keys"
+    },
+    {
+      "source": "/get-started/api-key-setup",
+      "destination": "/portal/api-keys"
+    },
+    {
+      "source": "/api-rate-limit",
+      "destination": "/portal/rate-limits"
+    },
+    {
+      "source": "/api-rate-limits",
+      "destination": "/portal/rate-limits"
+    },
+    {
+      "source": "/rate-limit",
+      "destination": "/portal/rate-limits"
+    },
+    {
+      "source": "/rate-limits",
+      "destination": "/portal/rate-limits"
+    },
+    {
+      "source": "/swap/rate-limits",
+      "destination": "/portal/rate-limits"
+    },
+    {
+      "source": "/api-payment-method",
+      "destination": "/portal/plans"
+    },
+    {
+      "source": "/pricing",
+      "destination": "/portal/plans"
+    },
+    {
+      "source": "/portal/pricing",
+      "destination": "/portal/plans"
+    },
+    {
+      "source": "/portal/plans-and-pricing",
+      "destination": "/portal/plans"
+    },
+    {
+      "source": "/portal/credits",
+      "destination": "/portal/plans"
+    },
+    {
+      "source": "/portal/get-started",
+      "destination": "/portal/setup"
+    },
+    {
+      "source": "/portal/getting-started",
+      "destination": "/portal/setup"
+    },
+    {
+      "source": "/api-faq",
+      "destination": "/portal/faq"
+    },
+    {
+      "source": "/faq",
+      "destination": "/portal/faq"
+    },
+    {
+      "source": "/api-responses",
+      "destination": "/portal/responses"
+    },
+    {
+      "source": "/environment-setup",
+      "destination": "/get-started/environment-setup"
+    },
+    {
+      "source": "/development-basics",
+      "destination": "/get-started/development-basics"
+    },
+    {
+      "source": "/getting-started",
+      "destination": "/get-started"
+    },
+    {
+      "source": "/quickstart",
+      "destination": "/get-started"
+    },
+    {
+      "source": "/api",
+      "destination": "/api-reference/swap/order"
+    },
+    {
+      "source": "/api/swap-api",
+      "destination": "/api-reference/swap/order"
+    },
+    {
+      "source": "/api/swap-api/quote",
+      "destination": "/api-reference/swap/v1/quote"
+    },
+    {
+      "source": "/api/swap-api/swap",
+      "destination": "/api-reference/swap/v1/swap"
+    },
+    {
+      "source": "/api/swap-api/swap-instructions",
+      "destination": "/api-reference/swap/v1/swap-instructions"
+    },
+    {
+      "source": "/api/swap-api/program-id-to-label",
+      "destination": "/api-reference/swap/program-id-to-label"
+    },
+    {
+      "source": "/api/program-id-to-label",
+      "destination": "/api-reference/swap/program-id-to-label"
+    },
+    {
+      "source": "/api/swap-api/order",
+      "destination": "/api-reference/swap/order"
+    },
+    {
+      "source": "/api/swap-api/v2/order",
+      "destination": "/api-reference/swap/order"
+    },
+    {
+      "source": "/api/swap-api/execute",
+      "destination": "/api-reference/swap/execute"
+    },
+    {
+      "source": "/api/swap-api/build",
+      "destination": "/api-reference/swap/build"
+    },
+    {
+      "source": "/api/swap-api/build-swap-transaction",
+      "destination": "/api-reference/swap/build"
+    },
+    {
+      "source": "/api/swap",
+      "destination": "/api-reference/swap/order"
+    },
+    {
+      "source": "/api/quote-api",
+      "destination": "/api-reference/swap/v1/quote"
+    },
+    {
+      "source": "/api/ultra-api",
+      "destination": "/api-reference/ultra/order"
+    },
+    {
+      "source": "/api/ultra-api/order",
+      "destination": "/api-reference/ultra/order"
+    },
+    {
+      "source": "/api/ultra/order",
+      "destination": "/api-reference/ultra/order"
+    },
+    {
+      "source": "/api/ultra-api/execute",
+      "destination": "/api-reference/ultra/execute"
+    },
+    {
+      "source": "/api/ultra/execute",
+      "destination": "/api-reference/ultra/execute"
+    },
+    {
+      "source": "/api/ultra-api/balances",
+      "destination": "/api-reference/ultra/balances"
+    },
+    {
+      "source": "/api/ultra-api/shield",
+      "destination": "/api-reference/ultra/shield"
+    },
+    {
+      "source": "/api/price-api",
+      "destination": "/api-reference/price"
+    },
+    {
+      "source": "/api/price-api/price",
+      "destination": "/api-reference/price"
+    },
+    {
+      "source": "/api/price-api/v3",
+      "destination": "/api-reference/price"
+    },
+    {
+      "source": "/api/price-api/v3/price",
+      "destination": "/api-reference/price"
+    },
+    {
+      "source": "/api/price-api/v2/price",
+      "destination": "/api-reference/price/v2/price"
+    },
+    {
+      "source": "/api/price",
+      "destination": "/api-reference/price"
+    },
+    {
+      "source": "/api/token-api",
+      "destination": "/api-reference/tokens/search"
+    },
+    {
+      "source": "/api/token-api/v2",
+      "destination": "/api-reference/tokens/search"
+    },
+    {
+      "source": "/api/token-api/v2/search",
+      "destination": "/api-reference/tokens/search"
+    },
+    {
+      "source": "/api/token-api/v2/recent",
+      "destination": "/api-reference/tokens/recent"
+    },
+    {
+      "source": "/api/tokens-api/search",
+      "destination": "/api-reference/tokens/search"
+    },
+    {
+      "source": "/api/token-api/v1/:slug*",
+      "destination": "/api-reference/tokens/v1/:slug*"
+    },
+    {
+      "source": "/api/trigger-api",
+      "destination": "/api-reference/trigger/create-order"
+    },
+    {
+      "source": "/api/trigger-api/create-order",
+      "destination": "/api-reference/trigger/create-order"
+    },
+    {
+      "source": "/api/trigger-api/get-trigger-orders",
+      "destination": "/api-reference/trigger/v1/get-trigger-orders"
+    },
+    {
+      "source": "/api/recurring-api",
+      "destination": "/api-reference/recurring/create-order"
+    },
+    {
+      "source": "/api/recurring-api/cancel-order",
+      "destination": "/api-reference/recurring/cancel-order"
+    },
+    {
+      "source": "/api/recurring-api/get-recurring-orders",
+      "destination": "/api-reference/recurring/get-recurring-orders"
+    },
+    {
+      "source": "/api/lend-api",
+      "destination": "/lend/earn/api"
+    },
+    {
+      "source": "/api/send-api",
+      "destination": "/api-reference/send/craft-send"
+    },
+    {
+      "source": "/api/rate-limit",
+      "destination": "/portal/rate-limits"
+    },
+    {
+      "source": "/api/:slug*",
+      "destination": "/api-reference/swap/order"
+    },
+    {
+      "source": "/api-reference/price/price",
+      "destination": "/api-reference/price"
+    },
+    {
+      "source": "/api-reference/price/v3",
+      "destination": "/api-reference/price"
+    },
+    {
+      "source": "/api-reference/price/v2",
+      "destination": "/api-reference/price/v2/price"
+    },
+    {
+      "source": "/api-reference/quote",
+      "destination": "/api-reference/swap/v1/quote"
+    },
+    {
+      "source": "/api-reference/swap-v2/:slug*",
+      "destination": "/api-reference/swap/:slug*"
+    },
+    {
+      "source": "/api-reference/swap/v2/quote",
+      "destination": "/api-reference/swap/order"
+    },
+    {
+      "source": "/api-reference/swap/v2/swap",
+      "destination": "/api-reference/swap/order"
+    },
+    {
+      "source": "/api-reference/swap/v2/swap-instructions",
+      "destination": "/api-reference/swap/build"
+    },
+    {
+      "source": "/api-reference/prediction/execute-order",
+      "destination": "/api-reference/prediction/execute"
+    },
+    {
+      "source": "/swap/get-order",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/order",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/execute",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/execute-order",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/order-execute",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/meta-aggregator",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/quote",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/get-started",
+      "destination": "/swap"
+    },
+    {
+      "source": "/swap/overview",
+      "destination": "/swap"
+    },
+    {
+      "source": "/swap/faq",
+      "destination": "/swap"
+    },
+    {
+      "source": "/swap/v2",
+      "destination": "/swap"
+    },
+    {
+      "source": "/swap/v2/order",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/v2/get-order",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/v2/execute",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/v2/execute-order",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/v2/get-quote",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/v2/get-started",
+      "destination": "/swap"
+    },
+    {
+      "source": "/swap/v2/router",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/swap/v2/add-fees-to-swap",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/router",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/swap/build-transaction",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/swap/build-and-submit",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/swap/submit",
+      "destination": "/transaction/submit"
+    },
+    {
+      "source": "/swap/cpi",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/swap/advanced/cpi",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/swap/advanced/fees",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/add-fees",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/integrator-fees",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/gasless",
+      "destination": "/swap/advanced/gasless"
+    },
+    {
+      "source": "/swap/slippage",
+      "destination": "/swap/advanced/slippage"
+    },
+    {
+      "source": "/swap/self-hosted",
+      "destination": "/swap/build"
+    },
+    {
+      "source": "/swap/migrate",
+      "destination": "/swap/migration/metis-to-build"
+    },
+    {
+      "source": "/swap/migration/ultra-to-meta-aggregator",
+      "destination": "/swap/migration/ultra-to-order"
+    },
+    {
+      "source": "/swap/v1/quote",
+      "destination": "/swap/v1/get-quote"
+    },
+    {
+      "source": "/swap/v1/swap",
+      "destination": "/swap/v1/build-swap-transaction"
+    },
+    {
+      "source": "/swap/v1/swap-instructions",
+      "destination": "/swap/v1/build-swap-transaction"
+    },
+    {
+      "source": "/swap/routing/rfq/v2/overview",
+      "destination": "/swap/routing/rfq/v2/streaming"
+    },
+    {
+      "source": "/routing/jupiterz",
+      "destination": "/swap/jupiterz"
+    },
+    {
+      "source": "/rfq",
+      "destination": "/swap/jupiterz"
+    },
+    {
+      "source": "/dex-integration",
+      "destination": "/swap/routing/amm/integration"
+    },
+    {
+      "source": "/projects-and-dexes/:slug*",
+      "destination": "/swap/routing/amm/integration"
+    },
+    {
+      "source": "/predict",
+      "destination": "/prediction"
+    },
+    {
+      "source": "/prediction-api",
+      "destination": "/prediction"
+    },
+    {
+      "source": "/prediction-market",
+      "destination": "/prediction"
+    },
+    {
+      "source": "/prediction-market-api",
+      "destination": "/prediction"
+    },
+    {
+      "source": "/prediction/get-started",
+      "destination": "/prediction"
+    },
+    {
+      "source": "/prediction/create-order",
+      "destination": "/prediction/trading-lifecycle"
+    },
+    {
+      "source": "/prediction/place-order",
+      "destination": "/prediction/trading-lifecycle"
+    },
+    {
+      "source": "/prediction/orders",
+      "destination": "/prediction/trading-lifecycle"
+    },
+    {
+      "source": "/prediction/events-markets",
+      "destination": "/prediction/events-and-markets"
+    },
+    {
+      "source": "/portfolio-api",
+      "destination": "/portfolio"
+    },
+    {
+      "source": "/portfolio/positions",
+      "destination": "/portfolio/jupiter-positions"
+    },
+    {
+      "source": "/data-api",
+      "destination": "/portfolio"
+    },
+    {
+      "source": "/referral",
+      "destination": "/tool-kits/referral-program"
+    },
+    {
+      "source": "/referral-program",
+      "destination": "/tool-kits/referral-program"
+    },
+    {
+      "source": "/tool-kits/mobile-adapter",
+      "destination": "/tool-kits/wallet-kit/jupiter-mobile-adapter"
+    },
+    {
+      "source": "/tool-kits/terminal-walkthrough",
+      "destination": "/tool-kits/plugin"
+    },
+    {
+      "source": "/tool-kits/plugin/get-started",
+      "destination": "/tool-kits/plugin"
+    },
+    {
+      "source": "/jupiter-terminal/:slug*",
+      "destination": "/tool-kits/plugin"
+    },
+    {
+      "source": "/terminal",
+      "destination": "/tool-kits/plugin"
+    },
+    {
+      "source": "/bug-bounty",
+      "destination": "/resources/security"
+    },
+    {
+      "source": "/security",
+      "destination": "/resources/security"
+    },
+    {
+      "source": "/legal/api-terms",
+      "destination": "/legal/sdk-api-license-agreement"
+    },
+    {
+      "source": "/legal/terms-of-service",
+      "destination": "/legal/terms-of-use"
+    },
+    {
+      "source": "/guides/general/get-your-token-on-jupiter",
+      "destination": "https://docs.jup.ag/user-docs/launch/vrfd/token-verification"
+    },
+    {
+      "source": "/guides/general/new-token-guide",
+      "destination": "https://docs.jup.ag/user-docs/launch/vrfd/token-verification"
+    },
+    {
+      "source": "/get-your-token-onto-jup",
+      "destination": "https://docs.jup.ag/user-docs/launch/vrfd/token-verification"
+    },
+    {
+      "source": "/guides/general/faq",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/faq"
+    },
+    {
+      "source": "/guides/general/personal-security-on-solana",
+      "destination": "https://docs.jup.ag/user-docs/more/security"
+    },
+    {
+      "source": "/guides/general/verify-swaps-with-SolanaFM",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/faq"
+    },
+    {
+      "source": "/guides/general/wrapped-sol",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/faq"
+    },
+    {
+      "source": "/guides/general/media-kit",
+      "destination": "https://docs.jup.ag/user-docs/more/brand-kit"
+    },
+    {
+      "source": "/guides/general/market-routing-guide",
+      "destination": "/swap/routing/amm/market-listing"
+    },
+    {
+      "source": "/guides/general",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/general/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/community/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/more/security"
+    },
+    {
+      "source": "/guides/swap/tutorials/how-to-swap",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/swap/tutorials/configure-settings",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/manual-mode"
+    },
+    {
+      "source": "/guides/swap/tutorials/trade-safely",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/risks-and-limitations"
+    },
+    {
+      "source": "/guides/swap/tutorials/earn-referral-fees",
+      "destination": "/tool-kits/referral-program"
+    },
+    {
+      "source": "/guides/swap",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/swap/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/how-to-swap-tokens",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/jupiter-swap/price-impact-slippage-price-warning",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/risks-and-limitations"
+    },
+    {
+      "source": "/guides/jupiter-swap/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/spot",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/perpetual-exchange/faq",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps/faq"
+    },
+    {
+      "source": "/guides/perpetual-exchange/fees",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps/fees"
+    },
+    {
+      "source": "/guides/perpetual-exchange/liquidation",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps/liquidation"
+    },
+    {
+      "source": "/guides/perpetual-exchange/onchain-accounts",
+      "destination": "/perps"
+    },
+    {
+      "source": "/guides/perpetual-exchange/jlp",
+      "destination": "https://docs.jup.ag/user-docs/earn/jlp"
+    },
+    {
+      "source": "/guides/perpetual-exchange/jlp-pool",
+      "destination": "https://docs.jup.ag/user-docs/earn/jlp"
+    },
+    {
+      "source": "/guides/perpetual-exchange",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps"
+    },
+    {
+      "source": "/guides/perpetual-exchange/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/perps"
+    },
+    {
+      "source": "/guides/jlp/How-To-Get-JLP",
+      "destination": "https://docs.jup.ag/user-docs/earn/jlp/earn"
+    },
+    {
+      "source": "/guides/jlp",
+      "destination": "https://docs.jup.ag/user-docs/earn/jlp"
+    },
+    {
+      "source": "/guides/jlp/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/earn/jlp"
+    },
+    {
+      "source": "/jlp",
+      "destination": "https://docs.jup.ag/user-docs/earn/jlp"
+    },
+    {
+      "source": "/guides/jupsol",
+      "destination": "https://docs.jup.ag/user-docs/earn/stake-sol/jupsol"
+    },
+    {
+      "source": "/guides/jupsol/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/earn/stake-sol/jupsol"
+    },
+    {
+      "source": "/jupsol",
+      "destination": "https://docs.jup.ag/user-docs/earn/stake-sol/jupsol"
+    },
+    {
+      "source": "/jup-token",
+      "destination": "https://docs.jup.ag/user-docs/more/jup-token"
+    },
+    {
+      "source": "/guides/limit-order",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/limit-orders"
+    },
+    {
+      "source": "/guides/limit-order/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/limit-orders"
+    },
+    {
+      "source": "/guides/dca",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/recurring-orders"
+    },
+    {
+      "source": "/guides/dca/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/recurring-orders"
+    },
+    {
+      "source": "/guides/va",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/recurring-orders"
+    },
+    {
+      "source": "/guides/va/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot/recurring-orders"
+    },
+    {
+      "source": "/guides/onboard/bridge",
+      "destination": "https://docs.jup.ag/user-docs/onramp/deposit/bridges"
+    },
+    {
+      "source": "/guides/onboard/onramp",
+      "destination": "https://docs.jup.ag/user-docs/onramp/deposit/buy-crypto"
+    },
+    {
+      "source": "/guides/onboard/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/onramp/deposit"
+    },
+    {
+      "source": "/guides/apepro",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/apepro/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/ape/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/trade/spot"
+    },
+    {
+      "source": "/guides/jupiter-lock",
+      "destination": "https://docs.jup.ag/user-docs/launch/lock"
+    },
+    {
+      "source": "/guides/jupiter-lock/:slug*",
+      "destination": "https://docs.jup.ag/user-docs/launch/lock"
+    },
+    {
+      "source": "/offerbook",
+      "destination": "https://docs.jup.ag/user-docs/earn/offerbook"
+    },
+    {
+      "source": "/guides/how-to-build-a-prediction-market-app",
+      "destination": "/guides/how-to-build-a-prediction-market-app-on-solana"
+    },
+    {
+      "source": "/api-reference/tokens/v2",
+      "destination": "/api-reference/tokens/search"
+    },
+    {
+      "source": "/privacy-policy",
+      "destination": "/legal/privacy-policy"
+    },
+    {
+      "source": "/portal/api-setup",
+      "destination": "/portal/setup"
+    },
+    {
+      "source": "/portal/plans-pricing",
+      "destination": "/portal/plans"
+    },
+    {
+      "source": "/prediction/overview",
+      "destination": "/prediction"
+    },
+    {
+      "source": "/perps/onchain-accounts",
+      "destination": "/perps"
+    },
+    {
+      "source": "/swap/common-instructions",
+      "destination": "/swap/build/common-instructions"
+    },
+    {
+      "source": "/swap/advanced/integrator-fees",
+      "destination": "/swap/order-and-execute"
+    },
+    {
+      "source": "/swap/advanced/compute-units-and-priority-fees",
+      "destination": "/swap/advanced/compute-units"
+    },
+    {
+      "source": "/tokens/recent",
+      "destination": "/tokens/token-information"
+    },
+    {
+      "source": "/routing/rfq",
+      "destination": "/swap/jupiterz"
     }
   ]
 }

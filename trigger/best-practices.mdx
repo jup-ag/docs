@@ -1,5 +1,6 @@
 ---
-title: "Best Practices"
+title: "Trigger Best Practices"
+sidebarTitle: "Best Practices"
 description: "Guidelines for error handling, token compatibility, and integration patterns across price orders and DCA in the Trigger Order V2 API."
 llmsDescription: "Best practices for Trigger Order V2 integrations across both order families. Price orders require an expiresAt and take a slippage setting (RTSE auto or fixed bps); DCA orders have no expiry (duration is orderCount times intervalSeconds, optional beginFillAt) and no slippage parameter (keeper-set per round). Covers error handling (400 details, 401 re-auth), the 10 USD minimum (per price order, or per DCA round), Token-2022 restrictions, and per-family order states."
 ---

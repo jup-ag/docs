@@ -1,6 +1,7 @@
 ---
 openapi: /openapi-spec/swap/v2/swap.yaml get /order
-title: "Get Order"
+title: "Get Order (Swap API)"
+sidebarTitle: "Get Order"
 description: "Get a swap quote and assembled transaction"
 llmsDescription: "GET /order endpoint for Jupiter Swap API V2 at api.jup.ag/swap/v2/order. Returns a swap quote and assembled transaction. Required params: inputMint, outputMint, amount, taker. Without optional params, all routers compete (Metis, JupiterZ RFQ, Dflow, OKX). Referral fees do not disable JupiterZ. Setting payer to a wallet different from taker restricts routing to Metis. Response includes base64 transaction, requestId (for /execute), routePlan, fee breakdown, and gas cost estimates. Sign the transaction and POST to /execute for managed landing."
 ---

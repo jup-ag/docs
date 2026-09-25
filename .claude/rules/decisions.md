@@ -292,6 +292,7 @@ Track all redirects added to `vercel.json` here for visibility:
 | `/swap/routing/market-listing` | `/swap/routing/amm/market-listing` | 2026-08-25 | Version-scoped routing slugs (BUILD-812). Old `/routing/market-listing` redirect repointed to the new URL |
 | `/swap/routing/rfq-integration` | `/swap/routing/rfq/v1/overview` | 2026-08-25 | Version-scoped routing slugs (BUILD-812): MM webhook V1 page became the landing of the split `rfq/v1/*` group. Old `/routing/rfq-integration` redirect repointed to the new URL |
 | `/swap/routing/rfq-streaming` | `/swap/routing/rfq/v2/streaming` | 2026-08-25 | Version-scoped routing slugs (BUILD-812). `rfq-streaming` was new in PR #946 but briefly preview-public, so a redirect was added |
+| `/docs/:slug*` | `/:slug*` | 2026-09-25 | Double-prefix cleanup (BUILD-894): visitors and agents request `developers.jup.ag/docs/docs/<page>` (2,471 views in 90 days, `/docs/send` alone 2,425). Mintlify matches redirects against the path without the `/docs` base path, which is why every other redirect source in this file is unprefixed; this rule therefore only ever sees the doubled form. Shipped in its own PR so it could be verified alone in production |
 
 ### [2026-04-06] Hidden pages for private integrator docs
 **Status:** implemented

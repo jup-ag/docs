@@ -1062,6 +1062,10 @@
     {
       "source": "/blog/:slug*",
       "destination": "https://developers.jup.ag/blog/:slug*"
+    },
+    {
+      "source": "/docs/:slug*",
+      "destination": "/:slug*"
     }
   ]
 }

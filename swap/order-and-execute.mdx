@@ -1,7 +1,7 @@
 ---
 title: "Order & Execute"
 description: "Best price across all routers with managed transaction landing"
-llmsDescription: "How to perform a swap using Jupiter's Meta-Aggregator path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routing engines compete for best price (Metis onchain routing, JupiterZ RFQ market makers, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter's proprietary landing pipeline, with confirmation polling and retry. Includes routing impact matrix showing which optional parameters disable which routers, order mode (ultra vs manual), fee documentation (Jupiter platform fee breakdown by token pair, fee mint priority, referral fee setup with code examples), the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types."
+llmsDescription: "How to perform a swap using Jupiter's Meta-Aggregator path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routing engines compete for best price (Metis onchain routing, JupiterZ RFQ market makers, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter's proprietary landing pipeline, with confirmation polling and retry. Includes routing impact matrix showing which optional parameters disable which routers, order mode (ultra vs manual), fee documentation (Jupiter platform fee breakdown by token pair, fee mint priority, referral fee setup with code examples), the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types, including the exact errorMessage string returned for each router and errorCode, why the gasless minimum inside that message varies per request, and the separate HTTP 400 shape that carries no errorCode at all."
 ---
 
 The Meta-Aggregator is the recommended way to swap on Jupiter. All routing engines compete for the best price (Metis, JupiterZ RFQ, Dflow, OKX), and Jupiter handles transaction landing for you via `/order` + `/execute`.
@@ -404,19 +404,34 @@ The same `errorCode` number has different meanings depending on the `router`. Ma
 
 **Aggregator routers** (`metis`, `dflow`, `okx`):
 
-| errorCode | Meaning |
-| --- | --- |
-| 1 | Insufficient funds (taker lacks input token balance) |
-| 2 | Insufficient SOL for gas |
-| 3 | Swap below minimum for gasless |
+| errorCode | Meaning | Message returned |
+| --- | --- | --- |
+| 1 | Taker does not hold enough of the input mint | `Insufficient funds` |
+| 2 | Insufficient SOL for gas | Not currently returned |
+| 3 | Swap is too small to qualify for gasless support | `Minimum $<amount> for gasless` |
 
 **JupiterZ router** (`jupiterz`):
 
-| errorCode | Meaning |
-| --- | --- |
-| 1 | Insufficient balance to fund the swap |
-| 2 | Missing associated token account |
-| 3 | Quote could not be built into a transaction |
+| errorCode | Meaning | Message returned |
+| --- | --- | --- |
+| 1 | Taker's balance cannot fund the swap | `Insufficient balance to fund the swap` |
+| 2 | A required associated token account does not exist | `Missing associated token account` |
+| 3 | The quote could not be built into a transaction | `Quote could not be built into a transaction` |
+
+`errorMessage` is for display only. The `<amount>` in the gasless message is worked out per request from the swap's USD value and the route's rent and priority fee cost, so the same `errorCode` returns `Minimum $5 for gasless` on one swap and `Minimum $10 for gasless` on another. Keep your logic on `router` + `errorCode`. The `error` field duplicates `errorMessage` and is kept for backwards compatibility.
+
+Not every failure carries an `errorCode`. When no router returns a usable quote, `/order` responds with HTTP 400 and a body that has no `errorCode` or `errorMessage`, only a `requestId` and an `error` string:
+
+```json
+{
+  "requestId": "01a0a504-1326-774b-818c-f2d629909e6b",
+  "error": "Failed to get quotes"
+}
+```
+
+Check the HTTP status before reading `errorCode`. `Failed to get quotes` covers more than one condition, so it is not specific enough to branch on.
+
+These codes apply to `/order`. `/execute` reports failures through a separate `code` field, described below.
 
 ### /execute error codes
 

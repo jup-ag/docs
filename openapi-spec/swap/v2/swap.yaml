@@ -396,24 +396,26 @@ paths:
                       Present when `taker` is defined and `transaction` is the empty string. The router quoted a price but could not build a transaction. Match on `router` + `errorCode` to identify the error.
 
                       Aggregator routers (router is metis, dflow, okx):
-                      - 1: Insufficient funds
-                      - 2: Insufficient SOL for gas
-                      - 3: Swap below minimum for gasless
+                      - 1: Taker does not hold enough of the input mint. Message: `Insufficient funds`
+                      - 2: Insufficient SOL for gas. Not currently returned
+                      - 3: Swap is too small to qualify for gasless support. Message: `Minimum $<amount> for gasless`
 
                       JupiterZ router (router is jupiterz):
-                      - 1: Insufficient balance to fund the swap
-                      - 2: Missing associated token account
-                      - 3: Quote could not be built into a transaction
+                      - 1: Taker's balance cannot fund the swap. Message: `Insufficient balance to fund the swap`
+                      - 2: A required associated token account does not exist. Message: `Missing associated token account`
+                      - 3: The quote could not be built into a transaction. Message: `Quote could not be built into a transaction`
                   errorMessage:
                     type: string
                     description: |
-                      Human-readable error description. Present when `taker` is defined and `transaction` is the empty string.
-                      Match on `router` + `errorCode` instead of this string, as the message text may be parameterised.
+                      Human-readable description of the error, present when `taker` is defined and `transaction` is the empty string. The response still carries valid pricing when this field is set.
+
+                      For display only. Keep your logic on `router` + `errorCode`, because the text is parameterised. The `<amount>` in the gasless message is worked out per request from the swap's USD value and the route's rent and priority fee cost, so `errorCode` 3 returns `Minimum $5 for gasless` on one swap and `Minimum $10 for gasless` on another.
                   error:
                     type: string
                     description: Duplicate of errorMessage for backwards compatibility
         "400":
-          description: Bad request
+          description: |
+            No router returned a usable quote, or the request was rejected before routing. The body carries `requestId` and `error` only, with no `errorCode` or `errorMessage`, so check the HTTP status before reading them.
           content:
             application/json:
               schema:
@@ -423,6 +425,8 @@ paths:
                     type: string
                   error:
                     type: string
+                    description: |
+                      Description of the failure. `Failed to get quotes` is the most common value and covers more than one condition, so it is not specific enough to branch on.
 
   /build:
     get:

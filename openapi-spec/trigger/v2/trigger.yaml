@@ -34,8 +34,11 @@ components:
         - error
     AccessRefreshTokens:
       type: object
-      description: Access token plus rotating refresh token, issued by access_refresh verify and by refresh.
+      description: Access token plus rotating refresh token, returned identically by access_refresh verify and by refresh.
       properties:
+        authMode:
+          type: string
+          enum: [access_refresh]
         accessToken:
           type: string
           description: JWT to send in the Authorization Bearer header. Expires 15 minutes after issue.
@@ -50,6 +53,7 @@ components:
           type: string
           enum: [Bearer]
       required:
+        - authMode
         - accessToken
         - refreshToken
         - expiresAt
@@ -431,21 +435,15 @@ paths:
         '200':
           description: |
             Tokens for the requested auth mode. The access_only variant is returned with
-            `Deprecation` (Unix timestamp of the deprecation date) and
-            `Link` (`rel="successor-version"` pointing to the refresh endpoint) response headers.
+            `Deprecation` (an RFC 8594 HTTP-date, e.g. `Tue, 21 Jul 2026 00:00:00 GMT`) and
+            `Link` (`rel="successor-version"` naming the absolute refresh URL
+            `https://api.jup.ag/trigger/v2/auth/refresh`) response headers.
           content:
             application/json:
               schema:
                 oneOf:
                   - title: AccessRefreshResult
-                    allOf:
-                      - type: object
-                        properties:
-                          authMode:
-                            type: string
-                            enum: [access_refresh]
-                        required: [authMode]
-                      - $ref: '#/components/schemas/AccessRefreshTokens'
+                    $ref: '#/components/schemas/AccessRefreshTokens'
                   - title: AccessOnlyResult
                     type: object
                     description: Deprecated. Returned when authMode is omitted or set to access_only.
@@ -508,6 +506,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessRefreshTokens'
               example:
+                authMode: "access_refresh"
                 accessToken: "eyJhbGciOiJIUzI1NiIs..."
                 refreshToken: "01a08512-95d8-70ac-bab5-20c73aa002bb.UtUzQa8kUgtu2XR2..."
                 expiresAt: "2026-09-16T14:12:47.000Z"

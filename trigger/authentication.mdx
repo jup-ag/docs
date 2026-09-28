@@ -193,10 +193,11 @@ const { accessToken, refreshToken: newRefreshToken, expiresAt } = await refreshR
 // Persist the new pair; discard the old refresh token.
 ```
 
-The response has the same fields as the `access_refresh` verify response, without `authMode`:
+The response has the same fields as the `access_refresh` verify response:
 
 ```json
 {
+  "authMode": "access_refresh",
   "accessToken": "<jwt, expires in 15 minutes>",
   "refreshToken": "<opaque, rotated>",
   "expiresAt": "2026-09-16T14:12:47.000Z",

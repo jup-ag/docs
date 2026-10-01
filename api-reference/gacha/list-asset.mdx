@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /marketplace/{asset}/list
+title: "List Asset"
+description: "Build the transaction to create a listing"
+llmsDescription: "POST /gacha/v2/marketplace/{asset}/list builds the transaction that lists one owned asset for sale at priceUsd (Collector Crypt only; a 2% platform fee is deducted from seller proceeds). Pass the seller wallet and priceUsd, sign the returned transactions and complete with POST /gacha/v2/transactions/submit. Errors: 403 not_owner, 451 region_restricted, 501 unsupported."
+hidden: true
+---

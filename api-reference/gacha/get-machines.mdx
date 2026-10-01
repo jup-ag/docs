@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml get /machines
+title: "Get Machines"
+description: "All live gacha machines across every platform"
+llmsDescription: "GET /gacha/v2/machines aggregates every platform's live machine feed (Collector Crypt, Phygitals, Beezie) into one normalised list with price, EV, buyback percentage, odds bands and per-tier stock. Filter by platform or status (active, sold_out, inactive) and sort by price, ev or buyback. Sold-out machines are omitted unless status=sold_out. A failing platform is dropped and named in the x-degraded-sources header."
+hidden: true
+---

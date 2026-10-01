@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml post /marketplace/{asset}/delist
+title: "Delist Asset"
+description: "Build the transaction to cancel a listing"
+llmsDescription: "POST /gacha/v2/marketplace/{asset}/delist builds the transaction that cancels the caller's active listing (Collector Crypt only). Pass the seller wallet, sign the returned transactions and complete with POST /gacha/v2/transactions/submit. Errors: 400 not_listed, 403 not_owner, 451 region_restricted, 501 unsupported."
+hidden: true
+---

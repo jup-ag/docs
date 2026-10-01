@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml get /machines/{id}/inventory
+title: "Get Machine Inventory"
+description: "The prize pool of one machine"
+llmsDescription: "GET /gacha/v2/machines/{id}/inventory returns one machine's prize pool, paged in the offset envelope and filterable by rarity and USD value range. Collector Crypt publishes the full pool (capped at 5,000 items); Phygitals and Beezie publish chase items only. Returns 404 for an unknown machine and 501 when the platform exposes no inventory."
+hidden: true
+---

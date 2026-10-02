@@ -24,6 +24,17 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-10-02] llms.txt links API reference pages to their `.md` twins; OpenAPI specs listed once
+**Status:** implemented
+**Scope:** new-section
+**Files affected:** `generate-llms-from-docs.js`, `llms.txt`, `ai/llms-txt.mdx`
+
+**Context:** `llms.txt` linked the 85 API reference entries to their product's OpenAPI YAML (the same 29 KB `swap.yaml` three times for `/order`, `/execute`, `/build`) instead of the page. An agent looking up one endpoint downloaded the whole product spec, the per-page `llmsDescription` sat on a URL that was not the page, and the docs inventory counted those 85 pages as "missing from llms.txt" (sitemap 238 vs llms.txt 172 on 2026-09-24). AI agents are the majority reader of this site (127k hits vs 58k human over the 30 days to 2026-09-30, 56% of them on `.md` twins), so the index they start from matters.
+**Decision:** Every entry links to the page's `.md` twin, API reference included; the twin of an API reference page embeds the part of the spec it documents (`api-reference/swap/order.md` is 15 KB against 29 KB for the full YAML). The specs are listed once in a new `## OpenAPI specifications` section before the Developer Platform footer, with `info.title` read from the YAML and the number of documented endpoints, for agents that want a whole product in one file. The preamble names the docs MCP server at its real address, `https://developers.jup.ag/docs/mcp` (it said `developers.jup.ag/mcp`, which 404s).
+**Rationale:** One URL per page keeps the index consistent with the sitemap and the inventory, gives agents the smallest useful fetch, and keeps the full spec one hop away.
+**Alternatives considered:** Keeping the YAML link and adding `.md` as a second link per entry, rejected: doubles the list for no gain. Dropping the YAML entirely, rejected: agents generating clients want the whole spec.
+**Migration notes:** None. `llms.txt` regenerated; the example on `ai/llms-txt.mdx` updated to the current format.
+
 ### [2026-08-25] Split the MM webhook (V1) page; version-scoped routing slugs
 **Status:** implemented
 **Scope:** folder-structure | navigation | rename | redirect

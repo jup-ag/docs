@@ -157,16 +157,48 @@ function emitEntry(pagePath) {
     console.warn(`Skipped API ref page (no openapi field): ${pagePath}`);
     return false;
   }
-  // API ref pages with openapi field link to the spec YAML instead of .md
-  let url;
+  // Every page, API reference included, links to its .md twin: the twin of an
+  // API reference page embeds the part of the OpenAPI spec it documents, so an
+  // agent fetching "/order" gets that endpoint rather than the whole product
+  // spec. The specs themselves are listed once, in the "OpenAPI specifications"
+  // section at the end, collected here.
   if (fm.openapi) {
     const specPath = fm.openapi.split(/\s+/)[0]; // e.g. "/openapi-spec/swap/v2/swap.yaml"
-    url = `${DOCS_URL}${specPath}`;
-  } else {
-    url = `${DOCS_URL}/${pagePath}.md`;
+    const entry = specsSeen.get(specPath) || { pages: 0 };
+    entry.pages += 1;
+    specsSeen.set(specPath, entry);
   }
-  emit(`- [${fm.title}](${url}): ${fm.description}\n`);
+  emit(`- [${fm.title}](${DOCS_URL}/${pagePath}.md): ${fm.description}\n`);
   return true;
+}
+
+// --- OpenAPI specs referenced by the API reference pages ---
+
+const specsSeen = new Map();
+
+function specTitle(specPath) {
+  // `info.title` of the YAML, read without a YAML parser: the `info:` block
+  // starts at column 0 and its keys are indented.
+  const file = path.join(baseFolder, specPath.replace(/^\//, ""));
+  if (!fs.existsSync(file)) return null;
+  const text = fs.readFileSync(file, "utf8");
+  const info = text.match(/^info:\s*\n((?:[ \t]+.*\n?)+)/m);
+  const title = info && info[1].match(/^[ \t]+title:[ \t]*(.+)$/m);
+  return title ? title[1].trim().replace(/^["']|["']$/g, "") : null;
+}
+
+function emitSpecs() {
+  if (specsSeen.size === 0) return;
+  emitHeading("OpenAPI specifications", 2);
+  emit(
+    "Machine-readable OpenAPI 3 files behind the API reference pages above. Fetch one when you need every endpoint, parameter and schema of a product at once; each API reference page's `.md` already embeds the part of the spec it documents.\n\n",
+  );
+  const sorted = [...specsSeen.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  for (const [specPath, { pages }] of sorted) {
+    const title = specTitle(specPath) || path.basename(specPath);
+    const noun = pages === 1 ? "endpoint" : "endpoints";
+    emit(`- [${title}](${DOCS_URL}${specPath}): OpenAPI 3 spec, ${pages} documented ${noun}.\n`);
+  }
 }
 
 // --- Nav tree walkers ---
@@ -275,7 +307,7 @@ emit(
   "> **Authentication**: Keyless access is available at 0.5 RPS on `api.jup.ag` with no sign-up - ideal for prototyping and lightweight agent use cases (no analytics or usage tracking). For production, sign up at [developers.jup.ag/portal](https://developers.jup.ag/portal), generate a free API key, and pass it via the `x-api-key` header to unlock higher rate limits and analytics.\n",
 );
 emit(
-  "> **AI tools**: Jupiter CLI (`npm i -g @jup-ag/cli`) for terminal and agent use, agent skills via `npx skills add`, MCP server at developers.jup.ag/mcp for in-editor docs, and llms-full.txt for complete documentation content.\n\n",
+  "> **AI tools**: Jupiter CLI (`npm i -g @jup-ag/cli`) for terminal and agent use, agent skills via `npx skills add`, MCP server at https://developers.jup.ag/docs/mcp for in-editor docs, and llms-full.txt for complete documentation content.\n\n",
 );
 
 emit(
@@ -304,6 +336,8 @@ for (const item of topLevelNav) {
   const name = item.tab || item.url || "unknown";
   if (!TAB_ORDER.includes(name)) walkTopLevel(item);
 }
+
+emitSpecs();
 
 // Footer
 emitHeading("Developer Platform", 2);

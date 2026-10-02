@@ -2663,6 +2663,10 @@
     {
       "source": "/routing/rfq",
       "destination": "/swap/jupiterz"
+    },
+    {
+      "source": "/docs/:slug*",
+      "destination": "/:slug*"
     }
   ]
 }

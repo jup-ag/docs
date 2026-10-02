@@ -1,5 +1,5 @@
 ---
-title: "Create Order"
+title: "Create Order (Trigger)"
 sidebarTitle: "Create"
 description: "Create price-triggered limit orders: single, OCO (take-profit/stop-loss), and OTOCO (conditional chains)."
 llmsDescription: "How to create Trigger V2 price orders with POST /trigger/v2/orders/price. Includes a complete runnable TypeScript example (authenticate, get vault, craft and sign deposit, submit the order). Covers the single, OCO (one-cancels-other TP/SL), and OTOCO (one-triggers-OCO) order types, the common and per-type parameters (triggerMint, triggerCondition, triggerPriceUsd, tpPriceUsd, slPriceUsd, slippageBps, expiresAt), default slippage by order side, validation rules (10 USD minimum, distinct mints, required future expiry), and the response ({ id, txSignature, depositConfirmed }). The shared vault and deposit reference lives on the Vault & Deposit page."

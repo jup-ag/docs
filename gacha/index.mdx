@@ -1,0 +1,139 @@
+---
+title: "Gacha API"
+description: "One API over every integrated collectible-gacha platform"
+llmsDescription: "Overview of the Jupiter Gacha API at https://api.raccoons.dev/gacha/v2: one normalised REST surface over Collector Crypt, Phygitals and Beezie covering the pack catalogue, machines, prize inventory, wallet collectibles, marketplace, buyback, rewards and the transaction gateway. Covers the base URL, that no API key is required, quickstart curl examples, and an index of every endpoint grouped by area."
+hidden: true
+---
+
+The Gacha API aggregates collectible-gacha platforms (Collector Crypt, Phygitals and Beezie today) behind one normalised surface. You never talk to a platform directly: machines, prize pools, wallet inventories, marketplace listings and pull history all come back in the same shapes regardless of where they live.
+
+Base URL:
+
+```
+https://api.raccoons.dev/gacha/v2
+```
+
+No API key is required. Money-moving endpoints (purchase, open, buy, list, delist, buyback, submit) are geo-blocked and return `451 region_restricted` from restricted regions.
+
+<CardGroup cols={2}>
+  <Card title="Conventions" icon="list-check" href="/gacha/conventions">
+    Identifiers, pagination, sorting, the error envelope, response headers and caching.
+  </Card>
+  <Card title="Packs" icon="box-open" href="/gacha/packs">
+    Jupiter's curated catalogue, how it differs from the raw machines feed, and how availability works.
+  </Card>
+  <Card title="Transaction gateway" icon="arrow-right-arrow-left" href="/gacha/transactions">
+    The build, sign, submit contract behind every money-moving flow, with a complete TypeScript example.
+  </Card>
+  <Card title="Platform coverage" icon="table-cells" href="/gacha/platforms">
+    What each integrated platform supports, and where the edges are.
+  </Card>
+</CardGroup>
+
+## Quickstart
+
+List every active machine, highest expected value first:
+
+```bash
+curl "https://api.raccoons.dev/gacha/v2/machines?status=active&sort=ev&order=desc"
+```
+
+Look inside one machine's prize pool:
+
+```bash
+curl "https://api.raccoons.dev/gacha/v2/machines/collector-crypt:pokemon_50/inventory?rarity=epic&limit=12"
+```
+
+Search every prize across all machines:
+
+```bash
+curl "https://api.raccoons.dev/gacha/v2/machines/inventory?status=active&minValueUsd=1000&sort=value&order=desc"
+```
+
+Fetch a wallet's collectibles, enriched with grades and values:
+
+```bash
+curl "https://api.raccoons.dev/gacha/v2/inventory/<wallet-address>?limit=12"
+```
+
+Read the storefront the way the Jupiter app does:
+
+```bash
+curl "https://api.raccoons.dev/gacha/v2/packs?available=true"
+```
+
+## Endpoints
+
+### Packs
+
+Jupiter's curated catalogue. Use it to build a storefront. See [Packs](/gacha/packs).
+
+| Endpoint | Description |
+| --- | --- |
+| [`GET /packs`](/api-reference/gacha/get-packs) | The pack catalogue, in shelf order |
+| [`GET /packs/categories`](/api-reference/gacha/get-pack-categories) | The category tabs |
+| [`GET /packs/{slug}`](/api-reference/gacha/get-pack) | One pack by slug |
+
+### Machines
+
+Every platform's live machines and prize pools, plus the purchase and open flow.
+
+| Endpoint | Description |
+| --- | --- |
+| [`GET /machines`](/api-reference/gacha/get-machines) | All live machines across platforms |
+| [`GET /machines/{id}`](/api-reference/gacha/get-machine) | One machine by id |
+| [`GET /machines/inventory`](/api-reference/gacha/search-machine-inventory) | Every prize across all machines |
+| [`GET /machines/{id}/inventory`](/api-reference/gacha/get-machine-inventory) | One machine's prize pool |
+| [`POST /machines/{id}/purchase`](/api-reference/gacha/purchase-machine) | Build the transactions to buy packs |
+| [`POST /machines/{id}/open`](/api-reference/gacha/open-machine) | Submit a signed purchase and reveal the items |
+
+### Inventory and collections
+
+| Endpoint | Description |
+| --- | --- |
+| [`GET /inventory/{address}`](/api-reference/gacha/get-inventory) | A wallet's gacha collectibles |
+| [`GET /collectibles/{id}`](/api-reference/gacha/get-collectible) | One collectible by asset id |
+| [`GET /collections`](/api-reference/gacha/get-collections) | Whitelisted gacha collections |
+
+### Marketplace and buyback
+
+Every write here returns unsigned transactions. Complete them through the [transaction gateway](/gacha/transactions).
+
+| Endpoint | Description |
+| --- | --- |
+| [`GET /marketplace`](/api-reference/gacha/get-marketplace-listings) | Browse listings for one platform |
+| [`GET /marketplace/{asset}`](/api-reference/gacha/get-market-state) | Market state of one asset |
+| [`POST /marketplace/{asset}/buy`](/api-reference/gacha/buy-asset) | Buy a listed asset |
+| [`POST /marketplace/{asset}/list`](/api-reference/gacha/list-asset) | Create a listing |
+| [`POST /marketplace/{asset}/delist`](/api-reference/gacha/delist-asset) | Cancel a listing |
+| [`POST /buyback/{asset}`](/api-reference/gacha/buyback-asset) | Instant-sell one item to its platform |
+| [`POST /buyback`](/api-reference/gacha/buyback-bulk) | Instant-sell several items in one round trip |
+
+### Transactions
+
+| Endpoint | Description |
+| --- | --- |
+| [`POST /transactions/submit`](/api-reference/gacha/submit-transactions) | Submit signed transactions for one intent |
+| [`POST /transactions/submit-batch`](/api-reference/gacha/submit-transactions-batch) | Submit several intents at once |
+| [`GET /transactions/{reference}`](/api-reference/gacha/get-transaction-status) | Status of an intent |
+
+### Activity, users and rewards
+
+| Endpoint | Description |
+| --- | --- |
+| [`GET /latest-pulls`](/api-reference/gacha/get-latest-pulls) | Public feed of recent pulls across every platform |
+| [`GET /users/{wallet}/stats`](/api-reference/gacha/get-user-stats) | Lifetime volume, total and per platform |
+| [`GET /users/{wallet}/activity`](/api-reference/gacha/get-user-activity) | A wallet's pull history |
+| [`GET /rewards/leaderboard`](/api-reference/gacha/get-leaderboard) | Top spenders for a season |
+| [`GET /rewards/leaderboard/me`](/api-reference/gacha/get-leaderboard-me) | One wallet's standing |
+| [`GET /rewards/leaderboard/seasons`](/api-reference/gacha/get-leaderboard-seasons) | Configured seasons |
+| [`GET /rewards/battlepass`](/api-reference/gacha/get-battlepass) | A wallet's battlepass progress |
+| [`POST /rewards/battlepass/claim`](/api-reference/gacha/claim-battlepass) | Claim earned battlepass tiers |
+| [`POST /rewards/leaderboard/claim`](/api-reference/gacha/claim-leaderboard) | Claim earned leaderboard prizes |
+
+## Related
+
+- [Conventions](/gacha/conventions)
+- [Packs](/gacha/packs)
+- [Transaction gateway](/gacha/transactions)
+- [Platform coverage](/gacha/platforms)

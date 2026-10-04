@@ -1,0 +1,155 @@
+---
+title: "Transaction gateway"
+description: "The build, sign, submit contract behind every money-moving flow"
+llmsDescription: "How money-moving flows work in the Jupiter Gacha API: a build endpoint (marketplace buy, list, delist, buyback) returns a plan with a UUID reference, unsigned base64 transactions and expiresAt; the client signs them with the user's wallet and submits them to POST /gacha/v2/transactions/submit, which dispatches to the right platform and replays stored results on retry. Covers polling GET /gacha/v2/transactions/{reference}, batch submission via POST /gacha/v2/buyback and POST /gacha/v2/transactions/submit-batch, the two-step pack purchase and open flow, and a complete TypeScript example with @solana/web3.js and error handling."
+hidden: true
+---
+
+Money-moving operations (marketplace buy, list and delist, buyback, pack purchases) never take custody of keys. The API builds an unsigned transaction, your app has the user's wallet sign it, and the gateway submits it to the right platform.
+
+<Steps>
+  <Step title="Build">
+    Call the action endpoint with the user's wallet, for example `POST /marketplace/{asset}/buy`. The API builds the platform transaction and returns a plan:
+
+    ```json
+    {
+      "reference": "819c50e4-7c40-489b-9e7b-eac2e6080cc3",
+      "platform": "collector-crypt",
+      "action": "buy",
+      "asset": "6SLnowc5...F1fg",
+      "transactions": ["<base64 unsigned transaction>"],
+      "expiresAt": "2026-07-24T09:42:52.901Z",
+      "next": "Sign each transaction, then POST /gacha/v2/transactions/submit"
+    }
+    ```
+
+    The `reference` is a persisted intent that records which platform and upstream flow the signed transactions must be routed to.
+  </Step>
+  <Step title="Sign">
+    Deserialise each entry in `transactions`, have the user's wallet sign it, and re-serialise to base64. Plans expire (see `expiresAt`, typically 5 minutes). Build again rather than submitting a stale plan.
+  </Step>
+  <Step title="Submit">
+    ```bash
+    curl -X POST "https://api.raccoons.dev/gacha/v2/transactions/submit" \
+      -H "content-type: application/json" \
+      -d '{"reference": "819c50e4-7c40-489b-9e7b-eac2e6080cc3", "signedTransactions": ["<signed base64>"]}'
+    ```
+
+    The gateway dispatches to the right upstream and returns the outcome with the on-chain signature when available. Submitting an already-finalised reference replays its stored result, so retries are always safe.
+  </Step>
+</Steps>
+
+## Complete example
+
+Buy a listed asset end to end with `@solana/web3.js`:
+
+```typescript
+import { VersionedTransaction, Keypair } from "@solana/web3.js";
+import bs58 from "bs58";
+
+const BASE_URL = "https://api.raccoons.dev/gacha/v2";
+const wallet = Keypair.fromSecretKey(bs58.decode(process.env.WALLET_SECRET_KEY!));
+const asset = "6SLnowc5..."; // mint address of the listed asset
+
+interface ApiError {
+  error: { code: string; message: string; requestId: string };
+}
+
+async function call<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const { error } = (await res.json()) as ApiError;
+    throw new Error(`${error.code}: ${error.message} (request ${error.requestId})`);
+  }
+  return (await res.json()) as T;
+}
+
+async function buy() {
+  // 1. Build
+  const plan = await call<{
+    reference: string;
+    transactions: string[];
+    expiresAt: string;
+  }>(`/marketplace/${asset}/buy`, { wallet: wallet.publicKey.toBase58() });
+
+  if (new Date(plan.expiresAt).getTime() < Date.now()) {
+    throw new Error("plan expired before signing, build again");
+  }
+
+  // 2. Sign every transaction in the plan
+  const signedTransactions = plan.transactions.map((b64) => {
+    const tx = VersionedTransaction.deserialize(Buffer.from(b64, "base64"));
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  });
+
+  // 3. Submit through the gateway
+  const result = await call<{
+    status: "submitted" | "pending" | "failed";
+    signature?: string;
+  }>("/transactions/submit", { reference: plan.reference, signedTransactions });
+
+  if (result.status === "failed") {
+    throw new Error(`submission failed for ${plan.reference}`);
+  }
+  console.log("status", result.status, "signature", result.signature);
+}
+
+buy().catch((err) => {
+  // Codes to expect: not_listed, not_owner, upstream_rejected, intent_expired, region_restricted
+  console.error(err.message);
+  process.exit(1);
+});
+```
+
+In a browser, replace `tx.sign([wallet])` with the wallet adapter's `signAllTransactions` so the user approves the whole plan once.
+
+## Checking status
+
+`GET /transactions/{reference}` returns the intent's current state (`pending`, `submitted` or `failed`) with its stored result. Use it for polling flows and post-hoc auditing.
+
+```bash
+curl "https://api.raccoons.dev/gacha/v2/transactions/819c50e4-7c40-489b-9e7b-eac2e6080cc3"
+```
+
+## Selling several items at once
+
+`POST /buyback` builds one buyback transaction per asset (up to 10) in a single round trip, so a wallet can cover them all with one `signAllTransactions` approval. The batch is not atomic: each asset is planned and settles independently, and assets the platform refuses are reported under `failed` while the rest still return `200`. Check both arrays.
+
+Each plan carries its own `reference`. Submit them together with `POST /transactions/submit-batch`:
+
+```json
+{
+  "submissions": [
+    { "reference": "819c50e4-...", "signedTransactions": ["<signed base64>"] },
+    { "reference": "c1f0a2d7-...", "signedTransactions": ["<signed base64>"] }
+  ]
+}
+```
+
+Results come back in request order with an `ok` flag per entry. A well-formed batch returns `200` even when every entry failed, so branch on each entry's `ok`.
+
+## Pack purchases
+
+Pack purchases use a platform-specific two-step because opening also reveals the won items:
+
+1. `POST /machines/{id}/purchase` with `player`, `quantity` and optionally `currency`. The response carries one unsigned transaction per pack under `packs[]`, each with its own `reference` and `intent`. No money moves here.
+2. Sign every transaction, then call `POST /machines/{id}/open` once per pack with the `player`, `reference`, `intent` and `signedTransactions`.
+
+A quantity above the machine's `maxPerPurchase` is split into several transactions (`chunks`) rather than rejected. Read `packs[].quantity` rather than assuming one pack per transaction; the values always sum to the quantity requested. Transactions settle independently, so a partial result is possible and your app must report it.
+
+While `open` returns `status: "pending"` (Phygitals settles asynchronously), poll the same endpoint with the `reference` and no `signedTransactions`. A `reference` whose transaction has expired returns `410 intent_expired`; call `purchase` again.
+
+See [Purchase Packs](/api-reference/gacha/purchase-machine) and [Open Packs](/api-reference/gacha/open-machine) for the full request and response schemas.
+
+## Related
+
+- [Submit Transactions](/api-reference/gacha/submit-transactions)
+- [Submit Transactions Batch](/api-reference/gacha/submit-transactions-batch)
+- [Get Transaction Status](/api-reference/gacha/get-transaction-status)
+- [Conventions](/gacha/conventions)
+- [Platform coverage](/gacha/platforms)

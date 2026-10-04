@@ -1,0 +1,7 @@
+---
+openapi: /openapi-spec/gacha/gacha.yaml get /machines/{id}
+title: "Get Machine"
+description: "One machine by its platform-scoped id"
+llmsDescription: "GET /gacha/v2/machines/{id} returns one machine by its ${platform}:${externalId} id (for example collector-crypt:pokemon_50) in the same shape as the list, including sold-out and inactive machines. Returns 404 machine_not_found for unknown ids."
+hidden: true
+---

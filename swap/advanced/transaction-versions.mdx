@@ -1,56 +1,46 @@
 ---
 title: "Transaction Versions (v0 and v1)"
 description: "Request Solana v1 transactions from the Swap API for larger routes without lookup tables"
-llmsDescription: "How to request and build Solana transaction v1 (SIMD-0385, the larger-transaction-sizes upgrade, live on mainnet since epoch 1035) from the Jupiter Swap API. v1 raises the max transaction size from 1232 to 4096 bytes, inlines up to 64 accounts so no Address Lookup Tables are needed, and encodes the compute budget (compute unit limit, compute unit price, loaded accounts data size, heap) on the message config instead of ComputeBudgetProgram instructions. Request it with transactionVersion=1 on GET /swap/v2/build (forces that version), or maxSupportedTransactionVersion=1 on GET /swap/v2/order (a ceiling: JupiterZ RFQ legs stay v0, the response transactionVersion reports what you got). For v1 the /build response returns empty computeBudgetInstructions and empty addressesByLookupTableAddress plus a computeUnitPrice field; you set the compute unit limit and loaded accounts data size limit on the message config yourself. v1 requires @solana/kit v8 or later to build, deserialize and sign; @solana/web3.js v1 has no v1 support. v0 is not deprecated; v1 is opt-in and recommended for new integrations. Includes a runnable @solana/kit v1 build-sign-send example."
+llmsDescription: "How to request and build Solana transaction v1 (SIMD-0385, the larger-transaction-sizes upgrade, live on mainnet since epoch 1035) from the Jupiter Swap API. v1 raises the max transaction size from 1232 to 4096 bytes and fits up to 64 accounts inline (no Address Lookup Tables), and encodes the compute budget (compute unit limit, compute unit price, loaded accounts data size, heap) on the message config instead of ComputeBudgetProgram instructions. Request it with transactionVersion=1 on GET /swap/v2/build (forces that version), or maxSupportedTransactionVersion=1 on GET /swap/v2/order (a ceiling: JupiterZ RFQ legs stay v0, the response transactionVersion reports what you got). For v1 the /build response returns empty computeBudgetInstructions and empty addressesByLookupTableAddress plus a computeUnitPrice field; you set the compute unit limit and loaded accounts data size limit on the message config yourself. v1 requires @solana/kit v8 or later to build, deserialize and sign; @solana/web3.js v1 has no v1 support; and not all wallet extensions can sign v1 yet. v1 is opt-in and recommended for new integrations. Includes a runnable @solana/kit v1 build-sign-send example."
 ---
 
-Solana [transaction v1](https://solana.com/upgrades/larger-transaction-sizes) (the "larger transaction sizes" upgrade, SIMD-0385) is live on mainnet. The Swap API can build v1 transactions across the whole service. v1 is opt-in: the default is still v0, and v0 is not deprecated. New routing features are built for v1 first, so use v1 for new integrations.
+Solana [transaction v1](https://solana.com/upgrades/larger-transaction-sizes) (the "larger transaction sizes" upgrade, SIMD-0385) is live on mainnet. The Swap API builds it on request. v1 is opt-in and the forward path for new integrations.
+
+v1 gives you:
+
+- **Bigger transactions:** 4096 bytes, up from 1232.
+- **No lookup tables:** up to 64 accounts inline, so there is nothing to resolve or compile against.
+- **Room for your own instructions:** CPI, memos, or transfers alongside the swap.
 
 ## v0 vs v1
 
-| | v0 (default) | v1 |
+| | v0 | v1 |
 | --- | --- | --- |
 | Max transaction size | 1232 bytes | 4096 bytes |
-| Accounts | ~35 static, more via Address Lookup Tables (ALTs) | Up to 64 inlined, **no ALTs** |
-| Compute budget | `ComputeBudgetProgram` instructions | Encoded on the message config at fixed positions |
+| Accounts | Up to 64, referenced via Address Lookup Tables (ALTs) | Up to 64, all inline (no ALTs) |
+| Compute budget | `ComputeBudgetProgram` instructions | On the message config |
 | SDK to build and sign | `@solana/kit` or `@solana/web3.js` | `@solana/kit` v8 or later only |
 
-Why v1 helps:
-
-- **Bigger routes fit without ALTs.** A multi-hop route that needed lookup tables to stay under 1232 bytes inlines its accounts directly in a v1 transaction. There is no `addressesByLookupTableAddress` to resolve or compile against.
-- **Room for your own instructions.** The 4096-byte envelope leaves space for custom instructions, CPI, memos, or transfers alongside the swap. See [Reduce Transaction Size](/swap/advanced/reduce-transaction-size) for when you still hit limits.
-- **Compute budget on the message.** v1 ignores `ComputeBudgetProgram` instructions (they run as no-ops that still cost compute units). The compute unit limit, compute unit price, loaded accounts data size, and heap size are set on the message config instead.
-
-<Warning>
-v1 defaults its compute budget fields to **zero**. A v1 transaction that does not set `computeUnitLimit` and `loadedAccountsDataSizeLimit` will fail. The Swap API returns the values to use (see [Response differences](#response-differences)); set them on the message config when you assemble the transaction.
-</Warning>
+Both cap at 64 accounts. v0 reaches that by referencing ALT addresses at 1 byte each; v1 inlines full addresses, which now fit in the larger envelope.
 
 ## Requesting v1
 
-The request parameter differs by endpoint.
+The parameter differs by endpoint:
 
-### Router (`/build`): `transactionVersion`
+- **Router — [`/build`](/swap/build):** pass `transactionVersion=1` (`"0"` or `"1"`, default `"0"`). This **forces** v1. You assemble the transaction yourself.
 
-On [`GET /swap/v2/build`](/swap/build), pass `transactionVersion` (`"0"` or `"1"`, default `"0"`). This **forces** that version on the route.
+  ```
+  GET https://api.jup.ag/swap/v2/build?...&transactionVersion=1
+  ```
 
-```
-GET https://api.jup.ag/swap/v2/build?...&transactionVersion=1
-```
+- **Meta-Aggregator — [`/order`](/swap/order-and-execute):** pass `maxSupportedTransactionVersion=1` (`"0"` or `"1"`, default `"0"`). This is a **ceiling, not a force:** the highest version your client accepts. JupiterZ RFQ wins are always v0, so you may still get v0. Read the response `transactionVersion` for what you got; [`/execute`](/swap/order-and-execute) lands either.
 
-The response changes shape for v1 (see [Response differences](#response-differences)). Assemble the transaction yourself with the compute budget on the message config.
-
-### Meta-Aggregator (`/order`): `maxSupportedTransactionVersion`
-
-On [`GET /swap/v2/order`](/swap/order-and-execute), pass `maxSupportedTransactionVersion` (`"0"` or `"1"`, default `"0"`). This is a **ceiling, not a force**: it says the highest version your client can accept. All routers compete, and some legs cannot be v1. JupiterZ RFQ transactions are always v0 (the market maker co-signs exact bytes), so an RFQ win returns a v0 transaction even with `maxSupportedTransactionVersion=1`.
-
-```
-GET https://api.jup.ag/swap/v2/order?...&maxSupportedTransactionVersion=1
-```
-
-Always read the response `transactionVersion` field to see what you actually got, and deserialize accordingly. [`POST /swap/v2/execute`](/swap/order-and-execute) lands either version.
+  ```
+  GET https://api.jup.ag/swap/v2/order?...&maxSupportedTransactionVersion=1
+  ```
 
 <Note>
-`transactionVersion` (`/build`) and `maxSupportedTransactionVersion` (`/order`) are different parameters. Using the wrong name is silently ignored: `/order?transactionVersion=1` returns a v0 transaction with no error.
+`transactionVersion` (`/build`) and `maxSupportedTransactionVersion` (`/order`) are different parameters. The wrong name is silently ignored: `/order?transactionVersion=1` returns a v0 transaction with no error.
 </Note>
 
 ## Response differences
@@ -60,27 +50,27 @@ When `/build` builds v1, the response changes shape:
 | Field | v0 | v1 |
 | --- | --- | --- |
 | `transactionVersion` | `0` | `1` |
-| `computeBudgetInstructions` | CU price instruction | **empty** (set the budget on the config) |
+| `computeBudgetInstructions` | CU price instruction | **empty** (budget goes on the config) |
 | `addressesByLookupTableAddress` | lookup tables to compile against | **`{}`** (no ALTs) |
-| `computeUnitPrice` | not present (inside the instruction) | present, micro-lamports per CU as a string |
+| `computeUnitPrice` | not present (inside the instruction) | present, micro-lamports per CU, as a string |
 
-You set the compute unit limit and loaded accounts data size limit on the message config yourself (see [Building a v1 transaction](#building-a-v1-transaction)). `/order` returns a built `transaction` and `transactionVersion`; sign it and hand it to `/execute`.
+You set the compute unit limit and loaded accounts data size limit yourself. On the Meta-Aggregator, `/order` returns a built `transaction` and `transactionVersion`; sign it and hand it to `/execute`.
 
 ## Building a v1 transaction
 
-v1 requires a current SDK. **`@solana/kit` v8 or later** exposes `setTransactionMessageConfig`, which writes the compute budget onto the v1 message. **`@solana/web3.js` v1 cannot build, deserialize, or sign v1 transactions** (it only offers `compileToLegacyMessage` and `compileToV0Message`), and the v1 wire format is different, so a v1 transaction returned by `/order` must be deserialized with a v1-capable SDK before you can sign it.
+- Build, deserialize, and sign with **`@solana/kit` v8 or later** (it exposes `setTransactionMessageConfig`). **`@solana/web3.js` v1 cannot build, deserialize, or sign v1** (only `compileToLegacyMessage` / `compileToV0Message`), and the v1 wire format differs.
+- Set the compute budget on the message config, not as instructions: `computeUnitLimit` and `loadedAccountsDataSizeLimit` (v1 defaults both to **zero**, so a transaction without them fails), plus the priority fee.
+- The API returns `computeUnitPrice` in micro-lamports per CU. v1's `priorityFeeLamports` is an absolute lamport total, so convert it:
+
+  ```
+  priorityFeeLamports = ceil(computeUnitPrice × computeUnitLimit ÷ 1_000_000)
+  ```
 
 <Warning>
-**Not all wallet extensions can sign v1 transactions yet.** Requesting v1 for a wallet that does not support it fails at signing. You need to know which wallets support v1 upfront and request v1 only for those. This matters most on the Meta-Aggregator path, where the end user's wallet signs the transaction that `/order` returns.
+**Not all wallet extensions can sign v1 transactions yet.** Requesting v1 for a wallet that does not support it fails at signing. Know which wallets support v1 upfront and request it only for those. This matters most on the Meta-Aggregator path, where the end user's wallet signs the transaction `/order` returns.
 </Warning>
 
-The compute unit price the API returns is micro-lamports per compute unit. v1's `priorityFeeLamports` is an absolute lamport total, so convert it with your chosen compute unit limit:
-
-```
-priorityFeeLamports = ceil(computeUnitPrice × computeUnitLimit ÷ 1_000_000)
-```
-
-The example below takes the Router (`/build`) path: request v1, assemble the transaction with the compute budget on the config, sign, and send. No lookup tables are involved.
+The example takes the Router (`/build`) path: request v1, assemble with the compute budget on the config, sign, and send.
 
 ```typescript title="@solana/kit (v8 or later)" expandable
 import {
@@ -210,25 +200,31 @@ console.log(`https://solscan.io/tx/${signature}`);
 ```
 
 <Note>
-Reading v1 transactions back from an RPC needs `maxSupportedTransactionVersion: 1` on `getTransaction` and similar calls, or the RPC returns an "unsupported version" error. This applies to your own confirmation and indexing code, not just to building.
+Reading v1 transactions back needs `maxSupportedTransactionVersion: 1` on `getTransaction` and similar RPC calls, or you get an "unsupported version" error. This applies to your confirmation and indexing code too.
 </Note>
 
 ## When to use v1
 
-- You hit the 1232-byte size limit on a v0 transaction, with or without custom instructions.
-- You want to avoid resolving and compiling against Address Lookup Tables.
-- You are building a new integration and want the surface new features target.
+Use v1 when you:
 
-Before enabling v1, confirm your whole signing path supports it: a v1-capable SDK (`@solana/kit` v8 or later), a wallet that can sign v1 transactions, and an RPC that accepts v1 (pass `maxSupportedTransactionVersion: 1` on reads). See [Building a v1 transaction](#building-a-v1-transaction).
+- Hit the 1232-byte size limit, with or without custom instructions.
+- Want to avoid resolving and compiling against Address Lookup Tables.
+- Are building a new integration, since new features target v1.
+
+First confirm your whole signing path supports it:
+
+- A v1-capable SDK (`@solana/kit` v8 or later).
+- A wallet that can sign v1 transactions.
+- An RPC that accepts v1 (`maxSupportedTransactionVersion: 1` on reads).
 
 ## Learn more
 
-- [Versioned transactions](https://solana.com/docs/core/transactions/versioned-transactions) on Solana docs
-- [Larger transaction sizes (v1)](https://solana.com/upgrades/larger-transaction-sizes) upgrade overview
-- [Solana fee structure](https://solana.com/docs/core/fees/fee-structure) for compute units and priority fees
+- [Versioned transactions](https://solana.com/docs/core/transactions/versioned-transactions)
+- [Larger transaction sizes (v1)](https://solana.com/upgrades/larger-transaction-sizes)
+- [Solana fee structure](https://solana.com/docs/core/fees/fee-structure)
 
 ## Related
 
 - [Build](/swap/build): request `transactionVersion` and assemble instructions yourself
 - [Order & Execute](/swap/order-and-execute): `maxSupportedTransactionVersion` on the managed path
-- [Reduce Transaction Size](/swap/advanced/reduce-transaction-size): account and instruction techniques when you still hit limits
+- [Reduce Transaction Size](/swap/advanced/reduce-transaction-size): techniques when you still hit limits

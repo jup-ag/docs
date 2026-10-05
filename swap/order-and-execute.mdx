@@ -333,7 +333,7 @@ These are guidelines, not guarantees of execution. Prices can move against you e
 
 ### 2. Sign the transaction
 
-- The transaction returned by `/order` is unsigned. Sign it with your wallet's private key. The example above uses `@solana/kit`. The transaction is a versioned transaction, v0 by default or v1 when you request it with `maxSupportedTransactionVersion=1` (check the response `transactionVersion`). Deserializing and signing a v1 transaction needs `@solana/kit` v8 or later; `@solana/web3.js` v1 cannot read v1 transactions. See [Transaction Versions](/swap/advanced/transaction-versions).
+- The transaction returned by `/order` is unsigned. Sign it with your wallet's private key. The example above uses `@solana/kit`. The transaction is a versioned transaction, v0 by default or v1 when you request it with `maxSupportedTransactionVersion=1` (check the response `transactionVersion`). Deserializing and signing a v1 transaction needs `@solana/kit` v8 or later; `@solana/web3.js` v1 cannot read v1 transactions. Not all wallet extensions can sign v1 transactions yet, so request `maxSupportedTransactionVersion=1` only for wallets you have confirmed support v1, otherwise signing fails. See [Transaction Versions](/swap/advanced/transaction-versions).
 - Note: we use the `partiallySignTransaction` for partial signing because when JupiterZ routing is provided, there is an additional signer which is the MM that will be required after sending the transaction to `/execute` request.
 
 ### 3. Execute the transaction

@@ -602,7 +602,7 @@ Validate the compute unit price from the response before signing. The estimate t
 
 By default `/build` returns v0 instructions. The response includes address lookup tables in `addressesByLookupTableAddress`; use these to compile a v0 (versioned) transaction, which supports more accounts than legacy transactions.
 
-Pass `transactionVersion=1` to build a [Solana v1 transaction](/swap/advanced/transaction-versions) instead. v1 raises the size limit to 4096 bytes and inlines accounts without lookup tables, so `addressesByLookupTableAddress` is `{}` and `computeBudgetInstructions` is empty. Set the compute budget (including the returned `computeUnitPrice`) on the message config, and build with a v1-capable SDK (`@solana/kit` v8 or later). See [Transaction Versions](/swap/advanced/transaction-versions) for a full v1 example.
+Pass `transactionVersion=1` to build a [Solana v1 transaction](/swap/advanced/transaction-versions) instead. v1 raises the size limit to 4096 bytes and inlines accounts without lookup tables, so `addressesByLookupTableAddress` is `{}` and `computeBudgetInstructions` is empty. Set the compute budget (including the returned `computeUnitPrice`) on the message config, and build with a v1-capable SDK (`@solana/kit` v8 or later). If an end-user wallet signs the transaction, confirm it supports v1 first: not all wallet extensions do, and signing fails otherwise. See [Transaction Versions](/swap/advanced/transaction-versions) for a full v1 example.
 
 ### 5. Sign and send
 

@@ -70,6 +70,10 @@ You set the compute unit limit and loaded accounts data size limit on the messag
 
 v1 requires a current SDK. **`@solana/kit` v8 or later** exposes `setTransactionMessageConfig`, which writes the compute budget onto the v1 message. **`@solana/web3.js` v1 cannot build, deserialize, or sign v1 transactions** (it only offers `compileToLegacyMessage` and `compileToV0Message`), and the v1 wire format is different, so a v1 transaction returned by `/order` must be deserialized with a v1-capable SDK before you can sign it.
 
+<Warning>
+**Not all wallet extensions can sign v1 transactions yet.** Requesting v1 for a wallet that does not support it fails at signing. You need to know which wallets support v1 upfront and request v1 only for those. This matters most on the Meta-Aggregator path, where the end user's wallet signs the transaction that `/order` returns.
+</Warning>
+
 The compute unit price the API returns is micro-lamports per compute unit. v1's `priorityFeeLamports` is an absolute lamport total, so convert it with your chosen compute unit limit:
 
 ```
@@ -215,7 +219,7 @@ Reading v1 transactions back from an RPC needs `maxSupportedTransactionVersion: 
 - You want to avoid resolving and compiling against Address Lookup Tables.
 - You are building a new integration and want the surface new features target.
 
-Stay on v0 when you depend on `@solana/web3.js` v1, or when your wallet or RPC stack does not yet support v1 transactions.
+Before enabling v1, confirm your whole signing path supports it: a v1-capable SDK (`@solana/kit` v8 or later), a wallet that can sign v1 transactions, and an RPC that accepts v1 (pass `maxSupportedTransactionVersion: 1` on reads). See [Building a v1 transaction](#building-a-v1-transaction).
 
 ## Learn more
 

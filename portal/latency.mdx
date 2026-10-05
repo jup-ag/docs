@@ -28,3 +28,7 @@ If your users are globally distributed:
 - **Asia-Pacific:** Singapore (`ap-southeast-1`) or Tokyo (`ap-northeast-1`)
 - **Europe:** Frankfurt (`eu-central-1`)
 - **Americas:** Virginia (`us-east-1`), Oregon (`us-west-2`), or São Paulo (`sa-east-1`)
+
+## Public latency benchmarks
+
+If you want to verify quote-path latency from your own region before colocating, [OpenChainBench](https://openchainbench.com/benchmarks/solana-dex-quote-latency) publishes an open, multi-region latency benchmark for Solana DEX aggregators. It probes the quote API on Jupiter, Raydium, OpenOcean and Mobula every 60 seconds from Paris, Virginia and Singapore, and tracks p50 / p95 wall-clock latency plus response success rate. Methodology and raw data are open-source ([source](https://github.com/ChainBench/openchainbench)).

@@ -1,7 +1,7 @@
 ---
 title: "Transaction Versions (v0 and v1)"
 description: "Request Solana v1 transactions from the Swap API for larger routes without lookup tables"
-llmsDescription: "How to request and build Solana transaction v1 (SIMD-0385, the larger-transaction-sizes upgrade, live on mainnet since epoch 1035) from the Jupiter Swap API. v1 raises the max transaction size from 1232 to 4096 bytes, inlines up to 64 accounts so no Address Lookup Tables are needed, and encodes the compute budget (compute unit limit, compute unit price, loaded accounts data size, heap) on the message config instead of ComputeBudgetProgram instructions. Request it with transactionVersion=1 on GET /swap/v2/quote and GET /swap/v2/build (forces that version, Metis-only), or maxSupportedTransactionVersion=1 on GET /swap/v2/order (a ceiling: JupiterZ RFQ legs stay v0, the response transactionVersion reports what you got). For v1 the response returns empty computeBudgetInstructions and empty addressesByLookupTableAddress plus computeUnitLimit, computeUnitPrice and loadedAccountsDataSizeLimit fields. v1 requires @solana/kit v8 or later to build, deserialize and sign; @solana/web3.js v1 has no v1 support. v0 is not deprecated; v1 is opt-in and recommended for new integrations. Includes a runnable @solana/kit v1 build-sign-send example."
+llmsDescription: "How to request and build Solana transaction v1 (SIMD-0385, the larger-transaction-sizes upgrade, live on mainnet since epoch 1035) from the Jupiter Swap API. v1 raises the max transaction size from 1232 to 4096 bytes, inlines up to 64 accounts so no Address Lookup Tables are needed, and encodes the compute budget (compute unit limit, compute unit price, loaded accounts data size, heap) on the message config instead of ComputeBudgetProgram instructions. Request it with transactionVersion=1 on GET /swap/v2/build (forces that version), or maxSupportedTransactionVersion=1 on GET /swap/v2/order (a ceiling: JupiterZ RFQ legs stay v0, the response transactionVersion reports what you got). For v1 the /build response returns empty computeBudgetInstructions and empty addressesByLookupTableAddress plus a computeUnitPrice field; you set the compute unit limit and loaded accounts data size limit on the message config yourself. v1 requires @solana/kit v8 or later to build, deserialize and sign; @solana/web3.js v1 has no v1 support. v0 is not deprecated; v1 is opt-in and recommended for new integrations. Includes a runnable @solana/kit v1 build-sign-send example."
 ---
 
 Solana [transaction v1](https://solana.com/upgrades/larger-transaction-sizes) (the "larger transaction sizes" upgrade, SIMD-0385) is live on mainnet. The Swap API can build v1 transactions across the whole service. v1 is opt-in: the default is still v0, and v0 is not deprecated. New routing features are built for v1 first, so use v1 for new integrations.
@@ -27,20 +27,19 @@ v1 defaults its compute budget fields to **zero**. A v1 transaction that does no
 
 ## Requesting v1
 
-The request parameter differs by surface.
+The request parameter differs by endpoint.
 
-### Swap surface: `transactionVersion`
+### Router (`/build`): `transactionVersion`
 
-On [`GET /swap/v2/quote`](/swap/quote-and-swap) and [`GET /swap/v2/build`](/swap/build), pass `transactionVersion` (`"0"` or `"1"`, default `"0"`). This **forces** that version on the route. These endpoints route through Metis only, which builds for exactly the version you ask for.
+On [`GET /swap/v2/build`](/swap/build), pass `transactionVersion` (`"0"` or `"1"`, default `"0"`). This **forces** that version on the route.
 
 ```
 GET https://api.jup.ag/swap/v2/build?...&transactionVersion=1
-GET https://api.jup.ag/swap/v2/quote?...&transactionVersion=1
 ```
 
-`/quote` echoes `transactionVersion` in its response. Pass that `QuoteResponse` through unchanged to [`POST /swap/v2/swap` or `POST /swap/v2/swap-instructions`](/swap/quote-and-swap), which build for the version the quote carries.
+The response changes shape for v1 (see [Response differences](#response-differences)). Assemble the transaction yourself with the compute budget on the message config.
 
-### Meta-Aggregator: `maxSupportedTransactionVersion`
+### Meta-Aggregator (`/order`): `maxSupportedTransactionVersion`
 
 On [`GET /swap/v2/order`](/swap/order-and-execute), pass `maxSupportedTransactionVersion` (`"0"` or `"1"`, default `"0"`). This is a **ceiling, not a force**: it says the highest version your client can accept. All routers compete, and some legs cannot be v1. JupiterZ RFQ transactions are always v0 (the market maker co-signs exact bytes), so an RFQ win returns a v0 transaction even with `maxSupportedTransactionVersion=1`.
 
@@ -51,27 +50,25 @@ GET https://api.jup.ag/swap/v2/order?...&maxSupportedTransactionVersion=1
 Always read the response `transactionVersion` field to see what you actually got, and deserialize accordingly. [`POST /swap/v2/execute`](/swap/order-and-execute) lands either version.
 
 <Note>
-`transactionVersion` (the Swap surface) and `maxSupportedTransactionVersion` (`/order`) are different parameters. Using the wrong name is silently ignored: `/order?transactionVersion=1` returns a v0 transaction with no error.
+`transactionVersion` (`/build`) and `maxSupportedTransactionVersion` (`/order`) are different parameters. Using the wrong name is silently ignored: `/order?transactionVersion=1` returns a v0 transaction with no error.
 </Note>
 
 ## Response differences
 
-When the built version is v1, the instruction-returning endpoints (`/build`, `/swap-instructions`) change shape:
+When `/build` builds v1, the response changes shape:
 
 | Field | v0 | v1 |
 | --- | --- | --- |
 | `transactionVersion` | `0` | `1` |
-| `computeBudgetInstructions` | CU price (and CU limit on `/swap-instructions`) | **empty** (budget is on the config) |
+| `computeBudgetInstructions` | CU price instruction | **empty** (set the budget on the config) |
 | `addressesByLookupTableAddress` | lookup tables to compile against | **`{}`** (no ALTs) |
 | `computeUnitPrice` | not present (inside the instruction) | present, micro-lamports per CU as a string |
-| `computeUnitLimit` | not present | present on `/swap-instructions` |
-| `loadedAccountsDataSizeLimit` | not present | present on `/swap-instructions`, in bytes (`67108864` = 64 MiB) |
 
-`/swap` returns a fully built v1 `swapTransaction` and `transactionVersion: 1`; deserialize, sign, and send it. `/order` returns a built `transaction` and `transactionVersion`; sign and hand to `/execute`.
+You set the compute unit limit and loaded accounts data size limit on the message config yourself (see [Building a v1 transaction](#building-a-v1-transaction)). `/order` returns a built `transaction` and `transactionVersion`; sign it and hand it to `/execute`.
 
 ## Building a v1 transaction
 
-v1 requires a current SDK. **`@solana/kit` v8 or later** exposes `setTransactionMessageConfig`, which writes the compute budget onto the v1 message. **`@solana/web3.js` v1 cannot build, deserialize, or sign v1 transactions** (it only offers `compileToLegacyMessage` and `compileToV0Message`), and the v1 wire format is different, so a v1 transaction returned by `/swap` or `/order` must be deserialized with a v1-capable SDK before you can sign it.
+v1 requires a current SDK. **`@solana/kit` v8 or later** exposes `setTransactionMessageConfig`, which writes the compute budget onto the v1 message. **`@solana/web3.js` v1 cannot build, deserialize, or sign v1 transactions** (it only offers `compileToLegacyMessage` and `compileToV0Message`), and the v1 wire format is different, so a v1 transaction returned by `/order` must be deserialized with a v1-capable SDK before you can sign it.
 
 The compute unit price the API returns is micro-lamports per compute unit. v1's `priorityFeeLamports` is an absolute lamport total, so convert it with your chosen compute unit limit:
 
@@ -229,6 +226,5 @@ Stay on v0 when you depend on `@solana/web3.js` v1, or when your wallet or RPC s
 ## Related
 
 - [Build](/swap/build): request `transactionVersion` and assemble instructions yourself
-- [Quote and Swap](/swap/quote-and-swap): `transactionVersion` on the separated quote and swap flow
 - [Order & Execute](/swap/order-and-execute): `maxSupportedTransactionVersion` on the managed path
 - [Reduce Transaction Size](/swap/advanced/reduce-transaction-size): account and instruction techniques when you still hit limits

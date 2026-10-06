@@ -1,11 +1,13 @@
 ---
 title: "Solana Swap API"
 sidebarTitle: "Overview"
-description: "One API for all swap use cases on Jupiter"
-llmsDescription: "Overview of Jupiter's unified Swap API at api.jup.ag/swap/v2. Two integration paths: Meta-Aggregator (GET /order + POST /execute) where all routing engines compete (Metis, JupiterZ RFQ, Dflow, OKX) for the best price with managed transaction landing, gasless support, and MEV protection; and Router (GET /build + POST /submit) for raw swap instructions with full transaction control, CPI composability, no swap fees, and Metis onchain routing only. Includes routing engine descriptions, availability by path, and a comparison table covering fees, execution, gasless, and transaction modification. Start with Meta-Aggregator unless you need to modify the transaction."
+description: "Jupiter's Solana Swap API: best-price routing across every major Solana liquidity source, returned as a ready-to-sign transaction or raw instructions."
+llmsDescription: "Overview of Jupiter's Swap API at api.jup.ag/swap/v2, the Solana swap API behind jup.ag. One GET /order call returns a quote and, with a taker wallet, a ready-to-sign transaction; POST /execute lands it. Routing engines compete for the best price: Metis onchain routing, JupiterZ RFQ market makers, Dflow and OKX. Two integration paths: Meta-Aggregator (/order + /execute, managed landing, gasless, Jupiter platform fee by token pair) and Router (/build + /submit or your own RPC, raw instructions, CPI, no Jupiter swap fee). Covers how a swap works step by step, when to use each path, routing engines, typical integrations (wallets, trading bots, AI agents, exchanges), migration from Ultra and Swap API V1, and an FAQ: quote without executing, RPC needs, fees, integrator and referral fees, gasless, slippage and RTSE, priority fees, sending through your own pipeline, rate limits, and migrating from V1 or Ultra."
 ---
 
-The Swap API unifies Jupiter's swap capabilities into a single entry point at `https://api.jup.ag/swap/v2`. Two paths cover every use case:
+The Swap API is Jupiter's REST API for swapping tokens on Solana, at `https://api.jup.ag/swap/v2`. One request returns a quote and, when you pass a wallet, a transaction ready to sign. Jupiter's routing engines compete for the best price on every request: Metis onchain routing, JupiterZ market makers answering a Request for Quote (RFQ), Dflow and OKX. You need no RPC node, no onchain state and no transaction assembly, and a single API key covers every Jupiter API.
+
+Wallets, trading bots, AI agents, exchanges and payment apps integrate it through one of two paths:
 
 - **Meta-Aggregator**: all routing engines compete for the best price. You get a fully assembled transaction, sign it, and Jupiter handles landing.
 - **Router**: Metis onchain routing only. You get raw swap instructions with full transaction control for custom builds, CPI, and composability.
@@ -20,11 +22,58 @@ The Swap API unifies Jupiter's swap capabilities into a single entry point at `h
   </Card>
 </CardGroup>
 
+## Quick start
+
+Get a quote for 0.1 SOL to USDC. No API key and no wallet are needed for a quote:
+
+```bash
+curl "https://api.jup.ag/swap/v2/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000"
+```
+
+```json
+{
+  "router": "jupiterz",
+  "inAmount": "100000000",
+  "outAmount": "12076477",
+  "feeBps": 2,
+  "transaction": null
+}
+```
+
+Without `taker`, `/order` returns the quote only. Add `taker=<your wallet>` to receive the transaction, sign it, and POST it to `/execute`. The full flow with `@solana/kit` and `@solana/web3.js` examples is on [Order and Execute](/swap/order-and-execute).
+
+Keyless requests are limited to 0.5 requests per second. For production, pass an API key in the `x-api-key` header; see [Rate Limits](/portal/rate-limits).
+
+## Why integrate the Swap API
+
+- **Best price by competition.** Metis, JupiterZ, Dflow and OKX compete on every `/order`. JupiterZ market makers often beat onchain routing by 5 to 20 bps on major pairs, and a self-learning mechanism sidelines underperforming sources.
+- **Managed execution.** `/execute` lands the transaction through Jupiter's landing pipeline, with slippage set by the Real-Time Slippage Estimator (RTSE), priority fees handled for you, and confirmation polling built in.
+- **Gasless swaps.** Users without SOL can still swap: Jupiter sponsors gas automatically on eligible trades, JupiterZ market makers pay fees on their quotes, or you sponsor gas with your own `payer`. See [Gasless Swaps](/swap/advanced/gasless).
+- **Full control when you need it.** `/build` returns raw instructions for CPI, custom instructions and your own landing pipeline, with no Jupiter swap fee.
+- **Transparent fees.** The platform fee depends on the token pair, from 0 bps on pegged assets and Jupiter tokens to 10 bps on most pairs, and every `/order` response shows `feeBps` and `feeMint`. See [Fees](/swap/order-and-execute#fees).
+- **The infrastructure behind jup.ag.** The same routing and landing serve Jupiter's own frontend.
+
+## How a swap works
+
+**Meta-Aggregator**
+
+1. `GET /order` with `inputMint`, `outputMint`, `amount` and `taker`. The response contains the quote, the winning `router`, a `requestId` and a base64 transaction.
+2. Sign the transaction with the taker's key. Sign promptly: RFQ quotes carry an `expireAt` and all quotes go stale as prices move.
+3. `POST /execute` with the signed transaction and the `requestId`. Jupiter lands it and returns the result and signature.
+
+**Router**
+
+1. `GET /build` with the same swap parameters. The response contains swap, setup and cleanup instructions, compute budget instructions and address lookup tables.
+2. Add your own instructions, simulate to set the compute unit limit, and compile a v0 transaction.
+3. Sign and send it through your own RPC, or through [`/submit`](/transaction/submit) with a SOL tip for Jupiter's landing pipeline.
+
+Step-by-step code for both flows: [Order and Execute](/swap/order-and-execute) and [Build](/swap/build).
+
 ## Choosing a path
 
 | | Meta-Aggregator | Router |
 | --- | --- | --- |
-| **Endpoints** | [`/order`](/swap/order-and-execute) + [`/execute`](/swap/order-and-execute#execute-the-transaction) | [`/build`](/swap/build) + [`/submit`](/transaction/submit) |
+| **Endpoints** | [`/order`](/swap/order-and-execute) + [`/execute`](/swap/order-and-execute#3-execute-the-transaction) | [`/build`](/swap/build) + [`/submit`](/transaction/submit) |
 | **Returns** | Assembled transaction | Raw swap instructions |
 | **Routers** | All (Metis, JupiterZ, Dflow, OKX) | Metis only |
 | **Best for** | Most integrations. Best price, simplest flow. | Custom transactions, CPI, composability. |
@@ -55,14 +104,14 @@ JupiterZ (RFQ) is not available on the Router path. It is available through the 
 
 ## Endpoints
 
-All endpoints require an API key via the `x-api-key` header. Get one at [Portal](https://developers.jup.ag/portal).
+Keyless requests work at 0.5 requests per second. Pass an API key in the `x-api-key` header for production rate limits; get one at [Portal](https://developers.jup.ag/portal).
 
 **Meta-Aggregator**
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | GET | [`/swap/v2/order`](/swap/order-and-execute) | Get a quote and assembled transaction |
-| POST | [`/swap/v2/execute`](/swap/order-and-execute#execute-the-transaction) | Execute a signed `/order` transaction with managed landing |
+| POST | [`/swap/v2/execute`](/swap/order-and-execute#3-execute-the-transaction) | Execute a signed `/order` transaction with managed landing |
 
 **Router**
 
@@ -71,15 +120,27 @@ All endpoints require an API key via the `x-api-key` header. Get one at [Portal]
 | GET | [`/swap/v2/build`](/swap/build) | Get a quote and raw swap instructions |
 | POST | [`tx.jup.ag`](/transaction/submit) | Land any signed transaction through Jupiter's infrastructure via Solana `sendTransaction` with SOL tips |
 
-## Learn More
+## Typical integrations
 
-<CardGroup cols={2}>
-  <Card title="Advanced" icon="gear" href="/swap/advanced">
-    Gasless swaps, compute unit estimation, reducing transaction size and latency.
+- **Wallets and trading terminals** use `/order` and `/execute` for the best price with managed landing, and [Jupiter Plugin](/tool-kits/plugin) when they want a drop-in swap widget instead of building the UI. See [How to Embed a Swap Widget in Your App](/guides/how-to-embed-a-swap-widget).
+- **Trading bots** use `/order` with a fixed `slippageBps` when they need deterministic behaviour, or `/build` when they need to control compute units and landing. See [Compute Units](/swap/advanced/compute-units) and [Reduce Latency](/swap/advanced/reduce-latency).
+- **AI agents** call the API keyless for prototyping, or through the [Jupiter CLI](/ai/cli) and [MCP server](/ai/mcp). Every page of these docs has a Markdown version at `.md`.
+- **Protocols and programs** compose swaps into their own transactions with `/build`, including CPI. See [Common instructions](/swap/build/common-instructions).
+- **Integrators earning fees** add a referral fee on `/order` or a platform fee on `/build`. See [Referral Program](/tool-kits/referral-program).
+
+## Migrating from Ultra or Swap API V1
+
+Ultra Swap API users move to the Meta-Aggregator: `/order` and `/execute` replace Ultra's endpoints with the same managed landing. Swap API V1 (Metis) users on `/quote` and `/swap` move to `/order` for managed execution or to `/build` for raw instructions.
+
+<CardGroup cols={3}>
+  <Card title="Ultra to Meta-Aggregator" icon="arrow-right" href="/swap/migration/ultra-to-order">
+    Replace Ultra's order and execute endpoints with Swap API V2.
   </Card>
-
-  <Card title="Migration Guides" icon="arrow-right" href="/swap/migration/metis-to-build">
-    Migrating from Ultra or Metis to the Swap API.
+  <Card title="Metis to Meta-Aggregator" icon="arrow-right" href="/swap/migration/metis-to-meta-aggregator">
+    Move from /quote and /swap to /order and /execute.
+  </Card>
+  <Card title="Metis to Router" icon="arrow-right" href="/swap/migration/metis-to-build">
+    Move from /quote and /swap-instructions to /build.
   </Card>
 </CardGroup>
 
@@ -89,3 +150,53 @@ If you want your liquidity routed through Jupiter:
 
 - **AMM operators**: [Integrate AMM into Metis](/swap/routing/amm/integration) to get your markets included in Jupiter's onchain routing.
 - **Market makers**: integrate into JupiterZ to provide off-chain liquidity via the RFQ system, over a [webhook (V1)](/swap/routing/rfq/v1/overview) or [gRPC streams (V2)](/swap/routing/rfq/v2/streaming).
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Should I use the Meta-Aggregator or the Router?">
+Start with the Meta-Aggregator (`/order` and `/execute`). All routing engines compete, including JupiterZ market makers, so it returns the best price, and Jupiter lands the transaction for you. Use the Router (`/build`) only when you must modify the transaction: adding your own instructions, calling the swap through CPI, or sending it through your own landing pipeline. The Router routes through Metis only and charges no Jupiter swap fee.
+</Accordion>
+
+<Accordion title="How do I get a quote without executing a swap?">
+Call `GET /order` without `taker`. The response contains the full quote (`inAmount`, `outAmount`, `router`, `feeBps`, price impact) and `transaction: null`. This replaces the V1 `/quote` endpoint for price checks. Add `taker` when you want the transaction. See [Get an order](/swap/order-and-execute#1-get-an-order).
+</Accordion>
+
+<Accordion title="Do I need my own Solana RPC node?">
+Not for the Meta-Aggregator: `/order` builds the transaction and `/execute` lands it, so the only thing you do yourself is sign. On the Router, you compile and send the transaction, through your own RPC or through [`/submit`](/transaction/submit), Jupiter's landing endpoint, which also removes the need for an RPC.
+</Accordion>
+
+<Accordion title="What fees does Jupiter charge?">
+`/order` includes a platform fee that depends on the token pair: 0 bps when buying Jupiter tokens or swapping pegged assets, 2 bps SOL to stablecoin, 5 bps liquid staking token to stablecoin, 10 bps for everything else, and 50 bps on tokens less than 24 hours old. The fee is deducted from the quote and shown in `feeBps`, `platformFee` and `feeMint`. `/build` has no Jupiter swap fee. See [Fees](/swap/order-and-execute#fees).
+</Accordion>
+
+<Accordion title="Can I add my own fee to swaps?">
+Yes. On `/order`, pass `referralAccount` and `referralFee` (50 to 255 bps); Jupiter keeps 20% of your fee and charges no separate platform fee. You create the referral accounts once through the [Referral Program](/tool-kits/referral-program). On `/build`, pass `platformFeeBps` with your `feeAccount`. See [Referral fees](/swap/order-and-execute#referral-fees) and [Build fees](/swap/build#fees).
+</Accordion>
+
+<Accordion title="Can users swap without holding SOL for gas?">
+Yes, on `/order`. Three sources can make a swap gasless: Jupiter sponsors gas automatically when the taker has low SOL on an eligible trade, a JupiterZ market maker pays the fees on its own quote, or you sponsor gas by passing a `payer` wallet. Check `signatureFeePayer` against the taker to know which one applied. See [Gasless Swaps](/swap/advanced/gasless).
+</Accordion>
+
+<Accordion title="How are slippage and failed swaps handled?">
+On `/order`, the Real-Time Slippage Estimator (RTSE) sets the slippage for each swap from token category, recent slippage data and live failure rates. On `/build`, pass `slippageBps=rtse` to opt in or a fixed value such as `50`. When `/order` cannot build a transaction it returns `transaction: ""` with an `errorCode` (for example insufficient funds or insufficient SOL for gas), and `/execute` returns its own error codes when landing fails. See [Slippage Estimation](/swap/advanced/slippage) and [Error codes](/swap/order-and-execute#error-codes).
+</Accordion>
+
+<Accordion title="How are priority fees set?">
+On `/order` and `/execute`, Jupiter sets and pays attention to priority fees as part of managed landing. On `/build`, the response includes a compute unit price based on recent network fees; `computeUnitPricePercentile` lets you choose the percentile (`medium`, `high`, `veryHigh`, or a value in bps), with the 50th percentile as default and the 90th in `mode=fast`. Simulate to set the compute unit limit, and cap the price if you bid in volatile conditions. See [Compute Units](/swap/advanced/compute-units).
+</Accordion>
+
+<Accordion title="Can I send the transaction through my own RPC or a Jito bundle?">
+Use `/build`. Its instructions are yours to assemble, sign and send however you want, and `forJitoBundle=true` excludes DEXes that are incompatible with Jito bundles. `/order` transactions are built for `/execute`: JupiterZ market makers have last-look rights and the transaction cannot be modified, so they are landed by Jupiter.
+</Accordion>
+
+<Accordion title="What are the rate limits?">
+Keyless: 0.5 requests per second. Free API key: 1 RPS, Developer 10, Launch 50, Pro 150. `/execute` has its own bucket (Keyless 20, Free 50, paid plans 100 RPS) that does not count against your main limit. See [Rate Limits](/portal/rate-limits).
+</Accordion>
+
+<Accordion title="I use Swap API V1 or Ultra. What changes?">
+V1's `/quote` and `/swap` become `/order` and `/execute` (or `/build` if you used `/swap-instructions`); route plans report `bps` instead of `percent`, and V2 instructions no longer emit fee events. Ultra's order and execute endpoints map directly onto `/order` and `/execute`. The migration guides list every change: [Ultra to Meta-Aggregator](/swap/migration/ultra-to-order), [Metis to Meta-Aggregator](/swap/migration/metis-to-meta-aggregator), [Metis to Router](/swap/migration/metis-to-build).
+</Accordion>
+
+</AccordionGroup>

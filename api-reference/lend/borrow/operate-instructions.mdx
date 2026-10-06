@@ -2,4 +2,5 @@
 openapi: /openapi-spec/lend/borrow.yaml post /borrow/operate-instructions
 title: "Operate Instructions"
 description: "Request the instructions and address lookup tables for a borrow operate transaction"
+llmsDescription: "POST /borrow/operate-instructions endpoint of the Jupiter Lend Borrow API at api.jup.ag/lend/v1/borrow/operate-instructions. Same inputs and sign conventions as /borrow/operate (vaultId, positionId, signer, colAmount, debtAmount) but returns raw instructions and addressLookupTableAddresses, plus nftId, for integrators who assemble their own transactions."
 ---

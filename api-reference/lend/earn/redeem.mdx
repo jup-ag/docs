@@ -2,4 +2,5 @@
 openapi: /openapi-spec/lend/lend.yaml post /earn/redeem
 title: "Redeem"
 description: "Request for a base64-encoded unsigned earn redeem transaction to redeem shares"
+llmsDescription: "POST /earn/redeem endpoint of the Jupiter Lend API at api.jup.ag/lend/v1/earn/redeem. Builds a base64-encoded unsigned transaction that redeems an exact number of jlToken shares for the underlying asset. Body: asset, signer, shares. Returns transaction. To withdraw by asset amount instead, use /earn/withdraw."
 ---

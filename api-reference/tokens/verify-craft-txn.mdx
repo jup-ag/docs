@@ -2,4 +2,5 @@
 openapi: /openapi-spec/tokens/v2/verification.yaml get /express/craft-txn
 title: "Craft Transaction"
 description: "Craft an unsigned 1000 JUP payment transaction for express verification"
+llmsDescription: "GET /verify/express/craft-txn endpoint of the Jupiter Tokens API V2 at api.jup.ag/tokens/v2/verify/express/craft-txn. Step 2 of express token verification: builds the unsigned payment transaction worth 1000 JUP. Required param: senderAddress; optional paymentCurrency (JUP transfers directly; SOL, USDC and JUPUSD craft a swap to 1000 JUP). Returns transaction, requestId (needed by the execute step), receiverAddress, mint, amount, tokenUsdRate, fee fields and expireAt."
 ---

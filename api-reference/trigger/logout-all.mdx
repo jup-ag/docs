@@ -1,5 +1,6 @@
 ---
 title: "Log Out All"
 description: "Revoke every session for the wallet"
+llmsDescription: "POST /auth/logout-all endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/auth/logout-all. Invalidates every refresh token issued for the authenticated wallet, forcing all devices to re-authenticate. Requires the access token as a Bearer credential. Returns success. Access tokens already issued stay valid until they expire."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /auth/logout-all
 ---

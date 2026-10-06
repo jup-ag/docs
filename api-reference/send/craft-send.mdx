@@ -2,4 +2,5 @@
 openapi: /openapi-spec/send/send.yaml post /craft-send
 title: "Craft Send"
 description: "Request for a base64-encoded unsigned Send transaction"
+llmsDescription: "POST /craft-send endpoint of the Jupiter Send API at api.jup.ag/send/v1/craft-send. Builds a base64-encoded unsigned transaction that locks tokens into a Send invite the recipient claims with a link. Body: inviteSigner (the invite keypair public key), sender, amount, optional mint (defaults to SOL). Returns tx, expiry and totalFeeLamports."
 ---

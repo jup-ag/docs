@@ -1,5 +1,6 @@
 ---
 title: "Create DCA Order"
 description: "Create a recurring dollar-cost averaging order"
+llmsDescription: "POST /orders/dca endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/orders/dca. Creates a dollar-cost averaging order that splits one deposit into orderCount equal rounds executed every intervalSeconds. Body: depositRequestId and depositSignedTx from /deposit/craft (crafted with orderType dca), userPubkey, inputMint, outputMint, inputAmount, orderCount, intervalSeconds, plus optional minPriceUsd, maxPriceUsd, triggerMint, beginFillAt, jlEnabled, jlMint. Call the path with no trailing slash. Returns id and txSignature."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /orders/dca
 ---

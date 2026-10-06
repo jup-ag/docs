@@ -2,5 +2,6 @@
 title: "Cancel Order (Trigger API)"
 sidebarTitle: "Cancel Order"
 description: "Cancel a pending trigger order"
+llmsDescription: "POST /orders/price/cancel/{orderId} endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/orders/price/cancel/{orderId}. Step 1 of the two-step cancellation of a price order: returns an unsigned withdrawal transaction (id, transaction, requestId). Sign it and submit it with POST /orders/price/confirm-cancel/{orderId} to get the funds back."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /orders/price/cancel/{orderId}
 ---

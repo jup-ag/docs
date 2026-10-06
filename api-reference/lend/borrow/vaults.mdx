@@ -2,4 +2,5 @@
 openapi: /openapi-spec/lend/borrow.yaml get /borrow/vaults
 title: "Vaults"
 description: "Request all borrow vaults with their configuration, rates, and liquidity"
+llmsDescription: "GET /borrow/vaults endpoint of the Jupiter Lend Borrow API at api.jup.ag/lend/v1/borrow/vaults. Lists the whitelisted borrow vaults of a market, each with id, address, supplyToken (collateral), borrowToken (debt), totalSupply and totalSupplyLiquidity. Optional params: market, rpcUrl. Use the vault id in /borrow/operate."
 ---

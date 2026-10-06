@@ -41,6 +41,10 @@ The estimated compute unit price tracks recent network priority fees. When recen
 
 Decode the compute unit price from the `setComputeUnitPrice` instruction in `computeBudgetInstructions` and clamp it to your own maximum. The instruction data is base64: a 1-byte discriminator (`3` for `setComputeUnitPrice`) followed by the price as a little-endian u64 in micro-lamports.
 
+<Note>
+On [transaction v1](/swap/advanced/transaction-versions), `computeBudgetInstructions` is empty, so this loop is a no-op. The price comes back in the `computeUnitPrice` field instead: clamp that value before converting it to `priorityFeeLamports`.
+</Note>
+
 ```typescript
 const COMPUTE_BUDGET_PROGRAM = 'ComputeBudget111111111111111111111111111111';
 const MAX_CUP_MICRO_LAMPORTS = 10_000_000n; // set your own maximum

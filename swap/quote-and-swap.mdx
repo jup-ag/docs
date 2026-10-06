@@ -1,7 +1,7 @@
 ---
 title: "Quote and Swap"
 description: "Separated quote and swap flow for integrators that need to roundtrip a quote"
-llmsDescription: "Two-step Swap API flow at api.jup.ag/swap/v2: GET /swap/v2/quote returns a QuoteResponse, POST /swap/v2/swap returns a base64 unsigned VersionedTransaction built from that quote, POST /swap/v2/swap-instructions returns raw instructions plus address lookup tables built from that quote. All three require an x-api-key header and are served only on api.jup.ag (not on lite-api.jup.ag). The compute-unit limit is pinned at 1,400,000 with no per-route simulation. The wSOL token account is closed when wrapAndUnwrapSol=true with rent returned to the taker, not the payer (different from /order). tipAmount transfers SOL to a randomly chosen receiver from a fixed allowlist of Jupiter authorities. Includes runnable TypeScript examples in both @solana/kit and @solana/web3.js for the quote-then-swap flow."
+llmsDescription: "Two-step Swap API flow at api.jup.ag/swap/v2: GET /swap/v2/quote returns a QuoteResponse, POST /swap/v2/swap returns a base64 unsigned VersionedTransaction built from that quote, POST /swap/v2/swap-instructions returns raw instructions plus address lookup tables built from that quote. All three require an x-api-key header and are served only on api.jup.ag (not on lite-api.jup.ag). The compute-unit limit is pinned at 1,400,000 with no per-route simulation. The wSOL token account is closed when wrapAndUnwrapSol=true with rent returned to the taker, not the payer (different from /order). tipAmount transfers SOL to a randomly chosen receiver from a fixed allowlist of Jupiter authorities. Pass transactionVersion='1' on /quote to route for a Solana v1 transaction: /swap then returns a v1 swapTransaction and /swap-instructions returns the compute budget (computeUnitLimit, computeUnitPrice, loadedAccountsDataSizeLimit) as fields with empty computeBudgetInstructions and no lookup tables; v1 requires @solana/kit v8 or later to deserialize and sign. Includes runnable TypeScript examples in both @solana/kit and @solana/web3.js for the quote-then-swap flow."
 hidden: true
 ---
 
@@ -48,6 +48,7 @@ GET https://api.jup.ag/swap/v2/quote
 | `platformFeeBps`                | `number`  | No       | Platform fee in basis points (0–10000). The matching `feeAccount` must be supplied at swap time                            |
 | `useIncurredSlippageForQuoting` | `boolean` | No       | Enables Metis's incurred-slippage adjustment. Internal data shows ~0.4–0.8 bps better quotes when enabled. Defaults to `false`; pass `true` to opt in |
 | `dynamicSwap`                   | `boolean` | No       | Allow split routing across multiple candidate AMMs. Defaults to `true`. Pass `false` to opt out                            |
+| `transactionVersion`            | `string`  | No       | Solana transaction version to route for, `"0"` or `"1"`. Defaults to `"0"`. `"1"` builds a [v1 transaction](/swap/advanced/transaction-versions) (no lookup tables, compute budget on the message config) at `/swap` and `/swap-instructions`. The value is echoed on the response and carried through when you forward the quote |
 
 ### Response
 
@@ -67,6 +68,7 @@ A `QuoteResponse` object. The documented fields are below; additional fields are
 | `timeTaken`            | `number`  | Routing latency in seconds                                                   |
 | `routePlan`            | `array`   | Per-step route information                                                   |
 | `platformFee`          | `object`  | `{ amount, feeBps }`. Present only when `platformFeeBps` was set on `/quote` |
+| `transactionVersion`   | `number`  | The version this quote was routed for, `0` or `1`. Preserved when forwarding the quote to `/swap` or `/swap-instructions` |
 
 ### Errors
 
@@ -99,11 +101,16 @@ POST https://api.jup.ag/swap/v2/swap-instructions
 | `tipAmount`                  | `string`                                                          | No       | Lamports to transfer to a permitted tip receiver via an included tip instruction. **Minimum is `1000000` lamports (0.001 SOL).** The receiver is randomly selected per request from a fixed set of Jupiter authority addresses (see [Tip receivers](#tip-receivers)). Paid by `payer` (or `taker`) |
 | `computeUnitPricePercentile` | `"medium"` &#124; `"high"` &#124; `"veryHigh"` &#124; `number`    | No       | Named level or integer (0–10000 bps) that controls the `setComputeUnitPrice` instruction. Named levels map to `"medium"`=2500, `"high"`=5000, `"veryHigh"`=7500. Defaults to **5000 bps (50th percentile)** when omitted |
 
+### Transaction version
+
+The version is chosen on `/quote` with `transactionVersion` and carried through on the `QuoteResponse`. `/swap` and `/swap-instructions` build for the version the quote carries, so you do not set it again here. When the quote is v1, `/swap` returns a v1 `swapTransaction` and `/swap-instructions` returns the compute budget as fields rather than instructions, with no lookup tables. Deserialize and sign v1 transactions with `@solana/kit` v8 or later. See [Transaction Versions](/swap/advanced/transaction-versions).
+
 ### /swap response
 
 | Field                       | Type     | Description                                                            |
 |-----------------------------|----------|------------------------------------------------------------------------|
-| `swapTransaction`           | `string` | Base64-encoded serialised unsigned `VersionedTransaction` (v0)         |
+| `swapTransaction`           | `string` | Base64-encoded serialised unsigned `VersionedTransaction`, in the quote's `transactionVersion` (v0 by default, v1 when the quote was routed with `transactionVersion=1`) |
+| `transactionVersion`        | `number` | The message version of `swapTransaction`, `0` or `1`. Build and sign v1 with `@solana/kit` v8 or later (`@solana/web3.js` v1 cannot sign v1) |
 | `lastValidBlockHeight`      | `number` | Last block height at which the included blockhash is valid             |
 | `prioritizationFeeLamports` | `number` | Compute-unit price multiplied by the pinned compute-unit limit of 1,400,000 (see the [Compute unit limit](#compute-unit-limit) note) |
 | `computeUnitPrice`          | `string` | Resolved compute-unit price, in micro-lamports                         |
@@ -112,13 +119,17 @@ POST https://api.jup.ag/swap/v2/swap-instructions
 
 | Field                              | Type                      | Description                                                                                                       |
 |------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------|
-| `computeBudgetInstructions`        | `Instruction[]`           | Includes `SetComputeUnitLimit(1_400_000)` and `SetComputeUnitPrice(...)`. See the [Compute unit limit](#compute-unit-limit) note          |
+| `computeBudgetInstructions`        | `Instruction[]`           | Includes `SetComputeUnitLimit(1_400_000)` and `SetComputeUnitPrice(...)`. See the [Compute unit limit](#compute-unit-limit) note. **Empty when `transactionVersion` is `1`**: use the `computeUnitLimit`, `computeUnitPrice`, and `loadedAccountsDataSizeLimit` fields below on the message config instead |
 | `setupInstructions`                | `Instruction[]`           | Setup (e.g. create-ATA, wrap-SOL) that must precede the swap                                                      |
 | `swapInstruction`                  | `Instruction`             | The swap instruction itself                                                                                       |
 | `cleanupInstruction`               | `Instruction \| null`     | Cleanup (e.g. unwrap-SOL) that must follow the swap                                                                |
 | `otherInstructions`                | `Instruction[]`           | Additional instructions required by the route                                                                     |
 | `tipInstruction`                   | `Instruction \| null`     | Present when `tipAmount` was supplied. Transfers SOL from `payer` (or `taker`) to a randomly chosen receiver from the [Tip receivers](#tip-receivers) allowlist |
-| `addressesByLookupTableAddress`    | `Record<string, string[]>`| Address Lookup Tables required to compile the v0 transaction (table address → contained addresses)                 |
+| `addressesByLookupTableAddress`    | `Record<string, string[]>`| Address Lookup Tables required to compile the v0 transaction (table address → contained addresses). **`{}` when `transactionVersion` is `1`** (v1 inlines accounts, no lookup tables) |
+| `transactionVersion`               | `number`                  | The version these instructions are for, `0` or `1`                                                                 |
+| `computeUnitLimit`                 | `number`                  | Present when `transactionVersion` is `1`. Compute unit limit to set on the message config                          |
+| `computeUnitPrice`                 | `string`                  | Present when `transactionVersion` is `1`. Compute unit price in micro-lamports                                     |
+| `loadedAccountsDataSizeLimit`      | `number`                  | Present when `transactionVersion` is `1`. Loaded accounts data size limit in bytes (`67108864` = 64 MiB)           |
 | `blockhashWithMetadata.blockhash`  | `number[]`                | Recent blockhash as a byte array                                                                                  |
 | `blockhashWithMetadata.lastValidBlockHeight` | `number`        | Last block height at which the blockhash is valid                                                                 |
 

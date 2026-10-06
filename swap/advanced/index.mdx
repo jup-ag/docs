@@ -2,7 +2,7 @@
 title: "Advanced Swap Techniques"
 sidebarTitle: "Overview"
 description: "Advanced techniques for both /order and /build"
-llmsDescription: "Index of advanced techniques for Jupiter Swap API V2. Sub-pages cover: slippage estimation via RTSE (automatic on /order, opt-in on /build with slippageBps=rtse), gasless swaps (automatic and integrator payer on both /order and /build), compute unit estimation (/build), reducing transaction size (maxAccounts + removing no-op instructions), and reducing latency (fast mode on /build). Also notes that circular arbitrage routes are not supported and require the Metis binary."
+llmsDescription: "Index of advanced techniques for Jupiter Swap API V2. Sub-pages cover: slippage estimation via RTSE (automatic on /order, opt-in on /build with slippageBps=rtse), gasless swaps (automatic and integrator payer on both /order and /build), compute unit estimation (/build), reducing transaction size (maxAccounts + removing no-op instructions), requesting Solana transaction v1 (transactionVersion on /build, maxSupportedTransactionVersion on /order), and reducing latency (fast mode on /build). Also notes that circular arbitrage routes are not supported and require the Metis binary."
 ---
 
 <CardGroup cols={2}>
@@ -17,6 +17,9 @@ llmsDescription: "Index of advanced techniques for Jupiter Swap API V2. Sub-page
   </Card>
   <Card title="Reduce Transaction Size" icon="compress" href="/swap/advanced/reduce-transaction-size">
     Control account count and remove unnecessary instructions on `/build`.
+  </Card>
+  <Card title="Transaction Versions" icon="layer-group" href="/swap/advanced/transaction-versions">
+    Request Solana v1 transactions for larger routes without lookup tables.
   </Card>
   <Card title="Reduce Latency" icon="bolt" href="/swap/advanced/reduce-latency">
     Get faster swap quotes with fast mode on `/build`.

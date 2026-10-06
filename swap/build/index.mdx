@@ -1,7 +1,7 @@
 ---
 title: "Build"
 description: "Raw swap instructions with full transaction control via Metis onchain routing"
-llmsDescription: "How to use Jupiter's Router path via the GET /swap/v2/build endpoint to get raw swap instructions for building custom transactions. Uses Metis onchain routing only (no JupiterZ RFQ market makers). Returns computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions, tipInstruction, and address lookup tables. Integrators assemble their own transaction, add custom instructions (CPI, memo, SOL transfer, etc.), simulate for compute units, compile to v0 transaction, sign, and send via their own RPC or via /submit for Jupiter's transaction landing. Optional parameters include slippageBps (number or 'rtse' for RTSE), tipAmount (for /submit), mode='fast', maxAccounts, platformFeeBps, payer (gasless). /execute is not available for /build. No Jupiter swap fees. Full @solana/kit and @solana/web3.js TypeScript code examples included."
+llmsDescription: "How to use Jupiter's Router path via the GET /swap/v2/build endpoint to get raw swap instructions for building custom transactions. Uses Metis onchain routing only (no JupiterZ RFQ market makers). Returns computeBudgetInstructions, setupInstructions, swapInstruction, cleanupInstruction, otherInstructions, tipInstruction, and address lookup tables. Integrators assemble their own transaction, add custom instructions (CPI, memo, SOL transfer, etc.), simulate for compute units, compile to v0 transaction, sign, and send via their own RPC or via /submit for Jupiter's transaction landing. Optional parameters include slippageBps (number or 'rtse' for RTSE), tipAmount (for /submit), mode='fast', maxAccounts, platformFeeBps, payer (gasless), and transactionVersion ('0' or '1'; '1' returns Solana v1 instructions with no lookup tables and the compute budget as response fields). /execute is not available for /build. No Jupiter swap fees. Full @solana/kit and @solana/web3.js TypeScript code examples included."
 ---
 
 The Router path uses the `/build` endpoint to return raw swap instructions instead of an assembled transaction. Routing is handled by Metis, Jupiter's onchain routing engine, which finds the best path across Solana DEXes.
@@ -550,13 +550,15 @@ console.log("Confirmed:", signature);
 
 | Field | Description |
 | --- | --- |
-| `computeBudgetInstructions` | Compute unit price instruction (does not include compute unit limit) |
+| `computeBudgetInstructions` | Compute unit price instruction (does not include compute unit limit). **Empty when `transactionVersion` is `"1"`**: use `computeUnitPrice` on the message config instead |
 | `setupInstructions` | Pre-swap setup (e.g. ATA creation) |
 | `swapInstruction` | The main swap instruction |
 | `cleanupInstruction` | Post-swap cleanup (may be null) |
 | `otherInstructions` | Additional instructions |
 | `tipInstruction` | SOL tip transfer instruction (present when `tipAmount` is provided) |
-| `addressesByLookupTableAddress` | Address lookup tables for v0 transactions |
+| `addressesByLookupTableAddress` | Address lookup tables for v0 transactions. **`{}` when `transactionVersion` is `"1"`** (v1 inlines accounts, no lookup tables) |
+| `transactionVersion` | The version these instructions are for, `0` or `1` |
+| `computeUnitPrice` | Present when `transactionVersion` is `"1"`. Compute unit price in micro-lamports, to set on the message config |
 | `blockhashWithMetadata` | Recent blockhash and expiry height |
 
 Each instruction follows this structure:
@@ -596,9 +598,11 @@ Both code examples above demonstrate this: simulate with max CU limit, then rebu
 
 Validate the compute unit price from the response before signing. The estimate tracks recent network priority fees and can spike when recent blocks contain transactions bidding extreme values. See [Cap the compute unit price](/swap/advanced/compute-units#cap-the-compute-unit-price) for a decode-and-clamp snippet.
 
-### 4. Build a v0 transaction
+### 4. Build the transaction
 
-The response includes address lookup tables in `addressesByLookupTableAddress`. Use these to compile a v0 (versioned) transaction, which supports more accounts than legacy transactions.
+By default `/build` returns v0 instructions. The response includes address lookup tables in `addressesByLookupTableAddress`; use these to compile a v0 (versioned) transaction, which supports more accounts than legacy transactions.
+
+Pass `transactionVersion=1` to build a [Solana v1 transaction](/swap/advanced/transaction-versions) instead. v1 raises the size limit to 4096 bytes and inlines accounts without lookup tables, so `addressesByLookupTableAddress` is `{}` and `computeBudgetInstructions` is empty. Set the compute budget (including the returned `computeUnitPrice`) on the message config, and build with a v1-capable SDK (`@solana/kit` v8 or later). If an end-user wallet signs the transaction, confirm it supports v1 first: not all wallet extensions do, and signing fails otherwise. See [Transaction Versions](/swap/advanced/transaction-versions) for a full v1 example.
 
 ### 5. Sign and send
 
@@ -639,6 +643,7 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 | `nativeDestinationAccount` | - | Native SOL account for output |
 | `blockhashSlotsToExpiry` | 150 | Slots until blockhash expires (1-300) |
 | `forJitoBundle` | false | Exclude DEXes incompatible with Jito bundles |
+| `transactionVersion` | `"0"` | Solana transaction version to build for, `"0"` or `"1"`. `"1"` returns v1 instructions: no lookup tables, and the compute budget as response fields instead of instructions. See [Transaction Versions](/swap/advanced/transaction-versions) |
 
 For the full parameter reference, see the [API reference](/api-reference/swap).
 

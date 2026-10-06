@@ -278,6 +278,17 @@ paths:
             - For example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
             - Labels are case sensitive (`SolFi`, not `solfi`). Full list of DEXes here using the `/program-id-to-label` endpoint.
             - On `/order` only `excludeDexes` is honoured, not `dexes`. Use `/build` to restrict routing to specific DEXes.
+        - name: maxSupportedTransactionVersion
+          in: query
+          schema:
+            type: string
+            enum: ["0", "1"]
+            default: "0"
+          description: |
+            - The highest Solana transaction version your client can accept, `"0"` or `"1"`. Defaults to `"0"`.
+            - This is a ceiling, not a force. You get v1 only when Metis wins the route and the order is not gasless; other routers and gasless orders (including automatic sponsorship for low-SOL takers) return v0. Wider v1 support is in progress.
+            - Read the response `transactionVersion` to see the version you got. v1 transactions must be deserialized and signed with a v1-capable SDK (`@solana/kit` v8 or later).
+          example: "1"
       responses:
         "200":
           description: Quote with optional assembled transaction
@@ -356,6 +367,11 @@ paths:
                     type: string
                     enum: [metis, jupiterz, dflow, okx]
                     description: Which router won the quote
+                  transactionVersion:
+                    type: number
+                    enum: [0, 1]
+                    description: |
+                      The Solana message version of `transaction`, `0` or `1`. With `maxSupportedTransactionVersion=1` this is `1` only when Metis wins the route and the order is not gasless, and `0` otherwise (other routers, and gasless orders including automatic sponsorship).
                   transaction:
                     type: string
                     nullable: true
@@ -545,6 +561,16 @@ paths:
           description: |
             Set to `true` if the transaction will be submitted as part of a Jito bundle.
             This excludes DEXes that are incompatible with Jito bundles.
+        - name: transactionVersion
+          in: query
+          schema:
+            type: string
+            enum: ["0", "1"]
+            default: "0"
+          description: |
+            The Solana transaction version to build for, `"0"` or `"1"`. Defaults to `"0"`.
+            `"1"` returns v1 instructions: `computeBudgetInstructions` is empty and `addressesByLookupTableAddress` is `{}` (v1 inlines accounts, no lookup tables). Set the compute budget, including the returned `computeUnitPrice`, on the message config. Build with a v1-capable SDK (`@solana/kit` v8 or later).
+          example: "1"
       responses:
         "200":
           description: Quote with raw swap instructions
@@ -579,7 +605,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Instruction"
-                    description: Compute unit price instruction (does not include compute unit limit)
+                    description: Compute unit price instruction (does not include compute unit limit). Empty when transactionVersion is "1"; use computeUnitPrice on the message config instead.
                   setupInstructions:
                     type: array
                     items:
@@ -606,7 +632,14 @@ paths:
                       items:
                         type: string
                     nullable: true
-                    description: Address lookup table mappings for v0 transactions
+                    description: Address lookup table mappings for v0 transactions. Empty object ({}) when transactionVersion is "1" (v1 inlines accounts, no lookup tables).
+                  transactionVersion:
+                    type: number
+                    enum: [0, 1]
+                    description: The Solana transaction version these instructions are for, 0 or 1, matching the transactionVersion request parameter.
+                  computeUnitPrice:
+                    type: string
+                    description: Present when transactionVersion is "1". Compute unit price in micro-lamports, to set on the message config.
                   blockhashWithMetadata:
                     type: object
                     properties:

@@ -1,10 +1,14 @@
 ---
 title: "Reduce Transaction Size"
 description: "Control account count and remove unnecessary instructions"
-llmsDescription: "How to reduce transaction size on Jupiter Swap API V2 /build. Two techniques: maxAccounts parameter (1-64, default 64) to limit the number of accounts in the swap route, and removing no-op createAssociatedTokenAccountIdempotent instructions from setupInstructions when the token accounts already exist. Both free up space for custom instructions and help avoid the 1232-byte transaction size limit."
+llmsDescription: "How to reduce transaction size on Jupiter Swap API V2 /build. Two techniques: maxAccounts parameter (1-64, default 64) to limit the number of accounts in the swap route, and removing no-op createAssociatedTokenAccountIdempotent instructions from setupInstructions when the token accounts already exist. Both free up space for custom instructions and help avoid the 1232-byte transaction size limit. Alternatively, request a Solana v1 transaction (transactionVersion=1) to raise the limit to 4096 bytes and inline accounts without lookup tables."
 ---
 
 When building custom transactions with `/build`, you may hit the 1232-byte transaction size limit, especially when adding custom instructions alongside the swap. Two techniques help.
+
+<Tip>
+Requesting a [Solana v1 transaction](/swap/advanced/transaction-versions) (`transactionVersion=1`) raises the size limit to 4096 bytes and inlines up to 64 accounts without Address Lookup Tables. If your constraint is size, v1 is often the simpler fix than the techniques below.
+</Tip>
 
 ## Limit accounts with `maxAccounts`
 

@@ -110,7 +110,7 @@ The version is chosen on `/quote` with `transactionVersion` and carried through 
 | Field                       | Type     | Description                                                            |
 |-----------------------------|----------|------------------------------------------------------------------------|
 | `swapTransaction`           | `string` | Base64-encoded serialised unsigned `VersionedTransaction`, in the quote's `transactionVersion` (v0 by default, v1 when the quote was routed with `transactionVersion=1`) |
-| `transactionVersion`        | `number` | The message version of `swapTransaction`, `0` or `1`. Deserialize a v1 transaction with `@solana/kit` v8 or later (`@solana/web3.js` v1 cannot read v1) |
+| `transactionVersion`        | `number` | The message version of `swapTransaction`, `0` or `1`. Build and sign v1 with `@solana/kit` v8 or later (`@solana/web3.js` v1 cannot sign v1) |
 | `lastValidBlockHeight`      | `number` | Last block height at which the included blockhash is valid             |
 | `prioritizationFeeLamports` | `number` | Compute-unit price multiplied by the pinned compute-unit limit of 1,400,000 (see the [Compute unit limit](#compute-unit-limit) note) |
 | `computeUnitPrice`          | `string` | Resolved compute-unit price, in micro-lamports                         |

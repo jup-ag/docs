@@ -286,7 +286,7 @@ paths:
             default: "0"
           description: |
             - The highest Solana transaction version your client can accept, `"0"` or `"1"`. Defaults to `"0"`.
-            - This is a ceiling, not a force. JupiterZ RFQ transactions are always v0, so an RFQ win returns a v0 transaction even with `"1"`.
+            - This is a ceiling, not a force. You get v1 only when Metis wins the route and the order is not gasless; other routers and gasless orders (including automatic sponsorship for low-SOL takers) return v0. Wider v1 support is in progress.
             - Read the response `transactionVersion` to see the version you got. v1 transactions must be deserialized and signed with a v1-capable SDK (`@solana/kit` v8 or later).
           example: "1"
       responses:
@@ -371,7 +371,7 @@ paths:
                     type: number
                     enum: [0, 1]
                     description: |
-                      The Solana message version of `transaction`, `0` or `1`. With `maxSupportedTransactionVersion=1`, aggregator wins (Metis, Dflow, OKX) return `1` and JupiterZ RFQ wins return `0`.
+                      The Solana message version of `transaction`, `0` or `1`. With `maxSupportedTransactionVersion=1` this is `1` only when Metis wins the route and the order is not gasless, and `0` otherwise (other routers, and gasless orders including automatic sponsorship).
                   transaction:
                     type: string
                     nullable: true

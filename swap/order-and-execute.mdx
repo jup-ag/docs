@@ -1,7 +1,7 @@
 ---
 title: "Order & Execute"
 description: "Best price across all routers with managed transaction landing"
-llmsDescription: "How to perform a swap using Jupiter's Meta-Aggregator path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routing engines compete for best price (Metis onchain routing, JupiterZ RFQ market makers, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter's proprietary landing pipeline, with confirmation polling and retry. Includes routing impact matrix showing which optional parameters disable which routers, order mode (ultra vs manual), fee documentation (Jupiter platform fee breakdown by token pair, fee mint priority, referral fee setup with code examples), the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer, and maxSupportedTransactionVersion to accept Solana v1 transactions as a ceiling: aggregator wins return v1, JupiterZ RFQ wins stay v0, read the response transactionVersion), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types."
+llmsDescription: "How to perform a swap using Jupiter's Meta-Aggregator path: GET /swap/v2/order to get a quote and assembled transaction, sign it, and POST /swap/v2/execute for managed transaction landing. All routing engines compete for best price (Metis onchain routing, JupiterZ RFQ market makers, Dflow, OKX). RTSE (Real-Time Slippage Estimator) is applied automatically at order time. /execute handles landing via Jupiter's proprietary landing pipeline, with confirmation polling and retry. Includes routing impact matrix showing which optional parameters disable which routers, order mode (ultra vs manual), fee documentation (Jupiter platform fee breakdown by token pair, fee mint priority, referral fee setup with code examples), the minimal happy path, full request/response shapes, optional parameters (slippageBps, referralAccount, gasless payer, and maxSupportedTransactionVersion to accept Solana v1 transactions as a ceiling: v1 only when Metis wins and the order is not gasless, v0 otherwise, read the response transactionVersion), and complete @solana/kit and @solana/web3.js TypeScript code examples. Error codes documented for both aggregator and RFQ swap types."
 ---
 
 The Meta-Aggregator is the recommended way to swap on Jupiter. All routing engines compete for the best price (Metis, JupiterZ RFQ, Dflow, OKX), and Jupiter handles transaction landing for you via `/order` + `/execute`.
@@ -295,7 +295,7 @@ if (result.status === "Success") {
 | `amount` | Amount in the smallest unit of the input token |
 | `taker` | Your wallet address. Required to receive an assembled transaction.<br/>Without `taker`, you get a quote but no transaction. This is useful for price checks. |
 
-To accept a [Solana v1 transaction](/swap/advanced/transaction-versions), pass `maxSupportedTransactionVersion=1` (`"0"` or `"1"`, default `"0"`). This is a **ceiling, not a force**: it is the highest version your client can handle. JupiterZ RFQ transactions are always v0, so an RFQ win returns v0 even with `maxSupportedTransactionVersion=1`. Read the response `transactionVersion` to see what you got, and deserialize accordingly. `/execute` lands either version.
+To accept a [Solana v1 transaction](/swap/advanced/transaction-versions), pass `maxSupportedTransactionVersion=1` (`"0"` or `"1"`, default `"0"`). This is a **ceiling, not a force**: you get v1 only when Metis wins the route and the order is not gasless. Other routers and gasless orders (including automatic sponsorship for low-SOL takers) return v0, and wider v1 support is in progress. Read the response `transactionVersion` to see what you got, and deserialize accordingly. `/execute` lands either version.
 
 **Key response fields:**
 
@@ -305,7 +305,7 @@ To accept a [Solana v1 transaction](/swap/advanced/transaction-versions), pass `
 | `requestId` | Pass this to `/execute`. |
 | `outAmount` | Expected output amount before slippage. |
 | `router` | Which router won the quote (`metis`, `jupiterz`, `dflow`, `okx`). |
-| `transactionVersion` | The message version of `transaction`, `0` or `1`. With `maxSupportedTransactionVersion=1` this is `1` on aggregator wins and `0` on RFQ wins. |
+| `transactionVersion` | The message version of `transaction`, `0` or `1`. With `maxSupportedTransactionVersion=1` this is `1` only when Metis wins and the order is not gasless, and `0` otherwise. |
 | `mode` | "ultra" (no optional params) or "manual" (optional params used). |
 | `errorCode` | Present when `transaction` is `""`. Match on `router` + `errorCode`. See [/order error codes](#order-error-codes). |
 | `errorMessage` | Present when `transaction` is `""`. Human-readable description. Do not match on this string, it may be parameterised. |
@@ -333,7 +333,7 @@ These are guidelines, not guarantees of execution. Prices can move against you e
 
 ### 2. Sign the transaction
 
-- The transaction returned by `/order` is unsigned. Sign it with your wallet's private key. The example above uses `@solana/kit`. The transaction is a versioned transaction, v0 by default or v1 when you request it with `maxSupportedTransactionVersion=1` (check the response `transactionVersion`). Deserializing and signing a v1 transaction needs `@solana/kit` v8 or later; `@solana/web3.js` v1 cannot read v1 transactions. Not all wallet extensions can sign v1 transactions yet, so request `maxSupportedTransactionVersion=1` only for wallets you have confirmed support v1, otherwise signing fails. See [Transaction Versions](/swap/advanced/transaction-versions).
+- The transaction returned by `/order` is unsigned. Sign it with your wallet's private key. The example above uses `@solana/kit`. The transaction is a versioned transaction, v0 by default or v1 when you request it with `maxSupportedTransactionVersion=1` (check the response `transactionVersion`). Build and sign v1 with `@solana/kit` v8 or later (`@solana/web3.js` v1 cannot sign v1). Not all wallet extensions can sign v1 yet, so request `maxSupportedTransactionVersion=1` only for wallets you have confirmed support it, otherwise signing fails. See [Transaction Versions](/swap/advanced/transaction-versions).
 - Note: we use the `partiallySignTransaction` for partial signing because when JupiterZ routing is provided, there is an additional signer which is the MM that will be required after sending the transaction to `/execute` request.
 
 ### 3. Execute the transaction

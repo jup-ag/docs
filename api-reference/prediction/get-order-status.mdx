@@ -2,4 +2,5 @@
 openapi: /openapi-spec/prediction/prediction.yaml get /orders/status/{orderPubkey}
 title: "Get Order Status"
 description: "Get the latest status and history for an order"
+llmsDescription: "GET /orders/status/{orderPubkey} endpoint of the Jupiter Prediction Market API at api.jup.ag/prediction/v1/orders/status/{orderPubkey}. Returns the latest status of an order with its event history: status, latestEventType, latestSignature, externalOrderId, orderId, history. Poll it after /execute to track the fill."
 ---

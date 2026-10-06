@@ -2,4 +2,5 @@
 openapi: /openapi-spec/lend/lend.yaml post /earn/mint
 title: "Mint"
 description: "Request for a base64-encoded unsigned earn mint transaction to mint shares"
+llmsDescription: "POST /earn/mint endpoint of the Jupiter Lend API at api.jup.ag/lend/v1/earn/mint. Builds a base64-encoded unsigned transaction that mints an exact number of jlToken shares, depositing whatever amount of the underlying asset that requires. Body: asset, signer, shares. Returns transaction. To deposit by asset amount instead, use /earn/deposit."
 ---

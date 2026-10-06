@@ -3,4 +3,5 @@ openapi: /openapi-spec/prediction/prediction.yaml post /orders
 title: "Create Order (Prediction API)"
 sidebarTitle: "Create Order"
 description: "Request an unsigned transaction to create a new order"
+llmsDescription: "POST /orders endpoint of the Jupiter Prediction Market API at api.jup.ag/prediction/v1/orders. Builds an unsigned transaction that buys or sells YES or NO contracts on a market. Body: isBuy (required), ownerPubkey, marketId or positionPubkey, isYes, size as contracts, contractsMicro or contractsDecimal, optional depositAmount and depositMint. Returns transaction, txMeta, externalOrderId, requiredSigners, execution (with the context to pass to /execute), executionModel, settlement, jupiterSwapRequestId and order. Sign the transaction, then submit it with POST /execute."
 ---

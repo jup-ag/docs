@@ -2,4 +2,5 @@
 openapi: /openapi-spec/tokens/v2/verification.yaml get /express/check-eligibility
 title: "Check Eligibility"
 description: "Check if a token is eligible for express verification and metadata updates"
+llmsDescription: "GET /verify/express/check-eligibility endpoint of the Jupiter Tokens API V2 at api.jup.ag/tokens/v2/verify/express/check-eligibility. Step 1 of express token verification: checks whether a token can be verified and whether its metadata can be updated. Required param: tokenId (mint). Returns tokenExists, isVerified, canVerify, canMetadata, verificationError, metadataError. If canVerify and canMetadata are both false, any submission is rejected before payment."
 ---

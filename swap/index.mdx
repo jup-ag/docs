@@ -26,11 +26,12 @@ Wallets, trading bots, AI agents, exchanges and payment apps integrate it throug
 
 Get a quote for 0.1 SOL to USDC. No API key and no wallet are needed for a quote:
 
-```bash
+<CodeGroup>
+```bash Request
 curl "https://api.jup.ag/swap/v2/order?inputMint=So11111111111111111111111111111111111111112&outputMint=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&amount=100000000"
 ```
 
-```json
+```json Response (quote only)
 {
   "router": "jupiterz",
   "inAmount": "100000000",
@@ -39,35 +40,69 @@ curl "https://api.jup.ag/swap/v2/order?inputMint=So11111111111111111111111111111
   "transaction": null
 }
 ```
+</CodeGroup>
 
 Without `taker`, `/order` returns the quote only. Add `taker=<your wallet>` to receive the transaction, sign it, and POST it to `/execute`. The full flow with `@solana/kit` and `@solana/web3.js` examples is on [Order and Execute](/swap/order-and-execute).
 
-Keyless requests are limited to 0.5 requests per second. For production, pass an API key in the `x-api-key` header; see [Rate Limits](/portal/rate-limits).
+<Tip>
+Keyless requests are limited to 0.5 requests per second. For production, pass an API key in the `x-api-key` header. See [Rate Limits](/portal/rate-limits).
+</Tip>
 
 ## Why integrate the Swap API
 
-- **Best price by competition.** Metis, JupiterZ, Dflow and OKX compete on every `/order`. JupiterZ market makers often beat onchain routing by 5 to 20 bps on major pairs, and a self-learning mechanism sidelines underperforming sources.
-- **Managed execution.** `/execute` lands the transaction through Jupiter's landing pipeline, with slippage set by the Real-Time Slippage Estimator (RTSE), priority fees handled for you, and confirmation polling built in.
-- **Gasless swaps.** Users without SOL can still swap: Jupiter sponsors gas automatically on eligible trades, JupiterZ market makers pay fees on their quotes, or you sponsor gas with your own `payer`. See [Gasless Swaps](/swap/advanced/gasless).
-- **Full control when you need it.** `/build` returns raw instructions for CPI, custom instructions and your own landing pipeline, with no Jupiter swap fee.
-- **Transparent fees.** The platform fee depends on the token pair, from 0 bps on pegged assets and Jupiter tokens to 10 bps on most pairs, and every `/order` response shows `feeBps` and `feeMint`. See [Fees](/swap/order-and-execute#fees).
-- **The infrastructure behind jup.ag.** The same routing and landing serve Jupiter's own frontend.
+<CardGroup cols={2}>
+  <Card title="Best price by competition" icon="trophy">
+    Metis, JupiterZ, Dflow and OKX compete on every `/order`. JupiterZ market makers often beat onchain routing by 5 to 20 bps on major pairs, and a self-learning mechanism sidelines underperforming sources.
+  </Card>
+  <Card title="Managed execution" icon="rocket" href="/swap/order-and-execute#3-execute-the-transaction">
+    `/execute` lands the transaction through Jupiter's landing pipeline: slippage set by the Real-Time Slippage Estimator (RTSE), priority fees handled for you, confirmation polling built in.
+  </Card>
+  <Card title="Gasless swaps" icon="gas-pump" href="/swap/advanced/gasless">
+    Users without SOL can still swap. Jupiter sponsors gas automatically on eligible trades, JupiterZ market makers pay fees on their quotes, or you sponsor gas with your own `payer`.
+  </Card>
+  <Card title="Full control when you need it" icon="sliders" href="/swap/build">
+    `/build` returns raw instructions for CPI, custom instructions and your own landing pipeline, with no Jupiter swap fee.
+  </Card>
+  <Card title="Transparent fees" icon="receipt" href="/swap/order-and-execute#fees">
+    The platform fee depends on the token pair, from 0 bps on pegged assets and Jupiter tokens to 10 bps on most pairs. Every `/order` response shows `feeBps` and `feeMint`.
+  </Card>
+  <Card title="The infrastructure behind jup.ag" icon="server">
+    The same routing and landing serve Jupiter's own frontend. No RPC node, no onchain state and no transaction assembly on your side.
+  </Card>
+</CardGroup>
 
 ## How a swap works
 
-**Meta-Aggregator**
-
-1. `GET /order` with `inputMint`, `outputMint`, `amount` and `taker`. The response contains the quote, the winning `router`, a `requestId` and a base64 transaction.
-2. Sign the transaction with the taker's key. Sign promptly: RFQ quotes carry an `expireAt` and all quotes go stale as prices move.
-3. `POST /execute` with the signed transaction and the `requestId`. Jupiter lands it and returns the result and signature.
-
-**Router**
-
-1. `GET /build` with the same swap parameters. The response contains swap, setup and cleanup instructions, compute budget instructions and address lookup tables.
-2. Add your own instructions, simulate to set the compute unit limit, and compile a v0 transaction.
-3. Sign and send it through your own RPC, or through [`/submit`](/transaction/submit) with a SOL tip for Jupiter's landing pipeline.
-
-Step-by-step code for both flows: [Order and Execute](/swap/order-and-execute) and [Build](/swap/build).
+<Tabs>
+  <Tab title="Meta-Aggregator">
+    <Steps>
+      <Step title="Get an order">
+        `GET /order` with `inputMint`, `outputMint`, `amount` and `taker`. The response contains the quote, the winning `router`, a `requestId` and a base64 transaction.
+      </Step>
+      <Step title="Sign the transaction">
+        Sign with the taker's key, and sign promptly: RFQ quotes carry an `expireAt`, and every quote goes stale as prices move.
+      </Step>
+      <Step title="Execute">
+        `POST /execute` with the signed transaction and the `requestId`. Jupiter lands it and returns the result and signature.
+      </Step>
+    </Steps>
+    Full code with `@solana/kit` and `@solana/web3.js`: [Order and Execute](/swap/order-and-execute).
+  </Tab>
+  <Tab title="Router">
+    <Steps>
+      <Step title="Get the instructions">
+        `GET /build` with the same swap parameters. The response contains swap, setup and cleanup instructions, compute budget instructions and address lookup tables.
+      </Step>
+      <Step title="Assemble your transaction">
+        Add your own instructions, simulate to set the compute unit limit, and compile a v0 transaction.
+      </Step>
+      <Step title="Sign and send">
+        Send it through your own RPC, or through [`/submit`](/transaction/submit) with a SOL tip for Jupiter's landing pipeline.
+      </Step>
+    </Steps>
+    Full code: [Build](/swap/build).
+  </Tab>
+</Tabs>
 
 ## Choosing a path
 
@@ -122,11 +157,23 @@ Keyless requests work at 0.5 requests per second. Pass an API key in the `x-api-
 
 ## Typical integrations
 
-- **Wallets and trading terminals** use `/order` and `/execute` for the best price with managed landing, and [Jupiter Plugin](/tool-kits/plugin) when they want a drop-in swap widget instead of building the UI. See [How to Embed a Swap Widget in Your App](/guides/how-to-embed-a-swap-widget).
-- **Trading bots** use `/order` with a fixed `slippageBps` when they need deterministic behaviour, or `/build` when they need to control compute units and landing. See [Compute Units](/swap/advanced/compute-units) and [Reduce Latency](/swap/advanced/reduce-latency).
-- **AI agents** call the API keyless for prototyping, or through the [Jupiter CLI](/ai/cli) and [MCP server](/ai/mcp). Every page of these docs has a Markdown version at `.md`.
-- **Protocols and programs** compose swaps into their own transactions with `/build`, including CPI. See [Common instructions](/swap/build/common-instructions).
-- **Integrators earning fees** add a referral fee on `/order` or a platform fee on `/build`. See [Referral Program](/tool-kits/referral-program).
+<CardGroup cols={2}>
+  <Card title="Wallets and trading terminals" icon="wallet" href="/guides/how-to-embed-a-swap-widget">
+    `/order` and `/execute` for the best price with managed landing, or [Jupiter Plugin](/tool-kits/plugin) for a drop-in swap widget.
+  </Card>
+  <Card title="Trading bots" icon="robot" href="/swap/advanced/reduce-latency">
+    `/order` with a fixed `slippageBps` for deterministic behaviour, or `/build` to control [compute units](/swap/advanced/compute-units) and landing.
+  </Card>
+  <Card title="AI agents" icon="wand-magic-sparkles" href="/ai/cli">
+    Keyless calls for prototyping, the Jupiter CLI, the [MCP server](/ai/mcp), and a Markdown version of every page at `.md`.
+  </Card>
+  <Card title="Protocols and programs" icon="code" href="/swap/build/common-instructions">
+    Compose swaps into your own transactions with `/build`, including CPI.
+  </Card>
+  <Card title="Integrators earning fees" icon="hand-holding-dollar" href="/tool-kits/referral-program">
+    A referral fee on `/order` or a platform fee on `/build`.
+  </Card>
+</CardGroup>
 
 ## Migrating from Ultra or Swap API V1
 

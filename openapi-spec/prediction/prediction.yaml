@@ -678,8 +678,10 @@ components:
           description: Required for sells
         isYes:
           type: boolean
+          description: "`true` to trade YES contracts, `false` for NO."
         isBuy:
           type: boolean
+          description: "`true` to buy contracts, `false` to sell."
         contracts:
           anyOf:
             - type: string
@@ -1289,6 +1291,9 @@ paths:
     get:
       tags:
         - Events
+      summary: Search events
+      description: >-
+        Full-text search of prediction events by title. Returns the matching events with pagination. Use `provider=bisonfi` for Jupiter Forecast markets.
       parameters:
         - schema:
             type: string
@@ -1316,6 +1321,7 @@ paths:
             minimum: 1
             maximum: 20
           required: false
+          description: "Maximum number of events to return, 1 to 20."
           name: limit
           in: query
       responses:
@@ -1338,6 +1344,9 @@ paths:
     get:
       tags:
         - Events
+      summary: List events
+      description: >-
+        Paginated list of prediction events, each holding one or more binary YES/NO markets. Filter by provider, category, subcategory, tags and status (`filter`), sort by volume or start time, and set `includeMarkets=true` to nest each event's markets in the response. Paginate with the `start` and `end` indexes.
       parameters:
         - schema:
             type: string
@@ -1355,6 +1364,7 @@ paths:
             type: boolean
             nullable: true
           required: false
+          description: "Set to `true` to nest each event's markets in the response."
           name: includeMarkets
           in: query
         - schema:
@@ -1368,6 +1378,7 @@ paths:
             nullable: true
             minimum: 0
           required: false
+          description: "Pagination start index of the page to return."
           name: start
           in: query
         - schema:
@@ -1375,6 +1386,7 @@ paths:
             nullable: true
             minimum: 0
           required: false
+          description: "Pagination end index of the page to return."
           name: end
           in: query
         - schema:
@@ -1389,6 +1401,7 @@ paths:
               - economics
               - tech
           required: false
+          description: "Event category. `all` returns every category."
           name: category
           in: query
         - schema:
@@ -1399,6 +1412,7 @@ paths:
                   type: string
               - type: string
           required: false
+          description: "Subcategory within the chosen category."
           name: subcategory
           in: query
         - schema:
@@ -1471,6 +1485,9 @@ paths:
     get:
       tags:
         - Events
+      summary: Get event
+      description: >-
+        One event by id, with its category, tags, metadata, volume and live score. Set `includeMarkets=true` to nest its markets.
       parameters:
         - schema:
             type: string
@@ -1484,6 +1501,7 @@ paths:
             type: boolean
             nullable: true
           required: false
+          description: "Set to `true` to nest the event's markets in the response."
           name: includeMarkets
           in: query
         - schema:
@@ -1509,6 +1527,9 @@ paths:
     get:
       tags:
         - Events
+      summary: Get suggested events
+      description: >-
+        Events suggested for a wallet, derived from that wallet's past order activity.
       parameters:
         - schema:
             type: string
@@ -1548,6 +1569,9 @@ paths:
     get:
       tags:
         - Events
+      summary: Get live scores
+      description: >-
+        Latest live scores for several sports events in one call. Pass the event ids as a comma-separated `eventIds` list; events without a score are omitted from the response.
       parameters:
         - schema:
             type: string
@@ -1575,6 +1599,9 @@ paths:
     get:
       tags:
         - Events
+      summary: Get event score
+      description: >-
+        Latest live score for one sports event: teams, score, period, elapsed time and status. Returns `null` when the event has no score.
       parameters:
         - schema:
             type: string
@@ -1594,6 +1621,9 @@ paths:
     get:
       tags:
         - Markets
+      summary: List event markets
+      description: >-
+        Paginated list of the binary markets of an event. Each market is a YES/NO question with its own id, status, pricing and result.
       parameters:
         - schema:
             type: string
@@ -1608,6 +1638,7 @@ paths:
             nullable: true
             minimum: 0
           required: false
+          description: "Pagination start index of the page to return."
           name: start
           in: query
         - schema:
@@ -1615,6 +1646,7 @@ paths:
             nullable: true
             minimum: 0
           required: false
+          description: "Pagination end index of the page to return."
           name: end
           in: query
       responses:
@@ -1638,6 +1670,9 @@ paths:
     get:
       tags:
         - Markets
+      summary: Get event market
+      description: >-
+        One market scoped to its event: title, status, result, open and close times, resolution time, rules and outcomes with current pricing.
       parameters:
         - schema:
             type: string
@@ -1672,6 +1707,9 @@ paths:
     get:
       tags:
         - Markets
+      summary: Get market
+      description: >-
+        One market by id: title, status, result, open and close times, resolution time, rules and outcomes with current pricing. Prices are in micro USD (1,000,000 = $1).
       parameters:
         - schema:
             type: string
@@ -1698,12 +1736,16 @@ paths:
     get:
       tags:
         - Orders
+      summary: List orders
+      description: >-
+        Paginated list of orders registered onchain. Filter by `ownerPubkey` and paginate with `start` and `end`.
       parameters:
         - schema:
             type: integer
             nullable: true
             minimum: 0
           required: false
+          description: "Pagination start index of the page to return."
           name: start
           in: query
         - schema:
@@ -1711,12 +1753,14 @@ paths:
             nullable: true
             minimum: 0
           required: false
+          description: "Pagination end index of the page to return."
           name: end
           in: query
         - schema:
             type: string
             minLength: 1
           required: false
+          description: "Filter orders by owner wallet public key."
           name: ownerPubkey
           in: query
       responses:
@@ -1762,6 +1806,9 @@ paths:
     post:
       tags:
         - Orders
+      summary: Create order
+      description: >-
+        Build an unsigned transaction that buys or sells YES or NO contracts on a market. Send exactly one quantity field: `contractsMicro` (1,000,000 = 1 contract), `contractsDecimal`, or the legacy whole-number `contracts`. Sign the returned transaction and submit it to `POST /execute` together with the `execution.context` object, unchanged.
       requestBody:
         required: true
         content:
@@ -1816,6 +1863,9 @@ paths:
     get:
       tags:
         - Orders
+      summary: Get order
+      description: >-
+        One order by its account public key: market, side, size, status and timestamps.
       parameters:
         - schema:
             type: string
@@ -1848,6 +1898,9 @@ paths:
     get:
       tags:
         - Orders
+      summary: Get order status
+      description: >-
+        Latest status of an order with its event history. Poll it after `POST /execute` to follow the fill.
       parameters:
         - schema:
             type: string
@@ -1928,12 +1981,16 @@ paths:
     get:
       tags:
         - Positions
+      summary: List positions
+      description: >-
+        Paginated list of onchain positions, each holding YES or NO contracts in one market. Filter by `ownerPubkey`, `marketPubkey`, `marketId` and `isYes`; paginate with `start` and `end`. USD values are in micro USD (1,000,000 = $1).
       parameters:
         - schema:
             type: integer
             nullable: true
             minimum: 0
           required: false
+          description: "Pagination start index of the page to return."
           name: start
           in: query
         - schema:
@@ -1941,6 +1998,7 @@ paths:
             nullable: true
             minimum: 0
           required: false
+          description: "Pagination end index of the page to return."
           name: end
           in: query
         - schema:
@@ -1955,12 +2013,14 @@ paths:
             type: string
             minLength: 1
           required: false
+          description: "Filter by market account public key."
           name: marketPubkey
           in: query
         - schema:
             type: string
             minLength: 1
           required: false
+          description: "Filter by market id."
           name: marketId
           in: query
         - schema:
@@ -2016,6 +2076,9 @@ paths:
     delete:
       tags:
         - Positions
+      summary: Close all positions
+      description: >-
+        Build one unsigned sell transaction per open position of a wallet, selling every contract. `minSellPriceSlippageBps` bounds the accepted sell price. Sign each transaction and submit it to `POST /execute`.
       requestBody:
         required: true
         content:
@@ -2049,6 +2112,9 @@ paths:
     get:
       tags:
         - Positions
+      summary: Get position
+      description: >-
+        One position by its account public key: side, contracts held (`contractsMicro` and `contractsDecimal`), cost basis, mark price and unrealised P&L in micro USD.
       parameters:
         - schema:
             type: string
@@ -2080,6 +2146,9 @@ paths:
     delete:
       tags:
         - Positions
+      summary: Close position
+      description: >-
+        Build an unsigned transaction that sells every contract of one position before the market resolves. Sign it and submit it to `POST /execute` together with the `execution.context` object.
       parameters:
         - schema:
             type: string
@@ -2118,6 +2187,9 @@ paths:
     post:
       tags:
         - Positions
+      summary: Claim position
+      description: >-
+        Build an unsigned transaction that claims the payout of a winning position after the market has resolved. Each winning contract pays out $1. Sign and send the returned transaction.
       parameters:
         - schema:
             type: string
@@ -2156,12 +2228,16 @@ paths:
     get:
       tags:
         - History
+      summary: Get history
+      description: >-
+        Paginated history of order, fill, settlement and claim events. Filter by `ownerPubkey` or `positionPubkey`, or pass `id` to fetch a single event. Paginate with `start` and `end`.
       parameters:
         - schema:
             type: integer
             nullable: true
             minimum: 0
           required: false
+          description: "Pagination start index of the page to return."
           name: start
           in: query
         - schema:
@@ -2169,6 +2245,7 @@ paths:
             nullable: true
             minimum: 0
           required: false
+          description: "Pagination end index of the page to return."
           name: end
           in: query
         - schema:
@@ -2216,6 +2293,9 @@ paths:
     get:
       tags:
         - Forecast
+      summary: Get forecast history
+      description: >-
+        Forecast time series recorded for a market, as `forecast_history` entries.
       parameters:
         - schema:
             type: string
@@ -2267,6 +2347,9 @@ paths:
     get:
       tags:
         - Trading
+      summary: Get trading status
+      description: >-
+        Whether the exchange currently accepts orders (`trading_active`). Check it before building an order.
       responses:
         "200":
           description: Whether trading is currently enabled
@@ -2278,6 +2361,9 @@ paths:
     get:
       tags:
         - Orderbook
+      summary: Get orderbook
+      description: >-
+        Current orderbook depth for a market: YES and NO levels in contracts and in dollars.
       parameters:
         - schema:
             type: string
@@ -2344,10 +2430,14 @@ paths:
     get:
       tags:
         - Profile
+      summary: Get profile
+      description: >-
+        Trading statistics of a wallet: realised P&L, volume, prediction counts, active contracts and portfolio value. USD values are in micro USD.
       parameters:
         - schema:
             type: string
           required: true
+          description: "Wallet public key."
           name: ownerPubkey
           in: path
       responses:
@@ -2405,10 +2495,14 @@ paths:
     get:
       tags:
         - Profile
+      summary: Get P&L history
+      description: >-
+        Profit and loss time series of a wallet for charting: `count` points spaced by `interval`.
       parameters:
         - schema:
             type: string
           required: true
+          description: "Wallet public key."
           name: ownerPubkey
           in: path
         - schema:
@@ -2419,6 +2513,7 @@ paths:
               - 1m
             default: 1w
           required: false
+          description: "Spacing between points: `24h`, `1w` or `1m`."
           name: interval
           in: query
         - schema:
@@ -2428,6 +2523,7 @@ paths:
             maximum: 1000
             default: 10
           required: false
+          description: "Number of points to return."
           name: count
           in: query
       responses:
@@ -2459,6 +2555,9 @@ paths:
     get:
       tags:
         - Trades
+      summary: Get trade feed
+      description: >-
+        Recent fills (`order_filled` events) across the exchange.
       responses:
         "200":
           description: Recent order_filled events
@@ -2536,6 +2635,9 @@ paths:
     get:
       tags:
         - Leaderboards
+      summary: Get leaderboards
+      description: >-
+        Ranked traders for a period and metric: P&L, volume or win rate.
       parameters:
         - schema:
             type: string
@@ -2545,6 +2647,7 @@ paths:
               - monthly
             default: all_time
           required: false
+          description: "Ranking window: `all_time`, `weekly` or `monthly`."
           name: period
           in: query
         - schema:
@@ -2553,6 +2656,7 @@ paths:
             maximum: 100
             default: 100
           required: false
+          description: "Maximum number of entries to return."
           name: limit
           in: query
         - schema:
@@ -2563,6 +2667,7 @@ paths:
               - win_rate
             default: pnl
           required: false
+          description: "Ranking metric: `pnl`, `volume` or `win_rate`."
           name: metric
           in: query
       responses:
@@ -2655,6 +2760,9 @@ paths:
     get:
       tags:
         - Vault
+      summary: Get vault info
+      description: >-
+        Settlement vault account: public key, decoded account data and balance.
       responses:
         "200":
           description: Vault account data

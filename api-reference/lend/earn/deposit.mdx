@@ -2,4 +2,5 @@
 openapi: /openapi-spec/lend/lend.yaml post /earn/deposit
 title: "Deposit"
 description: "Request for a base64-encoded unsigned earn deposit transaction to deposit assets"
+llmsDescription: "POST /earn/deposit endpoint of the Jupiter Lend API at api.jup.ag/lend/v1/earn/deposit. Builds a base64-encoded unsigned transaction that deposits an asset into Jupiter Lend Earn and mints jlToken shares to the signer. Body: asset, signer, amount (in the asset's base units). Returns transaction; sign and send it yourself."
 ---

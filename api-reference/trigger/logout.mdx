@@ -1,5 +1,6 @@
 ---
 title: "Log Out"
 description: "Revoke the refresh token for one session"
+llmsDescription: "POST /auth/logout endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/auth/logout. Revokes the refresh token of one session. Body: refreshToken. No authentication required, always returns 200 with success. Access tokens already issued stay valid until they expire (up to 15 minutes)."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /auth/logout
 ---

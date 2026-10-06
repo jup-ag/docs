@@ -3,4 +3,5 @@ openapi: /openapi-spec/price/v3/price.yaml get /price/v3
 title: "Get Price (Price API V3)"
 sidebarTitle: "Price"
 description: "Returns prices of specified tokens"
+llmsDescription: "GET /price/v3 endpoint of the Jupiter Price API V3 at api.jup.ag/price/v3. Returns USD prices for up to 50 token mints per request. Required param: ids (comma-separated mint addresses). Tokens without a reliable price are omitted from the response, so check for each requested id. Prices are heuristics-based, derived from the last swap and validated against liquidity and trading data."
 ---

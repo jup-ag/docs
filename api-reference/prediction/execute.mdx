@@ -3,4 +3,5 @@ openapi: /openapi-spec/prediction/prediction.yaml post /execute
 title: "Execute Order (Prediction API)"
 sidebarTitle: "Execute Order"
 description: "Submit a signed order transaction, including Jupiter Forecast orders"
+llmsDescription: "POST /execute endpoint of the Jupiter Prediction Market API at api.jup.ag/prediction/v1/execute. Submits a signed order transaction for execution. Body: signedTransaction (base64, required), context (the execution.context object returned by POST /orders or DELETE /positions/{positionPubkey}, passed unchanged) and requestId. Jupiter Forecast (bisonfi) orders execute as an atomic swap. Returns status, signature, error, requestId."
 ---

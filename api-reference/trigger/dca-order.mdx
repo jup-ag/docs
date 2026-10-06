@@ -1,5 +1,6 @@
 ---
 title: "Get DCA Order"
 description: "Get a single DCA order by ID, including fills and events"
+llmsDescription: "GET /orders/history/dca/{id} endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/orders/history/dca/{id}. Returns one DCA order with its fills and events: inputMint, outputMint, inputAmountInitial, inputAmountRemaining, amountPerRound, outputAmountTotal, inputAmountUsed, orderType, minPriceUsd, maxPriceUsd, vaultPubkey. The path requires the dca segment."
 openapi: /openapi-spec/trigger/v2/trigger.yaml get /orders/history/dca/{id}
 ---

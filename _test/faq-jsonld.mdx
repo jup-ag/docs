@@ -1,0 +1,17 @@
+---
+title: "FAQ JSON-LD test"
+description: "Throwaway page to test whether a raw JSON-LD script reaches the server-rendered HTML."
+noindex: true
+---
+
+Test page for BUILD-810. Marker: FAQJSONLD-RAW-SCRIPT.
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is this a test question?","acceptedAnswer":{"@type":"Answer","text":"Yes, marker FAQJSONLD-ANSWER."}}]}
+</script>
+
+<AccordionGroup>
+<Accordion title="Is this a test question?">
+Yes, marker FAQJSONLD-ANSWER.
+</Accordion>
+</AccordionGroup>

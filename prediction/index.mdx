@@ -1,8 +1,8 @@
 ---
-title: "Solana Prediction Market API"
+title: "Prediction Market API"
 sidebarTitle: "About Prediction"
-description: "Jupiter's Prediction Market API: discover events, read prices and orderbooks, trade YES/NO contracts and claim payouts on Solana prediction markets through REST endpoints at api.jup.ag/prediction/v1."
-llmsDescription: "Overview of Jupiter's Prediction Market API at api.jup.ag/prediction/v1 (beta), a REST API for binary YES/NO prediction markets on Solana. Discovery: GET /events, /events/search, /events/{eventId}, /markets/{marketId} (buy and sell prices in micro USD, 1000000 = $1), /orderbook/{marketId}, /trading-status. Trading: POST /orders builds an unsigned buy order (ownerPubkey, marketId, isYes, isBuy, depositAmount, depositMint JupUSD or USDC, minimum $5), DELETE closes a position, POST /execute submits the signed transaction. Tracking: GET /positions, /orders, /orders/status/{pubkey}, /history, /profiles, /leaderboards, /trades. Settlement: POST /positions/{positionPubkey}/claim pays $1 per winning contract with no claim fee. Fees apply to executed trades only. Contract quantities are fractional (contractsMicro, contractsDecimal). US and South Korea IPs are blocked. Jupiter Forecast adds 15-minute BTC up/down markets under /forecast."
+description: "Jupiter's Prediction Market API: discover events, read prices, trade YES/NO contracts and claim payouts on Solana prediction markets at api.jup.ag/prediction/v1."
+llmsDescription: "Overview of Jupiter's Prediction Market API at api.jup.ag/prediction/v1 (beta), a REST API for binary YES/NO prediction markets on Solana. Discovery: GET /events, /events/search, /events/{eventId}, /markets/{marketId} (buy and sell prices in micro USD, 1000000 = $1), /orderbook/{marketId}, /trading-status. Trading: POST /orders builds an unsigned buy order (ownerPubkey, marketId, isYes, isBuy, depositAmount, depositMint JupUSD or USDC, minimum $5), DELETE /positions/{positionPubkey} builds a sell, POST /execute submits the signed transaction (or send it through your own RPC). Tracking: GET /positions, /orders, /orders/status/{pubkey}, /history, /profiles, /leaderboards, /trades. Settlement: POST /positions/{positionPubkey}/claim pays $1 per winning contract with no claim fee. Fees apply to executed trades only. Contract quantities are fractional (contractsMicro, contractsDecimal). US and South Korea IPs are blocked. Jupiter Forecast 15-minute BTC up/down markets are served by the same endpoints with provider=bisonfi; GET /forecast?marketId= returns a numeric forecast time series for a market."
 ---
 
 <Note>
@@ -14,10 +14,10 @@ The Prediction Market API is currently in beta and subject to breaking changes a
 The Prediction Market API is Jupiter's REST API for prediction markets on Solana, served at `https://api.jup.ag/prediction/v1`. A prediction market lets people trade on the outcome of a real-world event: each market has a YES and a NO side, a contract on the winning side pays \$1, and the price of a contract reflects the probability the market gives that outcome. The API covers the whole life of a trade:
 
 - Discover events and their binary markets across sports, crypto, politics, e-sports, culture, economics and tech, with live prices and orderbook depth.
-- Build buy and sell orders as unsigned Solana transactions, sign them with the user's wallet, and submit them through `/execute`.
+- Build buy and sell orders as unsigned Solana transactions, sign them with the user's wallet, and submit them through `POST /execute` or your own RPC.
 - Track positions, orders, P&L and history, and claim payouts of \$1 per winning contract, with no claim fee.
 
-Orders are funded in JupUSD or USDC. Trading applications, wallets, bots and analytics dashboards integrate it; the data behind Jupiter's own prediction market interface comes from the same endpoints.
+Orders are funded in JupUSD or USDC. Trading applications, wallets, bots and analytics dashboards are the typical integrators.
 
 <CardGroup cols={2}>
   <Card title="Events & Markets" href="/prediction/events-and-markets" icon="magnifying-glass">
@@ -90,14 +90,14 @@ The sections [Architectural Components](#architectural-components) and [Key Conc
 
 | Area | Endpoints | Documentation |
 | --- | --- | --- |
-| Discover events and markets | `GET /events`, `GET /events/search`, `GET /events/{eventId}`, `GET /events/suggested/{pubkey}`, `GET /markets/{marketId}` | [Events & Markets](/prediction/events-and-markets) |
-| Read prices and depth | `GET /orderbook/{marketId}`, `GET /events/scores`, `GET /trading-status` | [Events & Markets](/prediction/events-and-markets#get-orderbook-data) |
+| Discover events and markets | `GET /events`, `GET /events/search`, `GET /events/{eventId}`, `GET /events/{eventId}/markets`, `GET /events/{eventId}/markets/{marketId}`, `GET /events/suggested/{pubkey}`, `GET /markets/{marketId}` | [Events & Markets](/prediction/events-and-markets) |
+| Read prices, depth and live scores | `GET /orderbook/{marketId}`, `GET /trading-status`, `GET /events/scores`, `GET /events/{eventId}/score` | [Events & Markets](/prediction/events-and-markets#get-orderbook-data) |
 | Open positions | `POST /orders` (unsigned buy transaction), `POST /execute` (submit the signed transaction) | [Open Positions](/prediction/open-positions) |
-| Manage positions | `DELETE /positions/{positionPubkey}` and close-all to sell, `GET /orders`, `GET /orders/status/{orderPubkey}` | [Manage Positions](/prediction/manage-positions) |
+| Manage positions | `DELETE /positions/{positionPubkey}` and `DELETE /positions` to sell, `GET /orders`, `GET /orders/{orderPubkey}`, `GET /orders/status/{orderPubkey}` | [Manage Positions](/prediction/manage-positions) |
 | Track activity | `GET /positions`, `GET /positions/{positionPubkey}`, `GET /history` | [Position Data & History](/prediction/position-data) |
 | Claim payouts | `POST /positions/{positionPubkey}/claim` | [Claim Payouts](/prediction/claim-payouts) |
 | Profiles and social | `GET /profiles/{ownerPubkey}`, `GET /profiles/{ownerPubkey}/pnl-history`, `GET /trades`, `GET /leaderboards` | [Social Features](/prediction/social-features) |
-| Forecast and vault | `GET /forecast`, `GET /vault-info` | [Jupiter Forecast](/prediction/forecast) |
+| Vault and forecast series | `GET /vault-info`, `GET /forecast?marketId=` (numeric forecast time series for a market) | [API Reference](/api-reference/prediction/get-vault-info) |
 
 Every endpoint is specified in the [Prediction API Reference](/api-reference/prediction/get-events).
 
@@ -114,10 +114,10 @@ Every endpoint is specified in the [Prediction API Reference](/api-reference/pre
     `POST /orders` with `ownerPubkey`, `marketId`, `isYes`, `isBuy: true`, `depositAmount` and `depositMint` (JupUSD or USDC). The minimum order is \$5. The response is an unsigned Solana transaction.
   </Step>
   <Step title="Sign and execute">
-    Sign the transaction with the user's wallet and submit it to `POST /execute`. Jupiter's keeper network fills the order on the underlying market.
+    Sign the transaction with the user's wallet and submit it, either to `POST /execute` with the build's `execution.context` or through your own RPC. Jupiter's keeper network fills the order on the underlying market.
   </Step>
   <Step title="Track the position">
-    `GET /orders/status/{orderPubkey}` reports `pending`, `filled` or `failed`; `GET /positions?ownerPubkey=` returns contracts held, cost basis, mark-to-market value and P&L.
+    `GET /orders/status/{orderPubkey}` reports `created`, `partiallyfilled`, `filled` or `failed`; `GET /positions?ownerPubkey=` returns contracts held, cost basis, mark-to-market value and P&L.
   </Step>
   <Step title="Sell or claim">
     Sell before resolution with `DELETE /positions/{positionPubkey}`, or hold to settlement and call `POST /positions/{positionPubkey}/claim` to receive \$1 per winning contract.
@@ -146,11 +146,11 @@ Full code for each step, with the data that flows from one call to the next, is 
 ## Geographical Restrictions
 
 - We have restricted United States and South Korea IPs from accessing the Prediction Market API.
-- If you have any questions, please reach out to us in Discord/Telegram.
+- If you have any questions, reach out to us in Discord/Telegram.
 
 ## Architectural Components
 
-We have generalised the Prediction Market architecture to be agnostic of the underlying data provider. This allows us to support multiple data providers and easily add new ones in the future.
+We have generalised the Prediction Market architecture to be agnostic of the underlying data provider. This allows us to support multiple data providers and add new ones in the future.
 
 ### Events
 
@@ -176,7 +176,7 @@ Markets are binary prediction markets within an event, representing specific YES
 
 **Market Properties:**
 - **Market ID**: Unique identifier derived as a PDA (Program Derived Address)
-- **Status**: `open`, `closed`
+- **Status**: `open`, `closed`, `cancelled`
 - **Result**: `null` (not yet resolved), `yes`, or `no`
 - **Pricing Data**: Buy/sell prices for YES and NO sides, volume, open interest, liquidity
 - **Metadata**: Title, description, trading rules, resolution criteria
@@ -187,7 +187,7 @@ Markets are binary prediction markets within an event, representing specific YES
 
 **Pricing Model:**
 - Prices are quoted in USD (stored as micro USD on-chain)
-- Each contract represents a claim to $1 if the outcome is correct
+- Each contract represents a claim to \$1 if the outcome is correct
 - Separate buy and sell prices for YES and NO sides
 - Prices reflect probability (e.g., 70¢ YES price = 70% probability)
 
@@ -225,20 +225,20 @@ Positions represent a user's holdings in a specific market side (YES or NO).
 - **Contracts**: Total contracts held
 - **Cost Basis**: `totalCostUsd`, `avgPriceUsd`
 - **Mark-to-Market**: `valueUsd`, `markPriceUsd` (current market value)
-- **P&L Metrics**: Unrealized P&L, P&L after fees, percentage returns
+- **P&L Metrics**: Unrealised P&L, P&L after fees, percentage returns
 - **Order Activity**: Number of open orders
 - **Settlement**: `claimable`, `claimed`, `claimedUsd`, `payoutUsd`
 
 **Position States:**
 - **Active**: Market is open, position has mark-to-market value and P&L
 - **Closed Market**: Market closed but not settled, P&L frozen
-- **Claimable**: Market settled favorably, payout available
+- **Claimable**: Market settled favourably, payout available
 - **Lost**: Market settled against the position (no payout)
 - **Claimed**: Payout has been withdrawn
 
 **P&L Calculation:**
-- **Unrealized P&L**: (Current market value) - (Cost basis)
-- **Realized P&L**: Calculated on partial or full position closes
+- **Unrealised P&L**: (Current market value) - (Cost basis)
+- **Realised P&L**: Calculated on partial or full position closes
 - **Fees**: Protocol and venue fees reduce net returns
 
 ### Vault
@@ -246,7 +246,7 @@ Positions represent a user's holdings in a specific market side (YES or NO).
 The Vault manages the settlement and escrow mechanism for the prediction market system.
 
 **Vault Functions:**
-- **Escrow Management**: Holds deposited JupUSD during active trading
+- **Escrow Management**: Holds deposited JupUSD or USDC during active trading
 - **Settlement Distribution**: Pays out winning positions
 - **Fee Collection**: Accumulates protocol and venue fees
 - **Balance Tracking**: Maintains total locked liquidity
@@ -261,6 +261,7 @@ The History system tracks all on-chain activity for audit and user interface pur
 - `order_created`: New order placed
 - `order_filled`: Order matched and executed
 - `order_failed`: Order could not be filled
+- `order_closed`: Order account closed after completion
 - `position_updated`: Position modified by order fill
 - `position_lost`: Position resolved against user
 - `payout_claimed`: User withdrew winnings
@@ -296,7 +297,7 @@ The settlement process resolves markets and enables winners to claim payouts.
 2. **Result Determined**: Authoritative source provides outcome
 3. **Market Settles**: Result recorded on-chain (`yes` or `no`)
 4. **Positions Become Claimable**: Winning positions can claim payouts
-5. **Users Claim**: Winners receive $1 per contract (no claim fees)
+5. **Users Claim**: Winners receive \$1 per contract (no claim fees)
 6. **Losing Positions**: Contracts become worthless
 
 **Settlement Guarantees:**
@@ -312,12 +313,12 @@ The settlement process resolves markets and enables winners to claim payouts.
 Every market has exactly two outcomes: YES or NO. This simplicity ensures:
 - Clear resolution criteria
 - Straightforward pricing (probability-based)
-- Easy position management
+- Simple position management
 - Transparent payouts
 
 ### Contract Value
 
-Each contract represents a claim to **$1 if correct**:
+Each contract represents a claim to **\$1 if correct**:
 - If you buy YES at 70¢ and YES wins, you profit 30¢ per contract
 - If you buy NO at 40¢ and NO wins, you profit 60¢ per contract
 - Losing contracts expire worthless
@@ -343,7 +344,7 @@ When creating an order you may send `contractsMicro` (or `contractsDecimal`, or 
 Market prices reflect implied probability:
 - 70¢ YES price ≈ 70% probability of YES outcome
 - 30¢ NO price ≈ 30% probability of NO outcome
-- YES price + NO price ≈ $1.00
+- YES price + NO price ≈ \$1.00
 
 ### Position Management
 
@@ -371,18 +372,18 @@ Your trading fees depend on three factors:
 Here's what fees look like for common prices:
 | Price per Contract | Fee (1 Contract) | Fee (100 Contracts) |
 |:------------------:|:----------------:|:-------------------:|
-| $0.01              | $0.01            | $0.07               |
-| $0.05              | $0.01            | $0.34               |
-| $0.10              | $0.01            | $0.63               |
-| $0.15              | $0.01            | $0.90               |
-| $0.20              | $0.02            | $1.12               |
-| $0.25              | $0.02            | $1.32               |
-| $0.30              | $0.02            | $1.47               |
-| $0.35              | $0.02            | $1.60               |
-| $0.40              | $0.02            | $1.68               |
+| \$0.01              | \$0.01            | \$0.07               |
+| \$0.05              | \$0.01            | \$0.34               |
+| \$0.10              | \$0.01            | \$0.63               |
+| \$0.15              | \$0.01            | \$0.90               |
+| \$0.20              | \$0.02            | \$1.12               |
+| \$0.25              | \$0.02            | \$1.32               |
+| \$0.30              | \$0.02            | \$1.47               |
+| \$0.35              | \$0.02            | \$1.60               |
+| \$0.40              | \$0.02            | \$1.68               |
 
 Example:
-- If you buy 100 contracts at $0.25:
+- If you buy 100 contracts at \$0.25:
 - Total cost: \$25.00
 - Trading fee: \$1.32
 
@@ -408,15 +409,15 @@ Upon position creation, there will be 3 transactions involved:
 <AccordionGroup>
 
 <Accordion title="What endpoints are included in the Prediction Market API?">
-Discovery: `/events`, `/events/search`, `/events/{eventId}`, `/events/suggested/{pubkey}`, `/markets/{marketId}`, `/orderbook/{marketId}`, `/events/scores` and `/trading-status`. Trading: `POST /orders` to build a buy order, `DELETE` on a position to sell, and `POST /execute` to submit the signed transaction. Tracking: `/orders`, `/orders/status/{orderPubkey}`, `/positions`, `/positions/{positionPubkey}` and `/history`. Settlement: `POST /positions/{positionPubkey}/claim`. Social: `/profiles/{ownerPubkey}`, `/profiles/{ownerPubkey}/pnl-history`, `/trades` and `/leaderboards`. Plus `/forecast` and `/vault-info`. The table in [What the API does](#what-the-api-does) links each group to its guide; the [API Reference](/api-reference/prediction/get-events) has every parameter.
+Discovery: `/events`, `/events/search`, `/events/{eventId}`, `/events/{eventId}/markets`, `/events/{eventId}/markets/{marketId}`, `/events/suggested/{pubkey}`, `/markets/{marketId}`, `/orderbook/{marketId}`, `/events/scores`, `/events/{eventId}/score` and `/trading-status`. Trading: `POST /orders` to build a buy order, `DELETE /positions/{positionPubkey}` or `DELETE /positions` to sell, and `POST /execute` to submit a signed transaction. Tracking: `/orders`, `/orders/{orderPubkey}`, `/orders/status/{orderPubkey}`, `/positions`, `/positions/{positionPubkey}` and `/history`. Settlement: `POST /positions/{positionPubkey}/claim`. Social: `/profiles/{ownerPubkey}`, `/profiles/{ownerPubkey}/pnl-history`, `/trades` and `/leaderboards`. Plus `/vault-info` and `/forecast?marketId=`, a numeric forecast time series for a market. The table in [What the API does](#what-the-api-does) links each group to its guide; the [API Reference](/api-reference/prediction/get-events) has every parameter.
 </Accordion>
 
 <Accordion title="How do I query active prediction market orders via API?">
-Call `GET /orders?ownerPubkey=<wallet>` to list a wallet's orders, each with its `status` (`pending`, `filled` or `failed`), filled contracts, average fill price and fees. For a single order, `GET /orders/{orderPubkey}` returns the details and `GET /orders/status/{orderPubkey}` the status alone, which is what you poll after `/execute`. Open positions rather than orders come from `GET /positions?ownerPubkey=<wallet>`. See [Position Data & History](/prediction/position-data#querying-orders).
+Call `GET /orders?ownerPubkey=<wallet>` to list a wallet's orders, each with its `status` (`pending`, `filled` or `failed`), filled contracts, average fill price and fees. For a single order, `GET /orders/status/{orderPubkey}` returns the status alone (`created`, `partiallyfilled`, `filled` or `failed`), which is what you poll after submitting. `GET /orders/{orderPubkey}` returns the full order while its account exists and `400` once a filled order has been closed, so use `/history` for past orders. Open positions rather than orders come from `GET /positions?ownerPubkey=<wallet>`. See [Position Data & History](/prediction/position-data#querying-orders).
 </Accordion>
 
 <Accordion title="How does a trade reach the blockchain?">
-The API never holds keys. `POST /orders` returns an unsigned Solana transaction; your application signs it with the user's wallet and sends it back through `POST /execute`. Jupiter's keeper network then fills the order on the underlying market and the order status moves from `pending` to `filled` or `failed`. The same pattern applies to selling and claiming.
+The API never holds keys. `POST /orders` returns an unsigned Solana transaction; your application signs it with the user's wallet and submits it, through `POST /execute` with the build's `execution.context` or through your own RPC. Jupiter's keeper network then fills the order on the underlying market and the order status moves from `created` to `filled` or `failed`. Selling works the same way from `DELETE /positions/{positionPubkey}`; a claim transaction from `/claim` is signed and sent to Solana directly.
 </Accordion>
 
 <Accordion title="Which currency are trades settled in?">
@@ -425,6 +426,18 @@ Orders are funded in JupUSD or USDC (`depositMint` on `POST /orders`), with a mi
 
 <Accordion title="What fees does the Prediction Market API charge?">
 Fees apply to executed buys and sells only: nothing on resting orders and nothing on claims. The fee grows with trade size and with uncertainty, so contracts priced near \$0.50 cost slightly more than contracts near \$0.01 or \$0.99, and every fee is rounded up to the cent. The table in [Fees](#fees) gives the amounts for common prices; `POST /orders` responses include the fee for that order.
+</Accordion>
+
+<Accordion title="How do I retrieve active prediction markets and events?">
+`GET /events?filter=live` returns events in progress and `filter=trending`, `new` or `upcoming` the other states; add `includeMarkets=true` to get each event's markets inline, or `category` and `tags` to narrow the list. A market is tradable while its `status` is `open`; `GET /trading-status` tells you whether trading is currently enabled. See [Events & Markets](/prediction/events-and-markets).
+</Accordion>
+
+<Accordion title="Can users close positions before an event resolves?">
+Yes, while the market is `open`. `DELETE /positions/{positionPubkey}` builds a sell transaction for a position and `DELETE /positions` for all of a wallet's positions; sign and submit it like a buy. Sales are executed trades, so the trading fee applies. See [Manage Positions](/prediction/manage-positions).
+</Accordion>
+
+<Accordion title="Can I retrieve trading history and P&L data?">
+Yes. `GET /positions?ownerPubkey=` returns each position with cost basis, mark-to-market value and P&L fields, `GET /history` returns the full event trail (orders created, filled, failed and closed, positions updated or lost, payouts claimed) with signatures and slots, and `GET /profiles/{ownerPubkey}/pnl-history` returns a wallet's P&L over time. See [Position Data & History](/prediction/position-data) and [Social Features](/prediction/social-features).
 </Accordion>
 
 <Accordion title="Is the API available in the United States?">
@@ -440,7 +453,7 @@ Contracts are fractional. Every quantity comes in three forms: `*Micro` as a str
 </Accordion>
 
 <Accordion title="How do winners get paid?">
-When an event resolves, the result is recorded onchain and winning positions become `claimable`. `POST /positions/{positionPubkey}/claim` builds the claim transaction, which pays \$1 per contract from the vault with no claim fee. Some markets settle automatically without a claim; [Claim Payouts](/prediction/claim-payouts) describes those cases and how to detect a lost position.
+When an event resolves, the result is recorded onchain and winning positions become `claimable`. `POST /positions/{positionPubkey}/claim` builds the claim transaction, which pays \$1 per contract from the vault with no claim fee. Some markets settle automatically without a claim, and a claimable payout that is not claimed within 24 hours is claimed on the winner's behalf by the keeper network, with no fee; [Claim Payouts](/prediction/claim-payouts) describes those cases and how to detect a lost position.
 </Accordion>
 
 <Accordion title="What is Jupiter Forecast?">

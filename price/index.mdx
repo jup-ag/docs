@@ -1,7 +1,7 @@
 ---
 title: "Solana Price API"
 sidebarTitle: "About Price"
-description: "Jupiter's Solana Price API: one GET /price/v3 request returns the current USD price of up to 50 Solana tokens, derived from onchain swaps and filtered for reliability."
+description: "Jupiter's Solana Price API: one GET /price/v3 request returns the current USD price of up to 50 Solana tokens, derived from onchain swaps."
 llmsDescription: "Overview of Jupiter's Price API at api.jup.ag/price/v3, the Solana price API behind jup.ag. GET /price/v3?ids=<mints> returns, for up to 50 mint addresses per request, usdPrice, decimals, blockId, priceChange24h (a percentage), liquidity and createdAt. Prices come from the last onchain swap, anchored on oracle-priced tokens such as SOL, and are validated by liquidity, holder, trading-activity and Organic Score heuristics. Tokens with no reliable price or no trade in 7 days are omitted from the response, not returned as null. Keyless requests work at 0.5 RPS; an x-api-key header raises the limit. Price API V2 is unmaintained."
 ---
 
@@ -60,7 +60,7 @@ Keyless requests are limited to 0.5 requests per second. For production, pass an
 
 Price API V3 prices tokens by using the **last swapped price (across all transactions)**. The swaps are priced by working outwards from a small set of reliable tokens (like SOL) whose price we get from external oracle sources.
 
-While and also after deriving the last swap price, we also utilise a number of heuristics to ensure the accuracy of the price and eliminate any outliers:
+While and also after deriving the last swap price, we also use a number of heuristics to ensure the accuracy of the price and eliminate any outliers:
 
 * Asset origin and launch method
 * Market liquidity metrics
@@ -72,7 +72,7 @@ While and also after deriving the last swap price, we also utilise a number of h
 <Warning>
 When using the Price API, do note that you may face many tokens where a price is not available.
 
-This is because we use the aforementioned heuristics to determine the price of a token and whether the price is reliable. If certain combinations of these factors indicate potential issues with price reliability or market health, the token is flagged and not provided a price.
+This is because we use the [heuristics above](#where-price-data-comes-from) to determine the price of a token and whether the price is reliable. If certain combinations of these factors indicate potential issues with price reliability or market health, the token is flagged and not provided a price.
 
 This is to safeguard users and prevent an inaccurate price from being returned.
 </Warning>
@@ -142,7 +142,7 @@ const missing = ids.filter((id) => !(id in price));
 A token is typically omitted when:
 
 * It has not been traded recently, in the last 7 days.
-* The aforementioned heuristics flag the price as unreliable, where certain combinations of factors indicate potential issues with price reliability or market health.
+* The [heuristics](#where-price-data-comes-from) flag the price as unreliable, where certain combinations of factors indicate potential issues with price reliability or market health.
 
 For additional context, you can cross reference a token's `audit.isSus` field in the [Tokens API V2](/tokens). Note that `audit.isSus` is only present when a token has been flagged suspicious, so its absence is not a guarantee of safety. Most tokens omitted from the price response are simply untraded or illiquid rather than flagged.
 
@@ -181,12 +181,28 @@ Every price starts from the last onchain swap, priced outwards from oracle-ancho
 One parameter: `ids`, a comma-separated list of up to 50 token mint addresses. The optional `x-api-key` header raises the rate limit above the keyless 0.5 requests per second. There is no parameter for currency, interval or historical data: the endpoint returns the current USD price only. See the [API reference](/api-reference/price).
 </Accordion>
 
+<Accordion title="How do I get the current SOL price in USD?">
+`GET https://api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112`. The response is keyed by mint address and `usdPrice` is the current price in USD; `decimals` (9 for SOL) converts raw lamport balances into SOL. The [Quick start](#quick-start) above shows the full response.
+</Accordion>
+
+<Accordion title="How do I fetch prices for multiple Solana tokens in one request?">
+Comma-separate the mint addresses in `ids`, up to 50 per request: `?ids=<mint1>,<mint2>,...`. Each priced token comes back as a key of the response object. Tokens without a reliable price are left out, so compare the returned keys with the mints you asked for.
+</Accordion>
+
+<Accordion title="What is the difference between a token price and a swap quote?">
+A price is a reference value: the USD value of one token derived from its last swap and the reliability heuristics, with no amount attached. A swap quote is executable: `GET /order` on the [Swap API](/swap/order-and-execute) returns the exact output amount for a given input amount, route and moment, including price impact and fees. Use the Price API to display values and the Swap API to trade.
+</Accordion>
+
+<Accordion title="Does the Price API provide historical prices?">
+No. `/price/v3` returns the current price and the 24-hour change (`priceChange24h`) only. For a price at a past block, record `usdPrice` and `blockId` yourself at the time you need them.
+</Accordion>
+
 <Accordion title="Why is a token missing from the response?">
 The response contains a key for each mint that has a reliable price, and nothing for the others: no `null`, no error. A token is typically dropped when it has not traded in the last 7 days or when the heuristics flag its price as unreliable. Compare your requested `ids` with the returned keys to find the missing ones, and cross-check `audit.isSus` in the [Token API](/tokens) if you need a reason.
 </Accordion>
 
 <Accordion title="How fresh is a price, and how do I verify it?">
-A price reflects the last swap of the token, and `blockId` is the Solana block at which it was computed. Compare `blockId` with the current slot from your RPC to judge recency. There is no fixed refresh interval: a token that trades every second updates every second, and a token that has not traded in 7 days is omitted.
+A price reflects the last swap of the token, and `blockId` is the Solana block at which it was computed; compare it with the current slot to judge recency. Prices update with swap activity rather than on a fixed interval, and a token that has not traded in 7 days is omitted.
 </Accordion>
 
 <Accordion title="Is priceChange24h a fraction or a percentage?">
@@ -198,7 +214,7 @@ Not to try it: keyless requests work at 0.5 requests per second. For production,
 </Accordion>
 
 <Accordion title="Which tokens does the Price API cover?">
-Any Solana token that has traded in the last 7 days and passes the reliability heuristics. There is no allow-list to join: a token gets a price as soon as it trades on the venues Jupiter indexes and its market looks healthy. Tokens that fail the heuristics are omitted, see [Limitations](#limitations).
+Any Solana token that has traded in the last 7 days and passes the reliability heuristics. Tokens are not registered manually: a token gets a price once it trades and its market passes the heuristics. Tokens that fail them are omitted, see [Limitations](#limitations).
 </Accordion>
 
 <Accordion title="What changed from Price API V2?">

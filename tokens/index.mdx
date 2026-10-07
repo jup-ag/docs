@@ -1,7 +1,7 @@
 ---
 title: "Solana Token API"
 sidebarTitle: "About Tokens"
-description: "Jupiter's Solana Token API: search any Solana token by name, symbol or mint and get its metadata, verification status, Organic Score, holders, market cap and trading stats in one GET request."
+description: "Jupiter's Solana Token API: search any Solana token by name, symbol or mint and get its metadata, verification status, Organic Score and trading stats in one request."
 llmsDescription: "Overview of Jupiter's Token API at api.jup.ag/tokens/v2, the Solana token API behind jup.ag's search and token pages. GET /search?query=<name|symbol|mint> (up to 100 comma-separated mints) returns per token: id, name, symbol, icon, decimals, tokenProgram, socials, isVerified, organicScore and organicScoreLabel, audit flags (mint and freeze authority, top holders, isSus when flagged), usdPrice, mcap, fdv, liquidity, holderCount and buy/sell stats over 5m, 1h, 6h and 24h. Other endpoints: /tag (lst, verified, stocks), /{category}/{interval} (toporganicscore, toptraded, toptrending), /recent (first pool created), and the Express Verification flow (check-eligibility, craft-txn, execute, 1000 JUP). Keyless requests work at 0.5 RPS; x-api-key raises the limit. The Content API is deprecated."
 ---
 
@@ -57,14 +57,14 @@ Keyless requests are limited to 0.5 requests per second. For production, pass an
 
 ## Supported tokens and lookups
 
-The API covers tokens trading on Solana, both SPL Token and Token-2022 mints. New tokens appear once their first liquidity pool is created, which is the order the `/recent` endpoint lists them in. Four endpoints cover the ways an application looks tokens up:
+Token objects carry `tokenProgram`, so both SPL Token and Token-2022 mints are returned, and the `/recent` endpoint lists tokens by the time their first pool was created. Four endpoints cover the ways an application looks tokens up:
 
 | Lookup | Endpoint | Returns |
 | --- | --- | --- |
 | By name, symbol or mint | [`GET /search`](/api-reference/tokens/search) | Closest matches for a name or symbol (20 by default), or the exact tokens for up to 100 comma-separated mints |
 | By tag | [`GET /tag`](/api-reference/tokens/tag) | Every token carrying a tag: `verified`, `lst` (liquid staking tokens) or `stocks` (tokenised equities) |
 | By category | [`GET /{category}/{interval}`](/api-reference/tokens/category) | Top tokens by `toporganicscore`, `toptraded` or `toptrending` over `5m`, `1h`, `6h` or `24h`, excluding majors such as SOL and USDC |
-| By recency | [`GET /recent`](/api-reference/tokens/recent) | Tokens whose first pool was just created, newest first |
+| By recency | [`GET /recent`](/api-reference/tokens/recent) | Tokens ordered by the time their first pool was created |
 
 Every endpoint returns the same token object, so one display component works for search results, tag lists and category rankings.
 
@@ -115,7 +115,7 @@ For more detail, see [How does Jupiter decide if a token is real?](https://devel
 
 ## Prices
 
-Every token object carries `usdPrice`, `mcap`, `fdv` and `liquidity`, plus price, volume, holder and liquidity changes in each `stats` interval, so a token page needs no second call. For pricing alone, such as valuing a wallet's holdings across up to 50 mints, use the [Price API](/price): it returns the same USD price with the `blockId` it was computed at, and nothing else.
+Every token object carries `usdPrice`, `mcap`, `fdv` and `liquidity`, plus price, volume, holder and liquidity changes in each `stats` interval, so a token page needs no second call. For pricing alone, such as valuing a wallet's holdings across up to 50 mints, use the [Price API](/price): it also returns a `usdPrice`, with the `blockId` it was computed at, and nothing else.
 
 ## Token Tags
 
@@ -188,12 +188,20 @@ Call `GET https://api.jup.ag/tokens/v2/search?query=<name, symbol or mint>`. The
 Combine three fields. `isVerified` tells you the token passed Jupiter's verification. `audit` reports whether the mint and freeze authorities are disabled and what share of supply the top holders own, and carries `isSus` only when the token has been flagged. `organicScore` separates real trading from bot activity. Tokens tagged `verified` can also be listed directly with `GET /tag?query=verified`.
 </Accordion>
 
+<Accordion title="How do I distinguish tokens that share the same symbol?">
+Use the mint address (`id`), which is unique; a symbol such as `USDC` or `JUP` can be claimed by any mint. When a `/search` by symbol returns several results, `isVerified`, `organicScore`, `holderCount`, `liquidity` and the `audit` flags separate the real token from imitations. In your own application, store and look tokens up by mint, never by symbol.
+</Accordion>
+
+<Accordion title="How do I discover trending or recently listed Solana tokens?">
+`GET /{category}/{interval}` with `toptrending`, `toptraded` or `toporganicscore` and an interval of `5m`, `1h`, `6h` or `24h` returns the current leaders, excluding majors such as SOL and USDC. `GET /recent` returns tokens ordered by the time their first pool was created. Both return the same token object as `/search`. See [Supported tokens and lookups](#supported-tokens-and-lookups).
+</Accordion>
+
 <Accordion title="How do I get a token verified?">
 Submit it on [Jupiter VRFD](https://verified.jup.ag), which is free, or use the [Express Verification API](/tokens/verification): check eligibility, craft a 1000 JUP payment transaction (payable in JUP, SOL, USDC or JUPUSD), sign it and execute. Verification and metadata updates are reviewed independently.
 </Accordion>
 
 <Accordion title="Should I use the Token API or the Price API for prices?">
-Both return the same USD price. Use the Token API when you also need metadata, verification or trading stats, for example on a token page. Use the [Price API](/price) when you only need prices, for example to value a wallet, since it prices up to 50 mints per request and returns the `blockId` each price was computed at.
+Both return a `usdPrice`. Use the Token API when you also need metadata, verification or trading stats, for example on a token page. Use the [Price API](/price) when you only need prices, for example to value a wallet, since it prices up to 50 mints per request and returns the `blockId` each price was computed at.
 </Accordion>
 
 <Accordion title="Do I need an API key?">

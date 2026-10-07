@@ -14,18 +14,18 @@ Comprehensive integration guidance for all Jupiter APIs. This is the starting po
 
 | Category | Description |
 |:---------|:------------|
-| Swap | Flagship swap API with managed execution (`/order` + `/execute`), custom transactions (`/build`), and gasless support |
-| Lend | Deposit and withdraw assets to earn yield |
-| Perps | Perpetual futures trading |
-| Trigger | Limit orders with price conditions |
-| Recurring | Dollar-cost averaging (DCA) strategies |
-| Token | Token metadata, search, and organic scoring |
-| Price | Real-time and historical pricing |
-| Prediction Markets | Binary outcome markets with JupUSD |
-| Send | Token transfers via invite links |
-| Studio | Token creation with Dynamic Bonding Curves |
-| Lock | Token vesting and lock |
-| Routing | DEX aggregation, RFQ integration, and market listing |
+| [Swap](/swap) | Flagship swap API with managed execution (`/order` + `/execute`), custom transactions (`/build`), and gasless support |
+| [Lend](/lend) | Deposit and withdraw assets to earn yield |
+| [Perps](/perps) | Perpetual futures trading |
+| [Trigger](/trigger) | Limit orders with price conditions |
+| [Recurring](/recurring) | Dollar-cost averaging (DCA) strategies |
+| [Token](/tokens) | Token metadata, search, and organic scoring |
+| [Price](/price) | Real-time and historical pricing |
+| [Prediction Markets](/prediction) | Binary outcome markets with JupUSD |
+| [Send](/send) | Token transfers via invite links |
+| [Studio](/studio) | Token creation with Dynamic Bonding Curves |
+| [Lock](/lock) | Token vesting and lock |
+| [Routing](/swap/routing/amm/integration) | DEX aggregation, RFQ integration, and market listing |
 
 The skill includes an intent router that maps developer goals to the right API, complete endpoint references, error handling patterns, and production hardening recommendations.
 
@@ -36,7 +36,7 @@ npx skills add jup-ag/agent-skills --skill "integrating-jupiter"
 
 ### jupiter-lend
 
-Deep-dive integration guidance for Jupiter Lend (powered by Fluid Protocol). Use this when building lending and borrowing features.
+Deep-dive integration guidance for [Jupiter Lend](/lend) (powered by Fluid Protocol). Use this when building lending and borrowing features.
 
 | Category | Description |
 |:---------|:------------|
@@ -70,7 +70,7 @@ npx skills add jup-ag/agent-skills --skill "integrating-jupiter"
 
 ## skill.md
 
-Jupiter's documentation also exposes a machine-readable skill file at [`developers.jup.ag/docs/skill.md`](https://developers.jup.ag/docs/skill.md). This is a high-level navigator that points AI agents to the available skills and their capabilities, following the [Mintlify skill.md](https://mintlify.com/docs/ai/skillmd) specification.
+Alongside [llms.txt](/ai/llms-txt), Jupiter's documentation also exposes a machine-readable skill file at [`developers.jup.ag/docs/skill.md`](https://developers.jup.ag/docs/skill.md). This is a high-level navigator that points AI agents to the available skills and their capabilities, following the [Mintlify skill.md](https://mintlify.com/docs/ai/skillmd) specification.
 
 ## Contributing
 

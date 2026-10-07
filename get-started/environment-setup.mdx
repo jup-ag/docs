@@ -13,7 +13,7 @@ npm install @solana/web3.js@1 @solana/spl-token bs58
 ```
 
 <Note>
-This documentation uses `@solana/web3.js` **v1**. Version 2 has a different API for transaction handling.
+This documentation uses `@solana/web3.js` **v1**. Version 2 has a different API for transaction handling. [Development Basics](/get-started/development-basics) covers the Solana concepts the guides assume.
 </Note>
 
 ## RPC Connection
@@ -25,12 +25,12 @@ const connection = new Connection('https://api.mainnet-beta.solana.com');
 ```
 
 <Info>
-Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters), but as your application grows, use a dedicated provider like [Helius](https://helius.dev/) or [Triton](https://triton.one/).
+Solana provides a [default RPC endpoint](https://solana.com/docs/core/clusters), but as your application grows, use a dedicated provider like [Helius](https://helius.dev/) or [Triton](https://triton.one/). Jupiter's API gateway regions are listed on [Latency and Server Locations](/portal/latency).
 </Info>
 
 ## Development Wallet
 
-<Warning>Never hardcode private keys in source code. Use environment variables or the Solana CLI keyfile.</Warning>
+<Warning>Never hardcode private keys in source code. Use environment variables or the Solana CLI keyfile. The same applies to the [API key](/portal/api-keys) you pass in `x-api-key`.</Warning>
 
 <CodeGroup>
 ```javascript .env file

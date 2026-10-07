@@ -47,11 +47,12 @@ BEFORE making the change.
 **Migration notes:** None. `llms.txt` regenerated; the example on `ai/llms-txt.mdx` updated to the current format.
 ### [2026-10-06] Ultra and Swap V1 pages declare a Swap V2 canonical instead of redirecting
 **Status:** implemented
-**Scope:** redirect
+**Scope:** unmaintained | seo
+**Linear issue:** BUILD-811
 **Files affected:** `ultra/*.mdx` (16), `api-reference/ultra/*.mdx` (7), `swap/v1/*.mdx` (7 of 8), `api-reference/swap/v1/*.mdx` (4)
 
-**Context:** BUILD-811 proposed redirecting the unmaintained Ultra pages to Swap V2 so that the `best swap api` ranking held by `/docs/ultra` (position 8) consolidates onto `/docs/swap`. Anmol (Slack, 2026-10-06): Ultra stays live and hidden until every integrator, Robinhood included, has migrated; integrator engineers still refer to those pages. Redirects are therefore off the table.
-**Decision:** Keep every page, URL and body unchanged and add a `canonical` frontmatter pointing at the Swap V2 page that replaces it (the mapping of the Ultra to Meta-Aggregator and Metis to Router migration guides). Mintlify renders it as `<link rel="canonical">` and `og:url` (verified on a preview, 2026-10-06). `swap/v1/payments-through-swap` keeps its own canonical: `/build` is ExactIn only, so there is no V2 equivalent.
+**Context:** BUILD-811 proposed redirecting the unmaintained Ultra pages to Swap V2 so that the `best swap api` ranking held by `/docs/ultra` (position 8) consolidates onto the maintained Swap V2 pages (BUILD-811 names `/docs/swap/order-and-execute` as the destination for the overview). Anmol (Slack, 2026-10-06): Ultra stays live and hidden until every integrator, Robinhood included, has migrated; integrator engineers still refer to those pages. Redirects are therefore off the table.
+**Decision:** Keep every page, URL and body unchanged and add a `canonical` frontmatter pointing at the Swap V2 page that replaces it (the mapping of the three migration guides: Ultra to Meta-Aggregator, Metis to Meta-Aggregator, Metis to Router). Mintlify renders it as `<link rel="canonical">` and `og:url` (verified on a preview, 2026-10-06). `swap/v1/payments-through-swap` gets no canonical: `/build` is ExactIn only, so there is no V2 equivalent.
 **Rationale:** Google treats a canonical as a strong hint, so the ranking signal moves to the maintained page while integrators keep full access. Worst case, Google ignores the hint and nothing changes. `noindex` would drop the ranking instead of moving it.
 **Alternatives considered:** Redirects, refused by Anmol. `noindex`, loses the signal. Doing nothing, leaves a deprecated page as the ranked one.
 **Migration notes:** None for readers. When Ultra is finally deprecated, replace these canonicals with real redirects to the same targets (the `/ultra-api/*` redirects added in PR #958 must then be repointed too, see the Redirect Log).

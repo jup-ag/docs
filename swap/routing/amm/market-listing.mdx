@@ -71,10 +71,10 @@ You can check your pool's liquidity directly via the UI of the DEX it was create
 
 ## What integrators see when a market is removed
 
-These criteria apply to Metis. When a market is removed from Metis routing:
+These criteria apply to [Metis](/swap#routing-engines). When a market is removed from Metis routing:
 
 - `/swap/v1/quote` returns `NO_ROUTES_FOUND`
-- `/swap/v2/build` returns `No routes found`
-- `/swap/v2/order` may still return a quote via another router (JupiterZ, OKX, or Dflow)
+- [`/swap/v2/build`](/swap/build) returns `No routes found`
+- [`/swap/v2/order`](/swap/order-and-execute) may still return a quote via another router (JupiterZ, OKX, or Dflow)
 
 If a token quotes on jup.ag but `/swap/v1/quote` returns `NO_ROUTES_FOUND`, the route is most likely coming from a non-Metis router. Use `/swap/v2/order` for Meta-Aggregator coverage across all routers.

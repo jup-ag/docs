@@ -4,9 +4,9 @@ description: "Authenticate with the Trigger Order API using a challenge-response
 llmsDescription: "How to authenticate with the Jupiter Trigger Order API V2. POST /trigger/v2/auth/challenge requests a challenge (message or transaction); POST /trigger/v2/auth/verify submits the signed challenge. Send authMode: access_refresh to receive a 15-minute accessToken plus a rotating refreshToken (expiresAt, tokenType); the legacy access_only mode returns a single 24h token and is deprecated. Covers POST /trigger/v2/auth/refresh (rotate the refresh token), POST /trigger/v2/auth/logout (revoke one session) and POST /trigger/v2/auth/logout-all (revoke every session), the 401-then-refresh retry pattern, and migration from access_only. Use the accessToken in the Authorization: Bearer header for all authenticated endpoints."
 ---
 
-The Trigger Order API V2 uses a challenge-response flow to authenticate users. Your wallet signs a challenge, and the server issues a JWT. There are two auth modes:
+The [Trigger Order API V2](/trigger) uses a challenge-response flow to authenticate users. Your wallet signs a challenge, and the server issues a JWT. There are two auth modes:
 
-- **`access_refresh`** (recommended): a 15-minute access token plus a rotating refresh token. Extend the session by calling `/refresh`, and revoke it with `/logout` or `/logout-all`.
+- **`access_refresh`** (recommended): a 15-minute access token plus a rotating refresh token. Extend the session by calling [`/refresh`](/api-reference/trigger/refresh), and revoke it with [`/logout`](/api-reference/trigger/logout) or [`/logout-all`](/api-reference/trigger/logout-all).
 - **`access_only`** (deprecated): a single JWT valid for 24 hours with no refresh or revocation. This is still the default when `authMode` is omitted.
 
 <Warning>
@@ -33,7 +33,7 @@ npm install @solana/web3.js bs58
 
 ## Step 1: Request a challenge
 
-Request a challenge for your wallet. The `type` field selects how your wallet will sign, and accepts exactly two values:
+Request a challenge for your wallet from [`/auth/challenge`](/api-reference/trigger/challenge). The `type` field selects how your wallet will sign, and accepts exactly two values:
 
 | `type` | Use it for | You sign with |
 | :--- | :--- | :--- |
@@ -76,7 +76,7 @@ const challenge = await challengeResponse.json();
 
 ## Step 2: Verify and get tokens
 
-Sign the challenge with your wallet, then submit the signature to `/verify`. Add `authMode: "access_refresh"` to the request body to receive refresh tokens. The challenge step is identical for both auth modes.
+Sign the challenge with your wallet, then submit the signature to [`/verify`](/api-reference/trigger/verify). Add `authMode: "access_refresh"` to the request body to receive refresh tokens. The challenge step is identical for both auth modes.
 
 **For message signing:**
 ```typescript
@@ -159,7 +159,7 @@ If you omit `authMode`, you get the deprecated `access_only` response instead: a
 
 ## Using the access token
 
-Include the access token in all authenticated requests:
+Include the access token in all authenticated requests, such as [Create Order](/trigger/create-order) and [Manage Orders](/trigger/manage-orders):
 
 ```typescript
 const response = await fetch('https://api.jup.ag/trigger/v2/vault', {

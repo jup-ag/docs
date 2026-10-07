@@ -4,7 +4,7 @@ description: "Deposit assets as collateral into a Jupiter Lend borrow position."
 llmsDescription: "Deposit collateral into a Jupiter Lend borrow position using getOperateIx with positive colAmount and zero debtAmount. Covers versioned (v0) transaction building with address lookup tables, positionId 0 for batch create + deposit, operate parameters table, and full TypeScript code example."
 ---
 
-Deposit collateral (supply assets) into an existing Jupiter Lend borrow position. The SDK builds operate instructions with a positive collateral amount and zero debt change. Transactions use versioned (v0) format with address lookup tables.
+Deposit collateral (supply assets) into an existing Jupiter Lend [borrow position](/lend/borrow/create-position). The SDK builds operate instructions with a positive collateral amount and zero debt change. Transactions use versioned (v0) format with address lookup tables.
 
 ## Deposit
 
@@ -111,7 +111,7 @@ Deposit collateral (supply assets) into an existing Jupiter Lend borrow position
     ```
 
     <Info>
-      After depositing, you can **Borrow** against this collateral. Monitor your LTV to avoid liquidation.
+      After depositing, you can [**Borrow**](/lend/borrow/borrow) against this collateral. Monitor your LTV with the [Read SDK](/lend/borrow/read-vault-data) to avoid [liquidation](/lend/borrow/liquidation).
     </Info>
   </Step>
 </Steps>

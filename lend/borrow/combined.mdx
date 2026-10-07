@@ -4,7 +4,7 @@ description: "Run create, deposit, borrow, repay, and withdraw in a single trans
 llmsDescription: "Combine multiple Jupiter Lend borrow operations (create position, deposit, borrow, repay, withdraw) into a single transaction using multiple getOperateIx calls. Covers positionId 0 for auto-creation, instruction merging, address lookup table deduplication, and full TypeScript code example."
 ---
 
-Combine multiple borrow operations into one transaction. Pass both `colAmount` and `debtAmount` in a single `getOperateIx` call to batch operations (e.g. deposit + borrow, or repay + withdraw). When `positionId` is `0`, the first call creates a new position and returns `positionId` for use in the second call. Transactions use versioned (v0) format with address lookup tables.
+Combine multiple borrow operations into one transaction. Pass both `colAmount` and `debtAmount` in a single `getOperateIx` call to batch operations (e.g. [deposit](/lend/borrow/deposit) + [borrow](/lend/borrow/borrow), or [repay](/lend/borrow/repay) + [withdraw](/lend/borrow/withdraw)). When `positionId` is `0`, the first call creates a new position and returns `positionId` for use in the second call. Transactions use versioned (v0) format with address lookup tables.
 
 ---
 
@@ -158,7 +158,7 @@ Combine operations by passing both `colAmount` and `debtAmount` in one call (e.g
     Pass both `colAmount` and `debtAmount` in a single `getOperateIx` call to batch two operations. Deposit + borrow: `colAmount` > 0, `debtAmount` > 0. Repay + withdraw: `colAmount` < 0, `debtAmount` < 0.
   </Accordion>
   <Accordion title="Using an existing position">
-    If you already have a position, use its `positionId` instead of `0` in the first call and skip the create step. Or use `positionId: positionId` for both calls when doing repay + withdraw only.
+    If you already have a [position](/lend/borrow/create-position), use its `positionId` instead of `0` in the first call and skip the create step. Or use `positionId: positionId` for both calls when doing repay + withdraw only.
   </Accordion>
 </AccordionGroup>
 

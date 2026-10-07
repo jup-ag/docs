@@ -12,12 +12,12 @@ llmsDescription: "How to atomically swap a Jupiter Lend borrow position from one
   Solana transactions have a 1232-byte size limit. If the serialised transaction exceeds 1232 bytes, the vault swap will not be possible in a single transaction. Consider splitting large positions or using simpler swap routes.
 </Warning>
 
-A vault swap moves your position from one vault to another atomically. Use Jupiter **Lite API** for swap quotes and instructions.
+A vault swap moves your [borrow position](/lend/borrow) from one vault to another atomically. Use the Jupiter **Lite API** ([Swap API](/swap/build)) for swap quotes and instructions.
 
 **Flow:** swap from SOL/USDC to SOL/USDT:
-1. Flashloan USDC
+1. [Flashloan](/lend/flashloan) USDC
 2. Repay all USDC debt and withdraw all SOL from vault 1
-3. Deposit SOL into vault 2 and borrow USDT with a 1-2 USD buffer for slippage
+3. [Deposit](/lend/borrow/deposit) SOL into vault 2 and [borrow](/lend/borrow/borrow) USDT with a 1-2 USD buffer for slippage
 4. Swap the new debt token → USDC
 5. Pay back the flashloan
 

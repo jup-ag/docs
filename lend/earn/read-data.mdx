@@ -5,7 +5,7 @@ llmsDescription: "Read Earn (supply) balances, positions, and pool metrics using
 ---
 
 <Note>
-  All position and pool data here is read from on-chain accounts using the **Jupiter Lend Read SDK**. No API calls are required.
+  All position and pool data here is read from on-chain accounts using the **Jupiter Lend Read SDK**. No API calls are required. For HTTP alternatives, see the [Earn API](/lend/earn/api) (`/tokens`, `/positions`, `/earnings`).
 </Note>
 
 ---
@@ -69,7 +69,7 @@ Use the Read SDK to list supported tokens, fetch pool details (supply rate, rewa
     ```
 
     <Info>
-      **Rates:** `supplyRate` and `rewardsRate` are scaled by the SDK's internal precision (e.g. 1e12). Use the same scaling when displaying APY or comparing with other sources.
+      **Rates:** `supplyRate` and `rewardsRate` are scaled by the SDK's internal precision (e.g. 1e12). Use the same scaling when displaying APY or comparing with other sources. The underlying market rates and utilisation come from the [Liquidity layer](/lend/liquidity/analytics).
     </Info>
   </Step>
 
@@ -127,7 +127,7 @@ Use the Read SDK to list supported tokens, fetch pool details (supply rate, rewa
   </Step>
 
   <Step title="Preview deposit and withdraw amounts">
-    Before depositing or withdrawing, preview how many shares you get for a given asset amount (deposit/mint) or how many assets you get for a given share amount (redeem/withdraw). Pass amounts as `BN`.
+    Before [depositing](/lend/earn/deposit) or [withdrawing](/lend/earn/withdraw), preview how many shares you get for a given asset amount (deposit/mint) or how many assets you get for a given share amount (redeem/withdraw). Pass amounts as `BN`.
 
     ```typescript
     import { BN } from "bn.js";

@@ -8,10 +8,10 @@ llmsDescription: "How to withdraw staked SOL from a Jupiter Lend Native Staked V
   These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
 </Info>
 
-Withdraw pool tokens from a Native Staked Vault, then burn them via the Single Pool program to receive your stake back.
+Withdraw pool tokens from a [Native Staked Vault](/lend/advanced/native-staked-vault), then burn them via the Single Pool program to receive your stake back.
 
 **Flow:**
-1. Withdraw pool tokens from vault via `getOperateIx` (negative colAmount)
+1. [Withdraw](/lend/borrow/withdraw) pool tokens from vault via `getOperateIx` (negative colAmount)
 2. Burn pool tokens with `SinglePoolProgram.withdraw` → receive stake account
 
 ---
@@ -35,7 +35,7 @@ Withdraw pool tokens from a Native Staked Vault, then burn them via the Single P
     ```
   </Step>
   <Step titleSize="h2" title="Withdraw Pool Tokens from Vault">
-    Use `getOperateIx` with `MAX_WITHDRAW_AMOUNT` to withdraw all collateral.
+    Use `getOperateIx` with `MAX_WITHDRAW_AMOUNT` to withdraw all collateral. As with a regular withdraw, this only succeeds if the resulting position stays within LTV, so [repay](/lend/borrow/repay) debt first if needed.
 
     ```typescript
     const { ixs: operateIxs, addressLookupTableAccounts } = await getOperateIx({

@@ -11,7 +11,7 @@ The Oracle Program delivers accurate price data to the protocol by integrating w
 
   The Oracle program has been audited by Zenith and Offside.
 
-  **Oracle Program Address:** `jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc`
+  **Oracle Program Address:** `jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc` (see all [program addresses](/lend/program-addresses)). Each vault exposes its oracle account in its [vault config](/lend/borrow/read-vault-data).
 </Info>
 
 ## Hop-Based Oracle System
@@ -45,7 +45,7 @@ This design enables the system to:
 | Operation type                                    | Max age                 |
 |---------------------------------------------------|-------------------------|
 | User operations (supply, borrow, repay, withdraw)  | 600 seconds (10 minutes)|
-| Liquidations                                      | 7200 seconds (2 hours)  |
+| [Liquidations](/lend/borrow/liquidation)          | 7200 seconds (2 hours)  |
 
 Pyth and Redstone use Unix timestamp freshness. Chainlink uses slot-based freshness (≈400 ms per slot).
 
@@ -69,7 +69,7 @@ Only Pyth validates confidence. Other sources (Chainlink, Redstone, StakePool, M
 | Redstone       | Redstone  | Additional price feeds                                                  |
 | Marinade       | MsolPool  | mSOL/SOL                                                                |
 | Jito           | StakePool | JITOSOL/SOL                                                             |
-| SPL Single Pool| SinglePool| Staked SOL (Helius, Jupiter, Nansen, Emerald, Shift, Kiln)              |
+| SPL Single Pool| SinglePool| Staked SOL (Helius, Jupiter, Nansen, Emerald, Shift, Kiln), used by [Native Staked Vaults](/lend/advanced/native-staked-vault) |
 | JupLend        | JupLend   | fToken exchange rates (e.g., JUPUSD)                                    |
 
 ## Oracle Verification Script

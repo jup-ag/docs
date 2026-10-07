@@ -1,7 +1,8 @@
 ---
-title: "Prediction Market API"
+title: "Solana Prediction Market API"
 sidebarTitle: "About Prediction"
-description: "Overview of Jupiter Prediction Market"
+description: "Jupiter's Prediction Market API: discover events, read prices and orderbooks, trade YES/NO contracts and claim payouts on Solana prediction markets through REST endpoints at api.jup.ag/prediction/v1."
+llmsDescription: "Overview of Jupiter's Prediction Market API at api.jup.ag/prediction/v1 (beta), a REST API for binary YES/NO prediction markets on Solana. Discovery: GET /events, /events/search, /events/{eventId}, /markets/{marketId} (buy and sell prices in micro USD, 1000000 = $1), /orderbook/{marketId}, /trading-status. Trading: POST /orders builds an unsigned buy order (ownerPubkey, marketId, isYes, isBuy, depositAmount, depositMint JupUSD or USDC, minimum $5), DELETE closes a position, POST /execute submits the signed transaction. Tracking: GET /positions, /orders, /orders/status/{pubkey}, /history, /profiles, /leaderboards, /trades. Settlement: POST /positions/{positionPubkey}/claim pays $1 per winning contract with no claim fee. Fees apply to executed trades only. Contract quantities are fractional (contractsMicro, contractsDecimal). US and South Korea IPs are blocked. Jupiter Forecast adds 15-minute BTC up/down markets under /forecast."
 ---
 
 <Note>
@@ -10,7 +11,13 @@ description: "Overview of Jupiter Prediction Market"
 The Prediction Market API is currently in beta and subject to breaking changes as we continue to improve the product. If you have any feedback, please reach out in [Discord](https://discord.gg/jup).
 </Note>
 
-The Jupiter Prediction Market enables you to participate in binary prediction markets on Solana, allowing users to trade on the outcomes of real-world events across categories like Sports, Crypto, Politics, E-sports, Culture, Economics, and Tech.
+The Prediction Market API is Jupiter's REST API for prediction markets on Solana, served at `https://api.jup.ag/prediction/v1`. A prediction market lets people trade on the outcome of a real-world event: each market has a YES and a NO side, a contract on the winning side pays \$1, and the price of a contract reflects the probability the market gives that outcome. The API covers the whole life of a trade:
+
+- Discover events and their binary markets across sports, crypto, politics, e-sports, culture, economics and tech, with live prices and orderbook depth.
+- Build buy and sell orders as unsigned Solana transactions, sign them with the user's wallet, and submit them through `/execute`.
+- Track positions, orders, P&L and history, and claim payouts of \$1 per winning contract, with no claim fee.
+
+Orders are funded in JupUSD or USDC. Trading applications, wallets, bots and analytics dashboards integrate it; the data behind Jupiter's own prediction market interface comes from the same endpoints.
 
 <CardGroup cols={2}>
   <Card title="Events & Markets" href="/prediction/events-and-markets" icon="magnifying-glass">
@@ -27,20 +34,114 @@ The Jupiter Prediction Market enables you to participate in binary prediction ma
   </Card>
 </CardGroup>
 
-### How It Works
+## Quick start
 
-Users can interact with the markets directly on Solana, and Jupiter will handle the off-chain actions required to:
-- **Open Positions**: Buy YES or NO contracts on market outcomes
-- **Manage Positions**: Buy to increase exposure or sell to reduce positions
-- **Claim Winnings**: Receive JupUSD payouts when your predictions are correct
-- **Track Performance**: Monitor positions, P&L, and trading history
+List one trending event with its markets. No API key is needed:
 
-Typical flow of actions:
-1. **Events are created** around real-world occurrences (e.g., "Will Solana reach $100k by end of 2026?")
-2. **Markets are established** within events, each representing a binary outcome (YES or NO)
-3. **Users trade contracts** at dynamic prices that reflect market sentiment (prices range from \$0 to \$1 per contract)
-4. **Events resolve** based on predetermined rules when the outcome is known
-5. **Winners claim payouts** - each winning contract is worth $1 (no claim fees)
+<CodeGroup>
+```bash Request
+curl "https://api.jup.ag/prediction/v1/events?filter=trending&includeMarkets=true&start=0&end=1"
+```
+
+```json Response (trimmed)
+{
+  "data": [
+    {
+      "eventId": "POLY-45915",
+      "category": "politics",
+      "metadata": { "title": "Brazil Presidential Election" },
+      "markets": [
+        {
+          "marketId": "POLY-601826",
+          "title": "Flávio Bolsonaro",
+          "status": "open",
+          "pricing": {
+            "buyYesPriceUsd": 850000,
+            "sellYesPriceUsd": 849000,
+            "buyNoPriceUsd": 151000,
+            "sellNoPriceUsd": 150000
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+</CodeGroup>
+
+Prices are in micro USD: `850000` is \$0.85, an implied probability of 85% for YES. Take a `marketId` from the response into `POST /orders` to build a buy order; the full sequence is on [Trading Lifecycle](/prediction/trading-lifecycle).
+
+<Tip>
+Keyless requests are limited to 0.5 requests per second. For production, pass an API key in the `x-api-key` header. See [Rate Limits](/portal/rate-limits).
+</Tip>
+
+## What prediction markets are
+
+A prediction market is a market on the outcome of a real-world occurrence, such as an election result, a match score or a token price at a date. On Jupiter every market is binary:
+
+- **Two outcomes.** Each market has a YES side and a NO side. An event groups one or more markets, for example one market per candidate or per team.
+- **Contracts pay \$1.** A contract on the winning side is worth \$1 at settlement; a contract on the losing side is worth nothing. Buying YES at \$0.70 and winning returns \$0.30 of profit per contract.
+- **Price is probability.** A YES price of \$0.70 means the market gives the outcome a 70% chance, and YES plus NO prices add up to about \$1.
+- **Settlement is final.** When the event resolves, the result is recorded onchain, winning positions become claimable and payouts come from the vault, with no claim fee.
+
+The sections [Architectural Components](#architectural-components) and [Key Concepts](#key-concepts) below describe events, markets, orders, positions, settlement, fees and fractional contracts in detail.
+
+## What the API does
+
+| Area | Endpoints | Documentation |
+| --- | --- | --- |
+| Discover events and markets | `GET /events`, `GET /events/search`, `GET /events/{eventId}`, `GET /events/suggested/{pubkey}`, `GET /markets/{marketId}` | [Events & Markets](/prediction/events-and-markets) |
+| Read prices and depth | `GET /orderbook/{marketId}`, `GET /events/scores`, `GET /trading-status` | [Events & Markets](/prediction/events-and-markets#get-orderbook-data) |
+| Open positions | `POST /orders` (unsigned buy transaction), `POST /execute` (submit the signed transaction) | [Open Positions](/prediction/open-positions) |
+| Manage positions | `DELETE /positions/{positionPubkey}` and close-all to sell, `GET /orders`, `GET /orders/status/{orderPubkey}` | [Manage Positions](/prediction/manage-positions) |
+| Track activity | `GET /positions`, `GET /positions/{positionPubkey}`, `GET /history` | [Position Data & History](/prediction/position-data) |
+| Claim payouts | `POST /positions/{positionPubkey}/claim` | [Claim Payouts](/prediction/claim-payouts) |
+| Profiles and social | `GET /profiles/{ownerPubkey}`, `GET /profiles/{ownerPubkey}/pnl-history`, `GET /trades`, `GET /leaderboards` | [Social Features](/prediction/social-features) |
+| Forecast and vault | `GET /forecast`, `GET /vault-info` | [Jupiter Forecast](/prediction/forecast) |
+
+Every endpoint is specified in the [Prediction API Reference](/api-reference/prediction/get-events).
+
+## How a trade works
+
+<Steps>
+  <Step title="Discover an event">
+    `GET /events` with `category`, `filter` or `tags`, or `GET /events/search?query=` for a keyword. Each event carries a `markets[]` array; pick the `marketId` of the outcome the user is trading.
+  </Step>
+  <Step title="Read the price">
+    `GET /markets/{marketId}` returns fresh `buyYesPriceUsd`, `buyNoPriceUsd`, `sellYesPriceUsd` and `sellNoPriceUsd` in micro USD. Re-fetch right before ordering; `GET /orderbook/{marketId}` shows how much size fills near that price.
+  </Step>
+  <Step title="Build the order">
+    `POST /orders` with `ownerPubkey`, `marketId`, `isYes`, `isBuy: true`, `depositAmount` and `depositMint` (JupUSD or USDC). The minimum order is \$5. The response is an unsigned Solana transaction.
+  </Step>
+  <Step title="Sign and execute">
+    Sign the transaction with the user's wallet and submit it to `POST /execute`. Jupiter's keeper network fills the order on the underlying market.
+  </Step>
+  <Step title="Track the position">
+    `GET /orders/status/{orderPubkey}` reports `pending`, `filled` or `failed`; `GET /positions?ownerPubkey=` returns contracts held, cost basis, mark-to-market value and P&L.
+  </Step>
+  <Step title="Sell or claim">
+    Sell before resolution with `DELETE /positions/{positionPubkey}`, or hold to settlement and call `POST /positions/{positionPubkey}/claim` to receive \$1 per winning contract.
+  </Step>
+</Steps>
+
+Full code for each step, with the data that flows from one call to the next, is on [Trading Lifecycle](/prediction/trading-lifecycle). For a complete application with video walkthrough and source, see [How to Build a Prediction Market App on Solana](/guides/how-to-build-a-prediction-market-app-on-solana).
+
+## Typical integrations
+
+<CardGroup cols={2}>
+  <Card title="Trading apps and wallets" icon="wallet" href="/guides/how-to-build-a-prediction-market-app-on-solana">
+    Event discovery, order building and position tracking behind your own interface, with the user signing in their wallet.
+  </Card>
+  <Card title="Bots and market participants" icon="robot" href="/prediction/events-and-markets#get-orderbook-data">
+    Orderbook depth, trading status and order status polling for automated strategies.
+  </Card>
+  <Card title="Dashboards and social products" icon="chart-line" href="/prediction/social-features">
+    Profiles, P&L history, leaderboards and the global trade feed.
+  </Card>
+  <Card title="Short-term BTC markets" icon="bitcoin" href="/prediction/forecast">
+    Jupiter Forecast's 15-minute BTC up/down rounds, tradable through the Prediction API or directly as tokens through the Swap API.
+  </Card>
+</CardGroup>
 
 ## Geographical Restrictions
 
@@ -49,7 +150,7 @@ Typical flow of actions:
 
 ## Architectural Components
 
-We have generalized the Prediction Market architecture to be agnostic of the underlying data provider. This allows us to support multiple data providers and easily add new ones in the future.
+We have generalised the Prediction Market architecture to be agnostic of the underlying data provider. This allows us to support multiple data providers and easily add new ones in the future.
 
 ### Events
 
@@ -225,9 +326,9 @@ Each contract represents a claim to **$1 if correct**:
 
 Contracts are fractional. Each response carries three forms of every contract quantity:
 
-- `*Micro` (e.g. `contractsMicro`) — exact amount in micro-contracts, where `1000000` = 1 contract. Use this for any math.
-- `*Decimal` (e.g. `contractsDecimal`) — exact amount as a decimal string (e.g. `"5.777773"`). Use this for display.
-- legacy whole-contract field (e.g. `contracts`) — the amount **floored to a whole number**. Kept for backwards compatibility only; fills can be fractional, so this value is truncated and must not be used for accounting.
+- `*Micro` (e.g. `contractsMicro`): exact amount in micro-contracts, where `1000000` = 1 contract. Use this for any math.
+- `*Decimal` (e.g. `contractsDecimal`): exact amount as a decimal string (e.g. `"5.777773"`). Use this for display.
+- legacy whole-contract field (e.g. `contracts`): the amount **floored to a whole number**. Kept for backwards compatibility only; fills can be fractional, so this value is truncated and must not be used for accounting.
 
 This applies across the API: `contracts`, `filledContracts`, `contractsSettled`, `newContracts`, and `totalActiveContracts` each have `*Micro` and `*Decimal` siblings.
 
@@ -301,3 +402,49 @@ Upon position creation, there will be 3 transactions involved:
 1. Create order: When opening a position, you sign a transaction to create an order for the position.
 2. Fill order: Once the order is created, our keeper system will pick up the order and fill them directly on the underlying prediction markets.
 3. Close order: Once the order is filled or not, the order will be closed.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="What endpoints are included in the Prediction Market API?">
+Discovery: `/events`, `/events/search`, `/events/{eventId}`, `/events/suggested/{pubkey}`, `/markets/{marketId}`, `/orderbook/{marketId}`, `/events/scores` and `/trading-status`. Trading: `POST /orders` to build a buy order, `DELETE` on a position to sell, and `POST /execute` to submit the signed transaction. Tracking: `/orders`, `/orders/status/{orderPubkey}`, `/positions`, `/positions/{positionPubkey}` and `/history`. Settlement: `POST /positions/{positionPubkey}/claim`. Social: `/profiles/{ownerPubkey}`, `/profiles/{ownerPubkey}/pnl-history`, `/trades` and `/leaderboards`. Plus `/forecast` and `/vault-info`. The table in [What the API does](#what-the-api-does) links each group to its guide; the [API Reference](/api-reference/prediction/get-events) has every parameter.
+</Accordion>
+
+<Accordion title="How do I query active prediction market orders via API?">
+Call `GET /orders?ownerPubkey=<wallet>` to list a wallet's orders, each with its `status` (`pending`, `filled` or `failed`), filled contracts, average fill price and fees. For a single order, `GET /orders/{orderPubkey}` returns the details and `GET /orders/status/{orderPubkey}` the status alone, which is what you poll after `/execute`. Open positions rather than orders come from `GET /positions?ownerPubkey=<wallet>`. See [Position Data & History](/prediction/position-data#querying-orders).
+</Accordion>
+
+<Accordion title="How does a trade reach the blockchain?">
+The API never holds keys. `POST /orders` returns an unsigned Solana transaction; your application signs it with the user's wallet and sends it back through `POST /execute`. Jupiter's keeper network then fills the order on the underlying market and the order status moves from `pending` to `filled` or `failed`. The same pattern applies to selling and claiming.
+</Accordion>
+
+<Accordion title="Which currency are trades settled in?">
+Orders are funded in JupUSD or USDC (`depositMint` on `POST /orders`), with a minimum of \$5 per order. Fees are charged in the mint used to buy. Payouts are \$1 per winning contract. Jupiter Forecast markets accept USDC only.
+</Accordion>
+
+<Accordion title="What fees does the Prediction Market API charge?">
+Fees apply to executed buys and sells only: nothing on resting orders and nothing on claims. The fee grows with trade size and with uncertainty, so contracts priced near \$0.50 cost slightly more than contracts near \$0.01 or \$0.99, and every fee is rounded up to the cent. The table in [Fees](#fees) gives the amounts for common prices; `POST /orders` responses include the fee for that order.
+</Accordion>
+
+<Accordion title="Is the API available in the United States?">
+No. United States and South Korea IP addresses are blocked from the Prediction Market API. See [Geographical Restrictions](#geographical-restrictions).
+</Accordion>
+
+<Accordion title="Do I need an API key?">
+Not to explore: keyless requests work at 0.5 requests per second. For production, pass an API key in the `x-api-key` header; one key covers every Jupiter API. See [Rate Limits](/portal/rate-limits).
+</Accordion>
+
+<Accordion title="How are contract quantities represented?">
+Contracts are fractional. Every quantity comes in three forms: `*Micro` as a string in micro-contracts (`1000000` = 1 contract, use it for math and parse it with `BigInt`), `*Decimal` as a decimal string for display, and a legacy whole-number field that is floored and must not be used for accounting. See [Fractional Contracts](#fractional-contracts).
+</Accordion>
+
+<Accordion title="How do winners get paid?">
+When an event resolves, the result is recorded onchain and winning positions become `claimable`. `POST /positions/{positionPubkey}/claim` builds the claim transaction, which pays \$1 per contract from the vault with no claim fee. Some markets settle automatically without a claim; [Claim Payouts](/prediction/claim-payouts) describes those cases and how to detect a lost position.
+</Accordion>
+
+<Accordion title="What is Jupiter Forecast?">
+Jupiter's native prediction market on Solana. The current markets are 15-minute Bitcoin up/down rounds settled from the Chainlink BTC/USD price. Each side is a Token-2022 mint worth \$1 if it wins, so the rounds can be traded through the Prediction API, which tracks positions and P&L for you, or directly through the Swap API as token swaps. See [Jupiter Forecast](/prediction/forecast).
+</Accordion>
+
+</AccordionGroup>

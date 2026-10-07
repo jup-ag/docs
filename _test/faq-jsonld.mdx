@@ -1,17 +1,15 @@
 ---
-title: "FAQ JSON-LD test"
-description: "Throwaway page to test whether a raw JSON-LD script reaches the server-rendered HTML."
+title: "FAQ JSON-LD test (inline)"
+description: "Throwaway page to test whether inline JSON-LD reaches the server-rendered HTML."
 noindex: true
 ---
 
-Test page for BUILD-810. Marker: FAQJSONLD-RAW-SCRIPT.
+Test page for BUILD-810, variant A: inline `<script>` with `dangerouslySetInnerHTML`. Marker: FAQJSONLD-INLINE.
 
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is this a test question?","acceptedAnswer":{"@type":"Answer","text":"Yes, marker FAQJSONLD-ANSWER."}}]}
-</script>
+<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is this an inline test question?","acceptedAnswer":{"@type":"Answer","text":"Yes, marker FAQJSONLD-INLINE-ANSWER."}}]}' }} />
 
 <AccordionGroup>
-<Accordion title="Is this a test question?">
-Yes, marker FAQJSONLD-ANSWER.
+<Accordion title="Is this an inline test question?">
+Yes, marker FAQJSONLD-INLINE-ANSWER.
 </Accordion>
 </AccordionGroup>

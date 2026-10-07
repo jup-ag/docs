@@ -1,0 +1,17 @@
+---
+title: "FAQ JSON-LD test (snippet)"
+description: "Throwaway page to test whether a .jsx snippet with JSON-LD reaches the server-rendered HTML."
+noindex: true
+---
+
+import { FaqJsonLd } from '/snippets/faq-jsonld.jsx';
+
+Test page for BUILD-810, variant B: `.jsx` snippet. Marker: FAQJSONLD-SNIPPET.
+
+<FaqJsonLd items={[["Is this a snippet test question?", "Yes, marker FAQJSONLD-SNIPPET-ANSWER."]]} />
+
+<AccordionGroup>
+<Accordion title="Is this a snippet test question?">
+Yes, marker FAQJSONLD-SNIPPET-ANSWER.
+</Accordion>
+</AccordionGroup>

@@ -105,7 +105,7 @@ Liquidate a position that has exceeded the protocol's liquidation threshold. You
 
 <AccordionGroup>
   <Accordion title="When can a position be liquidated?">
-    When the position's loan-to-value (LTV) or health factor crosses the vault's liquidation threshold. The exact rules and incentives are vault-specific: read `liquidationThreshold` and `liquidationPenalty` from the [vault config](/lend/borrow/read-vault-data), which also lists every position of a vault with its risk ratio. Prices come from the [Oracle program](/lend/oracles).
+    When the position's loan-to-value (LTV) or health factor crosses the vault's liquidation threshold. The exact rules and incentives are vault-specific: read `liquidationThreshold` and `liquidationPenalty` from the [vault config](/lend/borrow/read-vault-data). The same Read SDK lists every position of a vault with its risk ratio (`getAllPositionsWithRiskRatio`). Prices come from the [Oracle program](/lend/oracles).
   </Accordion>
   <Accordion title="Liquidator flow">
     As liquidator you typically supply the borrow token (or use absorb) and receive collateral. A [flashloan](/lend/flashloan) can source the borrow token within the same transaction. Check the vault's liquidation docs for exact parameters and rewards.

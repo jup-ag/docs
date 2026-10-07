@@ -4,7 +4,7 @@ description: "Repay borrowed debt"
 llmsDescription: "Repay borrowed debt on a Jupiter Lend borrow position using getOperateIx with zero colAmount and negative debtAmount. Covers partial and full repay, MAX_REPAY_AMOUNT sentinel for full debt repayment, versioned (v0) transaction building, and full TypeScript code example."
 ---
 
-Repay debt on a Jupiter Lend borrow position. The SDK builds operate instructions with zero collateral change and a negative debt amount. You must hold the borrow token in your wallet. Transactions use versioned (v0) format with address lookup tables.
+Repay debt on a Jupiter Lend [borrow position](/lend/borrow). The SDK builds operate instructions with zero collateral change and a negative debt amount. You must hold the borrow token in your wallet. Transactions use versioned (v0) format with address lookup tables.
 
 ---
 
@@ -53,7 +53,7 @@ Repay debt on a Jupiter Lend borrow position. The SDK builds operate instruction
     ```
 
     <Warning>
-      You must hold at least `REPAY_AMOUNT` of the borrow token in your wallet (or associated token account). Partial repay is supported; use an amount up to your current debt.
+      You must hold at least `REPAY_AMOUNT` of the borrow token in your wallet (or associated token account). Partial repay is supported; use an amount up to your current debt. If you only hold the collateral token, use [Repay with Collateral and Max Withdraw](/lend/advanced/repay-with-collateral-max-withdraw) instead.
     </Warning>
   </Step>
   <Step titleSize="h2" title="Build Repay Instructions">
@@ -133,7 +133,7 @@ For **repay**: `colAmount` = 0, `debtAmount` < 0 (negative).
 
 <AccordionGroup>
   <Accordion title="Partial vs full repay">
-    You can repay any amount up to your current debt. Partial repay reduces debt by that amount. For full repay, use your position's total debt (check vault APIs or UI for the exact value).
+    You can repay any amount up to your current debt. Partial repay reduces debt by that amount. For full repay, use your position's total debt, read with the [Read SDK](/lend/borrow/read-vault-data) or the [`/positions` endpoint](/api-reference/lend/borrow/positions).
   </Accordion>
   <Accordion title="Max repay (repay all debt)">
     To repay **all** debt in one go, use `MAX_REPAY_AMOUNT` from the SDK as `debtAmount`. The protocol treats this sentinel as "repay full debt":
@@ -151,7 +151,7 @@ For **repay**: `colAmount` = 0, `debtAmount` < 0 (negative).
     });
     ```
 
-    You must hold enough borrow token to cover the full debt; the protocol will take what is needed.
+    You must hold enough borrow token to cover the full debt; the protocol will take what is needed. To also withdraw the freed collateral in the same transaction, see [Combined Operations](/lend/borrow/combined).
   </Accordion>
 </AccordionGroup>
 

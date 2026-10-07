@@ -37,7 +37,7 @@ const SECTION_SUMMARIES = {
   "LO & DCA":
     "Vault-based trigger orders: limit orders (single, OCO for TP/SL, OTOCO) and DCA (time-based and price-conditional recurring swaps).",
   Prediction: "Binary prediction markets for real-world events.",
-  More: "Portfolio aggregation, Send (token transfers), Studio (token creation), and Lock (token vesting).",
+  More: "Send (token transfers), Studio (token creation), and Lock (token vesting).",
   // Tabs
   "Get Started": "Setup guides for environment, tooling, and first API calls.",
   AI: "AI-first developer experience — AI-friendly docs, CLI, agent skills, llms.txt, MCP integration, ecosystem tools, and everything AI agents need to build on Jupiter.",
@@ -285,7 +285,6 @@ emit("- [LO & DCA](https://developers.jup.ag/docs/trigger/index.md) (limit order
 emit("- [Lend](https://developers.jup.ag/docs/lend/index.md): `POST /lend/v1/earn/deposit`\n");
 emit("- [Price](https://developers.jup.ag/docs/price/index.md): `GET /price/v3?ids={mints}`\n");
 emit("- [Tokens](https://developers.jup.ag/docs/tokens/index.md): `GET /tokens/v2/search?query={query}`\n");
-emit("- [Portfolio](https://developers.jup.ag/docs/portfolio/index.md): `GET /portfolio/v1/positions?wallet={address}`\n");
 emit("- [Prediction](https://developers.jup.ag/docs/prediction/index.md): `POST /prediction/v1/order`\n\n");
 
 // Walk navigation in custom order: Get Started, AI, then product docs and the rest

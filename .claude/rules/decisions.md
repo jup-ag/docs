@@ -24,6 +24,18 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-10-07] Remove the public Portfolio API (v1); keep the hidden v2 B2B surface
+**Status:** implemented
+**Scope:** folder-structure | navigation | redirect
+**Files affected:** deleted `portfolio/{index,jupiter-positions}.mdx`, `api-reference/portfolio/{get-positions,get-staked-jup,get-platforms}.mdx`, `openapi-spec/portfolio/portfolio.yaml`; edited `docs.json` (removed Portfolio nav group + Portfolio API Reference group + 3 redirects), `portal/plans.mdx`, `portal/api-keys.mdx`, `ai/trading-mcp.mdx`, `ai/skills.mdx`, `generate-llms-from-docs.js`, `llms.txt`
+**Linear issue:** BUILD-915
+
+**Context:** Portfolio API is no longer a public product — usage is B2B-only going forward (YY, https://t.me/jup_dev/175). The ask was to remove it from the docs entirely, with no replacement/migration info ("there isn't really a space for this").
+**Decision:** Delete the public v1 Portfolio docs, API reference, and OpenAPI spec, and remove all public mentions (nav, plans credit table, api-keys permission list, Trading MCP + skills capability lists, llms.txt generator). **Keep** the already-hidden v2 pages (`portfolio/v2/index.mdx`, `api-reference/portfolio/v2/get-positions.mdx`, `openapi-spec/portfolio/v2/portfolio.yaml`) — they are `hidden: true`, out of nav, and excluded from llms.txt, serving as the B2B surface shared by direct URL with whitelisted orgs.
+**Rationale:** v1 was the public surface being retired; v2 was always the hidden whitelist-gated B2B surface, so it stays. No redirect target exists for the old v1 URLs (nothing public to point them at), so they 404 by design — consistent with "no space for this."
+**Alternatives considered:** (1) Redirect old v1 URLs to v2 — rejected, v2 is whitelist-gated B2B, not for public traffic. (2) Delete v2 too — rejected, YY explicitly said keep the v2 page.
+**Migration notes:** Removed the `/portfolio-api`, `/portfolio/positions`, and `/data-api` redirects (their destinations were deleted). `mint broken-links` and `node check-redirects.js` both pass. No changelog entry — not a public API change beyond removal, and the product is now B2B-only.
+
 ### [2026-08-25] Split the MM webhook (V1) page; version-scoped routing slugs
 **Status:** implemented
 **Scope:** folder-structure | navigation | rename | redirect

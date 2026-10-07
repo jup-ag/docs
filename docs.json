@@ -560,11 +560,6 @@
             "icon": "ellipsis",
             "groups": [
               {
-                "group": "Portfolio",
-                "tag": "BETA",
-                "pages": ["portfolio/index", "portfolio/jupiter-positions"]
-              },
-              {
                 "group": "Send",
                 "tag": "BETA",
                 "pages": [
@@ -601,14 +596,6 @@
               {
                 "group": "API Reference",
                 "pages": [
-                  {
-                    "group": "Portfolio",
-                    "pages": [
-                      "api-reference/portfolio/get-positions",
-                      "api-reference/portfolio/get-staked-jup",
-                      "api-reference/portfolio/get-platforms"
-                    ]
-                  },
                   {
                     "group": "Send",
                     "pages": [
@@ -2348,18 +2335,6 @@
     {
       "source": "/prediction/events-markets",
       "destination": "/prediction/events-and-markets"
-    },
-    {
-      "source": "/portfolio-api",
-      "destination": "/portfolio"
-    },
-    {
-      "source": "/portfolio/positions",
-      "destination": "/portfolio/jupiter-positions"
-    },
-    {
-      "source": "/data-api",
-      "destination": "/portfolio"
     },
     {
       "source": "/referral",

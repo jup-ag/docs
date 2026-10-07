@@ -208,9 +208,11 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
   the portfolio api, it will no longer be public and usage will only be for b2b"; ref
   https://t.me/jup_dev/175). Deleted: `portfolio/index.mdx`, `portfolio/jupiter-positions.mdx`,
   the three v1 `api-reference/portfolio/*` pages, and `openapi-spec/portfolio/portfolio.yaml`,
-  plus the Portfolio nav groups and the `/portfolio-api`, `/portfolio/positions`, `/data-api`
-  redirects in `docs.json`. No replacement/redirect target (B2B only, no public surface) — old
-  v1 URLs now 404 by design. Portfolio was also scrubbed from the public plans credit table,
+  plus the Portfolio nav groups in `docs.json`. There is no public replacement (B2B only), so
+  all eight removed public paths redirect to `/get-started` rather than 404 — including
+  `/portfolio-api`, `/portfolio/positions` and `/data-api`, which PR #958 had added six days
+  earlier as dead URLs still receiving traffic. Sources are exact paths, never a
+  `/portfolio/:slug*` wildcard, which would shadow the hidden v2 pages. Portfolio was also scrubbed from the public plans credit table,
   the api-keys permission list, the Trading MCP capability table (counts dropped 11→10 domains /
   75→72 tools), the integrating-jupiter skill table, and the llms.txt generator. **The hidden
   v2 docs were KEPT** (`portfolio/v2/index.mdx`, `api-reference/portfolio/v2/get-positions.mdx`,

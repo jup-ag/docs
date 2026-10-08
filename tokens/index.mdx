@@ -1,28 +1,86 @@
 ---
 title: "Solana Token API"
 sidebarTitle: "About Tokens"
-description: "Search, metadata, verification, and organic score for any Solana token"
-llmsDescription: "Jupiter Tokens API V2 for programmatic token discovery and metadata. Search by name/symbol/mint, get verification status, organic score, holder count, market cap, and trading stats. Covers verification levels (verified, unverified, banned), organic score methodology, and token tag standard."
+description: "Jupiter's Solana Token API: search any Solana token by name, symbol or mint and get its metadata, verification status, Organic Score and trading stats in one request."
+llmsDescription: "Overview of Jupiter's Token API at api.jup.ag/tokens/v2, the Solana token API behind jup.ag's search and token pages. GET /search?query=<name|symbol|mint> (up to 100 comma-separated mints) returns per token: id, name, symbol, icon, decimals, tokenProgram, socials, isVerified, organicScore and organicScoreLabel, audit flags (mint and freeze authority, top holders, isSus when flagged), usdPrice, mcap, fdv, liquidity, holderCount and buy/sell stats over 5m, 1h, 6h and 24h. Other endpoints: /tag (lst, verified, stocks), /{category}/{interval} (toporganicscore, toptraded, toptrending), /recent (first pool created), and the Express Verification flow (check-eligibility, craft-txn, execute, 1000 JUP). Keyless requests work at 0.5 RPS; x-api-key raises the limit. The Content API is deprecated."
 ---
 
-The Tokens API gives you search, metadata, verification status, and trading metrics for any Solana token. Use it to find tokens, display information to users, and filter by trust level.
+The Token API is Jupiter's REST API for Solana token data, served at `https://api.jup.ag/tokens/v2`. One `GET /search` request for a token name, symbol or mint address returns what an application needs to display and vet that token:
 
-## History
+- **Metadata**: name, symbol, icon, decimals, mint address, token program and project links.
+- **Trust signals**: Jupiter verification status, [Organic Score](#organic-score) and audit flags such as mint authority, freeze authority and top-holder concentration.
+- **Market data**: USD price, market cap, fully diluted valuation, liquidity, holder count and buy and sell statistics over 5 minutes, 1 hour, 6 hours and 24 hours.
 
-Token verification on Solana has evolved through several iterations: from the original Solana Token Registry (deprecated 2022), to Jupiter's community-maintained token lists (V1 via GitHub, V2 via Catdet List), to the current system powered by trading metrics, social signals, and Organic Score. Today, [Jupiter VRFD](https://verified.jup.ag) is the latest evolution, expanding beyond verification into token metadata, community content, and insights.
+It is the token data behind Jupiter's own search and token pages, and it answers without an API key for testing. Wallets, trading terminals, launchpads and analytics tools use it to build token lists, show token pages and filter out tokens their users should not see.
 
-## What You Get
+## Quick start
+
+Search for JUP by symbol. No API key is needed:
+
+<CodeGroup>
+```bash Request
+curl "https://api.jup.ag/tokens/v2/search?query=JUP"
+```
+
+```json Response (trimmed)
+[
+  {
+    "id": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+    "name": "Jupiter",
+    "symbol": "JUP",
+    "icon": "https://static.jup.ag/jup/icon.png",
+    "decimals": 6,
+    "isVerified": true,
+    "organicScore": 98.46,
+    "organicScoreLabel": "high",
+    "usdPrice": 0.3259,
+    "mcap": 1082025274.94,
+    "liquidity": 5789723.04,
+    "holderCount": 838275,
+    "audit": {
+      "mintAuthorityDisabled": true,
+      "freezeAuthorityDisabled": true,
+      "topHoldersPercentage": 15.46
+    },
+    "tags": ["verified", "community", "strict"],
+    "stats24h": { "priceChange": -2.1, "numBuys": 10234, "numSells": 9876 }
+  }
+]
+```
+</CodeGroup>
+
+The same endpoint resolves a batch of known mints: comma-separate up to 100 mint addresses in `query`. The full response schema is on [Token Information](/tokens/token-information) and the step-by-step tutorial is [How to Get Token Information on Solana](/guides/how-to-get-token-information).
+
+<Tip>
+Keyless requests are limited to 0.5 requests per second. For production, pass an API key in the `x-api-key` header. See [Rate Limits](/portal/rate-limits).
+</Tip>
+
+## Supported tokens and lookups
+
+Token objects carry `tokenProgram`, so both SPL Token and Token-2022 mints are returned, and the `/recent` endpoint lists tokens by the time their first pool was created. Four endpoints cover the ways an application looks tokens up:
+
+| Lookup | Endpoint | Returns |
+| --- | --- | --- |
+| By name, symbol or mint | [`GET /search`](/api-reference/tokens/search) | Closest matches for a name or symbol (20 by default), or the exact tokens for up to 100 comma-separated mints |
+| By tag | [`GET /tag`](/api-reference/tokens/tag) | Every token carrying a tag: `verified`, `lst` (liquid staking tokens) or `stocks` (tokenised equities) |
+| By category | [`GET /{category}/{interval}`](/api-reference/tokens/category) | Top tokens by `toporganicscore`, `toptraded` or `toptrending` over `5m`, `1h`, `6h` or `24h`, excluding majors such as SOL and USDC |
+| By recency | [`GET /recent`](/api-reference/tokens/recent) | Tokens ordered by the time their first pool was created |
+
+Every endpoint returns the same token object, so one display component works for search results, tag lists and category rankings.
+
+## Metadata and market data
 
 | Field | Description |
 | --- | --- |
-| **Metadata** | Name, symbol, icon, decimals, mint address |
+| **Metadata** | Name, symbol, icon, decimals, mint address, token program, project links (website, X, Telegram, Discord) |
 | **Verification** | Verification level (verified, unverified, banned) |
 | **Organic Score** | 0-100 score measuring genuine trading activity |
 | **Trading Stats** | Volume, price change, buy/sell counts across intervals (5m, 1h, 6h, 24h) |
-| **Market Data** | Holder count, market cap, liquidity |
+| **Market Data** | Holder count, market cap, fully diluted valuation, liquidity |
+| **Audit** | Mint and freeze authority status, top-holder percentage, `isSus` when a token has been flagged |
 | **Content** | Community-submitted text posts, tweets, summaries *(deprecated)* |
 
-## Verification Levels
+## Verification
 
 Jupiter categorises tokens into trust levels based on trading activity, social presence, and community review:
 
@@ -33,6 +91,8 @@ Jupiter categorises tokens into trust levels based on trading activity, social p
 | **Banned** | Flagged as malicious, scam, or misleading. | Do not display or warn users. |
 
 Check the `isVerified` field in the API response. Use `audit.isSus` as an additional signal for suspicious tokens. `audit.isSus` is only present when a token has been flagged, so check for the field's presence rather than its value.
+
+Projects submit tokens for verification on [Jupiter VRFD](https://verified.jup.ag) for free, or programmatically through the [Express Verification API](/tokens/verification), which costs 1000 JUP per submission and suits launchpads and agents.
 
 ## Organic Score
 
@@ -53,6 +113,10 @@ A few things to keep in mind when using it:
 
 For more detail, see [How does Jupiter decide if a token is real?](https://developers.jup.ag/blog/what-is-organic-score).
 
+## Prices
+
+Every token object carries `usdPrice`, `mcap`, `fdv` and `liquidity`, plus price, volume, holder and liquidity changes in each `stats` interval, so a token page needs no second call. For pricing alone, such as valuing a wallet's holdings across up to 50 mints, use the [Price API](/price): it also returns a `usdPrice`, with the `blockId` it was computed at, and nothing else.
+
 ## Token Tags
 
 Token tags are labels applied to tokens for categorisation and discoverability (e.g. `verified`, `lst`, `stocks`, `community`). Tags appear in the Jupiter UI and are available via the [GET /tag](/api-reference/tokens/tag) endpoint.
@@ -62,6 +126,23 @@ To get your tokens tagged:
 2. Provide a preferred tag name (short, mobile-friendly)
 3. Set a polling interval
 4. Reach out via [Discord](https://discord.gg/jup) to begin ingestion
+
+## Typical integrations
+
+<CardGroup cols={2}>
+  <Card title="Wallets and token selectors" icon="wallet" href="/guides/how-to-get-token-information">
+    `/search` for the token picker, `isVerified` and `audit` to warn users, and one batched `/search` call to resolve the mints in a wallet.
+  </Card>
+  <Card title="Trading terminals and discovery" icon="chart-line" href="/api-reference/tokens/category">
+    `/{category}/{interval}` for trending and top-traded lists, `/recent` for new launches, and the `stats` intervals for movers.
+  </Card>
+  <Card title="Launchpads and token projects" icon="rocket" href="/tokens/verification">
+    Submit new tokens for verification and metadata updates through the Express Verification API.
+  </Card>
+  <Card title="Analytics and AI agents" icon="robot" href="/ai/cli">
+    Organic Score, holder and volume statistics for screening, keyless calls for prototyping, and a Markdown version of this page at `.md`.
+  </Card>
+</CardGroup>
 
 ## API Reference
 
@@ -90,6 +171,56 @@ To get your tokens tagged:
     Get an unsigned 1000 JUP payment transaction
   </Card>
 </CardGroup>
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="How do I fetch token metadata using the Solana Token API?">
+Call `GET https://api.jup.ag/tokens/v2/search?query=<name, symbol or mint>`. The response is an array of token objects with `name`, `symbol`, `icon`, `decimals`, `id` (the mint address) and the project's links, alongside verification, Organic Score and market data. To resolve several known tokens at once, comma-separate up to 100 mint addresses in `query`. See [Token Information](/tokens/token-information) for every field.
+</Accordion>
+
+<Accordion title="What is the Organic Score in the Token API response?">
+`organicScore` is a 0-100 measure of how genuine a token's trading activity is, computed from organic volume, holders, traders and buyers after wallets that trade through known bots and automation tools are removed. It is relative to the rest of the ecosystem, moves most in a token's early growth, and comes with an `organicScoreLabel` (`high`, `medium`, `low`) that is too coarse for filtering: use the raw score. Details in [Organic Score](#organic-score).
+</Accordion>
+
+<Accordion title="How do I know whether a token is safe to show?">
+Combine three fields. `isVerified` tells you the token passed Jupiter's verification. `audit` reports whether the mint and freeze authorities are disabled and what share of supply the top holders own, and carries `isSus` only when the token has been flagged. `organicScore` separates real trading from bot activity. Tokens tagged `verified` can also be listed directly with `GET /tag?query=verified`.
+</Accordion>
+
+<Accordion title="How do I distinguish tokens that share the same symbol?">
+Use the mint address (`id`), which is unique; a symbol such as `USDC` or `JUP` can be claimed by any mint. When a `/search` by symbol returns several results, `isVerified`, `organicScore`, `holderCount`, `liquidity` and the `audit` flags separate the real token from imitations. In your own application, store and look tokens up by mint, never by symbol.
+</Accordion>
+
+<Accordion title="How do I discover trending or recently listed Solana tokens?">
+`GET /{category}/{interval}` with `toptrending`, `toptraded` or `toporganicscore` and an interval of `5m`, `1h`, `6h` or `24h` returns the current leaders, excluding majors such as SOL and USDC. `GET /recent` returns tokens ordered by the time their first pool was created. Both return the same token object as `/search`. See [Supported tokens and lookups](#supported-tokens-and-lookups).
+</Accordion>
+
+<Accordion title="How do I get a token verified?">
+Submit it on [Jupiter VRFD](https://verified.jup.ag), which is free, or use the [Express Verification API](/tokens/verification): check eligibility, craft a 1000 JUP payment transaction (payable in JUP, SOL, USDC or JUPUSD), sign it and execute. Verification and metadata updates are reviewed independently.
+</Accordion>
+
+<Accordion title="Should I use the Token API or the Price API for prices?">
+Both return a `usdPrice`. Use the Token API when you also need metadata, verification or trading stats, for example on a token page. Use the [Price API](/price) when you only need prices, for example to value a wallet, since it prices up to 50 mints per request and returns the `blockId` each price was computed at.
+</Accordion>
+
+<Accordion title="Do I need an API key?">
+Not to try it: keyless requests work at 0.5 requests per second. For production, pass an API key in the `x-api-key` header; the free plan starts at 1 request per second and paid plans go higher. One key covers every Jupiter API. See [Rate Limits](/portal/rate-limits).
+</Accordion>
+
+<Accordion title="How do I get my tokens tagged?">
+Host a public CSV of mint addresses, choose a short tag name and a polling interval, then ask in [Discord](https://discord.gg/jup) to start ingestion. Tags then appear in the Jupiter UI and through `GET /tag`. See [Token Tags](#token-tags).
+</Accordion>
+
+<Accordion title="Is the Content API still available?">
+The Content API (token posts, tweets and summaries from Jupiter VRFD) is deprecated and will be replaced as part of an upcoming Token API update. Existing integrators should reach out as described on the [Content API](/tokens/content) page. Token metadata, verification and market data are not affected.
+</Accordion>
+
+</AccordionGroup>
+
+## History
+
+Token verification on Solana has evolved through several iterations: from the original Solana Token Registry (deprecated 2022), to Jupiter's community-maintained token lists (V1 via GitHub, V2 via Catdet List), to the current system powered by trading metrics, social signals, and Organic Score. Today, [Jupiter VRFD](https://verified.jup.ag) is the latest evolution, expanding beyond verification into token metadata, community content, and insights.
 
 ## Learn More
 

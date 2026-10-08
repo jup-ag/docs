@@ -4,9 +4,9 @@ description: "Overview of the Custody account used in the Jupiter Perpetuals Pro
 llmsDescription: "The Custody account stores parameters and state for each token (SOL, ETH, BTC, USDC, USDT, JupUSD) managed by the JLP pool, including oracle data, pricing params, asset balances, and funding rate state."
 ---
 
-This page contains an overview of the  used in the Jupiter Perpetuals Program, and specifically the  account.
+This page contains an overview of the accounts used in the Jupiter Perpetuals Program, and specifically the `Custody` account.
 
-The `Custody` account is a struct which represents a set of parameters and states associated to custodies (tokens) managed by the JLP pool which consists of the following custodies.
+The `Custody` account is a struct which represents a set of parameters and states associated to custodies (tokens) managed by the [JLP pool](/perps/pool-account) which consists of the following custodies.
 
 | Custodies                                                                      |                                                                                |                                                                                |                                                                                 |                                                                                 |                                                                                    |
 | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -34,7 +34,7 @@ Each `Custody` account contains the following data:
 | `permissions`      | **Type:** `Permissions`<br/><br/> A set of global flags that can be set by the protocol's administrator to enable or disable trade actions which is useful during program upgrades or black swan events. |
 | `targetRatioBps`   | **Type:** `u64`<br/><br/> The target weightage (in basis points) for the custody in the JLP pool.                                                                                                        |
 | `assets`           | **Type:** [`Assets`](#assets)<br/><br/> Contains data used to calculate PNL, AUM, and core business logic for the program.                                                                               |
-| `fundingRateState` | **Type:** [`FundingRateState`](#fundingratestate)<br/><br/> Contains data used to calculate borrow fees for open positions.                                                                              |
+| `fundingRateState` | **Type:** [`FundingRateState`](#fundingratestate)<br/><br/> Contains data used to calculate borrow fees for [open positions](/perps/position-account).                                                                              |
 
 ### `PricingParams`
 

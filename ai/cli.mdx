@@ -4,7 +4,7 @@ description: "Trade on Jupiter from your terminal, Telegram, or through AI agent
 llmsDescription: "The Jupiter CLI (jup) is a command-line tool for interacting with Jupiter's products on Solana: Spot trading, Perpetual futures, and Lending. It is non-interactive and LLM-friendly by design, with JSON output mode for structured responses. Install via npm (npm i -g @jup-ag/cli). For full command references, key management, configuration, and JSON response schemas, see the CLI documentation at https://github.com/jup-ag/cli/tree/main/docs. Three usage paths: direct terminal, Telegram via OpenClaw/miniclaw, and AI agent integration."
 ---
 
-The Jupiter CLI (`jup`) lets you interact with Jupiter's products from the command line. Trade spot, open perps positions, earn yield, and more.
+The Jupiter CLI (`jup`) lets you interact with Jupiter's products from the command line. Trade [spot](/swap), open [perps](/perps) positions, [earn yield](/lend), and more.
 
 <Warning>
 The CLI is pre-v1 (early alpha) and should be considered unstable. Breaking changes may be introduced without warning.
@@ -61,7 +61,7 @@ For a more lightweight starting point, check out [miniclaw](https://github.com/y
 
 ### AI Agents
 
-The CLI is designed to be LLM-friendly. All commands are non-interactive and support JSON output for structured, parseable responses.
+The CLI is designed to be LLM-friendly. All commands are non-interactive and support JSON output for structured, parseable responses. For agents that integrate the APIs themselves, the [Documentation MCP](/ai/mcp) and the [agent skills](/ai/skills) provide the reference material and integration guidance.
 
 ```bash
 jup spot swap --from SOL --to USDC --amount 1 -f json
@@ -70,7 +70,7 @@ jup spot swap --from SOL --to USDC --amount 1 -f json
 AI agents (Claude Code, Cursor, Codex, etc.) can invoke CLI commands directly through shell access. Point your agent at the [CLI documentation on GitHub](https://github.com/jup-ag/cli/tree/main/docs) for complete command references and JSON response schemas.
 
 <Tip>
-Set an API key from [Portal](https://developers.jup.ag/portal) for higher rate limits when running automated workflows:
+Set an [API key](/portal/api-keys) from [Portal](https://developers.jup.ag/portal) for higher [rate limits](/portal/rate-limits) when running automated workflows:
 ```bash
 jup config set --api-key <your-key>
 ```

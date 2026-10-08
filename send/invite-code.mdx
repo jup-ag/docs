@@ -4,7 +4,7 @@ description: "Generate invite codes and derive deterministic keypairs for the Se
 llmsDescription: "Client-side utilities for generating 12-character base58 invite codes and deriving deterministic Solana keypairs for the Send API."
 ---
 
-This page covers the client-side prerequisites for the Send API: generating random 12-character base58 invite codes, deriving deterministic Solana secret keys from those codes, and the security requirements for handling invite codes and private keys.
+This page covers the client-side prerequisites for the [Send API](/send): generating random 12-character base58 invite codes, deriving deterministic Solana secret keys from those codes, and the security requirements for handling invite codes and private keys.
 
 ## Security
 
@@ -44,8 +44,8 @@ The following sections provide the complete implementation steps required before
   Create Solana Keypair instance from the secret key.
   </Step>
   <Step>
-  Post request to get Send transaction.
-   * If `craft-clawback`, requires an additional `invitePDA` to be passed in.
+  Post request to [`/craft-send`](/send/craft-send) to get the Send transaction.
+   * If [`/craft-clawback`](/send/craft-clawback), requires an additional `invitePDA` to be passed in.
   </Step>
   <Step>
   Sign with both sender and recipient keypair, then send transaction and wait for confirmation.

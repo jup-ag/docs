@@ -8,12 +8,12 @@ llmsDescription: "How to deposit staked SOL into a Jupiter Lend Native Staked Va
   These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
 </Info>
 
-Deposit your stake account into a Single Pool, receive pool tokens, then deposit those tokens into the corresponding Native Staked Vault (nsHELIUS, nsJUPITER, etc.) as collateral.
+Deposit your stake account into a Single Pool, receive pool tokens, then deposit those tokens into the corresponding [Native Staked Vault](/lend/advanced/native-staked-vault) (nsHELIUS, nsJUPITER, etc.) as collateral.
 
 **Flow:**
 1. Split stake into a new account
 2. Deposit the new stake into Single Pool → receive pool tokens
-3. Deposit pool tokens into vault via `getOperateIx`
+3. [Deposit](/lend/borrow/deposit) pool tokens into vault via `getOperateIx`
 
 ---
 
@@ -72,7 +72,7 @@ Deposit your stake account into a Single Pool, receive pool tokens, then deposit
     ```
   </Step>
   <Step titleSize="h2" title="Deposit Pool Tokens into Vault">
-    Find the vault by `supplyToken` = pool mint, then use `getOperateIx`.
+    Find the vault by `supplyToken` = pool mint with the [Read SDK](/lend/borrow/read-vault-data), then use `getOperateIx`.
 
     ```typescript
     const client = new Client(connection);

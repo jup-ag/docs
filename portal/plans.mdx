@@ -23,6 +23,8 @@ All plans use the same API (`api.jup.ag`) and have the same data freshness and l
 
 You can make requests without an API key at 0.5 requests per second (30 requests per minute). Keyless access is great for AI agent or test use cases, but for applications running in production for users, you should use the APIs with an API key - this unlocks higher rate limits and access to all Developer Platform features such as analytics, usage monitoring, and more.
 
+A [publishable key](/portal/api-keys#key-types) behaves like keyless access for rate limits and billing (the same per-IP limits, 0 credits, never billed), but attributes requests to your organisation so they appear in your analytics. Use one for keys that ship in a public client.
+
 ### Enterprise
 
 Need higher rate limits, custom SLAs, or volume pricing? [Contact us](https://airtable.com/apppC9l7PaT9XG8jN/pagjXGV6PFNwUd9P2/form).

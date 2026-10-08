@@ -1,10 +1,53 @@
 ---
 title: "API Keys"
 description: "Create API keys, restrict them to specific APIs, and manage their lifecycle."
-llmsDescription: "How to create and manage Jupiter Developer Platform API keys and restrict them with permissions. Keys are created inside a team, use the format jup_..., need a name unique within the team, and are shown in full only at creation (afterwards only the first and last few characters appear). Pass a key in the x-api-key header to api.jup.ag. New keys, permission changes, and deletions take effect within about 15 seconds. By default a key can call every Jupiter API. Permissions are an allow-list of products matched by case-sensitive path prefix, across Swap (which also covers /tx/v1/submit), Tokens, Price, Trigger, Recurring, Lend, Send, Studio, and Prediction. Once a list is set, the key can only call those endpoints, and a request to a disallowed endpoint is rejected at the gateway with 403 Forbidden and the message 'API key does not have access to this endpoint'. Covers the lifecycle (create, view, delete), permissions, and best practices: one key per app or environment, least privilege, and rotation."
+llmsDescription: "How to create and manage Jupiter Developer Platform API keys, choose between server and publishable key kinds, and restrict keys with permissions. Keys are created inside a team, use the format jup_..., and are shown in full only at creation. A server key (the default) carries your organisation's plan rate limit, endpoint access, and billing, so keep it on a server. A publishable key is safe to ship in a public client (browser, mobile app, extension): for access, rate limits, and billing it behaves like a request with no API key (keyless per-IP limits, keyless endpoints, 0 credits, never billed); the only difference is attribution, where the gateway logs it under your org, team, and key and forwards your org to Swap routing so org-specific fees and routing still apply. Publishable keys do not use your plan's rate limits or your org's access to protected endpoints. An existing key can be converted to publishable with no change to the key value (one-way, takes effect in about 15 seconds), after which its frontend firewall rules can be deleted. Pass a key in the x-api-key header to api.jup.ag. Permissions are an allow-list of products matched by case-sensitive path prefix, across Swap (which also covers /tx/v1/submit), Tokens, Price, Trigger, Recurring, Lend, Send, Studio, and Prediction; a request to a disallowed endpoint is rejected at the gateway with 403 Forbidden and the message 'API key does not have access to this endpoint'. Covers key kinds, the lifecycle (create, view, delete), permissions, and best practices: one key per app or environment, least privilege, and rotation."
 ---
 
-An API key authenticates your requests to `api.jup.ag`. You pass it in the `x-api-key` header. By default a key can call every Jupiter API, so keep it secret. Permissions let you restrict a key to specific APIs, so a key used in a client app, or one that leaks, can only reach the APIs you allowed.
+An API key authenticates your requests to `api.jup.ag`. You pass it in the `x-api-key` header. Keys come in two kinds: **server keys** for backend code you keep secret, and **publishable keys** for code that ships in a public client such as a browser, mobile app, or extension. [Permissions](#permissions) restrict any key to specific APIs.
+
+## Key types
+
+Every key is either a **server key** or a **publishable key**. New keys are server keys by default, and every key created before publishable keys existed is a server key.
+
+### Server key
+
+A server key carries your organisation's full access: your plan's [rate limit](/portal/rate-limits), your organisation's [endpoint permissions](#permissions), and your credit usage and billing. Keep a server key on a server. Anyone who copies it can spend your rate limit and your credits.
+
+### Publishable key
+
+A publishable key is safe to ship in a public client. For access, rate limits, and billing it behaves exactly like a request with **no API key**:
+
+- The same keyless [rate limits](/portal/rate-limits), applied per IP. It does not use your plan's rate limits.
+- The same endpoints a keyless request can reach. It cannot reach endpoints that need your organisation's access.
+- **0 credits, and never billed.**
+
+A copied publishable key gives nobody anything extra, because it grants no more than sending no key at all.
+
+The one difference from sending no key is **attribution**. The gateway logs publishable-key requests under your organisation, team, and key, so they appear in your [analytics](/portal/analytics), and it passes your organisation to Swap routing, so your organisation's fees and routing still apply. Requests with no key are logged under a shared anonymous organisation and never appear in your analytics.
+
+<Note>
+A publishable key does not use your plan's rate limits or your organisation's access to protected endpoints. If a call needs either, make it from your backend with a server key.
+</Note>
+
+### Which key to use
+
+| | Server key | Publishable key |
+| :--- | :--- | :--- |
+| Where it runs | Backend, kept secret | Any public client (browser, mobile, extension) |
+| Rate limit | Your [plan's limit](/portal/rate-limits) | Keyless limits, per IP |
+| Endpoint access | Your organisation's full access | Keyless endpoints only |
+| Credits and billing | Billed per your plan | 0 credits, never billed |
+| Attribution | Your org, team, and key | Your org, team, and key |
+| If copied | Exposes your full rate limit and credits | Grants nothing beyond sending no key |
+
+Use a server key for backend services. Use a publishable key for anything that runs in a public client. If a key ships in a browser, mobile app, or extension today, make it publishable.
+
+### Convert an existing key
+
+You can convert an existing key to a publishable key. The key value does not change, so your app keeps working with no code change, and the switch takes effect within about 15 seconds.
+
+Conversion is **one-way**: you cannot convert a publishable key back to a server key yourself. Move any backend traffic off the key first, then convert it. After converting a key that used to ship in your frontend, delete the [firewall](/portal/firewall) rules you added to protect it, because a publishable key no longer needs them.
 
 ## Create a key
 
@@ -15,7 +58,7 @@ API keys belong to a team. You can create and manage a team's keys if you are a 
     In [Portal](https://developers.jup.ag/portal), switch to the team the key is for, then open **API Keys**.
   </Step>
   <Step title="Create and name the key">
-    Create a key and give it a name. Names are unique within a team, so use something that identifies where the key runs, for example `web-app-prod` or `backend-staging`.
+    Create a key and give it a name. Names are unique within a team, so use something that identifies where the key runs, for example `web-app-prod` or `backend-staging`. Choose whether it is a server key or a publishable key (see [Key types](#key-types)).
   </Step>
   <Step title="Copy the key">
     The full key is shown **only once**, at creation. Copy it now and store it securely. After you close this dialog, Portal shows only the first and last few characters, and there is no way to reveal the full key again.
@@ -68,13 +111,14 @@ See [Response Codes](/portal/responses) for the other gateway responses.
 
 - **One key per app or environment.** Use separate keys for your web app, mobile app, and backend, and separate keys for staging and production. If one is exposed, you delete only that key. Your [rate limit](/portal/rate-limits) is shared across the organisation, so extra keys do not raise it.
 - **Least privilege.** Give each key only the permissions its app needs. A key used in a client app should be limited to the APIs that app actually calls.
-- **Rotate keys.** Replace keys periodically, and whenever one might be exposed. Create the new key, move traffic to it, then delete the old one. For a key you use in a client app, add [firewall](/portal/firewall) rules to limit abuse.
+- **Use a publishable key in client apps.** For a key that ships in a browser, mobile app, or extension, use a [publishable key](#key-types) rather than a server key. A server key in a public client exposes your organisation's full rate limit and credits to anyone who copies it.
+- **Rotate keys.** Replace keys periodically, and whenever one might be exposed. Create the new key, move traffic to it, then delete the old one.
 
 ## Related
 
 <CardGroup cols={2}>
   <Card title="Firewall" icon="shield-halved" href="/portal/firewall">
-    Block abuse and rate-limit traffic to keys you use in client apps.
+    Block and rate-limit abusive traffic to your server keys.
   </Card>
   <Card title="Organisations & Teams" icon="users" href="/portal/organisations">
     See who can create and manage a team's API keys.

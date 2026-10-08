@@ -18,6 +18,19 @@ priority fee = compute unit price × compute unit limit
 
 A tighter CU limit directly reduces the priority fee you pay. Setting it to the maximum (1,400,000) when you only use 200,000 means you pay 7x more than necessary. See [Solana fee structure](https://solana.com/docs/core/fees/fee-structure) for details.
 
+<Frame>
+  <iframe
+    src="https://plgrnd.io/embed?theme=dark&ref=jupiter-docs#flow=N4IgbiBcDMA0IDsD2ATApgZygbVASxShAGMBGEeAFwE8AHNIgYQHkBZVgUQDkAVCkWkgx5KeJAiigAHlAAM8alAC0paLIC+8FAENK2ySEpoplIrQBOYyzQAEAMzRobAXhvEkAW1oBXIze8IIjYWeMROAOtunj5+AUEANngeIgA6CAAKlmGQNqTysgU2ycTmSErx2l5I5pQYwWjmNowAqjYAFNoINsaVtPFoAJQAdLmwBfmFxaXlvdW1Lrk2FVU1QyDqmviEkIjkVHQMO1zNrABCHABK-ILCouIGMpDyIIpPmiA6egYI3h4ARg0oHlxhtYFsiAgAEz8Gj0IjHM6Xa5CERiCSQaRyBRQABskPen30GMQvwB5igkPGBVB4J2CAALDCDvCTucrvAbqj7sTHs9XqR6RotLoiaAfv9AZBgVSaSACBDoEy4UdWUiOSi7ujMU9sZBIaQABwEkXfUmSgVUjSbOXbEAePaGZk7VjNAAyPAAkulXQBNZG3NEPIEAVj5UDUxq+GNl8p2KDADthhxAABEPQA1D0pjj+rlakCPSEATjDkEFkdFMdtKETTtTHoAyt6AIJ+9UB7na+lqXXl4VR0BGExEdbW2N26H7ZUgF3ur2+3OaoNS0O6ylCj4m6Nj6tgSeO6dpzPZxeBnkUktrvIVyRVogofdJohppuu1unzsFqDd0v6jeEgwh1MHZRzBG17zARUp2TI8sxzds82XYtfxLG9tzA8cUCgg8YMbFs2wEDUzy7HsXgvf8t0HYxgJAUDaRIOwlWTFh2G4PgEKXc8YFI15oBxCiB0MaiiFdWYajqXQbG0Gx1zGQoWiWJIgjaSgkFoAYpIQFApMoGxKAACycUhYEFCZZCKbQpCSX52mSFAUH6AYAG4bD+JBKFUjwcn0pAAHcLIQag9KSTAimqNA1g2ABdeA0BQABzTAcHoqRqCUOLEoAfUyhBSCUcUySUSx4v0yglHtJRtHKNA7FMeAMCQbxzDCCEHQapqwgACU6Bzk1y-KzXMIq8BKurDG0cxEpo+0YQmqbuq0-oiAqqr+lq9YMNtVL0oStBsqhAaJSG4rSvKvK-mq9b6sa5q+v3drboW3qIUhQ7CpOsa9EmtBpsTOafqepadgqi61tMHciG2jK9syirzEwbx4jKj6lHjPLVpqsaHpa4G2purqeqBu08vhjBEeRkbStm76aLR6n5sJ5M0cqy7wc2yG0uh-b6TehphtG1GEyUUHMf4bG+sZa6OrQQGJd547Kc+-7aYTemAcZiDztZjaUs53bsuZ0nyf506ayUPAEBibWpduzWxfxmWNbjIWjaRk2lZp+8-pp2WvfNy3fG1iGdih-Wcrygq+ZRjxXoxq6QHF1r7el326Qjwb3bV6bH2V1OJxZsGdfAkO9aynLoHl93ytekX48TulsPFvOEAryOFdGrPlpzn2nfz2u2d1nay5joqEbdlH41j62E4drvk8e3uR9dimO6oZWIO7hnFqZvcC9F4OC1LmGGUrifd-7+eccQSWZ5T3uT7bzO18953N-V7eN+FoP2ZLoeYcn0eZNx6K1Rq9C2VtC42yvpPS+jsP6v0AcbD6nc4xv0oHnB8-sIH7x-ofP+Btd7LyrvGCuccsaz1frAjBhCx4ryps-KaEFsJfS3s9Z2pDv6Dy5plQ2tDiGQS-pA2+ttnZ4zvvAj4Ls+HIIYT9JhWdqEVwvgfUOZcSGIOAQLLCWDA5CPrpIxuDtFEaLoR7RhcZmG517to8Buj95RXUEAA"
+    title="Priority fee calculator: compute unit price times compute unit limit"
+    width="100%"
+    height="480"
+    style={{ width: '100%', borderRadius: '10px', border: 0 }}
+    sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+    allow="clipboard-write"
+    loading="lazy"
+  />
+</Frame>
+
 ## Customise compute unit price
 
 The `/build` response bakes a compute unit price into `computeBudgetInstructions` based on recent network priority fees. Use `computeUnitPricePercentile` to control how aggressively you bid:

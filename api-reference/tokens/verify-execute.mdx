@@ -3,4 +3,5 @@ openapi: /openapi-spec/tokens/v2/verification.yaml post /express/execute
 title: "Execute Verification (Tokens API)"
 sidebarTitle: "Execute"
 description: "Submit signed transaction with verification and metadata details"
+llmsDescription: "POST /verify/express/execute endpoint of the Jupiter Tokens API V2 at api.jup.ag/tokens/v2/verify/express/execute. Step 3 of express token verification: submits the signed payment transaction, records the payment, creates the verification request and optionally submits token metadata updates. Body: transaction, requestId, senderAddress, tokenId, twitterHandle, description, plus optional senderTwitterHandle, tokenMetadata, paymentCurrency, paymentAmount, jupOutputAmount. Returns status, signature, verificationCreated, metadataCreated, error, code. Verification and metadata updates are reviewed independently."
 ---

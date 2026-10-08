@@ -1,5 +1,6 @@
 ---
 title: "Refresh Token"
 description: "Rotate the refresh token and get a new access token"
+llmsDescription: "POST /auth/refresh endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/auth/refresh. Exchanges the current refreshToken for a new accessToken and a new refreshToken. Every call rotates the refresh token: store both new values and discard the old ones. Returns authMode, accessToken, refreshToken, expiresAt, tokenType."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /auth/refresh
 ---

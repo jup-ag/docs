@@ -2,4 +2,5 @@
 openapi: /openapi-spec/prediction/prediction.yaml delete /positions
 title: "Close All Positions"
 description: "Request unsigned transactions to close all open positions"
+llmsDescription: "DELETE /positions endpoint of the Jupiter Prediction Market API at api.jup.ag/prediction/v1/positions. Builds unsigned transactions that sell all contracts across every open position of a wallet. Body: minSellPriceSlippageBps (required), ownerPubkey. Returns data, one unsigned transaction per position, each to sign and submit with POST /execute."
 ---

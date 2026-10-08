@@ -1,5 +1,6 @@
 ---
 title: "Request Challenge"
 description: "Request a sign-in challenge for wallet authentication"
+llmsDescription: "POST /auth/challenge endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/auth/challenge. First step of wallet authentication: request a challenge to sign. Body: walletPubkey, type (message for standard wallets, transaction for hardware wallets that only sign transactions). Challenges expire after 5 minutes. Follow with POST /auth/verify."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /auth/challenge
 ---

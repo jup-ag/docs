@@ -1,5 +1,6 @@
 ---
 title: "Confirm Cancel DCA Order"
 description: "Submit the signed withdrawal transaction to finalize a DCA cancellation"
+llmsDescription: "POST /orders/dca/confirm-cancel/{id} endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/orders/dca/confirm-cancel/{id}. Step 2 of the two-step cancellation of a DCA order. Body: signedTransaction and cancelRequestId from the cancel step. Returns the remaining funds, moves the order to cancelled and responds with id and txSignature."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /orders/dca/confirm-cancel/{id}
 ---

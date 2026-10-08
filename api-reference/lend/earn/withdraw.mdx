@@ -2,4 +2,5 @@
 openapi: /openapi-spec/lend/lend.yaml post /earn/withdraw
 title: "Withdraw"
 description: "Request for a base64-encoded unsigned earn withdraw transaction to withdraw assets"
+llmsDescription: "POST /earn/withdraw endpoint of the Jupiter Lend API at api.jup.ag/lend/v1/earn/withdraw. Builds a base64-encoded unsigned transaction that withdraws an exact amount of the underlying asset from Jupiter Lend Earn, burning the matching jlToken shares. Body: asset, signer, amount. Returns transaction. To withdraw by number of shares, use /earn/redeem."
 ---

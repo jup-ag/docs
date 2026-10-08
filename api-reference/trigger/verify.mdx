@@ -1,5 +1,6 @@
 ---
 title: "Verify Challenge"
 description: "Submit the signed challenge to receive a JWT token"
+llmsDescription: "POST /auth/verify endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/auth/verify. Submit the signed challenge to receive tokens. authMode access_refresh (recommended) returns a 15-minute accessToken plus a rotating refreshToken; access_only (deprecated, default when omitted) returns a single 24-hour token and carries Deprecation and Link response headers. Use the access token as a Bearer credential on order endpoints."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /auth/verify
 ---

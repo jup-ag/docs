@@ -2,4 +2,5 @@
 openapi: /openapi-spec/prediction/prediction.yaml delete /positions/{positionPubkey}
 title: "Close Position"
 description: "Request an unsigned transaction to sell all contracts in a position"
+llmsDescription: "DELETE /positions/{positionPubkey} endpoint of the Jupiter Prediction Market API at api.jup.ag/prediction/v1/positions/{positionPubkey}. Builds an unsigned transaction that sells every contract of one position before the market resolves. Optional body: ownerPubkey. Returns transaction, txMeta, externalOrderId, requiredSigners, execution, executionModel, settlement, jupiterSwapRequestId, order. Sign it and submit with POST /execute."
 ---

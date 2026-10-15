@@ -1,5 +1,6 @@
 ---
 title: "Cancel DCA Order"
 description: "Initiate cancellation of a DCA order and craft the withdrawal transaction"
+llmsDescription: "POST /orders/dca/cancel/{id} endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/orders/dca/cancel/{id}. Step 1 of the two-step cancellation of a DCA order: moves it to withdrawing and returns an unsigned withdrawal transaction for the unfilled remainder (id, roundsRemaining, refundAmount, transaction, requestId). Rounds already filled are not reversed."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /orders/dca/cancel/{id}
 ---

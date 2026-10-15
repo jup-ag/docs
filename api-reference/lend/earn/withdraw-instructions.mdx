@@ -2,4 +2,5 @@
 openapi: /openapi-spec/lend/lend.yaml post /earn/withdraw-instructions
 title: "Withdraw Instructions"
 description: "Request for the instruction of an earn withdraw transaction to withdraw assets"
+llmsDescription: "POST /earn/withdraw-instructions endpoint of the Jupiter Lend API at api.jup.ag/lend/v1/earn/withdraw-instructions. Same inputs as /earn/withdraw (asset, signer, amount) but returns the raw instruction (programId, accounts, data) for custom transaction assembly."
 ---

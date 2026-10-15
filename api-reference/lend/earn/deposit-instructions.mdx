@@ -2,4 +2,5 @@
 openapi: /openapi-spec/lend/lend.yaml post /earn/deposit-instructions
 title: "Deposit Instructions"
 description: "Request for the instruction of an earn deposit transaction to deposit assets"
+llmsDescription: "POST /earn/deposit-instructions endpoint of the Jupiter Lend API at api.jup.ag/lend/v1/earn/deposit-instructions. Same inputs as /earn/deposit (asset, signer, amount) but returns the raw Solana instruction (programId, accounts, data) instead of a full transaction, for integrators who assemble their own transactions or compose the deposit with other instructions."
 ---

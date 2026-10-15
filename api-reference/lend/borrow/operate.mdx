@@ -2,4 +2,5 @@
 openapi: /openapi-spec/lend/borrow.yaml post /borrow/operate
 title: "Operate"
 description: "Request a base64-encoded unsigned borrow operate transaction (deposit, borrow, repay, withdraw)"
+llmsDescription: "POST /borrow/operate endpoint of the Jupiter Lend Borrow API at api.jup.ag/lend/v1/borrow/operate. Builds a base64-encoded unsigned versioned transaction for any borrow action on a vault position. Body: vaultId, positionId, signer, colAmount, debtAmount, optional positionOwner; optional param market. Positive colAmount deposits collateral and positive debtAmount borrows; negative values withdraw collateral and repay debt, so one call can deposit and borrow, or repay and withdraw, together. Returns nftId and transaction."
 ---

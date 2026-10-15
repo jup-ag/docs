@@ -2,4 +2,5 @@
 openapi: /openapi-spec/send/send.yaml post /craft-clawback
 title: "Craft Clawback"
 description: "Request for a base64-encoded unsigned Send transaction"
+llmsDescription: "POST /craft-clawback endpoint of the Jupiter Send API at api.jup.ag/send/v1/craft-clawback. Builds a base64-encoded unsigned transaction that returns an unclaimed Send invite's funds to the sender. Body: invitePDA, sender. Returns tx."
 ---

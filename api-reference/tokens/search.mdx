@@ -2,4 +2,5 @@
 openapi: /openapi-spec/tokens/v2/tokens.yaml get /search
 title: "Search"
 description: "Request a search by token's symbol, name or mint address"
+llmsDescription: "GET /search endpoint of the Jupiter Tokens API V2 at api.jup.ag/tokens/v2/search. Searches tokens by symbol, name or mint address. Required param: query. Returns an array of tokens with id (mint), name, symbol, icon, decimals, tokenProgram and the full token information set (verification, organic score, stats). Use it to resolve a ticker or name to a mint before calling Swap or Price."
 ---

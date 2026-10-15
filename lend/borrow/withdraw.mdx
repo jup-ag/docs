@@ -4,7 +4,7 @@ description: "Withdraw collateral from a Jupiter Lend borrow position."
 llmsDescription: "Withdraw collateral from a Jupiter Lend borrow position using getOperateIx with negative colAmount and zero debtAmount. Covers LTV constraints, MAX_WITHDRAW_AMOUNT sentinel for full withdrawal, versioned (v0) transaction building, and full TypeScript code example."
 ---
 
-Withdraw collateral (supply assets) from an existing Jupiter Lend borrow position. The SDK builds operate instructions with a negative collateral amount and zero debt change. You can only withdraw up to the amount that keeps your position within the vault's LTV limits. Transactions use versioned (v0) format with address lookup tables.
+Withdraw collateral (supply assets) from an existing Jupiter Lend [borrow position](/lend/borrow). The SDK builds operate instructions with a negative collateral amount and zero debt change. You can only withdraw up to the amount that keeps your position within the vault's LTV limits. Transactions use versioned (v0) format with address lookup tables.
 
 ## Withdraw
 
@@ -51,7 +51,7 @@ Withdraw collateral (supply assets) from an existing Jupiter Lend borrow positio
     ```
 
     <Warning>
-      Withdrawing collateral increases your LTV. Ensure you stay below the liquidation threshold; repay debt first if needed.
+      Withdrawing collateral increases your LTV. Ensure you stay below the [liquidation](/lend/borrow/liquidation) threshold; [repay](/lend/borrow/repay) debt first if needed.
     </Warning>
   </Step>
   <Step titleSize="h2" title="Build Withdraw Instructions">
@@ -146,7 +146,7 @@ For **withdraw**: `colAmount` < 0 (negative), `debtAmount` = 0.
     });
     ```
 
-    This only succeeds if the resulting position stays within LTV (e.g. you have no debt, or you repay first). Otherwise the vault will reject the transaction.
+    This only succeeds if the resulting position stays within LTV (e.g. you have no debt, or you repay first). Otherwise the vault will reject the transaction. To repay and withdraw in one transaction, see [Combined Operations](/lend/borrow/combined); to check the position first, see [Read vault data](/lend/borrow/read-vault-data).
   </Accordion>
 </AccordionGroup>
 

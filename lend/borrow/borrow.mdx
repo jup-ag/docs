@@ -4,7 +4,7 @@ description: "Borrow assets against your collateral"
 llmsDescription: "Borrow assets from a Jupiter Lend vault against deposited collateral using getOperateIx with zero colAmount and positive debtAmount. Covers versioned (v0) transaction building, operate parameters, LTV and interest mechanics, and full TypeScript code example."
 ---
 
-Borrow assets from a Jupiter Lend vault against your deposited collateral. The SDK builds operate instructions with zero collateral change and a positive debt amount. Transactions use versioned (v0) format with address lookup tables.
+Borrow assets from a Jupiter Lend vault against your [deposited collateral](/lend/borrow/deposit). The SDK builds operate instructions with zero collateral change and a positive debt amount. Transactions use versioned (v0) format with address lookup tables.
 
 ---
 
@@ -53,7 +53,7 @@ Borrow assets from a Jupiter Lend vault against your deposited collateral. The S
     ```
 
     <Warning>
-      You must have an existing position with deposited collateral. Your borrow capacity depends on collateral value and the vault's LTV limits.
+      You must have an existing [position](/lend/borrow/create-position) with deposited collateral. Your borrow capacity depends on collateral value and the vault's LTV limits.
     </Warning>
   </Step>
   <Step titleSize="h2" title="Build Borrow Instructions">
@@ -75,7 +75,7 @@ Borrow assets from a Jupiter Lend vault against your deposited collateral. The S
     ```
 
     <Info>
-      Borrow is operate with `colAmount` = 0 and `debtAmount` \> 0. The borrow token is sent to your wallet; you accrue interest until you **Repay**.
+      Borrow is operate with `colAmount` = 0 and `debtAmount` \> 0. The borrow token is sent to your wallet; you accrue interest until you [**Repay**](/lend/borrow/repay).
     </Info>
   </Step>
   <Step titleSize="h2" title="Build and Sign Transaction">
@@ -130,7 +130,7 @@ For **borrow**: `colAmount` = 0, `debtAmount` > 0.
 
 <AccordionGroup>
   <Accordion title="How much can you borrow?">
-    Your maximum borrow depends on your collateral value, the vault's loan-to-value (LTV) limits, and current borrows. Keep LTV below the liquidation threshold. The SDK does not provide a "max borrow" sentinel. Compute the maximum from your position (e.g. `getCurrentPosition` or `getFinalPosition`) and the vault's LTV, or use your app/API for the limit.
+    Your maximum borrow depends on your collateral value, the vault's loan-to-value (LTV) limits, and current borrows. Keep LTV below the [liquidation](/lend/borrow/liquidation) threshold, which you can read from the [vault config](/lend/borrow/read-vault-data). The SDK does not provide a "max borrow" sentinel. Compute the maximum from your position (e.g. `getCurrentPosition` or `getFinalPosition`) and the vault's LTV, or use your app/API for the limit.
   </Accordion>
   <Accordion title="Interest">
     Borrowed amounts accrue interest over time. Repay to reduce debt and stop interest on the repaid portion.

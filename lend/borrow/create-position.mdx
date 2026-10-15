@@ -4,7 +4,7 @@ description: "Create a new borrow position (position NFT)."
 llmsDescription: "Create a new borrow position (NFT) in a Jupiter Lend vault using getInitPositionIx from @jup-ag/lend/borrow. Required before depositing collateral or borrowing. Covers legacy transaction building, position ID usage, and option to batch create + deposit in one transaction."
 ---
 
-Create a new borrow position in a Jupiter Lend vault. You must create a position before you can deposit collateral, borrow, withdraw, or repay. The SDK returns a single instruction; the transaction uses a legacy (non-versioned) format.
+Create a new borrow position in a [Jupiter Lend vault](/lend/borrow). You must create a position before you can deposit collateral, borrow, withdraw, or repay. The SDK returns a single instruction; the transaction uses a legacy (non-versioned) format.
 
 ## Create Position
 
@@ -48,7 +48,7 @@ Create a new borrow position in a Jupiter Lend vault. You must create a position
     ```
 
     <Note>
-      Set `VAULT_ID` to the target vault (market). Vault IDs are protocol-specific; check Jupiter or the vault list for your market.
+      Set `VAULT_ID` to the target vault (market). Vault IDs are protocol-specific; list them with `getAllVaults()` from the [Read SDK](/lend/borrow/read-vault-data) or the [`/vaults` endpoint](/api-reference/lend/borrow/vaults).
     </Note>
   </Step>
   <Step titleSize="h2" title="Build Create Position Instruction">
@@ -106,7 +106,7 @@ Create a new borrow position in a Jupiter Lend vault. You must create a position
     You can skip a separate Create Position step by using `getOperateIx` with `positionId: 0`. The SDK batches init position and the first operate (deposit or borrow) in a single transaction. The returned `nftId` is your new position ID for future operations. See [**Deposit**](/lend/borrow/deposit) for an example.
   </Accordion>
   <Accordion title="Next steps">
-    After creating a position, **Deposit** collateral, then **Borrow**. Use **Withdraw** to remove collateral and **Repay** to reduce debt.
+    After creating a position, [**Deposit**](/lend/borrow/deposit) collateral, then [**Borrow**](/lend/borrow/borrow). Use [**Withdraw**](/lend/borrow/withdraw) to remove collateral and [**Repay**](/lend/borrow/repay) to reduce debt. To batch several operations in one transaction, see [Combined Operations](/lend/borrow/combined).
   </Accordion>
 </AccordionGroup>
 

@@ -4,12 +4,12 @@ description: "Query market state, interest rates, and utilisation for Jupiter Le
 llmsDescription: "How to use the @jup-ag/lend-read SDK Liquidity module for data and analytics: dashboards, APY aggregators, and protocol state queries. Covers listedTokens() for market discovery, getOverallTokenData() for supply/borrow rates and utilisation, getExchangePricesAndConfig() and calculateExchangePrice() for real-time price computation, getUserSupplyData() and getUserBorrowData() for individual positions, getUserMultipleBorrowSupplyData() for batched portfolio fetching, and getAllUserPositions() for global protocol state indexing. Distinct from Dune or other third-party analytics, this is the canonical SDK for Jupiter Lend liquidity layer data."
 ---
 
-The Liquidity layer is the foundation of Jupiter Lend, holding all the underlying assets. While you usually interact with the Earn (Lending) and Borrow (Vaults) layers to perform operations, querying the Liquidity layer directly is useful for **analytics, dashboards, and APY aggregators**.
+The [Liquidity layer](/lend/liquidity) is the foundation of [Jupiter Lend](/lend/architecture), holding all the underlying assets. While you usually interact with the Earn (Lending) and Borrow (Vaults) layers to perform operations, querying the Liquidity layer directly is useful for **analytics, dashboards, and APY aggregators**.
 
 The `@jup-ag/lend-read` SDK provides a `Liquidity` module to fetch real-time market data, interest rates, and raw user balances.
 
 <Note>
-  The Liquidity module is **read-only**. To supply or borrow assets, use the Earn or Borrow modules instead.
+  The Liquidity module is **read-only**. To supply or borrow assets, use the [Earn](/lend/earn) or [Borrow](/lend/borrow) modules instead.
 </Note>
 
 ## Understanding the Data
@@ -117,7 +117,7 @@ console.log("Borrows:", portfolio.userBorrowingsData);
 
 ## Global Protocol State
 
-This method is for analytics indexers or liquidator bots that need to map out the entire state of the protocol. It fetches every single active user position (supply and borrow) across the entire Liquidity protocol, allowing you to find the largest suppliers or identify at-risk positions globally.
+This method is for analytics indexers or [liquidator](/lend/borrow/liquidation) bots that need to map out the entire state of the protocol. It fetches every single active user position (supply and borrow) across the entire Liquidity protocol, allowing you to find the largest suppliers or identify at-risk positions globally.
 
 ```typescript
 // Fetch every active position in the protocol

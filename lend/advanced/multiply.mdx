@@ -12,12 +12,12 @@ llmsDescription: "How to build a leveraged (multiply/looping) position on Jupite
 
 For example, to multiply your SOL exposure using USDC debt:
 1. You have 1 SOL (collateral).
-2. Flashloan 100 USDC from Jupiter Lend (debt asset).
+2. [Flashloan](/lend/flashloan) 100 USDC from Jupiter Lend (debt asset).
 3. Swap 100 USDC → SOL using Jupiter Lite API.
-4. Deposit your SOL + swapped SOL into the vault and borrow 100 USDC.
+4. [Deposit](/lend/borrow/deposit) your SOL + swapped SOL into the vault and [borrow](/lend/borrow/borrow) 100 USDC.
 5. Pay back the flashloan with the borrowed USDC.
 
-All of this happens atomically in a single Solana transaction.
+All of this happens atomically in a single Solana transaction. To reverse it, see [Unwind](/lend/advanced/unwind).
 
 ---
 

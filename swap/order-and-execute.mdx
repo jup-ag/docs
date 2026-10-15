@@ -436,6 +436,7 @@ The `code` field in the `/execute` response indicates the result. `0` is success
 | `-1002` | Aggregator | Invalid transaction |
 | `-1003` | Aggregator | Transaction not fully signed |
 | `-1004` | Aggregator | Invalid block height |
+| `-1005` | Aggregator | Transaction expired before it landed (its blockhash expired, usually because it was signed too late) |
 | `-2000` | RFQ | Failed to land |
 | `-2001` | RFQ | Unknown error |
 | `-2002` | RFQ | Invalid payload |

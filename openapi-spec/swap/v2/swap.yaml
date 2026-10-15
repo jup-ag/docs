@@ -725,7 +725,7 @@ paths:
                     description: |
                       - Error code. 0 = success.
                       - Ultra: -1 (missing cached order), -2 (invalid signed tx), -3 (invalid message bytes).
-                      - Aggregator: -1000 (failed to land), -1001 (unknown), -1002 (invalid tx), -1003 (not fully signed), -1004 (invalid block height).
+                      - Aggregator: -1000 (failed to land), -1001 (unknown), -1002 (invalid tx), -1003 (not fully signed), -1004 (invalid block height), -1005 (transaction expired before it landed).
                       - RFQ: -2000 (failed to land), -2001 (unknown), -2002 (invalid payload), -2003 (quote expired), -2004 (swap rejected).
                   totalInputAmount:
                     type: string

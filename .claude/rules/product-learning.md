@@ -149,6 +149,10 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 - [2026-04-09] `/build` code examples now default to `/submit` as the submission path instead of `sendRawTransaction`. Comments note "or use your own RPC / transaction pipeline" for integrators not using `/submit`.
 - [2026-04-16] Code examples for `/build` and `/submit` must include confirmation polling as the final step (`confirmTransaction` with blockhash strategy). Step numbering must be consistent across pages that share the same flow (currently 7 steps: call API, collect instructions, prepare blockhash/ALTs, simulate CU, build final tx, sign and submit, confirm).
 
+## /execute error codes
+
+- [2026-10-15] `-1005` = the transaction expired before it landed (blockhash expired). Missing from the `/execute` table until this PR, although the legacy `ultra/response.mdx` table already listed it ("Expired"), along with `-1006` (timed out) and `-1007` (gasless unsupported wallet), which are still unconfirmed for Swap V2. Wei Liang (2026-10-15): it typically happens when the user takes too long to sign, and a few occurrences are normal. With Solana block times now ~200 ms and a recent blockhash valid for 150 blocks, a transaction lives ~30 s (it was ~60 s before). The backend parameters are being adjusted. Surfaced by Galileo support (13 user conversations in a week).
+
 ## dexes / excludeDexes behaviour
 
 - [2026-09-10] `GET /swap/v2/program-id-to-label` is live, proxied from V1 (BUILD-880, PR #954). Verified by anmol on live: answers **keyless** on both `/swap/v1` and `/swap/v2` prefixes, and the two prefixes return **byte-identical maps** (107 program IDs, 104 unique labels; `Sanctum` is the only label mapping to more than one program ID). Documented at `api-reference/swap/program-id-to-label.mdx`; the response schema example was dropped per YY.

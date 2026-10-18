@@ -63,7 +63,7 @@ Token objects carry `tokenProgram`, so both SPL Token and Token-2022 mints are r
 | --- | --- | --- |
 | By name, symbol or mint | [`GET /search`](/api-reference/tokens/search) | Closest matches for a name or symbol (20 by default), or the exact tokens for up to 100 comma-separated mints |
 | By tag | [`GET /tag`](/api-reference/tokens/tag) | Every token carrying a tag: `verified`, `lst` (liquid staking tokens) or `stocks` (tokenised equities) |
-| By category | [`GET /{category}/{interval}`](/api-reference/tokens/category) | Top tokens by `toporganicscore`, `toptraded` or `toptrending` over `5m`, `1h`, `6h` or `24h`, excluding majors such as SOL and USDC |
+| By category | [`GET /{category}/{interval}`](/api-reference/tokens/category) | Top tokens by `toporganicscore`, `toptraded` or `toptrending` over `5m`, `1h`, `6h` or `24h`. `toptraded` and `toptrending` leave out majors such as SOL and USDC; `toporganicscore` includes them |
 | By recency | [`GET /recent`](/api-reference/tokens/recent) | Tokens ordered by the time their first pool was created |
 
 Every endpoint returns the same token object, so one display component works for search results, tag lists and category rankings.

@@ -172,6 +172,7 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 - [2026-06-19] `audit.isSus` is serialized `omitempty` in source (`datapipes/.../model/assetupdate.go`), so it is **only present when a token is flagged suspicious** — absence is intentional and is not a guarantee of safety. Confirmed absent on SOL/USDC live. Check field presence, not value.
 - [2026-06-19] `/tokens/v2/search?query=` accepts **comma-separated mint addresses, up to 100 per call**, returning full mint info in one request. This is the supported batch-by-mint path; there is no dedicated `/by-mint/:mint` route and one is not needed (DEV-568). Verified live with `SOL,USDC`.
 - [2026-06-19] Tokens stats `priceChange` (stats5m/1h/6h/24h) is a **percentage**, same as Price API `priceChange24h`. Source: `datapipes/internal/pkg/percent/percent.go` → `(new-old)/old*100`.
+- [2026-10-19] **`GET /tokens/v2/{category}/{interval}` does not treat the three categories alike on majors.** Verified live on `24h`: `toporganicscore` returns SOL, USDC and USDT as its top results, while `toptraded` (cbBTC, PUMP, ZEC, HYPE...) and `toptrending` (TTWO, BP, CRCLx...) return no majors at all. Nothing in `openapi-spec/tokens/` documents an exclusion either way, so a blanket "excludes majors such as SOL and USDC" is wrong for `toporganicscore` (caught in PR #971, where the lookup table applied it to all three). An integrator building a trending list off `toporganicscore` gets SOL and USDC at the top.
 
 ## Ambiguities
 

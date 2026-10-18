@@ -82,7 +82,7 @@ A prediction market is a market on the outcome of a real-world occurrence, such 
 - **Two outcomes.** Each market has a YES side and a NO side. An event groups one or more markets, for example one market per candidate or per team.
 - **Contracts pay \$1.** A contract on the winning side is worth \$1 at settlement; a contract on the losing side is worth nothing. Buying YES at \$0.70 and winning returns \$0.30 of profit per contract.
 - **Price is probability.** A YES price of \$0.70 means the market gives the outcome a 70% chance, and YES plus NO prices add up to about \$1.
-- **Settlement is final.** When the event resolves, the result is recorded onchain, winning positions become claimable and payouts come from the vault, with no claim fee.
+- **Settlement is final.** When the event resolves, the result is recorded onchain, winning positions become claimable and payouts come from the vault, with no claim fee. [Jupiter Forecast](/prediction/forecast) rounds are the exception: they settle atomically, so there is no claim step.
 
 The sections [Architectural Components](#architectural-components) and [Key Concepts](#key-concepts) below describe events, markets, orders, positions, settlement, fees and fractional contracts in detail.
 

@@ -114,6 +114,12 @@ Keyless requests work at 0.5 requests per second. Pass an API key in the `x-api-
   <Card title="Full control when you need it" icon="sliders" href="/swap/build">
     `/build` returns raw instructions for CPI, custom instructions and your own landing pipeline, with no Jupiter swap fee.
   </Card>
+  <Card title="Transparent fees" icon="receipt" href="/swap/order-and-execute#fees">
+    The platform fee depends on the token pair, from 0 bps on pegged assets and Jupiter tokens to 10 bps on most pairs. Every `/order` response shows `feeBps` and `feeMint`.
+  </Card>
+  <Card title="The infrastructure behind jup.ag" icon="server">
+    The same routing and landing serve Jupiter's own frontend.
+  </Card>
 </CardGroup>
 
 ## Typical integrations

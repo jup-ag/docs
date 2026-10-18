@@ -1,19 +1,16 @@
 ---
 title: "Solana Swap API"
 sidebarTitle: "Overview"
-description: "Jupiter's Solana Swap API: one GET /order returns a quote and a ready-to-sign transaction, routed across Metis, JupiterZ RFQ, Dflow and OKX."
-llmsDescription: "Overview of Jupiter's Swap API at api.jup.ag/swap/v2, the Solana swap API behind jup.ag. One GET /order call returns a quote and, with a taker wallet, a ready-to-sign transaction; POST /execute lands it. Routing engines compete for the best price: Metis onchain routing, JupiterZ RFQ market makers, Dflow and OKX. Two integration paths: Meta-Aggregator (/order + /execute, managed landing, gasless, Jupiter platform fee by token pair) and Router (/build + /submit or your own RPC, raw instructions, CPI, no Jupiter swap fee). Covers how a swap works step by step, when to use each path, routing engines, typical integrations (wallets, trading bots, AI agents, exchanges), migration from Ultra and Swap API V1, and an FAQ: quote without executing, RPC needs, fees, integrator and referral fees, gasless, slippage and RTSE, priority fees, sending through your own pipeline, rate limits, and migrating from V1 or Ultra."
+description: "Jupiter's Solana Swap API: GET /order returns a routed quote and a ready-to-sign transaction, GET /build returns raw instructions for custom transactions."
+llmsDescription: "Overview of Jupiter's Swap API at api.jup.ag/swap/v2, the Solana swap API behind jup.ag. One GET /order call returns a quote and, with a taker wallet, a ready-to-sign transaction; POST /execute lands it. On /order, routing engines compete for the best price: Metis onchain routing, JupiterZ RFQ market makers, Dflow and OKX; /build routes through Metis only. Two integration paths: Meta-Aggregator (/order + /execute, managed landing, gasless, Jupiter platform fee by token pair) and Router (/build + /submit or your own RPC, raw instructions, CPI, no Jupiter swap fee). Covers how a swap works step by step, when to use each path, routing engines, typical integrations (wallets, trading bots, AI agents, exchanges), migration from Ultra and Swap API V1, and an FAQ: quote without executing, RPC needs, fees, integrator and referral fees, gasless, slippage and RTSE, priority fees, sending through your own pipeline, rate limits, and migrating from V1 or Ultra."
 ---
 
-The Swap API is Jupiter's REST API for swapping tokens on Solana, served at `https://api.jup.ag/swap/v2`.
+The Swap API is Jupiter's REST API for swapping tokens on Solana, served at `https://api.jup.ag/swap/v2`. Wallets, exchanges, trading bots and AI agents integrate it through one of two paths:
 
-One request returns a quote and, when you pass a wallet, a transaction ready to sign:
+- **Meta-Aggregator** (`/order` + `/execute`): Metis onchain routing, JupiterZ market makers answering a Request for Quote (RFQ), Dflow and OKX compete on every request. You get a transaction ready to sign, Jupiter lands it, and you need no RPC node and no transaction assembly on your side.
+- **Router** (`/build` + `/submit` or your own RPC): raw swap instructions from Metis onchain routing only, for CPI, custom instructions and your own landing pipeline, with no Jupiter swap fee.
 
-- Jupiter's routing engines compete for the best price on every request: Metis onchain routing, JupiterZ market makers answering a Request for Quote (RFQ), Dflow and OKX.
-- No RPC node, no onchain state and no transaction assembly on your side.
-- One API key covers every Jupiter API, and quotes work without a key.
-
-Wallets, exchanges, trading bots and AI agents integrate the Swap API through one of two paths:
+Quotes work without an API key, and one key covers every Jupiter API.
 
 <CardGroup cols={2}>
   <Card title="Meta-Aggregator" icon="bolt" href="/swap/order-and-execute">

@@ -7,8 +7,8 @@ llmsDescription: "Overview of Jupiter's Swap API at api.jup.ag/swap/v2, the Sola
 
 The Swap API is Jupiter's REST API for swapping tokens on Solana, served at `https://api.jup.ag/swap/v2`. Wallets, exchanges, trading bots and AI agents integrate it through one of two paths:
 
-- **Meta-Aggregator** (`/order` + `/execute`): Metis onchain routing, JupiterZ market makers answering a Request for Quote (RFQ), Dflow and OKX compete on every request. You get a transaction ready to sign, Jupiter lands it, and you need no RPC node and no transaction assembly on your side.
-- **Router** (`/build` + `/submit` or your own RPC): raw swap instructions from Metis onchain routing only, for CPI, custom instructions and your own landing pipeline, with no Jupiter swap fee.
+- **Meta-Aggregator** (`/order` + `/execute`): Metis, JupiterZ market makers answering a Request for Quote (RFQ), Dflow and OKX compete on every request. You sign the transaction Jupiter returns and Jupiter lands it, with no RPC node needed.
+- **Router** (`/build` + `/submit` or your own RPC): raw instructions from Metis onchain routing only, for CPI, custom instructions and your own landing pipeline, with no Jupiter swap fee.
 
 Quotes work without an API key, and one key covers every Jupiter API.
 
@@ -47,62 +47,6 @@ Without `taker`, `/order` returns the quote only. Add `taker=<your wallet>` to r
 <Tip>
 Keyless requests are limited to 0.5 requests per second. For production, pass an API key in the `x-api-key` header. See [Rate Limits](/portal/rate-limits).
 </Tip>
-
-## Why integrate the Swap API
-
-<CardGroup cols={2}>
-  <Card title="Routers compete on every order" icon="trophy">
-    Metis, JupiterZ, Dflow and OKX compete on every `/order`. JupiterZ market makers often beat onchain routing by 5 to 20 bps on major pairs, and a self-learning mechanism sidelines underperforming sources.
-  </Card>
-  <Card title="Managed execution" icon="rocket" href="/swap/order-and-execute#3-execute-the-transaction">
-    `/execute` lands the transaction through Jupiter's landing pipeline, with the priority fee set for you and confirmation polling built in. Slippage is set earlier, at order time, by the Real-Time Slippage Estimator (RTSE).
-  </Card>
-  <Card title="Gasless swaps" icon="gas-pump" href="/swap/advanced/gasless">
-    Users without SOL can still swap. Jupiter sponsors gas automatically on eligible trades, JupiterZ market makers pay fees on their quotes, or you sponsor gas with your own `payer`.
-  </Card>
-  <Card title="Full control when you need it" icon="sliders" href="/swap/build">
-    `/build` returns raw instructions for CPI, custom instructions and your own landing pipeline, with no Jupiter swap fee.
-  </Card>
-  <Card title="Transparent fees" icon="receipt" href="/swap/order-and-execute#fees">
-    The platform fee depends on the token pair, from 0 bps on pegged assets and Jupiter tokens to 10 bps on most pairs. Every `/order` response shows `feeBps` and `feeMint`.
-  </Card>
-  <Card title="The infrastructure behind jup.ag" icon="server">
-    The same routing and landing serve Jupiter's own frontend. No RPC node, no onchain state and no transaction assembly on your side.
-  </Card>
-</CardGroup>
-
-## How a swap works
-
-<Tabs>
-  <Tab title="Meta-Aggregator">
-    <Steps>
-      <Step title="Get an order">
-        `GET /order` with `inputMint`, `outputMint`, `amount` and `taker`. The response contains the quote, the winning `router`, a `requestId` and a base64 transaction.
-      </Step>
-      <Step title="Sign the transaction">
-        Sign with the taker's key, and sign promptly: RFQ quotes carry an `expireAt`, and every quote goes stale as prices move.
-      </Step>
-      <Step title="Execute">
-        `POST /execute` with the signed transaction and the `requestId`. Jupiter lands it and returns the result and signature.
-      </Step>
-    </Steps>
-    Full code with `@solana/kit` and `@solana/web3.js`: [Order and Execute](/swap/order-and-execute).
-  </Tab>
-  <Tab title="Router">
-    <Steps>
-      <Step title="Get the instructions">
-        `GET /build` with the same swap parameters. The response contains swap, setup and cleanup instructions, compute budget instructions and address lookup tables.
-      </Step>
-      <Step title="Assemble your transaction">
-        Add your own instructions, simulate to set the compute unit limit, and compile a v0 transaction.
-      </Step>
-      <Step title="Sign and send">
-        Send it through your own RPC, or through [`/submit`](/transaction/submit) with a SOL tip for Jupiter's landing pipeline.
-      </Step>
-    </Steps>
-    Full code: [Build](/swap/build). The [Advanced](/swap/advanced) guides cover compute units, transaction size and latency.
-  </Tab>
-</Tabs>
 
 ## Choosing a path
 
@@ -154,6 +98,23 @@ Keyless requests work at 0.5 requests per second. Pass an API key in the `x-api-
 | --- | --- | --- |
 | GET | [`/swap/v2/build`](/swap/build) | Get a quote and raw swap instructions |
 | POST | [`tx.jup.ag`](/transaction/submit) | Land any signed transaction through Jupiter's infrastructure via Solana `sendTransaction` with SOL tips |
+
+## Why integrate the Swap API
+
+<CardGroup cols={2}>
+  <Card title="Routers compete on every order" icon="trophy" href="#routing-engines">
+    Metis, JupiterZ, Dflow and OKX compete on every `/order`. JupiterZ market makers often beat onchain routing by 5 to 20 bps on major pairs, and a self-learning mechanism sidelines underperforming sources.
+  </Card>
+  <Card title="Managed execution" icon="rocket" href="/swap/order-and-execute#3-execute-the-transaction">
+    `/execute` lands the transaction through Jupiter's landing pipeline, with the priority fee set for you and confirmation polling built in. Slippage is set earlier, at order time, by the Real-Time Slippage Estimator (RTSE).
+  </Card>
+  <Card title="Gasless swaps" icon="gas-pump" href="/swap/advanced/gasless">
+    Users without SOL can still swap. Jupiter sponsors gas automatically on eligible trades, JupiterZ market makers pay fees on their quotes, or you sponsor gas with your own `payer`.
+  </Card>
+  <Card title="Full control when you need it" icon="sliders" href="/swap/build">
+    `/build` returns raw instructions for CPI, custom instructions and your own landing pipeline, with no Jupiter swap fee.
+  </Card>
+</CardGroup>
 
 ## Typical integrations
 

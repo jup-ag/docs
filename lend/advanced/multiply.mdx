@@ -1,19 +1,19 @@
 ---
 title: "Multiply (Leverage)"
 description: "Build leveraged positions by combining flashloans, Jupiter Swap, and vault operations."
-llmsDescription: "How to build a leveraged (multiply/looping) position on Jupiter Lend using a single atomic Solana transaction. Combines getFlashBorrowIx/getFlashPaybackIx from @jup-ag/lend/flashloan, Jupiter Lite API swap-instructions endpoint for swaps, and getOperateIx from @jup-ag/lend/borrow for vault deposit+borrow. Covers the full flow: flashloan debt asset → swap to collateral → deposit collateral and borrow debt → payback flashloan. Includes complete TypeScript code example with VersionedTransaction, address lookup tables, and helper functions."
+llmsDescription: "How to build a leveraged (multiply/looping) position on Jupiter Lend using a single atomic Solana transaction. Combines getFlashBorrowIx/getFlashPaybackIx from @jup-ag/lend/flashloan, Jupiter Swap API swap-instructions endpoint for swaps, and getOperateIx from @jup-ag/lend/borrow for vault deposit+borrow. Covers the full flow: flashloan debt asset → swap to collateral → deposit collateral and borrow debt → payback flashloan. Includes complete TypeScript code example with VersionedTransaction, address lookup tables, and helper functions."
 ---
 
 <Info>
   These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
 </Info>
 
-"Multiply" (often called "looping" or "leveraging") is the process of using borrowed capital to increase your exposure to an asset. Use Jupiter **Lite API** for swap quotes and instructions.
+"Multiply" (often called "looping" or "leveraging") is the process of using borrowed capital to increase your exposure to an asset. Use Jupiter **Swap API** for swap quotes and instructions.
 
 For example, to multiply your SOL exposure using USDC debt:
 1. You have 1 SOL (collateral).
 2. [Flashloan](/lend/flashloan) 100 USDC from Jupiter Lend (debt asset).
-3. Swap 100 USDC → SOL using Jupiter Lite API.
+3. Swap 100 USDC → SOL using Jupiter Swap API.
 4. [Deposit](/lend/borrow/deposit) your SOL + swapped SOL into the vault and [borrow](/lend/borrow/borrow) 100 USDC.
 5. Pay back the flashloan with the borrowed USDC.
 
@@ -76,19 +76,20 @@ All of this happens atomically in a single Solana transaction. To reverse it, se
     ```
   </Step>
 
-  <Step titleSize="h2" title="Get Quote and Swap Instructions (Jupiter Lite API)">
-    Fetch a quote from Jupiter Lite API, then POST to `swap-instructions` to get the swap instruction. Build your own transaction, do not use a pre-built swap transaction.
+  <Step titleSize="h2" title="Get Quote and Swap Instructions (Jupiter Swap API)">
+    Fetch a quote from Jupiter Swap API, then POST to `swap-instructions` to get the swap instruction. Build your own transaction, do not use a pre-built swap transaction.
 
     ```typescript
-    const LITE_API = "https://lite-api.jup.ag/swap/v1";
+    const SWAP_API = "https://api.jup.ag/swap/v1";
     const quoteResponse = await fetch(
-      `${LITE_API}/quote?inputMint=${usdcMint.toBase58()}&outputMint=${solMint.toBase58()}&amount=${borrowAmount.toString()}&slippageBps=100`
+      `${SWAP_API}/quote?inputMint=${usdcMint.toBase58()}&outputMint=${solMint.toBase58()}&amount=${borrowAmount.toString()}&slippageBps=100`,
+      { headers: { "x-api-key": "your-api-key" } }
     ).then((r) => r.json());
     if (quoteResponse.error || !quoteResponse.routePlan) throw new Error(quoteResponse.error ?? "No quote");
 
-    const swapRes = await fetch(`${LITE_API}/swap-instructions`, {
+    const swapRes = await fetch(`${SWAP_API}/swap-instructions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-api-key": "your-api-key" },
       body: JSON.stringify({ quoteResponse, userPublicKey: signer.toBase58() }),
     }).then((r) => r.json());
     if (swapRes.error) throw new Error(swapRes.error ?? "No swap instructions");
@@ -204,7 +205,7 @@ import path from "path";
 
 const KEYPAIR_PATH = "/path/to/your/keypair.json";
 const RPC_URL = "https://api.mainnet-beta.solana.com";
-const LITE_API = "https://lite-api.jup.ag/swap/v1";
+const SWAP_API = "https://api.jup.ag/swap/v1";
 const VAULT_ID = 1;
 const SOL_MINT = new PublicKey("So11111111111111111111111111111111111111112");
 const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
@@ -261,7 +262,7 @@ async function main() {
     getFlashBorrowIx(flashParams),
     getFlashPaybackIx(flashParams),
     fetch(
-      `${LITE_API}/quote?inputMint=${USDC_MINT.toBase58()}&outputMint=${SOL_MINT.toBase58()}&amount=${BORROW_USDC.toString()}&slippageBps=100`
+      `${SWAP_API}/quote?inputMint=${USDC_MINT.toBase58()}&outputMint=${SOL_MINT.toBase58()}&amount=${BORROW_USDC.toString()}&slippageBps=100`
     ).then((r) => r.json()),
     connection.getLatestBlockhash("confirmed"),
   ]);
@@ -282,9 +283,9 @@ async function main() {
     signer,
   });
 
-  const swapRes = await fetch(`${LITE_API}/swap-instructions`, {
+  const swapRes = await fetch(`${SWAP_API}/swap-instructions`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-api-key": "your-api-key" },
     body: JSON.stringify({ quoteResponse, userPublicKey: signer.toBase58() }),
   }).then((r) => r.json());
 

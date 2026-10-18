@@ -1,18 +1,18 @@
 ---
 title: "Unwind (Deleverage)"
 description: "Close or reduce leveraged positions by combining flashloans, Jupiter Swap, and vault operations."
-llmsDescription: "How to close or reduce a leveraged position on Jupiter Lend using a single atomic transaction. Combines getFlashBorrowIx/getFlashPaybackIx for flashloaning the collateral asset, Jupiter Lite API for swapping collateral to debt, and getOperateIx with MAX_REPAY_AMOUNT/MAX_WITHDRAW_AMOUNT for full unwind or negative signed amounts for partial unwind. Covers full and partial deleverage flows with complete TypeScript code example."
+llmsDescription: "How to close or reduce a leveraged position on Jupiter Lend using a single atomic transaction. Combines getFlashBorrowIx/getFlashPaybackIx for flashloaning the collateral asset, Jupiter Swap API for swapping collateral to debt, and getOperateIx with MAX_REPAY_AMOUNT/MAX_WITHDRAW_AMOUNT for full unwind or negative signed amounts for partial unwind. Covers full and partial deleverage flows with complete TypeScript code example."
 ---
 
 <Info>
   These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
 </Info>
 
-"Unwind" (deleverage) is the process of closing or reducing a [leveraged position](/lend/advanced/multiply). Use Jupiter **Lite API** for swap quotes and instructions. Build your own transaction, do not use a pre-built swap transaction.
+"Unwind" (deleverage) is the process of closing or reducing a [leveraged position](/lend/advanced/multiply). Use Jupiter **Swap API** for swap quotes and instructions. Build your own transaction, do not use a pre-built swap transaction.
 
 For example, to unwind a SOL/USDC position:
 1. [Flashloan](/lend/flashloan) collateral (SOL) from Jupiter Lend.
-2. Swap SOL → USDC using Jupiter Lite API (you need USDC to repay debt).
+2. Swap SOL → USDC using Jupiter Swap API (you need USDC to repay debt).
 3. Use `getOperateIx` to [repay](/lend/borrow/repay) debt and [withdraw](/lend/borrow/withdraw) collateral.
 4. Pay back the flashloan with the withdrawn SOL.
 
@@ -72,18 +72,19 @@ All of this happens atomically in a single Solana transaction.
     ```
   </Step>
 
-  <Step titleSize="h2" title="Get Quote and Swap Instructions (Jupiter Lite API)">
-    Fetch a quote from Jupiter Lite API (swap collateral → debt), then POST to `swap-instructions`. Use `otherAmountThreshold` from the quote as the repay amount for partial unwind.
+  <Step titleSize="h2" title="Get Quote and Swap Instructions (Jupiter Swap API)">
+    Fetch a quote from Jupiter Swap API (swap collateral → debt), then POST to `swap-instructions`. Use `otherAmountThreshold` from the quote as the repay amount for partial unwind.
 
     ```typescript
-    const LITE_API = "https://lite-api.jup.ag/swap/v1";
+    const SWAP_API = "https://api.jup.ag/swap/v1";
     const quoteResponse = await fetch(
-      `${LITE_API}/quote?inputMint=${solMint.toBase58()}&outputMint=${usdcMint.toBase58()}&amount=${withdrawAmount.toString()}&slippageBps=100`
+      `${SWAP_API}/quote?inputMint=${solMint.toBase58()}&outputMint=${usdcMint.toBase58()}&amount=${withdrawAmount.toString()}&slippageBps=100`,
+      { headers: { "x-api-key": "your-api-key" } }
     ).then((r) => r.json());
 
-    const swapRes = await fetch(`${LITE_API}/swap-instructions`, {
+    const swapRes = await fetch(`${SWAP_API}/swap-instructions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-api-key": "your-api-key" },
       body: JSON.stringify({ quoteResponse, userPublicKey: signer.toBase58() }),
     }).then((r) => r.json());
     const swapIx = jupIxToTransactionInstruction(swapRes.swapInstruction);

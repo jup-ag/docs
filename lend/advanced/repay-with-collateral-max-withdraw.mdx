@@ -1,14 +1,14 @@
 ---
 title: "Repay with Collateral and Max Withdraw"
 description: "Close a position when you hold only the collateral token."
-llmsDescription: "How to close a Jupiter Lend borrow position when you only hold the collateral token (e.g. SOL, not USDC). Uses a flashloan to borrow the debt asset, repay full debt and withdraw full collateral with getOperateIx using MAX_REPAY_AMOUNT and MAX_WITHDRAW_AMOUNT, swap collateral to debt via Jupiter Lite API, then payback the flashloan. All in a single atomic Solana transaction. Includes complete TypeScript code example."
+llmsDescription: "How to close a Jupiter Lend borrow position when you only hold the collateral token (e.g. SOL, not USDC). Uses a flashloan to borrow the debt asset, repay full debt and withdraw full collateral with getOperateIx using MAX_REPAY_AMOUNT and MAX_WITHDRAW_AMOUNT, swap collateral to debt via Jupiter Swap API, then payback the flashloan. All in a single atomic Solana transaction. Includes complete TypeScript code example."
 ---
 
 <Info>
   These flows use many instructions. If you hit compute limits, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
 </Info>
 
-Close a [borrow position](/lend/borrow) when you hold only the **collateral token** (e.g. SOL), not the debt token (e.g. USDC). Use Jupiter **Lite API** for swap quotes and instructions.
+Close a [borrow position](/lend/borrow) when you hold only the **collateral token** (e.g. SOL), not the debt token (e.g. USDC). Use Jupiter **Swap API** for swap quotes and instructions.
 
 **Flow:**
 1. [Flashloan](/lend/flashloan) debt asset (USDC) from Jupiter Lend
@@ -86,18 +86,19 @@ All of this happens atomically in one transaction.
     });
     ```
   </Step>
-  <Step titleSize="h2" title="Get Quote and Swap Instructions (Jupiter Lite API)">
+  <Step titleSize="h2" title="Get Quote and Swap Instructions (Jupiter Swap API)">
     Fetch a quote (swap collateral → debt). Ensure the swap output yields at least `debtAmount` of the debt token (account for slippage).
 
     ```typescript
-    const LITE_API = "https://lite-api.jup.ag/swap/v1";
+    const SWAP_API = "https://api.jup.ag/swap/v1";
     const quoteResponse = await fetch(
-      `${LITE_API}/quote?inputMint=${solMint.toBase58()}&outputMint=${usdcMint.toBase58()}&amount=${collateralSupply.toString()}&slippageBps=100`
+      `${SWAP_API}/quote?inputMint=${solMint.toBase58()}&outputMint=${usdcMint.toBase58()}&amount=${collateralSupply.toString()}&slippageBps=100`,
+      { headers: { "x-api-key": "your-api-key" } }
     ).then((r) => r.json());
 
-    const swapRes = await fetch(`${LITE_API}/swap-instructions`, {
+    const swapRes = await fetch(`${SWAP_API}/swap-instructions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-api-key": "your-api-key" },
       body: JSON.stringify({ quoteResponse, userPublicKey: signer.toBase58() }),
     }).then((r) => r.json());
     const swapIx = jupIxToTransactionInstruction(swapRes.swapInstruction);

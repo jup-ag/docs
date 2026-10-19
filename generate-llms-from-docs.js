@@ -197,7 +197,7 @@ function emitSpecs() {
   for (const [specPath, { pages }] of sorted) {
     const title = specTitle(specPath) || path.basename(specPath);
     const noun = pages === 1 ? "endpoint" : "endpoints";
-    emit(`- [${title}](${DOCS_URL}${specPath}): OpenAPI 3 spec, ${pages} documented ${noun}.\n`);
+    emit(`- [${title}](${DOCS_URL}${specPath}): OpenAPI 3 spec, ${pages} ${noun} documented here.\n`);
   }
 }
 

@@ -2,5 +2,6 @@
 title: "Create Order (Trigger API)"
 sidebarTitle: "Create Order"
 description: "Create a new trigger order"
+llmsDescription: "POST /orders/price endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/orders/price. Creates a price-triggered order: single (fires when the trigger price is crossed), oco (take-profit and stop-loss pair) or otoco (a parent trigger that activates a TP/SL pair on fill). Body: orderType, depositRequestId and depositSignedTx from /deposit/craft, userPubkey, inputMint, inputAmount, outputMint, triggerMint, expiresAt, plus triggerCondition, triggerPriceUsd, trailingBps, slippageBps, tpPriceUsd, slPriceUsd, tpSlippageBps, slSlippageBps. Returns id, txSignature, depositConfirmed, message."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /orders/price
 ---

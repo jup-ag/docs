@@ -2,4 +2,5 @@
 openapi: /openapi-spec/studio/studio.yaml post /dbc-pool/create-tx
 title: "DBC Pool Create TX"
 description: "Request for a base64-encoded unsigned transaction to create a Dynamic Bonding Curve pool with token metadata"
+llmsDescription: "POST /dbc-pool/create-tx endpoint of the Jupiter Studio API at api.jup.ag/studio/v1/dbc-pool/create-tx. Builds the unsigned transaction that launches a token on a Dynamic Bonding Curve (DBC) pool with its metadata. Body: buildCurveByMarketCapParam, antiSniping, fee, tokenName, tokenSymbol, tokenImageContentType, creator, optional isLpLocked. Returns transaction, mint, imagePresignedUrl and metadataPresignedUrl (upload targets for the image and metadata) and imageUrl. Sign the transaction and submit it with POST /dbc-pool/submit."
 ---

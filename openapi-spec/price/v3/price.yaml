@@ -5,7 +5,7 @@ info:
   description: Jupiter Price API V3 Schema
 
 servers:
-  - url: https://api.jup.ag
+  - url: https://api.jup.ag/price/v3
     description: Jupiter Price API V3 Endpoint
 
 components:
@@ -17,7 +17,7 @@ components:
       description: Get API key via https://developers.jup.ag/portal
 
 paths:
-  "/price/v3":
+  "/":
     get:
       summary: price
       description: |

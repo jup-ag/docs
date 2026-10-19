@@ -1,5 +1,6 @@
 ---
 title: "Confirm Cancel"
 description: "Confirm and execute a pending order cancellation"
+llmsDescription: "POST /orders/price/confirm-cancel/{orderId} endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/orders/price/confirm-cancel/{orderId}. Step 2 of the two-step cancellation of a price order. Body: signedTransaction and cancelRequestId from the cancel step. Completes the cancellation, returns the funds to your wallet and responds with id and txSignature."
 openapi: /openapi-spec/trigger/v2/trigger.yaml post /orders/price/confirm-cancel/{orderId}
 ---

@@ -2,4 +2,5 @@
 openapi: /openapi-spec/prediction/prediction.yaml post /positions/{positionPubkey}/claim
 title: "Claim Position"
 description: "Request an unsigned transaction to claim payout from a winning position"
+llmsDescription: "POST /positions/{positionPubkey}/claim endpoint of the Jupiter Prediction Market API at api.jup.ag/prediction/v1/positions/{positionPubkey}/claim. Builds an unsigned transaction that claims the payout of a winning position after the market has resolved. Optional body: ownerPubkey. Returns transaction, txMeta and position."
 ---

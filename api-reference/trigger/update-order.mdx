@@ -1,5 +1,6 @@
 ---
 title: "Update Order"
 description: "Update parameters of an existing trigger order"
+llmsDescription: "PATCH /orders/price/{orderId} endpoint of the Jupiter Trigger Order API V2 at api.jup.ag/trigger/v2/orders/price/{orderId}. Updates an open price order in place without cancelling it: triggerPriceUsd, trailingBps, slippageBps, and for oco or otoco orders tpPriceUsd, slPriceUsd, tpSlippageBps, slSlippageBps. Body must include orderType. Returns id."
 openapi: /openapi-spec/trigger/v2/trigger.yaml patch /orders/price/{orderId}
 ---

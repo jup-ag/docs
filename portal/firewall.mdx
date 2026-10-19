@@ -4,9 +4,11 @@ description: "Set rules to limit, rate-limit, or block traffic to your API keys 
 llmsDescription: "How to use the Jupiter Developer Platform firewall to control traffic to API keys used in browser, mobile, or other client-side apps. Firewall rules are evaluated per team at the api.jup.ag gateway before requests reach the API, with up to 50 rules per team (enabled or disabled, deleted rules excluded). When several rules match a request, one decision rule wins by: (1) action precedence Bypass > Deny > Rate limit > Log, (2) specificity (count of distinct condition types in the matched group, e.g. path + country = 2 beats path alone = 1), (3) age (older rule wins). Each rule combines conditions (Path starts-with prefix, API keys is-any-of, Method, Country, Header, IP/CIDR) with AND/OR groups and one of four actions: Log (record only), Deny (returns 403 'Request blocked by firewall'), Rate limit (N requests per second/minute scoped per IP, per API key, or per team; returns 429 when exceeded), or Bypass (skips firewall checks for matching trusted traffic, must have at least one condition). Each rule shows a human-readable IF...THEN Expression Overview. Firewall decisions and matched rules appear in request logs and Firewall analytics, and rule changes are recorded in the audit log."
 ---
 
-An API key used in a browser, mobile app, or other client-side code is not secret. Anyone can read it from network traffic and reuse it. Firewall rules let you control which requests the gateway allows, blocks, or rate-limits for a team's traffic.
+Firewall rules let you control which requests the gateway allows, blocks, or rate-limits for a team's traffic. They match on request attributes: path, IP, country, method, headers, and API key, and apply to all traffic for the team. To restrict what a single key can call, use [API Key Permissions](/portal/api-keys#permissions) instead.
 
-Firewall rules match on request attributes: path, IP, country, method, headers, and API key. They apply to all traffic for the team. To restrict what a single key can call, use [API Key Permissions](/portal/api-keys#permissions) instead.
+<Note>
+To protect a key that ships in a browser, mobile app, or extension, convert it to a [publishable key](/portal/api-keys#key-types) instead of writing firewall rules. A publishable key behaves like a request with no key, so a copied key grants nothing extra and needs no firewall rules. Once a frontend key is publishable, delete the firewall rules you added for it. Firewall rules remain useful for controlling abusive traffic to your server keys.
+</Note>
 
 Common uses:
 

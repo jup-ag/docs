@@ -5,11 +5,11 @@ llmsDescription: "Read vault configuration, state, and user positions for Jupite
 ---
 
 <Note>
-  All vault and position data here is read from on-chain accounts using the **Jupiter Lend Read SDK**. No API calls are required.
+  All vault and position data here is read from on-chain accounts using the **Jupiter Lend Read SDK**. No API calls are required. For HTTP alternatives, see the [Borrow API](/lend/borrow/api) (`/vaults`, `/positions`).
 </Note>
 
 <Info title="Data scaling">
-  Exchange prices are in **1e12** decimals. Balances are in **1e9** decimals.
+  Exchange prices are in **1e12** decimals. Balances are in **1e9** decimals. [Liquidity Data & Analytics](/lend/liquidity/analytics) explains how exchange prices accrue interest.
 </Info>
 
 ---
@@ -64,7 +64,7 @@ Use the Read SDK to list vaults, read vault config and state, and get user posit
   </Step>
 
   <Step title="Get vault config">
-    Fetch only the vault configuration: supply and borrow token mints, oracle, rebalancer, and risk parameters (collateral factor, liquidation threshold, fees).
+    Fetch only the vault configuration: supply and borrow token mints, [oracle](/lend/oracles), rebalancer, and risk parameters (collateral factor, liquidation threshold, fees).
 
     ```typescript
     const config = await client.vault.getVaultConfig(vaultId);
@@ -209,7 +209,7 @@ Use the Read SDK to list vaults, read vault config and state, and get user posit
   </Step>
 
   <Step title="Get all positions with risk ratio">
-    For a vault, fetch all positions with a computed risk ratio (borrow/supply). Useful for dashboards or liquidation-risk views.
+    For a vault, fetch all positions with a computed risk ratio (borrow/supply). Useful for dashboards or [liquidation](/lend/borrow/liquidation)-risk views.
 
     ```typescript
     const positionsWithRisk = await client.vault.getAllPositionsWithRiskRatio(vaultId);

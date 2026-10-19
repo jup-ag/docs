@@ -8,7 +8,7 @@ llmsDescription: "How to execute a flashloan using the Jupiter Lend SDK (@jup-ag
   If your custom logic is compute-heavy, add `ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 })` (or higher) as the first instruction in your transaction.
 </Info>
 
-The `@jup-ag/lend` SDK provides helper functions to retrieve the instructions needed to execute a flashloan.
+The `@jup-ag/lend` SDK provides helper functions to retrieve the instructions needed to execute a [flashloan](/lend/flashloan).
 
 To perform a flashloan, construct a transaction where the **borrow** instruction occurs first, followed by your **custom logic** (which uses the borrowed funds), and ending with the **payback** instruction.
 
@@ -85,7 +85,7 @@ To perform a flashloan, construct a transaction where the **borrow** instruction
     </Info>
   </Step>
   <Step titleSize="h2" title="Define Custom Logic">
-    Define the instructions that use the borrowed funds. This could be trades, clearing bad debt, collateral swapping, or any custom flashloan logic.
+    Define the instructions that use the borrowed funds. This could be trades, clearing bad debt, collateral swapping, or any custom flashloan logic. The [Multiply](/lend/advanced/multiply), [Unwind](/lend/advanced/unwind) and [Vault Swap](/lend/advanced/vault-swap) guides are complete examples of this pattern.
 
     ```typescript
     const customIxs = [

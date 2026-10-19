@@ -1,7 +1,7 @@
 ---
 title: "Vault Swap"
 description: "Move a position from one vault to another atomically."
-llmsDescription: "How to atomically swap a Jupiter Lend borrow position from one vault to another (e.g. SOL/USDC to SOL/USDT) in a single Solana transaction. Combines flashloan (borrow debt of vault 1), getOperateIx with MAX_REPAY_AMOUNT/MAX_WITHDRAW_AMOUNT to close vault 1, getOperateIx with positionId 0 to open vault 2, Jupiter Lite API swap to convert new debt token to original debt token, and flashloan payback. Covers borrow buffer for slippage, Solana 1232-byte transaction size limit, and complete TypeScript code example."
+llmsDescription: "How to atomically swap a Jupiter Lend borrow position from one vault to another (e.g. SOL/USDC to SOL/USDT) in a single Solana transaction. Combines flashloan (borrow debt of vault 1), getOperateIx with MAX_REPAY_AMOUNT/MAX_WITHDRAW_AMOUNT to close vault 1, getOperateIx with positionId 0 to open vault 2, Jupiter Swap API swap to convert new debt token to original debt token, and flashloan payback. Covers borrow buffer for slippage, Solana 1232-byte transaction size limit, and complete TypeScript code example."
 ---
 
 <Info>
@@ -12,12 +12,12 @@ llmsDescription: "How to atomically swap a Jupiter Lend borrow position from one
   Solana transactions have a 1232-byte size limit. If the serialised transaction exceeds 1232 bytes, the vault swap will not be possible in a single transaction. Consider splitting large positions or using simpler swap routes.
 </Warning>
 
-A vault swap moves your position from one vault to another atomically. Use Jupiter **Lite API** for swap quotes and instructions.
+A vault swap moves your [borrow position](/lend/borrow) from one vault to another atomically. Use Jupiter **Swap API** for swap quotes and instructions.
 
 **Flow:** swap from SOL/USDC to SOL/USDT:
-1. Flashloan USDC
+1. [Flashloan](/lend/flashloan) USDC
 2. Repay all USDC debt and withdraw all SOL from vault 1
-3. Deposit SOL into vault 2 and borrow USDT with a 1-2 USD buffer for slippage
+3. [Deposit](/lend/borrow/deposit) SOL into vault 2 and [borrow](/lend/borrow/borrow) USDT with a 1-2 USD buffer for slippage
 4. Swap the new debt token → USDC
 5. Pay back the flashloan
 
@@ -108,14 +108,15 @@ A vault swap moves your position from one vault to another atomically. Use Jupit
     Fetch a quote to swap the new debt token (e.g. USDT) → USDC. Ensure output is at least `debtAmount` to cover the flashloan.
 
     ```typescript
-    const LITE_API = "https://lite-api.jup.ag/swap/v1";
+    const SWAP_API = "https://api.jup.ag/swap/v1";
     const quoteResponse = await fetch(
-      `${LITE_API}/quote?inputMint=${usdtMint.toBase58()}&outputMint=${usdcMint.toBase58()}&amount=${borrowAmount.toString()}&slippageBps=100`
+      `${SWAP_API}/quote?inputMint=${usdtMint.toBase58()}&outputMint=${usdcMint.toBase58()}&amount=${borrowAmount.toString()}&slippageBps=100`,
+      { headers: { "x-api-key": "your-api-key" } }
     ).then((r) => r.json());
 
-    const swapRes = await fetch(`${LITE_API}/swap-instructions`, {
+    const swapRes = await fetch(`${SWAP_API}/swap-instructions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-api-key": "your-api-key" },
       body: JSON.stringify({ quoteResponse, userPublicKey: signer.toBase58() }),
     }).then((r) => r.json());
     const swapIx = jupIxToTransactionInstruction(swapRes.swapInstruction);

@@ -243,22 +243,26 @@ paths:
           schema:
             type: number
           description: |
-            - Priority fee in lamports
+            - Priority fee in lamports, must be greater than 0
             - If not set, Jupiter automatically determines an appropriate priority fee
-            - Setting this overrides the automatic optimisation
+            - Only takes effect together with `broadcastFeeType`: without it, the value is ignored and Jupiter sets the priority fee itself
         - name: jitoTipLamports
           in: query
           schema:
             type: number
           description: |
-            - Jito MEV tip in lamports for faster block inclusion
+            - Jito MEV tip in lamports for faster block inclusion, paid as a transfer to a Jito tip account
+            - Only takes effect together with `broadcastFeeType`: without it, no tip is added
+            - Without `priorityFeeLamports`, the tip replaces the priority fee: the compute unit price is set to 0
         - name: broadcastFeeType
           in: query
           schema:
             type: string
             enum: [maxCap, exactFee]
           description: |
-            - Fee cap strategy: `maxCap` treats the fee as a maximum, `exactFee` uses the exact amount
+            - How `priorityFeeLamports` and `jitoTipLamports` are applied, and required for either to take effect
+            - `exactFee`: pays exactly the value set
+            - `maxCap`: pays Jupiter's own estimate, capped at the value set
             - Ignored if neither `priorityFeeLamports` nor `jitoTipLamports` are set
         - name: excludeRouters
           in: query

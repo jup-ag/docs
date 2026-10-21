@@ -342,6 +342,11 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 
 ## Undocumented Behavior
 
+- [2026-10-21] Kalshi is legacy. `OrderCreateService` rejects every non-Polymarket keeper buy with `kalshi_buys_disabled` (jup-ag/prediction-market `app/src/services/OrderCreateService.ts`), and the Predict team confirmed Kalshi buys were switched off in July 2026 (Slack #trade-predict-markets-main, 2026-07-06). Sells, claims and refunds still run for existing Kalshi positions. About 119 Kalshi events still return `isActive: true` and `isLive: true` from `GET /events?provider=kalshi` because nothing re-syncs them. Document `kalshi` as legacy, never as a liquidity source.
+- [2026-10-21] Region check: `assertBuyAllowed` (`app/src/services/buy-region-policy.ts`) rejects buys from `US`, `KR` and `AU` (country read from the gateway's `x-api-gateway-country` header) with `unsupported_region` and the message "Trading is not available in your region". It runs on buy paths only (`POST /orders`, and `POST /execute` for create-order). Whether the API gateway also blocks reads by country is gateway config, not in this source, so do not claim reads are blocked or allowed. Covers BUILD-834 (Australia added).
+- [2026-10-21] `GET /events` `category` also accepts `finance`, `climate & science`, `weather` and `mentions` (`app/src/api/events/schema.ts`). `Market.provider` in source is `kalshi | polymarket` for keeper markets and `bisonfi` for Forecast. `gx` was a retired provider and is not returned.
+- [2026-10-21] `GET /events` default page size is 10 in code (`app/src/api/events/index.ts`) while `app/README.md` says 20. Max is 100.
+
 - [2026-03-09] Live API response schemas diverged from initial OpenAPI spec in several places (caught in PR#836/#839): Profile types are strings not numbers, PnL History returns `history` key not `data`, Leaderboard uses nested `{ all_time, weekly, monthly }` structure, `settlementTime` was renamed to `resolveAt`. Always verify against the live API when writing examples.
 
 ## Ambiguities
@@ -358,7 +363,7 @@ source code > SDK/FE > docs). Keep it current as a side effect of documenting th
 
 # Jupiter Forecast (BisonFi provider)
 
-Jupiter Forecast is a new in-house primitive: native Solana binary prediction markets, currently 15-minute BTC up/down. All facts below were verified live on 2026-06-29 with two real mainnet trades (buy `4USH17JArjQP5rCFqnEcLND38bwWN9XCe2CMPRpqReRnLBNX8mzQJLgPYT7ZfBvSnXa2ED1JGU7F2b5mytLkW81o`, close `3FzTLzmLNFsSDpjDaUkmuhuTkrrUxrFwNs6gtDTMxmnYyNrCM3n7wfR3dCFDXZFyRdAMQfxSTpvN7QAyd2kdjzPM`), then cross-checked against source on 2026-07-02. E2E scripts: `~/Dev/jup-workbench/forecast-e2e.cjs` + `forecast-close.cjs`.
+Jupiter Forecast is a new in-house primitive: native Solana binary prediction markets. As of 2026-10-21: BTC and SPCX up/down rounds, 5 and 15 minutes (launched as 15-minute BTC only). All facts below were verified live on 2026-06-29 with two real mainnet trades (buy `4USH17JArjQP5rCFqnEcLND38bwWN9XCe2CMPRpqReRnLBNX8mzQJLgPYT7ZfBvSnXa2ED1JGU7F2b5mytLkW81o`, close `3FzTLzmLNFsSDpjDaUkmuhuTkrrUxrFwNs6gtDTMxmnYyNrCM3n7wfR3dCFDXZFyRdAMQfxSTpvN7QAyd2kdjzPM`), then cross-checked against source on 2026-07-02. E2E scripts: `~/Dev/jup-workbench/forecast-e2e.cjs` + `forecast-close.cjs`.
 
 ## Sources
 
@@ -390,7 +395,8 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 ## Constraints (tested)
 
 - [2026-06-29] Minimum order is 5 USDC: `depositAmount` < 5000000 → `{code:"min...",message:"Minimum order is $5"}` (validated pre-routing). USDC-only: non-USDC `depositMint` → `{code:"bisonfi_usdc_only", message:"Forecast orders can only use USDC"}` (validated pre-routing).
-- [2026-06-29] **Gist's "Maximum buy: 100 USDC" was NOT reproduced.** During a live window, `POST /orders` built fine for 100, 100.000001, 150, and 200 USDC with no max error. [2026-07-02] RESOLVED from source: **the cap is 250 USDC** (`BISONFI_MAX_DEPOSIT_MICRO_USDC = 250_000_000` in `OrderCreateService`, error `"Maximum order is $250"`), enforced app-side at build on the Prediction API path only — "there is no on-chain limit on the Jupiter swap" per the source comment, so the direct Swap API path has no cap. The 200 USDC test passed because it was under 250; the gist's 100 is stale.
+- [2026-06-29] **Gist's "Maximum buy: 100 USDC" was NOT reproduced.** During a live window, `POST /orders` built fine for 100, 100.000001, 150, and 200 USDC with no max error. [2026-07-02] RESOLVED from source: **the cap is 250 USDC** (`BISONFI_MAX_DEPOSIT_MICRO_USDC = 250_000_000` in `OrderCreateService`, error `"Maximum order is $250"`), enforced app-side at build on the Prediction API path only — "there is no on-chain limit on the Jupiter swap" per the source comment, so the direct Swap API path has no cap. The 200 USDC test passed because it was under 250; the gist's 100 is stale. **[2026-10-21] Superseded: the cap is now 1,000 USDC** (`BISONFI_MAX_DEPOSIT_MICRO_USDC = 1_000_000_000`, message "Maximum order is $1000").
+- [2026-10-21] Forecast now lists BTC and SPCX rounds, 5m and 15m. Live API on 2026-10-21: BTC 5m and 15m rounds around the clock, SPCX 5m and 15m rounds opening 13:00 to 20:00 UTC (US market hours). SPCX events use `category=finance`, `subcategory=stocks`, tags `finance`, `stocks`, `spcx` plus `5m` or `15m`, and settle from Pyth Pro `Equity.US.SPCX/USD` (feed 3314, channel 4, `tracker/src/bisonfi/market-decoder.ts`). `GET /events?provider=bisonfi&filter=live&includeMarkets=true` returns only the open rounds, which is a safer discovery example than `category=crypto&tag=15m` (default page size 10).
 - [2026-07-02] Limit orders are rejected for Forecast markets (`OrderCreateService` throws unsupported-provider on `orderType: "limit"` when the provider is bisonfi). Market orders only.
 
 ## Open Questions

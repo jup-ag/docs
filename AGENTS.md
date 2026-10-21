@@ -212,6 +212,19 @@ changes ship: the first API-affecting change of a month creates `YYYY-MM.mdx`, e
 change that month appends to it. Breaking changes with future deadlines go in immediately
 as pre-announcements. There is no separate "hot list"; the current month's post is it.
 
+**Where the entry goes — product change vs platform feature.** The monthly post
+(`YYYY-MM.mdx`) is only for API and product changes: Swap, Ultra, Trigger, Tokens, Price,
+Prediction, Lend, JupUSD, and the like. Developer Platform / Portal features — anything
+under `portal/`, such as API keys, firewall, request logs, analytics, account security,
+plans, organisations, and teams — do NOT go in the monthly post. They go on the pinned
+platform feature page `web/content/changelog/developer-platform.mdx`, which is updated in
+place, newest first (add or extend a `## Month YYYY` section at the top). Put a platform
+feature there only, never in both places. If a single change is both a platform feature and
+a product-API change that integrators must act on, put the platform feature on the feature
+page and add the product-API part to the monthly post. The same companion-PR mechanics below
+apply to the feature page (it lives in the same `web/content/changelog/` directory, so it
+rides the same shared changelog PR).
+
 **Companion PR workflow.** If your changes affect a public API or product, the changelog
 entry is part of shipping, not a follow-up. As soon as the docs PR is open:
 

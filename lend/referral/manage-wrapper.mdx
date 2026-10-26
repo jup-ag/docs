@@ -21,7 +21,7 @@ Every example starts from a `WrapperContext` for your wrapper. [Read a wrapper](
 
 ## Read your earnings
 
-Your fees sit in the wrapper's vault as jlTokens (`fToken` in the SDK) until you claim them, and they keep earning Jupiter Lend yield with no partner fee on them. [Where fees sit until you claim](/lend/referral/fees#where-fees-sit-until-you-claim) explains why. Your balance is what the vault holds beyond the users' and Jupiter's balances.
+Your fees sit in the wrapper's vault as jlTokens until you claim them, and they keep earning Jupiter Lend yield with no partner fee on them. [Where fees sit until you claim](/lend/referral/fees#where-fees-sit-until-you-claim) explains why. Your balance is what the vault holds beyond the users' and Jupiter's balances.
 
 The stored books leave out the fee since the last checkpoint, so project them with `simulateAccrue` before you compute the balance.
 
@@ -42,8 +42,8 @@ const USDC = address("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 const JLUSDC = address("9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D");
 
 const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
-const lending = await findLendingAddress({ underlyingMint: USDC, fTokenMint: JLUSDC });
-const ctx = await resolveWrapper(rpc, { fTokenMint: JLUSDC, lending, xTokenMint });
+const lending = await findLendingAddress({ underlyingMint: USDC, jlTokenMint: JLUSDC });
+const ctx = await resolveWrapper(rpc, { jlTokenMint: JLUSDC, lending, xTokenMint });
 
 const P = ctx.lending.data.tokenExchangePrice; // underlying per jlToken, scaled by 10^12
 const books = simulateAccrue(ctx.wrapper.data, P, ctx.protocol.data.protocolFeeShareBps);
@@ -190,7 +190,7 @@ declare const authority: TransactionSigner;
 // The wallet or multisig that should receive the fees.
 declare const newOwner: Address;
 
-const mint = ctx.lending.data.fTokenMint;
+const mint = ctx.lending.data.jlTokenMint;
 const [newRecipient] = await findAssociatedTokenPda({ owner: newOwner, mint, tokenProgram: ctx.tokenProgram });
 
 const createAta = await getCreateAssociatedTokenIdempotentInstructionAsync({

@@ -20,7 +20,7 @@ The SDK is built on `@solana/kit` 8.5. Use Kit 8.5 or later in your app, so that
 Every operation is the same three steps. Only the first and the last touch the network.
 
 ```text
-resolveWrapper(rpc, { fTokenMint, lending, xTokenMint })   read: 2 RPC round trips, one validated snapshot
+resolveWrapper(rpc, { jlTokenMint, lending, xTokenMint })   read: 2 RPC round trips, one validated snapshot
   └─ ctx: WrapperContext
 depositUnderlying(ctx, { user, underlyingAmount, bound })  act: no RPC call
   └─ { instructions, quote }
@@ -42,7 +42,7 @@ A wrapper is identified by three addresses:
 
 | Value | Where it comes from |
 |---|---|
-| `fTokenMint` | The market's jlToken (`fToken` in the SDK) mint. Jupiter sends it at onboarding. The [Earn tokens endpoint](/api-reference/lend/earn/tokens) also lists it as `address`, next to the underlying mint as `assetAddress`. |
+| `jlTokenMint` | The market's jlToken mint. Jupiter sends it at onboarding. The [Earn tokens endpoint](/api-reference/lend/earn/tokens) also lists it as `address`, next to the underlying mint as `assetAddress`. |
 | `lending` | The market's Lending account. Derive it with `findLendingAddress` from the underlying mint and the jlToken mint. |
 | `xTokenMint` | Your wrapper's xToken mint. Jupiter sends it at onboarding. |
 
@@ -57,9 +57,9 @@ const USDC = address("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
 const JLUSDC = address("9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D");
 
 const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
-const lending = await findLendingAddress({ underlyingMint: USDC, fTokenMint: JLUSDC });
+const lending = await findLendingAddress({ underlyingMint: USDC, jlTokenMint: JLUSDC });
 
-const ctx = await resolveWrapper(rpc, { fTokenMint: JLUSDC, lending, xTokenMint });
+const ctx = await resolveWrapper(rpc, { jlTokenMint: JLUSDC, lending, xTokenMint });
 
 const { data } = ctx.wrapper;
 const share = data.protocolFeeShareOverride;
@@ -79,7 +79,7 @@ The context holds everything an action needs:
 | `WrapperContext` field | Contents |
 |---|---|
 | `wrapper` | The wrapper config account. `wrapper.data` has the fee settings and the books. See [Wrapper fields](/lend/referral/reference#wrapper-fields). |
-| `lending` | The Jupiter Lend market: `mint` (underlying), `fTokenMint`, `decimals`, `tokenExchangePrice` |
+| `lending` | The Jupiter Lend market: `mint` (underlying), `jlTokenMint`, `decimals`, `tokenExchangePrice` |
 | `protocol` | The protocol config: `protocolFeeShareBps`, `paused` |
 | `tokenProgram` | Token or Token-2022, read from the underlying mint |
 | `vaultBalance` | jlToken atoms in the wrapper's vault, read in the same request as `wrapper` |
@@ -126,8 +126,8 @@ const rpcSubscriptions = createSolanaRpcSubscriptions("wss://api.mainnet-beta.so
 const user = await createKeyPairSignerFromBytes(secretKey);
 
 // 1. Read: one validated snapshot of the wrapper and its market.
-const lending = await findLendingAddress({ underlyingMint: USDC, fTokenMint: JLUSDC });
-const ctx = await resolveWrapper(rpc, { fTokenMint: JLUSDC, lending, xTokenMint });
+const lending = await findLendingAddress({ underlyingMint: USDC, jlTokenMint: JLUSDC });
+const ctx = await resolveWrapper(rpc, { jlTokenMint: JLUSDC, lending, xTokenMint });
 if (ctx.protocol.data.paused) throw new Error("Lend Referral is paused");
 
 // 2. Act: instructions plus the estimate behind the bound. No RPC call.
@@ -235,7 +235,7 @@ Pick the signer by who signs. A noop signer from `createNoopSigner(address)` put
       signTransaction(tx: VersionedTransaction): Promise<VersionedTransaction>;
     };
     // The jlToken mint, the Lending account and the xToken mint. See "Read a wrapper".
-    declare const fTokenMint: string, lending: string, xTokenMint: string;
+    declare const jlTokenMint: string, lending: string, xTokenMint: string;
 
     const rpc = createSolanaRpc(connection.rpcEndpoint);
 
@@ -243,7 +243,7 @@ Pick the signer by who signs. A noop signer from `createNoopSigner(address)` put
     const user = createNoopSigner(address(wallet.publicKey.toBase58()));
 
     const ctx = await resolveWrapper(rpc, {
-      fTokenMint: address(fTokenMint),
+      jlTokenMint: address(jlTokenMint),
       lending: address(lending),
       xTokenMint: address(xTokenMint),
     });

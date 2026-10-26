@@ -5,7 +5,7 @@ description: "Program addresses, accounts, wrapper fields, limits, instructions,
 llmsDescription: "Reference for the Lend Referral program on Solana (LrefWFcNXGnLxnQUdKmuJ1U3fUrFBdNkm6xCfVfWwQW), which wraps a Jupiter Lend Earn market in a partner-branded xToken. Lists program addresses, account PDAs (protocol config, wrapper config, vault, underlying transit account, Lending account, xToken metadata), WrapperConfig and ProtocolConfig fields with units, limits (partner fee 1000 bps, protocol share 2500 bps, 10-atom underlying minimum, seed range, metadata lengths), user, partner and permissionless instructions with signers, arguments and @jup-ag/lend-referral-sdk functions, program error codes 7000 to 7018 with causes, and the user, fee and wrapper-setting events with their fields."
 ---
 
-Lookup tables for the Lend Referral program. For how the program behaves, see the [Lend Referral Overview](/lend/referral) and [Fees and Yield](/lend/referral/fees). Field and parameter names follow `@jup-ag/lend-referral-sdk`, where the jlToken is called `fToken`.
+Lookup tables for the Lend Referral program. For how the program behaves, see the [Lend Referral Overview](/lend/referral) and [Fees and Yield](/lend/referral/fees). Instruction, field and parameter names follow `@jup-ag/lend-referral-sdk`.
 
 ## Program addresses
 
@@ -24,7 +24,7 @@ Lookup tables for the Lend Referral program. For how the program behaves, see th
 | Wrapper config | PDA `["wrapper_config", xTokenMint]` of the Lend Referral program | `findWrapperConfigPda({ xTokenMint })` |
 | Vault | Associated token account of the wrapper config for the jlToken mint | `ctx.wrapper.data.vault` |
 | Underlying transit account | Associated token account of the wrapper config for the underlying mint. Empty between instructions. | `ctx.wrapper.data.wrapperUnderlyingAta` |
-| Lending account | PDA `["lending", underlyingMint, fTokenMint]` of Jupiter Lend (Earn) | `findLendingAddress({ underlyingMint, fTokenMint })` |
+| Lending account | PDA `["lending", underlyingMint, jlTokenMint]` of Jupiter Lend (Earn) | `findLendingAddress({ underlyingMint, jlTokenMint })` |
 | xToken metadata | Metaplex PDA `["metadata", TOKEN_METADATA_PROGRAM_ADDRESS, xTokenMint]` | `findXTokenMetadataAddress(xTokenMint)` |
 
 `findProtocolConfigPda` and `findWrapperConfigPda` resolve to `[address, bump]`. The other helpers resolve to an address.
@@ -36,7 +36,7 @@ Lookup tables for the Lend Referral program. For how the program behaves, see th
 | Field | Type and unit | Meaning |
 |---|---|---|
 | `authority` | `Address` | Wrapper authority |
-| `fTokenMint` | `Address` | jlToken mint of the market. Fixed at creation. |
+| `jlTokenMint` | `Address` | jlToken mint of the market. Fixed at creation. |
 | `lending` | `Address` | Lending account of the market. Fixed at creation. |
 | `xTokenMint` | `Address` | xToken mint. Fixed at creation. |
 | `vault` | `Address` | jlToken vault. Fixed at creation. |
@@ -46,9 +46,9 @@ Lookup tables for the Lend Referral program. For how the program behaves, see th
 | `partnerFeeBps` | `number`, bps of user yield | Partner fee |
 | `protocolFeeShareBps` | `number`, bps of the partner fee | Protocol share applied to the yield pending since the last accrue |
 | `protocolFeeShareOverride` | `Option<number>`, bps of the partner fee | Share Jupiter set for this wrapper. `None`: the wrapper follows the global share. |
-| `totalUserFTokenBalance` | `bigint`, jlToken atoms × 10^6 | Users' balance |
-| `accruedProtocolFeeFTokens` | `bigint`, jlToken atoms × 10^6 | Jupiter's balance |
-| `lastFTokenPrice` | `bigint`, underlying per jlToken × 10^12 | Exchange price at the last accrue (the fee checkpoint) |
+| `totalUserJLTokenBalance` | `bigint`, jlToken atoms × 10^6 | Users' balance |
+| `accruedProtocolFeeJLTokens` | `bigint`, jlToken atoms × 10^6 | Jupiter's balance |
+| `lastJLTokenPrice` | `bigint`, underlying per jlToken × 10^12 | Exchange price at the last accrue (the fee checkpoint) |
 | `totalXShares` | `bigint`, xToken atoms | Circulating xTokens plus the locked seed shares |
 | `lockedXShares` | `bigint`, xToken atoms | Seed shares. Never minted. Fixed at creation. |
 | `bump` | `number` | PDA bump |
@@ -73,7 +73,7 @@ The partner's balance is not stored. It is the vault balance less the users' and
 | Partner fee | 0 to 1000 bps (10% of user yield) | `MAX_YIELD_FEE_BPS` |
 | Protocol share | 0 to 2500 bps (25% of the partner fee). Currently 2500. | `MAX_PROTOCOL_FEE_SHARE_BPS` |
 | Smallest underlying amount on the underlying path | 10 underlying atoms | `MIN_UNDERLYING_AMOUNT` |
-| Seed | More than 1,000,000 jlToken atoms, and at most 10 whole jlTokens | `MIN_SEED_F_AMOUNT`, `MAX_SEED_WHOLE_F_TOKENS` |
+| Seed | More than 1,000,000 jlToken atoms, and at most 10 whole jlTokens | `MIN_SEED_JL_AMOUNT`, `MAX_SEED_WHOLE_JL_TOKENS` |
 | xToken name | 32 bytes | |
 | xToken symbol | 10 bytes | |
 | xToken metadata URI | 200 bytes | |
@@ -83,7 +83,7 @@ The partner's balance is not stored. It is the vault balance less the users' and
 
 ## Instructions
 
-This section lists the instructions that users, partners and anyone can call. Jupiter-only instructions are not listed.
+This section lists the instructions that users, partners and anyone can call. Jupiter-only instructions are not listed. Instruction and argument names are the SDK's: `get<Name>Instruction` builds each instruction, for example `getDepositJLTokenInstruction`.
 
 ### User instructions
 
@@ -91,32 +91,32 @@ Every user instruction accrues first and is blocked while the protocol is paused
 
 | Instruction | Arguments | Returns | SDK action |
 |---|---|---|---|
-| `deposit_f_token` | `f_amount` | xTokens minted | `depositFToken` |
-| `deposit_f_token_with_min_x_out` | `f_amount`, `min_x_out` | xTokens minted | `depositFToken` |
-| `redeem_to_f_token` | `x_shares` | jlTokens paid | `redeemToFToken` |
-| `redeem_to_f_token_with_min_out` | `x_shares`, `min_f_out` | jlTokens paid | `redeemToFToken` |
-| `deposit_underlying` | `underlying_amount` | xTokens minted | `depositUnderlying` |
-| `deposit_underlying_with_min_x_out` | `underlying_amount`, `min_x_out` | xTokens minted | `depositUnderlying` |
-| `mint_underlying` | `x_to_mint`, `max_underlying_in` | Underlying charged | `mintUnderlying` |
-| `redeem_to_underlying` | `x_shares` | Underlying paid | `redeemToUnderlying` |
-| `redeem_to_underlying_with_min_out` | `x_shares`, `min_underlying_out` | Underlying paid | `redeemToUnderlying` |
-| `withdraw_to_underlying` | `underlying_out`, `max_x_in` | xTokens burned | `withdrawToUnderlying` |
+| `depositJLToken` | `jlAmount` | xTokens minted | `depositJLToken` |
+| `depositJLTokenWithMinXOut` | `jlAmount`, `minXOut` | xTokens minted | `depositJLToken` |
+| `redeemToJLToken` | `xShares` | jlTokens paid | `redeemToJLToken` |
+| `redeemToJLTokenWithMinOut` | `xShares`, `minJLOut` | jlTokens paid | `redeemToJLToken` |
+| `depositUnderlying` | `underlyingAmount` | xTokens minted | `depositUnderlying` |
+| `depositUnderlyingWithMinXOut` | `underlyingAmount`, `minXOut` | xTokens minted | `depositUnderlying` |
+| `mintUnderlying` | `xToMint`, `maxUnderlyingIn` | Underlying charged | `mintUnderlying` |
+| `redeemToUnderlying` | `xShares` | Underlying paid | `redeemToUnderlying` |
+| `redeemToUnderlyingWithMinOut` | `xShares`, `minUnderlyingOut` | Underlying paid | `redeemToUnderlying` |
+| `withdrawToUnderlying` | `underlyingOut`, `maxXIn` | xTokens burned | `withdrawToUnderlying` |
 
-The signer is the user. The SDK action picks the `_with_min_...` variant when you pass a bound, and the plain variant for `bound: "unbounded"`. `mint_underlying` and `withdraw_to_underlying` always carry a maximum-input bound.
+The signer is the user. The SDK action sends the `...WithMin...` variant when you pass a bound, and the plain instruction for `bound: "unbounded"`. `mintUnderlying` and `withdrawToUnderlying` always carry a maximum-input bound.
 
 ### Partner and permissionless instructions
 
 | Instruction | Signer | Arguments | Accrues first | Blocked while paused | SDK function |
 |---|---|---|---|---|---|
 | `accrue` | None. Only the transaction fee payer signs. | none | Yes | Yes | `accrue` |
-| `claim_partner_fees` | Anyone when no claim authority is set. Otherwise the claim authority, the wrapper authority, or the owner of the fee recipient account. | `amount` (`2^64 − 1` claims everything) | Yes | Yes | `claimPartnerFees` |
-| `update_partner_fee` | Wrapper authority | `new_fee_bps` (at most 1000) | Yes | Yes | `updatePartnerFee` |
-| `update_partner_fee_recipient` | Wrapper authority | None. The new recipient is the `new_recipient` account. | No | No | `updatePartnerFeeRecipient` |
-| `update_claim_authority` | Wrapper authority | `new_claim_authority` (`Option<Address>`) | No | No | `getUpdateClaimAuthorityInstruction` |
-| `transfer_wrapper_authority` | Wrapper authority | `new_authority` | No | No | `getTransferWrapperAuthorityInstruction` |
-| `update_x_token_metadata` | Wrapper authority | `name`, `symbol`, `uri` | No | No | `getUpdateXTokenMetadataInstructionAsync` |
+| `claimPartnerFees` | Anyone when no claim authority is set. Otherwise the claim authority, the wrapper authority, or the owner of the fee recipient account. | `amount` (`2^64 − 1` claims everything) | Yes | Yes | `claimPartnerFees` |
+| `updatePartnerFee` | Wrapper authority | `newFeeBps` (at most 1000) | Yes | Yes | `updatePartnerFee` |
+| `updatePartnerFeeRecipient` | Wrapper authority | None. The new recipient is the `newRecipient` account. | No | No | `updatePartnerFeeRecipient` |
+| `updateClaimAuthority` | Wrapper authority | `newClaimAuthority` (`Option<Address>`) | No | No | `getUpdateClaimAuthorityInstruction` |
+| `transferWrapperAuthority` | Wrapper authority | `newAuthority` | No | No | `getTransferWrapperAuthorityInstruction` |
+| `updateXTokenMetadata` | Wrapper authority | `name`, `symbol`, `uri` | No | No | `getUpdateXTokenMetadataInstructionAsync` |
 
-`claim_partner_fees` always pays the stored `partnerFeeRecipient`. `update_partner_fee_recipient` accepts only an existing jlToken token account under the market's token program, and not the vault.
+`claimPartnerFees` always pays the stored `partnerFeeRecipient`. `updatePartnerFeeRecipient` accepts only an existing jlToken token account under the market's token program, and not the vault.
 
 ## Errors
 
@@ -129,7 +129,7 @@ Lend Referral program errors use codes 7000 to 7018. An error raised inside Jupi
 | 7002 | `ProtocolFeeShareExceedsMax` | The protocol share is above 2500 bps. Raised by Jupiter's instructions only. |
 | 7003 | `WrapperSlippageExceeded` | The output is below the minimum, or the input is above the maximum. |
 | 7004 | `WrapperInvalidFeeRecipient` | The recipient account differs from the stored one, or is the vault. |
-| 7005 | `WrapperFTokenMintMismatch` | An account does not belong to this wrapper or market. |
+| 7005 | `WrapperJLTokenMintMismatch` | An account does not belong to this wrapper or market. |
 | 7006 | `WrapperZeroShares` | The operation would mint or burn 0 xTokens. |
 | 7007 | `WrapperZeroAssets` | The operation would pay out 0 jlTokens or 0 underlying. |
 | 7008 | `WrapperCpiToLendingFailed` | Jupiter Lend returned fewer jlTokens than required, or burned more than computed. |
@@ -139,9 +139,9 @@ Lend Referral program errors use codes 7000 to 7018. An error raised inside Jupi
 | 7012 | `InvalidLendingProgram` | The Jupiter Lend program account is wrong. |
 | 7013 | `InvalidClaimAuthority` | The signer may not trigger partner claims on this wrapper. |
 | 7014 | `WrapperInitialDepositTooSmall` | The seed is not above 1,000,000 jlToken atoms. Raised at wrapper creation only. |
-| 7015 | `WrapperExactWithdrawStrandsShares` | `withdraw_to_underlying` would burn every circulating xToken and leave one jlToken or more behind. Use `redeem_to_underlying` for a full exit. |
+| 7015 | `WrapperExactWithdrawStrandsShares` | `withdrawToUnderlying` would burn every circulating xToken and leave one jlToken or more behind. Use `redeemToUnderlying` for a full exit. |
 | 7016 | `ProtocolPaused` | The protocol is paused. |
-| 7017 | `WrapperUnderlyingAmountTooSmall` | The underlying amount is below 10 atoms. Move dust with `redeem_to_f_token`. |
+| 7017 | `WrapperUnderlyingAmountTooSmall` | The underlying amount is below 10 atoms. Move dust with `redeemToJLToken`. |
 | 7018 | `WrapperSeedTooLarge` | The seed is above 10 whole jlTokens. Raised at wrapper creation only. |
 
 ## Events
@@ -150,21 +150,21 @@ The program emits these events for users, fees and wrapper settings. Field names
 
 | Event | Emitted by | Fields |
 |---|---|---|
-| `LogDepositFToken` | `deposit_f_token` | `wrapperConfig`, `user`, `fTokenAmount`, `xTokenMinted` |
-| `LogRedeemToFToken` | `redeem_to_f_token` | `wrapperConfig`, `user`, `xTokenBurned`, `fTokenAmount` |
-| `LogDepositUnderlying` | `deposit_underlying`, `mint_underlying` | `wrapperConfig`, `user`, `underlyingAmount`, `fSharesReceived`, `xTokenMinted` |
-| `LogRedeemToUnderlying` | `redeem_to_underlying` | `wrapperConfig`, `user`, `xTokenBurned`, `fSharesRedeemed`, `underlyingReceived` |
-| `LogWithdrawToUnderlying` | `withdraw_to_underlying` | `wrapperConfig`, `user`, `xTokenBurned`, `fSharesRedeemed`, `underlyingReceived` |
+| `LogDepositJLToken` | `depositJLToken` | `wrapperConfig`, `user`, `jlTokenAmount`, `xTokenMinted` |
+| `LogRedeemToJLToken` | `redeemToJLToken` | `wrapperConfig`, `user`, `xTokenBurned`, `jlTokenAmount` |
+| `LogDepositUnderlying` | `depositUnderlying`, `mintUnderlying` | `wrapperConfig`, `user`, `underlyingAmount`, `jlSharesReceived`, `xTokenMinted` |
+| `LogRedeemToUnderlying` | `redeemToUnderlying` | `wrapperConfig`, `user`, `xTokenBurned`, `jlSharesRedeemed`, `underlyingReceived` |
+| `LogWithdrawToUnderlying` | `withdrawToUnderlying` | `wrapperConfig`, `user`, `xTokenBurned`, `jlSharesRedeemed`, `underlyingReceived` |
 | `LogAccrue` | An accrue at which the Lend exchange price has risen since the last checkpoint | `wrapperConfig`, `oldPrice`, `newPrice`, `totalDeltaScaled`, `protocolDeltaScaled`, `partnerDeltaScaled` |
-| `LogClaimPartnerFees` | `claim_partner_fees` | `wrapperConfig`, `partnerFeeRecipient`, `fTokenAmount` |
+| `LogClaimPartnerFees` | `claimPartnerFees` | `wrapperConfig`, `partnerFeeRecipient`, `jlTokenAmount` |
 | `LogUpdateWrapperProtocolFeeShare` | An accrue at which the wrapper adopts a new protocol share | `wrapperConfig`, `oldBps`, `newBps` |
-| `LogInitWrapper` | Wrapper creation | `wrapperConfig`, `xTokenMint`, `fTokenMint`, `lending`, `authority`, `partnerFeeBps`, `partnerFeeRecipient`, `seedFAmount` |
-| `LogUpdatePartnerYieldFee` | `update_partner_fee` | `wrapperConfig`, `oldBps`, `newBps` |
-| `LogUpdatePartnerFeeRecipient` | `update_partner_fee_recipient` | `wrapperConfig`, `oldRecipient`, `newRecipient` |
-| `LogUpdateClaimAuthority` | `update_claim_authority` | `wrapperConfig`, `oldClaimAuthority`, `newClaimAuthority` |
-| `LogTransferWrapperAuthority` | `transfer_wrapper_authority` | `wrapperConfig`, `oldAuthority`, `newAuthority` |
-| `LogUpdateXTokenMetadata` | `update_x_token_metadata` | `wrapperConfig`, `xTokenMint`, `name`, `symbol`, `uri` |
+| `LogInitWrapper` | Wrapper creation | `wrapperConfig`, `xTokenMint`, `jlTokenMint`, `lending`, `authority`, `partnerFeeBps`, `partnerFeeRecipient`, `seedJLAmount` |
+| `LogUpdatePartnerYieldFee` | `updatePartnerFee` | `wrapperConfig`, `oldBps`, `newBps` |
+| `LogUpdatePartnerFeeRecipient` | `updatePartnerFeeRecipient` | `wrapperConfig`, `oldRecipient`, `newRecipient` |
+| `LogUpdateClaimAuthority` | `updateClaimAuthority` | `wrapperConfig`, `oldClaimAuthority`, `newClaimAuthority` |
+| `LogTransferWrapperAuthority` | `transferWrapperAuthority` | `wrapperConfig`, `oldAuthority`, `newAuthority` |
+| `LogUpdateXTokenMetadata` | `updateXTokenMetadata` | `wrapperConfig`, `xTokenMint`, `name`, `symbol`, `uri` |
 
-In `LogAccrue`, `oldPrice` and `newPrice` are underlying per jlToken × 10^12, and the three deltas are jlToken atoms × 10^6. `fSharesReceived` and `fSharesRedeemed` are jlToken atoms.
+In `LogAccrue`, `oldPrice` and `newPrice` are underlying per jlToken × 10^12, and the three deltas are jlToken atoms × 10^6. `jlSharesReceived` and `jlSharesRedeemed` are jlToken atoms.
 
 The SDK has a decoder for each event, such as `getLogAccrueEventDecoder`. Neither Kit nor the SDK extracts events from transaction logs: parse the `Program data:` log lines yourself, then decode the bytes with the event's decoder.

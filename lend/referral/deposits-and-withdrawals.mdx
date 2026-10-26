@@ -2,23 +2,23 @@
 title: "Lend Referral Deposits and Withdrawals"
 sidebarTitle: "Deposit and Withdraw"
 description: "Move user funds in and out of a Lend Referral wrapper: pick the operation, set a slippage bound, and show positions."
-llmsDescription: "How a front end deposits and withdraws user funds through a Jupiter Lend Referral wrapper with the @jup-ag/lend-referral-sdk TypeScript SDK. Covers choosing between depositUnderlying, mintUnderlying, depositFToken, redeemToUnderlying, withdrawToUnderlying and redeemToFToken, setting the required bound ({ slippageBps }, { limit } or unbounded) and reading quotes, exit paths for dust below 10 atoms (WrapperUnderlyingAmountTooSmall 7017), the last withdrawer (WrapperExactWithdrawStrandsShares 7015), a blocked underlying path and a protocol pause, user token accounts (userAccounts, createUserAccounts, payer), and showing a user's xToken position in jlTokens and in the underlying token with simulateAccrue and estimateUnderlyingFromXRedeem."
+llmsDescription: "How a front end deposits and withdraws user funds through a Jupiter Lend Referral wrapper with the @jup-ag/lend-referral-sdk TypeScript SDK. Covers choosing between depositUnderlying, mintUnderlying, depositJLToken, redeemToUnderlying, withdrawToUnderlying and redeemToJLToken, setting the required bound ({ slippageBps }, { limit } or unbounded) and reading quotes, exit paths for dust below 10 atoms (WrapperUnderlyingAmountTooSmall 7017), the last withdrawer (WrapperExactWithdrawStrandsShares 7015), a blocked underlying path and a protocol pause, user token accounts (userAccounts, createUserAccounts, payer), and showing a user's xToken position in jlTokens and in the underlying token with simulateAccrue and estimateUnderlyingFromXRedeem."
 ---
 
 Your front end moves user funds through a [Lend Referral](/lend/referral) wrapper with six user actions. Each action takes a `WrapperContext` from `resolveWrapper` and returns instructions plus a quote. The [SDK quick start](/lend/referral/sdk) shows how to read the context and how to sign and send the instructions. This page covers which action to call and how to bound it.
 
 ## Choose an operation
 
-Users can deposit and withdraw in the market's underlying token, such as USDC, or in its jlToken (`fToken` in the SDK). Pick the action by what the user fixes: the amount they give, or the amount they get.
+Users can deposit and withdraw in the market's underlying token, such as USDC, or in its jlToken. Pick the action by what the user fixes: the amount they give, or the amount they get.
 
 | User wants to | SDK action | User gives | User gets | Rounding |
 |---|---|---|---|---|
 | Deposit an amount of the underlying token | `depositUnderlying` | The underlying amount | xTokens | Down |
 | Receive an exact number of xTokens | `mintUnderlying` | The underlying needed | Exactly that many xTokens | Underlying needed rounds up |
-| Deposit jlTokens they already hold | `depositFToken` | jlTokens | xTokens | Down |
+| Deposit jlTokens they already hold | `depositJLToken` | jlTokens | xTokens | Down |
 | Redeem xTokens for the underlying token | `redeemToUnderlying` | xTokens | The underlying token | Down |
 | Withdraw an exact amount of the underlying token | `withdrawToUnderlying` | The xTokens needed | Exactly that amount | xTokens burned round up |
-| Redeem xTokens for jlTokens | `redeemToFToken` | xTokens | jlTokens | Down |
+| Redeem xTokens for jlTokens | `redeemToJLToken` | xTokens | jlTokens | Down |
 
 Rounding always favours the pool. For a full exit, redeem the whole xToken balance with `redeemToUnderlying`. Use the exact-amount actions, `mintUnderlying` and `withdrawToUnderlying`, only when the user names an exact output.
 
@@ -40,11 +40,11 @@ Each quote holds the estimate and the bound it sent. All amounts are raw atoms (
 
 | Action | `quote` |
 |---|---|
-| `depositUnderlying`, `depositFToken` | `{ xOut, minXOut }` |
+| `depositUnderlying`, `depositJLToken` | `{ xOut, minXOut }` |
 | `mintUnderlying` | `{ underlyingIn, maxUnderlyingIn }` |
 | `redeemToUnderlying` | `{ underlyingOut, minUnderlyingOut }` |
 | `withdrawToUnderlying` | `{ xIn, maxXIn }` |
-| `redeemToFToken` | `{ fOut, minFOut }` |
+| `redeemToJLToken` | `{ jlOut, minJLOut }` |
 
 Show the user the estimate and the bound before they sign. If the send fails with `WrapperSlippageExceeded` (7003), read the wrapper again and rebuild.
 
@@ -89,16 +89,16 @@ console.log(`About ${quote.underlyingIn} underlying atoms, at most ${quote.maxUn
 
 ```typescript jlTokens
 import { type TransactionSigner } from "@solana/kit";
-import { depositFToken, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+import { depositJLToken, type WrapperContext } from "@jup-ag/lend-referral-sdk";
 
 // From resolveWrapper. See the SDK quick start.
 declare const ctx: WrapperContext;
 // The user's wallet signer.
 declare const user: TransactionSigner;
 
-const { instructions, quote } = await depositFToken(ctx, {
+const { instructions, quote } = await depositJLToken(ctx, {
   user,
-  fAmount: 5_000_000n, // jlToken atoms
+  jlAmount: 5_000_000n, // jlToken atoms
   bound: { slippageBps: 50 },
 });
 console.log(`About ${quote.xOut} xToken atoms, at least ${quote.minXOut}`, instructions.length);
@@ -149,7 +149,7 @@ console.log(`Burns about ${quote.xIn} xToken atoms, at most ${quote.maxXIn}`, in
 
 ```typescript jlTokens
 import { type TransactionSigner } from "@solana/kit";
-import { redeemToFToken, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+import { redeemToJLToken, type WrapperContext } from "@jup-ag/lend-referral-sdk";
 
 // From resolveWrapper. See the SDK quick start.
 declare const ctx: WrapperContext;
@@ -157,12 +157,12 @@ declare const ctx: WrapperContext;
 declare const user: TransactionSigner;
 declare const xBalance: bigint;
 
-const { instructions, quote } = await redeemToFToken(ctx, {
+const { instructions, quote } = await redeemToJLToken(ctx, {
   user,
   xShares: xBalance,
   bound: { slippageBps: 50 },
 });
-console.log(`About ${quote.fOut} jlToken atoms, at least ${quote.minFOut}`, instructions.length);
+console.log(`About ${quote.jlOut} jlToken atoms, at least ${quote.minJLOut}`, instructions.length);
 ```
 </CodeGroup>
 
@@ -174,11 +174,11 @@ Most exits are a `redeemToUnderlying` of the whole balance. Four cases need a di
 
 ### Dust below 10 atoms
 
-The underlying path rejects amounts below 10 atoms, because Jupiter Liquidity rejects smaller operations. The SDK throws `AmountTooSmall` before it builds, and the program fails with `WrapperUnderlyingAmountTooSmall` (7017). Move dust with `redeemToFToken`, which has no 10-atom minimum.
+The underlying path rejects amounts below 10 atoms, because Jupiter Liquidity rejects smaller operations. The SDK throws `AmountTooSmall` before it builds, and the program fails with `WrapperUnderlyingAmountTooSmall` (7017). Move dust with `redeemToJLToken`, which has no 10-atom minimum.
 
 ```typescript
 import { type TransactionSigner } from "@solana/kit";
-import { redeemToFToken, redeemToUnderlying, ReferralSdkError, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+import { redeemToJLToken, redeemToUnderlying, ReferralSdkError, type WrapperContext } from "@jup-ag/lend-referral-sdk";
 
 // From resolveWrapper. See the SDK quick start.
 declare const ctx: WrapperContext;
@@ -192,7 +192,7 @@ async function buildExit() {
   } catch (err) {
     if (err instanceof ReferralSdkError && err.kind === "AmountTooSmall") {
       // Less than 10 underlying atoms: exit in jlTokens instead.
-      return await redeemToFToken(ctx, { user, xShares: xBalance, bound: { slippageBps: 50 } });
+      return await redeemToJLToken(ctx, { user, xShares: xBalance, bound: { slippageBps: 50 } });
     }
     throw err;
   }
@@ -208,7 +208,7 @@ console.log(instructions.length);
 
 ### Blocked underlying path
 
-The underlying path calls Jupiter Lend and Liquidity. If they block the withdrawal, for example during a liquidity shortage or under a withdrawal limit, `redeemToFToken` still works, because it only moves jlTokens out of the wrapper's vault.
+The underlying path calls Jupiter Lend and Liquidity. If they block the withdrawal, for example during a liquidity shortage or under a withdrawal limit, `redeemToJLToken` still works, because it only moves jlTokens out of the wrapper's vault.
 
 The same applies to a Token-2022 underlying token. If its mint authority later enables a transfer fee or a transfer hook, or freezes the wrapper's transit account, the underlying path stops working and the jlToken path keeps working.
 
@@ -222,7 +222,7 @@ The user's token accounts can be any token accounts the user owns. By default th
 
 | `UserOpts` field | Default | Effect |
 |---|---|---|
-| `userAccounts` | The user's ATAs | `{ userXTokenAccount?, userFTokenAccount?, userUnderlyingAccount? }`: token accounts the user owns, used instead of the ATAs |
+| `userAccounts` | The user's ATAs | `{ userXTokenAccount?, userJLTokenAccount?, userUnderlyingAccount? }`: token accounts the user owns, used instead of the ATAs |
 | `createUserAccounts` | `true` | Prepends an idempotent ATA creation for the destination account. An account you pass in `userAccounts` is never created. `false` skips creation. |
 | `payer` | `user` | Pays the rent of the created ATA. It is not the transaction fee payer and does not change any signer. |
 
@@ -260,7 +260,7 @@ An xToken's value in jlTokens rises as yield accrues, net of the partner fee, wh
 ```typescript
 import { type Address, createSolanaRpc } from "@solana/kit";
 import {
-  estimateFTokensOut,
+  estimateJLTokensOut,
   estimateUnderlyingFromXRedeem,
   resolveWrapper,
   simulateAccrue,
@@ -287,7 +287,7 @@ const xBalance = accounts.reduce(
 const P = ctx.lending.data.tokenExchangePrice;
 const books = simulateAccrue(ctx.wrapper.data, P, ctx.protocol.data.protocolFeeShareBps);
 
-const jlTokens = estimateFTokensOut(xBalance, books); // jlToken atoms
+const jlTokens = estimateJLTokensOut(xBalance, books); // jlToken atoms
 const underlying = estimateUnderlyingFromXRedeem(xBalance, P, books); // underlying atoms
 
 // The market's decimals, shared by the underlying token, its jlToken and the xToken.

@@ -9,12 +9,12 @@ A Lend Referral wrapper takes your partner fee out of the yield your users earn,
 
 ## How the fee is charged
 
-The wrapper holds jlTokens (`fToken` in the SDK) for its users. Each jlToken is worth more underlying tokens over time, as Jupiter Lend Earn pays yield. The wrapper records the jlToken exchange price at its last checkpoint. At each **accrue**, it does two things:
+The wrapper holds jlTokens for its users. Each jlToken is worth more underlying tokens over time, as Jupiter Lend Earn pays yield. The wrapper records the jlToken exchange price at its last checkpoint. At each **accrue**, it does two things:
 
 1. It refreshes the Lend exchange price.
 2. It charges the partner fee on the users' yield since the last checkpoint, and moves the new checkpoint to the current price.
 
-An accrue runs at the start of every deposit, redeem and withdrawal, every claim, every `update_partner_fee`, and every call to the `accrue` instruction. Anyone can call `accrue`. It has no signer account, so only the transaction fee payer signs.
+An accrue runs at the start of every deposit, redeem and withdrawal, every claim, every `updatePartnerFee`, and every call to the `accrue` instruction. Anyone can call `accrue`. It has no signer account, so only the transaction fee payer signs.
 
 Only the users' balance pays the fee. The partner's and Jupiter's balances are already fee income, so their jlTokens keep earning Earn yield with no fee on it.
 
@@ -73,7 +73,7 @@ A wrapper with routine user activity accrues often enough to sit at the continuo
 
 ## When fee changes take effect
 
-**Partner fee.** `update_partner_fee` accrues at the old fee first, so the new fee applies only to yield earned after the change. The change takes effect at once, with no delay, up to the 10% cap. Your users rely on your conduct within that cap. `update_partner_fee` is blocked while the protocol is paused. See [Change the partner fee](/lend/referral/manage-wrapper#change-the-partner-fee).
+**Partner fee.** `updatePartnerFee` accrues at the old fee first, so the new fee applies only to yield earned after the change. The change takes effect at once, with no delay, up to the 10% cap. Your users rely on your conduct within that cap. `updatePartnerFee` is blocked while the protocol is paused. See [Change the partner fee](/lend/referral/manage-wrapper#change-the-partner-fee).
 
 **Protocol share.** When Jupiter changes the protocol share, each wrapper picks up the new share at its next accrue. The yield pending since the last checkpoint splits at the old share. To apply a new share right away, call `accrue` on the wrapper. An idle wrapper keeps the old share until its next activity.
 

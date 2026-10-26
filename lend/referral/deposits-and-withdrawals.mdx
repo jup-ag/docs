@@ -1,5 +1,5 @@
 ---
-title: "Deposit and Withdraw (Lend Referral)"
+title: "Lend Referral Deposits and Withdrawals"
 sidebarTitle: "Deposit and Withdraw"
 description: "Move user funds in and out of a Lend Referral wrapper: pick the operation, set a slippage bound, and show positions."
 llmsDescription: "How a front end deposits and withdraws user funds through a Jupiter Lend Referral wrapper with the @jup-ag/lend-referral-sdk TypeScript SDK. Covers choosing between depositUnderlying, mintUnderlying, depositFToken, redeemToUnderlying, withdrawToUnderlying and redeemToFToken, setting the required bound ({ slippageBps }, { limit } or unbounded) and reading quotes, exit paths for dust below 10 atoms (WrapperUnderlyingAmountTooSmall 7017), the last withdrawer (WrapperExactWithdrawStrandsShares 7015), a blocked underlying path and a protocol pause, user token accounts (userAccounts, createUserAccounts, payer), and showing a user's xToken position in jlTokens and in the underlying token with simulateAccrue and estimateUnderlyingFromXRedeem."

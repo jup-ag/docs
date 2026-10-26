@@ -24,6 +24,18 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-10-26] Lend Referral docs as lend/referral/ ("Lend Referral" nav group)
+**Status:** implemented
+**Scope:** new-section | navigation
+**Files affected:** `lend/referral/{index,fees,sdk,deposits-and-withdrawals,manage-wrapper,reference}.mdx`, `docs.json`, `lend/index.mdx`, `lend/program-addresses.mdx`
+**Linear issue:** BUILD-949
+
+**Context:** The Lend Referral program (`LrefWFcNXGnLxnQUdKmuJ1U3fUrFBdNkm6xCfVfWwQW`, private repo `Instadapp/lend-referral`) lets a partner wrap a Jupiter Lend Earn market in its own xToken and take a fee on its users' yield. It had no developer docs. The repo's own `docs/integration.md` and `docs/sdk.md` mix partner-facing behaviour with governance runbooks (deploy, `init_config`, multisig handover) and SDK internals (codegen, golden vectors).
+**Decision:** A "Lend Referral" group in the Lend menu, directly after Lend AMM, with six pages, one Diataxis mode each: Overview (explanation: wrapper, roles, onboarding), Fees and Yield (explanation), SDK Quick Start (how-to), Deposit and Withdraw (how-to, for front ends), Manage Your Wrapper (how-to, for the partner), Reference. Audience is a partner who already knows Lend. Governance-only flows (wrapper creation runbook, protocol share overrides, pause, protocol fee claims) are described only by their effect on partners. A card on `lend/index.mdx` and a row on `lend/program-addresses.mdx` link the section.
+**Rationale:** The two personas (partner managing a wrapper, front end moving user funds) need different task pages; concepts every page relies on (fees, roles) live once and are linked. Placing it after Lend AMM keeps the core Earn then Borrow order untouched. Pages stay self-contained because the source repo is private.
+**Alternatives considered:** (1) One long page per source doc (integration + SDK), rejected: both run past 400 lines and mix modes. (2) Four pages with fees folded into the overview, rejected: the overview would cross ~250 lines and partners look up fees on their own. (3) Nesting under Earn, rejected: Earn's SDK pages target `@jup-ag/lend` (web3.js); this SDK is Kit-only and a separate package.
+**Migration notes:** New paths only, no redirects.
+
 ### [2026-10-07] Remove the public Portfolio API (v1); keep the hidden v2 B2B surface
 **Status:** implemented
 **Scope:** folder-structure | navigation | redirect

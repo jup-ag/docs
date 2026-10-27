@@ -450,12 +450,12 @@ Adding optional parameters to `/order` can restrict which routers are eligible:
 | Parameter | Metis | JupiterZ (RFQ) | Dflow | OKX |
 | --- | --- | --- | --- | --- |
 | **(no optional params)** | Yes | Yes | Yes | Yes |
-| `receiver` | Yes | Yes | Yes | Yes |
+| `receiver` | Yes | Yes | **No** | **No** |
 | `referralAccount` & `referralFee` | Yes | Yes | Yes | Yes |
-| `payer` (integrator gasless) | Yes | **No** | **No** | **No** |
+| `payer` (integrator gasless) | Yes | Yes | **No** | **No** |
 | `excludeRouters: jupiterz` | Yes | **No** | Yes | Yes |
 
-**Key takeaway:** setting `payer` to a wallet different from `taker` disables JupiterZ (RFQ) and restricts routing to Metis, which may result in worse pricing on major pairs where market makers often beat onchain routing by 5-20bps.
+**Key takeaway:** setting `payer` to a wallet different from `taker` disables Dflow and OKX, while Metis and JupiterZ (RFQ) still compete. On a JupiterZ route the market maker pays the transaction fees and your `payer` only pays rent for the output token accounts the transaction creates. See [Gasless Swaps](/swap/advanced/gasless#integrator-payer) for what `payer` pays on each route and when it must sign.
 
 For the full parameter reference, see the [API reference](/api-reference/swap/order).
 

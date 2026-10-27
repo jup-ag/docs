@@ -75,7 +75,7 @@ When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker 
 
 ## Integrator payer
 
-Integrators can cover all gas costs on behalf of their users by passing the `payer` parameter. This works on both `/order` and `/build`.
+Integrators can sponsor gas for their users by passing the `payer` parameter, so the user does not need SOL to swap. This works on both `/order` and `/build`.
 
 <Note>
 `payer` only activates when set to a wallet different from `taker`. Setting `payer=taker` has no effect. The request behaves as if no `payer` was provided.
@@ -86,7 +86,7 @@ Integrators can cover all gas costs on behalf of their users by passing the `pay
 Pass `payer` to cover gas-related fees for the taker. Metis and JupiterZ (RFQ) both compete for the quote. Dflow and OKX are not eligible when `payer` is set.
 
 <Note>
-This needs to be used together with referral parameters (`referralAccount` and `referralFee`) because it is assumed that you will be taking fees to recoup the costs spent on gas.
+`payer` works without referral parameters, but then you pay gas on every swap with no fee to recover it. Pass `referralAccount` and `referralFee` with `payer` to charge a fee that covers the gas you spend.
 </Note>
 
 ```typescript
@@ -126,7 +126,61 @@ What the payer pays, and whether it signs, depends on which router wins the quot
 - When the output is native SOL, the transaction creates no output token account, so the payer is not a signer and pays nothing
 - The taker pays no SOL
 
-Before sending to `/execute`, sign with the taker and with the payer if the payer is one of the transaction's required signers. The required signers are the first `header.numRequiredSignatures` keys of the transaction message. Their order differs between quotes, so match the payer by public key, not by position. The market maker signs on `/execute`.
+Before sending to `/execute`, sign with the taker and, only if it is one of the transaction's required signers, with the payer. Match the payer by public key, not by position: the signer order differs between quotes. Signing with a key that is not a required signer throws in both SDKs, so always signing with the payer breaks on native SOL output. On a JupiterZ route, the market maker signs during `/execute`.
+
+<CodeGroup>
+```typescript title="@solana/kit"
+import {
+  getTransactionDecoder,
+  getTransactionEncoder,
+  partiallySignTransaction,
+} from "@solana/kit";
+
+// order: the /order response
+// userSigner, payerSigner: KeyPairSigner from createKeyPairSignerFromBytes
+const transaction = getTransactionDecoder().decode(
+  Buffer.from(order.transaction, "base64"),
+);
+
+// The keys of `signatures` are the transaction's required signers.
+// The payer is one of them unless the output is native SOL on a JupiterZ route.
+const requiredSigners = Object.keys(transaction.signatures);
+const keyPairs = [userSigner, payerSigner]
+  .filter((s) => requiredSigners.includes(s.address))
+  .map((s) => s.keyPair);
+
+// Partial signing: on a JupiterZ route the market maker signs during /execute
+const signedTransaction = await partiallySignTransaction(keyPairs, transaction);
+const signedTxBase64 = Buffer.from(
+  getTransactionEncoder().encode(signedTransaction),
+).toString("base64");
+```
+
+```typescript title="@solana/web3.js"
+import { VersionedTransaction } from "@solana/web3.js";
+
+// order: the /order response
+// userKeypair, payerKeypair: Keypair
+const transaction = VersionedTransaction.deserialize(
+  Buffer.from(order.transaction, "base64"),
+);
+
+// The first numRequiredSignatures static keys are the required signers.
+// The payer is one of them unless the output is native SOL on a JupiterZ route.
+const { header, staticAccountKeys } = transaction.message;
+const requiredSigners = staticAccountKeys
+  .slice(0, header.numRequiredSignatures)
+  .map((key) => key.toBase58());
+transaction.sign(
+  [userKeypair, payerKeypair].filter((k) =>
+    requiredSigners.includes(k.publicKey.toBase58()),
+  ),
+);
+const signedTxBase64 = Buffer.from(transaction.serialize()).toString("base64");
+```
+</CodeGroup>
+
+Send `signedTxBase64` and the order's `requestId` to `/execute`, as in [Order & Execute](/swap/order-and-execute).
 
 ### On `/build`
 

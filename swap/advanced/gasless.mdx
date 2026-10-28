@@ -126,7 +126,7 @@ What the payer pays, and whether it signs, depends on which router wins the quot
 - When the output is native SOL, the transaction creates no output token account, so the payer is not a signer and pays nothing
 - The taker pays no SOL
 
-Before sending to `/execute`, sign with the taker and, only if it is one of the transaction's required signers, with the payer. Match the payer by public key, not by position: the signer order differs between quotes. Signing with a key that is not a required signer throws in both SDKs, so always signing with the payer breaks on native SOL output. On a JupiterZ route, the market maker signs during `/execute`.
+Before sending to `/execute`, sign with the taker and, only if it is one of the transaction's required signers, with the payer. Match the payer by public key, not by position: the signer order differs between quotes. Signing with a key that is not a required signer throws in both `@solana/kit` and `@solana/web3.js`, so always signing with the payer breaks on native SOL output. On a JupiterZ route, the market maker signs during `/execute`.
 
 <CodeGroup>
 ```typescript title="@solana/kit"

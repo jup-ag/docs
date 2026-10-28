@@ -125,9 +125,9 @@ components:
           type: string
           enum:
             - polymarket
-            - gx
+            - kalshi
             - bisonfi
-          description: Market data provider
+          description: Market data provider. `kalshi` markets are legacy and reject new buys with `kalshi_buys_disabled`.
         title:
           type: string
           description: Market title
@@ -267,7 +267,8 @@ components:
         category:
           type: string
           description: "The category for the event, allowed values: all, crypto, sports,
-            politics, esports, culture, economics, tech"
+            politics, esports, culture, economics, tech, finance, climate & science,
+            weather, mentions"
         subcategory:
           type: string
           description: The subcategory for the event
@@ -1302,9 +1303,9 @@ paths:
               - polymarket
               - bisonfi
             default: polymarket
-            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets. `kalshi` is legacy. Kalshi events can still be read, but new buys are rejected with `kalshi_buys_disabled`.
           required: false
-          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets. `kalshi` is legacy. Kalshi events can still be read, but new buys are rejected with `kalshi_buys_disabled`.
           name: provider
           in: query
         - schema:
@@ -1355,9 +1356,9 @@ paths:
               - polymarket
               - bisonfi
             default: polymarket
-            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets. `kalshi` is legacy. Kalshi events can still be read, but new buys are rejected with `kalshi_buys_disabled`.
           required: false
-          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets. `kalshi` is legacy. Kalshi events can still be read, but new buys are rejected with `kalshi_buys_disabled`.
           name: provider
           in: query
         - schema:
@@ -1400,6 +1401,10 @@ paths:
               - culture
               - economics
               - tech
+              - finance
+              - "climate & science"
+              - weather
+              - mentions
           required: false
           description: "Event category. `all` returns every category."
           name: category
@@ -1546,9 +1551,9 @@ paths:
               - polymarket
               - bisonfi
             default: polymarket
-            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets. `kalshi` is legacy. Kalshi events can still be read, but new buys are rejected with `kalshi_buys_disabled`.
           required: false
-          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets. `kalshi` is legacy. Kalshi events can still be read, but new buys are rejected with `kalshi_buys_disabled`.
           name: provider
           in: query
       responses:
@@ -2368,10 +2373,10 @@ paths:
         - schema:
             type: string
             minLength: 1
-            description: Kalshi or Polymarket market identifier
-            example: KXF1-25-LN
+            description: Market identifier
+            example: POLY-562828
           required: true
-          description: Kalshi or Polymarket market identifier
+          description: Market identifier
           name: marketId
           in: path
       responses:

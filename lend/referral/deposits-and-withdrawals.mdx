@@ -1,0 +1,301 @@
+---
+title: "Lend Referral Deposits and Withdrawals"
+sidebarTitle: "Deposit and Withdraw"
+description: "Move user funds in and out of a Lend Referral wrapper: pick the operation, set a slippage bound, and show positions."
+llmsDescription: "How a front end deposits and withdraws user funds through a Jupiter Lend Referral wrapper with the @jup-ag/lend-referral-sdk TypeScript SDK. Covers choosing between depositUnderlying, mintUnderlying, depositJLToken, redeemToUnderlying, withdrawToUnderlying and redeemToJLToken, setting the required bound ({ slippageBps }, { limit } or unbounded) and reading quotes, exit paths for dust below 10 atoms (WrapperUnderlyingAmountTooSmall 7017), the last withdrawer (WrapperExactWithdrawStrandsShares 7015), a blocked underlying path and a protocol pause, user token accounts (userAccounts, createUserAccounts, payer), and showing a user's xToken position in jlTokens and in the underlying token with simulateAccrue and estimateUnderlyingFromXRedeem."
+---
+
+Your front end moves user funds through a [Lend Referral](/lend/referral) wrapper with six user actions. Each action takes a `WrapperContext` from `resolveWrapper` and returns instructions plus a quote. The [SDK quick start](/lend/referral/sdk) shows how to read the context and how to sign and send the instructions. This page covers which action to call and how to bound it.
+
+## Choose an operation
+
+Users can deposit and withdraw in the market's underlying token, such as USDC, or in its jlToken. Pick the action by what the user fixes: the amount they give, or the amount they get.
+
+| User wants to | SDK action | User gives | User gets | Rounding |
+|---|---|---|---|---|
+| Deposit an amount of the underlying token | `depositUnderlying` | The underlying amount | xTokens | Down |
+| Receive an exact number of xTokens | `mintUnderlying` | The underlying needed | Exactly that many xTokens | Underlying needed rounds up |
+| Deposit jlTokens they already hold | `depositJLToken` | jlTokens | xTokens | Down |
+| Redeem xTokens for the underlying token | `redeemToUnderlying` | xTokens | The underlying token | Down |
+| Withdraw an exact amount of the underlying token | `withdrawToUnderlying` | The xTokens needed | Exactly that amount | xTokens burned round up |
+| Redeem xTokens for jlTokens | `redeemToJLToken` | xTokens | jlTokens | Down |
+
+Rounding always favours the pool. For a full exit, redeem the whole xToken balance with `redeemToUnderlying`. Use the exact-amount actions, `mintUnderlying` and `withdrawToUnderlying`, only when the user names an exact output.
+
+## Set a bound
+
+Every user action takes a required `bound`. The SDK estimates the result from the context and sends the bound on chain, so the transaction fails instead of executing at a worse rate.
+
+| `bound` | Deposits and redeems (minimum out) | `mintUnderlying`, `withdrawToUnderlying` (maximum in) |
+|---|---|---|
+| `{ slippageBps: 50 }` | Minimum = estimate minus 0.5%, rounded down | Maximum = estimate plus 0.5%, rounded up |
+| `{ limit: 990_000n }` | Minimum = `limit` | Maximum = `limit` |
+| `"unbounded"` | No minimum | Not accepted: a type error |
+
+`DEFAULT_SLIPPAGE_BPS` (50) is a suggested tolerance. The SDK never applies it for you.
+
+The estimate uses the exchange price Jupiter Lend last stored. The program refreshes that price before it executes, and the price only rises, so the real result can differ from the estimate by the yield since Lend's last update. Set `slippageBps` above that.
+
+Each quote holds the estimate and the bound it sent. All amounts are raw atoms (`bigint`). The bound is `null` for `"unbounded"`.
+
+| Action | `quote` |
+|---|---|
+| `depositUnderlying`, `depositJLToken` | `{ xOut, minXOut }` |
+| `mintUnderlying` | `{ underlyingIn, maxUnderlyingIn }` |
+| `redeemToUnderlying` | `{ underlyingOut, minUnderlyingOut }` |
+| `withdrawToUnderlying` | `{ xIn, maxXIn }` |
+| `redeemToJLToken` | `{ jlOut, minJLOut }` |
+
+Show the user the estimate and the bound before they sign. If the send fails with `WrapperSlippageExceeded` (7003), read the wrapper again and rebuild.
+
+## Deposit
+
+Each tab builds one deposit. Send the returned instructions in order, in one transaction.
+
+<CodeGroup>
+```typescript Underlying amount
+import { type TransactionSigner } from "@solana/kit";
+import { depositUnderlying, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// From resolveWrapper. See the SDK quick start.
+declare const ctx: WrapperContext;
+// The user's wallet signer.
+declare const user: TransactionSigner;
+
+const { instructions, quote } = await depositUnderlying(ctx, {
+  user,
+  underlyingAmount: 5_000_000n, // 5 USDC
+  bound: { slippageBps: 50 },
+});
+console.log(`About ${quote.xOut} xToken atoms, at least ${quote.minXOut}`, instructions.length);
+```
+
+```typescript Exact xTokens
+import { type TransactionSigner } from "@solana/kit";
+import { mintUnderlying, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// From resolveWrapper. See the SDK quick start.
+declare const ctx: WrapperContext;
+// The user's wallet signer.
+declare const user: TransactionSigner;
+
+const { instructions, quote } = await mintUnderlying(ctx, {
+  user,
+  xToMint: 1_000_000n,
+  bound: { slippageBps: 50 },
+});
+console.log(`About ${quote.underlyingIn} underlying atoms, at most ${quote.maxUnderlyingIn}`, instructions.length);
+```
+
+```typescript jlTokens
+import { type TransactionSigner } from "@solana/kit";
+import { depositJLToken, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// From resolveWrapper. See the SDK quick start.
+declare const ctx: WrapperContext;
+// The user's wallet signer.
+declare const user: TransactionSigner;
+
+const { instructions, quote } = await depositJLToken(ctx, {
+  user,
+  jlAmount: 5_000_000n, // jlToken atoms
+  bound: { slippageBps: 50 },
+});
+console.log(`About ${quote.xOut} xToken atoms, at least ${quote.minXOut}`, instructions.length);
+```
+</CodeGroup>
+
+The underlying-token deposits call Jupiter Lend, which mints jlTokens into the wrapper's vault. The wrapper then mints xTokens to the user. A deposit of fewer than 10 atoms of the underlying token fails, so the SDK throws `ReferralSdkError` with kind `AmountTooSmall` before it builds anything.
+
+## Withdraw
+
+`xBalance` is the user's xToken balance in atoms. [Show a user's position](#show-a-users-position) reads it.
+
+<CodeGroup>
+```typescript Full exit
+import { type TransactionSigner } from "@solana/kit";
+import { redeemToUnderlying, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// From resolveWrapper. See the SDK quick start.
+declare const ctx: WrapperContext;
+// The user's wallet signer and xToken balance in atoms.
+declare const user: TransactionSigner;
+declare const xBalance: bigint;
+
+const { instructions, quote } = await redeemToUnderlying(ctx, {
+  user,
+  xShares: xBalance,
+  bound: { slippageBps: 50 },
+});
+console.log(`About ${quote.underlyingOut} underlying atoms, at least ${quote.minUnderlyingOut}`, instructions.length);
+```
+
+```typescript Exact underlying
+import { type TransactionSigner } from "@solana/kit";
+import { withdrawToUnderlying, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// From resolveWrapper. See the SDK quick start.
+declare const ctx: WrapperContext;
+// The user's wallet signer.
+declare const user: TransactionSigner;
+
+const { instructions, quote } = await withdrawToUnderlying(ctx, {
+  user,
+  underlyingOut: 2_000_000n, // exactly 2 USDC
+  bound: { slippageBps: 50 },
+});
+console.log(`Burns about ${quote.xIn} xToken atoms, at most ${quote.maxXIn}`, instructions.length);
+```
+
+```typescript jlTokens
+import { type TransactionSigner } from "@solana/kit";
+import { redeemToJLToken, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// From resolveWrapper. See the SDK quick start.
+declare const ctx: WrapperContext;
+// The user's wallet signer and xToken balance in atoms.
+declare const user: TransactionSigner;
+declare const xBalance: bigint;
+
+const { instructions, quote } = await redeemToJLToken(ctx, {
+  user,
+  xShares: xBalance,
+  bound: { slippageBps: 50 },
+});
+console.log(`About ${quote.jlOut} jlToken atoms, at least ${quote.minJLOut}`, instructions.length);
+```
+</CodeGroup>
+
+On a redeem, the user's share of the vault is rounded down to whole jlToken atoms. The remainder, less than one atom, goes to the partner's balance. A user who holds jlTokens can withdraw them to the underlying token on [Jupiter Earn](/lend/earn/withdraw).
+
+## Exit in edge cases
+
+Most exits are a `redeemToUnderlying` of the whole balance. Four cases need a different path.
+
+### Dust below 10 atoms
+
+The underlying path rejects amounts below 10 atoms, because Jupiter Liquidity rejects smaller operations. The SDK throws `AmountTooSmall` before it builds, and the program fails with `WrapperUnderlyingAmountTooSmall` (7017). Move dust with `redeemToJLToken`, which has no 10-atom minimum.
+
+```typescript
+import { type TransactionSigner } from "@solana/kit";
+import { redeemToJLToken, redeemToUnderlying, ReferralSdkError, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// From resolveWrapper. See the SDK quick start.
+declare const ctx: WrapperContext;
+// The user's wallet signer and xToken balance in atoms.
+declare const user: TransactionSigner;
+declare const xBalance: bigint;
+
+async function buildExit() {
+  try {
+    return await redeemToUnderlying(ctx, { user, xShares: xBalance, bound: { slippageBps: 50 } });
+  } catch (err) {
+    if (err instanceof ReferralSdkError && err.kind === "AmountTooSmall") {
+      // Less than 10 underlying atoms: exit in jlTokens instead.
+      return await redeemToJLToken(ctx, { user, xShares: xBalance, bound: { slippageBps: 50 } });
+    }
+    throw err;
+  }
+}
+
+const { instructions } = await buildExit();
+console.log(instructions.length);
+```
+
+### Last withdrawer
+
+`withdrawToUnderlying` rounds the xTokens it burns up. It refuses a withdrawal that would burn every circulating xToken while leaving one jlToken or more in the vault, and fails with `WrapperExactWithdrawStrandsShares` (7015). For a full exit, use `redeemToUnderlying`, which pays the full proportional amount.
+
+### Blocked underlying path
+
+The underlying path calls Jupiter Lend and Liquidity. If they block the withdrawal, for example during a liquidity shortage or under a withdrawal limit, `redeemToJLToken` still works, because it only moves jlTokens out of the wrapper's vault.
+
+The same applies to a Token-2022 underlying token. If its mint authority later enables a transfer fee or a transfer hook, or freezes the wrapper's transit account, the underlying path stops working and the jlToken path keeps working.
+
+### Protocol pause
+
+Jupiter can pause the whole protocol. A pause blocks every deposit, redeem and withdrawal, the jlToken exit included, and has no time limit. Transactions fail with `ProtocolPaused` (7016). Check `ctx.protocol.data.paused` before you build, and show the user that withdrawals are paused instead of letting the transaction fail.
+
+## Token accounts
+
+The user's token accounts can be any token accounts the user owns. By default the SDK uses the user's associated token accounts (ATAs) under `ctx.tokenProgram`.
+
+| `UserOpts` field | Default | Effect |
+|---|---|---|
+| `userAccounts` | The user's ATAs | `{ userXTokenAccount?, userJLTokenAccount?, userUnderlyingAccount? }`: token accounts the user owns, used instead of the ATAs |
+| `createUserAccounts` | `true` | Prepends an idempotent ATA creation for the destination account. An account you pass in `userAccounts` is never created. `false` skips creation. |
+| `payer` | `user` | Pays the rent of the created ATA. It is not the transaction fee payer and does not change any signer. |
+
+The SDK creates only the destination account: the xToken account on a deposit, the underlying or jlToken account on a withdrawal. The xToken account must exist before a deposit, which the default creation covers. The source account must already exist and hold the input.
+
+This example withdraws into an existing token account and lets a sponsor pay the rent of any ATA the SDK creates:
+
+```typescript
+import { type Address, type TransactionSigner } from "@solana/kit";
+import { redeemToUnderlying, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// From resolveWrapper. See the SDK quick start.
+declare const ctx: WrapperContext;
+// The user's wallet signer, xToken balance, and the xToken account the user holds the balance in.
+declare const user: TransactionSigner;
+declare const xBalance: bigint;
+declare const userXTokenAccount: Address;
+// Your app's signer that pays ATA rent for the user.
+declare const sponsor: TransactionSigner;
+
+const { instructions } = await redeemToUnderlying(ctx, {
+  user,
+  xShares: xBalance,
+  bound: { slippageBps: 50 },
+  userAccounts: { userXTokenAccount }, // the source: never created
+  payer: sponsor, // pays the rent of the underlying ATA if it does not exist
+});
+console.log(instructions.length);
+```
+
+## Show a user's position
+
+An xToken's value in jlTokens rises as yield accrues, net of the partner fee, while the user's xToken balance stays the same. To show the value, read the balance, then project the wrapper's books to now with `simulateAccrue` and convert.
+
+```typescript
+import { type Address, createSolanaRpc } from "@solana/kit";
+import {
+  estimateJLTokensOut,
+  estimateUnderlyingFromXRedeem,
+  resolveWrapper,
+  simulateAccrue,
+  type WrapperRef,
+} from "@jup-ag/lend-referral-sdk";
+
+// The wrapper reference (see the SDK quick start) and the user's wallet address.
+declare const ref: WrapperRef;
+declare const owner: Address;
+
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+const ctx = await resolveWrapper(rpc, ref);
+
+// The user's xToken balance across every token account they own for the xToken mint.
+const { value: accounts } = await rpc
+  .getTokenAccountsByOwner(owner, { mint: ctx.wrapper.data.xTokenMint }, { encoding: "jsonParsed" })
+  .send();
+const xBalance = accounts.reduce(
+  (sum, { account }) => sum + BigInt(account.data.parsed.info.tokenAmount.amount),
+  0n,
+);
+
+// Project the books to the stored Lend price, as the next instruction will.
+const P = ctx.lending.data.tokenExchangePrice;
+const books = simulateAccrue(ctx.wrapper.data, P, ctx.protocol.data.protocolFeeShareBps);
+
+const jlTokens = estimateJLTokensOut(xBalance, books); // jlToken atoms
+const underlying = estimateUnderlyingFromXRedeem(xBalance, P, books); // underlying atoms
+
+// The market's decimals, shared by the underlying token, its jlToken and the xToken.
+const decimals = ctx.lending.data.decimals;
+const format = (atoms: bigint) => (Number(atoms) / 10 ** decimals).toFixed(decimals);
+console.log(`xTokens ${format(xBalance)}, worth ${format(jlTokens)} jlTokens or ${format(underlying)} underlying`);
+```
+
+These values are what a redeem would pay at the price Jupiter Lend last stored. The program refreshes the price first, and the price only rises. So a real redeem to the underlying token pays slightly more. A real redeem to jlTokens can pay slightly fewer, because the refresh also charges the partner fee on the new yield. The SDK math uses the wrapper's `totalXShares`, not the xToken mint supply, because a holder can burn xTokens directly through the token program.
+
+To show users the fee they pay on yield, quote it on the continuous-accrual basis described in [Effective fee](/lend/referral/fees#effective-fee).

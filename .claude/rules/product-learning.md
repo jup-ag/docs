@@ -572,6 +572,35 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 
 ---
 
+# Lend Referral
+
+## Sources
+
+- **Program:** `LrefWFcNXGnLxnQUdKmuJ1U3fUrFBdNkm6xCfVfWwQW` (mainnet). Same ID on every cluster.
+- **Source repo:** `Instadapp/lend-referral` (PRIVATE). Program, IDL and the TypeScript SDK (`ts-sdk/`). Its `docs/integration.md` and `docs/sdk.md` are the upstream docs. Pages in this repo must stay self-contained: never link to the repo or cite its file paths here.
+- **SDK:** `@jup-ag/lend-referral-sdk`, built on `@solana/kit` 8.5 with a Codama-generated client. The Kit rewrite is Instadapp/lend-referral#11 (stacked on #12, the mainnet deployment). Docs were written against #11 head `53cfb04`, then updated to `bc1e706` for the jlToken rename.
+- **Live state is readable with the SDK itself:** `fetchProtocol(rpc)` and `findWrappers(rpc, {})` against mainnet.
+
+## Status
+
+- [2026-10-26] Pre-launch. Verified live through the SDK: the program is deployed and executable, the protocol config exists with `protocolFeeShareBps = 2500` and `paused = false`, its authority is still the deployer (not yet the governance multisig), and there are **0 wrappers**. `@jup-ag/lend-referral-sdk` is NOT on npm (the package is `"private": true` and exports `./src/index.ts`). The docs (BUILD-949) write the install command as if it is published, so the docs PR must not merge before the SDK is published and #11/#12 merge. No changelog entry until launch.
+
+## Facts
+
+- [2026-10-26] **Naming.** The SDK calls the Lend Earn receipt token **jlToken** everywhere since #11 commits `2909703` (hand-written API: `depositJLToken`, `redeemToJLToken`, `jlAmount`, quote `{ jlOut, minJLOut }`, `estimateJLTokensOut`, `MIN_SEED_JL_AMOUNT`) and `bc1e706` (Codama client: `getDepositJLTokenInstruction`, `jlTokenMint`, `totalUserJLTokenBalance`, `LogDepositJLToken`, `jlSharesReceived`, error `WrapperJLTokenMintMismatch`). The Anchor program, its IDL and its logs still say fToken (`deposit_f_token`, `Error Code: WrapperFTokenMintMismatch`), and the error message strings stay the program's (`WRAPPER_F_TOKEN_MINT_MISMATCH`). Discriminators and error codes are unchanged. The user directed that these docs never mention fToken, so the Reference names instructions by the SDK's camelCase names (`depositJLTokenWithMinXOut`), not the program's snake_case ones. The product is **Lend Referral**, never "Referral Program" alone: `tool-kits/referral-program.mdx` is the unrelated swap referral product.
+- [2026-10-26] **`LogAccrue` is emitted only when the Lend exchange price rose since the wrapper's last checkpoint** (program `accrue` logic: `if final_price > last_price`), not on every accrue. The upstream docs do not say so.
+- [2026-10-26] **SDK estimates use the stored Lend price**, and the program refreshes it first (it only rises). So a real redeem to the underlying token pays slightly more than the quote, while a real redeem to jlTokens can pay slightly fewer (the refresh also charges the partner fee on the new yield). Bounds have to cover that drift.
+- [2026-10-26] `estimatePartnerClaimable` throws a plain `Error` when the books exceed the vault; only the `claimPartnerFees` action throws `ReferralSdkError` kind `VaultUnderrun`. The upstream `sdk.md` math table blurs the two.
+- [2026-10-26] On chain, jlUSDC (`9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D`) and USDC both have 6 decimals; `findLendingAddress(USDC, jlUSDC)` = `2vVYHYM8VYnvZqQWpTJSj8o8DBf1wM8pVs3bsTgYZiqJ`, classic Token program. xToken decimals equal the jlToken's.
+- [2026-10-26] Every TypeScript snippet in `lend/referral/*.mdx` was typechecked (`tsc --noEmit`, strict, nodenext) against the SDK source at `53cfb04`, and again at `bc1e706` after the jlToken rename. Re-run the check after any SDK API change before editing these pages.
+
+## Open Questions
+
+- [2026-10-26] Partner onboarding contact path. The docs point at the general support form (`https://support.jup.ag/requests/new`); confirm the intended channel.
+- [2026-10-26] Does the governance multisig hand-off (`transfer_protocol_authority`) happen before the first wrapper? The docs say "Jupiter" throughout, so they hold either way.
+
+---
+
 # Jupiter Lend AMM
 
 ## Sources

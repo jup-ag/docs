@@ -1,0 +1,433 @@
+---
+title: "Lend Referral SDK"
+sidebarTitle: "SDK Quick Start"
+description: "Read a Lend Referral wrapper, build deposit instructions, and sign them from a server, a wallet, or a multisig."
+llmsDescription: "Quick start for the @jup-ag/lend-referral-sdk TypeScript SDK, built on @solana/kit, for Jupiter Lend Referral wrappers (partner-branded xTokens over a Jupiter Lend Earn market). Covers installing the SDK, the read, act, sign-and-send call pattern, reading a wrapper with findLendingAddress and resolveWrapper, a complete depositUnderlying example with a slippage bound, signing from a Kit wallet, a @solana/web3.js wallet adapter (compile with Kit, deserialize as VersionedTransaction) and a Squads multisig (convert Kit instructions to TransactionInstruction), simulating with simulateMessage and setting compute units with buildTransactionMessage, and handling ReferralSdkError kinds and program errors with decodeProgramError."
+---
+
+The `@jup-ag/lend-referral-sdk` package reads [Lend Referral](/lend/referral) wrappers, builds the instructions for every user and partner operation, and reproduces the program's math so you can show estimates and set slippage bounds. It is built on `@solana/kit` (Kit). The SDK never signs and never sends: it takes Kit `TransactionSigner`s and returns Kit `Instruction`s, and your app signs and sends them.
+
+## Install
+
+```bash
+npm install @jup-ag/lend-referral-sdk @solana/kit
+```
+
+The SDK is built on `@solana/kit` 8.5. Use Kit 8.5 or later in your app, so that your signers and addresses match the SDK's types. The package is an ES module and exports everything from its root. Amounts are raw token atoms as `bigint`, and addresses are Kit `Address` strings that you compare with `===`.
+
+## How a call works
+
+Every operation is the same three steps. Only the first and the last touch the network.
+
+```text
+resolveWrapper(rpc, { jlTokenMint, lending, xTokenMint })   read: 2 RPC round trips, one validated snapshot
+  └─ ctx: WrapperContext
+depositUnderlying(ctx, { user, underlyingAmount, bound })  act: no RPC call
+  └─ { instructions, quote }
+buildTransactionMessage(rpc, { feePayer, instructions })   sign and send: your pipeline
+  ├─ signTransactionMessageWithSigners(message)
+  └─ sendAndConfirmTransactionFactory(...)(signed)
+       └─ on failure: decodeProgramError(err, message)      name the Lend Referral error
+```
+
+1. **Read.** `resolveWrapper` fetches the wrapper, its market, the protocol config and the vault, checks that they belong together, and returns a `WrapperContext`.
+2. **Act.** An action such as `depositUnderlying` turns the context into instructions and a quote. It derives every address and computes every estimate locally.
+3. **Sign and send.** Build a message with `buildTransactionMessage` or your own Kit pipeline, then sign and send it the way your app already does.
+
+Read again before each operation. A context is a snapshot, and the quote is only as fresh as the snapshot.
+
+## Read a wrapper
+
+A wrapper is identified by three addresses:
+
+| Value | Where it comes from |
+|---|---|
+| `jlTokenMint` | The market's jlToken mint. Jupiter sends it at onboarding. The [Earn tokens endpoint](/api-reference/lend/earn/tokens) also lists it as `address`, next to the underlying mint as `assetAddress`. |
+| `lending` | The market's Lending account. Derive it with `findLendingAddress` from the underlying mint and the jlToken mint. |
+| `xTokenMint` | Your wrapper's xToken mint. Jupiter sends it at onboarding. |
+
+```typescript
+import { address, type Address, createSolanaRpc, isSome, unwrapOption } from "@solana/kit";
+import { findLendingAddress, resolveWrapper } from "@jup-ag/lend-referral-sdk";
+
+// The wrapper's xToken mint. Jupiter sends it when it creates your wrapper.
+declare const xTokenMint: Address;
+
+const USDC = address("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+const JLUSDC = address("9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D");
+
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+const lending = await findLendingAddress({ underlyingMint: USDC, jlTokenMint: JLUSDC });
+
+const ctx = await resolveWrapper(rpc, { jlTokenMint: JLUSDC, lending, xTokenMint });
+
+const { data } = ctx.wrapper;
+const share = data.protocolFeeShareOverride;
+console.log({
+  partnerFeeBps: data.partnerFeeBps,
+  protocolShareBps: isSome(share) ? share.value : ctx.protocol.data.protocolFeeShareBps,
+  claimAuthority: unwrapOption(data.claimAuthority), // Address | null
+  paused: ctx.protocol.data.paused,
+  decimals: ctx.lending.data.decimals,
+  tokenProgram: ctx.tokenProgram,
+  vaultBalance: ctx.vaultBalance, // jlToken atoms in the vault
+});
+```
+
+The context holds everything an action needs:
+
+| `WrapperContext` field | Contents |
+|---|---|
+| `wrapper` | The wrapper config account. `wrapper.data` has the fee settings and the books. See [Wrapper fields](/lend/referral/reference#wrapper-fields). |
+| `lending` | The Jupiter Lend market: `mint` (underlying), `jlTokenMint`, `decimals`, `tokenExchangePrice` |
+| `protocol` | The protocol config: `protocolFeeShareBps`, `paused` |
+| `tokenProgram` | Token or Token-2022, read from the underlying mint |
+| `vaultBalance` | jlToken atoms in the wrapper's vault, read in the same request as `wrapper` |
+
+`claimAuthority` and `protocolFeeShareOverride` are Kit `Option` values, never `null`. Read them with `unwrapOption` or `isSome` from `@solana/kit`.
+
+If you omit `xTokenMint`, `resolveWrapper` searches the market for its wrapper. The search throws `ReferralSdkError` with kind `WrapperNotFound` when the market has no wrapper, and `AmbiguousWrapper` when it has more than one. Several partners can each have a wrapper on the same market, so pass `xTokenMint` in production.
+
+## Deposit end to end
+
+This example is a server process with a keypair. It deposits 1 USDC into the wrapper, accepts up to 0.5% less than the estimate, and decodes the program error if the transaction fails.
+
+```typescript
+import {
+  address,
+  type Address,
+  assertIsTransactionWithBlockhashLifetime,
+  createKeyPairSignerFromBytes,
+  createSolanaRpc,
+  createSolanaRpcSubscriptions,
+  getSignatureFromTransaction,
+  sendAndConfirmTransactionFactory,
+  signTransactionMessageWithSigners,
+} from "@solana/kit";
+import {
+  buildTransactionMessage,
+  decodeProgramError,
+  depositUnderlying,
+  findLendingAddress,
+  ReferralSdkError,
+  resolveWrapper,
+} from "@jup-ag/lend-referral-sdk";
+
+// The wallet's 64-byte secret key, loaded from your secret store.
+declare const secretKey: Uint8Array;
+// The wrapper's xToken mint. Jupiter sends it when it creates your wrapper.
+declare const xTokenMint: Address;
+
+const USDC = address("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+const JLUSDC = address("9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D");
+
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+const rpcSubscriptions = createSolanaRpcSubscriptions("wss://api.mainnet-beta.solana.com");
+const user = await createKeyPairSignerFromBytes(secretKey);
+
+// 1. Read: one validated snapshot of the wrapper and its market.
+const lending = await findLendingAddress({ underlyingMint: USDC, jlTokenMint: JLUSDC });
+const ctx = await resolveWrapper(rpc, { jlTokenMint: JLUSDC, lending, xTokenMint });
+if (ctx.protocol.data.paused) throw new Error("Lend Referral is paused");
+
+// 2. Act: instructions plus the estimate behind the bound. No RPC call.
+let built;
+try {
+  built = await depositUnderlying(ctx, {
+    user,
+    underlyingAmount: 1_000_000n, // 1 USDC
+    bound: { slippageBps: 50 },
+  });
+} catch (err) {
+  if (err instanceof ReferralSdkError && err.kind === "AmountTooSmall") {
+    throw new Error("Deposit at least 10 atoms of the underlying token");
+  }
+  throw err;
+}
+console.log(`Expect ${built.quote.xOut} xToken atoms, at least ${built.quote.minXOut}`);
+
+// 3. Sign and send.
+const message = await buildTransactionMessage(rpc, {
+  feePayer: user,
+  instructions: built.instructions,
+});
+const signed = await signTransactionMessageWithSigners(message);
+assertIsTransactionWithBlockhashLifetime(signed);
+try {
+  await sendAndConfirmTransactionFactory({ rpc, rpcSubscriptions })(signed, { commitment: "confirmed" });
+  console.log("Deposited:", getSignatureFromTransaction(signed));
+} catch (err) {
+  const decoded = decodeProgramError(err, message);
+  if (decoded?.name === "WrapperSlippageExceeded") {
+    // The rate moved past the bound. Read again and rebuild.
+  }
+  console.error(decoded ?? err);
+  throw err;
+}
+```
+
+`bound` is required on every user action. The other operations, the bound options and the token account options are on [Deposit and Withdraw](/lend/referral/deposits-and-withdrawals).
+
+## Sign from your app
+
+Pick the signer by who signs. A noop signer from `createNoopSigner(address)` puts the address on the instructions as a signer and produces no signature, so the real signature comes from the wallet or the multisig.
+
+| Caller | Signer you pass to the SDK | From instructions to the chain |
+|---|---|---|
+| Server process | `await createKeyPairSignerFromBytes(secretKey)` | [Deposit end to end](#deposit-end-to-end) |
+| Kit app with a Wallet Standard wallet | A `TransactionSendingSigner` from the `@solana/react` wallet hooks | `signAndSendTransactionMessageWithSigners` |
+| `@solana/web3.js` 1.x app with wallet adapter | `createNoopSigner(address(publicKey.toBase58()))` | Compile with Kit, sign the `VersionedTransaction` with the wallet adapter |
+| Squads multisig | `createNoopSigner(multisigVault)` | Convert the instructions to `TransactionInstruction`s for `@sqds/multisig` |
+
+<Tabs>
+  <Tab title="Kit wallet">
+    The wallet signs and sends in one call.
+
+    ```typescript
+    import {
+      getBase58Decoder,
+      signAndSendTransactionMessageWithSigners,
+      type TransactionSendingSigner,
+    } from "@solana/kit";
+    import {
+      buildTransactionMessage,
+      decodeProgramError,
+      depositUnderlying,
+      type ReferralRpc,
+      type TxRpc,
+      type WrapperContext,
+    } from "@jup-ag/lend-referral-sdk";
+
+    // Your app's RPC client, from createSolanaRpc(url).
+    declare const rpc: ReferralRpc & TxRpc;
+    // From resolveWrapper. See "Read a wrapper".
+    declare const ctx: WrapperContext;
+    // The connected account, from useWalletAccountTransactionSendingSigner in @solana/react.
+    declare const walletSigner: TransactionSendingSigner;
+
+    const { instructions } = await depositUnderlying(ctx, {
+      user: walletSigner,
+      underlyingAmount: 1_000_000n,
+      bound: { slippageBps: 50 },
+    });
+    const message = await buildTransactionMessage(rpc, { feePayer: walletSigner, instructions });
+    try {
+      const signature = await signAndSendTransactionMessageWithSigners(message);
+      console.log(getBase58Decoder().decode(signature));
+    } catch (err) {
+      console.error(decodeProgramError(err, message) ?? err);
+      throw err;
+    }
+    ```
+  </Tab>
+  <Tab title="web3.js wallet adapter">
+    Kit compiles the message with the wallet as signer and fee payer and leaves the signature slot empty. The wallet adapter fills it. Signing does not change the message bytes.
+
+    ```typescript
+    import { address, compileTransaction, createNoopSigner, createSolanaRpc, getTransactionEncoder } from "@solana/kit";
+    import { type Connection, type PublicKey, VersionedTransaction } from "@solana/web3.js";
+    import { buildTransactionMessage, depositUnderlying, resolveWrapper } from "@jup-ag/lend-referral-sdk";
+
+    // Your app's web3.js connection and the connected wallet-adapter wallet.
+    declare const connection: Connection;
+    declare const wallet: {
+      publicKey: PublicKey;
+      signTransaction(tx: VersionedTransaction): Promise<VersionedTransaction>;
+    };
+    // The jlToken mint, the Lending account and the xToken mint. See "Read a wrapper".
+    declare const jlTokenMint: string, lending: string, xTokenMint: string;
+
+    const rpc = createSolanaRpc(connection.rpcEndpoint);
+
+    // The wallet's key as a Kit signer that never signs. The wallet adapter signs later.
+    const user = createNoopSigner(address(wallet.publicKey.toBase58()));
+
+    const ctx = await resolveWrapper(rpc, {
+      jlTokenMint: address(jlTokenMint),
+      lending: address(lending),
+      xTokenMint: address(xTokenMint),
+    });
+    const { instructions } = await depositUnderlying(ctx, {
+      user,
+      underlyingAmount: 1_000_000n,
+      bound: { slippageBps: 50 },
+    });
+    const message = await buildTransactionMessage(rpc, { feePayer: user, instructions });
+
+    // Compile with Kit, then hand the bytes to web3.js.
+    const bytes = getTransactionEncoder().encode(compileTransaction(message));
+    const tx = VersionedTransaction.deserialize(Uint8Array.from(bytes));
+
+    try {
+      const signed = await wallet.signTransaction(tx);
+      const signature = await connection.sendRawTransaction(signed.serialize());
+      console.log(signature);
+    } catch (err) {
+      console.error("Deposit failed:", err);
+      throw err;
+    }
+    ```
+  </Tab>
+  <Tab title="Squads multisig">
+    `@sqds/multisig` is built on `@solana/web3.js` 1.x and takes `TransactionInstruction`s. When a Squads vault is the wrapper authority, give the SDK a noop signer for the vault and convert each Kit instruction. This example builds a partner fee change.
+
+    ```typescript
+    import { type Address, createNoopSigner, type Instruction } from "@solana/kit";
+    import { PublicKey, TransactionInstruction } from "@solana/web3.js";
+    import { updatePartnerFee, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+    // From resolveWrapper. See "Read a wrapper".
+    declare const ctx: WrapperContext;
+    // Your Squads vault address: the wrapper authority.
+    declare const multisigVault: Address;
+
+    // A Kit Instruction as a web3.js 1.x TransactionInstruction.
+    // AccountRole bits: 1 = writable, 2 = signer.
+    const toWeb3Instruction = (ix: Instruction) =>
+      new TransactionInstruction({
+        programId: new PublicKey(ix.programAddress),
+        keys: (ix.accounts ?? []).map((m) => ({
+          pubkey: new PublicKey(m.address),
+          isSigner: (m.role & 2) !== 0,
+          isWritable: (m.role & 1) !== 0,
+        })),
+        data: Buffer.from(ix.data ?? []),
+      });
+
+    // The multisig signs on chain, so the SDK gets a signer that never signs.
+    const authority = createNoopSigner(multisigVault);
+    const { instructions } = await updatePartnerFee(ctx, { authority, newFeeBps: 500 });
+
+    // Pass these to @sqds/multisig as the vault transaction's instructions.
+    const web3Instructions = instructions.map(toWeb3Instruction);
+    console.log(web3Instructions.length);
+    ```
+  </Tab>
+</Tabs>
+
+## Simulate and set compute
+
+`buildTransactionMessage` sets no compute budget and no priority fee unless you ask. Deposits and withdrawals in the underlying token call into Jupiter Lend and Liquidity, so simulate them before you send. `simulateMessage` simulates the unsigned message, so you can run it before the wallet signs.
+
+```typescript
+import {
+  createSolanaRpc,
+  getSolanaErrorFromTransactionError,
+  type Instruction,
+  type TransactionSigner,
+} from "@solana/kit";
+import { buildTransactionMessage, decodeProgramError, simulateMessage } from "@jup-ag/lend-referral-sdk";
+
+// The fee payer and the instructions from an action.
+declare const feePayer: TransactionSigner;
+declare const instructions: Instruction[];
+
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+
+// Simulate once to measure the compute units.
+const draft = await buildTransactionMessage(rpc, { feePayer, instructions });
+const { value } = await simulateMessage(rpc, draft);
+if (value.err) {
+  const decoded = decodeProgramError(getSolanaErrorFromTransactionError(value.err), draft);
+  console.error(decoded?.name ?? value.err, value.logs);
+  throw new Error("Simulation failed");
+}
+
+// Rebuild with a limit 10% above the measured units and a priority fee.
+const units = Number(value.unitsConsumed ?? 200_000n);
+const message = await buildTransactionMessage(rpc, {
+  feePayer,
+  instructions,
+  computeUnitLimit: Math.ceil(units * 1.1),
+  computeUnitPriceMicroLamports: 10_000n, // read recent fees with getRecentPrioritizationFees
+});
+console.log(`Simulated ${units} compute units`);
+```
+
+| `buildTransactionMessage` option | Effect |
+|---|---|
+| `feePayer` | The `TransactionSigner` that pays the transaction fee |
+| `instructions` | The instructions to send, in order |
+| `computeUnitLimit` | Prepends `SetComputeUnitLimit` |
+| `computeUnitPriceMicroLamports` | Prepends `SetComputeUnitPrice`, in micro-lamports per compute unit |
+| `lookupTables` | Address lookup table addresses. The helper fetches them and compresses the message. |
+
+If your instructions already contain a `SetComputeUnitLimit` or `SetComputeUnitPrice`, leave the matching option unset. Otherwise the helper throws `ReferralSdkError` with kind `DuplicateComputeBudgetInstruction`, because the runtime rejects a transaction with two of the same compute-budget instruction.
+
+## Handle errors
+
+Failures come from two places: checks the SDK runs before it builds anything, and errors the program returns on chain.
+
+The SDK throws `ReferralSdkError`, with a `kind` and a `context` (`account`, `address`, `matches`):
+
+| `kind` | Thrown by | Cause |
+|---|---|---|
+| `AccountNotFound` | Reads | An account the read needs does not exist. `context.account` names it. |
+| `MarketMismatch` | Reads | The Lending account or the wrapper does not belong to the market you passed |
+| `WrapperNotFound` | `resolveWrapper` without `xTokenMint` | The market has no wrapper |
+| `AmbiguousWrapper` | `resolveWrapper` without `xTokenMint` | The market has more than one wrapper. `context.matches` lists their config addresses. |
+| `AmountTooSmall` | Underlying-path actions | The underlying amount or its estimate is below 10 atoms |
+| `InvalidBound` | User actions | `slippageBps` is not an integer from 0 to 10,000, or `limit` is negative |
+| `FeeOutOfRange` | `updatePartnerFee` | The fee is not an integer from 0 to 1,000 bps |
+| `VaultUnderrun` | `claimPartnerFees` | The vault holds less than the wrapper's books track |
+| `DuplicateComputeBudgetInstruction` | `buildTransactionMessage` | A compute-budget option duplicates an instruction you passed |
+
+`decodeProgramError(err, message)` names the Lend Referral error behind a failed send or simulation and returns `{ code, name, message }`, or `null` when the failure is not a Lend Referral error. Pass the `message` you sent, so that a code from another program is not named as a Lend Referral error. Errors raised inside Jupiter Lend or Liquidity return `null`: they use their own codes in the 6000 range. To decode a simulation result, convert `value.err` with `getSolanaErrorFromTransactionError` first, as in [Simulate and set compute](#simulate-and-set-compute).
+
+```typescript
+import { type TransactionSigner } from "@solana/kit";
+import {
+  buildTransactionMessage,
+  decodeProgramError,
+  depositUnderlying,
+  type ReferralMessage,
+  type ReferralRpc,
+  ReferralSdkError,
+  resolveWrapper,
+  type TxRpc,
+  type WrapperRef,
+} from "@jup-ag/lend-referral-sdk";
+
+// Your RPC client, the wrapper reference (see "Read a wrapper"), and the user's signer.
+declare const rpc: ReferralRpc & TxRpc;
+declare const ref: WrapperRef;
+declare const user: TransactionSigner;
+// Your own sign-and-send step. Returns the transaction signature.
+declare function signAndSend(message: ReferralMessage): Promise<string>;
+
+let message: ReferralMessage;
+try {
+  const ctx = await resolveWrapper(rpc, ref);
+  const { instructions } = await depositUnderlying(ctx, {
+    user,
+    underlyingAmount: 1_000_000n,
+    bound: { slippageBps: 50 },
+  });
+  message = await buildTransactionMessage(rpc, { feePayer: user, instructions });
+} catch (err) {
+  if (err instanceof ReferralSdkError) {
+    // Raised before anything is sent. err.kind says which check failed.
+    console.error(err.kind, err.message, err.context);
+  }
+  throw err;
+}
+
+try {
+  console.log(await signAndSend(message));
+} catch (err) {
+  const decoded = decodeProgramError(err, message);
+  switch (decoded?.name) {
+    case "WrapperSlippageExceeded":
+      // Read again, rebuild with a fresh quote, and ask the user to confirm.
+      break;
+    case "ProtocolPaused":
+      // Every deposit, redeem and withdrawal is blocked until Jupiter unpauses.
+      break;
+    default:
+      console.error(decoded ?? err);
+  }
+  throw err;
+}
+```
+
+Every program error code, from 7000 to 7018, is listed with its cause in the [Lend Referral Reference](/lend/referral/reference#errors).

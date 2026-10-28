@@ -1,7 +1,7 @@
 ---
 title: "Gasless Swaps"
 description: "Let users swap without holding SOL for transaction fees"
-llmsDescription: "How gasless swaps work on Jupiter Swap API V2. The gasless: true response field on /order can be set by three independent paths: automatic Jupiter sponsorship (signatureFeePayer = gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB), a JupiterZ RFQ market maker (signatureFeePayer = MM address), or integrator-sponsored gas via the payer parameter. Covers the three sources, how to detect which one fired via signatureFeePayer, how to opt out using excludeRouters=jupiterz or a signatureFeePayer == taker check, JupiterZ output token account rent behaviour with referral fees, integrator payer setup for /order and /build, and the related fee semantics."
+llmsDescription: "How gasless swaps work on Jupiter Swap API V2. The gasless: true response field on /order can be set by three independent paths: automatic Jupiter sponsorship (signatureFeePayer = gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB), a JupiterZ RFQ market maker (signatureFeePayer = MM address), or integrator-sponsored gas via the payer parameter. Covers the three sources, how to detect which one fired via signatureFeePayer, how to opt out using excludeRouters=jupiterz or a signatureFeePayer == taker check, JupiterZ output token account rent behaviour with referral fees, integrator payer setup for /order and /build (on /order, payer works with Metis and JupiterZ routes: on JupiterZ the market maker pays signature and priority fees and payer only funds output token account rent, and payer is a required signer except for native SOL output), and the related fee semantics."
 ---
 
 Gasless swaps let users trade without holding SOL for transaction fees. On `/order`, the `gasless: true` response field can be set by three independent paths:
@@ -16,8 +16,10 @@ To identify which path fired on any quote, compare `signatureFeePayer` to the `t
 |----------------------------------------------------------|---------------------------------------|
 | Equal to `taker`                                         | Not gasless, taker pays               |
 | `gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`            | Automatic Jupiter sponsorship         |
-| Equal to your `payer` parameter                          | Integrator-sponsored gas              |
+| Equal to your `payer` parameter                          | Integrator-sponsored gas (Metis route) |
 | Any other address                                        | JupiterZ market maker (varies per quote) |
+
+When you set `payer` and a JupiterZ market maker wins the quote, `signatureFeePayer` is the market maker and `rentFeePayer` is your `payer` (or the taker when the output is native SOL, since no output token account is created). See [Integrator payer](#integrator-payer).
 
 ## Types of gas costs
 
@@ -55,11 +57,10 @@ Jupiter automatically covers gas costs when the taker lacks SOL.
 
 ## JupiterZ gasless (`/order`)
 
-When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker pays network and priority fees directly. Output token account rent is separate: when referral fees are not set, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) can pay the rent to create the taker's output token account. With referral fees, the taker pays output token account rent.
+When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker pays network and priority fees directly. Output token account rent is separate: when referral fees are not set, Jupiter's gas wallet (`gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`) can pay the rent to create the taker's output token account. With referral fees, the taker pays output token account rent. With an integrator `payer`, the payer pays it (see [Integrator payer](#integrator-payer)).
 
 **When it applies:**
 - Taker trades a pair the market makers are willing to quote
-- `payer` is not set
 
 **What it covers:** signature fee and priority fee. Output token account rent can be covered by Jupiter's gas wallet when referral fees are not set.
 
@@ -70,12 +71,11 @@ When a JupiterZ (RFQ) market maker wins the quote on `/order`, the market maker 
 - The `signatureFeePayer` is the MM's address. MM addresses vary per quote, so do not hardcode against a single address. Use the `signatureFeePayer != taker` check instead.
 
 **Limitations:**
-- Does not fire when `payer` is set
-- With `referralAccount` and `referralFee`, JupiterZ can still quote and execute, but the taker must have enough SOL for any required output token account rent
+- With `referralAccount` and `referralFee`, JupiterZ can still quote and execute, but the taker must have enough SOL for any required output token account rent, unless you set `payer`, which pays that rent instead
 
 ## Integrator payer
 
-Integrators can cover all gas costs on behalf of their users by passing the `payer` parameter. This works on both `/order` and `/build`.
+Integrators can sponsor gas for their users by passing the `payer` parameter, so the user does not need SOL to swap. This works on both `/order` and `/build`.
 
 <Note>
 `payer` only activates when set to a wallet different from `taker`. Setting `payer=taker` has no effect. The request behaves as if no `payer` was provided.
@@ -83,10 +83,10 @@ Integrators can cover all gas costs on behalf of their users by passing the `pay
 
 ### On `/order`
 
-Pass `payer` to cover all gas-related fees. The transaction requires both taker and payer signatures.
+Pass `payer` to cover gas-related fees for the taker. Metis and JupiterZ (RFQ) both compete for the quote. Dflow and OKX are not eligible when `payer` is set.
 
 <Note>
-This needs to be used together with referral parameters (`referralAccount` and `referralFee`) because it is assumed that you will be taking fees to recoup the costs spent on gas.
+`payer` works without referral parameters, but then you pay gas on every swap with no fee to recover it. Pass `referralAccount` and `referralFee` with `payer` to charge a fee that covers the gas you spend.
 </Note>
 
 ```typescript
@@ -104,15 +104,83 @@ const response = await fetch(
 );
 ```
 
-The returned transaction needs two signatures (taker + payer) before sending to `/execute`.
+What the payer pays, and whether it signs, depends on which router wins the quote. Read `router` in the `/order` response:
 
-**What it covers:** all four gas types.
+| | Metis route (`router: "metis"`) | JupiterZ route (`router: "jupiterz"`) |
+| --- | --- | --- |
+| Signature and priority fees | Payer | Market maker |
+| Output token account rent | Payer | Payer |
+| Other account rent | Payer | None needed |
+| `signatureFeePayer` / `rentFeePayer` | Payer / payer | Market maker / payer (taker for native SOL output) |
+| Payer signs | Yes | Yes, unless the output is native SOL |
 
-**How it works:**
-- Regardless of how much SOL the taker has, the payer covers all fees
+**How it works on a Metis route:**
+- Regardless of how much SOL the taker has, the payer covers all four gas types
 - Temporary wSOL ATA rent is covered by the payer and returned in the same transaction
 - Other ATAs are covered by the payer but not returned (they hold tokens post-swap)
-- Routes through Metis only
+
+**How it works on a JupiterZ route:**
+- The market maker is the transaction fee payer and pays signature and priority fees
+- The payer funds the rent to create the taker's output token account when it does not exist yet, and the receiver's output token account when `receiver` is set. When the account already exists, the payer pays nothing
+- The payer is a required signer whenever the output is an SPL token, including when the account already exists and no rent is charged
+- When the output is native SOL, the transaction creates no output token account, so the payer is not a signer and pays nothing
+- The taker pays no SOL
+
+Before sending to `/execute`, sign with the taker and, only if it is one of the transaction's required signers, with the payer. Match the payer by public key, not by position: the signer order differs between quotes. If you always sign with the payer, signing fails on native SOL output because the payer is not a required signer. `@solana/kit` fails with `Attempted to sign a transaction with an address that is not a signer for it`, and `@solana/web3.js` with `Cannot sign with non signer key <address>`. On a JupiterZ route, the market maker signs during `/execute`.
+
+<CodeGroup>
+```typescript title="@solana/kit"
+import {
+  getTransactionDecoder,
+  getTransactionEncoder,
+  partiallySignTransaction,
+} from "@solana/kit";
+
+// order: the /order response
+// userSigner, payerSigner: KeyPairSigner from createKeyPairSignerFromBytes
+const transaction = getTransactionDecoder().decode(
+  Buffer.from(order.transaction, "base64"),
+);
+
+// The keys of `signatures` are the transaction's required signers.
+// The payer is one of them unless the output is native SOL on a JupiterZ route.
+const requiredSigners = Object.keys(transaction.signatures);
+const keyPairs = [userSigner, payerSigner]
+  .filter((s) => requiredSigners.includes(s.address))
+  .map((s) => s.keyPair);
+
+// Partial signing: on a JupiterZ route the market maker signs during /execute
+const signedTransaction = await partiallySignTransaction(keyPairs, transaction);
+const signedTxBase64 = Buffer.from(
+  getTransactionEncoder().encode(signedTransaction),
+).toString("base64");
+```
+
+```typescript title="@solana/web3.js"
+import { VersionedTransaction } from "@solana/web3.js";
+
+// order: the /order response
+// userKeypair, payerKeypair: Keypair
+const transaction = VersionedTransaction.deserialize(
+  Buffer.from(order.transaction, "base64"),
+);
+
+// The first numRequiredSignatures static keys are the required signers.
+// The payer is one of them unless the output is native SOL on a JupiterZ route.
+const { header, staticAccountKeys } = transaction.message;
+const requiredSigners = staticAccountKeys
+  .slice(0, header.numRequiredSignatures)
+  .map((key) => key.toBase58());
+transaction.sign(
+  [userKeypair, payerKeypair].filter((k) =>
+    requiredSigners.includes(k.publicKey.toBase58()),
+  ),
+);
+const signedTxBase64 = Buffer.from(transaction.serialize()).toString("base64");
+```
+</CodeGroup>
+
+Send `signedTxBase64` and the order's `requestId` to `/execute`, as in [Order & Execute](/swap/order-and-execute).
 
 ### On `/build`
 

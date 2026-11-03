@@ -1,12 +1,10 @@
 ---
 title: "Program addresses"
 description: "Official program addresses for Jupiter Lend protocols."
-llmsDescription: "Official on-chain program addresses for Jupiter Lend, for the two markets on jup.ag and in the Borrow API. Main market (market=main): Earn (jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9), Liquidity (jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC), Lending Rewards Rate Model (jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar), Vaults/Borrow (jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi), Flashloan (jupgfSgfuAXv4B6R2Uxu85Z1qdzgju79s6MfZekN6XS), and AMM (jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd). Ethena market (market=ethena, used by the Bitwise x Ethena and Sentora markets on jup.ag): Earn (jup97Zx1NixM8UJMQFw8TtKzqTiRT3ETAJR7cVx3PfQ), Liquidity (jup6QF1sNDGpkkcu6F4qaFHcRBmnSS1VgyB4uFbBvNS), Lending Rewards Rate Model (jupGBUJYXuzz2hVSoqjrxoEwJUB6uuHJsQqkzmYyQ7n), Vaults/Borrow (jupo974WCqAUMD3RtpayTap1me7StQCWtEkBbDb6Ba3), and Flashloan (jupKxkab7RTnQJ6wXStXg6WY4rcReV3maiUNwByciFF). Both markets share the Oracle program (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc)."
+llmsDescription: "Official on-chain program addresses for the Jupiter Lend programs of the main market (market=main): Earn (jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9), Liquidity (jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC), Lending Rewards Rate Model (jup7TthsMgcR9Y3L277b8Eo9uboVSmu1utkuXHNUKar), Oracle (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc), Vaults/Borrow (jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi), Flashloan (jupgfSgfuAXv4B6R2Uxu85Z1qdzgju79s6MfZekN6XS), and AMM (jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd)."
 ---
 
-[Jupiter Lend](/lend/architecture) has two markets on jup.ag and in the Borrow API: the main market and the Ethena market. Each runs its own deployment of the Lend programs, and both share the Oracle program. The Borrow API selects the market with its `market` parameter (see [Borrow API](/lend/borrow/api)).
-
-## Main market (`market=main`)
+The official program addresses for [Jupiter Lend](/lend/architecture) across different protocols:
 
 | Program | Environment | Address |
 | ------- | ----------- | ------- |
@@ -17,19 +15,6 @@ llmsDescription: "Official on-chain program addresses for Jupiter Lend, for the 
 | **Jupiter Vaults (Borrow)** | Mainnet | `jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi` |
 | **Jupiter Flashloan** | Mainnet | `jupgfSgfuAXv4B6R2Uxu85Z1qdzgju79s6MfZekN6XS` |
 | **Jupiter Lend (AMM)** | Mainnet | `jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd` |
-
-## Ethena market (`market=ethena`)
-
-This deployment serves the Bitwise x Ethena and Sentora markets on jup.ag.
-
-| Program | Environment | Address |
-| ------- | ----------- | ------- |
-| **Jupiter Lend (Earn)** | Mainnet | `jup97Zx1NixM8UJMQFw8TtKzqTiRT3ETAJR7cVx3PfQ` |
-| **Jupiter Lend (Liquidity)** | Mainnet | `jup6QF1sNDGpkkcu6F4qaFHcRBmnSS1VgyB4uFbBvNS` |
-| **Jupiter Lend (Lending Rewards Rate Model)** | Mainnet | `jupGBUJYXuzz2hVSoqjrxoEwJUB6uuHJsQqkzmYyQ7n` |
-| **Jupiter Oracle** (shared with the main market) | Mainnet | `jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc` |
-| **Jupiter Vaults (Borrow)** | Mainnet | `jupo974WCqAUMD3RtpayTap1me7StQCWtEkBbDb6Ba3` |
-| **Jupiter Flashloan** | Mainnet | `jupKxkab7RTnQJ6wXStXg6WY4rcReV3maiUNwByciFF` |
 
 The [Oracle](/lend/oracles) and [Flashloan](/lend/flashloan) programs have their own pages.
 

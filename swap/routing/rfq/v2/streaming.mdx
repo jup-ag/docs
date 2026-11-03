@@ -110,9 +110,9 @@ Five RPCs, defined in [market_maker.proto](https://github.com/jup-ag/rfq-v2-sdk/
 
 ## Testing
 
-The SDK repository ships unit tests (offline) and end-to-end tests that exercise the full quote-sign-execute loop against the pre-production environment. The end-to-end tests move real funds on mainnet, so use a taker wallet holding only what you are willing to spend. Test commands and environment variables are documented in the [Rust](https://github.com/jup-ag/rfq-v2-sdk/blob/main/rust-sdk/tests/README.md) and [Python](https://github.com/jup-ag/rfq-v2-sdk/blob/main/python-sdk/tests/README.md) test READMEs. The maker-safety example is [`rust-sdk/examples/maker_safety.rs`](https://github.com/jup-ag/rfq-v2-sdk/blob/main/rust-sdk/examples/maker_safety.rs).
+The SDK repository ships unit tests (offline) and end-to-end tests that exercise the full quote-sign-execute loop against the pre-production environment. The end-to-end tests move real funds on mainnet, so use a taker wallet holding only what you are willing to spend. Commands and environment variables are documented in the [rfq-v2-sdk README](https://github.com/jup-ag/rfq-v2-sdk).
 
-Before requesting production access, confirm: unit and end-to-end tests pass for the pairs you quote, your quote stream stays stable and refreshes before expiry, your swap stream stays connected and answers pings, last look validates fills and checks exclusivity, you co-sign at index 1 without modifying the message, you respond within the deadline, and reconnection with backoff and sequence re-sync works. Do not run an SDK example in production without adding the last-look checks in steps 1 and 2 above.
+Before requesting production access, confirm: unit and end-to-end tests pass for the pairs you quote, your quote stream stays stable and refreshes before expiry, your swap stream stays connected and answers pings, last look validates fills and checks exclusivity, you co-sign at index 1 without modifying the message, you respond within the deadline, and reconnection with backoff and sequence re-sync works.
 
 ## Related
 

@@ -149,7 +149,7 @@ If step 2 fails (the transaction doesn't land), you can retry by calling the con
 
 ## Expired Order Withdrawal
 
-When a price order expires, Jupiter returns the remaining deposit to the wallet that owns the order: the order shows `executing` until the withdrawal lands, then `expired`. If that withdrawal is refused (for example on an older order whose destination token account is missing), the order moves to `pending_withdraw` (`ready_to_cancel`). Retrieve the funds with the same two-step cancel flow: initiate cancellation, sign the withdrawal transaction, and confirm. The order moves to `cancelled` once the withdrawal confirms on-chain.
+When a price order expires, Jupiter returns the remaining deposit to your wallet. If that withdrawal is refused, the order moves to `pending_withdraw` (`ready_to_cancel`). Retrieve the funds with the same two-step cancel flow: initiate cancellation, sign the withdrawal transaction, and confirm. The order moves to `cancelled` once the withdrawal confirms on-chain.
 
 ## Error Handling
 

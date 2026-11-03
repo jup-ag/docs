@@ -92,7 +92,7 @@ paths:
               example:
                 status: "Success"
                 signature: "5UfDuX7hXbTiKFJqS1MzGsNpbXTzMKJe2bZP1zrd7DnFBSChKvF2FVDNAuqz7SJpaHXTB9E5DP6tMjfZmVDMJRs"
-                order: "6zLm2iXR3D2JJgniSzZyUEawTpLLzr72KNnVJXPX6Rpu"
+                order: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
                 error: null
         '400':
           description: Bad request
@@ -146,11 +146,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetRecurringOrderResponse'
               example:
-                user: "BjRH4sQfSZU39Dpn9U4JmV2HRwwVYdcEo4YfdhXLgkuF"
+                user: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
                 orderStatus: "active"
                 time:
-                  - userPubkey: "BjRH4sQfSZU39Dpn9U4JmV2HRwwVYdcEo4YfdhXLgkuF"
-                    orderKey: "6zLm2iXR3D2JJgniSzZyUEawTpLLzr72KNnVJXPX6Rpu"
+                  - userPubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    orderKey: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
                     inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
                     outputMint: "So11111111111111111111111111111111111111112"
                     inDeposited: "100.0"
@@ -176,8 +176,8 @@ paths:
                     createdAt: "2025-03-15T10:30:00.000Z"
                     updatedAt: "2025-03-15T11:30:00.000Z"
                     trades:
-                      - orderKey: "6zLm2iXR3D2JJgniSzZyUEawTpLLzr72KNnVJXPX6Rpu"
-                        keeper: "8GZZrh1GDTjFJ8xVHHcb9mUxZsvZ3fHLnfbhcaSsYPN1"
+                      - orderKey: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+                        keeper: "J1TnP8zvVxbtF5KFp5xRmWuvG9McnhzmBd9XGfCyuxFP"
                         inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
                         outputMint: "So11111111111111111111111111111111111111112"
                         inputAmount: "10.0"

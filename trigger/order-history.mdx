@@ -146,9 +146,9 @@ Orders follow a state machine from creation to completion. The `orderState` fiel
 | `open` | Active and waiting for price trigger |
 | `executing` | Price condition met, swap in progress |
 | `filled` | Order completed successfully |
-| `pending_withdraw` | Cancellation initiated, or expiry refund refused; awaiting signed withdrawal |
+| `pending_withdraw` | Cancellation initiated, awaiting signed withdrawal |
 | `cancelled` | User cancelled the order |
-| `expired` | Order expired; remaining deposit returned to the wallet |
+| `expired` | Order expired before execution |
 | `failed` | Execution failed |
 
 ### Raw States
@@ -169,10 +169,10 @@ The `rawState` field exposes the internal processing state. Multiple raw states 
 | `executing` | `withdrawing` | Withdrawal transaction in flight |
 | `filled` | `fill_success` | Order fully filled and output withdrawn |
 | `executing` | `partial_fill_success` | Order partially filled, may continue filling |
-| `pending_withdraw` | `ready_to_cancel` | Cancellation initiated, or expiry refund refused; awaiting signed withdrawal |
+| `pending_withdraw` | `ready_to_cancel` | Cancellation initiated, awaiting signed withdrawal |
 | `cancelled` | `cancelled` | User cancelled the order |
 | `cancelled` | `oco_cancelled` | Automatically cancelled because the other side of an OCO pair filled |
-| `expired` | `expired` | Order expired; remaining deposit returned to the wallet |
+| `expired` | `expired` | Order expired before execution |
 | `failed` | `deposit_failed` | Deposit transaction failed on-chain (e.g. insufficient balance) |
 | `failed` | `withdraw_failed` | Output withdrawal failed after execution |
 | `failed` | `fill_failed` | Fill validation failed after execution |
@@ -187,8 +187,7 @@ flowchart TD
     O -->|"cancel initiated"| PW["pending_withdraw"]
     EX --> FL["filled"]
     EX --> XF
-    EX -->|"expiry refund landed"| EXP["expired"]
-    EX -->|"expiry refund refused"| PW
+    EX --> EXP["expired"]
     PW --> CAN["cancelled"]
 ```
 

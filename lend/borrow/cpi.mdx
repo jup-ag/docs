@@ -53,10 +53,6 @@ pub struct InitPositionParams<'info> {
 }
 ```
 
-<Warning>
-Check the program you invoke against its known address. `vaults_program` comes from the caller, so a caller can pass its own program instead: it would receive any PDA signature you pass with `invoke_signed` and could return any value you read back. Add `require_keys_eq!(*self.vaults_program.key, VAULTS_PROGRAM_ID);` at the start of `init_position` and of your `operate` helper, with `VAULTS_PROGRAM_ID` set to the Vaults program of the market and cluster you use (see [Program addresses](/lend/program-addresses)).
-</Warning>
-
 ### Init Position Implementation
 
 ```rust

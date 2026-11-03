@@ -2,7 +2,7 @@
 title: "Jupiter Trading MCP"
 sidebarTitle: "Trading MCP"
 description: "Execute Jupiter trades and DeFi operations from any MCP client."
-llmsDescription: "Jupiter's hosted Trading MCP server at https://mcp.jup.ag gives AI agents access to Jupiter's trading infrastructure through the Model Context Protocol. It exposes tools across 10 domains: Swap (quote, execute), Tokens (search, discovery, verification), Price, Trigger (limit orders, v2 vault flow), Recurring (DCA on the Trigger v2 flow), Lend (Earn deposits and withdrawals, Borrow vaults and positions), Prediction (prediction markets), Send (invite-based transfers), Studio (pool addresses and creator fees for Jupiter Studio tokens), and Transaction (land signed transactions). An API key is optional: requests without one work at a lower rate limit, and passing your Jupiter API key from the Developer Platform as a Bearer token raises the limit. Transport is HTTP (Streamable HTTP). Covers setup for Claude Desktop, Claude Code, Cursor, and Windsurf, plus example prompts. This is the read-write operations server, distinct from the read-only Documentation MCP."
+llmsDescription: "Jupiter's hosted Trading MCP server at https://mcp.jup.ag gives AI agents access to Jupiter's trading infrastructure through the Model Context Protocol. It exposes tools across 10 domains: Swap (quote, execute), Tokens (search, discovery, verification), Price, Trigger (limit orders, v2 vault flow), Recurring (DCA on the Trigger v2 flow), Lend (earn yield), Prediction (prediction markets), Send (invite-based transfers), Studio (token launch pools), and Transaction (land signed transactions). An API key is optional: requests without one work at a lower rate limit, and passing your Jupiter API key from the Developer Platform as a Bearer token raises the limit. Transport is HTTP (Streamable HTTP). Covers setup for Claude Desktop, Claude Code, Cursor, and Windsurf, plus example prompts. This is the read-write operations server, distinct from the read-only Documentation MCP."
 ---
 
 The Jupiter Trading MCP is a hosted [Model Context Protocol](https://modelcontextprotocol.io/) server that lets AI agents trade and run DeFi operations on Jupiter. Connect any MCP client to `https://mcp.jup.ag` and your agent can swap tokens, place orders, lend, and read on-chain positions. An API key is optional and only raises your rate limit.
@@ -22,10 +22,10 @@ The server exposes tools across **10 domains**. Your MCP client discovers them a
 | **Price** | Fetch real-time USD prices, liquidity, and 24h change for one or more tokens. |
 | **Trigger** | Create, update, cancel, and list limit orders that execute when a token hits a target price. |
 | **Recurring** | Set up and manage dollar-cost averaging (DCA) orders that buy at regular intervals, built on the [Trigger API](/trigger/dca)'s DCA flow. |
-| **Lend** | Deposit into and withdraw from Jupiter Lend Earn to earn yield, and read your positions and earnings. List Borrow vaults, open or manage a loan (deposit collateral, borrow, repay, withdraw collateral), and read your borrow positions. |
+| **Lend** | Deposit into and withdraw from Jupiter Lend to earn yield, and read your lending positions. |
 | **Prediction** | Browse prediction market events, place and close bets, claim payouts, and read scores and forecasts. |
 | **Send** | Send tokens via Jupiter Send invites, claw back unclaimed invites, and list invite history. |
-| **Studio** | Find the Dynamic Bonding Curve and migrated pool addresses of a Jupiter Studio token, check its unclaimed creator fees, and claim them. |
+| **Studio** | Claim creator fees from Jupiter Studio token-launch (Dynamic Bonding Curve) pools. |
 | **Transaction** | Land any signed Solana transaction on-chain through Jupiter's Beam landing infrastructure. |
 
 ## API Key (Optional)
@@ -70,8 +70,6 @@ Add the server to your MCP client's configuration. To use a higher rate limit, p
   }
   ```
 
-  `.mcp.json` is usually committed with the project, so keep your API key out of it: write `"Authorization": "Bearer ${JUPITER_API_KEY}"` and set `JUPITER_API_KEY` in your environment, or add the server to `~/.claude.json` instead.
-
   Verify with:
 
   ```bash
@@ -94,8 +92,6 @@ Add the server to your MCP client's configuration. To use a higher rate limit, p
     }
   }
   ```
-
-  In a project's `.cursor/mcp.json`, write `"Bearer ${env:JUPITER_API_KEY}"` instead of the key itself, and set `JUPITER_API_KEY` in your environment.
 
   Save and reload Cursor.
   </Tab>
@@ -146,7 +142,7 @@ Once connected, ask your AI assistant in plain language. Each prompt maps to one
 | "What tokens can I lend on Jupiter and what APY do they offer?" | `lend_list_tokens` |
 | "Are there any prediction markets about Bitcoin?" | `prediction_search_events` |
 
-Tools that prepare a fund-moving operation return an unsigned transaction, or raw instructions for the advanced `*_instructions` tools. The MCP server holds no keys and does not sign, and Claude Desktop, Claude Code, Cursor and Windsurf have no built-in wallet, so a wallet or signer you control must sign it. Before signing, check the tokens, amounts, recipient and fees: text your agent reads can change the parameters it sends. Never give an AI client your main wallet's private key or recovery phrase. If an agent signs for you, use a dedicated wallet that holds only what you can afford to lose.
+Trading prompts that move funds return an unsigned transaction. Your client signs it with your wallet and submits it, so you stay in control of every transaction.
 
 <Tip>
 If a tool call returns `401 Unauthorized`, the Jupiter API key you passed is invalid. Remove the `Authorization` header to run keyless at the lower rate limit, or replace it with a valid key from the [Developer Platform](https://developers.jup.ag/portal).

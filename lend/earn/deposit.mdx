@@ -74,26 +74,33 @@ This example builds, signs, and sends a deposit transaction.
     ```
   </Step>
   <Step iconType="regular" titleSize="h2" title="Set up connection and deposit parameters">
-    Set your RPC, asset mint, and deposit amount, load your wallet keypair from a local JSON file, then create the connection and the signer.
+    Set your RPC, signer, asset mint, and deposit amount.
 
     ```typescript
     const RPC_URL = "https://api.mainnet-beta.solana.com";
+    const userKeypair = Keypair.generate(); // <-- Replace this with your wallet
     const ASSET_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
     const DEPOSIT_AMOUNT = new BN(10_000_000);
+    ```
 
+    If your signer is stored as a local JSON keypair file, you can load it using the helper function below.
+
+    ```typescript
     function loadKeypair(keypairPath: string): Keypair {
       const fullPath = path.resolve(keypairPath);
       const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
       return Keypair.fromSecretKey(new Uint8Array(secret));
     }
+    ```
 
-    const userKeypair = loadKeypair("/path/to/your/keypair.json"); // <-- Replace with the path to your wallet keypair
-    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
-    const signer = userKeypair.publicKey;
+    Then initialise your signer:
+
+    ```
+    const userKeypair = loadKeypair("/path/to/your/keypair.json");
     ```
   </Step>
   <Step iconType="regular" titleSize="h2" title="Build Deposit Instructions">
-    Get the deposit instructions from the SDK for the signer, asset mint, and amount.
+    Build a transaction from the deposit instructions, set blockhash and fee payer, then sign with the user keypair and send the transaction.
 
     ```typescript
     const { ixs: depositIxs } = await getDepositIxs({

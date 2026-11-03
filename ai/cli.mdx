@@ -1,7 +1,7 @@
 ---
 title: "Jupiter CLI"
 description: "Trade on Jupiter from your terminal, Telegram, or through AI agents."
-llmsDescription: "The Jupiter CLI (jup) is a command-line tool for interacting with Jupiter's products on Solana: Spot trading, Perpetual futures, and Lending. It is non-interactive and LLM-friendly by design, with JSON output mode for structured responses. Install via npm (npm i -g @jup-ag/cli). For full command references, key management, configuration, and JSON response schemas, see the CLI documentation at https://github.com/jup-ag/cli/tree/main/docs. Three usage paths: direct terminal, Telegram via OpenClaw, and AI agent integration. Without --dry-run, commands that move funds sign and send without confirmation, so use a dedicated wallet."
+llmsDescription: "The Jupiter CLI (jup) is a command-line tool for interacting with Jupiter's products on Solana: Spot trading, Perpetual futures, and Lending. It is non-interactive and LLM-friendly by design, with JSON output mode for structured responses. Install via npm (npm i -g @jup-ag/cli). For full command references, key management, configuration, and JSON response schemas, see the CLI documentation at https://github.com/jup-ag/cli/tree/main/docs. Three usage paths: direct terminal, Telegram via OpenClaw, and AI agent integration."
 ---
 
 The Jupiter CLI (`jup`) lets you interact with Jupiter's products from the command line. Trade [spot](/swap), open [perps](/perps) positions, [earn yield](/lend), and more.
@@ -23,14 +23,6 @@ For other install methods (install script, standalone binary), see the [CLI repo
 The CLI covers Jupiter products like Spot (swaps, portfolio, transfers), Perps (leveraged longs/shorts), and Lend (earn yield on deposits). For the full command reference, key management, configuration, and examples, see the full [CLI documentation](https://github.com/jup-ag/cli/tree/main/docs) in the public CLI repository.
 
 ## Ways to Use
-
-<Warning>
-Without `--dry-run`, the CLI signs and sends a transaction as soon as a command that moves funds runs. It never asks for confirmation, and by default OpenClaw runs commands without asking you either.
-
-- Use a dedicated wallet that holds only what you can afford to lose. Never import your main wallet's recovery phrase or private key.
-- Any text the bot or agent reads (chat messages, token names, web pages) can try to make it trade or transfer funds. Make sure only you can message the bot: keep OpenClaw's pairing or allowlist mode for direct messages, approve only your own account, and keep the bot out of group chats. To approve each command yourself, set OpenClaw's [exec approvals](https://docs.openclaw.ai/tools/exec-approvals) to ask every time, and do not choose "allow always" for `jup` commands.
-- `jup keys add <name>` with no `--file`, `--seed-phrase`, `--private-key` or `--backend` option creates a new key and never shows a recovery phrase. `~/.config/jup/keys/<name>.json` holds the private key in plain text and is the only copy: back it up somewhere safe.
-</Warning>
 
 ### Terminal
 
@@ -73,11 +65,12 @@ jup spot swap --from SOL --to USDC --amount 1 -f json
 
 AI agents (Claude Code, Cursor, Codex, etc.) can invoke CLI commands directly through shell access. Point your agent at the [CLI documentation on GitHub](https://github.com/jup-ag/cli/tree/main/docs) for complete command references and JSON response schemas.
 
+<Tip>
 Set an [API key](/portal/api-keys) from [Portal](https://developers.jup.ag/portal) for higher [rate limits](/portal/rate-limits) when running automated workflows:
-
 ```bash
 jup config set --api-key <your-key>
 ```
+</Tip>
 
 ## Resources
 

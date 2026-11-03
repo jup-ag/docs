@@ -1,7 +1,7 @@
 ---
 title: "Oracles"
 description: "Price oracle system for the Jupiter Lend protocol, using multiple source types with freshness and confidence validation."
-llmsDescription: "Jupiter Lend Oracle Program (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) provides price data via a hop-based system. Its SourceType enum has 12 variants: Pyth, Chainlink, ChainlinkDataStreams, Redstone, StakePool, MsolPool, SinglePool, JupLend, InfPool, PstPool, DexSmartColPegOracle and DexSmartDebtPegOracle; no vault uses Redstone at present. Covers freshness limits (600 seconds for user operations, 7200 seconds for liquidations), Pyth confidence limits, the providers behind each source, and a script to read an oracle price by nonce."
+llmsDescription: "Jupiter Lend Oracle Program (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) provides price data via a hop-based system using Pyth, Chainlink, Redstone, StakePool, MsolPool, SinglePool, and JupLend sources."
 ---
 
 The Oracle Program delivers accurate price data to the protocol by integrating with trusted oracle providers. It calculates exchange rates by combining multiple price sources in a structured sequence, ensuring reliable asset valuations.
@@ -31,8 +31,6 @@ For example, to derive the JUPSOL/SOL rate, the system combines JUPSOL/USD and S
 | MsolPool    | Marinade mSOL pool state                                           | 1                                           |
 | SinglePool  | SPL Single Pool (Helius, Jupiter, Nansen, Emerald, Shift, Kiln)    | 3 (stake, mint, stake program)              |
 | JupLend     | JupLend fToken exchange rate                                       | 4 (Lending, TokenReserve, RateModel, FTokenMint) |
-
-The Oracle program's `SourceType` enum has five more variants: `ChainlinkDataStreams`, `InfPool`, `PstPool`, `DexSmartColPegOracle` and `DexSmartDebtPegOracle` (see [IDL and types](/lend/idl-and-types)).
 
 
 This design enables the system to:
@@ -67,7 +65,7 @@ Only Pyth validates confidence. Other sources (Chainlink, Redstone, StakePool, M
 | Provider       | Source    | Use case                                                                 |
 |----------------|-----------|--------------------------------------------------------------------------|
 | Pyth           | Pyth      | Spot prices for some vaults                                             |
-| Chainlink      | Chainlink | Most spot prices in the main market, including SOL/USD, BTC (cbBTC, WBTC), JLP, JUP and EURC/USD |
+| Chainlink      | Chainlink | SOL/USD, WBTC/USD, EURC/USD                                             |
 | Redstone       | Redstone  | Supported by the Oracle program, but no vault uses it at present        |
 | Marinade       | MsolPool  | mSOL/SOL                                                                |
 | Jito           | StakePool | JITOSOL/SOL                                                             |

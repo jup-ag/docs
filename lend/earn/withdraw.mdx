@@ -26,6 +26,9 @@ Import the required packages for Solana RPC and Jupiter Earn SDK operations.
     Use the Jupiter Earn SDK to generate withdraw instructions.
 
     ```typescript
+    const connection = new Connection("https://api.mainnet-beta.solana.com");
+    const signer = new PublicKey("YOUR_WALLET_ADDRESS");
+
     const { ixs: withdrawIxs } = await getWithdrawIxs({
         connection,
         signer,

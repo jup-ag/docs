@@ -32,7 +32,7 @@ For example, to derive the JUPSOL/SOL rate, the system combines JUPSOL/USD and S
 | SinglePool  | SPL Single Pool (Helius, Jupiter, Nansen, Emerald, Shift, Kiln)    | 3 (stake, mint, stake program)              |
 | JupLend     | JupLend fToken exchange rate                                       | 4 (Lending, TokenReserve, RateModel, FTokenMint) |
 
-The table lists the most common source types. The Oracle program's `SourceType` enum also includes `ChainlinkDataStreams`, `InfPool`, `PstPool`, `DexSmartColPegOracle` and `DexSmartDebtPegOracle` (see [IDL and types](/lend/idl-and-types)).
+The Oracle program's `SourceType` enum has five more variants: `ChainlinkDataStreams`, `InfPool`, `PstPool`, `DexSmartColPegOracle` and `DexSmartDebtPegOracle` (see [IDL and types](/lend/idl-and-types)).
 
 
 This design enables the system to:

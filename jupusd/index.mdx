@@ -41,7 +41,7 @@ For real-time reserve composition, backing ratio, and audit data, see the [JupUS
 | **JupUSD Mint**                 | [`JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD`](https://solscan.io/token/JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD)     |
 | **Program**                     | [`JUPUSDecMzAVgztLe6eGhwUBj1Pn3j9WAXwmtHmfbRr`](https://solscan.io/account/JUPUSDecMzAVgztLe6eGhwUBj1Pn3j9WAXwmtHmfbRr)   |
 | **Custodian (reserves)**        | [`B3q4P4XSmycvoHLaiEjchsGDafFPhKokvHvNRuW29N1y`](https://solscan.io/account/B3q4P4XSmycvoHLaiEjchsGDafFPhKokvHvNRuW29N1y) |
-| **Program authority (holds the mint/redeem buffer; JupUSD mint and freeze authority)** | [`CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA`](https://solscan.io/account/CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA) |
+| **Program authority (holds the redemption buffer; JupUSD mint and freeze authority)** | [`CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA`](https://solscan.io/account/CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA) |
 | **Multisig (update authority)** | [`31wgH9Czzd3qgquTGxVxtxJuzBd8Fm4xEo8rPX7CNfhM`](https://solscan.io/account/31wgH9Czzd3qgquTGxVxtxJuzBd8Fm4xEo8rPX7CNfhM) |
 | **Anchorage subaccount (custody)** | [`7i6ELgCKhZewDPg4P91w9FYpWKrSx7ptiNrUCrBarHff`](https://solscan.io/account/7i6ELgCKhZewDPg4P91w9FYpWKrSx7ptiNrUCrBarHff) |
 
@@ -55,7 +55,7 @@ A **benefactor** is a wallet authorised to mint and redeem JupUSD through the pr
 
 ### Oracle
 
-The JupUSD program uses [Pyth](https://pyth.network/) price feeds, one configured per collateral vault. Oracles serve two purposes in the mint/redeem flow:
+Each JupUSD collateral vault is configured with one [Pyth](https://pyth.network/) price feed. Oracles serve two purposes in the mint/redeem flow:
 
 1. **Peg validation**: verify that the collateral (USDC, USDtb) has not depegged before allowing the operation.
 2. **Exchange rate**: the oracle price is used in the calculation of the mint/redeem exchange rate.

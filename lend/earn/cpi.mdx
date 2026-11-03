@@ -64,7 +64,7 @@ pub struct DepositParams<'info> {
 ```
 
 <Warning>
-Check the program you invoke against its known address. `lending_program` comes from the caller, so a caller can pass its own program instead: it would receive any PDA signature you pass with `invoke_signed` and could return any value you read back. Add `require_keys_eq!(*self.lending_program.key, LENDING_PROGRAM_ID);` at the start of `deposit` and `withdraw`, with `LENDING_PROGRAM_ID` set to the Lending program of the market and cluster you use (see [Program addresses](/lend/program-addresses)).
+Check the program you invoke against its known address. `lending_program` comes from the caller, so a caller can pass its own program instead: it would receive any PDA signature you pass with `invoke_signed` and could return any value you read back. Add `require_keys_eq!(*self.lending_program.key, LENDING_PROGRAM_ID);` at the start of `deposit` and of your `withdraw` helper, with `LENDING_PROGRAM_ID` set to the Lending program of the market and cluster you use (see [Program addresses](/lend/program-addresses)).
 </Warning>
 
 ### Deposit Implementation

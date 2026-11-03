@@ -303,7 +303,7 @@ sequenceDiagram
 **For integrators building user-facing applications:**
 
 - Treat the refresh token as the sensitive credential. Never store tokens in local storage; use secure, httpOnly cookies or in-memory storage, and keep the refresh token out of logs and analytics.
-- Always verify the challenge content before signing. Do not blindly sign arbitrary messages.
+- Always verify the challenge content before signing. Do not blindly sign arbitrary messages. Only sign this challenge on a site you trust: the message does not name the site that asked for it.
 - On `401`, refresh once and retry; if the refresh fails, re-authenticate. Do not retry a refresh token that already returned `401` (it counts as reuse and revokes the session).
 - Tokens are tied to the wallet public key. Do not reuse them across wallets.
 - Call `/logout-all` if you suspect a refresh token has leaked.
@@ -318,7 +318,7 @@ The tokens grant limited access. An attacker with a leaked access or refresh tok
 
 An attacker **cannot**:
 
-- **Withdraw funds**: All withdrawal operations require the wallet owner to sign a transaction. The vault's funds remain secure.
+- **Withdraw funds**: Withdrawals pay out only to the wallet that owns the order, and a withdrawal you start with `cancel` must be signed by that wallet. The vault is a custodial account (see [Deposit](/trigger/deposit)), so Jupiter's service enforces this, not an on-chain program.
 - **Create new orders**: Depositing tokens requires signing a deposit transaction with the wallet.
 
-All operations involving funds (deposits, withdrawals) require the wallet owner to sign a transaction, so a leaked token alone cannot result in loss of funds. A leaked access token expires within 15 minutes; a leaked refresh token stays usable until it is rotated or revoked, so call `/logout-all` to cut off every session. If the wallet private key is also compromised, an attacker could sign transactions and withdraw funds from the vault.
+Deposits, and withdrawals you start with `cancel`, require the wallet owner to sign a transaction. A leaked access token expires within 15 minutes; a leaked refresh token stays usable until it is rotated or revoked, so call `/logout-all` to cut off every session. If the wallet private key is also compromised, an attacker could sign transactions and withdraw funds from the vault.

@@ -1,7 +1,7 @@
 ---
 title: "Skills"
 description: "Pre-built agent skills for integrating Jupiter APIs into AI coding agents."
-llmsDescription: "Jupiter provides two agent skills in the jup-ag/agent-skills repository that AI coding agents can use as context when building with Jupiter. (1) integrating-jupiter: comprehensive integration guidance covering all Jupiter APIs (Swap, Lend, Perps, Trigger, Recurring, Tokens, Price, Prediction Markets, Send, Studio, Lock, Routing) with intent routing, API playbooks, error handling, and production hardening. (2) jupiter-lend: deep-dive into Jupiter Lend protocol (powered by Fluid) covering liquidity pools, lending markets (jlTokens), vaults, and flashloans with read (@jup-ag/lend-read) and write (@jup-ag/lend) SDKs. Skills are installed via npx skills add and provide SKILL.md files that AI agents consume as context."
+llmsDescription: "Jupiter provides four agent skills in the jup-ag/agent-skills repository that AI coding agents can use as context when building with Jupiter. (1) integrating-jupiter: comprehensive integration guidance covering all Jupiter APIs (Swap, Lend, Perps, Trigger, Recurring, Tokens, Price, Prediction Markets, Send, Studio, Lock, Routing) with intent routing, API playbooks, error handling, and production hardening. (2) jupiter-lend: deep-dive into Jupiter Lend protocol (powered by Fluid) covering liquidity pools, lending markets (jlTokens), vaults, and flashloans with read (@jup-ag/lend-read) and write (@jup-ag/lend) SDKs. (3) jupiter-swap-migration: migrating Metis (v1) or Ultra integrations to Swap API V2 (/order or /build). (4) jupiter-vrfd: Express token verification, from the eligibility check to the 1,000 JUP payment and submission. Skills are installed via npx skills add and provide SKILL.md files that AI agents consume as context."
 ---
 
 Jupiter's [agent skills repository](https://github.com/jup-ag/agent-skills) provides structured context that AI coding agents use when building with Jupiter APIs. Each skill is a `SKILL.md` file containing integration guidance, API playbooks, code examples, and best practices that your AI agent consumes as reference material.
@@ -52,6 +52,24 @@ The skill covers both the read SDK (`@jup-ag/lend-read`) for querying data and t
 **Install:**
 ```bash
 npx skills add jup-ag/agent-skills --skill "jupiter-lend"
+```
+
+### jupiter-swap-migration
+
+Migration guidance for moving an existing integration from the Metis Swap API (`/swap/v1`) or Ultra to the Swap API V2 (`/swap/v2`): new base URL, choosing between `/order` + `/execute` and `/build`, and replacing the quote + swap-instructions flow.
+
+**Install:**
+```bash
+npx skills add jup-ag/agent-skills --skill "jupiter-swap-migration"
+```
+
+### jupiter-vrfd
+
+Guides an agent through [Express Verification](/tokens/verification) for a token: checking eligibility, crafting and signing the 1,000 JUP payment, and submitting the verification request or a metadata update.
+
+**Install:**
+```bash
+npx skills add jup-ag/agent-skills --skill "jupiter-vrfd"
 ```
 
 ## How Skills Work

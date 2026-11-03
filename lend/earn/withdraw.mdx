@@ -19,7 +19,7 @@ Import the required packages for Solana RPC and Jupiter Earn SDK operations.
     ```typescript
     import { Connection, PublicKey, Transaction } from "@solana/web3.js";
     import BN from "bn.js";
-    import { getDepositIxs, getMintIxs } from "@jup-ag/lend/earn";
+    import { getWithdrawIxs } from "@jup-ag/lend/earn";
     ```
   </Step>
   <Step iconType="regular" titleSize="h2" title="Build instructions">
@@ -27,9 +27,9 @@ Import the required packages for Solana RPC and Jupiter Earn SDK operations.
 
     ```typescript
     const { ixs: withdrawIxs } = await getWithdrawIxs({
-        new Connection("https://api.mainnet-beta.solana.com"),
-        new PublicKey("9a7qBeHBtjKk46YhfPJmBQG5zPmk4TcqpYbdJmJqcMup"),
-        asset: new PublicKey("9a7qBeHBtjKk46YhfPJmBQG5zPmk4TcqpYbdJmJqcMup"), // USDC Mint
+        connection,
+        signer,
+        asset: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"), // USDC Mint
         amount: new BN(10_000_000), // 10 USDC (6 decimals)
     });
 

@@ -10,7 +10,7 @@ This page maps a trigger order from start to finish: which endpoints to call, in
 ## Prerequisites
 
 - An API key from the [Portal](https://developers.jup.ag/portal). All requests require the `x-api-key` header.
-- A Solana wallet. Every step that moves funds (deposit, withdrawal) is signed client-side by the wallet owner.
+- A Solana wallet. Deposits, and withdrawals you start with `cancel`, are signed client-side by the wallet owner.
 
 ## The Flow
 
@@ -107,16 +107,17 @@ flowchart TD
     P["pending<br/>(deposit)"] --> O["open"]
     P --> XF["failed"]
     O --> EX["executing"]
-    O --> EXP["expired"]
     O -->|"cancel initiated"| PW["pending_withdraw"]
     EX --> FL["filled"]
     EX --> XF
+    EX -->|"expiry refund landed"| EXP["expired"]
+    EX -->|"expiry refund refused"| PW
     PW --> CAN["cancelled"]
 ```
 
-- **`open`** orders can be updated or cancelled. Updates and cancellation are only valid from this state.
+- **`open`** orders can be updated or cancelled. Updates are only valid from this state. Cancellation is valid from `open` and `pending_withdraw`.
 - **`executing`** covers the swap from trigger detection to output withdrawal, including partial fills.
-- **`expired`** orders did not fill before `expiresAt`. The deposit is still in the vault and is retrieved with the same cancel flow (see below).
+- **`expired`** orders did not fill before `expiresAt`. Jupiter returns the remaining deposit to the wallet that owns the order, with no signature from that wallet: the order shows `executing` while the withdrawal runs and `expired` once it has landed. If that withdrawal is refused (for example on an older order whose destination token account is missing), the order moves to `pending_withdraw` and you retrieve the tokens with the cancel flow (see below).
 
 **OCO orders:** the take-profit and stop-loss legs share one deposit. When one leg fills, the other transitions to `cancelled` automatically (`oco_cancelled` in the raw state). **OTOCO orders:** the child OCO pair only activates after the parent order reaches `filled`; if the parent expires or fails, the children are never created.
 
@@ -155,7 +156,7 @@ If the second step is interrupted (the tab closes, or the transaction does not l
 The order stays mid-cancel until a withdrawal confirms on-chain, so funds are never stranded.
 </Note>
 
-The details differ slightly by family. A price order can be cancelled while `open`, and the same flow retrieves funds from one that has `expired`. A DCA order can be cancelled while `active` or `withdrawing`; a failed `confirm-cancel` leaves it in `withdrawing` and does not roll back to `active`. Cancelling a DCA returns the unfilled remainder (`refundAmount`, `roundsRemaining`); rounds already filled are not reversed. See [Cancel a DCA Order](/trigger/dca-cancel).
+The details differ slightly by family. A price order can be cancelled while `open`, and the same flow retrieves funds from one whose expiry refund was refused (`pending_withdraw`). A DCA order can be cancelled while `active` or `withdrawing`; a failed `confirm-cancel` leaves it in `withdrawing` and does not roll back to `active`. Cancelling a DCA returns the unfilled remainder (`refundAmount`, `roundsRemaining`); rounds already filled are not reversed. See [Cancel a DCA Order](/trigger/dca-cancel).
 
 ## Related
 

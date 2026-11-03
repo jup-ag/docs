@@ -1,7 +1,7 @@
 ---
 title: "Mint & Redeem"
 description: "Technical documentation for minting and redeeming JupUSD"
-llmsDescription: "How to mint and redeem JupUSD programmatically using the @jup-ag/jup-usd-sdk TypeScript SDK, the JupUSD Web API (api.jupusd.money), or the web UI (jupusd.money/mint). Covers benefactor requirements (KYC/KYB whitelisting), Pyth oracle integration for peg validation and exchange rates, per-window rate limiting (config, vault, benefactor levels), key program addresses (JupUSD mint, program, custodian, reserves, multisig), and a complete error reference for all mint/redeem failure modes."
+llmsDescription: "How to mint and redeem JupUSD programmatically using the @jup-ag/jupusd-sdk TypeScript SDK, the JupUSD Web API (api.jupusd.money), or the web UI (jupusd.money/mint). Covers benefactor requirements (KYC/KYB whitelisting), Pyth oracle integration for peg validation and exchange rates, per-window rate limiting (config, vault, benefactor levels), key program addresses (JupUSD mint, program, custodian, reserves, multisig), and a complete error reference for all mint/redeem failure modes."
 ---
 
 <Warning>
@@ -41,7 +41,7 @@ For real-time reserve composition, backing ratio, and audit data, see the [JupUS
 | **JupUSD Mint**                 | [`JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD`](https://solscan.io/token/JuprjznTrTSp2UFa3ZBUFgwdAmtZCq4MQCwysN55USD)     |
 | **Program**                     | [`JUPUSDecMzAVgztLe6eGhwUBj1Pn3j9WAXwmtHmfbRr`](https://solscan.io/account/JUPUSDecMzAVgztLe6eGhwUBj1Pn3j9WAXwmtHmfbRr)   |
 | **Custodian (reserves)**        | [`B3q4P4XSmycvoHLaiEjchsGDafFPhKokvHvNRuW29N1y`](https://solscan.io/account/B3q4P4XSmycvoHLaiEjchsGDafFPhKokvHvNRuW29N1y) |
-| **Program reserves**            | [`CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA`](https://solscan.io/account/CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA) |
+| **Program authority (holds the mint/redeem buffer; JupUSD mint and freeze authority)** | [`CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA`](https://solscan.io/account/CkzLnD9r4d4ZZofsgNVo2VNunxDmte5YJ4vfAgMfBZNA) |
 | **Multisig (update authority)** | [`31wgH9Czzd3qgquTGxVxtxJuzBd8Fm4xEo8rPX7CNfhM`](https://solscan.io/account/31wgH9Czzd3qgquTGxVxtxJuzBd8Fm4xEo8rPX7CNfhM) |
 | **Anchorage subaccount (custody)** | [`7i6ELgCKhZewDPg4P91w9FYpWKrSx7ptiNrUCrBarHff`](https://solscan.io/account/7i6ELgCKhZewDPg4P91w9FYpWKrSx7ptiNrUCrBarHff) |
 
@@ -55,7 +55,7 @@ A **benefactor** is a wallet authorised to mint and redeem JupUSD through the pr
 
 ### Oracle
 
-The JupUSD program uses oracle price feeds from [Pyth](https://pyth.network/), [Chainlink](https://chain.link/), and [Chaos Labs](https://chaoslabs.xyz/). Oracles serve two purposes in the mint/redeem flow:
+The JupUSD program uses [Pyth](https://pyth.network/) price feeds, one configured per collateral vault. Oracles serve two purposes in the mint/redeem flow:
 
 1. **Peg validation**: verify that the collateral (USDC, USDtb) has not depegged before allowing the operation.
 2. **Exchange rate**: the oracle price is used in the calculation of the mint/redeem exchange rate.
@@ -87,15 +87,15 @@ The TypeScript SDK provides programmatic access to mint and redeem instructions.
 
 <CodeGroup>
   ```bash npm
-  npm install @jup-ag/jup-usd-sdk
+  npm install @jup-ag/jupusd-sdk
   ```
 
   ```bash yarn
-  yarn add @jup-ag/jup-usd-sdk
+  yarn add @jup-ag/jupusd-sdk
   ```
 
   ```bash pnpm
-  pnpm add @jup-ag/jup-usd-sdk
+  pnpm add @jup-ag/jupusd-sdk
   ```
 </CodeGroup>
 
@@ -137,7 +137,7 @@ import {
   findVault,
   getMintInstructionAsync,
   JUP_STABLE_PROGRAM_ADDRESS,
-} from "@jup-ag/jup-usd-sdk";
+} from "@jup-ag/jupusd-sdk";
 import { findAssociatedTokenPda } from "@solana-program/token";
 
 // Wallet must be a registered benefactor
@@ -219,7 +219,7 @@ import {
   findVault,
   getRedeemInstructionAsync,
   JUP_STABLE_PROGRAM_ADDRESS,
-} from "@jup-ag/jup-usd-sdk";
+} from "@jup-ag/jupusd-sdk";
 
 // Wallet must be a registered benefactor
 const userSigner = /* your wallet signer */;

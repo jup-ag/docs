@@ -95,7 +95,7 @@ Add the server to your MCP client's configuration. To use a higher rate limit, p
   }
   ```
 
-  In a project's `.cursor/mcp.json`, write `"Bearer ${env:JUPITER_API_KEY}"` instead of the key itself.
+  In a project's `.cursor/mcp.json`, write `"Bearer ${env:JUPITER_API_KEY}"` instead of the key itself, and set `JUPITER_API_KEY` in your environment.
 
   Save and reload Cursor.
   </Tab>
@@ -146,7 +146,7 @@ Once connected, ask your AI assistant in plain language. Each prompt maps to one
 | "What tokens can I lend on Jupiter and what APY do they offer?" | `lend_list_tokens` |
 | "Are there any prediction markets about Bitcoin?" | `prediction_search_events` |
 
-Tools that move funds return an unsigned transaction. The MCP server holds no keys and does not sign, and the clients on this page have no built-in wallet, so a wallet or signer you control must sign it. Before signing, check the tokens, amounts, recipient and fees: text your agent reads can change the parameters it sends. Never give an AI client your main wallet's private key or recovery phrase. If an agent signs for you, use a dedicated wallet that holds only what you can afford to lose.
+Tools that prepare a fund-moving operation return an unsigned transaction, or raw instructions for the advanced `*_instructions` tools. The MCP server holds no keys and does not sign, and Claude Desktop, Claude Code, Cursor and Windsurf have no built-in wallet, so a wallet or signer you control must sign it. Before signing, check the tokens, amounts, recipient and fees: text your agent reads can change the parameters it sends. Never give an AI client your main wallet's private key or recovery phrase. If an agent signs for you, use a dedicated wallet that holds only what you can afford to lose.
 
 <Tip>
 If a tool call returns `401 Unauthorized`, the Jupiter API key you passed is invalid. Remove the `Authorization` header to run keyless at the lower rate limit, or replace it with a valid key from the [Developer Platform](https://developers.jup.ag/portal).

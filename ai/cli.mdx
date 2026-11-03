@@ -28,8 +28,8 @@ The CLI covers Jupiter products like Spot (swaps, portfolio, transfers), Perps (
 Without `--dry-run`, the CLI signs and sends a transaction as soon as a command that moves funds runs. It never asks for confirmation, and by default OpenClaw runs commands without asking you either.
 
 - Use a dedicated wallet that holds only what you can afford to lose. Never import your main wallet's recovery phrase or private key.
-- Any text the bot or agent reads (chat messages, token names, web pages) can try to make it trade or transfer funds. Make sure only you can message the bot: keep OpenClaw's pairing or allowlist mode for direct messages, approve only your own account, and keep the bot out of group chats. To approve each command yourself, turn on OpenClaw's [exec approvals](https://docs.openclaw.ai/tools/exec-approvals).
-- `jup keys add <name>` without import options creates a new key and never shows a recovery phrase. `~/.config/jup/keys/<name>.json` is the only copy: back it up somewhere safe.
+- Any text the bot or agent reads (chat messages, token names, web pages) can try to make it trade or transfer funds. Make sure only you can message the bot: keep OpenClaw's pairing or allowlist mode for direct messages, approve only your own account, and keep the bot out of group chats. To approve each command yourself, set OpenClaw's [exec approvals](https://docs.openclaw.ai/tools/exec-approvals) to ask every time, and do not choose "allow always" for `jup` commands.
+- `jup keys add <name>` with no `--file`, `--seed-phrase`, `--private-key` or `--backend` option creates a new key and never shows a recovery phrase. `~/.config/jup/keys/<name>.json` holds the private key in plain text and is the only copy: back it up somewhere safe.
 </Warning>
 
 ### Terminal

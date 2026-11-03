@@ -2,7 +2,7 @@
 title: "Integration Flow"
 sidebarTitle: "Integration Flow"
 description: "The end-to-end sequence of Trigger API calls for both limit orders and DCA, the data that flows between them, and where the two families diverge."
-llmsDescription: "Maps the full Jupiter Trigger Order V2 integration flow for both order families (price/limit orders and DCA) across endpoints: POST /trigger/v2/auth/challenge and /auth/verify to get a JWT, GET /trigger/v2/vault (or /vault/register) to resolve the vault, POST /trigger/v2/deposit/craft to build a deposit and get a requestId, sign the deposit client-side, then the family-specific create call (POST /trigger/v2/orders/price with orderType single/oco/otoco, or POST /trigger/v2/orders/dca), monitoring (GET /trigger/v2/orders/history or /orders/history/dca), editing (PATCH /trigger/v2/orders/price/{id}, limit orders only), and the shared two-step cancel and withdraw (POST /orders/{price|dca}/cancel/{id} + /confirm-cancel/{id}). Shows the shared call order, the data dependencies (token, vaultPubkey, requestId, depositSignedTx, id, cancelRequestId), the order state machine, and how to recover an interrupted cancellation. Includes a limit-order vs DCA endpoint comparison table. Use this page to understand which endpoints to call in what order before integrating either family."
+llmsDescription: "Maps the full Jupiter Trigger Order V2 integration flow for both order families (price/limit orders and DCA) across endpoints: POST /trigger/v2/auth/challenge and /auth/verify to get a JWT (with authMode access_refresh: a 15-minute accessToken plus a rotating refreshToken, renewed with POST /trigger/v2/auth/refresh), GET /trigger/v2/vault (or /vault/register) to resolve the vault, POST /trigger/v2/deposit/craft to build a deposit and get a requestId, sign the deposit client-side, then the family-specific create call (POST /trigger/v2/orders/price with orderType single/oco/otoco, or POST /trigger/v2/orders/dca), monitoring (GET /trigger/v2/orders/history or /orders/history/dca), editing (PATCH /trigger/v2/orders/price/{id}, limit orders only), and the shared two-step cancel and withdraw (POST /orders/{price|dca}/cancel/{id} + /confirm-cancel/{id}). Shows the shared call order, the data dependencies (accessToken, vaultPubkey, requestId, depositSignedTx, id, cancelRequestId), the order state machine, and how to recover an interrupted cancellation. Includes a limit-order vs DCA endpoint comparison table. Use this page to understand which endpoints to call in what order before integrating either family."
 ---
 
 This page maps a trigger order from start to finish: which endpoints to call, in what order, the data that flows from one call into the next, and the states an order moves through. Both order families, price (limit) orders and DCA, follow the same spine. They differ only at the create, monitor, and manage steps. Each endpoint has its own detail page, linked at every step.
@@ -18,7 +18,7 @@ Authenticate once, set up your vault once, then repeat deposit-and-create per or
 
 ```mermaid
 flowchart TD
-    A["Authenticate<br/>/auth/challenge + /auth/verify"] -->|"token · JWT 24h"| B["Get vault<br/>/vault or /vault/register"]
+    A["Authenticate<br/>/auth/challenge + /auth/verify"] -->|"accessToken (15 min) + refreshToken"| B["Get vault<br/>/vault or /vault/register"]
     B -->|"vaultPubkey"| C["Craft + sign deposit<br/>/deposit/craft"]
     C -->|"requestId + depositSignedTx"| D["Create order<br/>/orders/price or /orders/dca"]
     D -->|"id + txSignature"| E["Monitor<br/>/orders/history or .../history/dca"]
@@ -47,9 +47,9 @@ The two families share authentication, the vault, and the deposit endpoint. They
 
 ### 1. Authenticate
 
-Call `POST /auth/challenge` with your `walletPubkey` and a `type` of `message` (standard wallets) or `transaction` (hardware wallets). Sign the returned challenge, then submit it to `POST /auth/verify` to receive a JWT `token`. Include the token as `Authorization: Bearer <token>` on every subsequent call.
+Call `POST /auth/challenge` with your `walletPubkey` and a `type` of `message` (standard wallets) or `transaction` (hardware wallets). Sign the returned challenge, then submit it to `POST /auth/verify` with `authMode: "access_refresh"` to receive a JWT `accessToken` and a `refreshToken`. Include the access token as `Authorization: Bearer <accessToken>` on every subsequent call.
 
-The token is valid for 24 hours. There is no refresh endpoint: when it expires, repeat the challenge-response flow.
+The access token is valid for 15 minutes. Before it expires, call `POST /auth/refresh` with the refresh token to get a new pair. Repeat the challenge-response flow only when the refresh returns `401`. If you omit `authMode`, the API uses the deprecated `access_only` mode: a single 24-hour `token` that cannot be refreshed.
 
 See [Authentication](/trigger/authentication) for the message and transaction flows and the full token lifecycle.
 

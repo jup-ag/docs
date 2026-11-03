@@ -47,7 +47,7 @@ Stop-loss orders use a higher default because execution certainty matters more t
 ## Error Handling
 
 - **Validation errors** (400) include a `details` object with per-field messages. Parse these to surface specific issues to users.
-- **Authentication errors** (401) mean the JWT has expired. Re-authenticate with a new challenge-response flow rather than retrying the same token.
+- **Authentication errors** (401) mean the access token has expired or been revoked. Refresh once with `POST /auth/refresh` and retry the request with the new access token. If the refresh also returns `401`, start a new challenge-response flow and do not send that refresh token again. A deprecated `access_only` token cannot be refreshed: re-authenticate. See [Handle 401 on protected routes](/trigger/authentication#handle-401-on-protected-routes).
 - **Minimum order size** is 10 USD: per price order, or per DCA round (`inputAmount / orderCount`). Enforce this client-side to avoid unnecessary API calls.
 - Handle unknown fields in responses gracefully. As the API evolves during beta, new fields may be added to response objects.
 

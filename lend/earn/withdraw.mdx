@@ -77,33 +77,26 @@ This example builds, signs, and sends a withdraw transaction.
     ```
   </Step>
   <Step iconType="regular" titleSize="h2" title="Set up connection and withdraw parameters">
-    Set your RPC, signer, asset mint, and withdraw amount.
+    Set your RPC, asset mint, and withdraw amount, load your wallet keypair from a local JSON file, then create the connection and the signer.
 
     ```typescript
     const RPC_URL = "https://api.mainnet-beta.solana.com";
-    const userKeypair = Keypair.generate(); // <-- Replace this with your wallet
     const ASSET_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"); // Asset mint to withdraw (USDC for example)
     const WITHDRAW_AMOUNT = new BN(10_000_000); // Amount of asset to withdraw, in smallest units (e.g., 1 USDC = 1_000_000)
-    ```
 
-    If your signer is stored as a local JSON keypair file, you can load it using the helper function below.
-
-    ```typescript
     function loadKeypair(keypairPath: string): Keypair {
       const fullPath = path.resolve(keypairPath);
       const secret = JSON.parse(fs.readFileSync(fullPath, "utf8"));
       return Keypair.fromSecretKey(new Uint8Array(secret));
     }
-    ```
 
-    Then initialise your signer:
-
-    ```
-    const userKeypair = loadKeypair("/path/to/your/keypair.json");
+    const userKeypair = loadKeypair("/path/to/your/keypair.json"); // <-- Replace with the path to your wallet keypair
+    const connection = new Connection(RPC_URL, { commitment: "confirmed" });
+    const signer = userKeypair.publicKey;
     ```
   </Step>
   <Step iconType="regular" titleSize="h2" title="Build withdraw instructions">
-    Build a transaction from the withdraw instructions, set blockhash and fee payer, then sign with the user keypair and send the transaction.
+    Get the withdraw instructions from the SDK for the signer, asset mint, and amount.
 
     ```typescript
     const { ixs: withdrawIxs } = await getWithdrawIxs({

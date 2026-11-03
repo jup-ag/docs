@@ -1,7 +1,7 @@
 ---
 title: "Oracles"
 description: "Price oracle system for the Jupiter Lend protocol, using multiple source types with freshness and confidence validation."
-llmsDescription: "Jupiter Lend Oracle Program (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) provides price data via a hop-based system using Pyth, Chainlink, Redstone, StakePool, MsolPool, SinglePool, and JupLend sources."
+llmsDescription: "Jupiter Lend Oracle Program (jupnw4B6Eqs7ft6rxpzYLJZYSnrpRgPcr589n5Kv4oc) provides price data via a hop-based system. Its SourceType enum has 12 variants: Pyth, Chainlink, ChainlinkDataStreams, Redstone, StakePool, MsolPool, SinglePool, JupLend, InfPool, PstPool, DexSmartColPegOracle and DexSmartDebtPegOracle; no vault uses Redstone at present. Covers freshness limits (600 seconds for user operations, 7200 seconds for liquidations), Pyth confidence limits, the providers behind each source, and a script to read an oracle price by nonce."
 ---
 
 The Oracle Program delivers accurate price data to the protocol by integrating with trusted oracle providers. It calculates exchange rates by combining multiple price sources in a structured sequence, ensuring reliable asset valuations.
@@ -68,7 +68,7 @@ Only Pyth validates confidence. Other sources (Chainlink, Redstone, StakePool, M
 |----------------|-----------|--------------------------------------------------------------------------|
 | Pyth           | Pyth      | Spot prices for some vaults                                             |
 | Chainlink      | Chainlink | Most spot prices in the main market, including SOL/USD, BTC (cbBTC, WBTC), JLP, JUP and EURC/USD |
-| Redstone       | Redstone  | Additional price feeds                                                  |
+| Redstone       | Redstone  | Supported by the Oracle program, but no vault uses it at present        |
 | Marinade       | MsolPool  | mSOL/SOL                                                                |
 | Jito           | StakePool | JITOSOL/SOL                                                             |
 | SPL Single Pool| SinglePool| Staked SOL (Helius, Jupiter, Nansen, Emerald, Shift, Kiln), used by [Native Staked Vaults](/lend/advanced/native-staked-vault) |

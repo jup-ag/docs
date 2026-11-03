@@ -79,7 +79,7 @@ Poll the history endpoint to track order state; the states differ by family.
 | `open` | Active, waiting for trigger | No action needed |
 | `filled` | Fully executed | Show completion to user |
 | `cancelled` | Cancelled by user | Confirm funds returned to vault |
-| `expired` | Past `expiresAt` | Prompt user to withdraw funds or recreate |
+| `expired` | Past `expiresAt`; the remaining deposit was returned to the wallet | Offer to recreate the order |
 | `failed` | Execution failed | Show error, suggest retry with adjusted parameters |
 
 **DCA** ([`GET /orders/history/dca`](/trigger/dca-history#order-states)) uses a different set: `pending`, `active`, `executing`, `completed` (all rounds filled), `pending_withdraw`, `cancelled`, and `failed`. There is no `open` or `expired` state; a DCA ends at `completed` when its budget is spent.

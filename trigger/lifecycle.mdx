@@ -10,7 +10,7 @@ This page maps a trigger order from start to finish: which endpoints to call, in
 ## Prerequisites
 
 - An API key from the [Portal](https://developers.jup.ag/portal). All requests require the `x-api-key` header.
-- A Solana wallet. Every step that moves funds (deposit, withdrawal) is signed client-side by the wallet owner.
+- A Solana wallet. Deposits, and withdrawals you start with `cancel`, are signed client-side by the wallet owner.
 
 ## The Flow
 
@@ -116,7 +116,7 @@ flowchart TD
 
 - **`open`** orders can be updated or cancelled. Updates and cancellation are only valid from this state.
 - **`executing`** covers the swap from trigger detection to output withdrawal, including partial fills.
-- **`expired`** orders did not fill before `expiresAt`. The deposit is still in the vault and is retrieved with the same cancel flow (see below).
+- **`expired`** orders did not fill before `expiresAt`. Jupiter returns the remaining deposit to the wallet that owns the order, with no signature from that wallet: the order shows `executing` while the withdrawal runs and `expired` once it has landed. If that withdrawal is refused (for example on an older order whose destination token account is missing), the order moves to `pending_withdraw` and you retrieve the tokens with the cancel flow (see below).
 
 **OCO orders:** the take-profit and stop-loss legs share one deposit. When one leg fills, the other transitions to `cancelled` automatically (`oco_cancelled` in the raw state). **OTOCO orders:** the child OCO pair only activates after the parent order reaches `filled`; if the parent expires or fails, the children are never created.
 

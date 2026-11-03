@@ -135,7 +135,7 @@ paths:
                     - Public key address of the sender
                     - Since this address funded the invite, it will be the receiving address of the full amount
             example:
-              invitePDA: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+              invitePDA: "6gHJbC9F8NQakR46c6MnngDRMBLi8L7F5GXExRKq1fN5"
               sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
       responses:
         '200':
@@ -209,7 +209,7 @@ paths:
               example:
                 invites:
                   - invite_signer: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
-                    invite_pda: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+                    invite_pda: "6gHJbC9F8NQakR46c6MnngDRMBLi8L7F5GXExRKq1fN5"
                     sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
                     expiry: "2025-03-22T10:30:00.000Z"
                     amount: "1000000"
@@ -278,7 +278,7 @@ paths:
               example:
                 invites:
                   - invite_signer: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
-                    invite_pda: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+                    invite_pda: "6gHJbC9F8NQakR46c6MnngDRMBLi8L7F5GXExRKq1fN5"
                     sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
                     expiry: "2025-03-22T10:30:00.000Z"
                     amount: "1000000"

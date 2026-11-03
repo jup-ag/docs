@@ -184,10 +184,10 @@ flowchart TD
     P["pending<br/>(deposit)"] --> O["open"]
     P --> XF["failed"]
     O --> EX["executing"]
-    O --> EXP["expired"]
     O -->|"cancel initiated"| PW["pending_withdraw"]
     EX --> FL["filled"]
     EX --> XF
+    EX --> EXP["expired"]
     PW --> CAN["cancelled"]
 ```
 

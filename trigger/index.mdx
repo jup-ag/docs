@@ -102,7 +102,7 @@ All endpoints require an API key via the `x-api-key` header. Authenticated endpo
 <AccordionGroup>
 
 <Accordion title="How do I get my funds back from an order?">
-For a price order that expired or that you no longer want, funds stay in the vault; retrieve them with the two-step cancel flow (initiate, sign the withdrawal, confirm). See [Expired Order Withdrawal](/trigger/manage-orders#expired-order-withdrawal). For a DCA order, cancelling returns the unfilled remainder to your wallet; rounds already filled are not reversed. See [Cancel a DCA Order](/trigger/dca-cancel).
+When a price order expires, Jupiter returns the remaining deposit to your wallet. For an open price order you no longer want, or one that shows `pending_withdraw`, use the two-step cancel flow (initiate, sign the withdrawal, confirm). See [Expired Order Withdrawal](/trigger/manage-orders#expired-order-withdrawal). For a DCA order, cancelling returns the unfilled remainder to your wallet; rounds already filled are not reversed. See [Cancel a DCA Order](/trigger/dca-cancel).
 </Accordion>
 
 <Accordion title="Can I edit an order after creating it?">

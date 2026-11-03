@@ -51,7 +51,7 @@ paths:
                     - Only pass in this parameter with other mint when required
             example:
               inviteSigner: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
-              sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              sender: "DFE6HuZj6KLUhsKnujSfu4rNYuBnSibsbH4qE9bZUPzq"
               amount: "1000000"
               mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
       responses:
@@ -136,7 +136,7 @@ paths:
                     - Since this address funded the invite, it will be the receiving address of the full amount
             example:
               invitePDA: "6gHJbC9F8NQakR46c6MnngDRMBLi8L7F5GXExRKq1fN5"
-              sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              sender: "DFE6HuZj6KLUhsKnujSfu4rNYuBnSibsbH4qE9bZUPzq"
       responses:
         '200':
           description: Successful response
@@ -210,7 +210,7 @@ paths:
                 invites:
                   - invite_signer: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
                     invite_pda: "6gHJbC9F8NQakR46c6MnngDRMBLi8L7F5GXExRKq1fN5"
-                    sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    sender: "DFE6HuZj6KLUhsKnujSfu4rNYuBnSibsbH4qE9bZUPzq"
                     expiry: "2025-03-22T10:30:00.000Z"
                     amount: "1000000"
                     creation_tx: "4xKpN2..."
@@ -279,7 +279,7 @@ paths:
                 invites:
                   - invite_signer: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
                     invite_pda: "6gHJbC9F8NQakR46c6MnngDRMBLi8L7F5GXExRKq1fN5"
-                    sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    sender: "DFE6HuZj6KLUhsKnujSfu4rNYuBnSibsbH4qE9bZUPzq"
                     expiry: "2025-03-22T10:30:00.000Z"
                     amount: "1000000"
                     creation_tx: "4xKpN2..."

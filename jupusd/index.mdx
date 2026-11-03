@@ -60,9 +60,13 @@ Each JupUSD collateral vault is configured with one [Pyth](https://pyth.network/
 1. **Peg validation**: verify that the collateral (USDC, USDtb) has not depegged before allowing the operation.
 2. **Exchange rate**: the oracle price is used in the calculation of the mint/redeem exchange rate.
 
-There is no fallback mechanism. If the Pyth feed is unavailable or rejected (confidence too wide, stale data), the transaction will fail with `PriceConfidenceTooWide` or `NoValidPrice`.
+There is no fallback mechanism. If the Pyth price is rejected, the mint or redeem transaction fails:
 
-Oracle validation parameters are configured per vault. You can inspect the current configuration for each vault onchain. For example, the USDC vault configuration: [`7JnALHo2bFuKsgkNymiqJwt228jy3my99CnfF75QD9oj`](https://solscan.io/account/7JnALHo2bFuKsgkNymiqJwt228jy3my99CnfF75QD9oj#accountData).
+- **Stale price** (older than the vault's staleness threshold): `PriceTooOld`, an error from the Pyth receiver SDK.
+- **Confidence interval too wide** (2% of the price or more): `PriceConfidenceTooWide`.
+- **Price out of bounds** (below the vault's minimum on mint, above its maximum on redeem), a zero or negative price, or an oracle account that does not match the vault: `BadOracle`.
+
+The staleness threshold and the minimum and maximum prices are configured per vault; the 2% confidence cap is the same for every vault. You can inspect the current configuration for each vault onchain. For example, the USDC vault configuration: [`7JnALHo2bFuKsgkNymiqJwt228jy3my99CnfF75QD9oj`](https://solscan.io/account/7JnALHo2bFuKsgkNymiqJwt228jy3my99CnfF75QD9oj#accountData).
 
 ### Rate limiting
 
@@ -358,7 +362,9 @@ The following errors may occur when calling the Mint or Redeem instructions.
 | **ZeroAmount**                              | Input amount is zero, or the computed output rounds to zero.               | Submit a non-zero amount large enough to produce output after fees.                                            |
 | **SlippageToleranceExceeded**               | Computed output is lower than `minAmountOut`.                              | Increase slippage tolerance or retry when pricing is more favourable.                                          |
 | **PriceConfidenceTooWide**                  | Pyth oracle confidence interval or spread is too wide.                     | Retry once oracle confidence tightens. Verify correct oracle accounts were supplied.                           |
-| **NoValidPrice**                            | No Pyth oracle price passed validation.                                    | Check oracle health and retry once price feeds are reporting valid data.                                       |
+| **PriceTooOld**                             | The Pyth price is older than the vault's staleness threshold. This error comes from the Pyth receiver SDK. | Retry once the Pyth feed has updated.                                                                          |
+| **BadOracle**                               | The oracle price is below the vault's minimum (mint) or above its maximum (redeem), is zero or negative, or the oracle account does not match the vault. | Pass the oracle account stored on the vault. If the price is out of bounds, retry once the collateral price is back within the vault's bounds. |
+| **NoValidPrice**                            | Defined by the program, but the mint and redeem code does not return it: oracle failures surface as `PriceTooOld`, `PriceConfidenceTooWide`, or `BadOracle`. | See those errors.                                                                                              |
 | **MathOverflow**                            | Arithmetic overflow during price or amount calculation.                    | This should not happen under normal conditions. Contact the team.                                              |
 | **VaultIsDry**                              | Redeem request exceeds the vault's available collateral balance.           | The program vault balance is too low. Wait for it to be replenished or contact the team.                       |
 

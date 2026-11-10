@@ -568,6 +568,7 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 - **Source repo:** `Instadapp/lend-referral` (PRIVATE). Program, IDL and the TypeScript SDK (`ts-sdk/`). Its `docs/integration.md` and `docs/sdk.md` are the upstream docs. Pages in this repo must stay self-contained: never link to the repo or cite its file paths here.
 - **SDK:** `@jup-ag/lend-referral-sdk`, built on `@solana/kit` 8.5 with a Codama-generated client. The Kit rewrite is Instadapp/lend-referral#11 (stacked on #12, the mainnet deployment). Docs were written against #11 head `53cfb04`, then updated to `bc1e706` for the jlToken rename.
 - **Live state is readable with the SDK itself:** `fetchProtocol(rpc)` and `findWrappers(rpc, {})` against mainnet.
+- **Audits:** Guardian (window Aug 24 to Sep 28, 2026, final report Nov 6, 2026) and Cantina Managed (Aug 24 to Sep 1, 2026, report Oct 13, 2026), both starting at commit `f57d29e0`. Published as `static/files/audits/lend-referral-{guardian,cantina}.pdf` and listed on `resources/audits.mdx`. The Cantina report reached us as `certora-audit.pdf`, but it is a Cantina report.
 
 ## Status
 
@@ -580,6 +581,7 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 - [2026-10-26] **SDK estimates use the stored Lend price**, and the program refreshes it first (it only rises). So a real redeem to the underlying token pays slightly more than the quote, while a real redeem to jlTokens can pay slightly fewer (the refresh also charges the partner fee on the new yield). Bounds have to cover that drift.
 - [2026-10-26] `estimatePartnerClaimable` throws a plain `Error` when the books exceed the vault; only the `claimPartnerFees` action throws `ReferralSdkError` kind `VaultUnderrun`. The upstream `sdk.md` math table blurs the two.
 - [2026-10-26] On chain, jlUSDC (`9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D`) and USDC both have 6 decimals; `findLendingAddress(USDC, jlUSDC)` = `2vVYHYM8VYnvZqQWpTJSj8o8DBf1wM8pVs3bsTgYZiqJ`, classic Token program. xToken decimals equal the jlToken's.
+- [2026-11-10] **The audits describe older code than the docs.** Several acknowledged findings no longer hold at #11 head `bc1e706`, so do not "correct" the docs from the PDFs: `updatePartnerFee` is now blocked while paused (`UpdatePartnerFee` checks `!protocol_config.paused`; Guardian I-03 and Cantina 3.3.35 saw it run while paused), and each wrapper now stores the protocol share it applies, so pending yield splits at the old share (Guardian L-02 and Cantina 3.3.3 saw a global change re-split past yield). Check a finding against current source before acting on it.
 - [2026-10-26] Every TypeScript snippet in `lend/referral/*.mdx` was typechecked (`tsc --noEmit`, strict, nodenext) against the SDK source at `53cfb04`, and again at `bc1e706` after the jlToken rename. Re-run the check after any SDK API change before editing these pages.
 
 ## Open Questions

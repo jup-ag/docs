@@ -27,7 +27,7 @@ BEFORE making the change.
 ### [2026-10-26] Lend Referral docs as lend/referral/ ("Lend Referral" nav group)
 **Status:** implemented
 **Scope:** new-section | navigation
-**Files affected:** `lend/referral/{index,fees,sdk,deposits-and-withdrawals,manage-wrapper,reference}.mdx`, `docs.json`, `lend/index.mdx`, `lend/program-addresses.mdx`
+**Files affected:** `lend/referral/{index,fees,sdk,deposits-and-withdrawals,manage-wrapper,reference}.mdx`, `docs.json`, `lend/index.mdx`, `lend/program-addresses.mdx`, `resources/audits.mdx`, `static/files/audits/lend-referral-{guardian,cantina}.pdf`
 **Linear issue:** BUILD-949
 
 **Context:** The Lend Referral program (`LrefWFcNXGnLxnQUdKmuJ1U3fUrFBdNkm6xCfVfWwQW`, private repo `Instadapp/lend-referral`) lets a partner wrap a Jupiter Lend Earn market in its own xToken and take a fee on its users' yield. It had no developer docs. The repo's own `docs/integration.md` and `docs/sdk.md` mix partner-facing behaviour with governance runbooks (deploy, `init_config`, multisig handover) and SDK internals (codegen, golden vectors).

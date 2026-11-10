@@ -88,7 +88,7 @@ For protocols that need to invoke the Jupiter swap from within their own onchain
 - [How CPI works](https://solana.com/docs/core/cpi)
 - **CPI considerations**
   - CPI cannot use Address Lookup Tables (ALTs), which limits the number of accounts in the transaction. Jupiter's complex routing often requires many accounts.
-  - Use `maxAccounts` on `/build` to control route complexity and keep the transaction within size limits.
+  - Use `maxAccounts` to limit the account count, or [`maxBytes`](/swap/advanced/reduce-transaction-size#budget-transaction-bytes-with-maxbytes) to budget transaction bytes directly, on `/build` to keep the transaction within size limits.
   - Set your own compute budget, as CPI adds overhead.
 - **Flash Fill (alternative to CPI)**: allows the use of Versioned Transactions and ALTs, avoiding the account limit constraints of CPI. The flow:
 - **References**

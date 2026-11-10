@@ -518,6 +518,20 @@ paths:
             minimum: 1
             maximum: 64
           description: Maximum number of accounts for the swap route. Defaults to 64.
+        - name: maxBytes
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1232
+          description: |
+            Target maximum size in bytes for the swap transaction, so you have room for your own instructions.
+            Metis picks the route by building and serializing its swap transaction exactly, and will not return a
+            route whose swap exceeds this budget. The budget covers only the bare swap: bytes added by `payer`,
+            `feeAccount`, `destinationTokenAccount`, `nativeDestinationAccount`, the close authority, cashback, the
+            tip instruction, and any instructions, signers or lookup tables you add yourself are NOT counted, so set
+            the budget below 1232 to leave room for them. Dynamic Swap routes are excluded when set. v0 only
+            (returns 400 with `transactionVersion=1`); ExactIn only.
         - name: payer
           in: query
           schema:

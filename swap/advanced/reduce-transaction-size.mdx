@@ -1,7 +1,7 @@
 ---
 title: "Reduce Transaction Size"
 description: "Budget transaction bytes with maxBytes, limit accounts, and remove unnecessary instructions"
-llmsDescription: "How to reduce transaction size on Jupiter Swap API V2 /build. Primary technique: the maxBytes parameter (integer 1-1232) asks Metis to pick a route whose swap transaction fits a byte budget. Sizing is deterministic: Metis builds and serializes the route's swap transaction, so a route it returns never exceeds the budget. The budget covers only the bare swap, so bytes added by payer, feeAccount, close authority, destination accounts, cashback, the tip instruction, and your own instructions, signers and lookup tables are not counted; set maxBytes below 1232 to leave room. v0 only (400 with transactionVersion=1), ExactIn only, and Dynamic Swap routes are excluded when set. maxBytes is more accurate than maxAccounts (1-64, account-count proxy) when the constraint is size. Also covers removing no-op createAssociatedTokenAccountIdempotent setup instructions, and requesting a Solana v1 transaction (transactionVersion=1) to raise the limit to 4096 bytes."
+llmsDescription: "How to reduce transaction size on Jupiter Swap API V2 /build. Primary technique: the maxBytes parameter (integer 1-1232) asks Metis to pick a route whose swap transaction fits a byte budget. Sizing is deterministic: Metis builds and serializes the route's swap transaction, so a route it returns never exceeds the budget. The budget covers only the bare swap, so anything you add (payer, feeAccount, close authority, destination accounts, cashback, tip, and your own instructions, signers and lookup tables) is not counted, because Metis cannot know whether those accounts sit in your Address Lookup Table and the API cannot receive it; set maxBytes below 1232, counting each added account as 1 byte if it is in your lookup table or 32 bytes if not and each extra signer as about 96 bytes. v0 only (400 with transactionVersion=1), ExactIn only, and Dynamic Swap routes are excluded when set. maxBytes is more accurate than maxAccounts (1-64, account-count proxy) when the constraint is size. Also covers removing no-op createAssociatedTokenAccountIdempotent setup instructions, and requesting a Solana v1 transaction (transactionVersion=1) to raise the limit to 4096 bytes."
 ---
 
 When building custom transactions with `/build`, you may hit the 1232-byte transaction size limit, especially when adding custom instructions alongside the swap. The techniques below help, in order of how directly they target size.
@@ -24,15 +24,18 @@ Sizing is deterministic, not an estimate. Metis picks the route by building and 
 
 ### What the budget counts
 
-The budget covers the **bare swap only**. Metis sizes a swap transaction with no extras, so these bytes are **not** counted today:
+The budget sizes the **bare swap route** that Metis builds. It does **not** count anything you add, whether through a `/build` request parameter (`payer`, `feeAccount`, `destinationTokenAccount`, `nativeDestinationAccount`, the close authority, cashback, the tip instruction) or on top of the response (your own instructions, extra signers, and Address Lookup Tables).
 
-- Fields you pass to `/build`: `payer`, `feeAccount`, `destinationTokenAccount`, `nativeDestinationAccount`, the close authority, cashback, and the tip instruction.
-- Anything you add yourself after `/build` returns: your own instructions, extra signers, and your own Address Lookup Tables.
+The reason is the lookup table. Metis cannot know whether an account you add ends up in your Address Lookup Table, and the API has no way to receive your lookup table, so it cannot size those accounts. Budget them yourself with this mental model:
 
-Your final assembled transaction is therefore the bare swap plus everything above. Because those additions are deterministic and under your control, if you account for their bytes the total comes out exactly. Subtract their size from 1232 and pass the result as `maxBytes`.
+- **Each account you add:** 1 byte if it is in your lookup table, 32 bytes if not.
+- **Each extra signer** (for example a separate `payer`): about 96 bytes. A signer cannot live in a lookup table, so it always costs the full amount.
+- **Your own instruction data:** its full byte length.
+
+Add those up and pass `maxBytes = 1232 − (that total)`. Every term is under your control, so your final transaction then fits.
 
 <Warning>
-  `maxBytes` budgets the bare swap, not your final transaction. The `payer`, close authority, `feeAccount`, destination accounts, tip, and your own instructions and lookup tables are **not** counted, so setting `maxBytes=1232` and then adding instructions will overflow the 1232-byte limit. Set `maxBytes` **below** 1232 by the size of what you add. As a reference, an extra signer (for example a separate `payer`) costs about 96 bytes, and a fee account costs 1 byte when a lookup table holds it or 32 bytes when it does not. Jupiter's own gasless path reserves a flat 200 bytes for its additions.
+  `maxBytes` budgets the bare swap, not your final transaction. Anything you add is **not** counted, so setting `maxBytes=1232` and then adding to the transaction overflows the 1232-byte limit. Set `maxBytes` below 1232 by the size of what you add, counting each added account as 1 byte if it is in your lookup table or 32 bytes if not, and each extra signer as about 96 bytes.
 </Warning>
 
 Setting `maxBytes` also changes how Metis sizes the route: omitting it uses an account-count model that never measures bytes, so `maxBytes=1232` is **not** a no-op and can return a different route than no limit at all.
@@ -40,7 +43,7 @@ Setting `maxBytes` also changes how Metis sizes the route: omitting it uses an a
 ### Before you use `maxBytes`
 
 - **Use v0 transactions.** `maxBytes` with `transactionVersion=1` returns `400`. If you need v1, you do not need `maxBytes`, since v1 already raises the limit to 4096 bytes.
-- **Leave headroom.** Pass `maxBytes = 1232 − (bytes of your additions)`. A small extra margin is wise where a cost is lookup-table-dependent (a key in a lookup table costs 1 byte, inline it costs 32).
+- **Leave headroom.** Pass `maxBytes = 1232 − (bytes of your additions)`, sizing each added account as 1 byte if it is in your lookup table or 32 bytes if not (see above).
 - **Expect fewer routes.** Dynamic Swap routes are excluded when `maxBytes` is set. Check that pricing is still acceptable.
 - **Handle `400`s.** Out of range (not 1-1232), non-integer, or `transactionVersion=1` all return `400`.
 

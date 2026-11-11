@@ -1,7 +1,7 @@
 ---
 title: "Reduce Transaction Size"
 description: "Budget transaction bytes with maxBytes, limit accounts, and remove unnecessary instructions"
-llmsDescription: "How to reduce transaction size on Jupiter Swap API V2 /build. Primary technique: the maxBytes parameter (integer 1-1232) asks Metis to pick a route whose swap transaction fits a byte budget. Sizing is deterministic, not an estimate: Metis builds and serializes the route's transaction to measure it. The budget covers the transaction you assemble from the /build response plus room for one compute unit limit instruction; what it does not count is anything you add on top (extra request parameters like payer, feeAccount or tipAmount, your own instructions, extra signers, and your own Address Lookup Tables), because Metis cannot see your lookup table and the API cannot receive it. Set maxBytes below 1232 to leave room, then serialize your final transaction and lower maxBytes further if it still exceeds 1232. v0 only (400 with transactionVersion=1); Dynamic Swap routes are excluded when set. A too-small budget returns No routes found (HTTP 400), and a tight budget can worsen pricing on large trades. maxBytes is more accurate than maxAccounts (1-64, account-count proxy) when the constraint is size. Also covers removing no-op createAssociatedTokenAccountIdempotent setup instructions, and requesting a Solana v1 transaction (transactionVersion=1) to raise the limit to 4096 bytes."
+llmsDescription: "How to reduce transaction size on Jupiter Swap API V2 /build. Primary technique: the maxBytes parameter (integer 1-1232) asks Metis to pick a route whose swap transaction fits a byte budget. Sizing is deterministic, not an estimate: Metis builds and serializes the route to measure it, and the swap it returns always comes in at or below maxBytes. maxBytes counts the bare swap only; anything you add on top is not counted, so your final transaction can still exceed maxBytes (request parameters that add to the transaction like payer, feeAccount or tipAmount, plus your own instructions, extra signers, and your own Address Lookup Tables). Set maxBytes below 1232 to leave room, then serialize your final transaction and lower maxBytes further if it still exceeds 1232. v0 only (400 with transactionVersion=1); Dynamic Swap routes are excluded when set. A too-small budget returns No routes found (HTTP 400), and a tight budget can worsen pricing on large trades. maxBytes is more accurate than maxAccounts (1-64, account-count proxy) when the constraint is size. Also covers removing no-op createAssociatedTokenAccountIdempotent setup instructions, and requesting a Solana v1 transaction (transactionVersion=1) to raise the limit to 4096 bytes."
 ---
 
 When building custom transactions with `/build`, you may hit the 1232-byte transaction size limit, especially when adding custom instructions alongside the swap. The techniques below help, in order of how directly they target size.
@@ -14,11 +14,11 @@ If your wallet, SDK, and RPC support it, prefer a [Solana v1 transaction](/swap/
 
 Set `maxBytes` (integer, 1-1232) to ask Metis for a route whose swap transaction fits a byte budget, leaving room for your own instructions.
 
-- Sizing is deterministic, not an estimate, which makes `maxBytes` more accurate than `maxAccounts`: Metis builds and serializes the route's transaction to measure it, rather than guessing from the account count.
-- The budget covers the transaction you assemble from the `/build` response, plus room for one compute unit limit instruction (the response returns the compute unit price; you add the limit after simulating). Anything else you add on top is **not** counted:
-  - Extra request parameters such as `payer`, `feeAccount`, destination accounts, close authority, cashback, or `tipAmount`.
+- Sizing is deterministic, not an estimate, which makes `maxBytes` more accurate than `maxAccounts`: Metis builds and serializes the route to measure it, rather than guessing from the account count. The swap it returns for your budget always comes in at or below `maxBytes`.
+- `maxBytes` counts the **bare swap only**. Anything you add on top is **not** counted, so your final transaction can still exceed `maxBytes`:
+  - Request parameters that add to the transaction, such as `payer`, `feeAccount`, destination accounts, close authority, cashback, or `tipAmount`.
   - Your own instructions, extra signers, and your own Address Lookup Tables.
-- Metis cannot size those additions for you, because it cannot tell whether each account you add sits in your lookup table, and the API has no way to receive your lookup table.
+- Set `maxBytes` below 1232 to leave room for whatever you add.
 
 ```
 GET https://api.jup.ag/swap/v2/build?...&maxBytes=1032

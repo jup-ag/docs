@@ -1,0 +1,291 @@
+---
+title: "Manage Your Lend Referral Wrapper"
+sidebarTitle: "Manage Your Wrapper"
+description: "Read and claim your partner fees, run accrue, and change your Lend Referral wrapper's fee, recipient, claim policy and name."
+llmsDescription: "How a partner manages its Jupiter Lend Referral wrapper with the @jup-ag/lend-referral-sdk TypeScript SDK after Jupiter hands over the wrapper authority. Covers reading claimable partner fees with simulateAccrue and estimatePartnerClaimable, claiming them as jlTokens with claimPartnerFees, running the permissionless accrue instruction, changing the partner fee (0 to 1000 bps) with updatePartnerFee, changing the fee recipient jlToken account with updatePartnerFeeRecipient, setting or clearing a claim authority with getUpdateClaimAuthorityInstruction, renaming the xToken with getUpdateXTokenMetadataInstructionAsync, transferring the wrapper authority with getTransferWrapperAuthorityInstruction (one step, irreversible), and signing with a Squads multisig."
+---
+
+After Jupiter creates your wrapper, it transfers the wrapper authority to the admin address you gave at [onboarding](/lend/referral#get-a-wrapper). From then on only you, as the wrapper authority, can change the partner fee, the fee recipient, the claim authority and the xToken's name. This page shows each task with the [Lend Referral SDK](/lend/referral/sdk).
+
+| Task | SDK function | Signer | Blocked while paused |
+|---|---|---|---|
+| Claim fees | `claimPartnerFees` | Anyone, or a permitted claimer when a claim authority is set | Yes |
+| Run accrue | `accrue` | None: only the fee payer signs | Yes |
+| Change the partner fee | `updatePartnerFee` | Wrapper authority | Yes |
+| Change the fee recipient | `updatePartnerFeeRecipient` | Wrapper authority | No |
+| Restrict who can claim | `getUpdateClaimAuthorityInstruction` | Wrapper authority | No |
+| Rename the xToken | `getUpdateXTokenMetadataInstructionAsync` | Wrapper authority | No |
+| Transfer the wrapper authority | `getTransferWrapperAuthorityInstruction` | Wrapper authority | No |
+
+Every example starts from a `WrapperContext` for your wrapper. [Read a wrapper](/lend/referral/sdk#read-a-wrapper) shows how to get one with your xToken mint.
+
+## Read your earnings
+
+Your fees sit in the wrapper's vault as jlTokens until you claim them, and they keep earning Jupiter Lend yield with no partner fee on them. [Where fees sit until you claim](/lend/referral/fees#where-fees-sit-until-you-claim) explains why. Your balance is what the vault holds beyond the users' and Jupiter's balances.
+
+The stored books leave out the fee since the last checkpoint, so project them with `simulateAccrue` before you compute the balance.
+
+```typescript
+import { address, type Address, createSolanaRpc } from "@solana/kit";
+import {
+  estimatePartnerClaimable,
+  EXCHANGE_PRICES_PRECISION,
+  findLendingAddress,
+  resolveWrapper,
+  simulateAccrue,
+} from "@jup-ag/lend-referral-sdk";
+
+// Your wrapper's xToken mint. Jupiter sends it when it creates your wrapper.
+declare const xTokenMint: Address;
+
+const USDC = address("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+const JLUSDC = address("9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D");
+
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+const lending = await findLendingAddress({ underlyingMint: USDC, jlTokenMint: JLUSDC });
+const ctx = await resolveWrapper(rpc, { jlTokenMint: JLUSDC, lending, xTokenMint });
+
+const P = ctx.lending.data.tokenExchangePrice; // underlying per jlToken, scaled by 10^12
+const books = simulateAccrue(ctx.wrapper.data, P, ctx.protocol.data.protocolFeeShareBps);
+
+const claimable = estimatePartnerClaimable(books, ctx.vaultBalance); // jlToken atoms
+const inUnderlying = (claimable * P) / EXCHANGE_PRICES_PRECISION; // underlying atoms at the stored price
+
+console.log({
+  partnerFeeBps: ctx.wrapper.data.partnerFeeBps,
+  feeRecipient: ctx.wrapper.data.partnerFeeRecipient,
+  claimableJlTokenAtoms: claimable,
+  claimableUnderlyingAtoms: inUnderlying,
+});
+```
+
+The value in the underlying token uses the price Jupiter Lend last stored. The program refreshes that price on every instruction, and it only rises.
+
+## Claim fees
+
+`claimPartnerFees` pays your balance to the fee recipient stored on the wrapper. The program accepts no other destination. `amount: "all"` claims the whole balance, and a `bigint` claims that many jlToken atoms.
+
+Who can trigger the claim depends on your [claim policy](#restrict-who-can-claim). With no claim authority set, anyone can, and the fees still go only to your recipient. With one set, only the claim authority, the wrapper authority or the owner of the fee recipient account can.
+
+```typescript
+import {
+  assertIsTransactionWithBlockhashLifetime,
+  createKeyPairSignerFromBytes,
+  createSolanaRpc,
+  createSolanaRpcSubscriptions,
+  getSignatureFromTransaction,
+  sendAndConfirmTransactionFactory,
+  signTransactionMessageWithSigners,
+} from "@solana/kit";
+import {
+  buildTransactionMessage,
+  claimPartnerFees,
+  decodeProgramError,
+  ReferralSdkError,
+  resolveWrapper,
+  type WrapperRef,
+} from "@jup-ag/lend-referral-sdk";
+
+// Your wrapper reference (see "Read a wrapper") and the claimer's 64-byte secret key.
+declare const ref: WrapperRef;
+declare const claimerSecretKey: Uint8Array;
+
+const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com");
+const rpcSubscriptions = createSolanaRpcSubscriptions("wss://api.mainnet-beta.solana.com");
+const claimer = await createKeyPairSignerFromBytes(claimerSecretKey);
+
+const ctx = await resolveWrapper(rpc, ref);
+if (ctx.protocol.data.paused) throw new Error("Claims are blocked while the protocol is paused");
+
+let built;
+try {
+  built = await claimPartnerFees(ctx, { claimer, amount: "all" });
+} catch (err) {
+  if (err instanceof ReferralSdkError && err.kind === "VaultUnderrun") {
+    // The vault holds less than the books track. The program would reject the claim.
+    console.error(err.message);
+  }
+  throw err;
+}
+console.log(`Claiming about ${built.quote.claimable} jlToken atoms`);
+
+const message = await buildTransactionMessage(rpc, { feePayer: claimer, instructions: built.instructions });
+const signed = await signTransactionMessageWithSigners(message);
+assertIsTransactionWithBlockhashLifetime(signed);
+try {
+  await sendAndConfirmTransactionFactory({ rpc, rpcSubscriptions })(signed, { commitment: "confirmed" });
+  console.log("Claimed:", getSignatureFromTransaction(signed));
+} catch (err) {
+  // InvalidClaimAuthority (7013): this signer may not trigger claims.
+  console.error(decodeProgramError(err, message) ?? err);
+  throw err;
+}
+```
+
+Fees arrive in the recipient account as jlTokens. To turn them into the underlying token, withdraw them on [Jupiter Earn](/lend/earn/withdraw).
+
+## Run accrue
+
+`accrue` checkpoints the wrapper's fees: it refreshes the Jupiter Lend price and charges the partner fee on the users' yield since the last checkpoint. Every deposit, withdrawal, claim and partner fee change already does this first, so a wrapper with user activity needs no extra calls.
+
+Anyone can run it. The instruction has no signer account, so only the transaction fee payer signs. Run it in two cases:
+
+- After Jupiter changes the protocol share. A change reaches each wrapper at its next accrue, so `accrue` applies it right away. An idle wrapper keeps the old share until its next activity.
+- To checkpoint an idle wrapper before you read or report its books.
+
+```typescript
+import { type TransactionSigner } from "@solana/kit";
+import { accrue, buildTransactionMessage, type ReferralRpc, type TxRpc, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// Your RPC client, the context from resolveWrapper, and any signer that pays the fee.
+declare const rpc: ReferralRpc & TxRpc;
+declare const ctx: WrapperContext;
+declare const feePayer: TransactionSigner;
+
+const { instructions } = await accrue(ctx);
+const message = await buildTransactionMessage(rpc, { feePayer, instructions });
+// Sign and send the message. See the SDK quick start.
+console.log(message.instructions.length);
+```
+
+Each accrue charges the fee on that interval's yield, and the charged jlTokens then compound with no fee. More frequent accrual therefore gives a slightly higher effective fee. [Effective fee](/lend/referral/fees#effective-fee) shows by how much.
+
+## Change the partner fee
+
+`updatePartnerFee` sets a new fee from 0 to 1,000 bps (0% to 10% of yield). The protocol share comes out of this fee, not on top of it. The instruction first accrues at the old fee, so the new fee applies to future yield only. It takes effect in the same transaction, with no delay.
+
+```typescript
+import { type TransactionSigner } from "@solana/kit";
+import { ReferralSdkError, updatePartnerFee, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// The context from resolveWrapper and the wrapper authority's signer.
+declare const ctx: WrapperContext;
+declare const authority: TransactionSigner;
+
+try {
+  const { instructions } = await updatePartnerFee(ctx, { authority, newFeeBps: 500 }); // 5% of yield
+  console.log(instructions.length); // sign and send. See the SDK quick start.
+} catch (err) {
+  if (err instanceof ReferralSdkError && err.kind === "FeeOutOfRange") {
+    console.error("The fee must be an integer from 0 to 1000 bps");
+  }
+  throw err;
+}
+```
+
+A fee change is blocked while the protocol is paused. Users get no notice period, so they rely on your conduct within the 10% cap. [When fee changes take effect](/lend/referral/fees#when-fee-changes-take-effect) explains the timing.
+
+## Change the fee recipient
+
+The fee recipient must be an existing jlToken token account under the market's token program. It cannot be a wallet address, an account for another mint, or the wrapper's vault. To pay fees to a wallet or a multisig, create its jlToken ATA first. This example uses `@solana-program/token` for the ATA, which the SDK also depends on.
+
+```typescript
+import { type Address, type TransactionSigner } from "@solana/kit";
+import { findAssociatedTokenPda, getCreateAssociatedTokenIdempotentInstructionAsync } from "@solana-program/token";
+import { updatePartnerFeeRecipient, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// The context from resolveWrapper and the wrapper authority's signer.
+declare const ctx: WrapperContext;
+declare const authority: TransactionSigner;
+// The wallet or multisig that should receive the fees.
+declare const newOwner: Address;
+
+const mint = ctx.lending.data.jlTokenMint;
+const [newRecipient] = await findAssociatedTokenPda({ owner: newOwner, mint, tokenProgram: ctx.tokenProgram });
+
+const createAta = await getCreateAssociatedTokenIdempotentInstructionAsync({
+  payer: authority,
+  owner: newOwner,
+  mint,
+  tokenProgram: ctx.tokenProgram,
+});
+const { instructions } = await updatePartnerFeeRecipient(ctx, { authority, newRecipient });
+
+// Send both in one transaction: the ATA creation first.
+const all = [createAta, ...instructions];
+console.log(all.length);
+```
+
+The change does not claim. Fees already in the vault go to the new recipient at the next claim.
+
+## Restrict who can claim
+
+By default anyone can trigger a claim, and the fees go only to your recipient. To limit who can trigger it, set a claim authority. Then only the claim authority, the wrapper authority, or the owner of the fee recipient account can claim. Other signers fail with `InvalidClaimAuthority` (7013).
+
+```typescript
+import { type Address, none, some, type TransactionSigner } from "@solana/kit";
+import { getUpdateClaimAuthorityInstruction, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// The context from resolveWrapper and the wrapper authority's signer.
+declare const ctx: WrapperContext;
+declare const authority: TransactionSigner;
+// The address allowed to trigger claims, such as your fee bot.
+declare const claimBot: Address;
+
+const setClaimer = getUpdateClaimAuthorityInstruction({
+  signer: authority,
+  wrapperConfig: ctx.wrapper.address,
+  newClaimAuthority: some(claimBot),
+});
+
+// none() clears it: anyone can trigger claims again.
+const clearClaimer = getUpdateClaimAuthorityInstruction({
+  signer: authority,
+  wrapperConfig: ctx.wrapper.address,
+  newClaimAuthority: none(),
+});
+console.log(setClaimer, clearClaimer);
+```
+
+## Rename the xToken
+
+`getUpdateXTokenMetadataInstructionAsync` rewrites the xToken's Metaplex metadata. The name is at most 32 bytes, the symbol at most 10 bytes, and the URI at most 200 bytes. The URI points to the Metaplex JSON file, which you host or Jupiter hosts for you.
+
+```typescript
+import { type TransactionSigner } from "@solana/kit";
+import { getUpdateXTokenMetadataInstructionAsync, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// The context from resolveWrapper and the wrapper authority's signer.
+declare const ctx: WrapperContext;
+declare const authority: TransactionSigner;
+
+const rename = await getUpdateXTokenMetadataInstructionAsync({
+  signer: authority,
+  wrapperConfig: ctx.wrapper.address,
+  xTokenMint: ctx.wrapper.data.xTokenMint,
+  name: "Acme USDC",
+  symbol: "aUSDC",
+  uri: "https://example.com/ausdc.json",
+});
+console.log(rename); // sign and send. See the SDK quick start.
+```
+
+## Transfer the wrapper authority
+
+<Warning>
+The transfer is one step and cannot be undone. Jupiter cannot reverse it. If you transfer to a wrong address, you lose control of the wrapper permanently. Confirm the new address out of band, for example with a message signed by the new key, before you send.
+</Warning>
+
+The new authority takes effect in the same transaction and needs no acceptance step. Prefer a multisig as the wrapper authority.
+
+```typescript
+import { type Address, type TransactionSigner } from "@solana/kit";
+import { getTransferWrapperAuthorityInstruction, type WrapperContext } from "@jup-ag/lend-referral-sdk";
+
+// The context from resolveWrapper and the current wrapper authority's signer.
+declare const ctx: WrapperContext;
+declare const authority: TransactionSigner;
+// The new wrapper authority, confirmed out of band.
+declare const newAuthority: Address;
+
+const handOff = getTransferWrapperAuthorityInstruction({
+  signer: authority,
+  wrapperConfig: ctx.wrapper.address,
+  newAuthority,
+});
+console.log(handOff); // sign and send. See the SDK quick start.
+```
+
+## Sign with a multisig
+
+When a multisig is the wrapper authority, the multisig signs on chain. Pass the SDK a noop signer for the multisig's address with `createNoopSigner(multisigAddress)` as `authority` or `signer`, then hand the instructions to the multisig. For a Squads vault, convert each Kit instruction to a `@solana/web3.js` `TransactionInstruction` and pass them to `@sqds/multisig` as the vault transaction's instructions. The Squads tab in [Sign from your app](/lend/referral/sdk#sign-from-your-app) has the full example.

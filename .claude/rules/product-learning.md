@@ -586,7 +586,7 @@ Jupiter Forecast is a new in-house primitive: native Solana binary prediction ma
 
 ## Open Questions
 
-- [2026-10-26] Partner onboarding contact path. The docs point at the general support form (`https://support.jup.ag/requests/new`); confirm the intended channel.
+- [2026-10-26] Partner onboarding contact path. [2026-11-11] The pages name no contact channel for now: the general support form link was removed (user, PR #984), because the partner intake will be an Airtable form that isn't ready yet. Add that form to "Get a wrapper" on `lend/referral/index.mdx` in a separate PR once it exists. Do not fall back to the general support form.
 - [2026-10-26] Does the governance multisig hand-off (`transfer_protocol_authority`) happen before the first wrapper? The docs say "Jupiter" throughout, so they hold either way.
 
 ---

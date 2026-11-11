@@ -525,15 +525,12 @@ paths:
             minimum: 1
             maximum: 1232
           description: |
-            Target maximum size in bytes for the swap transaction, so you have room for your own instructions.
-            Metis picks the route by building and serializing its swap transaction exactly, and will not return a
-            route whose swap exceeds this budget. The budget covers only the bare swap: anything you add, whether a
-            `/build` request parameter (`payer`, `feeAccount`, destination accounts, the close authority, cashback,
-            the tip instruction) or your own instructions, signers and lookup tables, is NOT counted, because Metis
-            cannot know whether those accounts sit in your Address Lookup Table and the API cannot receive it. Set
-            the budget below 1232 to leave room: count each account you add as 1 byte if it is in your lookup table
-            or 32 bytes if not, and each extra signer as about 96 bytes. Dynamic Swap routes are excluded when set.
-            v0 only (returns 400 with `transactionVersion=1`); ExactIn only.
+            Target maximum transaction size in bytes, leaving room for your own instructions.
+
+            - Sizing is deterministic, not an estimate.
+            - Only the bare swap is counted. Anything you add (request params, your own instructions, signers, lookup tables) is not.
+            - Set the budget below 1232 to leave room: count each added account as 1 byte if in your lookup table, else 32, and each extra signer as ~96 bytes.
+            - v0 only (400 with `transactionVersion=1`); ExactIn only.
         - name: payer
           in: query
           schema:

@@ -633,6 +633,7 @@ Sign the transaction with your wallet and send via your own RPC, or use [`/submi
 | `computeUnitPricePercentile` | - | Priority fee percentile for the CU price instruction. Named levels: `"medium"` (25th), `"high"` (50th), `"veryHigh"` (75th), or an integer 0-10000 in bps. See [Compute Units](/swap/advanced/compute-units) |
 | `mode` | (default) | "fast" for reduced latency routing (BETA) |
 | `maxAccounts` | 64 | Maximum accounts for the swap route (1-64) |
+| `maxBytes` | - | Byte budget for the swap transaction (1-1232), to leave room for your own instructions. v0 only. See [Reduce Transaction Size](/swap/advanced/reduce-transaction-size#budget-transaction-bytes-with-maxbytes) |
 | `platformFeeBps` | 0 | Integrator platform fee in bps (requires `feeAccount`) |
 | `feeAccount` | - | Token account to collect platform fees |
 | `payer` | public key | Account that pays transaction fees and rent |

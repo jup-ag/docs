@@ -527,10 +527,10 @@ paths:
           description: |
             Target maximum transaction size in bytes, leaving room for your own instructions.
 
-            - Sizing is deterministic, not an estimate.
-            - Only the bare swap is counted. Anything you add (request params, your own instructions, signers, lookup tables) is not.
-            - Set the budget below 1232 to leave room: count each added account as 1 byte if in your lookup table, else 32, and each extra signer as ~96 bytes.
-            - v0 only (400 with `transactionVersion=1`); ExactIn only.
+            - Sizing is deterministic, not an estimate: Metis builds and serializes the route's transaction to measure it.
+            - The budget covers the transaction you assemble from the response, plus room for one compute unit limit instruction. Anything you add on top is not counted: extra request parameters (`payer`, `feeAccount`, `tipAmount`, destination accounts, close authority, cashback), your own instructions, extra signers, and your own lookup tables.
+            - Set the budget below 1232 to leave room, then serialize your final transaction and lower `maxBytes` further if it still exceeds 1232. As a rough guide, each added account costs 1 byte if in your lookup table else 32, and each extra signer about 96 bytes.
+            - v0 only (400 with `transactionVersion=1`).
         - name: payer
           in: query
           schema:

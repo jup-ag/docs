@@ -12,40 +12,36 @@ If your wallet, SDK, and RPC support it, prefer a [Solana v1 transaction](/swap/
 
 ## Budget transaction bytes with `maxBytes`
 
-Set `maxBytes` (integer, 1-1232) to ask Metis for a route whose swap transaction fits a byte budget. This is the most direct way to leave room for your own instructions.
+Set `maxBytes` (integer, 1-1232) to ask Metis for a route whose swap transaction fits a byte budget, leaving room for your own instructions.
 
 ```
 GET https://api.jup.ag/swap/v2/build?...&maxBytes=1032
 ```
 
-Sizing is deterministic, not an estimate. Metis picks the route by building and serializing its swap transaction the same way it would for the real swap, so a route it returns never exceeds the budget. If the swap ever exceeded `maxBytes`, that would be a bug. This makes `maxBytes` more accurate than `maxAccounts`, which only limits the account count as a proxy for size.
+Sizing is deterministic, not an estimate: Metis builds and serializes the route's swap transaction the same way it does for the real swap, so a returned route never exceeds the budget. This makes `maxBytes` more accurate than `maxAccounts`, which only caps the account count as a proxy for size.
 
-`maxBytes` is new and still experimental. If a returned route's swap exceeds the budget, or you hit any other issue, report it to [Jupiter developer support](https://support.jup.ag/requests/new) or the `#developer-support` channel in [Discord](https://discord.gg/jup).
+`maxBytes` is new and still experimental. Report any issue to [Jupiter developer support](https://support.jup.ag/requests/new) or `#developer-support` in [Discord](https://discord.gg/jup).
 
 ### What the budget counts
 
-The budget sizes the **bare swap route** that Metis builds. It does **not** count anything you add, whether through a `/build` request parameter (`payer`, `feeAccount`, `destinationTokenAccount`, `nativeDestinationAccount`, the close authority, cashback, the tip instruction) or on top of the response (your own instructions, extra signers, and Address Lookup Tables).
-
-The reason is the lookup table. Metis cannot know whether an account you add ends up in your Address Lookup Table, and the API has no way to receive your lookup table, so it cannot size those accounts. Budget them yourself with this mental model:
+The budget sizes the **bare swap route**, not your final transaction. Anything you add is **not** counted, whether a `/build` request parameter (`payer`, `feeAccount`, destination accounts, close authority, cashback, tip) or something you append yourself (instructions, extra signers, lookup tables). Metis cannot know whether an account you add sits in your Address Lookup Table (1 byte) or not (32 bytes), and the API has no way to receive your lookup table, so it cannot size those additions. Budget them yourself:
 
 - **Each account you add:** 1 byte if it is in your lookup table, 32 bytes if not.
-- **Each extra signer** (for example a separate `payer`): about 96 bytes. A signer cannot live in a lookup table, so it always costs the full amount.
+- **Each extra signer** (such as a separate `payer`): about 96 bytes. A signer cannot live in a lookup table, so it always costs the full amount.
 - **Your own instruction data:** its full byte length.
 
-Add those up and pass `maxBytes = 1232 − (that total)`. Every term is under your control, so your final transaction then fits.
+Pass `maxBytes = 1232 − (that total)` and your final transaction fits.
 
 <Warning>
-  `maxBytes` budgets the bare swap, not your final transaction. Anything you add is **not** counted, so setting `maxBytes=1232` and then adding to the transaction overflows the 1232-byte limit. Set `maxBytes` below 1232 by the size of what you add, counting each added account as 1 byte if it is in your lookup table or 32 bytes if not, and each extra signer as about 96 bytes.
+  Setting `maxBytes=1232` and then adding to the transaction overflows the 1232-byte limit, since your additions are not counted. Also note `maxBytes=1232` is **not** a no-op: omitting the param uses an account-count model, so setting any value (even the max) can return a different route.
 </Warning>
-
-Setting `maxBytes` also changes how Metis sizes the route: omitting it uses an account-count model that never measures bytes, so `maxBytes=1232` is **not** a no-op and can return a different route than no limit at all.
 
 ### Before you use `maxBytes`
 
-- **Use v0 transactions.** `maxBytes` with `transactionVersion=1` returns `400`. If you need v1, you do not need `maxBytes`, since v1 already raises the limit to 4096 bytes.
-- **Leave headroom.** Pass `maxBytes = 1232 − (bytes of your additions)`, sizing each added account as 1 byte if it is in your lookup table or 32 bytes if not (see above).
-- **Expect fewer routes.** Dynamic Swap routes are excluded when `maxBytes` is set. Check that pricing is still acceptable.
-- **Handle `400`s.** Out of range (not 1-1232), non-integer, or `transactionVersion=1` all return `400`.
+- **Use v0 transactions.** `maxBytes` with `transactionVersion=1` returns `400`. If you need v1 you do not need `maxBytes`, since v1 already raises the limit to 4096 bytes.
+- **Leave headroom** for your additions (see above).
+- **Expect fewer routes.** Dynamic Swap routes are excluded when `maxBytes` is set, so check pricing.
+- **Handle `400`s** from out-of-range, non-integer, or `transactionVersion=1` values.
 
 `/build` is ExactIn only, so the ExactIn-only restriction on `maxBytes` never affects it.
 

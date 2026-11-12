@@ -223,9 +223,10 @@ function walkPages(pages, headingDepth) {
   return count;
 }
 
-function walkGroup(group, headingDepth) {
+function walkGroup(group, headingDepth, parentName) {
   const name = group.group?.trim();
-  if (name) {
+  // Skip a group heading that repeats its section heading (e.g. "## Swap" then "### Swap")
+  if (name && name !== parentName?.trim()) {
     emitHeading(name, headingDepth);
     return walkPages(group.pages || [], headingDepth + 1);
   }
@@ -276,7 +277,7 @@ function walkTopLevel(item) {
       }
       let count = 0;
       for (const group of menuItem.groups || []) {
-        count += walkGroup(group, 3);
+        count += walkGroup(group, 3, menuItem.item);
       }
     }
   } else if (item.groups) {
@@ -287,7 +288,7 @@ function walkTopLevel(item) {
       emit(`${SECTION_SUMMARIES[sectionName]}\n\n`);
     }
     for (const group of item.groups) {
-      walkGroup(group, 3);
+      walkGroup(group, 3, sectionName);
     }
   }
 }
@@ -317,7 +318,7 @@ emit("- [LO & DCA](https://developers.jup.ag/docs/trigger/index.md) (limit order
 emit("- [Lend](https://developers.jup.ag/docs/lend/index.md): `POST /lend/v1/earn/deposit`\n");
 emit("- [Price](https://developers.jup.ag/docs/price/index.md): `GET /price/v3?ids={mints}`\n");
 emit("- [Tokens](https://developers.jup.ag/docs/tokens/index.md): `GET /tokens/v2/search?query={query}`\n");
-emit("- [Prediction](https://developers.jup.ag/docs/prediction/index.md): `POST /prediction/v1/order`\n\n");
+emit("- [Prediction](https://developers.jup.ag/docs/prediction/index.md): `GET /prediction/v1/events` + `POST /prediction/v1/orders`\n\n");
 
 // Walk navigation in custom order: Get Started, AI, then product docs and the rest
 const TAB_ORDER = ["Get Started", "AI", "Docs", "Tool Kits", "Changelog", "Resources"];

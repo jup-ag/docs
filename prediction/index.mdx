@@ -2,7 +2,7 @@
 title: "Prediction Market API"
 sidebarTitle: "About Prediction"
 description: "Jupiter's Prediction Market API: discover events, read prices, trade YES/NO contracts and claim payouts on Solana prediction markets at api.jup.ag/prediction/v1."
-llmsDescription: "Overview of Jupiter's Prediction Market API at api.jup.ag/prediction/v1 (beta), a REST API for binary YES/NO prediction markets on Solana. Discovery: GET /events, /events/search, /events/{eventId}, /markets/{marketId} (buy and sell prices in micro USD, 1000000 = $1), /orderbook/{marketId}, /trading-status. Trading: POST /orders builds an unsigned buy order (ownerPubkey, marketId, isYes, isBuy, depositAmount, depositMint JupUSD or USDC, minimum $5), DELETE /positions/{positionPubkey} builds a sell, POST /execute submits the signed transaction (or send it through your own RPC). Tracking: GET /positions, /orders, /orders/status/{pubkey}, /history, /profiles, /leaderboards, /trades. Settlement: POST /positions/{positionPubkey}/claim pays $1 per winning contract with no claim fee. Fees apply to executed trades only. Contract quantities are fractional (contractsMicro, contractsDecimal). US and South Korea IPs are blocked. Jupiter Forecast 15-minute BTC up/down markets are served by the same endpoints with provider=bisonfi; GET /forecast?marketId= returns a numeric forecast time series for a market."
+llmsDescription: "Overview of Jupiter's Prediction Market API at api.jup.ag/prediction/v1 (beta), a REST API for binary YES/NO prediction markets on Solana. Discovery: GET /events, /events/search, /events/{eventId}, /markets/{marketId} (buy and sell prices in micro USD, 1000000 = $1), /orderbook/{marketId}, /trading-status. Trading: POST /orders builds an unsigned buy order (ownerPubkey, marketId, isYes, isBuy, depositAmount, depositMint JupUSD or USDC, minimum $5), DELETE /positions/{positionPubkey} builds a sell, POST /execute submits the signed transaction (or send it through your own RPC). Tracking: GET /positions, /orders, /orders/status/{pubkey}, /history, /profiles, /leaderboards, /trades. Settlement: POST /positions/{positionPubkey}/claim pays $1 per winning contract with no claim fee. Fees apply to executed trades only. Contract quantities are fractional (contractsMicro, contractsDecimal). Buy orders from US, South Korea and Australia IPs are rejected with unsupported_region. Jupiter Forecast 5- and 15-minute BTC and SPCX up/down markets are served by the same endpoints with provider=bisonfi; GET /forecast?marketId= returns a numeric forecast time series for a market."
 ---
 
 <Note>
@@ -13,11 +13,11 @@ The Prediction Market API is currently in beta and subject to breaking changes a
 
 The Prediction Market API is Jupiter's REST API for prediction markets on Solana, served at `https://api.jup.ag/prediction/v1`. A prediction market lets people trade on the outcome of a real-world event: each market has a YES and a NO side, a contract on the winning side pays \$1, and the price of a contract reflects the probability the market gives that outcome. The API covers the whole life of a trade:
 
-- Discover events and their binary markets across sports, crypto, politics, e-sports, culture, economics and tech, with live prices and orderbook depth.
+- Discover events and their binary markets across sports, crypto, politics, finance, e-sports, culture, economics, tech and more, with live prices and orderbook depth.
 - Build buy and sell orders as unsigned Solana transactions, sign them with the user's wallet, and submit them through `POST /execute` or your own RPC.
 - Track positions, orders, P&L and history, and claim payouts of \$1 per winning contract, with no claim fee.
 
-Orders are funded in JupUSD or USDC. Trading applications, wallets, bots and analytics dashboards are the typical integrators.
+Orders are funded in JupUSD or USDC. Trading applications, wallets, bots and analytics dashboards are the typical integrators. [Jupiter Predict](https://jup.ag/prediction), Jupiter's own prediction market app, runs on this API.
 
 <CardGroup cols={2}>
   <Card title="Events & Markets" href="/prediction/events-and-markets" icon="magnifying-glass">
@@ -138,14 +138,14 @@ Full code for each step, with the data that flows from one call to the next, is 
   <Card title="Dashboards and social products" icon="chart-line" href="/prediction/social-features">
     Profiles, P&L history, leaderboards and the global trade feed.
   </Card>
-  <Card title="Short-term BTC markets" icon="bitcoin" href="/prediction/forecast">
-    Jupiter Forecast's 15-minute BTC up/down rounds, tradable through the Prediction API or directly as tokens through the Swap API.
+  <Card title="Short-term BTC and SPCX markets" icon="bitcoin" href="/prediction/forecast">
+    Jupiter Forecast's 5- and 15-minute BTC and SPCX up/down rounds, tradable through the Prediction API or directly as tokens through the Swap API.
   </Card>
 </CardGroup>
 
 ## Geographical Restrictions
 
-- We have restricted United States and South Korea IPs from accessing the Prediction Market API.
+- Buy orders from United States, South Korea and Australia IP addresses are rejected with the `unsupported_region` error code and the message "Trading is not available in your region".
 - If you have any questions, reach out to us in Discord/Telegram.
 
 ## Architectural Components
@@ -441,7 +441,7 @@ Yes. `GET /positions?ownerPubkey=` returns each position with cost basis, mark-t
 </Accordion>
 
 <Accordion title="Is the API available in the United States?">
-No. United States and South Korea IP addresses are blocked from the Prediction Market API. See [Geographical Restrictions](#geographical-restrictions).
+Not for trading. Buy orders from United States, South Korea and Australia IP addresses are rejected with `unsupported_region`. See [Geographical Restrictions](#geographical-restrictions).
 </Accordion>
 
 <Accordion title="Do I need an API key?">
@@ -457,7 +457,7 @@ When an event resolves, the result is recorded onchain and winning positions bec
 </Accordion>
 
 <Accordion title="What is Jupiter Forecast?">
-Jupiter's native prediction market on Solana. The current markets are 15-minute Bitcoin up/down rounds settled from the Chainlink BTC/USD price. Each side is a Token-2022 mint worth \$1 if it wins, so the rounds can be traded through the Prediction API, which tracks positions and P&L for you, or directly through the Swap API as token swaps. See [Jupiter Forecast](/prediction/forecast).
+Jupiter's native prediction market on Solana. The current markets are 5- and 15-minute up/down rounds on Bitcoin, settled from the Chainlink BTC/USD price, and on SPCX, settled from the Pyth Pro SPCX/USD price during US market hours. Each side is a Token-2022 mint worth \$1 if it wins, so the rounds can be traded through the Prediction API, which tracks positions and P&L for you, or directly through the Swap API as token swaps. See [Jupiter Forecast](/prediction/forecast).
 </Accordion>
 
 </AccordionGroup>

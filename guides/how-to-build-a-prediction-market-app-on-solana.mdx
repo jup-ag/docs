@@ -2,7 +2,7 @@
 title: "How to Build a Prediction Market App on Solana"
 sidebarTitle: "Prediction Markets"
 description: "Build prediction market features into your Solana app using Jupiter's Prediction API."
-llmsDescription: "Jupiter Prediction API brings prediction markets to Solana. Binary YES/NO trading on real-world events (sports, crypto, politics, elections). Aggregates liquidity from Polymarket and Kalshi. Full API for order creation, position management, P&L tracking, and payout claims. Base URL: https://api.jup.ag/prediction/v1. Requires x-api-key header from developers.jup.ag/portal."
+llmsDescription: "Jupiter Prediction API brings prediction markets to Solana. Binary YES/NO trading on real-world events (sports, crypto, politics, elections). Markets come mainly from Polymarket, plus Jupiter Forecast short-term BTC and SPCX up/down rounds (provider=bisonfi). Kalshi markets are legacy: new buys are rejected with kalshi_buys_disabled. Full API for order creation, position management, P&L tracking, and payout claims. Base URL: https://api.jup.ag/prediction/v1. Requires x-api-key header from developers.jup.ag/portal."
 ---
 
 {/* Alternative search terms for AI discovery:
@@ -17,7 +17,7 @@ llmsDescription: "Jupiter Prediction API brings prediction markets to Solana. Bi
 
 ## TL;DR
 
-Jupiter's Prediction API lets you add prediction market trading to your Solana app. Users can trade on real-world event outcomes (sports, crypto, politics) with liquidity aggregated from Polymarket and Kalshi. The API handles order matching, position tracking, and settlement.
+Jupiter's Prediction API lets you add prediction market trading to your Solana app. Users can trade on real-world event outcomes (sports, crypto, politics). Most markets come from Polymarket, and [Jupiter Forecast](/prediction/forecast) adds short BTC and SPCX up/down rounds. The API handles order matching, position tracking, and settlement. [Jupiter Predict](https://jup.ag/prediction), Jupiter's own prediction market app, runs on this API.
 
 **Base URL:** `https://api.jup.ag/prediction/v1`
 
@@ -79,9 +79,9 @@ Building prediction markets from scratch requires:
 
 Jupiter handles all of this:
 
-- **Aggregates liquidity** from Polymarket and Kalshi.
+- **Polymarket markets**, tradable from a Solana wallet, plus short-term [Jupiter Forecast](/prediction/forecast) rounds.
 - **Keeper network** matches and fills orders.
-- **On-chain settlement** with guaranteed payouts.
+- **Onchain settlement.** Winning contracts pay \$1 each.
 - **No payout fees.** Winners receive the full $1 per contract.
 
 You get prediction market functionality without building the infrastructure.
@@ -151,9 +151,9 @@ events.forEach(event => {
 </CodeGroup>
 
 **Filter options:**
-- `category`: `all`, `crypto`, `sports`, `politics`, `esports`, `culture`, `economics`, `tech`
-- `filter`: `new` (last 24h), `live` (in progress), `trending`
-- `provider`: `polymarket` (default), `kalshi`
+- `category`: `all`, `crypto`, `sports`, `politics`, `esports`, `culture`, `economics`, `tech`, `finance`, `climate & science`, `weather`, `mentions`
+- `filter`: `new` (last 24h), `live` (in progress), `trending`, `upcoming` (starts within 3 days)
+- `provider`: `polymarket` (default), `bisonfi` ([Jupiter Forecast](/prediction/forecast)), `kalshi` (legacy: new buys are rejected with `kalshi_buys_disabled`)
 
 ### Search for specific events
 
@@ -439,6 +439,8 @@ interface HistoryEvent {
 5. **Market settles**: When event resolves, result is recorded
 6. **Claim payout**: If position won, call `/claim` to withdraw
 
+[Jupiter Forecast](/prediction/forecast) orders skip steps 3 and 6: they execute atomically through `POST /execute` and winning tokens settle automatically.
+
 ---
 
 ## Common questions
@@ -476,7 +478,7 @@ interface HistoryEvent {
   </Accordion>
 
   <Accordion title="Which data provider should I use?">
-    Polymarket (default) has more markets. Kalshi is US-regulated. Use the `provider` query param to switch.
+    Polymarket (the default) covers almost every event. Use `provider=bisonfi` for Jupiter Forecast rounds. `kalshi` is legacy: Kalshi events can still be read and existing positions sold or claimed, but new buys are rejected with `kalshi_buys_disabled`.
   </Accordion>
 </AccordionGroup>
 
@@ -487,4 +489,5 @@ interface HistoryEvent {
 - **[Prediction API Reference](/api-reference/prediction).** Full endpoint documentation.
 - **[About Prediction Markets](/prediction/index).** Architecture and concepts.
 - **[Portal](https://developers.jup.ag/portal).** Get your API key.
+- **[Jupiter Predict](https://jup.ag/prediction).** Jupiter's prediction market app, built on this API.
 - **[Jupiter Dev Notifications](https://t.me/jup_dev).** API updates and announcements.

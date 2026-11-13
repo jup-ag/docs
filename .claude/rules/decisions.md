@@ -24,6 +24,18 @@ BEFORE making the change.
 
 ## Active Decisions
 
+### [2026-11-13] The Ultra overview's canonical points to the Swap API overview
+**Status:** implemented
+**Scope:** unmaintained | seo
+**Files affected:** `ultra/index.mdx`
+**Linear issue:** BUILD-811 (follow-up)
+
+**Context:** After the 2026-10-06 canonicals went live (2026-10-19), a spot check (Slack, 2026-11-05) had `best swap api` drop from position 8 to 24. The Ultra overview declared `/docs/swap/order-and-execute` as its canonical, a how-to page that does not answer an overview query, and its `description` still called Ultra "Jupiter's flagship swap API" and said "Start here for most swap integrations". YY (Slack, 2026-11-13): Ultra V1 will not be fully deprecated any time soon, but integrators are actively being moved to Swap V2, so redirects stay off the table.
+**Decision:** The Ultra overview's canonical moves to `https://developers.jup.ag/docs/swap`, the Swap API overview (`Solana Swap API`, which has the "best swap API" FAQ), the target the Metis overview (`swap/v1/index.mdx`) already uses. Its `description` drops "flagship" and "Start here" and says the API is superseded by Swap API V2. The body and every other Ultra canonical stay unchanged: endpoint and guide pages keep pointing at their Swap V2 equivalent.
+**Rationale:** Overview to overview is the closest match, and it is the mapping the other V1 overview already has. The canonical stays a hint: if Google ignores it, nothing changes.
+**Alternatives considered:** (1) Redirect `/ultra` to `/swap`, refused: Ultra stays live for integrators. (2) Drop the canonical, rejected: it would put an unmaintained page back in results for `best swap api`. (3) Rewrite the body's "most advanced" copy, rejected: the 2026-10-06 decision keeps Ultra bodies unchanged for integrators.
+**Migration notes:** None for readers. When Ultra is finally deprecated, redirect `/ultra` to `/swap`, not to `order-and-execute`.
+
 ### [2026-10-26] Lend Referral docs as lend/referral/ ("Lend Referral" nav group)
 **Status:** implemented
 **Scope:** new-section | navigation
@@ -67,7 +79,7 @@ BEFORE making the change.
 **Decision:** Keep every page, URL and body unchanged and add a `canonical` frontmatter pointing at the Swap V2 page that replaces it (the mapping of the three migration guides: Ultra to Meta-Aggregator, Metis to Meta-Aggregator, Metis to Router). Mintlify renders it as `<link rel="canonical">` and `og:url` (verified on a preview, 2026-10-06). `ultra/get-balances`, `ultra/get-holdings`, `api-reference/ultra/balances` and `api-reference/ultra/holdings` get no canonical: their replacement was the public Portfolio API, removed on 2026-10-07 (BUILD-915), and the hidden Portfolio v2 B2B pages are not a public target. `swap/v1/payments-through-swap` gets no canonical: `/build` is ExactIn only, so there is no V2 equivalent.
 **Rationale:** Google treats a canonical as a strong hint, so the ranking signal moves to the maintained page while integrators keep full access. Worst case, Google ignores the hint and nothing changes. `noindex` would drop the ranking instead of moving it.
 **Alternatives considered:** Redirects, refused by Anmol. `noindex`, loses the signal. Doing nothing, leaves a deprecated page as the ranked one.
-**Migration notes:** None for readers. When Ultra is finally deprecated, replace these canonicals with real redirects to the same targets (the `/ultra-api/*` redirects added in PR #958 must then be repointed too, see the Redirect Log).
+**Migration notes:** None for readers. When Ultra is finally deprecated, replace these canonicals with real redirects to the same targets (the `/ultra-api/*` redirects added in PR #958 must then be repointed too, see the Redirect Log). The overview's target changed to `/swap` on 2026-11-13 (see that entry).
 
 ### [2026-08-25] Split the MM webhook (V1) page; version-scoped routing slugs
 **Status:** implemented

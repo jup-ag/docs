@@ -22,6 +22,7 @@ paths:
           schema:
             type: string
           required: true
+          example: JUP
           description: |
             - Search for a token and its information by its symbol, name or mint address
             - Comma-separate to ONLY search for multiple mint addresses
@@ -121,6 +122,10 @@ paths:
               - verified
               - stocks
           required: true
+          example: verified
+          description: |
+            - The tag to filter mints by
+            - One of `lst`, `verified`, or `stocks`
       responses:
         '200':
           description: Successful response
@@ -174,6 +179,7 @@ paths:
           schema:
             type: string
             enum: [toporganicscore, toptraded, toptrending]
+          example: toptraded
           description: |
             - Top tokens in different trading categories
             - The result filters out generic top tokens like SOL, USDC, etc
@@ -184,6 +190,7 @@ paths:
           schema:
             type: string
             enum: [5m, 1h, 6h, 24h]
+          example: 24h
           description: |
             - Query by time interval for more accuracy
         - in: query

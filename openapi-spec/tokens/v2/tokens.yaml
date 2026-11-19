@@ -20,6 +20,7 @@ paths:
         - in: query
           name: query
           schema:
+            x-default: "JUP"
             type: string
           required: true
           description: |
@@ -115,6 +116,7 @@ paths:
         - in: query
           name: query
           schema:
+            x-default: "verified"
             type: string
             enum:
               - lst
@@ -172,6 +174,7 @@ paths:
           name: category
           required: true
           schema:
+            x-default: "toptraded"
             type: string
             enum: [toporganicscore, toptraded, toptrending]
           description: |
@@ -182,6 +185,7 @@ paths:
           name: interval
           required: true
           schema:
+            x-default: "24h"
             type: string
             enum: [5m, 1h, 6h, 24h]
           description: |

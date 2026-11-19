@@ -89,6 +89,9 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/SubmitDBCTransactionRequestBody'
+            example:
+              transaction: "<base64 signed transaction from POST /dbc-pool/create-tx>"
+              owner: "GkwFnmMDvn3HGMpJpWBg8tgJxr3NxNvg3AXxvXVPbRGJ"
       responses:
         '200':
           description: Successful response
@@ -135,8 +138,10 @@ paths:
       parameters:
         - name: mint
           in: path
+          example: "4mbPZzDCWXvTCJbscMWeDD7TT1pra9mkZHGaBxc2jupx"
           required: true
           schema:
+            x-default: "4mbPZzDCWXvTCJbscMWeDD7TT1pra9mkZHGaBxc2jupx"
             type: string
       responses:
         '200':
@@ -216,7 +221,7 @@ paths:
                   description: |
                     - Dynamic Bonding Curve pool address
             example:
-              poolAddress: "PoolAddress11111111111111111111111111111111"
+              poolAddress: "GjZUE8qMh2wv6bHa6HPJxFx3XUZCWZyxhYgfKoyEyn7R"
       responses:
         '200':
           description: Successful response
@@ -270,8 +275,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateClaimFeeDBCTransactionRequestBody'
             example:
-              ownerWallet: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
-              poolAddress: "PoolAddress11111111111111111111111111111111"
+              ownerWallet: "6xhUkEYwFHtCnDM2r5r8fLRMFahyfw9dPz4k1HuogCgy"
+              poolAddress: "GjZUE8qMh2wv6bHa6HPJxFx3XUZCWZyxhYgfKoyEyn7R"
               maxQuoteAmount: 5000000
       responses:
         '200':

@@ -133,6 +133,7 @@ components:
       in: query
       required: true
       schema:
+        x-default: "So11111111111111111111111111111111111111112"
         type: string
       description: The mint address of the input token
       example: So11111111111111111111111111111111111111112
@@ -142,6 +143,7 @@ components:
       in: query
       required: true
       schema:
+        x-default: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
         type: string
       description: The mint address of the output token
       example: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
@@ -151,6 +153,7 @@ components:
       in: query
       required: true
       schema:
+        x-default: "1000000000"
         type: string
       description: The amount to swap in the smallest unit of the input token
       example: "1000000000"
@@ -468,6 +471,7 @@ paths:
           in: query
           required: true
           schema:
+            x-default: "GkwFnmMDvn3HGMpJpWBg8tgJxr3NxNvg3AXxvXVPbRGJ"
             type: string
           description: Public key of the user initiating the swap.
           example: GkwFnmMDvn3HGMpJpWBg8tgJxr3NxNvg3AXxvXVPbRGJ
@@ -716,6 +720,9 @@ paths:
                 lastValidBlockHeight:
                   type: string
                   description: Optional block height for nonce validation
+            example:
+              signedTransaction: "<base64 signed transaction from GET /swap/v2/order>"
+              requestId: "<requestId from GET /swap/v2/order>"
       responses:
         "200":
           description: Execution result

@@ -322,6 +322,7 @@ paths:
         - in: query
           name: tokenId
           schema:
+            x-default: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
             type: string
           required: true
           description: Token mint address to check eligibility for
@@ -365,8 +366,10 @@ paths:
         - ApiKeyAuth: []
       parameters:
         - in: query
+          example: "GkwFnmMDvn3HGMpJpWBg8tgJxr3NxNvg3AXxvXVPbRGJ"
           name: senderAddress
           schema:
+            x-default: "GkwFnmMDvn3HGMpJpWBg8tgJxr3NxNvg3AXxvXVPbRGJ"
             type: string
           required: true
           description: Solana wallet address that will sign and pay for the transaction
@@ -413,6 +416,13 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/ExpressExecuteBody"
+            example:
+              transaction: "<base64 signed transaction from GET /express/craft-txn>"
+              requestId: "<requestId from GET /express/craft-txn>"
+              senderAddress: "GkwFnmMDvn3HGMpJpWBg8tgJxr3NxNvg3AXxvXVPbRGJ"
+              tokenId: "<mint address of the token to verify>"
+              twitterHandle: "https://x.com/yourproject"
+              description: "Submitting for verification because..."
       responses:
         "200":
           description: Submission result

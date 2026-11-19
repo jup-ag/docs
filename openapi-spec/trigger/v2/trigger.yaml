@@ -909,8 +909,10 @@ paths:
       parameters:
         - name: orderId
           in: path
+          example: "019f5b3c-8d51-7711-a19e-a6fcc0960fd1"
           required: true
           schema:
+            x-default: "019f5b3c-8d51-7711-a19e-a6fcc0960fd1"
             type: string
           description: Order UUID
       requestBody:
@@ -982,8 +984,10 @@ paths:
       parameters:
         - name: orderId
           in: path
+          example: "019f5b3c-8d51-7711-a19e-a6fcc0960fd1"
           required: true
           schema:
+            x-default: "019f5b3c-8d51-7711-a19e-a6fcc0960fd1"
             type: string
       responses:
         '200':
@@ -1030,8 +1034,10 @@ paths:
       parameters:
         - name: orderId
           in: path
+          example: "019f5b3c-8d51-7711-a19e-a6fcc0960fd1"
           required: true
           schema:
+            x-default: "019f5b3c-8d51-7711-a19e-a6fcc0960fd1"
             type: string
       requestBody:
         required: true
@@ -1050,8 +1056,8 @@ paths:
                 - signedTransaction
                 - cancelRequestId
             example:
-              signedTransaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
-              cancelRequestId: "cancel-request-uuid"
+              signedTransaction: "<base64 signed withdrawal transaction from the cancel response>"
+              cancelRequestId: "<requestId from the cancel response>"
       responses:
         '200':
           description: Cancellation confirmed
@@ -1276,8 +1282,10 @@ paths:
       parameters:
         - name: id
           in: path
+          example: "019f0592-966e-736b-aedd-80fa56e2e399"
           required: true
           schema:
+            x-default: "019f0592-966e-736b-aedd-80fa56e2e399"
             type: string
           description: DCA order UUID
       responses:
@@ -1331,8 +1339,10 @@ paths:
       parameters:
         - name: id
           in: path
+          example: "019f0592-966e-736b-aedd-80fa56e2e399"
           required: true
           schema:
+            x-default: "019f0592-966e-736b-aedd-80fa56e2e399"
             type: string
           description: DCA order UUID
       requestBody:
@@ -1351,6 +1361,9 @@ paths:
               required:
                 - signedTransaction
                 - cancelRequestId
+            example:
+              signedTransaction: "<base64 signed withdrawal transaction from the cancel response>"
+              cancelRequestId: "<requestId from the cancel response>"
       responses:
         '200':
           description: Cancellation confirmed
@@ -1491,8 +1504,10 @@ paths:
       parameters:
         - name: id
           in: path
+          example: "019f0592-966e-736b-aedd-80fa56e2e399"
           required: true
           schema:
+            x-default: "019f0592-966e-736b-aedd-80fa56e2e399"
             type: string
           description: DCA order UUID
       responses:

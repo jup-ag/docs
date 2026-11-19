@@ -1308,6 +1308,7 @@ paths:
           name: provider
           in: query
         - schema:
+            x-default: "nvidia"
             type: string
             minLength: 1
             maxLength: 200
@@ -1316,6 +1317,7 @@ paths:
           description: Search term matched against event titles
           name: query
           in: query
+          example: "nvidia"
         - schema:
             type: integer
             minimum: 1
@@ -1490,6 +1492,7 @@ paths:
         One event by id, with its category, tags, metadata, volume and live score. Set `includeMarkets=true` to nest its markets.
       parameters:
         - schema:
+            x-default: "POLY-1353337"
             type: string
             minLength: 1
             description: Event identifier
@@ -1497,6 +1500,7 @@ paths:
           description: Event identifier
           name: eventId
           in: path
+          example: "POLY-1353337"
         - schema:
             type: boolean
             nullable: true
@@ -1574,6 +1578,7 @@ paths:
         Latest live scores for several sports events in one call. Pass the event ids as a comma-separated `eventIds` list; events without a score are omitted from the response.
       parameters:
         - schema:
+            x-default: "POLY-351731,POLY-30615"
             type: string
             minLength: 1
             example: POLY-351731,POLY-30615
@@ -1581,6 +1586,7 @@ paths:
           description: Comma-separated event IDs to fetch live scores for (max 100)
           name: eventIds
           in: query
+          example: "POLY-351731,POLY-30615"
       responses:
         "200":
           description: Latest live scores for the given event IDs. Events without a score row are omitted.
@@ -1604,12 +1610,14 @@ paths:
         Latest live score for one sports event: teams, score, period, elapsed time and status. Returns `null` when the event has no score.
       parameters:
         - schema:
+            x-default: "POLY-351731"
             type: string
             minLength: 1
           required: true
           description: Event identifier
           name: eventId
           in: path
+          example: "POLY-351731"
       responses:
         "200":
           description: Latest live score for the event, or null if no score row exists.
@@ -1626,6 +1634,7 @@ paths:
         Paginated list of the binary markets of an event. Each market is a YES/NO question with its own id, status, pricing and result.
       parameters:
         - schema:
+            x-default: "POLY-1353337"
             type: string
             minLength: 1
             description: Event identifier
@@ -1633,6 +1642,7 @@ paths:
           description: Event identifier
           name: eventId
           in: path
+          example: "POLY-1353337"
         - schema:
             type: integer
             nullable: true
@@ -1675,6 +1685,7 @@ paths:
         One market scoped to its event: title, status, result, open and close times, resolution time, rules and outcomes with current pricing.
       parameters:
         - schema:
+            x-default: "POLY-1353337"
             type: string
             minLength: 1
             description: Event identifier
@@ -1682,7 +1693,9 @@ paths:
           description: Event identifier
           name: eventId
           in: path
+          example: "POLY-1353337"
         - schema:
+            x-default: "POLY-6919847"
             type: string
             minLength: 1
             description: Market identifier
@@ -1690,6 +1703,7 @@ paths:
           description: Market identifier
           name: marketId
           in: path
+          example: "POLY-6919847"
       responses:
         "200":
           description: Market data
@@ -1712,6 +1726,7 @@ paths:
         One market by id: title, status, result, open and close times, resolution time, rules and outcomes with current pricing. Prices are in micro USD (1,000,000 = $1).
       parameters:
         - schema:
+            x-default: "POLY-6919847"
             type: string
             minLength: 1
             description: Market identifier
@@ -1719,6 +1734,7 @@ paths:
           description: Market identifier
           name: marketId
           in: path
+          example: "POLY-6919847"
       responses:
         "200":
           description: Market data
@@ -1757,12 +1773,14 @@ paths:
           name: end
           in: query
         - schema:
+            x-default: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
             type: string
             minLength: 1
-          required: false
-          description: "Filter orders by owner wallet public key."
+          required: true
+          description: "Owner wallet public key. The API returns 400 without it."
           name: ownerPubkey
           in: query
+          example: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
       responses:
         "200":
           description: List of all orders registered on-chain
@@ -1815,6 +1833,13 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateOrderRequest"
+            example:
+              ownerPubkey: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
+              marketId: "POLY-6919847"
+              isYes: true
+              isBuy: true
+              depositAmount: "5000000"
+              depositMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
       responses:
         "200":
           description: Unsigned transaction for creating an order
@@ -1846,6 +1871,10 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/ExecuteRequest"
+            example:
+              signedTransaction: "<base64 signed transaction from POST /orders>"
+              context:
+                type: "create_order"
       responses:
         "200":
           description: Execution result
@@ -1868,6 +1897,7 @@ paths:
         One order by its account public key: market, side, size, status and timestamps.
       parameters:
         - schema:
+            x-default: "2ajHmp51DWyzwdd461KNYr8Kpyeg1Z7rznAEF7ZpPfvB"
             type: string
             minLength: 1
             description: Order account public key
@@ -1875,6 +1905,7 @@ paths:
           description: Order account public key
           name: orderPubkey
           in: path
+          example: "2ajHmp51DWyzwdd461KNYr8Kpyeg1Z7rznAEF7ZpPfvB"
       responses:
         "200":
           description: Order data
@@ -1903,6 +1934,7 @@ paths:
         Latest status of an order with its event history. Poll it after `POST /execute` to follow the fill.
       parameters:
         - schema:
+            x-default: "2ajHmp51DWyzwdd461KNYr8Kpyeg1Z7rznAEF7ZpPfvB"
             type: string
             minLength: 1
             description: Order account public key
@@ -1910,6 +1942,7 @@ paths:
           description: Order account public key
           name: orderPubkey
           in: path
+          example: "2ajHmp51DWyzwdd461KNYr8Kpyeg1Z7rznAEF7ZpPfvB"
       responses:
         "200":
           description: Latest status for an order with event history
@@ -2002,13 +2035,15 @@ paths:
           name: end
           in: query
         - schema:
+            x-default: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
             type: string
             minLength: 1
             description: Position owner public key
-          required: false
+          required: true
           description: Position owner public key
           name: ownerPubkey
           in: query
+          example: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
         - schema:
             type: string
             minLength: 1
@@ -2085,6 +2120,9 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CloseAllPositionsRequest"
+            example:
+              ownerPubkey: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
+              minSellPriceSlippageBps: 500
       responses:
         "200":
           description: Unsigned transactions that sell all contracts across every open
@@ -2117,6 +2155,7 @@ paths:
         One position by its account public key: side, contracts held (`contractsMicro` and `contractsDecimal`), cost basis, mark price and unrealised P&L in micro USD.
       parameters:
         - schema:
+            x-default: "GUPYpiaXTScZPeR3VByRVj9bDkF8VxqtiHLrh8jSRAp8"
             type: string
             minLength: 1
             description: Position account public key
@@ -2124,6 +2163,7 @@ paths:
           description: Position account public key
           name: positionPubkey
           in: path
+          example: "GUPYpiaXTScZPeR3VByRVj9bDkF8VxqtiHLrh8jSRAp8"
       responses:
         "200":
           description: Position data
@@ -2151,6 +2191,7 @@ paths:
         Build an unsigned transaction that sells every contract of one position before the market resolves. Sign it and submit it to `POST /execute` together with the `execution.context` object.
       parameters:
         - schema:
+            x-default: "GUPYpiaXTScZPeR3VByRVj9bDkF8VxqtiHLrh8jSRAp8"
             type: string
             minLength: 32
             description: Position account public key
@@ -2158,12 +2199,15 @@ paths:
           description: Position account public key
           name: positionPubkey
           in: path
+          example: "GUPYpiaXTScZPeR3VByRVj9bDkF8VxqtiHLrh8jSRAp8"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/ClosePositionRequest"
+            example:
+              ownerPubkey: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
       responses:
         "200":
           description: Unsigned transaction that sells all contracts for a position
@@ -2192,6 +2236,7 @@ paths:
         Build an unsigned transaction that claims the payout of a winning position after the market has resolved. Each winning contract pays out $1. Sign and send the returned transaction.
       parameters:
         - schema:
+            x-default: "GUPYpiaXTScZPeR3VByRVj9bDkF8VxqtiHLrh8jSRAp8"
             type: string
             minLength: 32
             description: Position account public key
@@ -2199,12 +2244,15 @@ paths:
           description: Position account public key
           name: positionPubkey
           in: path
+          example: "GUPYpiaXTScZPeR3VByRVj9bDkF8VxqtiHLrh8jSRAp8"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/ClaimPositionRequest"
+            example:
+              ownerPubkey: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
       responses:
         "200":
           description: Unsigned transaction to claim payout for a winning position
@@ -2249,13 +2297,15 @@ paths:
           name: end
           in: query
         - schema:
+            x-default: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
             type: string
             minLength: 32
             description: History owner public key
-          required: false
+          required: true
           description: History owner public key
           name: ownerPubkey
           in: query
+          example: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
         - schema:
             type: integer
             minimum: 1
@@ -2366,14 +2416,16 @@ paths:
         Current orderbook depth for a market: YES and NO levels in contracts and in dollars.
       parameters:
         - schema:
+            x-default: "POLY-6919847"
             type: string
             minLength: 1
             description: Kalshi or Polymarket market identifier
-            example: KXF1-25-LN
+            example: POLY-6919847
           required: true
           description: Kalshi or Polymarket market identifier
           name: marketId
           in: path
+          example: "POLY-6919847"
       responses:
         "200":
           description: Orderbook depth for the given market
@@ -2435,11 +2487,13 @@ paths:
         Trading statistics of a wallet: realised P&L, volume, prediction counts, active contracts and portfolio value. USD values are in micro USD.
       parameters:
         - schema:
+            x-default: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
             type: string
           required: true
           description: "Wallet public key."
           name: ownerPubkey
           in: path
+          example: "LiwHeNCJtS7Rju739HViPcBhcpQj7T2Ez1g92DxM4Zi"
       responses:
         "200":
           description: Profile stats

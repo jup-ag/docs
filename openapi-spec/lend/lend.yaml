@@ -268,6 +268,7 @@ paths:
             User wallet addresses (comma separated)
           required: true
           schema:
+            x-default: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf,jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
             type: string
           example: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf,jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
       responses:
@@ -304,6 +305,7 @@ paths:
             User wallet address
           required: true
           schema:
+            x-default: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf"
             type: string
           example: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf"
         - name: positions
@@ -312,6 +314,7 @@ paths:
             User token positions (comma-separated)
           required: true
           schema:
+            x-default: "9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D,2uQsyo1fXXQkDtcpXnLofWy88PxcvnfH2L8FPSE62FVU"
             type: string
           example: "9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D,2uQsyo1fXXQkDtcpXnLofWy88PxcvnfH2L8FPSE62FVU"
       responses:

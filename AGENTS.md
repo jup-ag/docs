@@ -169,7 +169,10 @@ state of the code.
   - Exception: a change that needs a changelog entry has TWO PRs on one issue —
     the docs PR here and the companion changelog PR in the `developer-platform`
     repo (see the Changelog section). Attach both PRs to the same issue; do not
-    create a separate issue for the changelog entry.
+    create a separate issue for the changelog entry. The changelog PR is also where
+    the rule relaxes the other way: one open changelog PR is shared across issues
+    (it accumulates every pending entry), so attach your issue to that shared PR
+    rather than opening a second changelog PR (see the Changelog section).
 
 ### 4. Branch (Worktree)
 
@@ -209,22 +212,50 @@ changes ship: the first API-affecting change of a month creates `YYYY-MM.mdx`, e
 change that month appends to it. Breaking changes with future deadlines go in immediately
 as pre-announcements. There is no separate "hot list"; the current month's post is it.
 
+**Where the entry goes — product change vs platform feature.** The monthly post
+(`YYYY-MM.mdx`) is only for API and product changes: Swap, Ultra, Trigger, Tokens, Price,
+Prediction, Lend, JupUSD, and the like. Developer Platform / Portal features — anything
+under `portal/`, such as API keys, firewall, request logs, analytics, account security,
+plans, organisations, and teams — do NOT go in the monthly post. They go on the pinned
+platform feature page `web/content/changelog/developer-platform.mdx`, which is updated in
+place, newest first (add or extend a `## Month YYYY` section at the top). Put a platform
+feature there only, never in both places. If a single change is both a platform feature and
+a product-API change that integrators must act on, put the platform feature on the feature
+page and add the product-API part to the monthly post. The same companion-PR mechanics below
+apply to the feature page (it lives in the same `web/content/changelog/` directory, so it
+rides the same shared changelog PR).
+
 **Companion PR workflow.** If your changes affect a public API or product, the changelog
 entry is part of shipping, not a follow-up. As soon as the docs PR is open:
 
 1. Go to your local clone of `jup-ag/developer-platform`. If you don't have one, clone it
    as a sibling of this repo: `git clone https://github.com/jup-ag/developer-platform.git`.
-2. Branch from `origin/develop` and open the PR against `develop` (the integration branch:
-   pushes to it build the staging site, and production ships when a `web-v*` release is cut).
-   Branch naming: `<user>/build-XXX-description` matching the Linear issue.
+2. **Reuse the open changelog PR — do not open a second one.** There should only ever be ONE
+   open changelog PR at a time; it is a shared, accumulating PR so that a single merge
+   publishes every pending entry (and so two entries never create the same `YYYY-MM.mdx` and
+   conflict). Check for it first:
+   `gh pr list --repo jup-ag/developer-platform --state open --search "changelog in:title"`
+   (or look for an open PR touching `web/content/changelog/`).
+   - **If one is open:** check out its branch, add your entry to the current month's post,
+     commit, and push to that same branch. No new PR. Then attach that PR to your Linear issue
+     too (the same changelog PR may be linked from several issues).
+   - **If none is open:** branch from `origin/develop` and open a new PR against `develop` (the
+     integration branch: pushes to it build the staging site, and production ships when a
+     `web-v*` release is cut). Name the branch for the batch it will carry, not one issue,
+     e.g. `<user>/changelog-YYYY-MM` (a `<user>/build-XXX-description` name is fine when you
+     know it will stay a single entry).
 3. Add or update the current month's post in `web/content/changelog/`. Follow the format in
    `web/content/changelog/_template.mdx` and the rules in `web/content/blog/README.md`
    (breaking changes first, one section per product area, each entry a `<ChangelogItem>`
-   with a one-line change + "WTM" explanation + full docs URLs).
-4. Open the companion PR there and attach it to the SAME Linear issue as the docs PR
-   (no separate issue; this is the documented exception to the 1:1 issue-per-PR rule).
-5. The issue stays `In Review` until BOTH PRs are merged. Merge the changelog PR after
-   (or together with) the docs PR so the changelog never links to unpublished docs.
+   with a one-line change + "WTM" explanation + full docs URLs). If your doc links are not
+   merged yet, add the entry without the links and note it in the PR, rather than linking to
+   pages that 404.
+4. Attach the changelog PR to the SAME Linear issue(s) as the docs work (no separate issue;
+   this is the documented exception to the 1:1 issue-per-PR rule, and a single changelog PR
+   may be attached to multiple issues).
+5. Each contributing issue stays `In Review` until BOTH its docs PR and the shared changelog
+   PR are merged. Keep the changelog PR open and accumulating until the batch is ready; merge
+   it after (or together with) the docs PRs so the changelog never links to unpublished docs.
 
 **When to add an entry:**
 - New API endpoints or products
